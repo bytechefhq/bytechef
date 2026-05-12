@@ -37,6 +37,9 @@ public class AgileCrmComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("agileCrm")
         .title("Agile CRM")
+        .version(1)
+        .customAction(true)
+        .customActionHelp("", "https://www.agilecrm.com/api")
         .description(
             "All-in-One CRM. Automate your sales, marketing, and service in one platform. Avoid data leaks and " +
                 "enable consistent messaging.")

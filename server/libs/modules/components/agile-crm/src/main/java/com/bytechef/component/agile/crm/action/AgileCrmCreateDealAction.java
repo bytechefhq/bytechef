@@ -180,6 +180,7 @@ public class AgileCrmCreateDealAction {
                                             .description("The calendar URL of the owner."))),
                         array("contacts")
                             .description("Contacts of the deal."))))
+        .help("", "https://docs.bytechef.io/reference/components/agile-crm_v1#create-deal")
         .perform(AgileCrmCreateDealAction::perform);
 
     private AgileCrmCreateDealAction() {

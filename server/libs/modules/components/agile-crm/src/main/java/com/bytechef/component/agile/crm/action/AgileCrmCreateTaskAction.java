@@ -76,6 +76,7 @@ public class AgileCrmCreateTaskAction {
                 .description("The due date of the task.")
                 .required(true))
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/agile-crm_v1#create-task")
         .perform(AgileCrmCreateTaskAction::perform);
 
     private AgileCrmCreateTaskAction() {
