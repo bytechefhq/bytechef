@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/agile-crm_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -2665,9 +2668,12 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new deal.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/agile-crm_v1#create-deal"
+    },
     "metadata": null,
-    "name": "crateDeal",
+    "name": "createDeal",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -4819,7 +4825,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/agile-crm_v1#create-task"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {
@@ -8976,7 +8985,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "crateDeal",
+    "name": "createDeal",
     "description": "Creates a new deal.",
     "element": { },
     "help": null,
@@ -12728,14 +12737,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/agile-crm_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.agilecrm.com/api"
+  },
   "description": "All-in-One CRM. Automate your sales, marketing, and service in one platform. Avoid data leaks and enable consistent messaging.",
   "icon": "path:assets/agile-crm.svg",
   "metadata": null,
@@ -12749,7 +12764,10 @@
     "deprecated": null,
     "description": "Triggers when a new task is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/agile-crm_v1#new-task"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newTask",
