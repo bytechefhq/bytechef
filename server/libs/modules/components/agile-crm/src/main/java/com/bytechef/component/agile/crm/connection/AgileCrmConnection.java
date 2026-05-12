@@ -32,6 +32,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public class AgileCrmConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/agile-crm_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://%s.agilecrm.com/dev/api"
             .formatted(connectionParameters.getRequiredString(DOMAIN)))
         .authorizations(

@@ -219,6 +219,7 @@ public class AgileCrmCreateContactAction {
                                     .description("The calendar URL of the owner."),
                                 string("calendarURL")
                                     .description("The calendar URL of the owner.")))))
+        .help("", "https://docs.bytechef.io/reference/components/agile-crm_v1#create-contact")
         .perform(AgileCrmCreateContactAction::perform);
 
     private AgileCrmCreateContactAction() {

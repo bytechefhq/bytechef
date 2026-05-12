@@ -47,6 +47,7 @@ public class AgileCrmNewTaskTrigger {
         .description("Triggers when a new task is added.")
         .type(TriggerType.POLLING)
         .output(outputSchema(TASK_OUTPUT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/agile-crm_v1#new-task")
         .poll(AgileCrmNewTaskTrigger::poll);
 
     private AgileCrmNewTaskTrigger() {
