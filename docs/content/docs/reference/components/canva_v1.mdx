@@ -1,0 +1,337 @@
+---
+title: "Canva"
+description: "Canva is a web and mobile application designed to help users create, design, and collaborate on visual content."
+---
+
+
+Categories: Productivity and Collaboration
+
+
+Type: canva/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### OAuth2 Authorization Code
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client id | STRING |  | true |
+| clientSecret | Client secret | STRING |  | true |
+
+
+
+## Connection Setup
+
+### Find Client ID and Secret
+
+1. Navigate to [Canva Developers page](https://www.canva.com/developers/integrations/connect-api).
+2. Click on **Create an integration**.
+3. Choose type of the integration and click on  **Create Integration**.
+4. Click on **Scopes**.
+5. Select following scopes:
+        - asset:read
+        - asset:write
+        - design:content:read
+        - design:content:write
+        - design:meta:read
+6. Click on **Authentication**.
+7. Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`.
+8. Click on **Configuration**.
+9. Click on **Generate secret**.
+10. Copy Client ID and Secret.
+11. Save changes.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/ccdd3dda-7af3-4e1e-b239-724bbd18128c?type=1&controls=on&skipIntro=false" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Create Design
+Name: createDesign
+
+`Create a Canva design.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| type | Type | STRING <details> <summary> Options </summary> <span>preset</span>, <span>custom</span> </details> |  | true |
+| name | Name | STRING <details> <summary> Options </summary> <span>doc</span>, <span>email</span>, <span>presentation</span>, <span>whiteboard</span> </details> | The name of the design type. | true |
+| width | Width | INTEGER | The width of the design, in pixels. | true |
+| height | Height | INTEGER | The height of the design, in pixels. | true |
+| title | Title | STRING | The name of the design. | false |
+| asset_id | Asset Id | STRING | The ID of an asset to insert into the created design. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Design",
+  "name" : "createDesign",
+  "parameters" : {
+    "type" : "",
+    "name" : "",
+    "width" : 1,
+    "height" : 1,
+    "title" : "",
+    "asset_id" : ""
+  },
+  "type" : "canva/v1/createDesign"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The design ID. |
+| owner | OBJECT <details> <summary> Properties </summary> &#123;STRING\(user_id), STRING\(team_id)&#125; </details> |  |
+| URLs | ARRAY <details> <summary> Items </summary> [STRING\($edit_url), STRING\($view_url)] </details> |  |
+| created_at | DATE_TIME | When the design was created in Canva. |
+| updated_at | DATE_TIME | When the design was last updated in Canva. |
+| title | STRING | The design title. |
+| thumbnail | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(width), INTEGER\(height), STRING\(url)&#125; </details> | A thumbnail image representing the object. |
+| page_count | INTEGER | The total number of pages in the design. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "owner" : {
+    "user_id" : "",
+    "team_id" : ""
+  },
+  "URLs" : [ "", "" ],
+  "created_at" : "2021-01-01T00:00:00",
+  "updated_at" : "2021-01-01T00:00:00",
+  "title" : "",
+  "thumbnail" : {
+    "width" : 1,
+    "height" : 1,
+    "url" : ""
+  },
+  "page_count" : 1
+}
+```
+
+#### Find Asset ID
+
+To find the Asset ID, click [here](/reference/components/canva_v1#how-to-find-your-canva-asset-id).
+
+
+
+### Export Design
+Name: exportDesign
+
+`Get the status and results of an export job, including link(s) to the downloadable file(s).`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| design_id | Design ID | STRING | The design ID. | true |
+| type | Type | STRING <details> <summary> Options </summary> <span title="Export the design as a PDF.">pdf</span>, <span title="Export the design as a JPEG.">jpg</span>, <span title="Export the design as a PNG.">png</span>, <span title="Export the design as a PPTX.">pptx</span>, <span title="Export the design as a GIF.">gif</span>, <span title="Export the design as an MP4.">mp4</span>, <span title="Export the email design as an HTML bundle.">html_bundle</span>, <span title="Export the email design as a standalone HTML file with hosted assets.">html_standalone</span> </details> |  | true |
+| quality | Quality | INTEGER | The quality of the exported JPEG that determines how compressed the exported file should be. | true |
+| video_quality | Video quality | STRING <details> <summary> Options </summary> <span>horizontal_480p</span>, <span>horizontal_720p</span>, <span>horizontal_1080p</span>, <span>horizontal_4k</span>, <span>vertical_480p</span>, <span>vertical_720p</span>, <span>vertical_1080p</span>, <span>vertical_4k</span> </details> | The orientation and resolution of the exported video. | true |
+| export_quality | Export quality | STRING <details> <summary> Options </summary> <span>regular</span>, <span>pro</span> </details> | Specifies the export quality of the design. | false |
+| width | Width | INTEGER | Specify the width in pixels of the exported image. | false |
+| height | Height | INTEGER | Specify the height in pixels of the exported image. | false |
+| size | Size | STRING <details> <summary> Options </summary> <span>a4</span>, <span>a3</span>, <span>letter</span>, <span>legal</span> </details> | The paper size of the export PDF file. | false |
+| lossless | Lossless | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true (default), the PNG is exported without compression. | false |
+| transparent_background | Transparent background | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If set to true, the PNG is exported with a transparent background. | false |
+| as_single_image | As single image | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | When true, multi-page designs are merged into a single image. | false |
+| pages | Pages | ARRAY <details> <summary> Items </summary> [INTEGER] </details> | To specify which pages to export in a multi-page design. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Export Design",
+  "name" : "exportDesign",
+  "parameters" : {
+    "design_id" : "",
+    "type" : "",
+    "quality" : 1,
+    "video_quality" : "",
+    "export_quality" : "",
+    "width" : 1,
+    "height" : 1,
+    "size" : "",
+    "lossless" : false,
+    "transparent_background" : false,
+    "as_single_image" : false,
+    "pages" : [ 1 ]
+  },
+  "type" : "canva/v1/exportDesign"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | The export job ID. |
+| status | STRING | The export status of the job. |
+| URLs | ARRAY <details> <summary> Items </summary> [STRING] </details> | Download URL(s) for the completed export job.  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "status" : "",
+  "URLs" : [ "" ]
+}
+```
+
+#### Find Design ID
+
+To find the Design ID, click [here](/reference/components/canva_v1#how-to-find-your-canva-design-id).
+
+
+
+### Upload Asset
+Name: uploadAsset
+
+`Get the status and results of an upload asset job.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| asset_name | Asset name | STRING | The asset's name. | true |
+| asset | Asset | FILE_ENTRY | Asset to upload. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload Asset",
+  "name" : "uploadAsset",
+  "parameters" : {
+    "asset_name" : "",
+    "asset" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "canva/v1/uploadAsset"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| job | OBJECT <details> <summary> Properties </summary> &#123;STRING\(id), STRING\(status), &#123;STRING\(id), STRING\(type), STRING\(name), [STRING]\(tags), &#123;STRING\(user_id), STRING\(team_id)&#125;\(owner), STRING\(created_at), STRING\(updated_at), &#123;STRING\(width), STRING\(height), STRING\(url)&#125;\(thumbnail)&#125;\(asset)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "job" : {
+    "id" : "",
+    "status" : "",
+    "asset" : {
+      "id" : "",
+      "type" : "",
+      "name" : "",
+      "tags" : [ "" ],
+      "owner" : {
+        "user_id" : "",
+        "team_id" : ""
+      },
+      "created_at" : "",
+      "updated_at" : "",
+      "thumbnail" : {
+        "width" : "",
+        "height" : "",
+        "url" : ""
+      }
+    }
+  }
+}
+```
+
+
+
+
+
+
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to Find Your Canva Design ID
+
+1. Open your design in Canva.
+2. Look at the URL in your browser. It will look similar to:
+
+   https://www.canva.com/design/DAF123abcXYZ/edit
+
+   The Design ID is a part after /design/ of the URL (DAF123abcXYZ in this example).
+
+### How to Find Your Canva Asset ID
+
+1. Navigate to the asset you uploaded (e.g., image, video, or file) from Projects, Uploads, or within a design in Canva.
+2. Click on the asset to open its preview or use it inside a design.
+3. Look at the URL in your browser. It will look similar to:
+
+    https://www.canva.com/uploads/Msd59349ff
+
+    The Asset ID is the value at the end of the URL (Msd59349ff in this example).
+
+
+
