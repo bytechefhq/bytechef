@@ -34,9 +34,11 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -76,16 +78,13 @@ class GotifySendMessageActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/message", stringArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        Body body = bodyArgumentCaptor.getValue();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
 
         Map<String, Object> expectedBody = Map.of(
             MESSAGE, "message",
@@ -93,8 +92,6 @@ class GotifySendMessageActionTest {
             TITLE, "title",
             EXTRAS, Map.of("top", Map.of("sub", Map.of("key", "value"))));
 
-        assertEquals(expectedBody, body.getContent());
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals("/message", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
