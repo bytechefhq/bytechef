@@ -1,0 +1,27 @@
+#### Find your Pipeline ID
+
+Only by using the Agile CRM API `/milestone/pipelines`.
+
+** Via API **
+
+* Use the `GET /milestone/pipelines` endpoint.
+* Returns a list of available pipelines in your Agile CRM account.
+* In the response, locate the `id` property for the pipeline you want to use.
+
+#### Find your Milestone
+
+1. Click on your profile icon in the right upper corner
+2. Click on "Admin settings"
+3. Click on "Deals"
+4. Open tab "Tracks and Milestones"
+5. There you will see Tracks (Pipelines) and their Milestones
+
+#### Find your Owner ID
+
+Only by using the Agile CRM API `/contacts`.
+
+** Via API **
+
+* Use the `GET /contacts` endpoint.
+* Returns a list of contacts in your Agile CRM account.
+* In the response, locate the `owner` object and use the `id` field as the Owner ID.
