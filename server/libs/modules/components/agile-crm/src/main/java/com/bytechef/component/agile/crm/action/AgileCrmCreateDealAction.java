@@ -48,7 +48,7 @@ import java.util.Map;
  */
 public class AgileCrmCreateDealAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("crateDeal")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("createDeal")
         .title("Create Deal")
         .description("Creates a new deal.")
         .properties(
