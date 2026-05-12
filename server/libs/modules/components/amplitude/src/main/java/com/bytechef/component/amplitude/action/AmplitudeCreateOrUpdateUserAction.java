@@ -113,6 +113,7 @@ public class AmplitudeCreateOrUpdateUserAction {
             outputSchema(
                 string()
                     .description("Response message")))
+        .help("", "https://docs.bytechef.io/reference/components/amplitude_v1#create-or-update-user")
         .perform(AmplitudeCreateOrUpdateUserAction::perform);
 
     private AmplitudeCreateOrUpdateUserAction() {

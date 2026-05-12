@@ -35,6 +35,9 @@ public class AmplitudeComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("amplitude")
         .title("Amplitude")
+        .version(1)
+        .customAction(true)
+        .customActionHelp("", "https://amplitude.com/docs/apis")
         .description(
             "Build better products by turning your user data into meaningful insights, using Amplitude's digital " +
                 "analytics platform and experimentation tools.")
