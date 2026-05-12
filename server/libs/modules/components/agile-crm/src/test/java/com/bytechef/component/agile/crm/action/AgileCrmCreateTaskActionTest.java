@@ -21,46 +21,55 @@ import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.PRIORI
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.SUBJECT;
 import static com.bytechef.component.agile.crm.constant.AgileCrmConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AgileCrmCreateTaskActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final LocalDateTime mockDate = LocalDateTime.of(2025, 5, 12, 8, 45, 0);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final LocalDateTime mockDate = LocalDateTime.of(
+        2025, 5, 12, 8, 45, 0);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SUBJECT, "test", TYPE, "testing", PRIORITY_TYPE, "priorityType", DUE, mockDate));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final Map<String, Object> responseMap = Map.of();
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void perform() {
-        when(mockedContext.http(any()))
+    void perform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -68,8 +77,8 @@ class AgileCrmCreateTaskActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        Body body = bodyArgumentCaptor.getValue();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/tasks", stringArgumentCaptor.getValue());
 
         long epochSecond = mockDate.atZone(ZoneId.systemDefault())
             .toEpochSecond();
@@ -77,6 +86,10 @@ class AgileCrmCreateTaskActionTest {
         Map<String, Object> expectedBody = Map.of(
             SUBJECT, "test", TYPE, "testing", PRIORITY_TYPE, "priorityType", DUE, epochSecond);
 
-        assertEquals(expectedBody, body.getContent());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }
