@@ -136,7 +136,7 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         return clusterElementDefinitionFacade.executeOptions(
             clusterElementWorkflowNodeType.name(), clusterElementWorkflowNodeType.version(),
             clusterElementWorkflowNodeType.operation(), propertyName,
-            evaluator.evaluate(clusterElement.getParameters(), context), clusterElement.getExtensions(),
+            evaluator.evaluate(clusterElement.getParameters(), context), workflowTask.getExtensions(),
             lookupDependsOnPaths, searchText, connectionId, clusterElementConnectionIds,
             clusterElementInputParameters);
     }
