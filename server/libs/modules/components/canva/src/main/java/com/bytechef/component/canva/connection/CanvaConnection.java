@@ -57,11 +57,28 @@ public class CanvaConnection {
                 .scopes((connection, context) -> {
                     Map<String, Boolean> map = new LinkedHashMap<>();
 
+                    map.put("app:read", false);
+                    map.put("app:write", false);
                     map.put("asset:read", true);
                     map.put("asset:write", true);
+                    map.put("brandtemplate:content:read", false);
+                    map.put("brandtemplate:content:write", false);
+                    map.put("brandtemplate:meta:read", false);
+                    map.put("brandtemplate:meta:write", false);
+                    map.put("comment:read", false);
+                    map.put("comment:write", false);
                     map.put("design:content:read", true);
                     map.put("design:content:write", true);
                     map.put("design:meta:read", true);
+                    map.put("design:meta:write", false);
+                    map.put("design:permission:read", false);
+                    map.put("design:permission:write", false);
+                    map.put("folder:read", false);
+                    map.put("folder:write", false);
+                    map.put("folder:permission:read", false);
+                    map.put("folder:permission:write", false);
+                    map.put("profile:read", false);
+                    map.put("profile:write", false);
 
                     return map;
                 })
