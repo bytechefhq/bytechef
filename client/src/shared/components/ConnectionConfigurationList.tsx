@@ -16,6 +16,7 @@ interface ConnectionConfigurationListFormFieldProps {
     connectionDialogAllowed: boolean;
     connections: ConnectionI[];
     control: Control<FieldValues>;
+    currentConnectionId?: number;
     groupedIndices?: number[];
     index: number;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
@@ -28,6 +29,7 @@ const ConnectionConfigurationListFormField = ({
     connectionDialogAllowed,
     connections,
     control,
+    currentConnectionId,
     groupedIndices,
     handleConnectionDialogOpen,
     handleConnectionIdChange,
@@ -95,7 +97,13 @@ const ConnectionConfigurationListFormField = ({
 
                     <Select
                         onValueChange={handleConnectionValueChange}
-                        value={field.value ? field.value.toString() : undefined}
+                        value={
+                            currentConnectionId != null
+                                ? currentConnectionId.toString()
+                                : field.value
+                                  ? field.value.toString()
+                                  : undefined
+                        }
                     >
                         <FormControl className="flex space-x-2">
                             <div className="flex space-x-2">
@@ -151,6 +159,7 @@ interface ConnectionConfigurationListProps {
     connections: ConnectionI[];
     connectionsGrouped?: boolean;
     control: Control<FieldValues>;
+    getCurrentConnectionId?: (index: number) => number | undefined;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
     handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
     workflow: Workflow;
@@ -162,6 +171,7 @@ const ConnectionConfigurationList = ({
     connections,
     connectionsGrouped = false,
     control,
+    getCurrentConnectionId,
     handleConnectionDialogOpen,
     handleConnectionIdChange,
     workflow,
@@ -229,11 +239,12 @@ const ConnectionConfigurationList = ({
                     connectionDialogAllowed={connectionDialogAllowed}
                     connections={connections}
                     control={control}
+                    currentConnectionId={getCurrentConnectionId?.(index)}
                     groupedIndices={groupedIndices}
                     handleConnectionDialogOpen={handleConnectionDialogOpen}
                     handleConnectionIdChange={handleConnectionIdChange}
                     index={index}
-                    key={`${connection.workflowNodeName}_${connection.key}`}
+                    key={`${connection.workflowNodeName}_${connection.key}_${connectionsGrouped}`}
                     workflowNodeLabel={
                         groupedIndices ? undefined : workflowNodeLabelMap.get(connection.workflowNodeName)
                     }
