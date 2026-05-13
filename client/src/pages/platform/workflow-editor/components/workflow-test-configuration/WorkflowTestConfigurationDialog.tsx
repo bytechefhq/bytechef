@@ -11,7 +11,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
-import {Label} from '@/components/ui/label';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
@@ -31,11 +30,12 @@ import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platf
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
 import {PropertyAllType} from '@/shared/types';
+import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {FileInputIcon, InfoIcon, Link2Icon} from 'lucide-react';
 import {useState} from 'react';
-import {Control, FieldValues, useForm} from 'react-hook-form';
+import {Control, FieldValues, useForm, useWatch} from 'react-hook-form';
 
 interface WorkflowTestConfigurationDialogProps {
     onClose: () => void;
@@ -90,6 +90,23 @@ const WorkflowTestConfigurationDialog = ({
     });
 
     const {control, formState, handleSubmit, setValue} = form;
+
+    const watchedConnections = useWatch({control, name: 'connections'});
+
+    const handleConnectionsGroupedChange = (grouped: boolean) => {
+        setConnectionsGrouped(grouped);
+
+        if (!grouped) {
+            return;
+        }
+
+        synchronizeGroupedConnections({
+            componentConnections,
+            getConnectionId: (index) => watchedConnections?.[index]?.connectionId,
+            setConnectionId: (index, connectionId) =>
+                setValue(`connections.${index}.connectionId`, connectionId as number, {shouldDirty: true}),
+        });
+    };
 
     const inputs: WorkflowInput[] = workflow.inputs ?? [];
 
@@ -170,6 +187,7 @@ const WorkflowTestConfigurationDialog = ({
                                         connections={connections}
                                         connectionsGrouped={connectionsGrouped}
                                         control={control as unknown as Control<FieldValues>}
+                                        getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
                                         handleConnectionDialogOpen={(componentConnection) => {
                                             setComponentConnection(componentConnection);
 
@@ -223,7 +241,7 @@ const WorkflowTestConfigurationDialog = ({
                                 <Switch
                                     checked={connectionsGrouped}
                                     label="Group Connections"
-                                    onCheckedChange={setConnectionsGrouped}
+                                    onCheckedChange={handleConnectionsGroupedChange}
                                 />
 
                                 <Tooltip>
