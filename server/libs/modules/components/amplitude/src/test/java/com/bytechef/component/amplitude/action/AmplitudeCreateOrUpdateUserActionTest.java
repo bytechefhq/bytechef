@@ -24,46 +24,53 @@ import static com.bytechef.component.amplitude.constant.AmplitudeConstants.IDENT
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.KEY;
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.USER_PROPERTIES;
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.VALUE;
-import static com.bytechef.component.definition.Context.Http.responseType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.amplitude.util.AmplitudeUtils;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AmplitudeCreateOrUpdateUserActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final Map<String, Object> mockedIdentification = Map.of();
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", ID, "id", USER_PROPERTIES,
             List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private final Response mockedResponse = mock(Response.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String identificationJson = "identificationJson";
         String responseString = "response";
 
@@ -76,16 +83,12 @@ class AmplitudeCreateOrUpdateUserActionTest {
             when(mockedContext.json(any()))
                 .thenReturn(identificationJson);
 
-            when(mockedContext.http(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(responseType(any())))
+            when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.body(bodyArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(String.class))
                 .thenReturn(responseString);
 
@@ -93,13 +96,19 @@ class AmplitudeCreateOrUpdateUserActionTest {
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseString, response);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.TEXT, configuration.getResponseType());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of(CONTENT_TYPE, CONTENT_TYPE_URLENCODED), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("/identify", CONTENT_TYPE, CONTENT_TYPE_URLENCODED),
+                stringArgumentCaptor.getAllValues());
 
-            Body body = bodyArgumentCaptor.getValue();
+            Map<String, Object> expectedBody = Map.of(API_KEY, "api_key", IDENTIFICATION, identificationJson);
 
-            assertEquals(Map.of(API_KEY, "api_key", IDENTIFICATION, identificationJson), body.getContent());
-            assertEquals(BodyContentType.FORM_URL_ENCODED, body.getContentType());
+            assertEquals(Body.of(expectedBody, Http.BodyContentType.FORM_URL_ENCODED), bodyArgumentCaptor.getValue());
         }
     }
 }
