@@ -156,7 +156,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
             public <T> T resolve(
                 ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction) {
 
-                ClusterElement clusterElement = clusterElementMap.fetchClusterElement(clusterElementType)
+                ClusterElement clusterElement = clusterElementMap.fetchClusterElementRecursively(clusterElementType)
                     .orElse(null);
 
                 if (clusterElement == null) {
@@ -179,7 +179,7 @@ public class ClusterElementDefinitionFacadeImpl implements ClusterElementDefinit
 
                 return clusterElementFunction.apply(
                     clusterElementObject, ParametersFactory.create(inputParameters),
-                    ParametersFactory.create(clusterElementConnection.getParameters()),
+                    ParametersFactory.create(clusterElementConnection),
                     ParametersFactory.create(clusterElement.getExtensions()), clusterElementConnections, context);
             }
         };

@@ -25,6 +25,7 @@ import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 
@@ -34,6 +35,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 @ExtendWith(ObjectMapperSetupExtension.class)
 class ClusterElementMapTest {
 
+    private static final ClusterElementType DATA_SOURCE = new ClusterElementType(
+        "DATA_SOURCE", "dataSource", "Data Source");
+    private static final ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
     private static final ClusterElementType TOOLS = new ClusterElementType("TOOLS", "tools", "Tools", true, false);
 
     @Test
@@ -92,5 +96,142 @@ class ClusterElementMapTest {
 
         assertThatThrownBy(() -> clusterElementMap.getClusterElement(TOOLS, "missing_1"))
             .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testFetchClusterElementRecursivelyFindsSibling() {
+        Map<String, Object> sourceElement = Map.of(
+            WorkflowConstants.NAME, "airtable_1",
+            WorkflowConstants.TYPE, "airtable/v1/airtableSource",
+            WorkflowConstants.PARAMETERS, Map.of());
+
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of(
+                "source", sourceElement,
+                "destination", Map.of(
+                    WorkflowConstants.NAME, "csvFile_1",
+                    WorkflowConstants.TYPE, "csvFile/v1/csvFileDestination",
+                    WorkflowConstants.PARAMETERS, Map.of()),
+                "processor", Map.of(
+                    WorkflowConstants.NAME, "dataStreamProcessor_1",
+                    WorkflowConstants.TYPE, "dataStreamProcessor/v1/fieldMapper",
+                    WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        Optional<ClusterElement> clusterElementOptional = clusterElementMap.fetchClusterElementRecursively(SOURCE);
+
+        assertThat(clusterElementOptional).isPresent();
+
+        ClusterElement clusterElement = clusterElementOptional.get();
+
+        assertThat(clusterElement.getWorkflowNodeName()).isEqualTo("airtable_1");
+
+        assertThat(clusterElement.getComponentName()).isEqualTo("airtable");
+    }
+
+    @Test
+    void testFetchClusterElementRecursivelyFindsNestedChild() {
+        Map<String, Object> dataSourceElement = Map.of(
+            WorkflowConstants.NAME, "postgres_1",
+            WorkflowConstants.TYPE, "postgres/v1/dataSource",
+            WorkflowConstants.PARAMETERS, Map.of());
+
+        Map<String, Object> chatMemoryElement = Map.of(
+            WorkflowConstants.NAME, "jdbcChatMemory_1",
+            WorkflowConstants.TYPE, "jdbcChatMemory/v1/chatMemory",
+            WorkflowConstants.PARAMETERS, Map.of(),
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("dataSource", dataSourceElement));
+
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("chatMemory", chatMemoryElement));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        Optional<ClusterElement> clusterElementOptional = clusterElementMap.fetchClusterElementRecursively(DATA_SOURCE);
+
+        assertThat(clusterElementOptional).isPresent();
+
+        ClusterElement clusterElement = clusterElementOptional.get();
+
+        assertThat(clusterElement.getWorkflowNodeName()).isEqualTo("postgres_1");
+
+        assertThat(clusterElement.getComponentName()).isEqualTo("postgres");
+    }
+
+    @Test
+    void testFetchClusterElementRecursivelyReturnsEmptyWhenAbsent() {
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("chatMemory", Map.of(
+                WorkflowConstants.NAME, "jdbcChatMemory_1",
+                WorkflowConstants.TYPE, "jdbcChatMemory/v1/chatMemory",
+                WorkflowConstants.PARAMETERS, Map.of())));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        assertThat(clusterElementMap.fetchClusterElementRecursively(DATA_SOURCE)).isEmpty();
+        assertThat(clusterElementMap.fetchClusterElementRecursively(SOURCE)).isEmpty();
+    }
+
+    @Test
+    void testFetchClusterElementRecursivelyPrefersTopLevelOverNested() {
+        Map<String, Object> nestedDataSource = Map.of(
+            WorkflowConstants.NAME, "nested_dataSource_1",
+            WorkflowConstants.TYPE, "postgres/v1/dataSource",
+            WorkflowConstants.PARAMETERS, Map.of());
+
+        Map<String, Object> chatMemoryElement = Map.of(
+            WorkflowConstants.NAME, "jdbcChatMemory_1",
+            WorkflowConstants.TYPE, "jdbcChatMemory/v1/chatMemory",
+            WorkflowConstants.PARAMETERS, Map.of(),
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("dataSource", nestedDataSource));
+
+        Map<String, Object> topLevelDataSource = Map.of(
+            WorkflowConstants.NAME, "top_dataSource_1",
+            WorkflowConstants.TYPE, "mysql/v1/dataSource",
+            WorkflowConstants.PARAMETERS, Map.of());
+
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS,
+            Map.of("dataSource", topLevelDataSource, "chatMemory", chatMemoryElement));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        Optional<ClusterElement> clusterElementOptional = clusterElementMap.fetchClusterElementRecursively(DATA_SOURCE);
+
+        assertThat(clusterElementOptional).isPresent();
+
+        ClusterElement clusterElement = clusterElementOptional.get();
+
+        assertThat(clusterElement.getWorkflowNodeName()).isEqualTo("top_dataSource_1");
+    }
+
+    @Test
+    void testFetchClusterElementRecursivelyWalksIntoListEntries() {
+        Map<String, Object> nestedDataSource = Map.of(
+            WorkflowConstants.NAME, "postgres_1",
+            WorkflowConstants.TYPE, "postgres/v1/dataSource",
+            WorkflowConstants.PARAMETERS, Map.of());
+
+        Map<String, Object> toolWithDataSource = Map.of(
+            WorkflowConstants.NAME, "aiAgent_tool_1",
+            WorkflowConstants.TYPE, "aiAgent/v1/tool",
+            WorkflowConstants.PARAMETERS, Map.of(),
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("dataSource", nestedDataSource));
+
+        Map<String, Object> extensions = Map.of(
+            WorkflowExtConstants.CLUSTER_ELEMENTS, Map.of("tools", List.of(toolWithDataSource)));
+
+        ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
+
+        Optional<ClusterElement> clusterElementOptional = clusterElementMap.fetchClusterElementRecursively(DATA_SOURCE);
+
+        assertThat(clusterElementOptional).isPresent();
+
+        ClusterElement clusterElement = clusterElementOptional.get();
+
+        assertThat(clusterElement.getWorkflowNodeName()).isEqualTo("postgres_1");
     }
 }

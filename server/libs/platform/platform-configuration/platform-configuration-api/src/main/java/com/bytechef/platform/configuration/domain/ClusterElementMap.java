@@ -105,6 +105,56 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
             .map(value -> (ClusterElement) value);
     }
 
+    /**
+     * Resolves a single-instance cluster element by type, searching the top-level entries first and then walking
+     * recursively into the extensions of any nested cluster elements. Used by option/dynamic-property resolvers where
+     * the caller wants the target element regardless of whether it is a sibling of the current element or nested inside
+     * one of its siblings.
+     */
+    public Optional<ClusterElement> fetchClusterElementRecursively(ClusterElementType clusterElementType) {
+        Optional<ClusterElement> clusterElementOptional = fetchClusterElement(clusterElementType);
+
+        if (clusterElementOptional.isPresent()) {
+            return clusterElementOptional;
+        }
+
+        for (Entry<String, Object> entry : entrySet) {
+            Object value = entry.getValue();
+
+            if (value instanceof ClusterElement clusterElement) {
+                Optional<ClusterElement> nested = searchInsideRecursively(clusterElement, clusterElementType);
+
+                if (nested.isPresent()) {
+                    return nested;
+                }
+            } else if (value instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof ClusterElement clusterElement) {
+                        Optional<ClusterElement> nested = searchInsideRecursively(clusterElement, clusterElementType);
+
+                        if (nested.isPresent()) {
+                            return nested;
+                        }
+                    }
+                }
+            }
+        }
+
+        return Optional.empty();
+    }
+
+    private static Optional<ClusterElement> searchInsideRecursively(
+        ClusterElement clusterElement, ClusterElementType clusterElementType) {
+
+        Map<String, ?> extensions = clusterElement.getExtensions();
+
+        if (extensions == null || !extensions.containsKey(WorkflowExtConstants.CLUSTER_ELEMENTS)) {
+            return Optional.empty();
+        }
+
+        return of(extensions).fetchClusterElementRecursively(clusterElementType);
+    }
+
     public ClusterElement getClusterElement(ClusterElementType clusterElementType) {
         Object value = super.get(clusterElementType.key());
 
