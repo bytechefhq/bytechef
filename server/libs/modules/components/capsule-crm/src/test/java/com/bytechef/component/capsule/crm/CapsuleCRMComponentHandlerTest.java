@@ -26,7 +26,6 @@ class CapsuleCRMComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/capsule-crm_v1.json", new CapsuleCRMComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/capsule-crm_v1.json", new CapsuleCRMComponentHandler().getDefinition());
     }
 }

@@ -22,15 +22,17 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DE
 import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.DUE_ON;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,30 +51,20 @@ class CapsuleCRMCreateTaskActionTest extends AbstractCapsuleCRMActionTest {
 
         Map<String, Object> propertyStubsMap = createPropertyStubsMap();
 
-        when(mockedParameters.getRequiredString(DESCRIPTION))
-            .thenReturn((String) propertyStubsMap.get(DESCRIPTION));
-        when(mockedParameters.getDate(DUE_ON))
-            .thenReturn((Date) propertyStubsMap.get(DUE_ON));
-        when(mockedParameters.getString(DETAIL))
-            .thenReturn((String) propertyStubsMap.get(DETAIL));
-        when(mockedParameters.get(CATEGORY))
-            .thenReturn(propertyStubsMap.get(CATEGORY));
+        mockedParameters = MockParametersFactory.create(propertyStubsMap);
 
         Object result = CapsuleCRMCreateTaskAction.perform(mockedParameters, null, mockedContext);
 
-        assertEquals(responeseMap, result);
-
+        assertEquals(responseMap, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/tasks", stringArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
-        assertEquals("/tasks", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of("task", propertyStubsMap), body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(Map.of("task", propertyStubsMap), BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     private static Map<String, Object> createPropertyStubsMap() {
