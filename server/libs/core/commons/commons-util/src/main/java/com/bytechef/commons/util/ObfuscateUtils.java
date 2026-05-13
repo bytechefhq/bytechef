@@ -16,8 +16,11 @@
 
 package com.bytechef.commons.util;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -26,9 +29,30 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ObfuscateUtils {
 
-    private static final String SECURITY_INSENSITIVE_KEYS =
-        ":authorizationUrl:authorizationType:bucketName:clientId:headerPrefix:refreshUrl:region:scopes:tokenUrl:";
-    private static final String SECURITY_SENSITIVE_KEYS = ":password:";
+    private static final Set<String> SECURITY_INSENSITIVE_KEYS;
+    private static final Set<String> SECURITY_SENSITIVE_KEYS;
+
+    static {
+        Set<String> insensitiveKeys = new HashSet<>(
+            Set.of(
+                "addTo", "authorizationType", "authorizationUrl", "base", "baseUri", "baseUrl", "bucketName",
+                "clientId", "collection", "collectionName", "companyDomain", "companyId", "connectionString",
+                "containerName", "contactPoints", "cryptoProtocol", "database", "databaseName", "datacenter",
+                "deployment", "dimensions", "distanceType", "domain", "embeddingDimension", "endpoint", "headerPrefix",
+                "host", "indexName", "initializeSchema", "instance_url", "keyPrefix", "keyspace", "optimization",
+                "organization_id", "port", "protocol", "publicEndpoint", "refreshUrl", "region", "schemaName",
+                "scopeName", "scopes", "serverUrl", "shopName", "similarity", "siteName", "subdomain", "table",
+                "tableName", "timeToLive", "tokenUrl", "uri", "url", "username", "website"));
+
+        SECURITY_INSENSITIVE_KEYS = Collections.unmodifiableSet(insensitiveKeys);
+
+        Set<String> sensitiveKeys = new HashSet<>(Set.of("password"));
+
+        SECURITY_SENSITIVE_KEYS = Collections.unmodifiableSet(sensitiveKeys);
+    }
+
+    private ObfuscateUtils() {
+    }
 
     /**
      * Obfuscates original string value. Argument maxLength value may be used to influence the length of new obfuscated
@@ -69,13 +93,11 @@ public class ObfuscateUtils {
             (key, valueIn) -> {
                 obfuscatedMap.computeIfAbsent(
                     key, k -> {
-                        var keyExpression = String.format(":%s:", key);
-
-                        if (SECURITY_INSENSITIVE_KEYS.contains(keyExpression)) {
+                        if (SECURITY_INSENSITIVE_KEYS.contains(key)) {
                             return String.valueOf(valueIn);
                         }
 
-                        int secureVisibleLength = getSecureVisibleLength(keyExpression, visibleLength);
+                        int secureVisibleLength = getSecureVisibleLength(key, visibleLength);
 
                         return obfuscate(String.valueOf(valueIn), maxLength, secureVisibleLength);
                     });
@@ -94,7 +116,7 @@ public class ObfuscateUtils {
      * @return secure visible length
      */
     private static int getSecureVisibleLength(String keyName, int expectedVisibleLength) {
-        if (SECURITY_SENSITIVE_KEYS.contains(String.valueOf(keyName))) {
+        if (SECURITY_SENSITIVE_KEYS.contains(keyName)) {
             return 0;
         }
 
