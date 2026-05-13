@@ -39,6 +39,8 @@ import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
+import com.bytechef.platform.configuration.domain.WorkflowTestConfigurationConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
@@ -184,6 +186,74 @@ class WorkflowNodeOptionFacadeTest {
             verify(actionDefinitionFacade).executeOptions(
                 eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(),
                 anyMap());
+        }
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testGetWorkflowNodeOptionsForActionFiltersConnectionsByNodeName() {
+        String workflowId = "workflow1";
+        String workflowNodeName = "agent1";
+        String otherWorkflowNodeName = "agent2";
+        String sharedConnectionKey = "jdbc";
+        String propertyName = "model";
+        long agent1ConnectionId = 100L;
+        long agent2ConnectionId = 200L;
+        long environmentId = 1L;
+
+        WorkflowTestConfigurationConnection agent1Connection = new WorkflowTestConfigurationConnection(
+            agent1ConnectionId, sharedConnectionKey, workflowNodeName);
+        WorkflowTestConfigurationConnection agent2Connection = new WorkflowTestConfigurationConnection(
+            agent2ConnectionId, sharedConnectionKey, otherWorkflowNodeName);
+
+        WorkflowTestConfiguration workflowTestConfiguration = mock(WorkflowTestConfiguration.class);
+
+        when(workflowTestConfiguration.getConnections()).thenReturn(List.of(agent1Connection, agent2Connection));
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(workflowId, environmentId))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+        doReturn(Map.of()).when(workflowTestConfigurationService)
+            .getWorkflowTestConfigurationInputs(workflowId, environmentId);
+
+        Workflow workflow = mock(Workflow.class);
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+        when(workflow.getTask(workflowNodeName)).thenReturn(workflowTask);
+        when(workflowTask.getType()).thenReturn("httpClient/v1/get");
+        when(workflowTask.getName()).thenReturn(workflowNodeName);
+        doReturn(Map.of()).when(workflowTask)
+            .evaluateParameters(anyMap(), any(Evaluator.class));
+        doReturn(Map.of()).when(workflowTask)
+            .getExtensions();
+
+        doReturn(Map.of()).when(workflowNodeOutputFacade)
+            .getPreviousWorkflowNodeSampleOutputs(eq(workflowId), eq(workflowNodeName), eq(environmentId));
+
+        List<Option> expectedOptions = List.of(mock(Option.class));
+
+        when(actionDefinitionFacade.executeOptions(
+            eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(), anyMap(), anyMap()))
+                .thenReturn(expectedOptions);
+
+        try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.fetch(workflow, workflowNodeName))
+                .thenReturn(Optional.empty());
+
+            List<Option> result = workflowNodeOptionFacade.getWorkflowNodeOptions(
+                workflowId, workflowNodeName, propertyName, List.of(), null, environmentId);
+
+            assertEquals(expectedOptions, result);
+
+            ArgumentCaptor<Map<String, Long>> connectionIdsCaptor = ArgumentCaptor.forClass(Map.class);
+
+            verify(actionDefinitionFacade).executeOptions(
+                eq("httpClient"), eq(1), eq("get"), eq(propertyName), anyMap(), anyList(), isNull(),
+                connectionIdsCaptor.capture(), anyMap());
+
+            Map<String, Long> capturedConnectionIds = connectionIdsCaptor.getValue();
+
+            assertEquals(1, capturedConnectionIds.size());
+            assertEquals(agent1ConnectionId, capturedConnectionIds.get(sharedConnectionKey));
         }
     }
 

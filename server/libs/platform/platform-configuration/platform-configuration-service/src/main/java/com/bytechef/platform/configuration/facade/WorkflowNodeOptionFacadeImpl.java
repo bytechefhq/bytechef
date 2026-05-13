@@ -230,6 +230,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                         .stream()
                         .flatMap(workflowTestConfiguration -> CollectionUtils.stream(
                             workflowTestConfiguration.getConnections()))
+                        .filter(connection -> Objects.equals(
+                            connection.getWorkflowNodeName(), workflowNodeName))
                         .collect(Collectors.toMap(
                             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
                             WorkflowTestConfigurationConnection::getConnectionId));
