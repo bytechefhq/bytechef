@@ -12,12 +12,6 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
 | `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `ANTHROPIC` |
 
-## AI Command Center Configuration
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_AI_COMMAND_CENTER_ENABLED` | Enable or disable the AI Command Center surface (REST/GraphQL controllers, JDBC repositories, service beans) | `false` |
-
 ## AI Firecrawl Configuration
 
 | Environment Variable | Description | Default Value |
@@ -25,16 +19,6 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_FIRECRAWL_API_KEY` | Firecrawl API key (sensitive) | - |
 | `BYTECHEF_AI_FIRECRAWL_BASE_URL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
 | `BYTECHEF_AI_FIRECRAWL_ENABLED` | Enable or disable Firecrawl | `false` |
-
-## AI Gateway Configuration
-
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_AI_GATEWAY_ENABLED` | Enable or disable the AI Gateway | `false` |
-| `BYTECHEF_AI_GATEWAY_OTLP_MAX_SPANS_PER_REQUEST` | Maximum spans accepted in a single OTLP request body. Requests exceeding this return HTTP 413. | `1000` |
-| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_ENABLED` | Enable or disable AI Gateway rate limiting | `false` |
-| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_PROVIDER` | Rate limiting provider | - |
-| `BYTECHEF_AI_GATEWAY_EXTERNAL_SCORES_MAX_BATCH_SIZE` | Maximum scores accepted in a single batch POST. Requests exceeding this return HTTP 413. | `1000` |
 
 ## AI Knowledge Base Configuration
 
