@@ -15,7 +15,7 @@ export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
     formState: FormState<IntegrationInstanceConfiguration>;
     label: string;
     setValue: UseFormSetValue<IntegrationInstanceConfiguration>;
-    switchHidden?: boolean;
+    showWorkflowToggle?: boolean;
     workflow: Workflow;
     workflowIndex: number;
 }
@@ -26,7 +26,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
     formState,
     label,
     setValue,
-    switchHidden = false,
+    showWorkflowToggle = false,
     workflow,
     workflowIndex,
 }: IntegrationInstanceConfigurationDialogWorkflowListItemProps) => {
@@ -47,7 +47,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
 
     return (
         <div>
-            {!switchHidden && (
+            {showWorkflowToggle && (
                 <div className="flex cursor-pointer justify-between py-2">
                     <span className="font-semibold">{label}</span>
 
@@ -61,7 +61,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
                 </div>
             )}
 
-            {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
+            {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
                 <ul className="mt-2 space-y-6">
                     <li className="flex flex-col gap-3">
                         <Label className="text-base font-semibold">Inputs</Label>

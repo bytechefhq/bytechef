@@ -477,136 +477,131 @@ const ProjectDeploymentDialog = ({
                 onClick={(event) => event.stopPropagation()}
                 onInteractOutside={(event) => event.preventDefault()}
             >
-                <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
-                        <div className="flex w-full flex-col space-y-1">
-                            <DialogTitle>
-                                {effectiveChangeProjectVersion
-                                    ? 'Change Project Version'
-                                    : `${effectiveProjectDeployment?.id ? 'Edit' : 'New'} Deployment ${!effectiveProjectDeployment?.id ? '-' : ''} ${
-                                          !effectiveProjectDeployment?.id
-                                              ? projectDeploymentDialogSteps[activeStepIndex].name
-                                              : ''
-                                      }`}
-                            </DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
+                    <div className="flex w-full flex-col space-y-1">
+                        <DialogTitle>
+                            {effectiveChangeProjectVersion
+                                ? 'Change Project Version'
+                                : `${effectiveProjectDeployment?.id ? 'Edit' : 'New'} Deployment ${!effectiveProjectDeployment?.id ? '-' : ''} ${
+                                      !effectiveProjectDeployment?.id
+                                          ? projectDeploymentDialogSteps[activeStepIndex].name
+                                          : ''
+                                  }`}
+                        </DialogTitle>
 
-                            {!effectiveProjectDeployment?.id && !effectiveChangeProjectVersion && (
-                                <nav aria-label="Progress">
-                                    <ol className="space-y-4 md:flex md:space-y-0" role="list">
-                                        {projectDeploymentDialogSteps.map((step, index) => (
-                                            <li className="md:flex-1" key={step.name}>
-                                                <div
-                                                    className={twMerge(
-                                                        'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0',
-                                                        index <= activeStepIndex
-                                                            ? 'border-gray-900 hover:border-gray-800'
-                                                            : 'hover:border-gray-30 border-gray-200'
-                                                    )}
-                                                />
-                                            </li>
-                                        ))}
-                                    </ol>
-                                </nav>
-                            )}
-                        </div>
-
-                        <DialogCloseButton />
-                    </DialogHeader>
-
-                    <WorkflowMockProvider>
-                        <div
-                            className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}
-                        >
-                            {activeStepIndex === 1 && isWorkflowsPending ? (
-                                <div className="flex justify-center py-12">
-                                    <LoadingDots />
-                                </div>
-                            ) : (
-                                projectDeploymentDialogSteps[activeStepIndex].content
-                            )}
-                        </div>
-                    </WorkflowMockProvider>
-
-                    <DialogFooter className="p-6">
-                        {activeStepIndex === 0 && (
-                            <>
-                                <DialogClose asChild>
-                                    <Button label="Cancel" variant="outline" />
-                                </DialogClose>
-
-                                {(!effectiveProjectDeployment?.id || effectiveChangeProjectVersion) && (
-                                    <Button
-                                        disabled={
-                                            basicStepTab === 'change-version' &&
-                                            !projectDeploymentsLoading &&
-                                            (projectDeployments?.length ?? 0) === 0 &&
-                                            showTabs
-                                        }
-                                        label="Next"
-                                        onClick={handleSubmit(handleNextClick)}
-                                    />
-                                )}
-                            </>
+                        {!effectiveProjectDeployment?.id && !effectiveChangeProjectVersion && (
+                            <nav aria-label="Progress">
+                                <ol className="space-y-4 md:flex md:space-y-0" role="list">
+                                    {projectDeploymentDialogSteps.map((step, index) => (
+                                        <li className="md:flex-1" key={step.name}>
+                                            <div
+                                                className={twMerge(
+                                                    'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0',
+                                                    index <= activeStepIndex
+                                                        ? 'border-gray-900 hover:border-gray-800'
+                                                        : 'hover:border-gray-30 border-gray-200'
+                                                )}
+                                            />
+                                        </li>
+                                    ))}
+                                </ol>
+                            </nav>
                         )}
+                    </div>
 
-                        {(activeStepIndex === 1 ||
-                            (effectiveProjectDeployment?.id && !effectiveChangeProjectVersion)) && (
-                            <>
-                                {activeStepIndex === 1 && hasVisibleConnections && (
-                                    <div className="mr-auto flex items-center gap-2">
-                                        <Switch
-                                            checked={connectionsGrouped}
-                                            label="Group Connections"
-                                            onCheckedChange={setConnectionsGrouped}
-                                        />
+                    <DialogCloseButton />
+                </DialogHeader>
 
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                            </TooltipTrigger>
+                <WorkflowMockProvider>
+                    <div className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}>
+                        {activeStepIndex === 1 && isWorkflowsPending ? (
+                            <div className="flex justify-center py-12">
+                                <LoadingDots />
+                            </div>
+                        ) : (
+                            <Form {...form}>{projectDeploymentDialogSteps[activeStepIndex].content}</Form>
+                        )}
+                    </div>
+                </WorkflowMockProvider>
 
-                                            <TooltipContent>Connections grouped by their app.</TooltipContent>
-                                        </Tooltip>
-                                    </div>
-                                )}
+                <DialogFooter className="p-6">
+                    {activeStepIndex === 0 && (
+                        <>
+                            <DialogClose asChild>
+                                <Button label="Cancel" variant="outline" />
+                            </DialogClose>
 
-                                {activeStepIndex === 1 && (
-                                    <Button
-                                        label="Previous"
-                                        onClick={() => setActiveStepIndex(activeStepIndex - 1)}
-                                        variant="outline"
+                            {(!effectiveProjectDeployment?.id || effectiveChangeProjectVersion) && (
+                                <Button
+                                    disabled={
+                                        basicStepTab === 'change-version' &&
+                                        !projectDeploymentsLoading &&
+                                        (projectDeployments?.length ?? 0) === 0 &&
+                                        showTabs
+                                    }
+                                    label="Next"
+                                    onClick={handleSubmit(handleNextClick)}
+                                />
+                            )}
+                        </>
+                    )}
+
+                    {(activeStepIndex === 1 || (effectiveProjectDeployment?.id && !effectiveChangeProjectVersion)) && (
+                        <>
+                            {activeStepIndex === 1 && hasVisibleConnections && (
+                                <div className="mr-auto flex items-center gap-2">
+                                    <Switch
+                                        checked={connectionsGrouped}
+                                        label="Group Connections"
+                                        onCheckedChange={setConnectionsGrouped}
                                     />
-                                )}
 
-                                {!hasEnabledWorkflows ? (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
-                                            <span className="inline-flex">
-                                                <Button
-                                                    disabled={isSaveDisabled}
-                                                    icon={isDeploymentPending ? <LoadingIcon /> : undefined}
-                                                    label={isDeploymentPending ? 'Saving...' : 'Save'}
-                                                    onClick={handleSubmit(handleSaveClick)}
-                                                />
-                                            </span>
+                                            <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
                                         </TooltipTrigger>
 
-                                        <TooltipContent>
-                                            Enable at least one workflow to save this deployment
-                                        </TooltipContent>
+                                        <TooltipContent>Connections grouped by their app.</TooltipContent>
                                     </Tooltip>
-                                ) : (
-                                    <Button
-                                        disabled={isSaveDisabled}
-                                        icon={isDeploymentPending ? <LoadingIcon /> : undefined}
-                                        label={isDeploymentPending ? 'Saving...' : 'Save'}
-                                        onClick={handleSubmit(handleSaveClick)}
-                                    />
-                                )}
-                            </>
-                        )}
-                    </DialogFooter>
-                </Form>
+                                </div>
+                            )}
+
+                            {activeStepIndex === 1 && (
+                                <Button
+                                    label="Previous"
+                                    onClick={() => setActiveStepIndex(activeStepIndex - 1)}
+                                    variant="outline"
+                                />
+                            )}
+
+                            {!hasEnabledWorkflows ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <span className="inline-flex">
+                                            <Button
+                                                disabled={isSaveDisabled}
+                                                icon={isDeploymentPending ? <LoadingIcon /> : undefined}
+                                                label={isDeploymentPending ? 'Saving...' : 'Save'}
+                                                onClick={handleSubmit(handleSaveClick)}
+                                            />
+                                        </span>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>
+                                        Enable at least one workflow to save this deployment
+                                    </TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <Button
+                                    disabled={isSaveDisabled}
+                                    icon={isDeploymentPending ? <LoadingIcon /> : undefined}
+                                    label={isDeploymentPending ? 'Saving...' : 'Save'}
+                                    onClick={handleSubmit(handleSaveClick)}
+                                />
+                            )}
+                        </>
+                    )}
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );
