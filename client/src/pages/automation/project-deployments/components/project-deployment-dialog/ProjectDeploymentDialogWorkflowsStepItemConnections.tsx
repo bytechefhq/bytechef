@@ -1,50 +1,28 @@
-import ProjectDeploymentDialogWorkflowsStepItemConnection from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemConnection';
+import DeploymentConnectionFormField from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemConnection';
 import {ComponentConnection, ProjectDeployment} from '@/shared/middleware/automation/configuration';
 import {Control, UseFormSetValue} from 'react-hook-form';
-
-interface ProjectDeploymentDialogWorkflowsStepItemConnectionsProps {
-    componentConnections: ComponentConnection[];
-    control: Control<ProjectDeployment>;
-    connectionsGrouped?: boolean;
-    setValue: UseFormSetValue<ProjectDeployment>;
-    workflowIndex: number;
-    workflowNodeLabelMap: Map<string, string>;
-}
 
 type ComponentConnectionWithIndexType = {
     connection: ComponentConnection;
     originalIndex: number;
 };
+interface ProjectDeploymentDialogWorkflowsStepItemConnectionsProps {
+    componentConnections: ComponentConnection[];
+    control: Control<ProjectDeployment>;
+    setValue: UseFormSetValue<ProjectDeployment>;
+    workflowIndex: number;
+}
 
 const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
     componentConnections,
-    connectionsGrouped,
     control,
     setValue,
     workflowIndex,
-    workflowNodeLabelMap,
 }: ProjectDeploymentDialogWorkflowsStepItemConnectionsProps) => {
     const componentConnectionsLength = componentConnections.length;
 
     if (!componentConnectionsLength) {
         return <p className="text-sm">No defined connections.</p>;
-    }
-
-    if (!connectionsGrouped) {
-        return (
-            <ul className="space-y-4">
-                {componentConnections.map((componentConnection, componentConnectionIndex) => (
-                    <ProjectDeploymentDialogWorkflowsStepItemConnection
-                        componentConnection={componentConnection}
-                        componentConnectionIndex={componentConnectionIndex}
-                        control={control}
-                        key={`${componentConnectionIndex}_${componentConnection.key}`}
-                        workflowIndex={workflowIndex}
-                        workflowNodeLabel={workflowNodeLabelMap.get(componentConnection.workflowNodeName)}
-                    />
-                ))}
-            </ul>
-        );
     }
 
     const connectionGroupMap = new Map<string, ComponentConnectionWithIndexType[]>();
@@ -69,7 +47,7 @@ const ProjectDeploymentDialogWorkflowsStepItemConnections = ({
                 const connectionGrouping = {indices: groupedIndices, setValue};
 
                 return (
-                    <ProjectDeploymentDialogWorkflowsStepItemConnection
+                    <DeploymentConnectionFormField
                         componentConnection={representative.connection}
                         componentConnectionIndex={representative.originalIndex}
                         connectionGrouping={connectionGrouping}

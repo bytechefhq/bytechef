@@ -1,16 +1,18 @@
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
-import {ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 
 export interface ProjectDeploymentDialogWorkflowsStepProps {
+    connections?: Connection[];
+    connectionsGrouped?: boolean;
     control: Control<ProjectDeployment>;
     formState: FormState<ProjectDeployment>;
-    connectionsGrouped?: boolean;
     setValue: UseFormSetValue<ProjectDeployment>;
     workflows: Workflow[];
 }
 
 const ProjectDeploymentDialogWorkflowsStep = ({
+    connections,
     connectionsGrouped,
     control,
     formState,
@@ -20,6 +22,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     <div className="h-full space-y-4">
         {workflows?.map((workflow, workflowIndex) => (
             <ProjectDeploymentDialogWorkflowsStepItem
+                connections={connections}
                 connectionsGrouped={connectionsGrouped}
                 control={control}
                 formState={formState}

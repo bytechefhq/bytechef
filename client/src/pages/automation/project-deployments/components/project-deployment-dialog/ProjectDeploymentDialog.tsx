@@ -27,6 +27,7 @@ import {
     useCreateProjectDeploymentMutation,
     useUpdateProjectDeploymentMutation,
 } from '@/shared/mutations/automation/projectDeployments.mutations';
+import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {ProjectDeploymentTagKeys} from '@/shared/queries/automation/projectDeploymentTags.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
@@ -114,6 +115,18 @@ const ProjectDeploymentDialog = ({
     });
 
     const {control, formState, getValues, handleSubmit, reset, setValue, watch} = form;
+
+    const watchedEnvironmentId = watch('environmentId');
+
+    const deploymentEnvironmentId = watchedEnvironmentId ?? currentEnvironmentId;
+
+    const {data: connections} = useGetWorkspaceConnectionsQuery(
+        {
+            environmentId: deploymentEnvironmentId,
+            id: currentWorkspaceId!,
+        },
+        !!currentWorkspaceId
+    );
 
     const watchedProjectDeploymentWorkflows = watch('projectDeploymentWorkflows');
     const hasEnabledWorkflows = watchedProjectDeploymentWorkflows?.some((workflow) => workflow.enabled) ?? false;
@@ -283,6 +296,7 @@ const ProjectDeploymentDialog = ({
         {
             content: workflows && (
                 <ProjectDeploymentDialogWorkflowsStep
+                    connections={connections}
                     connectionsGrouped={connectionsGrouped}
                     control={control}
                     formState={formState}
