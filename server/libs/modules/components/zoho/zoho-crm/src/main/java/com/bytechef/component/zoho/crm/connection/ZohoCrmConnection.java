@@ -28,7 +28,7 @@ import java.util.Map;
 public class ZohoCrmConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = ZohoConnection.createConnection(
-        "/crm/v7", getScopes(), false, 1,
+        "/crm/v8", getScopes(), false, 1,
         "https://docs.bytechef.io/reference/components/zoho-crm_v1#connection-setup");
 
     private static Map<String, Boolean> getScopes() {
