@@ -30,6 +30,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -53,8 +54,7 @@ import org.mockito.ArgumentCaptor;
 class AgileCrmCreateTaskActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
-    private final LocalDateTime mockDate = LocalDateTime.of(
-        2025, 5, 12, 8, 45, 0);
+    private final LocalDateTime mockDate = LocalDateTime.of(2025, 5, 12, 8, 45, 0);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SUBJECT, "test", TYPE, "testing", PRIORITY_TYPE, "priorityType", DUE, mockDate));
     private final Map<String, Object> responseMap = Map.of();
@@ -90,6 +90,6 @@ class AgileCrmCreateTaskActionTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-        assertEquals(Body.of(expectedBody, Http.BodyContentType.JSON), bodyArgumentCaptor.getValue());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 }

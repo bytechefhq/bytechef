@@ -96,8 +96,7 @@ class AgileCrmUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("domainUser", Map.of("domain", "testDomain", "id", "testId")));
 
-        List<Option<String>> result = AgileCrmUtils.getUserIdOptions(
-            null, null, Map.of(), "", mockedContext);
+        List<Option<String>> result = AgileCrmUtils.getUserIdOptions(null, null, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("testDomain", "testId"));
 
@@ -122,8 +121,7 @@ class AgileCrmUtilsTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("name", "testName", "id", 123456L)));
 
-        List<Option<Long>> result = AgileCrmUtils.getPipelineIdOptions(
-            null, null, Map.of(), "", mockedContext);
+        List<Option<Long>> result = AgileCrmUtils.getPipelineIdOptions(null, null, Map.of(), "", mockedContext);
 
         List<Option<Long>> expected = List.of(option("testName", 123456L));
 
@@ -153,9 +151,7 @@ class AgileCrmUtilsTest {
         List<Option<String>> result = AgileCrmUtils.getMilestoneOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<Option<String>> expected = List.of(option("lost", "lost"), option("won", "won"));
-
-        assertEquals(expected, result);
+        assertEquals(List.of(option("lost", "lost"), option("won", "won")), result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/milestone/pipelines", stringArgumentCaptor.getValue());
 
