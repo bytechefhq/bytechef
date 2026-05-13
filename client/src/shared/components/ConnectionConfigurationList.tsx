@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {PlusIcon} from 'lucide-react';
@@ -200,8 +199,6 @@ const ConnectionConfigurationList = ({
         return groupedConnections;
     }, [componentConnections, connectionsGrouped]);
 
-    console.log('connectionsGrouped: ', connectionsGrouped);
-
     const workflowNodeLabelMap = useMemo(() => {
         if (connectionsGrouped) {
             return new Map<string, string>();
@@ -225,27 +222,23 @@ const ConnectionConfigurationList = ({
     }, [connectionsGrouped, workflow?.tasks, workflow?.triggers]);
 
     return (
-        <div className="space-y-2">
-            <Label className="text-content-neutral-secondary">Connections</Label>
-
-            <div className="space-y-4">
-                {connectionsToRender.map(({connection, groupedIndices, index}) => (
-                    <ConnectionConfigurationListFormField
-                        componentConnection={connection}
-                        connectionDialogAllowed={connectionDialogAllowed}
-                        connections={connections}
-                        control={control}
-                        groupedIndices={groupedIndices}
-                        handleConnectionDialogOpen={handleConnectionDialogOpen}
-                        handleConnectionIdChange={handleConnectionIdChange}
-                        index={index}
-                        key={`${connection.workflowNodeName}_${connection.key}`}
-                        workflowNodeLabel={
-                            groupedIndices ? undefined : workflowNodeLabelMap.get(connection.workflowNodeName)
-                        }
-                    />
-                ))}
-            </div>
+        <div className="space-y-4">
+            {connectionsToRender.map(({connection, groupedIndices, index}) => (
+                <ConnectionConfigurationListFormField
+                    componentConnection={connection}
+                    connectionDialogAllowed={connectionDialogAllowed}
+                    connections={connections}
+                    control={control}
+                    groupedIndices={groupedIndices}
+                    handleConnectionDialogOpen={handleConnectionDialogOpen}
+                    handleConnectionIdChange={handleConnectionIdChange}
+                    index={index}
+                    key={`${connection.workflowNodeName}_${connection.key}`}
+                    workflowNodeLabel={
+                        groupedIndices ? undefined : workflowNodeLabelMap.get(connection.workflowNodeName)
+                    }
+                />
+            ))}
         </div>
     );
 };

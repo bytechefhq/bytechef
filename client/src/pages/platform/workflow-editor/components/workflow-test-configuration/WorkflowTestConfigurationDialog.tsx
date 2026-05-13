@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
 import {Label} from '@/components/ui/label';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
@@ -32,7 +33,7 @@ import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowT
 import {PropertyAllType} from '@/shared/types';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
-import {InfoIcon} from 'lucide-react';
+import {FileInputIcon, InfoIcon, Link2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {Control, FieldValues, useForm} from 'react-hook-form';
 
@@ -128,57 +129,40 @@ const WorkflowTestConfigurationDialog = ({
     return (
         <Dialog onOpenChange={onClose} open={true}>
             <DialogContent
-                className="max-w-workflow-test-configuration-dialog-width"
+                className="max-w-workflow-test-configuration-dialog-width gap-0 p-0"
                 onInteractOutside={(event) => event.preventDefault()}
             >
+                <DialogHeader className="flex flex-row items-center justify-between space-y-0 p-6">
+                    <div className="flex flex-col space-y-1">
+                        <DialogTitle>Workflow Test Configuration</DialogTitle>
+
+                        <DialogDescription>
+                            Set workflow input, trigger output values and test connections.
+                        </DialogDescription>
+                    </div>
+
+                    <DialogCloseButton />
+                </DialogHeader>
+
                 <Form {...form}>
-                    <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
-                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                            <div className="flex flex-col space-y-1">
-                                <DialogTitle>Workflow Test Configuration</DialogTitle>
+                    <Tabs
+                        className="flex max-h-workflow-test-configuration-dialog-height flex-col gap-3 overflow-y-auto"
+                        defaultValue="connections"
+                    >
+                        <TabsList className="mx-6 flex">
+                            <TabsTrigger className="flex w-full gap-2" value="connections">
+                                <Link2Icon className="size-4" />
+                                Connections
+                            </TabsTrigger>
 
-                                <DialogDescription>
-                                    Set workflow input, trigger output values and test connections.
-                                </DialogDescription>
-                            </div>
+                            <TabsTrigger className="flex w-full gap-2" value="inputs">
+                                <FileInputIcon className="size-4" />
+                                Inputs
+                            </TabsTrigger>
+                        </TabsList>
 
-                            <DialogCloseButton />
-                        </DialogHeader>
-
-                        <div className="max-h-workflow-test-configuration-dialog-height overflow-y-auto">
-                            <div className="space-y-4 py-4">
-                                {inputs && inputs.length > 0 && (
-                                    <div className="space-y-2">
-                                        <Label className="text-content-neutral-secondary">Inputs</Label>
-
-                                        <Properties
-                                            control={control}
-                                            controlPath="inputs"
-                                            formState={formState}
-                                            properties={inputs.map((input) => {
-                                                if (input.type === 'string') {
-                                                    return {
-                                                        controlType: 'TEXT',
-                                                        type: 'STRING',
-                                                        ...input,
-                                                    } as PropertyAllType;
-                                                } else if (input.type === 'number') {
-                                                    return {
-                                                        type: 'NUMBER',
-                                                        ...input,
-                                                    } as PropertyAllType;
-                                                } else {
-                                                    return {
-                                                        controlType: 'SELECT',
-                                                        type: 'BOOLEAN',
-                                                        ...input,
-                                                    } as PropertyAllType;
-                                                }
-                                            })}
-                                        />
-                                    </div>
-                                )}
-
+                        <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
+                            <TabsContent className="px-6" value="connections">
                                 {connections && componentConnections && componentConnections.length > 0 && (
                                     <ConnectionConfigurationList
                                         componentConnections={componentConnections}
@@ -197,38 +181,68 @@ const WorkflowTestConfigurationDialog = ({
                                         workflow={workflow}
                                     />
                                 )}
-                            </div>
-                        </div>
+                            </TabsContent>
 
-                        <DialogFooter className="flex items-center">
-                            <div className="mr-auto flex items-center gap-2">
-                                {componentConnections.length > 1 && (
-                                    <>
-                                        <Switch
-                                            checked={connectionsGrouped}
-                                            label="Group Connections"
-                                            onCheckedChange={setConnectionsGrouped}
-                                        />
-
-                                        <Tooltip>
-                                            <TooltipTrigger asChild>
-                                                <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                            </TooltipTrigger>
-
-                                            <TooltipContent>Connections grouped by their app.</TooltipContent>
-                                        </Tooltip>
-                                    </>
+                            <TabsContent className="px-6" value="inputs">
+                                {inputs && inputs.length > 0 && (
+                                    <Properties
+                                        control={control}
+                                        controlPath="inputs"
+                                        formState={formState}
+                                        properties={inputs.map((input) => {
+                                            if (input.type === 'string') {
+                                                return {
+                                                    controlType: 'TEXT',
+                                                    type: 'STRING',
+                                                    ...input,
+                                                } as PropertyAllType;
+                                            } else if (input.type === 'number') {
+                                                return {
+                                                    type: 'NUMBER',
+                                                    ...input,
+                                                } as PropertyAllType;
+                                            } else {
+                                                return {
+                                                    controlType: 'SELECT',
+                                                    type: 'BOOLEAN',
+                                                    ...input,
+                                                } as PropertyAllType;
+                                            }
+                                        })}
+                                    />
                                 )}
-                            </div>
-
-                            <DialogClose asChild>
-                                <Button label="Cancel" type="button" variant="outline" />
-                            </DialogClose>
-
-                            <Button label="Save" type="submit" />
-                        </DialogFooter>
-                    </form>
+                            </TabsContent>
+                        </form>
+                    </Tabs>
                 </Form>
+
+                <DialogFooter className="flex items-center p-6">
+                    <div className="mr-auto flex items-center gap-2">
+                        {componentConnections.length > 1 && (
+                            <>
+                                <Switch
+                                    checked={connectionsGrouped}
+                                    label="Group Connections"
+                                    onCheckedChange={setConnectionsGrouped}
+                                />
+
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
+                                    </TooltipTrigger>
+
+                                    <TooltipContent>Connections grouped by their app.</TooltipContent>
+                                </Tooltip>
+                            </>
+                        )}
+                    </div>
+
+                    <DialogClose asChild>
+                        <Button label="Cancel" type="button" variant="outline" />
+                    </DialogClose>
+
+                    <Button label="Save" type="submit" />
+                </DialogFooter>
 
                 {showNewConnectionDialog && componentDefinitions && (
                     <Portal.Root>
