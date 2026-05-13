@@ -94,8 +94,7 @@ class AgileCrmNewTaskTriggerTest {
             Parameters mockedParameters = MockParametersFactory.create(
                 Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked));
 
-            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(
-                null, null, mockedParameters, mockedContext);
+            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(null, null, mockedParameters, mockedContext);
 
             PollOutput expectedPollOutput = new PollOutput(
                 List.of(
@@ -144,11 +143,9 @@ class AgileCrmNewTaskTriggerTest {
             Parameters mockedParameters = MockParametersFactory.create(
                 Map.of(LAST_TIME_CHECKED, mockedLastTimeChecked));
 
-            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(
-                null, null, mockedParameters, mockedContext);
+            PollOutput pollOutput = AgileCrmNewTaskTrigger.poll(null, null, mockedParameters, mockedContext);
 
-            PollOutput expectedPollOutput = new PollOutput(
-                List.of(), Map.of(LAST_TIME_CHECKED, mockedNow), false);
+            PollOutput expectedPollOutput = new PollOutput(List.of(), Map.of(LAST_TIME_CHECKED, mockedNow), false);
 
             assertEquals(expectedPollOutput, pollOutput);
             assertNotNull(httpFunctionArgumentCaptor.getValue());
