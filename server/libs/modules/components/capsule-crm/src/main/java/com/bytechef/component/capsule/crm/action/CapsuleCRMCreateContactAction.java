@@ -41,11 +41,9 @@ import com.bytechef.component.capsule.crm.util.CapsuleCRMUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Monika Domiter
@@ -163,9 +161,6 @@ public class CapsuleCRMCreateContactAction {
         .output()
         .perform(CapsuleCRMCreateContactAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_PARTIES_CONTEXT_FUNCTION =
-        http -> http.post("/parties");
-
     private CapsuleCRMCreateContactAction() {
     }
 
@@ -174,7 +169,7 @@ public class CapsuleCRMCreateContactAction {
 
         ContactType contactType = inputParameters.getRequired(TYPE, ContactType.class);
 
-        return actionContext.http(POST_PARTIES_CONTEXT_FUNCTION)
+        return actionContext.http(http -> http.post("/parties"))
             .body(
                 Body.of(
                     "party",
@@ -190,6 +185,6 @@ public class CapsuleCRMCreateContactAction {
                     }))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

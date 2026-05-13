@@ -17,7 +17,6 @@
 package com.bytechef.component.capsule.crm.action;
 
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -26,7 +25,6 @@ import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,7 +40,7 @@ public abstract class AbstractCapsuleCRMActionTest {
     protected ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     protected Parameters mockedParameters = mock(Parameters.class);
-    protected Map<String, Object> responeseMap = Map.of("key", "value");
+    protected Map<String, Object> responseMap = Map.of("key", "value");
 
     @BeforeEach
     public void beforeEach(Executor mockedExecutor, Http mockedHttp, Response mockedResponse) {
@@ -50,7 +48,7 @@ public abstract class AbstractCapsuleCRMActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responeseMap);
+        when(mockedResponse.getBody())
+            .thenReturn(responseMap);
     }
 }

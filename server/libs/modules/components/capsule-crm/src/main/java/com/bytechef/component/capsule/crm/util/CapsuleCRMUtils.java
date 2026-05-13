@@ -20,7 +20,6 @@ import static com.bytechef.component.capsule.crm.constant.CapsuleCRMConstants.NA
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -37,15 +36,12 @@ public class CapsuleCRMUtils {
     private CapsuleCRMUtils() {
     }
 
-    protected static final ContextFunction<Http, Http.Executor> GET_COUNTRIES_CONTEXT_FUNCTION =
-        http -> http.get("/countries");
-
     public static List<Option<String>> getCountryOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, ActionContext context) {
 
         Map<String, List<Map<String, Object>>> body =
-            context.http(GET_COUNTRIES_CONTEXT_FUNCTION)
+            context.http(http -> http.get("/countries"))
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});

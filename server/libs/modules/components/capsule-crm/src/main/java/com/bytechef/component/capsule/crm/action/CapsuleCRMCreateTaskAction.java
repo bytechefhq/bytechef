@@ -32,11 +32,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Monika Domiter
@@ -97,16 +95,13 @@ public class CapsuleCRMCreateTaskAction {
                                 .description("The hex colour code of the category.")))))
         .perform(CapsuleCRMCreateTaskAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_TASKS_CONTEXT_FUNCTION =
-        http -> http.post("/tasks");
-
     private CapsuleCRMCreateTaskAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(POST_TASKS_CONTEXT_FUNCTION)
+        return actionContext.http(http -> http.post("/tasks"))
             .body(
                 Body.of(
                     "task",
@@ -118,6 +113,6 @@ public class CapsuleCRMCreateTaskAction {
                     }))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
