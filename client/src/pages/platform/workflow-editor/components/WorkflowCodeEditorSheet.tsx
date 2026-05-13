@@ -6,7 +6,7 @@ import {ScrollArea} from '@/components/ui/scroll-area';
 import {Sheet, SheetClose, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
-import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/WorkflowTestConfigurationDialog';
+import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog';
 import useWorkflowCodeEditorSheet from '@/pages/platform/workflow-editor/hooks/useWorkflowCodeEditorSheet';
 import MonacoEditorLoader from '@/shared/components/MonacoEditorLoader';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';

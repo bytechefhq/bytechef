@@ -24,7 +24,7 @@ type ConnectionGroupingType = {
     setValue: UseFormSetValue<ProjectDeployment>;
 };
 
-export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
+export interface DeploymentConnectionFormFieldProps {
     componentConnection: ComponentConnection;
     componentConnectionIndex: number;
     connectionGrouping?: ConnectionGroupingType;
@@ -33,14 +33,14 @@ export interface ProjectDeploymentDialogWorkflowsStepItemConnectionProps {
     workflowNodeLabel?: string;
 }
 
-const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
+const DeploymentConnectionFormField = ({
     componentConnection,
     componentConnectionIndex,
     connectionGrouping,
     control,
     workflowIndex,
     workflowNodeLabel,
-}: ProjectDeploymentDialogWorkflowsStepItemConnectionProps) => {
+}: DeploymentConnectionFormFieldProps) => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
@@ -192,4 +192,4 @@ const ProjectDeploymentDialogWorkflowsStepItemConnection = ({
     );
 };
 
-export default ProjectDeploymentDialogWorkflowsStepItemConnection;
+export default DeploymentConnectionFormField;
