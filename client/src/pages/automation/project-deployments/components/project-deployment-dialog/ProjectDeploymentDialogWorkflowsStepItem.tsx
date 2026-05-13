@@ -4,7 +4,7 @@ import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/p
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
-import {Control, FieldValues, FormState, UseFormSetValue} from 'react-hook-form';
+import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
@@ -37,6 +37,11 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     );
 
     const componentConnections = getWorkflowComponentConnections(workflow);
+
+    const watchedConnections = useWatch({
+        control,
+        name: `projectDeploymentWorkflows.${workflowIndex}.connections`,
+    });
 
     return (
         <>
@@ -74,6 +79,9 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             connections={connections ?? []}
                             connectionsGrouped={connectionsGrouped}
                             control={control as unknown as Control<FieldValues>}
+                            getCurrentConnectionId={(connectionIndex) =>
+                                watchedConnections?.[connectionIndex]?.connectionId
+                            }
                             handleConnectionIdChange={(connectionIndex, connectionId) =>
                                 setValue(
                                     `projectDeploymentWorkflows.${workflowIndex}.connections.${connectionIndex}.connectionId`,

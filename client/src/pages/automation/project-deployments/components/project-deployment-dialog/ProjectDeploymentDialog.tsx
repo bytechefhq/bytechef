@@ -33,6 +33,7 @@ import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployme
 import {useGetProjectVersionWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
 import {ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
@@ -336,6 +337,39 @@ const ProjectDeploymentDialog = ({
 
     const handleNextClick = () => setActiveStepIndex(activeStepIndex + 1);
 
+    const handleConnectionsGroupedChange = (grouped: boolean) => {
+        setConnectionsGrouped(grouped);
+
+        if (!grouped || !workflows) {
+            return;
+        }
+
+        const projectDeploymentWorkflows = getValues('projectDeploymentWorkflows') ?? [];
+
+        workflows.forEach((workflow) => {
+            const workflowIndex = projectDeploymentWorkflows.findIndex(
+                (projectDeploymentWorkflow) => projectDeploymentWorkflow.workflowId === workflow.id
+            );
+
+            if (workflowIndex < 0) {
+                return;
+            }
+
+            const workflowConnections = projectDeploymentWorkflows[workflowIndex]?.connections ?? [];
+
+            synchronizeGroupedConnections({
+                componentConnections: getWorkflowComponentConnections(workflow),
+                getConnectionId: (index) => workflowConnections[index]?.connectionId,
+                setConnectionId: (index, connectionId) =>
+                    setValue(
+                        `projectDeploymentWorkflows.${workflowIndex}.connections.${index}.connectionId`,
+                        connectionId as number,
+                        {shouldDirty: true}
+                    ),
+            });
+        });
+    };
+
     const handleSaveClick = (formData: ProjectDeployment) => {
         if (!formData) {
             return;
@@ -553,7 +587,7 @@ const ProjectDeploymentDialog = ({
                                     <Switch
                                         checked={connectionsGrouped}
                                         label="Group Connections"
-                                        onCheckedChange={setConnectionsGrouped}
+                                        onCheckedChange={handleConnectionsGroupedChange}
                                     />
 
                                     <Tooltip>
