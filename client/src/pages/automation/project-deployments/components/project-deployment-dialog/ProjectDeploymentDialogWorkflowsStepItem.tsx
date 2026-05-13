@@ -16,7 +16,7 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
     formState: FormState<ProjectDeployment>;
     label?: string;
     setValue: UseFormSetValue<ProjectDeployment>;
-    switchHidden?: boolean;
+    showWorkflowToggle?: boolean;
     workflow: Workflow;
     workflowIndex: number;
 }
@@ -28,7 +28,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     formState,
     label,
     setValue,
-    switchHidden = false,
+    showWorkflowToggle = false,
     workflow,
     workflowIndex,
 }: ProjectDeploymentDialogWorkflowListItemProps) => {
@@ -40,7 +40,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
 
     return (
         <>
-            {!switchHidden && (
+            {showWorkflowToggle && (
                 <div className="flex cursor-pointer justify-between py-2">
                     <span className="font-semibold">{label}</span>
 
@@ -55,7 +55,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                 </div>
             )}
 
-            {(workflowEnabledMap.get(workflow.id!) || switchHidden) && (
+            {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
                 <ul className="mt-2 space-y-6">
                     <li className="flex flex-col gap-3">
                         <Label className="text-base font-semibold">Inputs</Label>

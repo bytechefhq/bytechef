@@ -27,6 +27,7 @@ const IntegrationInstanceConfigurationDialogWorkflowsStep = ({
                     key={workflow.id!}
                     label={workflow.label!}
                     setValue={setValue}
+                    showWorkflowToggle
                     workflow={workflow}
                     workflowIndex={workflowIndex}
                 />

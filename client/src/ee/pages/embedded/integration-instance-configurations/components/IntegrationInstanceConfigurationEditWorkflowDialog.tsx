@@ -153,7 +153,6 @@ const IntegrationInstanceConfigurationEditWorkflowDialog = ({
                         key={workflow.id!}
                         label="Enable"
                         setValue={setValue}
-                        switchHidden={true}
                         workflow={workflow}
                         workflowIndex={0}
                     />

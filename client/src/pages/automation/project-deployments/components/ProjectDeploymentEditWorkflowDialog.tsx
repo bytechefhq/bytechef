@@ -148,7 +148,6 @@ const ProjectDeploymentEditWorkflowDialog = ({
                             formState={formState}
                             key={workflow.id!}
                             setValue={setValue}
-                            switchHidden={true}
                             workflow={workflow}
                             workflowIndex={0}
                         />
