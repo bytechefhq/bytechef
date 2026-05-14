@@ -107,16 +107,22 @@ const WorkflowCodeEditorSheet = ({
                         <div className="flex items-center gap-2">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <Button
-                                        disabled={testConfigurationDisabled}
-                                        icon={<Settings2Icon />}
-                                        label="Test Configuration"
-                                        onClick={() => handleWorkflowTestConfigurationDialog(true)}
-                                        variant="secondary"
-                                    />
+                                    <span tabIndex={0}>
+                                        <Button
+                                            disabled={testConfigurationDisabled}
+                                            icon={<Settings2Icon />}
+                                            label="Test Configuration"
+                                            onClick={() => handleWorkflowTestConfigurationDialog(true)}
+                                            variant="secondary"
+                                        />
+                                    </span>
                                 </TooltipTrigger>
 
-                                <TooltipContent>Set the workflow test configuration</TooltipContent>
+                                <TooltipContent>
+                                    {testConfigurationDisabled
+                                        ? 'Add a connection or an input to enable test configuration.'
+                                        : 'Set the workflow test configuration.'}
+                                </TooltipContent>
                             </Tooltip>
 
                             <ButtonGroup>
