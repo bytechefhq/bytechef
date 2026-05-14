@@ -21,6 +21,7 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 
 /**
@@ -40,14 +41,16 @@ import org.springframework.ai.chat.memory.InMemoryChatMemoryRepository;
 @SuppressFBWarnings("MS")
 public final class InMemoryChatMemoryRepositoryHolder {
 
-    private static final Cache<String, InMemoryChatMemoryRepository> REPOSITORIES = Caffeine.newBuilder()
+    private static final Cache<String, ChatMemoryRepository> REPOSITORIES = Caffeine.newBuilder()
         .expireAfterAccess(Duration.ofHours(1))
         .build();
 
     private InMemoryChatMemoryRepositoryHolder() {
     }
 
-    public static InMemoryChatMemoryRepository getInstance() {
-        return REPOSITORIES.get(TenantContext.getCurrentTenantId(), _ -> new InMemoryChatMemoryRepository());
+    public static ChatMemoryRepository getInstance() {
+        return REPOSITORIES.get(
+            TenantContext.getCurrentTenantId(),
+            _ -> new TimestampedInMemoryChatMemoryRepository(new InMemoryChatMemoryRepository()));
     }
 }
