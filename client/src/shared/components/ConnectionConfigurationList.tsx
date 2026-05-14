@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {PlusIcon} from 'lucide-react';
+import {ArrowUpRightIcon, InfoIcon, PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -168,7 +168,7 @@ const ConnectionConfigurationListFormField = ({
 interface ConnectionConfigurationListProps {
     componentConnections: ComponentConnection[];
     connectionDialogAllowed?: boolean;
-    connections: ConnectionI[];
+    connections?: ConnectionI[];
     connectionsGrouped?: boolean;
     control: Control<FieldValues>;
     getCurrentConnectionId?: (index: number) => number | undefined;
@@ -243,13 +243,17 @@ const ConnectionConfigurationList = ({
         return workflowNodeLabelMap;
     }, [connectionsGrouped, workflow?.tasks, workflow?.triggers]);
 
+    if (!connectionsToRender.length) {
+        return <h3 className="p-4 text-center font-medium text-content-neutral-primary">No Connections yet</h3>;
+    }
+
     return (
         <div className="space-y-4">
             {connectionsToRender.map(({connection, groupedIndices, index}) => (
                 <ConnectionConfigurationListFormField
                     componentConnection={connection}
                     connectionDialogAllowed={connectionDialogAllowed}
-                    connections={connections}
+                    connections={connections!}
                     control={control}
                     currentConnectionId={getCurrentConnectionId?.(index)}
                     groupedIndices={groupedIndices}
