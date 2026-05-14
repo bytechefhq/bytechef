@@ -30,6 +30,7 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.N
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.TEXT;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
@@ -51,6 +52,7 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.constant.ColumnType;
+import com.bytechef.microsoft.commons.MicrosoftConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -213,13 +215,21 @@ public class MicrosoftSharePointUtils {
         }
 
         Map<String, ?> body = context.http(
-            http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/items/root/children"))
-            .queryParameter("$filter", "folder ne null")
+            http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/root/delta"))
+            .queryParameter("$select", "id,name,folder,parentReference")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        return getOptions(context, body, NAME, ID);
+        List<Object> folders = new ArrayList<>();
+
+        if (body.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
+            list.stream()
+                .filter(o -> o instanceof Map<?, ?> map && map.containsKey(FOLDER))
+                .forEach(folders::add);
+        }
+
+        return getOptions(context, Map.of(VALUE, folders), NAME, ID);
     }
 
     public static List<Option<String>> getListIdOptions(
