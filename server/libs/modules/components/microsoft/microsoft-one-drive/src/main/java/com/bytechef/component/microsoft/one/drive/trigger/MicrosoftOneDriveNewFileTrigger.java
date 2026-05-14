@@ -23,6 +23,8 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.FILE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
 import static com.bytechef.component.microsoft.one.drive.util.MicrosoftOneDriveUtils.getFolderId;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION_PROPERTY;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
@@ -49,7 +51,8 @@ public class MicrosoftOneDriveNewFileTrigger {
                 .description(
                     "ID of the folder to watch for new files. If no folder is specified, the root folder will be used.")
                 .options((OptionsFunction<String>) MicrosoftOneDriveUtils::getFolderIdOptions)
-                .required(false))
+                .required(false),
+            RECURSION_PROPERTY)
         .output(outputSchema(FILE_OUTPUT_PROPERTY))
         .poll(MicrosoftOneDriveNewFileTrigger::poll)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
@@ -63,8 +66,12 @@ public class MicrosoftOneDriveNewFileTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        String url = "/me/drive/items/%s/children".formatted(getFolderId(inputParameters.getString(PARENT_ID)));
+        String url = "/me/drive/items/%s/".formatted(getFolderId(inputParameters.getString(PARENT_ID)));
 
-        return MicrosoftTriggerUtils.poll(url, "file", closureParameters, context);
+        return MicrosoftTriggerUtils.poll(
+            inputParameters.getBoolean(RECURSION) ? url + "delta" : url + "children",
+            "file",
+            closureParameters,
+            context);
     }
 }
