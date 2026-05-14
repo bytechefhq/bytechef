@@ -29,6 +29,7 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.N
 import static com.bytechef.component.microsoft.share.point.constant.ColumnType.TEXT;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
@@ -272,12 +273,13 @@ class MicrosoftSharePointUtilsTest {
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "folderName", ID, "folderId"))));
+            .thenReturn(Map.of(VALUE, List.of(Map.of(NAME, "folderName", ID, "folderId", FOLDER, "folder"))));
 
         List<Option<String>> folderIdOptions = MicrosoftSharePointUtils.getFolderIdOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
-        List<String> expectedStrings = List.of("/sites/siteId/drive/items/root/children", "$filter", "folder ne null");
+        List<String> expectedStrings = List.of(
+            "/sites/siteId/drive/root/delta", "$select", "id,name,folder,parentReference");
 
         assertEquals(List.of(option("folderName", "folderId")), folderIdOptions);
         assertEquals(expectedStrings, stringArgumentCaptor.getAllValues());
