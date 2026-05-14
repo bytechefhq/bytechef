@@ -280,12 +280,12 @@ export default function pasteNode({
     reservedNames.add(newName);
 
     const clonedParameters = structuredClone(copiedNode.parameters ?? {});
-    const sourceDefinitionTask = definitionTasks.find(
+    const workflowDefinitionTask = definitionTasks.find(
         (task: {name: string}) => task.name === (copiedNode.workflowNodeName ?? copiedNode.name)
     ) as {clusterElements?: ClusterElementsType} | undefined;
 
-    const clonedClusterElements = sourceDefinitionTask?.clusterElements
-        ? structuredClone(sourceDefinitionTask.clusterElements)
+    const clonedClusterElements = workflowDefinitionTask?.clusterElements
+        ? structuredClone(workflowDefinitionTask.clusterElements)
         : copiedNode.clusterElements && !Array.isArray(copiedNode.clusterElements)
           ? structuredClone(copiedNode.clusterElements)
           : undefined;
