@@ -23,8 +23,10 @@ import static com.bytechef.component.amplitude.constant.AmplitudeConstants.KEY;
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.PLATFORM;
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.USER_PROPERTIES;
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.VALUE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -53,14 +55,15 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class AmplitudeCreateAttributionEventActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = ArgumentCaptor.forClass(Context.class);
+    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", EVENT_TYPE, "eventType", PLATFORM, "platform",
             IDENTIFIER, Map.of(KEY, "identifierKey", VALUE, "identifierValue"),
             USER_PROPERTIES, List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -79,10 +82,8 @@ class AmplitudeCreateAttributionEventActionTest {
 
             when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.queryParameters(
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-                stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                    .thenReturn(mockedExecutor);
+            when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
             when(mockedResponse.getBody(String.class))
                 .thenReturn(responseString);
 
@@ -91,6 +92,7 @@ class AmplitudeCreateAttributionEventActionTest {
 
             assertEquals(responseString, response);
             assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals("/attribution", stringArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
             Configuration configuration = configurationBuilder.build();
@@ -98,8 +100,12 @@ class AmplitudeCreateAttributionEventActionTest {
             assertEquals(ResponseType.TEXT, configuration.getResponseType());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
             assertEquals(mockedContext, contextArgumentCaptor.getValue());
-            assertEquals(
-                List.of("/attribution", API_KEY, "api_key", "event", jsonString), stringArgumentCaptor.getAllValues());
+
+            Object[] queryParameters = {
+                API_KEY, "api_key", "event", jsonString
+            };
+
+            assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
         }
     }
 }

@@ -81,8 +81,7 @@ public class AmplitudeCreateAttributionEventAction {
             outputSchema(
                 string()
                     .description("Response message")))
-        .help(
-            "", "https://docs.bytechef.io/reference/components/amplitude_v1#create-attribution-event")
+        .help("", "https://docs.bytechef.io/reference/components/amplitude_v1#create-attribution-event")
         .perform(AmplitudeCreateAttributionEventAction::perform);
 
     private AmplitudeCreateAttributionEventAction() {

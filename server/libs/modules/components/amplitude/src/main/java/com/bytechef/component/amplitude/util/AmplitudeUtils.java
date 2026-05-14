@@ -85,7 +85,7 @@ public class AmplitudeUtils {
         return options;
     }
 
-    public static Map<String, String> getUserProperties(Parameters inputParameters) {
+    private static Map<String, String> getUserProperties(Parameters inputParameters) {
         Map<String, String> userProperties = new HashMap<>();
 
         List<Map<String, String>> userPropertiesList = inputParameters.getList(

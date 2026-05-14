@@ -26,40 +26,62 @@ import static com.bytechef.component.amplitude.constant.AmplitudeConstants.USER_
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.VALUE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Json;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
 class AmplitudeUtilsTest {
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Json, Executor>> jsonFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Context mockedContext = mock(Context.class);
+    private final Json mockedJson = mock(Json.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", EVENT_TYPE, "eventType", PLATFORM, "platform", ID, "id",
             IDENTIFIER, Map.of(KEY, "identifierKey", VALUE, "identifierValue"),
             USER_PROPERTIES, List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
+    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
 
     @Test
     void testGetEventJson() {
         String responseString = "response";
 
-        when(mockedContext.json(any()))
+        when(mockedContext.json(jsonFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Json, Executor> value = jsonFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedJson);
+            });
+
+        when(mockedJson.write(objectArgumentCaptor.capture()))
             .thenReturn(responseString);
 
         String result = AmplitudeUtils.getEventJson(mockedParameters, mockedContext);
 
         assertEquals(responseString, result);
+
+        Map<String, Object> eventMap = Map.of(
+            EVENT_TYPE, "eventType", PLATFORM, "platform", "identifierKey", "identifierValue",
+            USER_PROPERTIES, Map.of("userPropertyKey", "userPropertyValue"));
+
+        assertEquals(eventMap, objectArgumentCaptor.getValue());
     }
 
     @Test
@@ -96,15 +118,6 @@ class AmplitudeUtilsTest {
         List<Option<String>> expected = List.of(
             option("The Google ADID", "adid"),
             option("App Set ID", "android_app_set_id"));
-
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void testGetUserProperties() {
-        Map<String, String> result = AmplitudeUtils.getUserProperties(mockedParameters);
-
-        Map<String, String> expected = Map.of("userPropertyKey", "userPropertyValue");
 
         assertEquals(expected, result);
     }

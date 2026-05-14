@@ -26,7 +26,8 @@ import static com.bytechef.component.amplitude.constant.AmplitudeConstants.USER_
 import static com.bytechef.component.amplitude.constant.AmplitudeConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
@@ -35,11 +36,13 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Context.Json;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -56,14 +59,19 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class AmplitudeCreateOrUpdateUserActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Json, Executor>> jsonFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Map<String, Object> mockedIdentification = Map.of();
+    private final Json mockedJson = mock(Json.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             API_KEY, "api_key", ID, "id", USER_PROPERTIES,
             List.of(Map.of(KEY, "userPropertyKey", VALUE, "userPropertyValue"))));
-    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = ArgumentCaptor.forClass(Parameters.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
+    private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -76,13 +84,18 @@ class AmplitudeCreateOrUpdateUserActionTest {
 
         try (MockedStatic<AmplitudeUtils> amplitudeUtilsMockedStatic = mockStatic(AmplitudeUtils.class)) {
             amplitudeUtilsMockedStatic
-                .when(() -> AmplitudeUtils.getIdentification(
-                    parametersArgumentCaptor.capture()))
+                .when(() -> AmplitudeUtils.getIdentification(parametersArgumentCaptor.capture()))
                 .thenReturn(mockedIdentification);
 
-            when(mockedContext.json(any()))
-                .thenReturn(identificationJson);
+            when(mockedContext.json(jsonFunctionArgumentCaptor.capture()))
+                .thenAnswer(inv -> {
+                    ContextFunction<Json, Executor> value = jsonFunctionArgumentCaptor.getValue();
 
+                    return value.apply(mockedJson);
+                });
+
+            when(mockedJson.write(objectArgumentCaptor.capture()))
+                .thenReturn(identificationJson);
             when(mockedHttp.post(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
@@ -96,6 +109,8 @@ class AmplitudeCreateOrUpdateUserActionTest {
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(responseString, response);
+            assertNotNull(jsonFunctionArgumentCaptor.getValue());
+            assertEquals(mockedIdentification, objectArgumentCaptor.getValue());
             assertNotNull(httpFunctionArgumentCaptor.getValue());
 
             ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
@@ -103,12 +118,12 @@ class AmplitudeCreateOrUpdateUserActionTest {
 
             assertEquals(ResponseType.TEXT, configuration.getResponseType());
             assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
-            assertEquals(List.of("/identify", CONTENT_TYPE, CONTENT_TYPE_URLENCODED),
-                stringArgumentCaptor.getAllValues());
+            assertEquals(
+                List.of("/identify", CONTENT_TYPE, CONTENT_TYPE_URLENCODED), stringArgumentCaptor.getAllValues());
 
             Map<String, Object> expectedBody = Map.of(API_KEY, "api_key", IDENTIFICATION, identificationJson);
 
-            assertEquals(Body.of(expectedBody, Http.BodyContentType.FORM_URL_ENCODED), bodyArgumentCaptor.getValue());
+            assertEquals(Body.of(expectedBody, BodyContentType.FORM_URL_ENCODED), bodyArgumentCaptor.getValue());
         }
     }
 }
