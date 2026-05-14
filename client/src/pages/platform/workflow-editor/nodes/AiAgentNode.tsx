@@ -10,7 +10,7 @@ import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
 import {CheckIcon, ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
-import {ChangeEvent, FocusEvent, KeyboardEvent, MouseEvent, memo, useCallback, useMemo, useState} from 'react';
+import {ChangeEvent, FocusEvent, KeyboardEvent, memo, useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -38,9 +38,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
-    const {currentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
+            setCurrentNode: state.setCurrentNode,
         }))
     );
     const {incrementLayoutResetCounter, workflow} = useWorkflowDataStore(
@@ -193,36 +194,48 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         (newLabel: string) => {
             const trimmed = newLabel.trim();
 
-            if (trimmed && trimmed !== nodeLabel) {
-                if (!workflow.definition) {
-                    return;
-                }
+            if (!trimmed || trimmed === nodeLabel) {
+                setRenamingNodeName(undefined);
 
-                const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-                const mainClusterRootTask = getTask({
-                    tasks: workflowDefinitionTasks,
+                return;
+            }
+
+            if (!workflow.definition) {
+                setRenamingNodeName(undefined);
+
+                return;
+            }
+
+            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+            const mainClusterRootTask = getTask({
+                tasks: workflowDefinitionTasks,
+                workflowNodeName: data.workflowNodeName,
+            });
+
+            if (!mainClusterRootTask) {
+                setRenamingNodeName(undefined);
+
+                return;
+            }
+
+            saveWorkflowDefinition({
+                decorative: true,
+                nodeData: {
+                    ...mainClusterRootTask,
+                    componentName: data.componentName,
+                    label: trimmed,
                     workflowNodeName: data.workflowNodeName,
-                });
+                },
+                updateWorkflowMutation: updateWorkflowMutation!,
+            });
 
-                if (!mainClusterRootTask) {
-                    return;
-                }
-
-                saveWorkflowDefinition({
-                    decorative: true,
-                    nodeData: {
-                        ...mainClusterRootTask,
-                        componentName: data.componentName,
-                        label: trimmed,
-                        workflowNodeName: data.workflowNodeName,
-                    },
-                    updateWorkflowMutation: updateWorkflowMutation!,
-                });
+            if (currentNode?.workflowNodeName === data.workflowNodeName) {
+                setCurrentNode({...currentNode, label: trimmed});
             }
 
             setRenamingNodeName(undefined);
         },
-        [data, nodeLabel, setRenamingNodeName, updateWorkflowMutation, workflow]
+        [currentNode, data, nodeLabel, setCurrentNode, setRenamingNodeName, updateWorkflowMutation, workflow]
     );
 
     const handleRenameKeyDown = useCallback(
@@ -246,11 +259,6 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleRenameInputChange = useCallback(
         (event: ChangeEvent<HTMLInputElement>) => setRenameValue(event.target.value),
         [setRenameValue]
-    );
-
-    const handleRenameInputMouseDown = useCallback(
-        (event: MouseEvent<HTMLInputElement>) => event.stopPropagation(),
-        []
     );
 
     const handleRenameConfirmClick = useCallback(
@@ -294,9 +302,9 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onRename={handleStartRename}
             onResetPosition={handleResetPosition}
             onSwitch={handleSwitch}
-            showCopy
-            showDelete
-            showRename
+            showCopyAction
+            showDeleteAction
+            showRenameAction
         >
             <div
                 className={twMerge(
@@ -458,7 +466,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 onBlur={handleRenameInputBlur}
                                 onChange={handleRenameInputChange}
                                 onKeyDown={handleRenameKeyDown}
-                                onMouseDown={handleRenameInputMouseDown}
+                                onMouseDown={(event) => event.stopPropagation()}
                                 value={renameValue}
                             />
 

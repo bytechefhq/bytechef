@@ -25,16 +25,16 @@ interface WorkflowNodeContextMenuProps {
     children: ReactNode;
     data: NodeDataType;
     hasSavedPosition: boolean;
-    onCopy: () => void;
+    onCopy?: () => void;
     onDelete: () => void;
-    onPaste: () => void;
+    onPaste?: () => void;
     onRename: () => void;
     onResetPosition: () => void;
     onSwitch: () => void;
-    showCopy?: boolean;
-    showDelete?: boolean;
-    showRename?: boolean;
-    showReplace?: boolean;
+    showCopyAction?: boolean;
+    showDeleteAction?: boolean;
+    showRenameAction?: boolean;
+    showReplaceAction?: boolean;
 }
 
 const WorkflowNodeContextMenu = ({
@@ -48,10 +48,10 @@ const WorkflowNodeContextMenu = ({
     onRename,
     onResetPosition,
     onSwitch,
-    showCopy = false,
-    showDelete = false,
-    showRename = false,
-    showReplace = false,
+    showCopyAction = false,
+    showDeleteAction = false,
+    showRenameAction = false,
+    showReplaceAction = false,
 }: WorkflowNodeContextMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
@@ -61,7 +61,7 @@ const WorkflowNodeContextMenu = ({
 
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
 
-    const pasteMenuItem = useMemo(() => {
+    const PasteMenuItem = useMemo(() => {
         if (!canPaste || !copiedNode) {
             return null;
         }
@@ -114,27 +114,26 @@ const WorkflowNodeContextMenu = ({
                         </>
                     ) : (
                         <>
-                            {showReplace && (
+                            {showReplaceAction && (
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>
                                     <ArrowLeftRightIcon className="size-4 shrink-0" />
                                     Replace
                                 </ContextMenuItem>
                             )}
 
-                            {showCopy && (
+                            {showCopyAction && (
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onCopy}>
                                     <CopyIcon className="size-4 shrink-0" />
                                     Copy
                                 </ContextMenuItem>
                             )}
 
-                            {showCopy && pasteMenuItem}
+                            {showCopyAction && PasteMenuItem}
 
-                            {(showReplace || showCopy || canPaste) && (showRename || hasSavedPosition) && (
-                                <ContextMenuSeparator className="m-0" />
-                            )}
+                            {(showReplaceAction || showCopyAction || canPaste) &&
+                                (showRenameAction || hasSavedPosition) && <ContextMenuSeparator className="m-0" />}
 
-                            {showRename && (
+                            {showRenameAction && (
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onRename}>
                                     <TextCursorInputIcon className="size-4 shrink-0" />
                                     Rename
@@ -148,23 +147,25 @@ const WorkflowNodeContextMenu = ({
                                 </ContextMenuItem>
                             )}
 
-                            {showDelete && <ContextMenuSeparator className="m-0" />}
+                            {showDeleteAction && (
+                                <>
+                                    <ContextMenuSeparator className="m-0" />
 
-                            {showDelete && (
-                                <ContextMenuItem
-                                    className="dropdown-menu-item-destructive gap-2"
-                                    onClick={handleDeleteClick}
-                                >
-                                    <Trash2Icon className="size-4 shrink-0" />
-                                    Delete
-                                </ContextMenuItem>
+                                    <ContextMenuItem
+                                        className="dropdown-menu-item-destructive gap-2"
+                                        onClick={handleDeleteClick}
+                                    >
+                                        <Trash2Icon className="size-4 shrink-0" />
+                                        Delete
+                                    </ContextMenuItem>
+                                </>
                             )}
                         </>
                     )}
                 </ContextMenuContent>
             </ContextMenu>
 
-            {!data.trigger && showDelete && (
+            {!data.trigger && showDeleteAction && (
                 <DeleteAlertDialog
                     nodeName={data.label}
                     onCancel={handleDeleteCancel}
