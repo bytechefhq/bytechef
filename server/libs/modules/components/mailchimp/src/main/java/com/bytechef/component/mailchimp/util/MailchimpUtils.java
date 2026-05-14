@@ -52,27 +52,37 @@ public class MailchimpUtils extends AbstractMailchimpUtils {
     }
 
     public static List<Option<String>> getListIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
-
-        Map<String, ?> response = context
-            .http(http -> http.get("/lists"))
-            .queryParameters(
-                "fields", "lists.id,lists.name,total_items",
-                "count", "1000")
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (response.get("lists") instanceof List<?> lists) {
-            for (Object list : lists) {
-                if (list instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+        int offset = 0;
+        int totalItems;
+
+        do {
+            Map<String, ?> response = context
+                .http(http -> http.get("/lists"))
+                .queryParameters(
+                    "fields", "lists.id,lists.name,total_items",
+                    "count", "1000",
+                    "offset", offset)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (response.get("lists") instanceof List<?> lists) {
+                for (Object list : lists) {
+                    if (list instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("name"), (String) map.get("id")));
+
+                        offset++;
+                    }
                 }
             }
-        }
+
+            totalItems = (Integer) response.get("total_items");
+        } while (totalItems > offset);
 
         return options;
     }
