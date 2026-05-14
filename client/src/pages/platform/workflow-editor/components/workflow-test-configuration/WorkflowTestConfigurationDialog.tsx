@@ -232,25 +232,23 @@ const WorkflowTestConfigurationDialog = ({
                 </Form>
 
                 <DialogFooter className="flex items-center p-6">
-                    <div className="mr-auto flex items-center gap-2">
-                        {componentConnections.length > 1 && (
-                            <>
-                                <Switch
-                                    checked={connectionsGrouped}
-                                    label="Group Connections"
-                                    onCheckedChange={handleConnectionsGroupedChange}
-                                />
+                    {componentConnections.length > 1 && (
+                        <div className="mr-auto flex items-center gap-2">
+                            <Switch
+                                checked={connectionsGrouped}
+                                label="Group Connections"
+                                onCheckedChange={handleConnectionsGroupedChange}
+                            />
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
-                                    </TooltipTrigger>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <InfoIcon className="size-4 cursor-default text-content-onsurface-secondary" />
+                                </TooltipTrigger>
 
-                                    <TooltipContent>Connections grouped by their app.</TooltipContent>
-                                </Tooltip>
-                            </>
-                        )}
-                    </div>
+                                <TooltipContent>Connections grouped by their component.</TooltipContent>
+                            </Tooltip>
+                        </div>
+                    )}
 
                     <DialogClose asChild>
                         <Button label="Cancel" type="button" variant="outline" />
