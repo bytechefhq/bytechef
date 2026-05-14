@@ -14,10 +14,11 @@ import {Form} from '@/components/ui/form';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
-import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
+import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {
     ComponentConnection,
@@ -29,13 +30,13 @@ import {
 import {useSaveWorkflowTestConfigurationMutation} from '@/shared/mutations/platform/workflowTestConfigurations.mutations';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowTestConfigurationKeys} from '@/shared/queries/platform/workflowTestConfigurations.queries';
-import {PropertyAllType} from '@/shared/types';
 import {synchronizeGroupedConnections} from '@/shared/util/synchronizeGroupedConnections';
 import * as Portal from '@radix-ui/react-portal';
 import {useQueryClient} from '@tanstack/react-query';
 import {FileInputIcon, InfoIcon, Link2Icon} from 'lucide-react';
 import {useState} from 'react';
 import {Control, FieldValues, useForm, useWatch} from 'react-hook-form';
+import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowTestConfigurationDialogProps {
     onClose: () => void;
@@ -53,6 +54,13 @@ const WorkflowTestConfigurationDialog = ({
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
 
     const connectionDialogAllowed = useWorkflowNodeDetailsPanelStore((state) => state.connectionDialogAllowed);
+
+    const {setShowWorkflowCodeEditorSheet, setShowWorkflowInputsSheet} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+            setShowWorkflowInputsSheet: state.setShowWorkflowInputsSheet,
+        }))
+    );
 
     const {
         ConnectionKeys,
@@ -106,6 +114,14 @@ const WorkflowTestConfigurationDialog = ({
             setConnectionId: (index, connectionId) =>
                 setValue(`connections.${index}.connectionId`, connectionId as number, {shouldDirty: true}),
         });
+    };
+
+    const handleOpenInputs = () => {
+        onClose();
+
+        setShowWorkflowCodeEditorSheet(false);
+
+        setShowWorkflowInputsSheet(true);
     };
 
     const inputs: WorkflowInput[] = workflow.inputs ?? [];
@@ -183,55 +199,33 @@ const WorkflowTestConfigurationDialog = ({
 
                         <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
                             <TabsContent className="px-6 py-3" value="connections">
-                                {connections && componentConnections && componentConnections.length > 0 && (
-                                    <ConnectionConfigurationList
-                                        componentConnections={componentConnections}
-                                        connectionDialogAllowed={connectionDialogAllowed}
-                                        connections={connections}
-                                        connectionsGrouped={connectionsGrouped}
-                                        control={control as unknown as Control<FieldValues>}
-                                        getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
-                                        handleConnectionDialogOpen={(componentConnection) => {
-                                            setComponentConnection(componentConnection);
+                                <ConnectionConfigurationList
+                                    componentConnections={componentConnections}
+                                    connectionDialogAllowed={connectionDialogAllowed}
+                                    connections={connections}
+                                    connectionsGrouped={connectionsGrouped}
+                                    control={control as unknown as Control<FieldValues>}
+                                    getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
+                                    handleConnectionDialogOpen={(componentConnection) => {
+                                        setComponentConnection(componentConnection);
 
-                                            setShowNewConnectionDialog(true);
-                                        }}
-                                        handleConnectionIdChange={(index, connectionId) =>
-                                            setValue(`connections.${index}.connectionId`, connectionId)
-                                        }
-                                        workflow={workflow}
-                                    />
-                                )}
+                                        setShowNewConnectionDialog(true);
+                                    }}
+                                    handleConnectionIdChange={(index, connectionId) =>
+                                        setValue(`connections.${index}.connectionId`, connectionId)
+                                    }
+                                    workflow={workflow}
+                                />
                             </TabsContent>
 
                             <TabsContent className="px-6 py-3" value="inputs">
-                                {inputs && inputs.length > 0 && (
-                                    <Properties
-                                        control={control}
-                                        controlPath="inputs"
-                                        formState={formState}
-                                        properties={inputs.map((input) => {
-                                            if (input.type === 'string') {
-                                                return {
-                                                    controlType: 'TEXT',
-                                                    type: 'STRING',
-                                                    ...input,
-                                                } as PropertyAllType;
-                                            } else if (input.type === 'number') {
-                                                return {
-                                                    type: 'NUMBER',
-                                                    ...input,
-                                                } as PropertyAllType;
-                                            } else {
-                                                return {
-                                                    controlType: 'SELECT',
-                                                    type: 'BOOLEAN',
-                                                    ...input,
-                                                } as PropertyAllType;
-                                            }
-                                        })}
-                                    />
-                                )}
+                                <InputConfigurationList
+                                    control={control as unknown as Control<FieldValues>}
+                                    controlPath="inputs"
+                                    formState={formState}
+                                    inputs={inputs}
+                                    onOpenInputs={handleOpenInputs}
+                                />
                             </TabsContent>
                         </form>
                     </Tabs>

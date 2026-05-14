@@ -1,9 +1,9 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
-import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
+import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {FileInputIcon, Link2Icon} from 'lucide-react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
@@ -79,7 +79,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             <span className="ml-1">({componentConnections.length})</span>
                         </TabsTrigger>
 
-                        <TabsTrigger className="flex w-full gap-2 data-[state=active]:shadow-none" value="inputs">
+                        <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="inputs">
                             <FileInputIcon className="mr-2 size-4" />
 
                             <span>Inputs</span>
@@ -108,11 +108,11 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                     </TabsContent>
 
                     <TabsContent className="py-3" value="inputs">
-                        <ProjectDeploymentDialogWorkflowsStepItemInputs
-                            control={control}
-                            formState={formState}
-                            workflow={workflow}
-                            workflowIndex={workflowIndex}
+                        <InputConfigurationList
+                            control={control as unknown as Control<FieldValues>}
+                            controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
+                            formState={formState as unknown as FormState<FieldValues>}
+                            inputs={workflow.inputs}
                         />
                     </TabsContent>
                 </Tabs>
