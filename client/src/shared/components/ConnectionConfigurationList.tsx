@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
@@ -96,19 +96,29 @@ const ConnectionConfigurationListFormField = ({
                     </FormLabel>
 
                     <Select
+                        defaultValue={currentConnectionId != null ? currentConnectionId.toString() : undefined}
+                        name={field.name}
                         onValueChange={handleConnectionValueChange}
                         value={
-                            currentConnectionId != null
+                            (currentConnectionId != null
                                 ? currentConnectionId.toString()
                                 : field.value
                                   ? field.value.toString()
-                                  : undefined
+                                  : undefined) || ''
                         }
                     >
-                        <FormControl className="flex space-x-2">
+                        <FormControl>
                             <div className="flex space-x-2">
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Choose Connection..." />
+                                    {currentConnectionId ? (
+                                        <SelectValue placeholder="Select a connection..." />
+                                    ) : (
+                                        <SelectValue placeholder="Select a connection...">
+                                            <span className="text-content-neutral-secondary/80">
+                                                Select a connection...
+                                            </span>
+                                        </SelectValue>
+                                    )}
                                 </SelectTrigger>
 
                                 {connectionDialogAllowed && (
@@ -125,6 +135,8 @@ const ConnectionConfigurationListFormField = ({
                         </FormControl>
 
                         <SelectContent>
+                            <SelectItem value="null">Select a connection...</SelectItem>
+
                             {connectionList.map((connection) => (
                                 <SelectItem
                                     className="flex items-center"

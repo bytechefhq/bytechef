@@ -1,9 +1,11 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
+import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ProjectDeploymentDialogWorkflowsStepItemInputs from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
+import {FileInputIcon, Link2Icon} from 'lucide-react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -44,13 +46,19 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     });
 
     return (
-        <>
+        <div className="">
             {showWorkflowToggle && (
-                <div className="flex cursor-pointer justify-between py-2">
-                    <span className="font-semibold">{label}</span>
+                <div className="flex justify-between py-2">
+                    <Label
+                        className="w-full cursor-pointer text-base font-semibold"
+                        htmlFor={`projectDeploymentWorkflows.${workflowIndex}`}
+                    >
+                        {label}
+                    </Label>
 
                     <Switch
                         checked={workflowEnabledMap.get(workflow.id!)}
+                        id={`projectDeploymentWorkflows.${workflowIndex}`}
                         onCheckedChange={(value) => {
                             setValue(`projectDeploymentWorkflows.${workflowIndex!}.enabled`, value);
 
@@ -61,19 +69,26 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             )}
 
             {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
-                <ul className="mt-2 space-y-6">
-                    <li className="flex flex-col gap-3">
-                        <Label className="text-base font-semibold">Inputs</Label>
+                <Tabs defaultValue="connections">
+                    <TabsList className="flex w-full">
+                        <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
+                            <Link2Icon className="mr-2 size-4" />
 
-                        <ProjectDeploymentDialogWorkflowsStepItemInputs
-                            control={control}
-                            formState={formState}
-                            workflow={workflow}
-                            workflowIndex={workflowIndex}
-                        />
-                    </li>
+                            <span>Connections</span>
 
-                    <li className="flex flex-col gap-3">
+                            <span className="ml-1">({componentConnections.length})</span>
+                        </TabsTrigger>
+
+                        <TabsTrigger className="flex w-full gap-2 data-[state=active]:shadow-none" value="inputs">
+                            <FileInputIcon className="mr-2 size-4" />
+
+                            <span>Inputs</span>
+
+                            <span className="ml-1">({workflow.inputs?.length})</span>
+                        </TabsTrigger>
+                    </TabsList>
+
+                    <TabsContent className="py-3" value="connections">
                         <ConnectionConfigurationList
                             componentConnections={componentConnections}
                             connections={connections ?? []}
@@ -90,10 +105,19 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             }
                             workflow={workflow}
                         />
-                    </li>
-                </ul>
+                    </TabsContent>
+
+                    <TabsContent className="py-3" value="inputs">
+                        <ProjectDeploymentDialogWorkflowsStepItemInputs
+                            control={control}
+                            formState={formState}
+                            workflow={workflow}
+                            workflowIndex={workflowIndex}
+                        />
+                    </TabsContent>
+                </Tabs>
             )}
-        </>
+        </div>
     );
 };
 

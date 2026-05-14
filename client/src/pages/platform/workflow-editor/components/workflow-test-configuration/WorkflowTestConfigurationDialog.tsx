@@ -162,24 +162,27 @@ const WorkflowTestConfigurationDialog = ({
                 </DialogHeader>
 
                 <Form {...form}>
-                    <Tabs
-                        className="flex max-h-workflow-test-configuration-dialog-height flex-col gap-3 overflow-y-auto"
-                        defaultValue="connections"
-                    >
+                    <Tabs className="max-h-workflow-test-configuration-dialog-height" defaultValue="connections">
                         <TabsList className="mx-6 flex">
-                            <TabsTrigger className="flex w-full gap-2" value="connections">
-                                <Link2Icon className="size-4" />
-                                Connections
+                            <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
+                                <Link2Icon className="mr-2 size-4" />
+
+                                <span>Connections</span>
+
+                                <span className="ml-1">({componentConnections.length})</span>
                             </TabsTrigger>
 
-                            <TabsTrigger className="flex w-full gap-2" value="inputs">
-                                <FileInputIcon className="size-4" />
-                                Inputs
+                            <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="inputs">
+                                <FileInputIcon className="mr-2 size-4" />
+
+                                <span>Inputs</span>
+
+                                <span className="ml-1">({workflow.inputs?.length})</span>
                             </TabsTrigger>
                         </TabsList>
 
                         <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
-                            <TabsContent className="px-6" value="connections">
+                            <TabsContent className="px-6 py-3" value="connections">
                                 {connections && componentConnections && componentConnections.length > 0 && (
                                     <ConnectionConfigurationList
                                         componentConnections={componentConnections}
@@ -201,7 +204,7 @@ const WorkflowTestConfigurationDialog = ({
                                 )}
                             </TabsContent>
 
-                            <TabsContent className="px-6" value="inputs">
+                            <TabsContent className="px-6 py-3" value="inputs">
                                 {inputs && inputs.length > 0 && (
                                     <Properties
                                         control={control}
