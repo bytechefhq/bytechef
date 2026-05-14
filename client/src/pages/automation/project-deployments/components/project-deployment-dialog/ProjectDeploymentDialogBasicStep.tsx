@@ -299,14 +299,14 @@ const ProjectDeploymentDialogBasicStep = ({
             }}
             value={basicStepTab}
         >
-            <TabsList>
-                <TabsTrigger className="gap-2 px-3 py-1" value="new-deployment">
+            <TabsList className="flex">
+                <TabsTrigger className="w-full gap-2" value="new-deployment">
                     <PlusIcon className="size-4" />
 
                     <span>New</span>
                 </TabsTrigger>
 
-                <TabsTrigger className="gap-2 px-3 py-1" value="change-version">
+                <TabsTrigger className="w-full gap-2" value="change-version">
                     <RefreshCwIcon className="size-4" />
 
                     <span>Change Version</span>
