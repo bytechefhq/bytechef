@@ -101,8 +101,17 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
     }
 
     public Optional<ClusterElement> fetchClusterElement(ClusterElementType clusterElementType) {
-        return Optional.ofNullable(super.get(clusterElementType.key()))
-            .map(value -> (ClusterElement) value);
+        Object value = super.get(clusterElementType.key());
+
+        if (value instanceof ClusterElement clusterElement) {
+            return Optional.of(clusterElement);
+        }
+
+        if (value instanceof List<?> list && !list.isEmpty() && list.get(0) instanceof ClusterElement clusterElement) {
+            return Optional.of(clusterElement);
+        }
+
+        return Optional.empty();
     }
 
     /**
