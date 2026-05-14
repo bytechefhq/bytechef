@@ -163,7 +163,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Property 'active' has incorrect type. Expected: boolean, but got: string", errors.toString());
+            assertEquals("[task2] Property 'active' has incorrect type. Expected: boolean, but got: string",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -282,7 +283,7 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Task 'invalidformat' doesn't exits.", errors.toString());
+            assertEquals("[task2] Task 'invalidformat' doesn't exits.", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -336,7 +337,7 @@ class WorkflowValidatorTest {
 
             assertEquals("", errors.toString());
             assertEquals(
-                "Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
+                "[task2] Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -531,7 +532,7 @@ class WorkflowValidatorTest {
 
             assertEquals("", errors.toString());
             assertEquals(
-                "Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'",
+                "[task2] Property 'task1.propInvalid' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -568,7 +569,7 @@ class WorkflowValidatorTest {
 
         String string = errors.toString();
 
-        assertTrue(string.contains("Field 'type' must match pattern:"), string);
+        assertTrue(string.contains("[testTask] Field 'type' must match pattern:"), string);
     }
 
     @Test
@@ -585,7 +586,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Missing required field: label", errors.toString());
+        assertEquals("[testTask] Missing required field: label", errors.toString());
     }
 
     @Test
@@ -602,7 +603,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Missing required field: type", errors.toString());
+        assertEquals("[testTask] Missing required field: type", errors.toString());
     }
 
     @Test
@@ -637,7 +638,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Field 'label' must be a string", errors.toString());
+        assertEquals("[testTask] Field 'label' must be a string", errors.toString());
     }
 
     @Test
@@ -673,7 +674,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Field 'type' must be a string", errors.toString());
+        assertEquals("[testTask] Field 'type' must be a string", errors.toString());
     }
 
     @Test
@@ -752,7 +753,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Missing required field: parameters", errors.toString());
+        assertEquals("[testTask] Missing required field: parameters", errors.toString());
     }
 
     @Test
@@ -770,7 +771,7 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskStructure(invalidTask, errors);
 
-        assertEquals("Field 'parameters' must be an object", errors.toString());
+        assertEquals("[testTask] Field 'parameters' must be an object", errors.toString());
     }
 
     @Test
@@ -847,10 +848,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("Property 'extraField' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Property 'extraField' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -968,12 +969,12 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Property 'name' has incorrect type. Expected: string, but got: integer
-            Property 'age' has incorrect type. Expected: integer, but got: string
-            Property 'active' has incorrect type. Expected: boolean, but got: string""", errors.toString());
+            [testTask] Property 'name' has incorrect type. Expected: string, but got: integer
+            [testTask] Property 'age' has incorrect type. Expected: integer, but got: string
+            [testTask] Property 'active' has incorrect type. Expected: boolean, but got: string""", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -999,14 +1000,14 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Property 'day' is in incorrect date format. Format should be in: 'yyyy-MM-dd'
-            Property 'night' is in incorrect date format. Impossible date: 2025-02-30
-            Property 'from' is in incorrect time format. Impossible time: 45:45:73
-            Property 'to' is in incorrect time format. Format should be in: 'hh:mm:ss'
-            Property 'specific_date' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'""",
+            [testTask] Property 'day' is in incorrect date format. Format should be in: 'yyyy-MM-dd'
+            [testTask] Property 'night' is in incorrect date format. Impossible date: 2025-02-30
+            [testTask] Property 'from' is in incorrect time format. Impossible time: 45:45:73
+            [testTask] Property 'to' is in incorrect time format. Format should be in: 'hh:mm:ss'
+            [testTask] Property 'specific_date' has incorrect type. Format should be in: 'yyyy-MM-ddThh:mm:ss'""",
             errors.toString());
         assertEquals("", warnings.toString());
     }
@@ -1038,14 +1039,14 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Property 'obj.name' has incorrect type. Expected: string, but got: integer
-            Property 'obj.age' has incorrect type. Expected: integer, but got: string
-            Property 'obj.active' has incorrect type. Expected: boolean, but got: string
-            Value 'John' has incorrect type in property 'items'. Expected: integer, but got: string
-            Value 'Porky' has incorrect type in property 'items'. Expected: integer, but got: string""",
+            [testTask] Property 'obj.name' has incorrect type. Expected: string, but got: integer
+            [testTask] Property 'obj.age' has incorrect type. Expected: integer, but got: string
+            [testTask] Property 'obj.active' has incorrect type. Expected: boolean, but got: string
+            [testTask] Value 'John' has incorrect type in property 'items'. Expected: integer, but got: string
+            [testTask] Value 'Porky' has incorrect type in property 'items'. Expected: integer, but got: string""",
             errors.toString());
         assertEquals("", warnings.toString());
     }
@@ -1138,10 +1139,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: items[2].age", errors.toString());
-        assertEquals("Property 'items[index].page' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Missing required property: items[2].age", errors.toString());
+        assertEquals("[testTask] Property 'items[index].page' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -1177,10 +1178,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: items[1].adult", errors.toString());
-        assertEquals("Property 'items[2].adult' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Missing required property: items[1].adult", errors.toString());
+        assertEquals("[testTask] Property 'items[2].adult' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -1201,10 +1202,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("Property 'config.key' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Property 'config.key' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -1296,12 +1297,12 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Property 'invalidNumber' has incorrect type. Expected: integer, but got: string
-            Missing required property: missingRequired""", errors.toString());
-        assertEquals("Property 'extraProperty' is not defined in task definition", warnings.toString());
+            [testTask] Property 'invalidNumber' has incorrect type. Expected: integer, but got: string
+            [testTask] Missing required property: missingRequired""", errors.toString());
+        assertEquals("[testTask] Property 'extraProperty' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -1317,10 +1318,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("Property 'anyProperty' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Property 'anyProperty' is not defined in task definition", warnings.toString());
     }
 
     @Test
@@ -1463,13 +1464,13 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
-            Property 'featureConfig' is not defined in task definition
-            Property 'featureConfig.setting1' is not defined in task definition
-            Property 'featureConfig.setting2' is not defined in task definition""", warnings.toString());
+            [testTask] Property 'featureConfig' is not defined in task definition
+            [testTask] Property 'featureConfig.setting1' is not defined in task definition
+            [testTask] Property 'featureConfig.setting2' is not defined in task definition""", warnings.toString());
     }
 
     @Test
@@ -1495,14 +1496,14 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
-            Property 'featureConfig' is not defined in task definition
-            Property 'featureConfig.setting1' is not defined in task definition
-            Property 'featureConfig.setting2' is not defined in task definition
-            Invalid logic for display condition: 'gndfknskgn / sflakdjdkf 3'""", warnings.toString());
+            [testTask] Property 'featureConfig' is not defined in task definition
+            [testTask] Property 'featureConfig.setting1' is not defined in task definition
+            [testTask] Property 'featureConfig.setting2' is not defined in task definition
+            [testTask] Invalid logic for display condition: 'gndfknskgn / sflakdjdkf 3'""", warnings.toString());
     }
 
     @Test
@@ -1527,9 +1528,9 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: featureConfig.setting1", errors.toString());
+        assertEquals("[testTask] Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -1555,9 +1556,9 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: featureConfig.setting1", errors.toString());
+        assertEquals("[testTask] Missing required property: featureConfig.setting1", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -1587,15 +1588,15 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Missing required property: advancedConfig
-            Missing required property: advancedConfig.mandatory
-            Missing required property: advancedConfig.mandatory.name""", errors.toString());
+            [testTask] Missing required property: advancedConfig
+            [testTask] Missing required property: advancedConfig.mandatory
+            [testTask] Missing required property: advancedConfig.mandatory.name""", errors.toString());
         assertEquals("""
-            Property 'basicConfig' is not defined in task definition
-            Property 'basicConfig.name' is not defined in task definition""", warnings.toString());
+            [testTask] Property 'basicConfig' is not defined in task definition
+            [testTask] Property 'basicConfig.name' is not defined in task definition""", warnings.toString());
     }
 
     @Test
@@ -1661,10 +1662,11 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("Property 'bodyContent.extension' is not defined in task definition", warnings.toString());
+        assertEquals("[testTask] Property 'bodyContent.extension' is not defined in task definition",
+            warnings.toString());
     }
 
     @Test
@@ -1694,12 +1696,12 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Missing required property: bodyContent.mimeType
-            Missing required property: bodyContent.name
-            Missing required property: bodyContent.url""", errors.toString());
+            [testTask] Missing required property: bodyContent.mimeType
+            [testTask] Missing required property: bodyContent.name
+            [testTask] Missing required property: bodyContent.url""", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -1781,10 +1783,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
-        assertEquals("Invalid logic for display condition: 'enableAdvanced == true'", warnings.toString());
+        assertEquals("[testTask] Invalid logic for display condition: 'enableAdvanced == true'", warnings.toString());
     }
 
     @Test
@@ -1862,10 +1864,11 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: config1.config2.config3.finalValue", errors.toString());
-        assertEquals("Property 'config1.config2.config3.randomValue' is not defined in task definition",
+        assertEquals("[testTask] Missing required property: config1.config2.config3.finalValue", errors.toString());
+        assertEquals(
+            "[testTask] Property 'config1.config2.config3.randomValue' is not defined in task definition",
             warnings.toString());
     }
 
@@ -1904,10 +1907,10 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals(
-            "Property 'config1.config2.config3.finalValue' has incorrect type. Expected: string, but got: integer",
+            "[testTask] Property 'config1.config2.config3.finalValue' has incorrect type. Expected: string, but got: integer",
             errors.toString());
         assertEquals("", warnings.toString());
     }
@@ -1946,12 +1949,13 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
-            Property 'config1.config2.config3' is not defined in task definition
-            Property 'config1.config2.config3.finalValue' is not defined in task definition""", warnings.toString());
+            [testTask] Property 'config1.config2.config3' is not defined in task definition
+            [testTask] Property 'config1.config2.config3.finalValue' is not defined in task definition""",
+            warnings.toString());
     }
 
     @Test
@@ -2018,9 +2022,9 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: advancedConfig", errors.toString());
+        assertEquals("[testTask] Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -2041,9 +2045,9 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
-        assertEquals("Missing required property: advancedConfig", errors.toString());
+        assertEquals("[testTask] Missing required property: advancedConfig", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -2168,12 +2172,12 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("""
-            Missing required property: config1.level2
-            Missing required property: config1.config2.level3
-            Missing required property: config1.config2.config3.finalValue""", errors.toString());
+            [testTask] Missing required property: config1.level2
+            [testTask] Missing required property: config1.config2.level3
+            [testTask] Missing required property: config1.config2.config3.finalValue""", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -2284,13 +2288,13 @@ class WorkflowValidatorTest {
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
 
-        TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+        TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
         assertEquals("", errors.toString());
         assertEquals("""
-            Property 'headers.Authorization' is not defined in task definition
-            Property 'headers.Content-Type' is not defined in task definition
-            Property 'queryParameters.debug' is not defined in task definition""", warnings.toString());
+            [testTask] Property 'headers.Authorization' is not defined in task definition
+            [testTask] Property 'headers.Content-Type' is not defined in task definition
+            [testTask] Property 'queryParameters.debug' is not defined in task definition""", warnings.toString());
     }
 
     @Test
@@ -2921,7 +2925,7 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Missing required field: label", errors.toString());
+            assertEquals("[testTask1] Missing required field: label", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -2966,8 +2970,8 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals("""
-                Property 'name' has incorrect type. Expected: string, but got: integer
-                Missing required property: age""", errors.toString());
+                [testTask1] Property 'name' has incorrect type. Expected: string, but got: integer
+                [testTask1] Missing required property: age""", errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3026,7 +3030,7 @@ class WorkflowValidatorTest {
 
             assertEquals("", errors.toString());
             assertEquals(
-                "Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
+                "[testTask2] Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
@@ -3084,7 +3088,7 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals(
-                "Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
+                "[testTask2] Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -3154,9 +3158,10 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
+            assertEquals("[testTask2] Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
                 errors.toString());
-            assertEquals("Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
+            assertEquals(
+                "[testTask3] Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception for valid tasks: " + e.getMessage());
@@ -3252,8 +3257,9 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals("""
-                Missing required field: label
-                Property 'age' has incorrect type. Expected: integer, but got: string""", errors.toString());
+                [invalidTask] Missing required field: label
+                [invalidTask] Property 'age' has incorrect type. Expected: integer, but got: string""",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3340,8 +3346,9 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals("""
-                Property 'loop1.item[0]' in output of 'loop/v1' is of type string, not number
-                Property 'loop1.item[2]' in output of 'loop/v1' is of type object, not number""", errors.toString());
+                [loop1] Property 'loop1.item[0]' in output of 'loop/v1' is of type string, not number
+                [loop1] Property 'loop1.item[2]' in output of 'loop/v1' is of type object, not number""",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3422,7 +3429,7 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals(
-                "Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
+                "[loop1] Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -3659,10 +3666,10 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Missing required property: name", errors.toString());
+            assertEquals("[condition_1] Missing required property: name", errors.toString());
             assertEquals("""
-                Property 'age' is not defined in task definition
-                Property 'task1.propNumber' might not exist in the output of 'component/v1/trigger1'""",
+                [condition_1] Property 'age' is not defined in task definition
+                [condition_1] Property 'task1.propNumber' might not exist in the output of 'component/v1/trigger1'""",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3802,9 +3809,11 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
+            assertEquals(
+                "[condition_1] Property 'loop1.item[0]' in output of 'loop/v1' is of type boolean, not number",
                 errors.toString());
-            assertEquals("Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
+            assertEquals(
+                "[condition_1] Property 'task1.propString' might not exist in the output of 'component/v1/trigger1'",
                 warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -4307,7 +4316,7 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
-        assertEquals("Missing required field: label", errors.toString());
+        assertEquals("[test_task] Missing required field: label", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -4333,7 +4342,7 @@ class WorkflowValidatorTest {
 
         WorkflowValidator.validateSingleTask(task, taskDefProvider, errors, warnings);
 
-        assertEquals("Missing required property: name", errors.toString());
+        assertEquals("[test_task] Missing required property: name", errors.toString());
         assertEquals("", warnings.toString());
     }
 
