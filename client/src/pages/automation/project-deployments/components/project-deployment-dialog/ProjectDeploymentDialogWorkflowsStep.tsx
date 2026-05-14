@@ -19,7 +19,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     setValue,
     workflows,
 }: ProjectDeploymentDialogWorkflowsStepProps) => (
-    <div className="h-full space-y-4">
+    <div className="h-full space-y-5">
         {workflows?.map((workflow, workflowIndex) => (
             <ProjectDeploymentDialogWorkflowsStepItem
                 connections={connections}

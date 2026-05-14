@@ -13,6 +13,7 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form} from '@/components/ui/form';
+import {Progress} from '@/components/ui/progress';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/stores/useWorkflowsEnabledStore';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
@@ -489,6 +490,22 @@ const ProjectDeploymentDialog = ({
         setTabInitialized(true);
     }, [isOpen, projectDeploymentsLoading, projectDeployments, changeProjectVersion, tabInitialized]);
 
+    let dialogTitle = '';
+
+    if (effectiveChangeProjectVersion) {
+        dialogTitle = 'Change Project Version';
+    }
+
+    if (!effectiveChangeProjectVersion && effectiveProjectDeployment) {
+        const {id: projectDeploymentId} = effectiveProjectDeployment;
+
+        if (!projectDeploymentId) {
+            dialogTitle = `New Deployment - ${projectDeploymentDialogSteps[activeStepIndex].name}`;
+        } else {
+            dialogTitle = `Edit Deployment - ${effectiveProjectDeployment.name}`;
+        }
+    }
+
     return (
         <Dialog
             onOpenChange={(isOpen) => {
@@ -511,35 +528,16 @@ const ProjectDeploymentDialog = ({
                 onClick={(event) => event.stopPropagation()}
                 onInteractOutside={(event) => event.preventDefault()}
             >
-                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 p-6">
-                    <div className="flex w-full flex-col space-y-1">
-                        <DialogTitle>
-                            {effectiveChangeProjectVersion
-                                ? 'Change Project Version'
-                                : `${effectiveProjectDeployment?.id ? 'Edit' : 'New'} Deployment ${!effectiveProjectDeployment?.id ? '-' : ''} ${
-                                      !effectiveProjectDeployment?.id
-                                          ? projectDeploymentDialogSteps[activeStepIndex].name
-                                          : ''
-                                  }`}
-                        </DialogTitle>
+                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 pb-3 pt-6">
+                    <div className="flex w-full flex-col space-y-2">
+                        <DialogTitle>{dialogTitle}</DialogTitle>
 
                         {!effectiveProjectDeployment?.id && !effectiveChangeProjectVersion && (
-                            <nav aria-label="Progress">
-                                <ol className="space-y-4 md:flex md:space-y-0" role="list">
-                                    {projectDeploymentDialogSteps.map((step, index) => (
-                                        <li className="md:flex-1" key={step.name}>
-                                            <div
-                                                className={twMerge(
-                                                    'group flex flex-col border-l-4 py-2 pl-4 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0',
-                                                    index <= activeStepIndex
-                                                        ? 'border-gray-900 hover:border-gray-800'
-                                                        : 'hover:border-gray-30 border-gray-200'
-                                                )}
-                                            />
-                                        </li>
-                                    ))}
-                                </ol>
-                            </nav>
+                            <Progress
+                                aria-label="Progress"
+                                className="h-1"
+                                value={((activeStepIndex + 1) / projectDeploymentDialogSteps.length) * 100}
+                            />
                         )}
                     </div>
 
@@ -547,7 +545,9 @@ const ProjectDeploymentDialog = ({
                 </DialogHeader>
 
                 <WorkflowMockProvider>
-                    <div className={twMerge('px-6', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}>
+                    <div
+                        className={twMerge('px-6 py-3', activeStepIndex === 1 && 'max-h-dialog-height overflow-y-auto')}
+                    >
                         {activeStepIndex === 1 && isWorkflowsPending ? (
                             <div className="flex justify-center py-12">
                                 <LoadingDots />
@@ -558,7 +558,7 @@ const ProjectDeploymentDialog = ({
                     </div>
                 </WorkflowMockProvider>
 
-                <DialogFooter className="p-6">
+                <DialogFooter className="px-6 pb-6 pt-3">
                     {activeStepIndex === 0 && (
                         <>
                             <DialogClose asChild>
