@@ -20,6 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -52,7 +54,8 @@ public class MicrosoftSharePointNewFileTrigger {
                 .description("If no folder is selected, root folder will be monitored for new file.")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
-                .required(false))
+                .required(false),
+            RECURSION_PROPERTY)
         .output()
         .poll(MicrosoftSharePointNewFileTrigger::poll)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
@@ -64,9 +67,14 @@ public class MicrosoftSharePointNewFileTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        String url = "/sites/%s/drive/items/%s/children".formatted(
-            inputParameters.getRequiredString(SITE_ID), inputParameters.getString(PARENT_FOLDER, "root"));
+        String url = "/sites/%s/drive/items/%s/".formatted(
+            inputParameters.getRequiredString(SITE_ID),
+            inputParameters.getString(PARENT_FOLDER, "root"));
 
-        return MicrosoftTriggerUtils.poll(url, "file", closureParameters, context);
+        return MicrosoftTriggerUtils.poll(
+            inputParameters.getBoolean(RECURSION) ? url + "delta" : url + "children",
+            "file",
+            closureParameters,
+            context);
     }
 }

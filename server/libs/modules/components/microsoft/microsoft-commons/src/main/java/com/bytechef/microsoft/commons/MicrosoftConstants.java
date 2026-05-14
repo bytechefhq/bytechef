@@ -16,6 +16,10 @@
 
 package com.bytechef.microsoft.commons;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
+
+import com.bytechef.component.definition.Property.BooleanProperty;
+
 /**
  * @author Nikolina Spehar
  */
@@ -24,7 +28,14 @@ public class MicrosoftConstants {
     public static final String FILE = "file";
     public static final String ID = "id";
     public static final String LAST_TIME_CHECKED = "lastTimeChecked";
-    public static final String VALUE = "value";
-    public static final String ODATA_NEXT_LINK = "@odata.nextLink";
     public static final String NAME = "name";
+    public static final String ODATA_NEXT_LINK = "@odata.nextLink";
+    public static final String RECURSION = "recursion";
+    public static final String VALUE = "value";
+
+    public static final BooleanProperty RECURSION_PROPERTY = bool(RECURSION)
+        .label("Recursion")
+        .description("Whether subfolders of the selected parent folder will be recursively checked for new files.")
+        .defaultValue(false)
+        .required(false);
 }
