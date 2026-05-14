@@ -136,6 +136,16 @@ public class WorkflowValidator {
 
             JsonNode taskJsonNode = com.bytechef.commons.util.JsonUtils.readTree(task);
 
+            String taskName = "";
+
+            if (taskJsonNode.has("name")) {
+                JsonNode nameJsonNode = taskJsonNode.get("name");
+
+                if (nameJsonNode.isString()) {
+                    taskName = nameJsonNode.asString();
+                }
+            }
+
             JsonNode typeJsonNode = taskJsonNode.get("type");
 
             String type = typeJsonNode.asString();
@@ -149,7 +159,7 @@ public class WorkflowValidator {
                 taskParameters = com.bytechef.commons.util.JsonUtils.write(parametersJsonNode);
             }
 
-            TaskValidator.validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+            TaskValidator.validateTaskParameters(taskName, taskParameters, taskDefinition, errors, warnings);
 
         } catch (Exception e) {
             errors.append("Failed to validate task: ");

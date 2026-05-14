@@ -53,13 +53,6 @@ class TaskValidator {
      */
     public static void validateAllTasks(ValidationContext context) {
         for (JsonNode taskJsonNode : context.getTasks()) {
-            validateTaskStructure(taskJsonNode.toString(), context.getErrors());
-
-            List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
-
-            processTaskDispatcher(taskJsonNode, context);
-            validateDataPills(taskJsonNode, taskDefinition, context);
-
             String taskName = "";
 
             if (taskJsonNode.has("name")) {
@@ -68,7 +61,43 @@ class TaskValidator {
                 taskName = nameJsonNode.asString();
             }
 
+            StringBuilder errors = context.getErrors();
+            StringBuilder warnings = context.getWarnings();
+            int errorsStart = errors.length();
+            int warningsStart = warnings.length();
+
+            validateTaskStructureFields(taskJsonNode, errors);
+
+            List<PropertyInfo> taskDefinition = validateTaskParameters(taskJsonNode, context);
+
+            processTaskDispatcher(taskJsonNode, context);
+            validateDataPills(taskJsonNode, taskDefinition, context);
             validateClusterElements(taskJsonNode, taskName, context);
+
+            if (!taskName.isEmpty()) {
+                prefixTaskMessages(errors, errorsStart, taskName);
+                prefixTaskMessages(warnings, warningsStart, taskName);
+            }
+        }
+    }
+
+    private static void prefixTaskMessages(StringBuilder builder, int startPosition, String taskName) {
+        if (builder.length() <= startPosition) {
+            return;
+        }
+
+        String newContent = builder.substring(startPosition);
+
+        builder.delete(startPosition, builder.length());
+
+        if (newContent.startsWith("\n")) {
+            newContent = newContent.substring(1);
+        }
+
+        String prefix = "[" + taskName + "] ";
+
+        for (String line : newContent.split("\n", -1)) {
+            StringUtils.appendWithNewline(prefix + line, builder);
         }
     }
 
@@ -195,6 +224,26 @@ class TaskValidator {
             return;
         }
 
+        String taskName = "";
+
+        if (taskJsonNode.has("name")) {
+            JsonNode nameJsonNode = taskJsonNode.get("name");
+
+            if (nameJsonNode.isString()) {
+                taskName = nameJsonNode.asString();
+            }
+        }
+
+        int errorsStart = errors.length();
+
+        validateTaskStructureFields(taskJsonNode, errors);
+
+        if (!taskName.isEmpty()) {
+            prefixTaskMessages(errors, errorsStart, taskName);
+        }
+    }
+
+    private static void validateTaskStructureFields(JsonNode taskJsonNode, StringBuilder errors) {
         FieldValidator.appendErrorRequiredStringField(taskJsonNode, "label", errors);
         FieldValidator.appendErrorRequiredStringField(taskJsonNode, "name", errors);
         appendErrorTaskTypeField(taskJsonNode, errors);
@@ -214,7 +263,7 @@ class TaskValidator {
 
                 StringUtils.appendWithNewline(ValidationErrorUtils.typeError(path, "object", actualType), errors);
             } else {
-                validateTaskStructure(taskJsonNode.toString(), errors);
+                validateTaskStructureFields(taskJsonNode, errors);
 
                 if (taskJsonNode.has("parameters") && taskJsonNode.has("type")) {
                     JsonNode parametersJsonNode = taskJsonNode.get("parameters");
@@ -249,6 +298,30 @@ class TaskValidator {
 
         PropertyValidator.validateProperties(
             taskParametersJsonNode, taskDefinition, "", taskParameters, errors, warnings);
+    }
+
+    /**
+     * Validates task parameters and prefixes all errors and warnings with the given task name.
+     *
+     * @param taskName       the task name used as prefix for messages
+     * @param taskParameters the task parameters JSON
+     * @param taskDefinition list of PropertyInfo representing the task definition
+     * @param errors         StringBuilder to collect validation errors
+     * @param warnings       StringBuilder to collect validation warnings
+     */
+    public static void validateTaskParameters(
+        String taskName, String taskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors,
+        StringBuilder warnings) {
+
+        int errorsStart = errors.length();
+        int warningsStart = warnings.length();
+
+        validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
+
+        if (!taskName.isEmpty()) {
+            prefixTaskMessages(errors, errorsStart, taskName);
+            prefixTaskMessages(warnings, warningsStart, taskName);
+        }
     }
 
     /**
@@ -407,7 +480,7 @@ class TaskValidator {
      * Validates the structure of a nested task.
      */
     private static void validateTaskStructure(JsonNode nestedTaskJsonNode, ValidationContext context) {
-        validateTaskStructure(nestedTaskJsonNode.toString(), context.getErrors());
+        validateTaskStructureFields(nestedTaskJsonNode, context.getErrors());
     }
 
     /**

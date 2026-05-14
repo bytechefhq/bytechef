@@ -138,7 +138,8 @@ class WorkflowValidatorClusterElementsTest {
             WorkflowValidator.validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(),
                 errors, warnings);
 
-            assertEquals("Missing required property: aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model",
+            assertEquals(
+                "[aiAgent_1] Missing required property: aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -238,7 +239,7 @@ class WorkflowValidatorClusterElementsTest {
                 errors, warnings);
 
             assertEquals(
-                "Property 'aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model' has incorrect type. Expected: string, but got: number",
+                "[aiAgent_1] Property 'aiAgent_1.questionAnswerRag_1.couchbase_1.openAi_3.model' has incorrect type. Expected: string, but got: number",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -344,8 +345,8 @@ class WorkflowValidatorClusterElementsTest {
 
             assertEquals("", errors.toString());
             assertEquals("""
-                Cluster element 'guardrails' is missing from task aiAgent_1
-                Cluster element 'guardsnails' are not defined in task aiAgent_1""", warnings.toString());
+                [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
+                [aiAgent_1] Cluster element 'guardsnails' are not defined in task aiAgent_1""", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -449,8 +450,8 @@ class WorkflowValidatorClusterElementsTest {
 
             assertEquals("", errors.toString());
             assertEquals("""
-                Cluster element 'embedding' is missing from task couchbase_1
-                Cluster element 'model' are not defined in task couchbase_1""", warnings.toString());
+                [aiAgent_1] Cluster element 'embedding' is missing from task couchbase_1
+                [aiAgent_1] Cluster element 'model' are not defined in task couchbase_1""", warnings.toString());
 
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -552,12 +553,12 @@ class WorkflowValidatorClusterElementsTest {
 
             assertEquals("", errors.toString());
             assertEquals("""
-                Property 'expression' is not defined in task definition
-                Cluster element 'model' is missing from task aiAgent_1
-                Cluster element 'chatMemory' is missing from task aiAgent_1
-                Cluster element 'rag' is missing from task aiAgent_1
-                Cluster element 'guardrails' is missing from task aiAgent_1
-                Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+                [condition_1] Property 'expression' is not defined in task definition
+                [condition_1] Cluster element 'model' is missing from task aiAgent_1
+                [condition_1] Cluster element 'chatMemory' is missing from task aiAgent_1
+                [condition_1] Cluster element 'rag' is missing from task aiAgent_1
+                [condition_1] Cluster element 'guardrails' is missing from task aiAgent_1
+                [condition_1] Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -794,12 +795,12 @@ class WorkflowValidatorClusterElementsTest {
             clusterElementTypesMap.toString());
         assertEquals("", errors.toString());
         assertEquals("""
-            Property 'expression' is not defined in task definition
-            Cluster element 'model' is missing from task aiAgent_1
-            Cluster element 'chatMemory' is missing from task aiAgent_1
-            Cluster element 'rag' is missing from task aiAgent_1
-            Cluster element 'guardrails' is missing from task aiAgent_1
-            Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+            [condition_1] Property 'expression' is not defined in task definition
+            [aiAgent_1] Cluster element 'model' is missing from task aiAgent_1
+            [aiAgent_1] Cluster element 'chatMemory' is missing from task aiAgent_1
+            [aiAgent_1] Cluster element 'rag' is missing from task aiAgent_1
+            [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
+            [aiAgent_1] Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
     }
 
     @Test
@@ -918,9 +919,10 @@ class WorkflowValidatorClusterElementsTest {
             "{mariaDbVectorStore/v1/load=[documentReader, documentTransformer, embedding], questionAnswerRag/v1/rag=[vectorStore], aiAgent/v1/chat=[model, chatMemory, rag, guardrails, tools], couchbase/v1/vectorStore=[documentReader, documentTransformer, embedding]}",
             clusterElementTypesMap.toString());
         assertEquals(
-            "Property 'trigger_1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
+            "[aiAgent_1] Property 'trigger_1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
             errors.toString());
-        assertEquals("Property 'trigger_1.message' might not exist in the output of 'component/v1/trigger1'",
+        assertEquals(
+            "[aiAgent_1] Property 'trigger_1.message' might not exist in the output of 'component/v1/trigger1'",
             warnings.toString());
     }
 }
