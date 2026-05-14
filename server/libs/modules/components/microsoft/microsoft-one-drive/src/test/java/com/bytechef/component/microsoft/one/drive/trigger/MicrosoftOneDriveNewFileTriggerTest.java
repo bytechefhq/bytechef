@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.one.drive.trigger;
 
 import static com.bytechef.component.microsoft.one.drive.constant.MicrosoftOneDriveConstants.PARENT_ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -38,7 +39,8 @@ import org.mockito.MockedStatic;
  */
 class MicrosoftOneDriveNewFileTriggerTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(PARENT_ID, "xy"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
+        PARENT_ID, "xy", RECURSION, false));
     private final PollOutput mockedPollOutput = mock(PollOutput.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
