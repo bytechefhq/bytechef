@@ -28,13 +28,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
  *
  * @author ByteChef
  */
-class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
+public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
 
     private final ChatMemoryRepository delegate;
     private final JdbcTemplate jdbcTemplate;
     private final String findConversationIdsOrderedSql;
 
-    OrderedJdbcChatMemoryRepository(
+    @SuppressFBWarnings("EI2")
+    public OrderedJdbcChatMemoryRepository(
         ChatMemoryRepository delegate, JdbcTemplate jdbcTemplate, String findConversationIdsOrderedSql) {
 
         this.delegate = delegate;

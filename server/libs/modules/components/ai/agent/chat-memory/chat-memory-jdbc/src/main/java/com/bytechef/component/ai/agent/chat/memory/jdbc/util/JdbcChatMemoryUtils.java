@@ -78,7 +78,7 @@ public class JdbcChatMemoryUtils {
             delegate, jdbcTemplate, getSelectConversationIdsOrderedSql(dialect));
     }
 
-    private static String getSelectConversationIdsOrderedSql(JdbcChatMemoryRepositoryDialect dialect) {
+    public static String getSelectConversationIdsOrderedSql(JdbcChatMemoryRepositoryDialect dialect) {
         if (dialect instanceof MysqlChatMemoryRepositoryDialect) {
             return "SELECT conversation_id FROM SPRING_AI_CHAT_MEMORY GROUP BY conversation_id ORDER BY MAX(`timestamp`) DESC";
         } else if (dialect instanceof OracleChatMemoryRepositoryDialect) {
