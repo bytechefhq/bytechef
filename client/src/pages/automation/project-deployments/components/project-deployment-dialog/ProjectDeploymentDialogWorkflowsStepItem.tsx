@@ -5,7 +5,7 @@ import {useWorkflowsEnabledStore} from '@/pages/automation/project-deployments/s
 import ConnectionConfigurationList from '@/shared/components/ConnectionConfigurationList';
 import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
-import {FileInputIcon, Link2Icon} from 'lucide-react';
+import {FileInputIcon, Link2Icon, WorkflowIcon} from 'lucide-react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -46,13 +46,17 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     });
 
     return (
-        <div className="">
+        <div>
             {showWorkflowToggle && (
-                <div className="flex justify-between py-2">
+                <div className="flex items-center rounded-lg py-2">
                     <Label
-                        className="w-full cursor-pointer text-base font-semibold"
+                        className="flex w-full cursor-pointer items-center gap-2 text-base font-semibold"
                         htmlFor={`projectDeploymentWorkflows.${workflowIndex}`}
                     >
+                        <div className="rounded-lg bg-surface-brand-secondary p-2">
+                            <WorkflowIcon className="size-4 text-content-brand-primary" />
+                        </div>
+
                         {label}
                     </Label>
 
@@ -69,7 +73,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             )}
 
             {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
-                <Tabs defaultValue="connections">
+                <Tabs className="mt-2" defaultValue="connections">
                     <TabsList className="flex w-full">
                         <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
                             <Link2Icon className="mr-2 size-4" />

@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {ArrowUpRightIcon, InfoIcon, PlusIcon} from 'lucide-react';
+import {PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -77,20 +77,22 @@ const ConnectionConfigurationListFormField = ({
             name={`connections.${index}.connectionId`}
             render={({field}) => (
                 <FormItem>
-                    <FormLabel className="flex items-center">
+                    <FormLabel className="flex items-center gap-1">
                         {componentDefinition?.icon && (
                             <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
                         )}
 
-                        <span className="ml-1">{workflowNodeLabel || `${componentDefinition?.title} Connection`}</span>
+                        <span className="max-w-[70%] truncate">
+                            {workflowNodeLabel || `${componentDefinition?.title} Connection`}
+                        </span>
 
                         {groupedIndices ? (
-                            <span className="ml-0.5 text-xs text-content-neutral-secondary">
+                            <span className="text-xs text-content-neutral-secondary">
                                 (applies to {groupedIndices.length} nodes)
                             </span>
                         ) : (
-                            <span className="ml-0.5 text-xs text-content-neutral-secondary">
-                                {`(${componentConnection.workflowNodeName} - ${componentConnection.key})`}
+                            <span className="text-xs text-content-neutral-secondary">
+                                {`(${componentConnection.componentName} - ${componentConnection.workflowNodeName})`}
                             </span>
                         )}
                     </FormLabel>
