@@ -17,6 +17,8 @@
 package com.bytechef.component.teamwork.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.teamwork.constant.TeamworkConstants.PAGE_NUMBER;
+import static com.bytechef.component.teamwork.constant.TeamworkConstants.PAGE_SIZE;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
@@ -39,20 +41,33 @@ public class TeamworkUtils extends AbstractTeamworkUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, ?> body = context.http(http -> http.get("/tasklists"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         List<Option<Long>> options = new ArrayList<>();
+        Map<String, ?> body;
+        boolean hasMore = false;
+        int nextPageNumber = 1;
+        int pageSize = 50;
 
-        if (body.get("tasklists") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), ((Integer) map.get("id")).intValue()));
+        do {
+            body = context.http(http -> http.get("/tasklists"))
+                .queryParameters(PAGE_SIZE, pageSize, PAGE_NUMBER, nextPageNumber)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("tasklists") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("name"), ((Integer) map.get("id")).intValue()));
+                    }
                 }
             }
-        }
+
+            if (body.get("meta") instanceof Map<?, ?> meta && meta.get("page") instanceof Map<?, ?> page) {
+                hasMore = (Boolean) page.get("hasMore");
+            }
+            nextPageNumber++;
+
+        } while (hasMore);
 
         return options;
     }

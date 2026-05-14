@@ -17,6 +17,9 @@
 package com.bytechef.component.teamwork.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.teamwork.constant.TeamworkConstants.PAGE_NUMBER;
+import static com.bytechef.component.teamwork.constant.TeamworkConstants.PAGE_SIZE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -48,6 +51,7 @@ import org.mockito.ArgumentCaptor;
 class TeamworkUtilsTest {
 
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testGetTasklistIdOptions(
@@ -56,6 +60,8 @@ class TeamworkUtilsTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("tasklists", List.of(Map.of("name", "name", "id", 123))));
@@ -76,5 +82,15 @@ class TeamworkUtilsTest {
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(1, objectsArgumentCaptorAllValues.size());
+
+        Object[] queryParameters = {
+            PAGE_SIZE, 50, PAGE_NUMBER, 1
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptorAllValues.getFirst());
     }
 }
