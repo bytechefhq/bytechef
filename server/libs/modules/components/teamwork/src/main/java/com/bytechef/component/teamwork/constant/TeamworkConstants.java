@@ -21,6 +21,8 @@ package com.bytechef.component.teamwork.constant;
  */
 public class TeamworkConstants {
 
+    public static final String PAGE_NUMBER = "page";
+    public static final String PAGE_SIZE = "pageSize";
     public static final String SITE_NAME = "siteName";
 
     private TeamworkConstants() {
