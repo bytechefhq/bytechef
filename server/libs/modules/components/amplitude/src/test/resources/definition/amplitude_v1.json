@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates attribution event using Attribution API.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/amplitude_v1#create-attribution-event"
+    },
     "metadata": null,
     "name": "createAttributionEvent",
     "outputDefinition": {
@@ -280,7 +283,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates or updates user without sending an event.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/amplitude_v1#create-or-update-user"
+    },
     "metadata": null,
     "name": "createOrUpdateUser",
     "outputDefinition": {
@@ -1440,14 +1446,20 @@
       "type": "CUSTOM"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/amplitude_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://amplitude.com/docs/apis"
+  },
   "description": "Build better products by turning your user data into meaningful insights, using Amplitude's digital analytics platform and experimentation tools.",
   "icon": "path:assets/amplitude.svg",
   "metadata": null,
