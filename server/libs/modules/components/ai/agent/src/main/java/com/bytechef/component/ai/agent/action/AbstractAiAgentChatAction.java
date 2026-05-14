@@ -55,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -111,11 +112,16 @@ public abstract class AbstractAiAgentChatAction {
             ParametersFactory.create(concatenatedInputParameters),
             ParametersFactory.create(modelConnection.getParameters()), true);
 
-        ClusterElement chatMemoryClusterElement = clusterElementMap.getClusterElement(CHAT_MEMORY);
+        String conversationId = clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+            .map(clusterElement -> {
+                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
 
-        Parameters chatMemoryParameters = ParametersFactory.create(chatMemoryClusterElement.getParameters());
+                String id = chatMemoryParameters.getString("conversationId");
 
-        String conversationId = chatMemoryParameters.getString("conversationId");
+                return id != null ? id : UUID.randomUUID()
+                    .toString();
+            })
+            .orElse(null);
 
         @SuppressWarnings("unchecked")
         Map<String, Map<String, String>> toolSimulations =
