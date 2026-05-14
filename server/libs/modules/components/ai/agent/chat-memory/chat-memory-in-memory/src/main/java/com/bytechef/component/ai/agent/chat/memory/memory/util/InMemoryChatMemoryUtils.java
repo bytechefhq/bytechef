@@ -18,6 +18,7 @@ package com.bytechef.component.ai.agent.chat.memory.memory.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,21 +33,23 @@ public class InMemoryChatMemoryUtils {
     private InMemoryChatMemoryUtils() {
     }
 
-    public static List<ModifiableOption<String>> getFirstMessages() {
-        ChatMemoryRepository chatMemoryRepository = InMemoryChatMemoryRepositoryHolder.getInstance();
+    public static ActionDefinition.OptionsFunction<String> getFirstMessages() {
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
+            ChatMemoryRepository chatMemoryRepository = InMemoryChatMemoryRepositoryHolder.getInstance();
 
-        List<ModifiableOption<String>> options = new ArrayList<>();
+            List<ModifiableOption<String>> options = new ArrayList<>();
 
-        List<String> conversationIds = chatMemoryRepository.findConversationIds();
+            List<String> conversationIds = chatMemoryRepository.findConversationIds();
 
-        for (String conversationId : conversationIds) {
-            List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
+            for (String conversationId : conversationIds) {
+                List<Message> messages = chatMemoryRepository.findByConversationId(conversationId);
 
-            Message message = messages.getFirst();
+                Message message = messages.getFirst();
 
-            options.add(option(conversationId, conversationId, message.getText()));
-        }
+                options.add(option(conversationId, conversationId, message.getText()));
+            }
 
-        return options;
+            return options;
+        };
     }
 }
