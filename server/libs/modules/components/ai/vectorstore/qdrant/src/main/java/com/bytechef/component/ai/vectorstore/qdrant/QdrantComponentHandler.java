@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.qdrant.action.QdrantDeleteAction;
 import com.bytechef.component.ai.vectorstore.qdrant.action.QdrantLoadAction;
 import com.bytechef.component.ai.vectorstore.qdrant.action.QdrantSearchAction;
+import com.bytechef.component.ai.vectorstore.qdrant.action.QdrantUpdateAction;
 import com.bytechef.component.ai.vectorstore.qdrant.cluster.QdrantSearchTool;
 import com.bytechef.component.ai.vectorstore.qdrant.cluster.QdrantVectorStore;
 import com.bytechef.component.ai.vectorstore.qdrant.connection.QdrantConnection;
@@ -55,7 +56,8 @@ public class QdrantComponentHandler implements ComponentHandler {
                 .actions(
                     QdrantDeleteAction.of(clusterElementDefinitionService),
                     QdrantLoadAction.of(clusterElementDefinitionService),
-                    QdrantSearchAction.of(clusterElementDefinitionService))
+                    QdrantSearchAction.of(clusterElementDefinitionService),
+                    QdrantUpdateAction.of(clusterElementDefinitionService))
                 .clusterElements(
                     QdrantSearchTool.of(clusterElementDefinitionService),
                     QdrantVectorStore.of(clusterElementDefinitionService)));

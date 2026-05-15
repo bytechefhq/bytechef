@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseDeleteAction;
 import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseLoadAction;
 import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseSearchAction;
+import com.bytechef.component.ai.vectorstore.typesense.action.TypesenseUpdateAction;
 import com.bytechef.component.ai.vectorstore.typesense.cluster.TypesenseSearchTool;
 import com.bytechef.component.ai.vectorstore.typesense.cluster.TypesenseVectorStore;
 import com.bytechef.component.ai.vectorstore.typesense.connection.TypesenseConnection;
@@ -52,8 +53,9 @@ public class TypesenseComponentHandler implements ComponentHandler {
             .connection(TypesenseConnection.CONNECTION_DEFINITION)
             .actions(
                 TypesenseDeleteAction.of(clusterElementDefinitionService),
+                TypesenseLoadAction.of(clusterElementDefinitionService),
                 TypesenseSearchAction.of(clusterElementDefinitionService),
-                TypesenseLoadAction.of(clusterElementDefinitionService))
+                TypesenseUpdateAction.of(clusterElementDefinitionService))
             .clusterElements(
                 TypesenseSearchTool.of(clusterElementDefinitionService),
                 TypesenseVectorStore.of(clusterElementDefinitionService)));

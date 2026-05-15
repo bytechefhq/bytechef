@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.oracle.action.OracleDeleteAction;
 import com.bytechef.component.ai.vectorstore.oracle.action.OracleLoadAction;
 import com.bytechef.component.ai.vectorstore.oracle.action.OracleSearchAction;
+import com.bytechef.component.ai.vectorstore.oracle.action.OracleUpdateAction;
 import com.bytechef.component.ai.vectorstore.oracle.cluster.OracleSearchTool;
 import com.bytechef.component.ai.vectorstore.oracle.cluster.OracleVectorStore;
 import com.bytechef.component.ai.vectorstore.oracle.connection.OracleConnection;
@@ -54,7 +55,8 @@ public class OracleComponentHandler implements ComponentHandler {
                 .actions(
                     OracleDeleteAction.of(clusterElementDefinitionService),
                     OracleLoadAction.of(clusterElementDefinitionService),
-                    OracleSearchAction.of(clusterElementDefinitionService))
+                    OracleSearchAction.of(clusterElementDefinitionService),
+                    OracleUpdateAction.of(clusterElementDefinitionService))
                 .clusterElements(
                     OracleSearchTool.of(clusterElementDefinitionService),
                     OracleVectorStore.of(clusterElementDefinitionService)));

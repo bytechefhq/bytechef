@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorDeleteAction;
 import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorLoadAction;
 import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorSearchAction;
+import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorUpdateAction;
 import com.bytechef.component.ai.vectorstore.pgvector.cluster.PgVectorSearchTool;
 import com.bytechef.component.ai.vectorstore.pgvector.cluster.PgVectorVectorStore;
 import com.bytechef.component.ai.vectorstore.pgvector.connection.PgVectorConnection;
@@ -51,8 +52,9 @@ public class PgVectorComponentHandler implements ComponentHandler {
             .connection(PgVectorConnection.CONNECTION_DEFINITION)
             .actions(
                 PgVectorDeleteAction.of(clusterElementDefinitionService),
+                PgVectorLoadAction.of(clusterElementDefinitionService),
                 PgVectorSearchAction.of(clusterElementDefinitionService),
-                PgVectorLoadAction.of(clusterElementDefinitionService))
+                PgVectorUpdateAction.of(clusterElementDefinitionService))
             .clusterElements(
                 PgVectorSearchTool.of(clusterElementDefinitionService),
                 PgVectorVectorStore.of(clusterElementDefinitionService)));

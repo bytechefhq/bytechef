@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.s3.action.S3DeleteAction;
 import com.bytechef.component.ai.vectorstore.s3.action.S3LoadAction;
 import com.bytechef.component.ai.vectorstore.s3.action.S3SearchAction;
+import com.bytechef.component.ai.vectorstore.s3.action.S3UpdateAction;
 import com.bytechef.component.ai.vectorstore.s3.cluster.S3SearchTool;
 import com.bytechef.component.ai.vectorstore.s3.cluster.S3VectorStore;
 import com.bytechef.component.ai.vectorstore.s3.connection.S3Connection;
@@ -54,7 +55,8 @@ public class S3ComponentHandler implements ComponentHandler {
                 .actions(
                     S3DeleteAction.of(clusterElementDefinitionService),
                     S3LoadAction.of(clusterElementDefinitionService),
-                    S3SearchAction.of(clusterElementDefinitionService))
+                    S3SearchAction.of(clusterElementDefinitionService),
+                    S3UpdateAction.of(clusterElementDefinitionService))
                 .clusterElements(
                     S3SearchTool.of(clusterElementDefinitionService),
                     S3VectorStore.of(clusterElementDefinitionService)));

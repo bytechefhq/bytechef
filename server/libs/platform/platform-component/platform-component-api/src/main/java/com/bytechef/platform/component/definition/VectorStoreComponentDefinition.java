@@ -47,6 +47,11 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
     /**
      *
      */
+    String UPDATE = "update";
+
+    /**
+     *
+     */
     String VECTOR_STORE = "vectorStore";
 
     /**
@@ -72,7 +77,8 @@ public interface VectorStoreComponentDefinition extends ClusterRootComponentDefi
         return Map.of(
             DELETE, List.of(EMBEDDING.name()),
             LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()),
-            SEARCH, List.of(EMBEDDING.name()));
+            SEARCH, List.of(EMBEDDING.name()),
+            UPDATE, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name(), EMBEDDING.name()));
     }
 
     /**

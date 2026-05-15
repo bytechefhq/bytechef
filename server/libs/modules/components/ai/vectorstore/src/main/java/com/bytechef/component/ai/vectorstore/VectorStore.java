@@ -117,6 +117,14 @@ public interface VectorStore {
         return vectorStore.similaritySearch(searchRequest);
     }
 
+    default void update(
+        Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
+        DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+
+        delete(inputParameters, connectionParameters, embeddingModel);
+        load(inputParameters, connectionParameters, embeddingModel, documentReader, documentTransformers);
+    }
+
     private static Optional<Filter.Expression> getFilterExpression(List<Map<String, Object>> metadataFilters) {
         FilterExpressionBuilder builder = new FilterExpressionBuilder();
         FilterExpressionBuilder.Op filterExpression = null;
