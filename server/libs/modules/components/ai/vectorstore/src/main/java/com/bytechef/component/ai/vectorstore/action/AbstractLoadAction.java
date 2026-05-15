@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
@@ -27,6 +28,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import java.util.stream.Stream;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
@@ -71,7 +73,13 @@ public abstract class AbstractLoadAction {
         return action(LOAD)
             .title("Load Documents")
             .description("Loads documents into the vector store using LLM embeddings.")
-            .properties(properties)
+            .properties(
+                Stream
+                    .of(
+                        properties.stream(),
+                        Stream.of(METADATA_PROPERTY))
+                    .flatMap(stream -> stream)
+                    .toList())
             .perform((MultipleConnectionsPerformFunction) loadAction::perform);
     }
 
