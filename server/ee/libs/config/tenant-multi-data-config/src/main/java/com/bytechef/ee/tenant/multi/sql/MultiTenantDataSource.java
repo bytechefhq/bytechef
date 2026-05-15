@@ -31,7 +31,7 @@ public class MultiTenantDataSource implements DataSource {
 
     private final DataSource dataSource;
     private static final Logger log = LoggerFactory.getLogger(MultiTenantDataSource.class);
-    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ?";
+    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ";
 
     @SuppressFBWarnings("EI")
     public MultiTenantDataSource(DataSource dataSource) {
@@ -109,8 +109,8 @@ public class MultiTenantDataSource implements DataSource {
     private static void setSearchPath(Connection connection) throws SQLException {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema();
 
-        try (PreparedStatement statement = connection.prepareStatement(SET_SEARCH_PATH_STATEMENT)) {
-            statement.setString(1, currentDatabaseSchema);
+        try (PreparedStatement statement =
+            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + currentDatabaseSchema)) {
 
             statement.execute();
 

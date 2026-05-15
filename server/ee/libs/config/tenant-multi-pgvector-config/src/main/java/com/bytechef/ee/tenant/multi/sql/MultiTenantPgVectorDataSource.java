@@ -19,7 +19,8 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 
 /**
- * Multi-tenant DataSource wrapper for PgVector that sets the PostgreSQL search_path to the tenant's vectorstore schema.
+ * Multi-tenant DataSource wrapper for PgVector that sets the PostgreSQL search_path to the tenant's vector store
+ * schema.
  *
  * @version ee
  *
@@ -27,8 +28,8 @@ import javax.sql.DataSource;
  */
 public class MultiTenantPgVectorDataSource implements DataSource {
 
-    private static final String VECTORSTORE_SCHEMA_SUFFIX = "vectorstore";
-    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ?";
+    private static final String VECTOR_STORE_SCHEMA_SUFFIX = "vectorstore";
+    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ";
 
     private final DataSource dataSource;
 
@@ -106,10 +107,10 @@ public class MultiTenantPgVectorDataSource implements DataSource {
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection) throws SQLException {
-        String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(VECTORSTORE_SCHEMA_SUFFIX);
+        String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(VECTOR_STORE_SCHEMA_SUFFIX);
 
-        try (PreparedStatement statement = connection.prepareStatement(SET_SEARCH_PATH_STATEMENT)) {
-            statement.setString(1, currentDatabaseSchema);
+        try (PreparedStatement statement =
+            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + currentDatabaseSchema)) {
 
             statement.execute();
         }
