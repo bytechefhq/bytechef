@@ -553,6 +553,28 @@ class WorkflowValidatorTest {
     }
 
     @Test
+    void validateTaskStructureInvalidJsonAddsError2() {
+        String invalidTask = """
+            {
+                "label": "Test Task",
+                "name": "testTask"
+                "type": "component/v1/test",
+                "parameters": {}
+            }
+            """;
+        StringBuilder errors = new StringBuilder();
+
+        TaskValidator.validateTaskStructure(invalidTask, errors);
+
+        String string = errors.toString();
+
+        assertEquals(
+            "Invalid JSON format: Unexpected character ('\"' (code 34)): was expecting comma to separate Object entries"
+                + "  at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN]\n",
+            string);
+    }
+
+    @Test
     void validateTaskStructureInvalidTypePatternAddsError() {
         String invalidTask = """
             {

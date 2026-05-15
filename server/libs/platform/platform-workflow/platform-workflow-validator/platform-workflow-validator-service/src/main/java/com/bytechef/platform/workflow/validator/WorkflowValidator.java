@@ -96,7 +96,8 @@ public class WorkflowValidator {
             validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
-            errors.append(e.getMessage());
+            errors.append(e.getMessage()
+                .replace("\n", " "));
         }
     }
 
