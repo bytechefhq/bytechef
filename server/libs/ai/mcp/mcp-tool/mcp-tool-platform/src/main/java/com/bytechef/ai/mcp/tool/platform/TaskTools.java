@@ -238,9 +238,7 @@ public class TaskTools {
         String flowString = taskDispatcherTools.getTaskDispatcherInstructions(taskDispatcher);
 
         if (flowString != null) {
-            builder.append("""
-                Whenever you see an array with 'task' type, you can put as may tasks in that array.
-                """);
+            builder.append("Whenever you see an array with 'task' type, you can put as may tasks in that array.");
             builder.append("\n");
             builder.append(flowString);
         } else {
