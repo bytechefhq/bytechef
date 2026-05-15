@@ -27,6 +27,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.ai.embedding.EmbeddingModel;
 
@@ -38,6 +39,7 @@ public final class VectorStoreDefinition {
     private final VectorStore vectorStore;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public VectorStoreDefinition(
         ClusterElementDefinitionService clusterElementDefinitionService, VectorStore vectorStore) {
 

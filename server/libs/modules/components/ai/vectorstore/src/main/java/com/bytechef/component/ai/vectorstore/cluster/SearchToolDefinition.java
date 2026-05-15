@@ -30,6 +30,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -44,6 +45,7 @@ public final class SearchToolDefinition {
     private final String componentName;
     private final VectorStore vectorStore;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public SearchToolDefinition(
         String componentName, VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
