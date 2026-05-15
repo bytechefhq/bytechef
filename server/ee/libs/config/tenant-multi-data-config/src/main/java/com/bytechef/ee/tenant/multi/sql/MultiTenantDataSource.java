@@ -7,17 +7,9 @@
 
 package com.bytechef.ee.tenant.multi.sql;
 
-import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.sql.BaseDataSource;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.PrintWriter;
-import java.sql.Connection;
-import java.sql.ConnectionBuilder;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.SQLFeatureNotSupportedException;
 import javax.sql.DataSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Multi-tenant DataSource wrapper that sets the PostgreSQL search_path based on tenant context.
@@ -27,94 +19,11 @@ import org.slf4j.LoggerFactory;
  * @author Ivica Cardic
  * @author Igor Beslic
  */
-public class MultiTenantDataSource implements DataSource {
-
-    private final DataSource dataSource;
-    private static final Logger log = LoggerFactory.getLogger(MultiTenantDataSource.class);
-    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ";
+public class MultiTenantDataSource extends BaseDataSource {
 
     @SuppressFBWarnings("EI")
     public MultiTenantDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
-    @Override
-    public Connection getConnection() throws SQLException {
-        Connection connection = dataSource.getConnection();
-
-        setSearchPath(connection);
-
-        return connection;
-    }
-
-    @Override
-    public Connection getConnection(String username, String password) throws SQLException {
-        Connection connection = dataSource.getConnection(username, password);
-
-        setSearchPath(connection);
-
-        return connection;
-    }
-
-    @Override
-    public PrintWriter getLogWriter() throws SQLException {
-        return dataSource.getLogWriter();
-    }
-
-    @Override
-    public void setLogWriter(PrintWriter out) throws SQLException {
-        dataSource.setLogWriter(out);
-    }
-
-    @Override
-    public void setLoginTimeout(int seconds) throws SQLException {
-        dataSource.setLoginTimeout(seconds);
-    }
-
-    @Override
-    public int getLoginTimeout() throws SQLException {
-        return dataSource.getLoginTimeout();
-    }
-
-    @Override
-    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
-        return dataSource.getParentLogger();
-    }
-
-    @Override
-    public ConnectionBuilder createConnectionBuilder() throws SQLException {
-        return dataSource.createConnectionBuilder();
-    }
-
-    @Override
-    public <T> T unwrap(Class<T> iface) throws SQLException {
-        return dataSource.unwrap(iface);
-    }
-
-    @Override
-    public boolean isWrapperFor(Class<?> iface) throws SQLException {
-        return dataSource.isWrapperFor(iface);
-    }
-
-    /**
-     * Sets the PostgreSQL search_path to the current tenant's schema.
-     *
-     * <p>
-     * <b>Security Note:</b> The SQL injection suppression is for schema name injection which cannot be parameterized in
-     * PostgreSQL. Schema names must be included as identifiers, not as parameterized values. The tenant ID is validated
-     * to contain only alphanumeric characters, underscores, and hyphens to prevent SQL injection. This is a PostgreSQL
-     * limitation, not a security vulnerability.
-     */
-    @SuppressFBWarnings("SQL_INJECTION_JDBC")
-    private static void setSearchPath(Connection connection) throws SQLException {
-        String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema();
-
-        try (PreparedStatement statement =
-            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + currentDatabaseSchema)) {
-
-            statement.execute();
-
-            log.trace("Executed SQL: {} {}", SET_SEARCH_PATH_STATEMENT, currentDatabaseSchema);
-        }
-    }
 }
