@@ -43,7 +43,7 @@ import org.springframework.web.context.request.WebRequest;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AbstractException.class)
@@ -63,7 +63,7 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     public ResponseEntity<ProblemDetail> handleNoSuchElementException(
         final NoSuchElementException exception, final WebRequest request) {
 
-        logger.error(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
 
         return ResponseEntity
             .of(createProblemDetail(exception, HttpStatus.NOT_FOUND, exception.getMessage(), null, null, request))
@@ -75,16 +75,15 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
         Exception exception = getCauseException((Exception) throwable);
 
-        HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-
         if (exception instanceof IllegalArgumentException) {
             return handleIllegalArgumentExceptionException((IllegalArgumentException) exception, request);
         }
 
-        logger.error(throwable.getMessage(), throwable);
+        log.error(throwable.getMessage(), throwable);
 
         return ResponseEntity
-            .of(createProblemDetail(exception, httpStatus, exception.getMessage(), null, null, request))
+            .of(createProblemDetail(
+                exception, HttpStatus.INTERNAL_SERVER_ERROR, exception.getMessage(), null, null, request))
             .build();
     }
 
@@ -93,7 +92,7 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     public ResponseEntity<ProblemDetail> handleIllegalArgumentExceptionException(
         final IllegalArgumentException illegalArgumentException, final WebRequest request) {
 
-        logger.error(illegalArgumentException.getMessage(), illegalArgumentException);
+        log.error(illegalArgumentException.getMessage(), illegalArgumentException);
 
         Exception exception = getCauseException(illegalArgumentException);
 
@@ -106,7 +105,7 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     public ResponseEntity<ProblemDetail> handleConcurrencyFailureException(
         final ConcurrencyFailureException exception, final WebRequest request) {
 
-        logger.error(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
 
         return ResponseEntity
             .of(createProblemDetail(exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request))
