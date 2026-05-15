@@ -73,8 +73,6 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
-        logger.error(throwable.getMessage(), throwable);
-
         Exception exception = getCauseException((Exception) throwable);
 
         HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
@@ -82,6 +80,8 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
         if (exception instanceof IllegalArgumentException) {
             return handleIllegalArgumentExceptionException((IllegalArgumentException) exception, request);
         }
+
+        logger.error(throwable.getMessage(), throwable);
 
         return ResponseEntity
             .of(createProblemDetail(exception, httpStatus, exception.getMessage(), null, null, request))
