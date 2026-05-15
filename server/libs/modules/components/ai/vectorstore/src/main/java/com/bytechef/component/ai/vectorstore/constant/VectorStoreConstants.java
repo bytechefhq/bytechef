@@ -41,11 +41,11 @@ public class VectorStoreConstants {
 
     public static final Property METADATA_PROPERTY = array(METADATA)
         .label("Metadata")
-        .description("List of document metadata keys to filter by.")
+        .description("List of metadata key-value pairs to filter by.")
         .items(
             object()
                 .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time()))
-        .required(true);
+        .required(false);
 
     public static final Property QUERY_PROPERTY = string(QUERY)
         .label("Query")

@@ -23,13 +23,16 @@ import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstant
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
@@ -54,6 +57,27 @@ public interface VectorStore {
             documents = documentTransformer.transform(documents);
         }
 
+        List<Map<String, Object>> metadataList = inputParameters.getList(
+            METADATA, new TypeReference<>() {});
+
+        if (!metadataList.isEmpty()) {
+            Map<String, Object> additionalMetadata = new HashMap<>();
+
+            for (Map<String, Object> metadataEntry : metadataList) {
+                additionalMetadata.putAll(metadataEntry);
+            }
+
+            documents = documents.stream()
+                .map(document -> {
+                    Map<String, Object> mergedMetadata = new HashMap<>(document.getMetadata());
+
+                    mergedMetadata.putAll(additionalMetadata);
+
+                    return new Document(document.getId(), document.getText(), mergedMetadata);
+                })
+                .toList();
+        }
+
         vectorStore.add(documents);
     }
 
@@ -66,6 +90,34 @@ public interface VectorStore {
         List<Map<String, Object>> metadataFilters = inputParameters.getList(
             METADATA, new TypeReference<>() {});
 
+        Optional<Filter.Expression> filterExpression = getFilterExpression(metadataFilters);
+
+        filterExpression.ifPresent(vectorStore::delete);
+    }
+
+    default List<Document> search(
+        Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
+
+        org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
+            inputParameters, connectionParameters, embeddingModel);
+
+        List<Map<String, Object>> metadata = inputParameters.getList(
+            METADATA, new TypeReference<>() {});
+
+        Optional<Filter.Expression> filterExpression = getFilterExpression(metadata);
+
+        SearchRequest searchRequest = SearchRequest.builder()
+            .query(inputParameters.getRequiredString(QUERY))
+            .filterExpression(filterExpression.orElse(null))
+            .topK(inputParameters.getInteger(TOP_K, SearchRequest.DEFAULT_TOP_K))
+            .similarityThreshold(
+                inputParameters.getDouble(SIMILARITY_THRESHOLD, SearchRequest.SIMILARITY_THRESHOLD_ACCEPT_ALL))
+            .build();
+
+        return vectorStore.similaritySearch(searchRequest);
+    }
+
+    private static Optional<Filter.Expression> getFilterExpression(List<Map<String, Object>> metadataFilters) {
         FilterExpressionBuilder builder = new FilterExpressionBuilder();
         FilterExpressionBuilder.Op filterExpression = null;
 
@@ -86,23 +138,9 @@ public interface VectorStore {
         }
 
         if (filterExpression != null) {
-            vectorStore.delete(filterExpression.build());
+            return Optional.of(filterExpression.build());
         }
-    }
 
-    default List<Document> search(
-        Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
-
-        org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
-            inputParameters, connectionParameters, embeddingModel);
-
-        SearchRequest searchRequest = SearchRequest.builder()
-            .query(inputParameters.getRequiredString(QUERY))
-            .topK(inputParameters.getInteger(TOP_K, SearchRequest.DEFAULT_TOP_K))
-            .similarityThreshold(
-                inputParameters.getDouble(SIMILARITY_THRESHOLD, SearchRequest.SIMILARITY_THRESHOLD_ACCEPT_ALL))
-            .build();
-
-        return vectorStore.similaritySearch(searchRequest);
+        return Optional.empty();
     }
 }
