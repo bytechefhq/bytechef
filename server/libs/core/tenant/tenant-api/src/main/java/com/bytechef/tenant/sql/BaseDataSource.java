@@ -34,6 +34,7 @@ public abstract class BaseDataSource implements DataSource {
     private final DataSource dataSource;
     private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ";
 
+    @SuppressFBWarnings("EI")
     public BaseDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
