@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Adds a new member to the list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mailchimp_v1#add-member-to-list"
+    },
     "metadata": {
       "path": "/lists/{listId}/members",
       "mimeType": "application/json",
@@ -1375,20 +1378,6 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "language": "string",
-          "interests": {
-            "property1": true,
-            "property2": true
-          },
-          "timestamp_signup": "2019-08-24T14:15:22",
-          "id": "string",
-          "_links": [ {
-            "schema": "string",
-            "href": "string",
-            "rel": "string",
-            "method": "GET",
-            "targetSchema": "string"
-          } ],
           "web_id": 0,
           "member_rating": 0,
           "vip": true,
@@ -1401,24 +1390,24 @@
           "list_id": "string",
           "full_name": "string",
           "merge_fields": {
-            "property1": "",
-            "property2": ""
+            "property2": "",
+            "property1": ""
           },
           "stats": {
-            "avg_open_rate": 0,
             "ecommerce_data": {
+              "total_revenue": 0,
               "number_of_orders": 0,
-              "currency_code": "USD",
-              "total_revenue": 0
+              "currency_code": "USD"
             },
-            "avg_click_rate": 0
+            "avg_click_rate": 0,
+            "avg_open_rate": 0
           },
           "contact_id": "string",
           "last_note": {
-            "note_id": 0,
             "created_at": "2019-08-24T14:15:22",
             "note": "string",
-            "created_by": "string"
+            "created_by": "string",
+            "note_id": 0
           },
           "email_address": "string",
           "status": "subscribed",
@@ -1426,25 +1415,39 @@
           "timestamp_opt": "2019-08-24T14:15:22",
           "ip_opt": "string",
           "location": {
-            "latitude": 0,
-            "dstoff": 0,
             "timezone": "string",
             "country_code": "string",
             "gmtoff": 0,
             "longitude": 0,
-            "region": "string"
+            "region": "string",
+            "latitude": 0,
+            "dstoff": 0
           },
           "ip_signup": "string",
           "tags": [ {
-            "name": "string",
-            "id": 0
+            "id": 0,
+            "name": "string"
           } ],
           "marketing_permissions": [ {
-            "enabled": true,
             "text": "string",
-            "marketing_permission_id": "string"
+            "marketing_permission_id": "string",
+            "enabled": true
           } ],
-          "email_type": "string"
+          "email_type": "string",
+          "language": "string",
+          "interests": {
+            "property2": true,
+            "property1": true
+          },
+          "timestamp_signup": "2019-08-24T14:15:22",
+          "id": "string",
+          "_links": [ {
+            "href": "string",
+            "rel": "string",
+            "method": "GET",
+            "targetSchema": "string",
+            "schema": "string"
+          } ]
         }
       },
       "outputSchema": {
@@ -2804,20 +2807,6 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "language": "string",
-        "interests": {
-          "property1": true,
-          "property2": true
-        },
-        "timestamp_signup": "2019-08-24T14:15:22",
-        "id": "string",
-        "_links": [ {
-          "schema": "string",
-          "href": "string",
-          "rel": "string",
-          "method": "GET",
-          "targetSchema": "string"
-        } ],
         "web_id": 0,
         "member_rating": 0,
         "vip": true,
@@ -2830,24 +2819,24 @@
         "list_id": "string",
         "full_name": "string",
         "merge_fields": {
-          "property1": "",
-          "property2": ""
+          "property2": "",
+          "property1": ""
         },
         "stats": {
-          "avg_open_rate": 0,
           "ecommerce_data": {
+            "total_revenue": 0,
             "number_of_orders": 0,
-            "currency_code": "USD",
-            "total_revenue": 0
+            "currency_code": "USD"
           },
-          "avg_click_rate": 0
+          "avg_click_rate": 0,
+          "avg_open_rate": 0
         },
         "contact_id": "string",
         "last_note": {
-          "note_id": 0,
           "created_at": "2019-08-24T14:15:22",
           "note": "string",
-          "created_by": "string"
+          "created_by": "string",
+          "note_id": 0
         },
         "email_address": "string",
         "status": "subscribed",
@@ -2855,25 +2844,39 @@
         "timestamp_opt": "2019-08-24T14:15:22",
         "ip_opt": "string",
         "location": {
-          "latitude": 0,
-          "dstoff": 0,
           "timezone": "string",
           "country_code": "string",
           "gmtoff": 0,
           "longitude": 0,
-          "region": "string"
+          "region": "string",
+          "latitude": 0,
+          "dstoff": 0
         },
         "ip_signup": "string",
         "tags": [ {
-          "name": "string",
-          "id": 0
+          "id": 0,
+          "name": "string"
         } ],
         "marketing_permissions": [ {
-          "enabled": true,
           "text": "string",
-          "marketing_permission_id": "string"
+          "marketing_permission_id": "string",
+          "enabled": true
         } ],
-        "email_type": "string"
+        "email_type": "string",
+        "language": "string",
+        "interests": {
+          "property2": true,
+          "property1": true
+        },
+        "timestamp_signup": "2019-08-24T14:15:22",
+        "id": "string",
+        "_links": [ {
+          "href": "string",
+          "rel": "string",
+          "method": "GET",
+          "targetSchema": "string",
+          "schema": "string"
+        } ]
       }
     },
     "perform": null,
@@ -4838,20 +4841,6 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "language": "string",
-          "interests": {
-            "property1": true,
-            "property2": true
-          },
-          "timestamp_signup": "2019-08-24T14:15:22",
-          "id": "string",
-          "_links": [ {
-            "schema": "string",
-            "href": "string",
-            "rel": "string",
-            "method": "GET",
-            "targetSchema": "string"
-          } ],
           "web_id": 0,
           "member_rating": 0,
           "vip": true,
@@ -4864,24 +4853,24 @@
           "list_id": "string",
           "full_name": "string",
           "merge_fields": {
-            "property1": "",
-            "property2": ""
+            "property2": "",
+            "property1": ""
           },
           "stats": {
-            "avg_open_rate": 0,
             "ecommerce_data": {
+              "total_revenue": 0,
               "number_of_orders": 0,
-              "currency_code": "USD",
-              "total_revenue": 0
+              "currency_code": "USD"
             },
-            "avg_click_rate": 0
+            "avg_click_rate": 0,
+            "avg_open_rate": 0
           },
           "contact_id": "string",
           "last_note": {
-            "note_id": 0,
             "created_at": "2019-08-24T14:15:22",
             "note": "string",
-            "created_by": "string"
+            "created_by": "string",
+            "note_id": 0
           },
           "email_address": "string",
           "status": "subscribed",
@@ -4889,25 +4878,39 @@
           "timestamp_opt": "2019-08-24T14:15:22",
           "ip_opt": "string",
           "location": {
-            "latitude": 0,
-            "dstoff": 0,
             "timezone": "string",
             "country_code": "string",
             "gmtoff": 0,
             "longitude": 0,
-            "region": "string"
+            "region": "string",
+            "latitude": 0,
+            "dstoff": 0
           },
           "ip_signup": "string",
           "tags": [ {
-            "name": "string",
-            "id": 0
+            "id": 0,
+            "name": "string"
           } ],
           "marketing_permissions": [ {
-            "enabled": true,
             "text": "string",
-            "marketing_permission_id": "string"
+            "marketing_permission_id": "string",
+            "enabled": true
           } ],
-          "email_type": "string"
+          "email_type": "string",
+          "language": "string",
+          "interests": {
+            "property2": true,
+            "property1": true
+          },
+          "timestamp_signup": "2019-08-24T14:15:22",
+          "id": "string",
+          "_links": [ {
+            "href": "string",
+            "rel": "string",
+            "method": "GET",
+            "targetSchema": "string",
+            "schema": "string"
+          } ]
         }
       },
       "outputSchema": {
@@ -6267,20 +6270,6 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "language": "string",
-        "interests": {
-          "property1": true,
-          "property2": true
-        },
-        "timestamp_signup": "2019-08-24T14:15:22",
-        "id": "string",
-        "_links": [ {
-          "schema": "string",
-          "href": "string",
-          "rel": "string",
-          "method": "GET",
-          "targetSchema": "string"
-        } ],
         "web_id": 0,
         "member_rating": 0,
         "vip": true,
@@ -6293,24 +6282,24 @@
         "list_id": "string",
         "full_name": "string",
         "merge_fields": {
-          "property1": "",
-          "property2": ""
+          "property2": "",
+          "property1": ""
         },
         "stats": {
-          "avg_open_rate": 0,
           "ecommerce_data": {
+            "total_revenue": 0,
             "number_of_orders": 0,
-            "currency_code": "USD",
-            "total_revenue": 0
+            "currency_code": "USD"
           },
-          "avg_click_rate": 0
+          "avg_click_rate": 0,
+          "avg_open_rate": 0
         },
         "contact_id": "string",
         "last_note": {
-          "note_id": 0,
           "created_at": "2019-08-24T14:15:22",
           "note": "string",
-          "created_by": "string"
+          "created_by": "string",
+          "note_id": 0
         },
         "email_address": "string",
         "status": "subscribed",
@@ -6318,25 +6307,39 @@
         "timestamp_opt": "2019-08-24T14:15:22",
         "ip_opt": "string",
         "location": {
-          "latitude": 0,
-          "dstoff": 0,
           "timezone": "string",
           "country_code": "string",
           "gmtoff": 0,
           "longitude": 0,
-          "region": "string"
+          "region": "string",
+          "latitude": 0,
+          "dstoff": 0
         },
         "ip_signup": "string",
         "tags": [ {
-          "name": "string",
-          "id": 0
+          "id": 0,
+          "name": "string"
         } ],
         "marketing_permissions": [ {
-          "enabled": true,
           "text": "string",
-          "marketing_permission_id": "string"
+          "marketing_permission_id": "string",
+          "enabled": true
         } ],
-        "email_type": "string"
+        "email_type": "string",
+        "language": "string",
+        "interests": {
+          "property2": true,
+          "property1": true
+        },
+        "timestamp_signup": "2019-08-24T14:15:22",
+        "id": "string",
+        "_links": [ {
+          "href": "string",
+          "rel": "string",
+          "method": "GET",
+          "targetSchema": "string",
+          "schema": "string"
+        } ]
       }
     },
     "processErrorResponse": null,
@@ -7013,14 +7016,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mailchimp_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://mailchimp.com/developer/marketing/api/"
+  },
   "description": "Mailchimp is a marketing automation and email marketing platform.",
   "icon": "path:assets/mailchimp.svg",
   "metadata": null,
@@ -7034,7 +7043,10 @@
     "deprecated": null,
     "description": "Triggers when an Audience subscriber is added to the list.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mailchimp_v1#subscribe"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "subscribe",
@@ -7079,7 +7091,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "The email address of the subscriber.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -7101,7 +7113,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "The type of email address used for the subscriber.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -7123,7 +7135,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "The MD5 hash of the lowercase version of the list member's email address.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -7189,7 +7201,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "The ID of the list the subscriber was added to.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -7322,7 +7334,7 @@
             "advancedOption": null,
             "controlType": "DATE_TIME",
             "defaultValue": null,
-            "description": null,
+            "description": "The date and time the webhook was triggered.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7339,7 +7351,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "The type of webhook that was triggered.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7402,7 +7414,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "The email address of the subscriber.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7424,7 +7436,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "The type of email address used for the subscriber.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7446,7 +7458,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "The MD5 hash of the lowercase version of the list member's email address.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7512,7 +7524,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "The ID of the list the subscriber was added to.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -7645,7 +7657,7 @@
           "advancedOption": null,
           "controlType": "DATE_TIME",
           "defaultValue": null,
-          "description": null,
+          "description": "The date and time the webhook was triggered.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
@@ -7662,7 +7674,7 @@
           "advancedOption": null,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": null,
+          "description": "The type of webhook that was triggered.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
