@@ -45,8 +45,8 @@ import java.util.Map;
  */
 public class MailchimpSubscribeTrigger {
 
-    private static final String LIST_ID = "listId";
-    private static final String SUBSCRIBE = "subscribe";
+    protected static final String LIST_ID = "listId";
+    protected static final String SUBSCRIBE = "subscribe";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger(SUBSCRIBE)
         .title("Subscribe")
