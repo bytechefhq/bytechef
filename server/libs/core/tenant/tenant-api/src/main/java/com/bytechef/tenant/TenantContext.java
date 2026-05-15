@@ -26,11 +26,13 @@ import org.springframework.util.Assert;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class TenantContext {
 
     public static final String CURRENT_TENANT_ID = "CURRENT_TENANT_ID";
     public static final String DEFAULT_TENANT_ID = "public";
+    private static final String TENANT_PATTERN = TenantConstants.TENANT_PREFIX + "_";
 
     private static final ThreadLocal<String> currentTenant = ThreadLocal.withInitial(() -> DEFAULT_TENANT_ID);
     private static final Logger log = LoggerFactory.getLogger(TenantContext.class);
@@ -52,15 +54,21 @@ public class TenantContext {
     }
 
     public static String getCurrentDatabaseSchema() {
-        return Objects.equals(getCurrentTenantId(), DEFAULT_TENANT_ID)
-            ? DEFAULT_TENANT_ID
-            : TenantConstants.TENANT_PREFIX + "_" + getCurrentTenantId();
+        return getCurrentDatabaseSchema(null);
     }
 
-    public static String getCurrentDatabaseSchema(String suffix) {
-        return Objects.equals(getCurrentTenantId(), DEFAULT_TENANT_ID)
-            ? DEFAULT_TENANT_ID
-            : TenantConstants.TENANT_PREFIX + "_" + suffix + "_" + getCurrentTenantId();
+    public static String getCurrentDatabaseSchema(String vectorSchemaSuffix) {
+        if (Objects.equals(getCurrentTenantId(), DEFAULT_TENANT_ID)) {
+            return DEFAULT_TENANT_ID;
+        }
+
+        String currentSuffix = "";
+
+        if (Objects.nonNull(vectorSchemaSuffix)) {
+            currentSuffix = vectorSchemaSuffix + "_";
+        }
+
+        return TENANT_PATTERN + currentSuffix + getCurrentTenantId();
     }
 
     public static String getCurrentTenantId() {
