@@ -66,7 +66,8 @@ class JsonNodeUtils {
             return com.bytechef.commons.util.JsonUtils.readTree(json);
         } catch (Exception e) {
             errors.append("Invalid JSON format: ")
-                .append(e.getMessage())
+                .append(e.getMessage()
+                    .replace("\n", " "))
                 .append("\n");
 
             return null;
