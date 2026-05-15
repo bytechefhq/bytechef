@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.pgvector.constant.PgVectorCo
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorDeleteAction;
 import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorLoadAction;
 import com.bytechef.component.ai.vectorstore.pgvector.action.PgVectorSearchAction;
 import com.bytechef.component.ai.vectorstore.pgvector.cluster.PgVectorSearchTool;
@@ -49,6 +50,7 @@ public class PgVectorComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(PgVectorConnection.CONNECTION_DEFINITION)
             .actions(
+                PgVectorDeleteAction.of(clusterElementDefinitionService),
                 PgVectorSearchAction.of(clusterElementDefinitionService),
                 PgVectorLoadAction.of(clusterElementDefinitionService))
             .clusterElements(

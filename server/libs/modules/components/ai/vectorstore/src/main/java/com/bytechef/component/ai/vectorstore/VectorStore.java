@@ -16,17 +16,21 @@
 
 package com.bytechef.component.ai.vectorstore;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SIMILARITY_THRESHOLD;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOP_K;
 
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.List;
+import java.util.Map;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * @author Monika Kušter
@@ -51,6 +55,39 @@ public interface VectorStore {
         }
 
         vectorStore.add(documents);
+    }
+
+    default void delete(
+        Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel) {
+
+        org.springframework.ai.vectorstore.VectorStore vectorStore = createVectorStore(
+            inputParameters, connectionParameters, embeddingModel);
+
+        List<Map<String, Object>> metadataFilters = inputParameters.getList(
+            METADATA, new TypeReference<>() {});
+
+        FilterExpressionBuilder builder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op filterExpression = null;
+
+        for (Map<String, Object> metadataFilter : metadataFilters) {
+            FilterExpressionBuilder.Op groupExpression = null;
+
+            for (Map.Entry<String, Object> entry : metadataFilter.entrySet()) {
+                FilterExpressionBuilder.Op condition = builder.eq(entry.getKey(), entry.getValue());
+
+                groupExpression = groupExpression == null ? condition : builder.and(groupExpression, condition);
+            }
+
+            if (groupExpression != null) {
+                filterExpression = filterExpression == null
+                    ? groupExpression
+                    : builder.or(filterExpression, groupExpression);
+            }
+        }
+
+        if (filterExpression != null) {
+            vectorStore.delete(filterExpression.build());
+        }
     }
 
     default List<Document> search(
