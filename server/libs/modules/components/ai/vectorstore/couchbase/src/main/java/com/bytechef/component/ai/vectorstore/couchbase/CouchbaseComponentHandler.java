@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.couchbase.constant.Couchbase
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseDeleteAction;
 import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseLoadAction;
 import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseSearchAction;
 import com.bytechef.component.ai.vectorstore.couchbase.cluster.CouchbaseSearchTool;
@@ -51,6 +52,7 @@ public class CouchbaseComponentHandler implements ComponentHandler {
                 .connection(CouchbaseConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
+                    CouchbaseDeleteAction.of(clusterElementDefinitionService),
                     CouchbaseLoadAction.of(clusterElementDefinitionService),
                     CouchbaseSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(

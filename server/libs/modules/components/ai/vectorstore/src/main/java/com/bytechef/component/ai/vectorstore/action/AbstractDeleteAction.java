@@ -16,10 +16,9 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY_PROPERTY;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SEARCH_PROPERTIES;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.DELETE;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.ai.vectorstore.util.VectorStoreUtils;
@@ -37,15 +36,15 @@ import java.util.stream.Stream;
 import org.springframework.ai.embedding.EmbeddingModel;
 
 /**
- * @author Ivica Cardic
+ * @author Monika Kušter
  */
-public abstract class AbstractSearchAction {
+public abstract class AbstractDeleteAction {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final String componentName;
     private final VectorStore vectorStore;
 
-    protected AbstractSearchAction(
+    protected AbstractDeleteAction(
         String componentName, VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
@@ -58,22 +57,20 @@ public abstract class AbstractSearchAction {
         String componentName, VectorStore vectorStore, List<Property> properties,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        AbstractSearchAction searchAction = new AbstractSearchAction(
+        AbstractDeleteAction deleteAction = new AbstractDeleteAction(
             componentName, vectorStore, clusterElementDefinitionService) {};
 
-        return action(SEARCH)
-            .title("Search Documents")
-            .description("Query documents from the vector store using LLM embeddings.")
+        return action(DELETE)
+            .title("Delete Documents")
+            .description("Delete documents from the vector store by metadata")
             .properties(
                 Stream
                     .of(
-                        Stream.of(QUERY_PROPERTY),
-                        properties.stream(),
-                        SEARCH_PROPERTIES.stream())
+                        Stream.of(METADATA_PROPERTY),
+                        properties.stream())
                     .flatMap(stream -> stream)
                     .toList())
-            .output()
-            .perform((MultipleConnectionsPerformFunction) searchAction::perform);
+            .perform((MultipleConnectionsPerformFunction) deleteAction::perform);
     }
 
     protected Object perform(
@@ -84,8 +81,10 @@ public abstract class AbstractSearchAction {
         EmbeddingModel embeddingModel = VectorStoreUtils.getEmbeddingModel(
             extensions, componentConnections, clusterElementDefinitionService);
 
-        return vectorStore.search(
+        vectorStore.delete(
             inputParameters, ParametersFactory.create(vectorStoreComponentConnection.getParameters()),
             embeddingModel);
+
+        return null;
     }
 }

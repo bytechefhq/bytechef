@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.mariadb.constant.MariaDBVect
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.mariadb.action.MariaDBVectorStoreDeleteAction;
 import com.bytechef.component.ai.vectorstore.mariadb.action.MariaDBVectorStoreLoadAction;
 import com.bytechef.component.ai.vectorstore.mariadb.action.MariaDBVectorStoreSearchAction;
 import com.bytechef.component.ai.vectorstore.mariadb.cluster.MariaDBVectorStoreClusterElement;
@@ -50,6 +51,7 @@ public class MariaDBVectorStoreComponentHandler implements ComponentHandler {
                 .connection(MariaDBVectorStoreConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
+                    MariaDBVectorStoreDeleteAction.of(clusterElementDefinitionService),
                     MariaDBVectorStoreLoadAction.of(clusterElementDefinitionService),
                     MariaDBVectorStoreSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(

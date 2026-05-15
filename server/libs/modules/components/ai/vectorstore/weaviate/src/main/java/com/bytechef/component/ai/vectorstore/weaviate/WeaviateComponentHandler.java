@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.weaviate.constant.WeaviateCo
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.weaviate.action.WeaviateDeleteAction;
 import com.bytechef.component.ai.vectorstore.weaviate.action.WeaviateLoadAction;
 import com.bytechef.component.ai.vectorstore.weaviate.action.WeaviateSearchAction;
 import com.bytechef.component.ai.vectorstore.weaviate.cluster.WeaviateSearchTool;
@@ -51,6 +52,7 @@ public class WeaviateComponentHandler implements ComponentHandler {
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .connection(WeaviateConnection.CONNECTION_DEFINITION)
             .actions(
+                WeaviateDeleteAction.of(clusterElementDefinitionService),
                 WeaviateSearchAction.of(clusterElementDefinitionService),
                 WeaviateLoadAction.of(clusterElementDefinitionService))
             .clusterElements(

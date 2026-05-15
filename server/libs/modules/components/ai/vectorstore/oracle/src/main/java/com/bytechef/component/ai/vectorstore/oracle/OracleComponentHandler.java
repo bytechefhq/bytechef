@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.oracle.constant.OracleConsta
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.oracle.action.OracleDeleteAction;
 import com.bytechef.component.ai.vectorstore.oracle.action.OracleLoadAction;
 import com.bytechef.component.ai.vectorstore.oracle.action.OracleSearchAction;
 import com.bytechef.component.ai.vectorstore.oracle.cluster.OracleSearchTool;
@@ -51,6 +52,7 @@ public class OracleComponentHandler implements ComponentHandler {
                 .connection(OracleConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
+                    OracleDeleteAction.of(clusterElementDefinitionService),
                     OracleLoadAction.of(clusterElementDefinitionService),
                     OracleSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(

@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.neo4j.constant.Neo4jConstant
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jDeleteAction;
 import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jLoadAction;
 import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jSearchAction;
 import com.bytechef.component.ai.vectorstore.neo4j.cluster.Neo4jSearchTool;
@@ -51,6 +52,7 @@ public class Neo4jComponentHandler implements ComponentHandler {
                 .connection(Neo4jConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
+                    Neo4jDeleteAction.of(clusterElementDefinitionService),
                     Neo4jLoadAction.of(clusterElementDefinitionService),
                     Neo4jSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(

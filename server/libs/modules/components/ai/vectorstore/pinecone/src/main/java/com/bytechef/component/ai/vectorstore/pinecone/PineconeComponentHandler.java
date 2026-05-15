@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.vectorstore.pinecone.constant.PineconeCo
 import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.pinecone.action.PineconeDeleteAction;
 import com.bytechef.component.ai.vectorstore.pinecone.action.PineconeLoadAction;
 import com.bytechef.component.ai.vectorstore.pinecone.action.PineconeSearchAction;
 import com.bytechef.component.ai.vectorstore.pinecone.cluster.PineconeSearchTool;
@@ -51,6 +52,7 @@ public class PineconeComponentHandler implements ComponentHandler {
                 .connection(PineconeConnection.CONNECTION_DEFINITION)
                 .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                 .actions(
+                    PineconeDeleteAction.of(clusterElementDefinitionService),
                     PineconeLoadAction.of(clusterElementDefinitionService),
                     PineconeSearchAction.of(clusterElementDefinitionService))
                 .clusterElements(

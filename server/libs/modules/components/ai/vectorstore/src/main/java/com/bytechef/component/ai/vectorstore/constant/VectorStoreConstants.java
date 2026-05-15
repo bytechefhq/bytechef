@@ -16,9 +16,15 @@
 
 package com.bytechef.component.ai.vectorstore.constant;
 
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 
 import com.bytechef.component.definition.Property;
 import java.util.List;
@@ -31,6 +37,15 @@ public class VectorStoreConstants {
     public static final String QUERY = "query";
     public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
     public static final String TOP_K = "topK";
+    public static final String METADATA = "metadata";
+
+    public static final Property METADATA_PROPERTY = array(METADATA)
+        .label("Metadata")
+        .description("List of document metadata keys to filter by.")
+        .items(
+            object()
+                .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time()))
+        .required(true);
 
     public static final Property QUERY_PROPERTY = string(QUERY)
         .label("Query")

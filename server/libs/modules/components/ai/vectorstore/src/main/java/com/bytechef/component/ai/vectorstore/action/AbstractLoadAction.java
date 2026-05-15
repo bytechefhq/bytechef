@@ -69,8 +69,8 @@ public abstract class AbstractLoadAction {
             clusterElementDefinitionService, componentName, vectorStore) {};
 
         return action(LOAD)
-            .title("Load Data")
-            .description("Loads data into the vector store using LLM embeddings.")
+            .title("Load Documents")
+            .description("Loads documents into the vector store using LLM embeddings.")
             .properties(properties)
             .perform((MultipleConnectionsPerformFunction) loadAction::perform);
     }
