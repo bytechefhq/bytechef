@@ -1486,7 +1486,7 @@ public class ApplicationProperties {
             }
 
             /** Vector store provider */
-            private Provider provider = Provider.PGVECTOR;
+            private Provider provider;
 
             /** PgVector configuration */
             private PgVector pgVector = new PgVector();
