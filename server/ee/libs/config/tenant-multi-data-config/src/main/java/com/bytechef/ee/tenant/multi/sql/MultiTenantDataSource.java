@@ -12,11 +12,11 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.ConnectionBuilder;
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.sql.Statement;
-import java.util.logging.Logger;
 import javax.sql.DataSource;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -30,7 +30,8 @@ import org.slf4j.LoggerFactory;
 public class MultiTenantDataSource implements DataSource {
 
     private final DataSource dataSource;
-    private static final org.slf4j.Logger log = LoggerFactory.getLogger(MultiTenantDataSource.class);
+    private static final Logger log = LoggerFactory.getLogger(MultiTenantDataSource.class);
+    private static final String SET_SEARCH_PATH_STATEMENT = "SET search_path TO ?";
 
     @SuppressFBWarnings("EI")
     public MultiTenantDataSource(DataSource dataSource) {
@@ -76,7 +77,7 @@ public class MultiTenantDataSource implements DataSource {
     }
 
     @Override
-    public Logger getParentLogger() throws SQLFeatureNotSupportedException {
+    public java.util.logging.Logger getParentLogger() throws SQLFeatureNotSupportedException {
         return dataSource.getParentLogger();
     }
 
@@ -106,12 +107,14 @@ public class MultiTenantDataSource implements DataSource {
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection) throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            String tenantSchemaDefinitionStatement = "SET search_path TO " + TenantContext.getCurrentDatabaseSchema();
+        String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema();
 
-            statement.execute(tenantSchemaDefinitionStatement);
+        try (PreparedStatement statement = connection.prepareStatement(SET_SEARCH_PATH_STATEMENT)) {
+            statement.setString(1, currentDatabaseSchema);
 
-            log.trace("Executing SQL: " + tenantSchemaDefinitionStatement);
+            statement.execute();
+
+            log.trace("Executed SQL: {} {}", SET_SEARCH_PATH_STATEMENT, currentDatabaseSchema);
         }
     }
 }
