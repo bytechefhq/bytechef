@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jDeleteAction;
 import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jLoadAction;
 import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jSearchAction;
+import com.bytechef.component.ai.vectorstore.neo4j.action.Neo4jUpdateAction;
 import com.bytechef.component.ai.vectorstore.neo4j.cluster.Neo4jSearchTool;
 import com.bytechef.component.ai.vectorstore.neo4j.cluster.Neo4jVectorStore;
 import com.bytechef.component.ai.vectorstore.neo4j.connection.Neo4jConnection;
@@ -54,7 +55,8 @@ public class Neo4jComponentHandler implements ComponentHandler {
                 .actions(
                     Neo4jDeleteAction.of(clusterElementDefinitionService),
                     Neo4jLoadAction.of(clusterElementDefinitionService),
-                    Neo4jSearchAction.of(clusterElementDefinitionService))
+                    Neo4jSearchAction.of(clusterElementDefinitionService),
+                    Neo4jUpdateAction.of(clusterElementDefinitionService))
                 .clusterElements(
                     Neo4jSearchTool.of(clusterElementDefinitionService),
                     Neo4jVectorStore.of(clusterElementDefinitionService)));

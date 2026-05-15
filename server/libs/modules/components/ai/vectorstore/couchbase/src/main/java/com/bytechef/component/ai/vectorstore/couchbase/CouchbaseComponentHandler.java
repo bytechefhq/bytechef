@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseDeleteAction;
 import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseLoadAction;
 import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseSearchAction;
+import com.bytechef.component.ai.vectorstore.couchbase.action.CouchbaseUpdateAction;
 import com.bytechef.component.ai.vectorstore.couchbase.cluster.CouchbaseSearchTool;
 import com.bytechef.component.ai.vectorstore.couchbase.cluster.CouchbaseVectorStore;
 import com.bytechef.component.ai.vectorstore.couchbase.connection.CouchbaseConnection;
@@ -54,7 +55,8 @@ public class CouchbaseComponentHandler implements ComponentHandler {
                 .actions(
                     CouchbaseDeleteAction.of(clusterElementDefinitionService),
                     CouchbaseLoadAction.of(clusterElementDefinitionService),
-                    CouchbaseSearchAction.of(clusterElementDefinitionService))
+                    CouchbaseSearchAction.of(clusterElementDefinitionService),
+                    CouchbaseUpdateAction.of(clusterElementDefinitionService))
                 .clusterElements(
                     CouchbaseSearchTool.of(clusterElementDefinitionService),
                     CouchbaseVectorStore.of(clusterElementDefinitionService)));
