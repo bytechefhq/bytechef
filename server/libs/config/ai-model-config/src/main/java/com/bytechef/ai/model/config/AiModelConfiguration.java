@@ -25,6 +25,8 @@ import com.openai.client.okhttp.OpenAIOkHttpClient;
 import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
+import org.springframework.ai.anthropic.AnthropicCacheOptions;
+import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
@@ -92,6 +94,10 @@ class AiModelConfiguration {
                 AnthropicChatOptions.builder()
                     .model(anthropicChatOptions.getModel())
                     .temperature(anthropicChatOptions.getTemperature())
+                    .cacheOptions(
+                        AnthropicCacheOptions.builder()
+                            .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
+                            .build())
                     .maxTokens(64000)
                     .build())
             .observationRegistry(observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP))
