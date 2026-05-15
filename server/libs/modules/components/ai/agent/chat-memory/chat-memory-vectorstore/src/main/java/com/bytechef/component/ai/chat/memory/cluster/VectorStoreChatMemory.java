@@ -98,8 +98,7 @@ public class VectorStoreChatMemory {
                     ParametersFactory.create(componentConnectionConnectionParameters),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
             .defaultTopK(
-                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20))
-            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200);
+                inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 
         return new ChatMemoryFunction.Result(builder.build(), null);
     }
