@@ -118,8 +118,9 @@ public abstract class AbstractAiAgentChatAction {
 
                 String id = chatMemoryParameters.getString("conversationId");
 
-                return id != null ? id : UUID.randomUUID()
-                    .toString();
+                UUID uuid = UUID.randomUUID();
+
+                return id != null ? id : uuid.toString();
             })
             .orElse(null);
 
