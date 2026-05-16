@@ -59,15 +59,72 @@ function App() {
 
 ## Configuration
 
-### ByteChefChatConfig
+### AutomationChatConfig
 
 ```typescript
-interface ByteChefChatConfig {
+interface AutomationChatConfig {
     /**
-     * The full webhook URL to connect to
+     * The full text-chat webhook URL. If the URL ends with /sse, SSE streaming is used automatically;
+     * otherwise the widget falls back to plain HTTP request/response.
      */
     webhookUrl: string;
+
+    /**
+     * Optional base URL of a ByteChef browser-voice webhook. When set, the widget renders a mic button.
+     * Clicking the mic opens a WebSocket to <voiceWebhookUrl>/wss after minting a session token at
+     * POST <voiceWebhookUrl>/voice-session-token.
+     *
+     * The URL points at a workflow with a browser/v1/voiceSession trigger. See the voice quickstart
+     * docs for setup: docs/voice/quickstart.md
+     */
+    voiceWebhookUrl?: string;
+
+    /**
+     * Welcome message title shown on the first turn.
+     * @default 'Hello there!'
+     */
+    title?: string;
+
+    /**
+     * Welcome message description shown on the first turn.
+     * @default 'How can I help you today?'
+     */
+    description?: string;
+
+    /**
+     * Optional list of suggestion chips shown on the welcome screen.
+     */
+    suggestions?: Suggestion[];
 }
+```
+
+### Voice support
+
+Voice requires a modern browser (Chrome 66+, Firefox 76+, Safari 14.1+) and a secure context (HTTPS or
+localhost). The widget gates the mic button automatically — on unsupported browsers no mic appears, no
+silent failure at click time.
+
+If you embed the widget inside an `<iframe>`, the iframe MUST grant microphone access via the `allow`
+attribute or `getUserMedia` is silently denied by the browser:
+
+```html
+<iframe src="https://your-site.com/chat-widget" allow="microphone"></iframe>
+```
+
+The voice session is bound to the workflow's webhook — the widget hits
+`POST <voiceWebhookUrl>/voice-session-token` to mint a single-use token, then opens
+`WSS <voiceWebhookUrl>/wss?sessionToken=…`. The token TTL is 60 seconds; on expiry or replay the server
+closes the WebSocket with a `POLICY_VIOLATION` and the widget shows the error.
+
+If you need to detect voice support before mounting the widget (e.g. to render a different UI on
+unsupported browsers), import the helper:
+
+```tsx
+import {checkVoiceSupport} from '@bytechef/chat';
+
+const voiceReason = checkVoiceSupport();
+// null = voice works
+// string = human-readable reason voice does not work in this browser
 ```
 
 ### ByteChefChatModal Additional Props

@@ -40,6 +40,12 @@ export interface WorkflowTrigger {
      */
     description?: string;
     /**
+     * Key-value map of trigger extensions — structural configuration that is not a component-declared trigger property, such as the websocketTasks realtime pipeline.
+     * @type {{ [key: string]: any; }}
+     * @memberof WorkflowTrigger
+     */
+    readonly extensions?: { [key: string]: any; };
+    /**
      * The human-readable description of the task.
      * @type {string}
      * @memberof WorkflowTrigger
@@ -98,6 +104,7 @@ export function WorkflowTriggerFromJSONTyped(json: any, ignoreDiscriminator: boo
         
         'connections': json['connections'] == null ? undefined : ((json['connections'] as Array<any>).map(ComponentConnectionFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
+        'extensions': json['extensions'] == null ? undefined : json['extensions'],
         'label': json['label'] == null ? undefined : json['label'],
         'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'],
@@ -111,7 +118,7 @@ export function WorkflowTriggerToJSON(json: any): WorkflowTrigger {
     return WorkflowTriggerToJSONTyped(json, false);
 }
 
-export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'> | null, ignoreDiscriminator: boolean = false): any {
+export function WorkflowTriggerToJSONTyped(value?: Omit<WorkflowTrigger, 'connections'|'extensions'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

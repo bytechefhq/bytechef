@@ -12,6 +12,11 @@ export {TooltipIconButton} from './components/assistant-ui/tooltip-icon-button';
 export {useSSE} from './hooks/useSSE';
 export type {UseSSEOptionsType, SSERequestType, UseSSEResultType} from './hooks/useSSE';
 export {useAutomationChatConfig} from './hooks/useAutomationChatConfig';
+export {useAutomationChatVoiceSession} from './hooks/useAutomationChatVoiceSession';
+
+// Voice
+export {BrowserVoiceSession, checkVoiceSupport} from './lib/BrowserVoiceSession';
+export type {VoiceEventI, VoiceSessionStatusType, BrowserVoiceSessionOptionsI} from './lib/BrowserVoiceSession';
 
 // Store
 export {useChatStore} from './stores/useChatStore';
