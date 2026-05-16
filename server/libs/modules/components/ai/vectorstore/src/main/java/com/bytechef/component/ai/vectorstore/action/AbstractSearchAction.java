@@ -68,10 +68,8 @@ public abstract class AbstractSearchAction {
             .properties(
                 Stream
                     .of(
-                        Stream.of(QUERY_PROPERTY),
-                        properties.stream(),
-                        Stream.of(METADATA_PROPERTY),
-                        SEARCH_PROPERTIES.stream())
+                        Stream.of(QUERY_PROPERTY), properties.stream(),
+                        Stream.of(METADATA_PROPERTY), SEARCH_PROPERTIES.stream())
                     .flatMap(stream -> stream)
                     .toList())
             .output()

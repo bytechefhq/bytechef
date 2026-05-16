@@ -76,10 +76,7 @@ public abstract class AbstractUpdateAction {
                 "Updates documents in the vector store by deleting existing ones matching the metadata filter " +
                     "and loading new ones using LLM embeddings.")
             .properties(
-                Stream
-                    .of(
-                        properties.stream(),
-                        Stream.of(METADATA_PROPERTY))
+                Stream.of(properties.stream(), Stream.of(METADATA_PROPERTY))
                     .flatMap(stream -> stream)
                     .toList())
             .perform((MultipleConnectionsPerformFunction) updateAction::perform);

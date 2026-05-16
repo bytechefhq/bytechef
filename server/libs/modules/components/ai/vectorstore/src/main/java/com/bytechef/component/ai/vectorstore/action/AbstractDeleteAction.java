@@ -64,10 +64,7 @@ public abstract class AbstractDeleteAction {
             .title("Delete Documents")
             .description("Delete documents from the vector store by metadata")
             .properties(
-                Stream
-                    .of(
-                        Stream.of(METADATA_PROPERTY),
-                        properties.stream())
+                Stream.of(Stream.of(METADATA_PROPERTY), properties.stream())
                     .flatMap(stream -> stream)
                     .toList())
             .perform((MultipleConnectionsPerformFunction) deleteAction::perform);

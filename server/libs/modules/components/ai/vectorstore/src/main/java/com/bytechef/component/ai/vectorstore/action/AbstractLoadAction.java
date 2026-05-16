@@ -74,10 +74,7 @@ public abstract class AbstractLoadAction {
             .title("Load Documents")
             .description("Loads documents into the vector store using LLM embeddings.")
             .properties(
-                Stream
-                    .of(
-                        properties.stream(),
-                        Stream.of(METADATA_PROPERTY))
+                Stream.of(properties.stream(), Stream.of(METADATA_PROPERTY))
                     .flatMap(stream -> stream)
                     .toList())
             .perform((MultipleConnectionsPerformFunction) loadAction::perform);
