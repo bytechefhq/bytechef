@@ -63,8 +63,6 @@ class TaskValidator {
 
             StringBuilder errors = context.getErrors();
             StringBuilder warnings = context.getWarnings();
-            int errorsStart = errors.length();
-            int warningsStart = warnings.length();
 
             validateTaskStructureFields(taskJsonNode, errors);
 
@@ -75,8 +73,8 @@ class TaskValidator {
             validateClusterElements(taskJsonNode, taskName, context);
 
             if (!taskName.isEmpty()) {
-                prefixTaskMessages(errors, errorsStart, taskName);
-                prefixTaskMessages(warnings, warningsStart, taskName);
+                prefixTaskMessages(errors, errors.length(), taskName);
+                prefixTaskMessages(warnings, warnings.length(), taskName);
             }
         }
     }
@@ -234,12 +232,10 @@ class TaskValidator {
             }
         }
 
-        int errorsStart = errors.length();
-
         validateTaskStructureFields(taskJsonNode, errors);
 
         if (!taskName.isEmpty()) {
-            prefixTaskMessages(errors, errorsStart, taskName);
+            prefixTaskMessages(errors, errors.length(), taskName);
         }
     }
 
@@ -313,14 +309,11 @@ class TaskValidator {
         String taskName, String taskParameters, List<PropertyInfo> taskDefinition, StringBuilder errors,
         StringBuilder warnings) {
 
-        int errorsStart = errors.length();
-        int warningsStart = warnings.length();
-
         validateTaskParameters(taskParameters, taskDefinition, errors, warnings);
 
         if (!taskName.isEmpty()) {
-            prefixTaskMessages(errors, errorsStart, taskName);
-            prefixTaskMessages(warnings, warningsStart, taskName);
+            prefixTaskMessages(errors, errors.length(), taskName);
+            prefixTaskMessages(warnings, warnings.length(), taskName);
         }
     }
 
