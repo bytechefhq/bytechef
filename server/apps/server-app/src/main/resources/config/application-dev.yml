@@ -3,7 +3,7 @@ logging:
     ROOT: INFO
     com.bytechef: DEBUG
     com.bytechef.ee.observability: INFO
-    org.springframework.ai.chat.client.advisor': DEBUG
+    org.springframework.ai.chat.client.advisor.SimpleLoggerAdvisor: DEBUG
 
 server:
   port: 9555
