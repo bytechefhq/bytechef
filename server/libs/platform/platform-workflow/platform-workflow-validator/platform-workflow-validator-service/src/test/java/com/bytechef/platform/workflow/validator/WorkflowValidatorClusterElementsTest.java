@@ -346,7 +346,8 @@ class WorkflowValidatorClusterElementsTest {
             assertEquals("", errors.toString());
             assertEquals("""
                 [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
-                [aiAgent_1] Cluster element 'guardsnails' are not defined in task aiAgent_1""", warnings.toString());
+                [aiAgent_1] Cluster element 'guardsnails' are not defined in task aiAgent_1""",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -451,7 +452,8 @@ class WorkflowValidatorClusterElementsTest {
             assertEquals("", errors.toString());
             assertEquals("""
                 [aiAgent_1] Cluster element 'embedding' is missing from task couchbase_1
-                [aiAgent_1] Cluster element 'model' are not defined in task couchbase_1""", warnings.toString());
+                [aiAgent_1] Cluster element 'model' are not defined in task couchbase_1""",
+                warnings.toString());
 
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -558,7 +560,8 @@ class WorkflowValidatorClusterElementsTest {
                 [condition_1] Cluster element 'chatMemory' is missing from task aiAgent_1
                 [condition_1] Cluster element 'rag' is missing from task aiAgent_1
                 [condition_1] Cluster element 'guardrails' is missing from task aiAgent_1
-                [condition_1] Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+                [condition_1] Cluster element 'tools' is missing from task aiAgent_1""",
+                warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
         }
@@ -800,7 +803,8 @@ class WorkflowValidatorClusterElementsTest {
             [aiAgent_1] Cluster element 'chatMemory' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'rag' is missing from task aiAgent_1
             [aiAgent_1] Cluster element 'guardrails' is missing from task aiAgent_1
-            [aiAgent_1] Cluster element 'tools' is missing from task aiAgent_1""", warnings.toString());
+            [aiAgent_1] Cluster element 'tools' is missing from task aiAgent_1""",
+            warnings.toString());
     }
 
     @Test

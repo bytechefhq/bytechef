@@ -64,10 +64,11 @@ class JsonNodeUtils {
     public static @Nullable JsonNode parseJsonWithErrorHandling(String json, StringBuilder errors) {
         try {
             return com.bytechef.commons.util.JsonUtils.readTree(json);
-        } catch (Exception e) {
+        } catch (Exception exception) {
+            String message = exception.getMessage();
+
             errors.append("Invalid JSON format: ")
-                .append(e.getMessage()
-                    .replace("\n", " "))
+                .append(message.replace("\n", " "))
                 .append("\n");
 
             return null;

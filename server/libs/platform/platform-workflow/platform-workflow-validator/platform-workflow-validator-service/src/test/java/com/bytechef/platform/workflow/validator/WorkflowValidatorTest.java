@@ -163,7 +163,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("[task2] Property 'active' has incorrect type. Expected: boolean, but got: string",
+            assertEquals(
+                "[task2] Property 'active' has incorrect type. Expected: boolean, but got: string",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -569,8 +570,9 @@ class WorkflowValidatorTest {
         String string = errors.toString();
 
         assertEquals(
-            "Invalid JSON format: Unexpected character ('\"' (code 34)): was expecting comma to separate Object entries"
-                + "  at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte offset: #UNKNOWN]\n",
+            "Invalid JSON format: Unexpected character ('\"' (code 34)): was expecting comma to separate Object " +
+                "entries at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); byte " +
+                "offset: #UNKNOWN]\n",
             string);
     }
 
@@ -1525,7 +1527,8 @@ class WorkflowValidatorTest {
             [testTask] Property 'featureConfig' is not defined in task definition
             [testTask] Property 'featureConfig.setting1' is not defined in task definition
             [testTask] Property 'featureConfig.setting2' is not defined in task definition
-            [testTask] Invalid logic for display condition: 'gndfknskgn / sflakdjdkf 3'""", warnings.toString());
+            [testTask] Invalid logic for display condition: 'gndfknskgn / sflakdjdkf 3'""",
+            warnings.toString());
     }
 
     @Test
@@ -1615,10 +1618,12 @@ class WorkflowValidatorTest {
         assertEquals("""
             [testTask] Missing required property: advancedConfig
             [testTask] Missing required property: advancedConfig.mandatory
-            [testTask] Missing required property: advancedConfig.mandatory.name""", errors.toString());
+            [testTask] Missing required property: advancedConfig.mandatory.name""",
+            errors.toString());
         assertEquals("""
             [testTask] Property 'basicConfig' is not defined in task definition
-            [testTask] Property 'basicConfig.name' is not defined in task definition""", warnings.toString());
+            [testTask] Property 'basicConfig.name' is not defined in task definition""",
+            warnings.toString());
     }
 
     @Test
@@ -1644,8 +1649,8 @@ class WorkflowValidatorTest {
                     new PropertyInfo("mimeType", "STRING", null, true, true, null, null),
                     new PropertyInfo("name", "STRING", null, true, true, null, null),
                     new PropertyInfo("url", "STRING", null, true, true, null, null))),
-            new PropertyInfo("bodyContent", "OBJECT", null, false, true, "bodyContentType == false",
-                List.of()));
+            new PropertyInfo(
+                "bodyContent", "OBJECT", null, false, true, "bodyContentType == false", List.of()));
 
         StringBuilder errors = new StringBuilder();
         StringBuilder warnings = new StringBuilder();
@@ -1723,7 +1728,8 @@ class WorkflowValidatorTest {
         assertEquals("""
             [testTask] Missing required property: bodyContent.mimeType
             [testTask] Missing required property: bodyContent.name
-            [testTask] Missing required property: bodyContent.url""", errors.toString());
+            [testTask] Missing required property: bodyContent.url""",
+            errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -2993,7 +2999,8 @@ class WorkflowValidatorTest {
 
             assertEquals("""
                 [testTask1] Property 'name' has incorrect type. Expected: string, but got: integer
-                [testTask1] Missing required property: age""", errors.toString());
+                [testTask1] Missing required property: age""",
+                errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
             fail("Should not throw exception: " + e.getMessage());
@@ -3110,7 +3117,8 @@ class WorkflowValidatorTest {
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
             assertEquals(
-                "[testTask2] Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, not boolean",
+                "[testTask2] Property 'testTask1.propString' in output of 'component/v1/trigger1' is of type string, " +
+                    "not boolean",
                 errors.toString());
             assertEquals("", warnings.toString());
         } catch (Exception e) {
@@ -3180,7 +3188,8 @@ class WorkflowValidatorTest {
             WorkflowValidator.validateWorkflowTasks(
                 taskJsonNodes, taskDefinitionMap, taskOutputMap, new HashMap<>(), errors, warnings);
 
-            assertEquals("[testTask2] Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
+            assertEquals(
+                "[testTask2] Wrong task order: You can't reference 'testTask3.prepNumber' in testTask2",
                 errors.toString());
             assertEquals(
                 "[testTask3] Property 'testTask1.propBool' might not exist in the output of 'component/v1/trigger1'",
