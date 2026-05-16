@@ -59,8 +59,8 @@ public class VectorStoreChatMemory {
         return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Vector Store Chat Memory")
             .description(
-                "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for " +
-                    "text based exchanges with the models, not multi-modal exchanges.")
+                "Memory is retrieved from a VectorStore and added as prior messages in the conversation. This " +
+                    "only works for text based exchanges with the models, not multi-modal exchanges.")
             .type(CHAT_MEMORY)
             .properties(
                 string(CONVERSATION_ID)
@@ -96,7 +96,6 @@ public class VectorStoreChatMemory {
                     ParametersFactory.create(clusterElement.getParameters()),
                     ParametersFactory.create(componentConnectionConnectionParameters),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
-            .conversationId(inputParameters.getString(CONVERSATION_ID))
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 

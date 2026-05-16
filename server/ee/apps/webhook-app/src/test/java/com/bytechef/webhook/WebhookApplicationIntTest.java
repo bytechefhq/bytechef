@@ -15,7 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = WebhookApplication.class)
+@SpringBootTest(classes = WebhookApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class WebhookApplicationIntTest {
 
     @Test

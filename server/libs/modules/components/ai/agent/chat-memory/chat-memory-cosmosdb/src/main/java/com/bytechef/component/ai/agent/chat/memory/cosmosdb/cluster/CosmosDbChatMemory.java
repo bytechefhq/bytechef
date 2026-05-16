@@ -28,7 +28,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import java.util.Map;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
@@ -43,7 +44,7 @@ public class CosmosDbChatMemory {
     public static final ClusterElementDefinition<ChatMemoryFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("Cosmos DB Chat Memory")
-            .description("Memory is retrieved from Azure Cosmos DB and added into the prompt's system text.")
+            .description("Memory is retrieved from Azure Cosmos DB and added as prior messages in the conversation.")
             .properties(
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
@@ -53,7 +54,7 @@ public class CosmosDbChatMemory {
             .type(CHAT_MEMORY)
             .object(() -> CosmosDbChatMemory::apply);
 
-    protected static PromptChatMemoryAdvisor apply(
+    protected static MessageChatMemoryAdvisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
@@ -63,8 +64,8 @@ public class CosmosDbChatMemory {
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
-        return PromptChatMemoryAdvisor.builder(chatMemory)
-            .conversationId(inputParameters.getString(CONVERSATION_ID))
+        return MessageChatMemoryAdvisor.builder(chatMemory)
+            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
             .build();
     }
 }

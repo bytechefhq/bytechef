@@ -262,6 +262,22 @@
         "value": "gpt-5-4"
       }, {
         "description": null,
+        "label": "gpt-5-4-mini",
+        "value": "gpt-5-4-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-mini-2026-03-17",
+        "value": "gpt-5-4-mini-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano",
+        "value": "gpt-5-4-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano-2026-03-17",
+        "value": "gpt-5-4-nano-2026-03-17"
+      }, {
+        "description": null,
         "label": "gpt-5-chat-latest",
         "value": "gpt-5-chat-latest"
       }, {
@@ -1478,6 +1494,22 @@
         "description": null,
         "label": "gpt-5-4",
         "value": "gpt-5-4"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-mini",
+        "value": "gpt-5-4-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-mini-2026-03-17",
+        "value": "gpt-5-4-mini-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano",
+        "value": "gpt-5-4-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano-2026-03-17",
+        "value": "gpt-5-4-nano-2026-03-17"
       }, {
         "description": null,
         "label": "gpt-5-chat-latest",
@@ -4075,6 +4107,22 @@
         "description": null,
         "label": "gpt-5-4",
         "value": "gpt-5-4"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-mini",
+        "value": "gpt-5-4-mini"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-mini-2026-03-17",
+        "value": "gpt-5-4-mini-2026-03-17"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano",
+        "value": "gpt-5-4-nano"
+      }, {
+        "description": null,
+        "label": "gpt-5-4-nano-2026-03-17",
+        "value": "gpt-5-4-nano-2026-03-17"
       }, {
         "description": null,
         "label": "gpt-5-chat-latest",

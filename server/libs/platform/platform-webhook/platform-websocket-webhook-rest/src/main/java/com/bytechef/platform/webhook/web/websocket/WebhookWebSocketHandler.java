@@ -43,6 +43,7 @@ import java.util.concurrent.CancellationException;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
@@ -82,6 +83,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     private final Cache<String, List<Map<String, Object>>> pendingEvents;
     private final Cache<String, String> sessionIdToCallSid;
 
+    @Autowired
     @SuppressFBWarnings("EI")
     public WebhookWebSocketHandler(
         CallSessionRegistry callSessionRegistry, JobFacade jobFacade,
