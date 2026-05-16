@@ -28,7 +28,8 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
@@ -52,7 +53,7 @@ public class JdbcChatMemory {
     private ClusterElementDefinition<ChatMemoryFunction> build() {
         return ComponentDsl.<ChatMemoryFunction>clusterElement("chatMemory")
             .title("JDBC Chat Memory")
-            .description("Memory is retrieved from a JDBC database and added into the prompt's system text.")
+            .description("Memory is retrieved from a JDBC database and added as prior messages in the conversation.")
             .properties(
                 string(CONVERSATION_ID)
                     .label("Conversation ID")
@@ -63,7 +64,7 @@ public class JdbcChatMemory {
             .object(() -> this::apply);
     }
 
-    protected PromptChatMemoryAdvisor apply(
+    protected MessageChatMemoryAdvisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) throws Exception {
 
@@ -74,8 +75,8 @@ public class JdbcChatMemory {
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
-        return PromptChatMemoryAdvisor.builder(chatMemory)
-            .conversationId(inputParameters.getString(CONVERSATION_ID))
+        return MessageChatMemoryAdvisor.builder(chatMemory)
+            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
             .build();
     }
 }

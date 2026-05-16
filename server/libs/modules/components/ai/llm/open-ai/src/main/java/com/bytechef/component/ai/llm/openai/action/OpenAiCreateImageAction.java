@@ -120,13 +120,12 @@ public class OpenAiCreateImageAction {
             .height(size.getDimensions()[1])
             .model(inputParameters.getRequiredString(MODEL))
             .N(inputParameters.getInteger(N))
+            .quality(quality.getValue())
             .responseFormat(responseFormat.getValue())
             .style(style.getValue())
             .user(inputParameters.getString(USER))
             .width(size.getDimensions()[0])
             .build();
-
-        imageOptions.setQuality(quality.getValue());
 
         return new OpenAiImageModel(
             OpenAIOkHttpClient.builder()

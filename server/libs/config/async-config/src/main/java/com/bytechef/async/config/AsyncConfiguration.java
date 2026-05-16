@@ -29,6 +29,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.task.AsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ContextPropagatingTaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -60,7 +61,7 @@ public class AsyncConfiguration implements AsyncConfigurer {
 
     @Override
     @Bean(name = "taskExecutor")
-    public Executor getAsyncExecutor() {
+    public TaskExecutor getAsyncExecutor() {
         TenantThreadPoolTaskExecutor executor = new TenantThreadPoolTaskExecutor();
 
         TaskExecutionProperties.Pool pool = taskExecutionProperties.getPool();

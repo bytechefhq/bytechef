@@ -784,7 +784,7 @@
   } ],
   "clusterElements": [ {
     "name": "chatMemory",
-    "description": "Memory is retrieved from a VectorStore added into the prompt's system text. This only works for text based exchanges with the models, not multi-modal exchanges.",
+    "description": "Memory is retrieved from a VectorStore and added as prior messages in the conversation. This only works for text based exchanges with the models, not multi-modal exchanges.",
     "element": { },
     "help": null,
     "outputDefinition": null,

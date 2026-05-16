@@ -17,6 +17,7 @@
 package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.component.definition.ActionDefinition.WebSocketHandler;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Objects;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -31,6 +32,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("EI_EXPOSE_REP2")
 class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
 
     private static final Logger logger = LoggerFactory.getLogger(WebSocketEmitter.class);

@@ -946,7 +946,7 @@
   } ],
   "clusterElements": [ {
     "name": "chatMemory",
-    "description": "Memory is retrieved from the application database and added into the prompt's system text.",
+    "description": "Memory is retrieved from the application database and added as prior messages in the conversation.",
     "element": { },
     "help": null,
     "outputDefinition": null,
