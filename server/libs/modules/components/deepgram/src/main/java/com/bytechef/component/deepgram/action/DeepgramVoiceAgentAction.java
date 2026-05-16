@@ -34,6 +34,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicBoolean;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Voice agent action using Deepgram's conversational AI WebSocket API.
@@ -160,7 +161,7 @@ public class DeepgramVoiceAgentAction {
                     .header("Authorization", "Token " + apiKey)
                     .buildAsync(
                         URI.create("wss://agent.deepgram.com/v1/agent/converse"),
-                        new DeepgramAgentListener(webSocketEmitter, closed))
+                        new DeepgramAgentListener(webSocketEmitter, context, closed))
                     .join();
 
                 deepgramWebSocket.sendText(settingsMessage, true)
@@ -271,14 +272,70 @@ public class DeepgramVoiceAgentAction {
         }
     }
 
+    /**
+     * Normalizes a raw Deepgram voice-agent text frame into the browser voice UI's typed event vocabulary. Recognized
+     * events are translated; any event without a browser-UI representation (control frames, or an unparseable payload)
+     * is forwarded unchanged under the legacy {@code {source, data}} envelope so nothing is silently dropped.
+     */
+    @SuppressWarnings("unchecked")
+    static Map<String, Object> toBrowserVoiceEvent(ActionContext context, String message) {
+        // Forwarded unchanged when the payload is unparseable or has no browser-UI representation, so nothing is
+        // silently dropped.
+        Map<String, Object> passthrough = Map.of("source", "deepgram_agent", "data", message);
+
+        try {
+            Map<String, Object> deepgramMessage = context.json(json -> json.read(message, Map.class));
+
+            Map<String, Object> voiceEvent = toVoiceEvent(deepgramMessage);
+
+            return voiceEvent != null ? voiceEvent : passthrough;
+        } catch (Exception exception) {
+            return passthrough;
+        }
+    }
+
+    /**
+     * Maps a parsed Deepgram voice-agent server event to a browser voice event, or {@code null} when the event has no
+     * browser-UI representation (e.g. {@code Welcome}, {@code SettingsApplied}, {@code AgentAudioDone}).
+     *
+     * <ul>
+     * <li>{@code ConversationText} with {@code role=user} &rarr; {@code transcript_final}</li>
+     * <li>{@code ConversationText} with {@code role=assistant} &rarr; {@code assistant_text}</li>
+     * <li>{@code UserStartedSpeaking} &rarr; {@code speech_start} (barge-in signal)</li>
+     * </ul>
+     *
+     * @param deepgramMessage the parsed Deepgram event
+     * @return the browser voice event, or {@code null} if the event is not surfaced to the browser
+     */
+    static @Nullable Map<String, Object> toVoiceEvent(Map<String, Object> deepgramMessage) {
+        if (!(deepgramMessage.get("type") instanceof String type)) {
+            return null;
+        }
+
+        return switch (type) {
+            case "ConversationText" -> {
+                Object content = deepgramMessage.get("content");
+                String text = content == null ? "" : String.valueOf(content);
+
+                yield "assistant".equals(deepgramMessage.get("role"))
+                    ? Map.of("type", "assistant_text", "text", text)
+                    : Map.of("type", "transcript_final", "text", text);
+            }
+            case "UserStartedSpeaking" -> Map.of("type", "speech_start");
+            default -> null;
+        };
+    }
+
     private static class DeepgramAgentListener implements WebSocket.Listener {
 
         private final AtomicBoolean closed;
+        private final ActionContext context;
         private final StringBuilder textBuffer = new StringBuilder();
         private final WebSocketEmitter webSocketEmitter;
 
-        DeepgramAgentListener(WebSocketEmitter webSocketEmitter, AtomicBoolean closed) {
+        DeepgramAgentListener(WebSocketEmitter webSocketEmitter, ActionContext context, AtomicBoolean closed) {
             this.closed = closed;
+            this.context = context;
             this.webSocketEmitter = webSocketEmitter;
         }
 
@@ -296,7 +353,7 @@ public class DeepgramVoiceAgentAction {
 
                 textBuffer.setLength(0);
 
-                webSocketEmitter.send(Map.of("source", "deepgram_agent", "data", message));
+                webSocketEmitter.send(toBrowserVoiceEvent(context, message));
             }
 
             return WebSocket.Listener.super.onText(webSocket, data, last);

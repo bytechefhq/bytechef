@@ -22,6 +22,7 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.configuration.constant.WorkflowExtConstants;
+import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 import java.util.Collections;
@@ -75,6 +76,22 @@ public class WorkflowTrigger implements Serializable, Trigger {
     }
 
     private WorkflowTrigger() {
+    }
+
+    /**
+     * Collects any key that is not one of the typed fields into {@link #extensions}.
+     *
+     * <p>
+     * The {@link #WorkflowTrigger(Map)} constructor already does this, but it is not the path Jackson takes: triggers
+     * reach this class through {@code Workflow.getExtensions(TRIGGERS, WorkflowTrigger.class, ...)}, which converts
+     * each raw trigger map with the no-arg constructor plus field binding. Without this any-setter, every non-typed key
+     * was dropped on that path and {@link #getExtension} always answered {@code null} — so a trigger extension could be
+     * written into a workflow definition and then never read back.
+     */
+    @JsonAnySetter
+    @SuppressWarnings("PMD.UnusedPrivateMethod")
+    private void putExtension(String name, Object value) {
+        extensions.put(name, value);
     }
 
     public static List<WorkflowTrigger> of(Workflow workflow) {

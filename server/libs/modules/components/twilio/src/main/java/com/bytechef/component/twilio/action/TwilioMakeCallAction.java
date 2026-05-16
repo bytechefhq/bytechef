@@ -38,6 +38,7 @@ import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.RealtimeCallAction;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +64,9 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
     public static final String SUB_WORKFLOW = "subWorkflow";
     private static final String TIMEOUT = "timeout";
     private static final String MAX_DURATION = "maxDuration";
+    private static final long POLL_INTERVAL_MILLIS = 2000L;
+    private static final Set<String> TERMINAL_STATUSES = Set.of(
+        "completed", "busy", "failed", "no-answer", "canceled");
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("makeCall")
         .title("Make Outbound Call")
@@ -185,16 +189,17 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
 
             log.info("Outbound call initiated: callSid={}, status={}, callRef={}", callSid, status, callReference);
 
-            // For now, return immediately with the call status
-            // In the full implementation, we would register a session and block until completion
-            // This requires the CallSessionRegistry to be accessible from the component
+            if (callSid == null || callSid.isBlank()) {
+                return Map.of(
+                    "callSid", "",
+                    "status", status != null ? status : "failed",
+                    "duration", 0,
+                    "direction", "outbound-api");
+            }
 
-            return Map.of(
-                "callSid", callSid != null ? callSid : "",
-                "status", status != null ? status : "initiated",
-                "duration", 0,
-                "direction", "outbound-api");
-
+            // Block until the call reaches a terminal state (or the max duration elapses) so the workflow can branch
+            // on the real outcome, by polling Twilio for the call's status.
+            return awaitCallCompletion(context, accountSid, callSid, inputParameters.getInteger(MAX_DURATION, 30));
         } catch (Exception exception) {
             log.error("Failed to make outbound call: to={}, from={}", to, from, exception);
 
@@ -222,5 +227,68 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
         Long jobId = context.getJobId();
 
         return jobId != null ? "job_" + jobId : "unknown";
+    }
+
+    /**
+     * Blocks until the outbound call reaches a terminal state or the maximum duration elapses, by polling Twilio for
+     * the call resource, then returns the final status and duration.
+     */
+    private static Map<String, Object> awaitCallCompletion(
+        ActionContext context, String accountSid, String callSid, int maxDurationMinutes) {
+
+        long deadline = System.currentTimeMillis() + maxDurationMinutes * 60_000L;
+        String status = "initiated";
+        int duration = 0;
+
+        while (System.currentTimeMillis() < deadline) {
+            try {
+                Thread.sleep(POLL_INTERVAL_MILLIS);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread()
+                    .interrupt();
+
+                break;
+            }
+
+            Map<String, Object> call = context
+                .http(http -> http.get("/Accounts/" + accountSid + "/Calls/" + callSid + ".json"))
+                .configuration(responseType(ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<Map<String, Object>>() {});
+
+            Object statusValue = call.get("status");
+
+            if (statusValue != null) {
+                status = String.valueOf(statusValue);
+            }
+
+            Object durationValue = call.get("duration");
+
+            if (durationValue != null) {
+                duration = parseDuration(String.valueOf(durationValue));
+            }
+
+            if (isTerminalStatus(status)) {
+                break;
+            }
+        }
+
+        return Map.of(
+            "callSid", callSid,
+            "status", isTerminalStatus(status) ? status : "timeout",
+            "duration", duration,
+            "direction", "outbound-api");
+    }
+
+    static boolean isTerminalStatus(String status) {
+        return status != null && TERMINAL_STATUSES.contains(status);
+    }
+
+    private static int parseDuration(String value) {
+        try {
+            return Integer.parseInt(value.trim());
+        } catch (NumberFormatException numberFormatException) {
+            return 0;
+        }
     }
 }

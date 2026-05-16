@@ -36,6 +36,9 @@ public class WorkflowTriggerModel {
 
   private @Nullable String description;
 
+  @Valid
+  private Map<String, Object> extensions = new HashMap<>();
+
   private @Nullable String label;
 
   @Valid
@@ -110,6 +113,35 @@ public class WorkflowTriggerModel {
   @JsonProperty("description")
   public void setDescription(@Nullable String description) {
     this.description = description;
+  }
+
+  public WorkflowTriggerModel extensions(Map<String, Object> extensions) {
+    this.extensions = extensions;
+    return this;
+  }
+
+  public WorkflowTriggerModel putExtensionsItem(String key, Object extensionsItem) {
+    if (this.extensions == null) {
+      this.extensions = new HashMap<>();
+    }
+    this.extensions.put(key, extensionsItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of trigger extensions — structural configuration that is not a component-declared trigger property, such as the websocketTasks realtime pipeline.
+   * @return extensions
+   */
+  
+  @Schema(name = "extensions", accessMode = Schema.AccessMode.READ_ONLY, description = "Key-value map of trigger extensions — structural configuration that is not a component-declared trigger property, such as the websocketTasks realtime pipeline.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("extensions")
+  public Map<String, Object> getExtensions() {
+    return extensions;
+  }
+
+  @JsonProperty("extensions")
+  public void setExtensions(Map<String, Object> extensions) {
+    this.extensions = extensions;
   }
 
   public WorkflowTriggerModel label(@Nullable String label) {
@@ -265,6 +297,7 @@ public class WorkflowTriggerModel {
     WorkflowTriggerModel workflowTrigger = (WorkflowTriggerModel) o;
     return Objects.equals(this.connections, workflowTrigger.connections) &&
         Objects.equals(this.description, workflowTrigger.description) &&
+        Objects.equals(this.extensions, workflowTrigger.extensions) &&
         Objects.equals(this.label, workflowTrigger.label) &&
         Objects.equals(this.metadata, workflowTrigger.metadata) &&
         Objects.equals(this.name, workflowTrigger.name) &&
@@ -275,7 +308,7 @@ public class WorkflowTriggerModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(connections, description, label, metadata, name, parameters, timeout, type);
+    return Objects.hash(connections, description, extensions, label, metadata, name, parameters, timeout, type);
   }
 
   @Override
@@ -284,6 +317,7 @@ public class WorkflowTriggerModel {
     sb.append("class WorkflowTriggerModel {\n");
     sb.append("    connections: ").append(toIndentedString(connections)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
+    sb.append("    extensions: ").append(toIndentedString(extensions)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");

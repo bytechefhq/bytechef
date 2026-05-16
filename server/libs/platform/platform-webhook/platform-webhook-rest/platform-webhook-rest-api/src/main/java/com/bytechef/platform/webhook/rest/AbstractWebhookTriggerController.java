@@ -61,6 +61,15 @@ public abstract class AbstractWebhookTriggerController {
     public static final String HEADER_WORKFLOW_EXECUTION_ID = "X-ByteChef-Workflow-Execution-Id";
     public static final String HEADER_PUBLIC_URL = "X-ByteChef-Public-Url";
 
+    /**
+     * The full external URL this webhook request arrived at, reconstructed from the configured public URL plus the
+     * request path and query string. Components that verify URL-based request signatures (e.g. Twilio's
+     * {@code X-Twilio-Signature}) read this so they can validate against the exact URL the caller signed, which is not
+     * otherwise recoverable from the trigger layer (the raw servlet request is not passed to triggers, and behind a
+     * proxy the servlet URL is the internal one).
+     */
+    public static final String HEADER_REQUEST_URL = "X-ByteChef-Request-Url";
+
     private static final Logger log = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     private final FileEntryTokens fileEntryTokens;
@@ -99,8 +108,8 @@ public abstract class AbstractWebhookTriggerController {
                 httpServletRequest, tempFileStorage, webhookTriggerFlags);
         }
 
-        // Add workflowExecutionId and publicUrl as headers for trigger access
-        webhookRequest = addPlatformHeaders(webhookRequest, workflowExecutionId);
+        // Add workflowExecutionId, publicUrl and the full external request URL as headers for trigger access
+        webhookRequest = addPlatformHeaders(webhookRequest, workflowExecutionId, httpServletRequest);
 
         if (log.isDebugEnabled()) {
             log.debug(
@@ -302,7 +311,10 @@ public abstract class AbstractWebhookTriggerController {
         }
     }
 
-    private WebhookRequest addPlatformHeaders(WebhookRequest webhookRequest, WorkflowExecutionId workflowExecutionId) {
+    private WebhookRequest addPlatformHeaders(
+        WebhookRequest webhookRequest, WorkflowExecutionId workflowExecutionId,
+        HttpServletRequest httpServletRequest) {
+
         Map<String, List<String>> headers = new HashMap<>(webhookRequest.headers());
 
         headers.put(HEADER_WORKFLOW_EXECUTION_ID, List.of(workflowExecutionId.toString()));
@@ -311,6 +323,24 @@ public abstract class AbstractWebhookTriggerController {
             headers.put(HEADER_PUBLIC_URL, List.of(publicUrl));
         }
 
+        headers.put(HEADER_REQUEST_URL, List.of(resolveRequestUrl(httpServletRequest)));
+
         return new WebhookRequest(headers, webhookRequest.parameters(), webhookRequest.body(), webhookRequest.method());
+    }
+
+    /**
+     * Reconstructs the full external URL of this request. Prefers the configured {@link #publicUrl} (the externally
+     * reachable base, correct even behind a proxy) joined with the request path and query string; falls back to the raw
+     * servlet URL when no public URL is configured.
+     */
+    private String resolveRequestUrl(HttpServletRequest httpServletRequest) {
+        String queryString = httpServletRequest.getQueryString();
+        String suffix = queryString == null ? "" : "?" + queryString;
+
+        if (publicUrl != null && !publicUrl.isBlank()) {
+            return publicUrl + httpServletRequest.getRequestURI() + suffix;
+        }
+
+        return httpServletRequest.getRequestURL() + suffix;
     }
 }

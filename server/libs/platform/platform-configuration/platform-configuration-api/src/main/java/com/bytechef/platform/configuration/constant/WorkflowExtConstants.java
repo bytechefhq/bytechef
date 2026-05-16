@@ -30,4 +30,10 @@ public class WorkflowExtConstants {
     public static final String INTERNAL_ONLY = "internalOnly";
     public static final String OBJECT_NAME = "objectName";
     public static final String TRIGGERS = "triggers";
+
+    /**
+     * The embedded realtime pipeline (voice session sub-workflow) carried on a trigger. A structural key, not a
+     * component-declared trigger property — see WebsocketTasks in platform-websocket-webhook-rest.
+     */
+    public static final String WEBSOCKET_TASKS = "websocketTasks";
 }

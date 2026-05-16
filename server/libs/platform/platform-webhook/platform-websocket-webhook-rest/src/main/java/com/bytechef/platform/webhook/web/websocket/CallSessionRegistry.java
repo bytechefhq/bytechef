@@ -310,7 +310,7 @@ public class CallSessionRegistry {
         private String callStatus;
         private String subWorkflowId;
         private Long mainJobId;
-        private Long subJobId;
+        private Long voiceSessionId;
         private String workflowExecutionId;
         private Long actionJobId;
         private Integer callDuration;
@@ -365,12 +365,12 @@ public class CallSessionRegistry {
             this.mainJobId = mainJobId;
         }
 
-        public Long getSubJobId() {
-            return subJobId;
+        public Long getVoiceSessionId() {
+            return voiceSessionId;
         }
 
-        public void setSubJobId(Long subJobId) {
-            this.subJobId = subJobId;
+        public void setVoiceSessionId(Long voiceSessionId) {
+            this.voiceSessionId = voiceSessionId;
         }
 
         public String getWorkflowExecutionId() {

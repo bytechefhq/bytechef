@@ -135,7 +135,7 @@ public class JobSyncExecutor {
         this(
             contextService, evaluator, jobService, maxTaskExecutions, memoryMessageBroker, List.of(), List.of(),
             List.of(), taskDispatcherPreSendProcessors, List.of(), taskExecutionService, taskExecutor,
-            taskHandlerRegistry, taskFileStorage, timeout, new WebSocketEmitterRegistry(), workflowService);
+            taskHandlerRegistry, taskFileStorage, timeout, workflowService);
     }
 
     @SuppressFBWarnings("EI")
@@ -147,7 +147,7 @@ public class JobSyncExecutor {
         List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         List<TaskDispatcherResolverFactory> taskDispatcherResolverFactories, TaskExecutionService taskExecutionService,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry, TaskFileStorage taskFileStorage,
-        long timeout, WebSocketEmitterRegistry webSocketEmitterRegistry, WorkflowService workflowService) {
+        long timeout, WorkflowService workflowService) {
 
         this.contextService = contextService;
 
@@ -179,7 +179,6 @@ public class JobSyncExecutor {
             List.of(
                 new CallableResponseTaskExecutionPostOutputProcessor(),
                 new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
-                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges, webSocketEmitterRegistry),
                 new SuspendTaskExecutionPostOutputProcessor(null),
                 new WebhookResponseTaskExecutionPostOutputProcessor()));
 

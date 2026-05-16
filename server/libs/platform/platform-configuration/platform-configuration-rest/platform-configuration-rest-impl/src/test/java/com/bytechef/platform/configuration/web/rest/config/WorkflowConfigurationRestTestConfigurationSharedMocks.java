@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.web.rest.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
@@ -55,9 +56,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ActionDefinitionFacade.class, ActionDefinitionService.class, ClusterElementDefinitionService.class,
     ComponentDefinitionService.class, ConnectionDefinitionService.class, DateTimeMapper.class,
-    EnvironmentService.class, OAuth2ParametersFacade.class, OAuth2Service.class, TaskDispatcherDefinitionService.class,
-    TriggerDefinitionFacade.class, TriggerDefinitionService.class, UnifiedApiDefinitionService.class,
-    WorkflowNodeDescriptionFacade.class, WorkflowNodeDynamicPropertiesFacade.class, WorkflowNodeOptionFacade.class,
+    EnvironmentService.class, FileEntryTokens.class, OAuth2ParametersFacade.class, OAuth2Service.class,
+    TaskDispatcherDefinitionService.class, TriggerDefinitionFacade.class,
+    TriggerDefinitionService.class, UnifiedApiDefinitionService.class, WorkflowNodeDescriptionFacade.class,
+    WorkflowNodeDynamicPropertiesFacade.class, WorkflowNodeOptionFacade.class,
     WorkflowNodeOutputFacade.class, WorkflowNodeParameterFacade.class, WebhookTriggerTestFacade.class,
     WorkflowNodeScriptFacade.class, WorkflowNodeTestOutputFacade.class, WorkflowNodeTestOutputService.class,
     WorkflowService.class, WorkflowTestConfigurationFacade.class, WorkflowTestConfigurationService.class

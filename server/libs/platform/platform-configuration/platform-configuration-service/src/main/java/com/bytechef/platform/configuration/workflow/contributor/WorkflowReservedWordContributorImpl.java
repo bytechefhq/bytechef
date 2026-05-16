@@ -31,6 +31,7 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
             WorkflowExtConstants.AUTHORIZATION_REQUIRED, "category", WorkflowExtConstants.CLUSTER_ELEMENTS,
             WorkflowExtConstants.COMPONENT_NAME, WorkflowExtConstants.COMPONENT_VERSION,
             WorkflowExtConstants.CONNECTIONS, WorkflowExtConstants.GROUP_NAME, WorkflowExtConstants.INTERNAL_ONLY,
-            WorkflowExtConstants.OBJECT_NAME, "tags", WorkflowExtConstants.TRIGGERS);
+            WorkflowExtConstants.OBJECT_NAME, "tags", WorkflowExtConstants.TRIGGERS,
+            WorkflowExtConstants.WEBSOCKET_TASKS);
     }
 }

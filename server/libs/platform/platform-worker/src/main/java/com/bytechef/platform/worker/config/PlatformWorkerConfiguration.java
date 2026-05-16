@@ -20,9 +20,9 @@ import com.bytechef.atlas.worker.annotation.ConditionalOnWorker;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.worker.task.CallableResponseTaskExecutionPostOutputProcessor;
+import com.bytechef.platform.worker.task.RealtimeActionTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SseStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.SuspendTaskExecutionPostOutputProcessor;
-import com.bytechef.platform.worker.task.WebSocketStreamTaskExecutionPostOutputProcessor;
 import com.bytechef.platform.worker.task.WebhookResponseTaskExecutionPostOutputProcessor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,10 +49,8 @@ public class PlatformWorkerConfiguration {
 
     @Bean
     @Order(3)
-    WebSocketStreamTaskExecutionPostOutputProcessor webSocketStreamTaskExecutionPostOutputProcessor(
-        MessageBroker messageBroker) {
-
-        return new WebSocketStreamTaskExecutionPostOutputProcessor(messageBroker);
+    RealtimeActionTaskExecutionPostOutputProcessor realtimeActionTaskExecutionPostOutputProcessor() {
+        return new RealtimeActionTaskExecutionPostOutputProcessor();
     }
 
     @Bean

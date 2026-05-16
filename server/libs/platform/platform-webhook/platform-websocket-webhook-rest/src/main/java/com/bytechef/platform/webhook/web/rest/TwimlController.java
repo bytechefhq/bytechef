@@ -17,12 +17,17 @@
 package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry;
+import com.bytechef.platform.webhook.web.websocket.TwilioStreamToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import jakarta.servlet.http.HttpServletRequest;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,16 +52,24 @@ class TwimlController {
 
     private static final Logger log = LoggerFactory.getLogger(TwimlController.class);
 
+    private static final long STREAM_TOKEN_TTL_SECONDS = 3600L;
+
     private final CallSessionRegistry callSessionRegistry;
     private final String publicUrl;
+    private final String twilioAuthToken;
+    private final String streamTokenSecret;
 
     @SuppressFBWarnings("EI")
     TwimlController(
         CallSessionRegistry callSessionRegistry,
-        @Value("${bytechef.webhook.url:}") String publicUrl) {
+        @Value("${bytechef.webhook.url:}") String publicUrl,
+        @Value("${bytechef.twilio.auth-token:}") String twilioAuthToken,
+        @Value("${bytechef.twilio.stream-token.secret:}") String streamTokenSecret) {
 
         this.callSessionRegistry = callSessionRegistry;
         this.publicUrl = publicUrl;
+        this.twilioAuthToken = twilioAuthToken;
+        this.streamTokenSecret = streamTokenSecret;
     }
 
     /**
@@ -85,7 +98,16 @@ class TwimlController {
         @PathVariable String workflowExecutionId,
         @RequestParam(required = false) String callSid,
         @RequestParam(required = false) String callRef,
-        @RequestParam(required = false) String subWorkflowId) {
+        @RequestParam(required = false) String subWorkflowId,
+        @RequestParam Map<String, String> allParams,
+        HttpServletRequest request) {
+
+        if (!isValidTwilioRequest(request, allParams)) {
+            log.warn("Rejected TwiML request with invalid Twilio signature");
+
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .build();
+        }
 
         if (log.isDebugEnabled()) {
             log.debug(
@@ -116,14 +138,33 @@ class TwimlController {
                     "<?xml version=\"1.0\" encoding=\"UTF-8\"?><Response><Say>Error: Missing call identifier</Say></Response>");
         }
 
-        String twiml = buildTwimlResponse(publicUrl, workflowExecutionId, effectiveCallSid, subWorkflowId);
+        String twiml = buildTwimlResponse(
+            publicUrl, workflowExecutionId, effectiveCallSid, subWorkflowId, streamTokenSecret);
 
         return ResponseEntity.ok(twiml);
     }
 
+    /**
+     * Opt-in Twilio request-signature validation, identical to the status-callback controller: when
+     * {@code bytechef.twilio.auth-token} is configured, requests with a missing or invalid {@code X-Twilio-Signature}
+     * are rejected; when it is unset, validation is skipped (unchanged behavior).
+     */
+    private boolean isValidTwilioRequest(HttpServletRequest request, Map<String, String> params) {
+        if (twilioAuthToken == null || twilioAuthToken.isBlank()) {
+            return true;
+        }
+
+        String queryString = request.getQueryString();
+        String url = publicUrl + request.getRequestURI() + (queryString == null ? "" : "?" + queryString);
+
+        return TwilioSignatureValidator.isValid(
+            twilioAuthToken, url, params, request.getHeader("X-Twilio-Signature"));
+    }
+
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private static String buildTwimlResponse(
-        String publicUrl, String workflowExecutionId, String callSid, String subWorkflowId) {
+        String publicUrl, String workflowExecutionId, String callSid, String subWorkflowId,
+        String streamTokenSecret) {
 
         // URL-encode every attacker-influenced value placed into a URL so it cannot inject extra path segments or query
         // parameters, then XML-encode the resulting attribute values so they cannot break out of the TwiML markup.
@@ -133,6 +174,17 @@ class TwimlController {
 
         if (subWorkflowId != null) {
             wsUrl += "&subWorkflowId=" + urlEncode(subWorkflowId);
+        }
+
+        // When configured, bind the media-stream WebSocket to this callSid with a signed, expiring token — a WebSocket
+        // upgrade cannot carry X-Twilio-Signature, so the token is what the handler verifies on connect.
+        if (streamTokenSecret != null && !streamTokenSecret.isBlank()) {
+            String streamToken = TwilioStreamToken.mint(
+                streamTokenSecret, callSid, STREAM_TOKEN_TTL_SECONDS,
+                Instant.now()
+                    .getEpochSecond());
+
+            wsUrl += "&streamToken=" + urlEncode(streamToken);
         }
 
         String statusCallbackUrl = publicUrl + "/webhooks/twilio/status?callSid=" + urlEncode(callSid);

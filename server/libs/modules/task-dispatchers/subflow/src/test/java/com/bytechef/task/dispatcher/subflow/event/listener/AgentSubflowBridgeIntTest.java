@@ -53,7 +53,6 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
-import com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
@@ -476,7 +475,7 @@ class AgentSubflowBridgeIntTest {
                 List.of(new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService)),
                 List.of(),
                 taskExecutionService, taskExecutor, taskHandlerMap::get, taskFileStorage, -1,
-                new WebSocketEmitterRegistry(), workflowService);
+                workflowService);
 
             // The sub-workflow job carries the agent job id, exactly as AgentSubflowLauncher would set it.
 

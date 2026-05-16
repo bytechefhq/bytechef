@@ -18,14 +18,17 @@ package com.bytechef.platform.webhook.web.websocket;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
-import com.bytechef.atlas.execution.dto.JobParametersDTO;
-import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
+import com.bytechef.platform.webhook.voice.VoiceSessionEngine;
+import com.bytechef.platform.webhook.voice.VoiceSessionEngine.VoiceSession;
+import com.bytechef.platform.webhook.voice.WebSocketEmitter;
+import com.bytechef.platform.webhook.voice.WebSocketEmitterRegistry;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -34,70 +37,127 @@ import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.CancellationException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.BinaryMessage;
 import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
-import org.springframework.web.socket.handler.TextWebSocketHandler;
+import org.springframework.web.socket.handler.AbstractWebSocketHandler;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.ObjectMapper;
 
 /**
- * WebSocket handler for webhook connections with workflow execution streaming support. Establishes connections at
- * /webhooks/{id} and streams workflow execution events in real-time using the JobSyncExecutor bridge pattern similar to
- * SSE streaming.
+ * WebSocket handler for webhook connections, and the entry point for voice sessions. Establishes connections at
+ * /webhooks/{id}.
  *
  * <p>
- * When a WebSocket connection is established with a callSid, the handler reads the websocket subflow definition from
- * the workflow trigger's extensions and executes it via the JobFacade.
+ * When a connection carries a callSid, the handler reads the trigger's {@code websocketTasks} pipeline and hands it to
+ * {@link com.bytechef.platform.webhook.voice.VoiceSessionEngine}. No Atlas job runs while the caller is connected;
+ * Atlas re-enters only once the session ends, through the continuation job {@link WorkflowContinuationHelper} creates
+ * on close.
  * </p>
  *
  * @author Ivica Cardic
  */
 @Component
-public class WebhookWebSocketHandler extends TextWebSocketHandler {
+public class WebhookWebSocketHandler extends AbstractWebSocketHandler {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookWebSocketHandler.class);
     private static final int MAX_PENDING_EVENTS = 100;
-    private static final String WEBSOCKET_TASKS = "websocketTasks";
+    private static final String SESSION_LIMIT_SECONDS = "sessionLimitSeconds";
 
+    private final BrowserVoiceSessionTokenService browserVoiceSessionTokenService;
     private final CallSessionRegistry callSessionRegistry;
-    private final JobFacade jobFacade;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final ObjectMapper objectMapper;
+    private final VoiceMetricsRecorder voiceMetricsRecorder;
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
+    private final VoiceSessionEngine voiceSessionEngine;
+    private final WebSocketEmitterRegistry webSocketEmitterRegistry;
     private final WorkflowContinuationHelper workflowContinuationHelper;
     private final WorkflowService workflowService;
 
+    private final long maxSessionDurationSeconds;
+
+    @Value("${bytechef.twilio.stream-token.secret:}")
+    private String twilioStreamTokenSecret;
+
     private final Cache<String, AutoCloseable> streamHandles;
     private final Cache<String, List<Map<String, Object>>> pendingEvents;
+    // Twilio streams G.711 mu-law at 8 kHz; the reference linear-PCM voice pipeline consumes 16 kHz input and
+    // produces 24 kHz output (deepgram/v1/voiceAgent defaults), so audio is transcoded between those rates.
+    private static final int TWILIO_SAMPLE_RATE_HZ = 8000;
+    private static final int TWILIO_INBOUND_PCM_RATE_HZ = 16000;
+    private static final int TWILIO_OUTBOUND_PCM_RATE_HZ = 24000;
+
     private final Cache<String, String> sessionIdToCallSid;
+    private final Cache<String, String> firstTaskNameByCallSid;
+    private final Cache<String, String> streamSidBySessionId;
+    private final Cache<String, Long> sessionOpenedAtBySessionId;
+    private final ScheduledExecutorService sessionTimeoutScheduler;
+    private final Cache<String, ScheduledFuture<?>> sessionTimeoutsBySessionId;
 
     @Autowired
     @SuppressFBWarnings("EI")
     public WebhookWebSocketHandler(
-        CallSessionRegistry callSessionRegistry, JobFacade jobFacade,
+        BrowserVoiceSessionTokenService browserVoiceSessionTokenService, CallSessionRegistry callSessionRegistry,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ObjectMapper objectMapper,
-        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowContinuationHelper workflowContinuationHelper,
-        WorkflowService workflowService) {
+        VoiceMetricsRecorder voiceMetricsRecorder,
+        WebhookWorkflowExecutor webhookWorkflowExecutor,
+        VoiceSessionEngine voiceSessionEngine, WebSocketEmitterRegistry webSocketEmitterRegistry,
+        WorkflowContinuationHelper workflowContinuationHelper, WorkflowService workflowService) {
 
+        this(browserVoiceSessionTokenService, callSessionRegistry, jobPrincipalAccessorRegistry, objectMapper,
+            voiceMetricsRecorder, webhookWorkflowExecutor, voiceSessionEngine, webSocketEmitterRegistry,
+            workflowContinuationHelper, workflowService, 30L * 60L);
+    }
+
+    @SuppressFBWarnings("EI")
+    public WebhookWebSocketHandler(
+        BrowserVoiceSessionTokenService browserVoiceSessionTokenService, CallSessionRegistry callSessionRegistry,
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, ObjectMapper objectMapper,
+        VoiceMetricsRecorder voiceMetricsRecorder,
+        WebhookWorkflowExecutor webhookWorkflowExecutor,
+        VoiceSessionEngine voiceSessionEngine, WebSocketEmitterRegistry webSocketEmitterRegistry,
+        WorkflowContinuationHelper workflowContinuationHelper, WorkflowService workflowService,
+        long maxSessionDurationSeconds) {
+
+        this.browserVoiceSessionTokenService = browserVoiceSessionTokenService;
         this.callSessionRegistry = callSessionRegistry;
-        this.jobFacade = jobFacade;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.objectMapper = objectMapper;
+        this.voiceMetricsRecorder = voiceMetricsRecorder;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
+        this.voiceSessionEngine = voiceSessionEngine;
+        this.webSocketEmitterRegistry = webSocketEmitterRegistry;
         this.workflowContinuationHelper = workflowContinuationHelper;
         this.workflowService = workflowService;
+        this.maxSessionDurationSeconds = maxSessionDurationSeconds;
+        this.sessionTimeoutScheduler = Executors.newSingleThreadScheduledExecutor(runnable -> {
+            Thread thread = new Thread(runnable, "voice-session-timeout");
+
+            thread.setDaemon(true);
+
+            return thread;
+        });
 
         this.streamHandles = Caffeine.newBuilder()
             .expireAfterWrite(10, TimeUnit.MINUTES)
@@ -118,6 +178,26 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
             .expireAfterWrite(10, TimeUnit.MINUTES)
             .maximumSize(1000)
             .build();
+
+        this.firstTaskNameByCallSid = Caffeine.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
+
+        this.streamSidBySessionId = Caffeine.newBuilder()
+            .expireAfterWrite(10, TimeUnit.MINUTES)
+            .maximumSize(1000)
+            .build();
+
+        this.sessionOpenedAtBySessionId = Caffeine.newBuilder()
+            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .maximumSize(10000)
+            .build();
+
+        this.sessionTimeoutsBySessionId = Caffeine.newBuilder()
+            .expireAfterWrite(60, TimeUnit.MINUTES)
+            .maximumSize(10000)
+            .build();
     }
 
     @Override
@@ -126,10 +206,55 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         String webhookId = extractId(uri);
         String sessionKey = session.getId();
         String callSid = extractCallSid(uri);
+        String sessionToken = extractQueryParam(uri, "sessionToken");
+        // Present only for outbound Twilio calls: identifies the workflow (model B) whose trigger carries the
+        // realtime websocketTasks pipeline to run for this call.
+        String subWorkflowId = extractQueryParam(uri, "subWorkflowId");
 
         log.info(
-            "WebSocket connection established for webhook: {}, sessionId: {}, callSid: {}",
-            webhookId, sessionKey, callSid);
+            "WebSocket connection established for webhook: {}, sessionId: {}, callSid: {}, hasToken: {}",
+            webhookId, sessionKey, callSid, sessionToken != null);
+
+        // Browser-voice path: no callSid, but a single-use sessionToken minted via
+        // POST /webhooks/{webhookId}/voice-session-token. Validate the token, then synthesise a callSid
+        // so the rest of the handler (registry, sub-workflow spawn, continuation-on-close) works unchanged.
+        if (callSid == null && sessionToken != null) {
+            if (webhookId == null || !browserVoiceSessionTokenService.consume(sessionToken, webhookId)) {
+                log.warn("Browser-voice WS upgrade rejected: invalid token for webhook={}", webhookId);
+
+                Map<String, Object> error = new LinkedHashMap<>();
+
+                error.put("type", "error");
+                error.put("message", "Invalid or expired session token");
+
+                sendMessage(session, error);
+                session.close(CloseStatus.POLICY_VIOLATION);
+
+                return;
+            }
+
+            callSid = "browser-" + UUID.randomUUID();
+        }
+
+        // Twilio media-stream path: a WebSocket upgrade cannot carry X-Twilio-Signature, so when a stream-token secret
+        // is configured the wss URL must carry a valid signed streamToken bound to this callSid (minted into the TwiML
+        // <Stream> at build time). Browser-voice connections are already gated by their single-use sessionToken above.
+        if (callSid != null && twilioStreamTokenSecret != null && !twilioStreamTokenSecret.isBlank()
+            && !callSid.startsWith("browser-")) {
+
+            String streamToken = extractQueryParam(uri, "streamToken");
+
+            if (!TwilioStreamToken.verify(
+                twilioStreamTokenSecret, callSid, streamToken, Instant.now()
+                    .getEpochSecond())) {
+
+                log.warn("Twilio media-stream WS upgrade rejected: invalid streamToken for callSid={}", callSid);
+
+                session.close(CloseStatus.POLICY_VIOLATION);
+
+                return;
+            }
+        }
 
         if (callSid != null) {
 
@@ -179,9 +304,13 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
             callSessionRegistry.registerSession(callSid, session, metadata);
             sessionIdToCallSid.put(sessionKey, callSid);
+            sessionOpenedAtBySessionId.put(sessionKey, System.nanoTime());
+            voiceMetricsRecorder.recordSessionOpened();
+
+            scheduleMaxDurationClose(session, sessionKey);
 
             if (webhookId != null) {
-                startWebsocketSubflow(callSid, webhookId);
+                startWebsocketSubflow(callSid, webhookId, subWorkflowId);
             }
         }
 
@@ -197,6 +326,53 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
+    protected void handleBinaryMessage(WebSocketSession session, BinaryMessage message) {
+        // Browser-voice path sends audio as raw binary frames (PCM16). Twilio sends audio as JSON text frames instead
+        // (handled in handleTextMessage). Either way the inbound audio is forwarded to the FIRST task's emitter.
+        ByteBuffer payload = message.getPayload();
+        byte[] bytes = new byte[payload.remaining()];
+
+        payload.get(bytes);
+
+        forwardInboundAudioToFirstTask(session, bytes);
+    }
+
+    /**
+     * Forwards an inbound audio frame to the first task's emitter in the sub-workflow's linear chain, so the leading
+     * realtime component (e.g. {@code deepgram/v1/voiceAgent} or an STT) receives the caller/microphone audio.
+     */
+    private void forwardInboundAudioToFirstTask(WebSocketSession session, byte[] bytes) {
+        String callSid = sessionIdToCallSid.getIfPresent(session.getId());
+
+        if (callSid == null) {
+            return;
+        }
+
+        Optional<CallSessionRegistry.CallSession> callSessionOpt = callSessionRegistry.getSessionByCallSid(callSid);
+
+        if (callSessionOpt.isEmpty()) {
+            return;
+        }
+
+        Long voiceSessionId = callSessionOpt.get()
+            .getVoiceSessionId();
+        String firstTaskName = firstTaskNameByCallSid.getIfPresent(callSid);
+
+        if (voiceSessionId == null || firstTaskName == null) {
+            return;
+        }
+
+        Optional<WebSocketEmitter> emitterOpt = webSocketEmitterRegistry.get(voiceSessionId, firstTaskName);
+
+        if (emitterOpt.isEmpty()) {
+            return;
+        }
+
+        emitterOpt.get()
+            .dispatchBinaryMessage(bytes);
+    }
+
+    @Override
     protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
         String sessionKey = session.getId();
         String payload = message.getPayload();
@@ -207,6 +383,14 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
         try {
             Map<String, Object> request = objectMapper.readValue(payload, new TypeReference<>() {});
+
+            String twilioEvent = TwilioMediaStream.eventType(request);
+
+            if (twilioEvent != null) {
+                handleTwilioMediaStreamFrame(session, twilioEvent, request);
+
+                return;
+            }
 
             String action = (String) request.get("action");
 
@@ -230,6 +414,36 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    /**
+     * Handles a Twilio Media Streams control/audio frame. On {@code start} the streamSid is captured (needed to frame
+     * outbound audio); on {@code media} the base64 audio payload is decoded and forwarded to the sub-workflow; other
+     * frames ({@code connected}/{@code stop}) carry no audio to forward.
+     */
+    private void handleTwilioMediaStreamFrame(WebSocketSession session, String eventType, Map<String, Object> frame) {
+        switch (eventType) {
+            case TwilioMediaStream.EVENT_START -> {
+                String streamSid = TwilioMediaStream.extractStreamSid(frame);
+
+                if (streamSid != null) {
+                    streamSidBySessionId.put(session.getId(), streamSid);
+                }
+            }
+            case TwilioMediaStream.EVENT_MEDIA -> {
+                byte[] muLawAudio = TwilioMediaStream.decodeMediaPayload(frame);
+
+                if (muLawAudio != null) {
+                    // Transcode Twilio mu-law/8 kHz to the linear PCM/16 kHz the pipeline's leading component expects.
+                    byte[] pcmAudio = TwilioAudioCodec.resamplePcm16(
+                        TwilioAudioCodec.muLawToPcm16(muLawAudio), TWILIO_SAMPLE_RATE_HZ, TWILIO_INBOUND_PCM_RATE_HZ);
+
+                    forwardInboundAudioToFirstTask(session, pcmAudio);
+                }
+            }
+            default -> log.debug(
+                "Twilio media-stream {} frame received: sessionId={}", eventType, session.getId());
+        }
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String sessionKey = session.getId();
@@ -249,15 +463,15 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                     log.info(
                         "Signaling workflow completion on WebSocket close: callSid={}", callSid);
 
-                    Long subJobId = callSession.getSubJobId();
+                    Long voiceSessionId = callSession.getVoiceSessionId();
 
-                    if (subJobId != null) {
+                    if (voiceSessionId != null) {
                         try {
-                            jobFacade.stopJob(subJobId);
+                            voiceSessionEngine.stop(voiceSessionId);
                         } catch (Exception exception) {
                             log.warn(
-                                "Failed to stop sub-workflow on WebSocket close: callSid={}, subJobId={}",
-                                callSid, subJobId, exception);
+                                "Failed to stop voice session on WebSocket close: callSid={}, voiceSessionId={}",
+                                callSid, voiceSessionId, exception);
                         }
                     }
 
@@ -285,6 +499,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
             callSessionRegistry.removeSessionByCallSid(callSid);
             sessionIdToCallSid.invalidate(sessionKey);
+            streamSidBySessionId.invalidate(sessionKey);
         }
 
         AutoCloseable handle = streamHandles.getIfPresent(sessionKey);
@@ -295,6 +510,55 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         }
 
         pendingEvents.invalidate(sessionKey);
+
+        // Cancel the max-duration scheduled close (this close handler may run before the timer fires, e.g.
+        // when the user clicks End or the WS drops naturally).
+        ScheduledFuture<?> pendingTimeout = sessionTimeoutsBySessionId.getIfPresent(sessionKey);
+
+        if (pendingTimeout != null) {
+            pendingTimeout.cancel(false);
+            sessionTimeoutsBySessionId.invalidate(sessionKey);
+        }
+
+        Long openedAt = sessionOpenedAtBySessionId.getIfPresent(sessionKey);
+
+        if (openedAt != null) {
+            long durationNanos = System.nanoTime() - openedAt;
+
+            voiceMetricsRecorder.recordSessionClosed(java.time.Duration.ofNanos(durationNanos));
+            sessionOpenedAtBySessionId.invalidate(sessionKey);
+        } else if (status != null && !CloseStatus.NORMAL.equalsCode(status)) {
+            voiceMetricsRecorder.recordSessionError();
+        }
+    }
+
+    private void scheduleMaxDurationClose(WebSocketSession session, String sessionKey) {
+        scheduleMaxDurationClose(session, sessionKey, maxSessionDurationSeconds);
+    }
+
+    private void scheduleMaxDurationClose(WebSocketSession session, String sessionKey, long durationSeconds) {
+        if (durationSeconds <= 0) {
+            return;
+        }
+
+        ScheduledFuture<?> future = sessionTimeoutScheduler.schedule(() -> {
+            if (!session.isOpen()) {
+                return;
+            }
+
+            log.info(
+                "Closing WebSocket due to max session duration ({}s) reached: sessionId={}",
+                durationSeconds, sessionKey);
+
+            try {
+                session.close(CloseStatus.NORMAL.withReason("Maximum session duration reached"));
+            } catch (IOException ioException) {
+                log.warn(
+                    "Failed to close WS at max duration: sessionId={}", sessionKey, ioException);
+            }
+        }, durationSeconds, TimeUnit.SECONDS);
+
+        sessionTimeoutsBySessionId.put(sessionKey, future);
     }
 
     private void executeWorkflow(WebSocketSession session, Map<String, Object> request) throws Exception {
@@ -337,7 +601,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
      * definition is stored as a string in the trigger's {@code websocketTasks} extension field within the workflow
      * definition JSON.
      */
-    private void startWebsocketSubflow(String callSid, String webhookIdString) {
+    private void startWebsocketSubflow(String callSid, String webhookIdString, @Nullable String subWorkflowId) {
         Optional<CallSessionRegistry.CallSession> callSessionOpt = callSessionRegistry.getSessionByCallSid(callSid);
 
         if (callSessionOpt.isEmpty()) {
@@ -352,9 +616,18 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
         Thread.startVirtualThread(() -> {
             try {
-                WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.parse(webhookIdString);
+                String websocketSubflowDefinition;
+                WorkflowExecutionId workflowExecutionId = null;
 
-                String websocketSubflowDefinition = getWebsocketSubflowDefinition(workflowExecutionId);
+                if (subWorkflowId != null && !subWorkflowId.isBlank()) {
+                    // Outbound call (model B): resolve the pipeline from the trigger of the workflow chosen in the
+                    // makeCall action, not from an inbound trigger.
+                    websocketSubflowDefinition = getWebsocketSubflowDefinitionByWorkflowId(subWorkflowId);
+                } else {
+                    workflowExecutionId = WorkflowExecutionId.parse(webhookIdString);
+
+                    websocketSubflowDefinition = getWebsocketSubflowDefinition(workflowExecutionId);
+                }
 
                 if (websocketSubflowDefinition == null || websocketSubflowDefinition.isBlank()) {
                     log.warn(
@@ -363,24 +636,42 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                     return;
                 }
 
-                log.info("Starting websocket subflow: callSid={}", callSid);
+                if (workflowExecutionId != null) {
+                    applyTriggerSessionLimit(callSid, workflowExecutionId);
+                }
 
-                Workflow subflowWorkflow = workflowService.create(
-                    websocketSubflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
+                Optional<WebSocketSession> webSocketSessionOpt = callSessionRegistry.getWebSocketSession(callSid);
+
+                if (webSocketSessionOpt.isEmpty()) {
+                    log.warn("Cannot start voice session: no open WS session for callSid={}", callSid);
+
+                    return;
+                }
+
+                WebSocketSession wsSession = webSocketSessionOpt.get();
 
                 Map<String, Object> inputs = new LinkedHashMap<>();
 
                 inputs.put("callSid", callSid);
                 inputs.put("mainWorkflowExecutionId", webhookIdString);
 
-                JobParametersDTO jobParameters = new JobParametersDTO(subflowWorkflow.getId(), inputs);
+                // Stage order in the definition IS the wiring: inbound audio goes to stage[0], each stage's outbound
+                // feeds the next, and the last stage's outbound reaches the caller. No Atlas job runs during the
+                // call — see VoiceSessionEngine.
+                VoiceSession voiceSession = voiceSessionEngine.start(
+                    websocketSubflowDefinition, inputs, null,
+                    workflowExecutionId == null ? null : workflowExecutionId.getType(),
+                    emitter -> attachOutboundBridge(wsSession, emitter));
 
-                long subJobId = jobFacade.createJob(jobParameters);
+                callSession.setVoiceSessionId(voiceSession.sessionId());
 
-                callSession.setSubJobId(subJobId);
+                List<String> stageNames = voiceSession.stageNames();
+
+                firstTaskNameByCallSid.put(callSid, stageNames.isEmpty() ? "" : stageNames.getFirst());
 
                 log.info(
-                    "Websocket subflow started: callSid={}, subJobId={}", callSid, subJobId);
+                    "Voice session started: callSid={}, sessionId={}, stages={}", callSid, voiceSession.sessionId(),
+                    stageNames);
             } catch (Exception exception) {
                 log.error("Failed to start websocket subflow: callSid={}", callSid, exception);
             }
@@ -388,9 +679,145 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     }
 
     /**
+     * Hooks the emitter's outbound channels to the live WS session. Outbound text/JSON from the workflow becomes
+     * {@link TextMessage}s, outbound binary (TTS audio) becomes {@link BinaryMessage}s.
+     */
+    private void attachOutboundBridge(WebSocketSession wsSession, WebSocketEmitter emitter) {
+        emitter.addOutboundListener(payload -> {
+            if (!wsSession.isOpen()) {
+                return;
+            }
+
+            try {
+                if (payload instanceof String stringPayload) {
+                    wsSession.sendMessage(new TextMessage(stringPayload));
+                } else {
+                    wsSession.sendMessage(new TextMessage(JsonUtils.write(payload)));
+                }
+            } catch (IOException ioException) {
+                log.warn(
+                    "Failed to forward outbound text to WS session: sessionId={}", wsSession.getId(), ioException);
+            }
+        });
+
+        emitter.addOutboundBinaryListener(bytes -> {
+            if (!wsSession.isOpen()) {
+                return;
+            }
+
+            try {
+                String streamSid = streamSidBySessionId.getIfPresent(wsSession.getId());
+
+                if (streamSid != null) {
+                    // Twilio call: transcode the pipeline's linear PCM/24 kHz output back to mu-law/8 kHz and send it
+                    // as
+                    // a base64 media text frame, not a raw binary frame.
+                    byte[] muLawAudio = TwilioAudioCodec.pcm16ToMuLaw(
+                        TwilioAudioCodec.resamplePcm16(bytes, TWILIO_OUTBOUND_PCM_RATE_HZ, TWILIO_SAMPLE_RATE_HZ));
+
+                    wsSession.sendMessage(
+                        new TextMessage(JsonUtils.write(TwilioMediaStream.mediaFrame(streamSid, muLawAudio))));
+                } else {
+                    wsSession.sendMessage(new BinaryMessage(bytes));
+                }
+            } catch (IOException ioException) {
+                log.warn(
+                    "Failed to forward outbound binary to WS session: sessionId={}", wsSession.getId(), ioException);
+            }
+        });
+
+        // Barge-in: when the current turn is cancelled, tell Twilio to flush any audio it has buffered but not played.
+        emitter.addOutboundTurnCancelListener(turnId -> {
+            String streamSid = streamSidBySessionId.getIfPresent(wsSession.getId());
+
+            if (streamSid == null || !wsSession.isOpen()) {
+                return;
+            }
+
+            try {
+                wsSession.sendMessage(new TextMessage(JsonUtils.write(TwilioMediaStream.clearFrame(streamSid))));
+            } catch (IOException ioException) {
+                log.warn(
+                    "Failed to forward Twilio clear frame to WS session: sessionId={}", wsSession.getId(),
+                    ioException);
+            }
+        });
+    }
+
+    /**
+     * If the trigger defines a {@code sessionLimitSeconds} parameter (value &gt; 0), cancel the default max-duration
+     * timeout that was scheduled at connection time and reschedule with the trigger's value. When the trigger value is
+     * 0 the default timeout (set at construction) continues to apply.
+     */
+    private void applyTriggerSessionLimit(String callSid, WorkflowExecutionId workflowExecutionId) {
+        int triggerLimitSeconds = getSessionLimitSeconds(workflowExecutionId);
+
+        if (triggerLimitSeconds <= 0) {
+            return;
+        }
+
+        Optional<WebSocketSession> wsSessionOpt = callSessionRegistry.getWebSocketSession(callSid);
+
+        if (wsSessionOpt.isEmpty()) {
+            return;
+        }
+
+        WebSocketSession wsSession = wsSessionOpt.get();
+        String sessionKey = wsSession.getId();
+
+        ScheduledFuture<?> existingTimeout = sessionTimeoutsBySessionId.getIfPresent(sessionKey);
+
+        if (existingTimeout != null) {
+            existingTimeout.cancel(false);
+            sessionTimeoutsBySessionId.invalidate(sessionKey);
+        }
+
+        scheduleMaxDurationClose(wsSession, sessionKey, triggerLimitSeconds);
+    }
+
+    /**
+     * Reads the {@code sessionLimitSeconds} parameter from the trigger. Returns 0 when not set or set to 0 (meaning no
+     * limit).
+     */
+    private int getSessionLimitSeconds(WorkflowExecutionId workflowExecutionId) {
+        try {
+            WorkflowTrigger workflowTrigger = resolveWorkflowTrigger(workflowExecutionId);
+
+            return MapUtils.getInteger(workflowTrigger.getParameters(), SESSION_LIMIT_SECONDS, 0);
+        } catch (Exception exception) {
+            log.warn(
+                "Failed to read sessionLimitSeconds from trigger for workflowExecutionId={}", workflowExecutionId,
+                exception);
+
+            return 0;
+        }
+    }
+
+    /**
      * Resolves the websocket subflow definition string from the workflow trigger's extensions.
      */
     private String getWebsocketSubflowDefinition(WorkflowExecutionId workflowExecutionId) {
+        WorkflowTrigger workflowTrigger = resolveWorkflowTrigger(workflowExecutionId);
+
+        return WebsocketTasks.resolve(workflowTrigger);
+    }
+
+    /**
+     * Resolves the {@code websocketTasks} realtime pipeline from the triggers of the workflow selected in an outbound
+     * call action (model B), returning the first trigger that defines one.
+     */
+    private @Nullable String getWebsocketSubflowDefinitionByWorkflowId(String subWorkflowId) {
+        Workflow workflow = workflowService.getWorkflow(subWorkflowId);
+
+        return WorkflowTrigger.of(workflow)
+            .stream()
+            .map(WebsocketTasks::resolve)
+            .filter(definition -> definition != null && !definition.isBlank())
+            .findFirst()
+            .orElse(null);
+    }
+
+    private WorkflowTrigger resolveWorkflowTrigger(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor =
             jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
 
@@ -399,9 +826,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
-
-        return workflowTrigger.getExtension(WEBSOCKET_TASKS, String.class, null);
+        return WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
     }
 
     private WebhookRequest buildWebhookRequest(Map<String, Object> request) {

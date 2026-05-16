@@ -57,7 +57,6 @@ import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
-import com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacade;
 import com.bytechef.platform.job.sync.simulation.WorkflowSimulationFacadeImpl;
@@ -122,7 +121,7 @@ public class WorkflowTestConfiguration {
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry, WebSocketEmitterRegistry webSocketEmitterRegistry,
+        TaskHandlerRegistry taskHandlerRegistry,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
@@ -156,7 +155,7 @@ public class WorkflowTestConfiguration {
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300,
-                webSocketEmitterRegistry, workflowService),
+                workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
     }
@@ -165,7 +164,7 @@ public class WorkflowTestConfiguration {
     WorkflowSimulationFacade workflowSimulationFacade(
         Environment environment, Evaluator evaluator, ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskExecutor taskExecutor, TaskHandlerRegistry taskHandlerRegistry,
-        WebSocketEmitterRegistry webSocketEmitterRegistry, WorkflowService workflowService) {
+        WorkflowService workflowService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
         CounterService counterService = new CounterServiceImpl(new InMemoryCounterRepository());
@@ -191,8 +190,7 @@ public class WorkflowTestConfiguration {
             getTaskDispatcherResolverFactories(
                 contextService, counterService, evaluator, coordinatorEventPublisher, jobService, subflowResolver,
                 taskExecutionService, taskFileStorage, workflowService),
-            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, webSocketEmitterRegistry,
-            workflowService);
+            taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService);
 
         return new WorkflowSimulationFacadeImpl(jobSyncExecutor, taskExecutionService);
     }

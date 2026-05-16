@@ -20,3 +20,25 @@ Use a keyword when you want to:
 If you do **not** need keyword‑based routing and want to handle all incoming messages for a number with a single workflow, you can leave the keyword field empty (or follow your Infobip configuration strategy).
 
 For detailed information about how keywords work in Infobip, see the [official documentation](https://www.infobip.com/docs/numbers/keywords-and-actions#configure-keywords-keywords).
+
+### Voice Calls (Real-Time Media Streaming)
+
+The **Make Outbound Call** action and the **Inbound Voice Call** trigger stream call audio to a real-time
+sub-workflow over a WebSocket bridge, enabling live audio processing and AI voice conversations.
+
+#### Operator setup
+
+- **Enable media replacement.** Bidirectional audio (the sub-workflow both *receiving* caller audio and
+  *sending* audio back into the call) requires **media replacement** to be enabled on the Infobip
+  media-stream configuration. Without it, streaming is receive-only and the caller will not hear the
+  workflow's responses.
+- **Public URL.** ByteChef must be reachable at a public HTTPS URL so Infobip can open the `wss://` media
+  stream back to the platform bridge.
+- **Calls configuration.** Outbound calls require a Calls configuration ID (created in the Infobip portal
+  or via the Calls API); optionally scope calls to a subaccount with an application ID.
+- **Webhook signature (recommended).** Set a **Webhook Signature Secret** on the Inbound Voice Call trigger
+  to reject unsigned or tampered inbound-call webhooks. Leave it empty to skip verification.
+
+> Note: the Infobip Calls API endpoints, field names, webhook signature header, and call-state values used by
+> these operations follow Infobip's documented conventions. Verify them against your account's Calls API
+> version before relying on voice in production.

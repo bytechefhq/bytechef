@@ -35,11 +35,12 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     private static final String OBJECT_NAME = "objectName";
     private static final String TRIGGERS = "triggers";
     private static final String TAGS = "tags";
+    private static final String WEBSOCKET_TASKS = "websocketTasks";
 
     @Override
     public List<String> getReservedWords() {
         return List.of(
             AUTHORIZATION_REQUIRED, CATEGORY, CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
-            GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, TAGS, TRIGGERS);
+            GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, TAGS, TRIGGERS, WEBSOCKET_TASKS);
     }
 }

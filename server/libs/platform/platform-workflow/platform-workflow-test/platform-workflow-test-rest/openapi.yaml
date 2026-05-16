@@ -53,6 +53,27 @@ paths:
 #                format: event-stream
 #                items:
 #                  $ref: '#/components/schemas/WorkflowTestExecution'
+  /workflow-tests/{workflowId}/voice-session-token:
+    post:
+      description: "Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user's session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds."
+      summary: "Issue workflow-test voice session token"
+      tags:
+        - "workflow-test"
+      operationId: "issueWorkflowTestVoiceSessionToken"
+      parameters:
+        - name: "workflowId"
+          description: "Id of the workflow to test."
+          in: "path"
+          schema:
+            type: "string"
+          required: true
+      responses:
+        "200":
+          description: "Token issued."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WorkflowTestVoiceSessionToken"
   /workflow-tests/{jobId}/stop:
     post:
       description: "Abort an in-progress workflow test run identified by jobId. Sends an 'error' event with 'Aborted' and closes the SSE stream."
@@ -105,3 +126,14 @@ components:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/Job"
         triggerExecution:
           $ref: "../../../../platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest//platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TriggerExecution"
+    WorkflowTestVoiceSessionToken:
+      description: "Single-use short-lived token authorizing a browser to open a workflow-test voice WebSocket."
+      type: "object"
+      properties:
+        token:
+          description: "The single-use token."
+          type: "string"
+        expiresInSeconds:
+          description: "Token TTL in seconds (typically 60)."
+          type: "integer"
+          format: "int64"
