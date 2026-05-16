@@ -83,10 +83,18 @@ public class ClusterElementMap extends AbstractMap<String, Object> {
                         continue;
                     }
 
-                    clusterElementSet.add(
-                        Map.entry(
-                            clusterElementsEntry.getKey(),
-                            toClusterElement((Map<String, ?>) clusterElementEntryValue, connections)));
+                    try {
+                        clusterElementSet.add(
+                            Map.entry(
+                                clusterElementsEntry.getKey(),
+                                toClusterElement((Map<String, ?>) clusterElementEntryValue, connections)));
+                    } catch (Exception exception) {
+                        if (log.isDebugEnabled()) {
+                            log.debug(
+                                "Skipping malformed scalar cluster element entry '{}': {}",
+                                clusterElementsEntry.getKey(), exception.getMessage());
+                        }
+                    }
                 }
             }
         }
