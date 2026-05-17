@@ -111,10 +111,7 @@ downstream observability picks up guardrail activity without grepping logs:
 | Key | Emitted by | Carries |
 |---|---|---|
 | `guardrail.violations` | `CheckForViolationsAdvisor` (blocked response) | List of violations with public-view fields (guardrail name, match count, classifier score, execution-failure kind; raw matched substrings are scrubbed) |
-| `guardrail.skippedLlmOutputChecks` | `CheckForViolationsAdvisor` (streaming path) | Count of LLM-stage output checks that were skipped because per-chunk LLM classification is not run during streaming |
-| `guardrail.uncheckedStructuredOutput` | `CheckForViolationsAdvisor` (response with empty text but structured content) | `true` when the assistant text was empty but the generation carried tool calls or media that string checks cannot inspect |
-| `guardrail.unsanitizedStructuredOutput` | `SanitizeTextAdvisor` (call path) | `true` when at least one generation in the response had null text — the sanitizer could not rewrite tool calls or media payloads |
-| `guardrail.partialLeak` | `SanitizeTextAdvisor` (streaming path) | `true` when a sanitizer failure occurred mid-stream after some chunks were already shipped; remaining chunks were replaced with the withheld placeholder |
+| `guardrail.sanitizeWithheld` | `SanitizeTextAdvisor` (call and streaming paths) | `true` when the sanitizer itself failed — a sanitizer threw or errored — so the response was withheld and replaced with the failure placeholder |
 
 Execution failures appear as entries in `guardrail.violations` with `executionFailed=true` and a
 `failureKind` tag (`CONFIGURATION:*` for operator-fixable problems, `UNKNOWN:*` for programming
