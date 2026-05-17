@@ -1,0 +1,21 @@
+{
+  "title": "Guardrails",
+  "description": "Block, mask, or rewrite content flowing into and out of your AI agents",
+  "pages": [
+    "index",
+    "check-for-violations",
+    "sanitize-text",
+    "---Preflight (rule-based)---",
+    "pii",
+    "secret-keys",
+    "urls",
+    "custom-regex",
+    "keywords",
+    "---LLM stage---",
+    "jailbreak",
+    "nsfw",
+    "topical-alignment",
+    "custom",
+    "llm-pii"
+  ]
+}
