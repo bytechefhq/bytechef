@@ -258,7 +258,9 @@ const ProjectWorkflowList = ({
                 accept=".json"
                 className="hidden"
                 onChange={async (event) => {
-                    if (!event.target.files?.length) return;
+                    if (!event.target.files?.length) {
+                        return;
+                    }
 
                     try {
                         setIsImportingN8nWorkflow(true);
@@ -270,6 +272,7 @@ const ProjectWorkflowList = ({
                         );
                     } finally {
                         setIsImportingN8nWorkflow(false);
+
                         if (converterHiddenFileInputRef.current) {
                             converterHiddenFileInputRef.current.value = '';
                         }

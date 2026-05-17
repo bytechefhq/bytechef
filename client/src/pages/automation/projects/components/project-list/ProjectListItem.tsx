@@ -691,6 +691,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         );
                     } finally {
                         setIsImportingN8nWorkflow(false);
+
                         if (converterHiddenFileInputRef.current) {
                             converterHiddenFileInputRef.current.value = '';
                         }
