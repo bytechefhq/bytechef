@@ -11,7 +11,7 @@ import com.agui.core.state.State;
 import com.agui.core.tool.ToolCall;
 import com.agui.server.LocalAgent;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.PromptChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -333,7 +333,7 @@ public class SpringAIAgent extends LocalAgent {
         if (Objects.nonNull(this.chatMemory)) {
             try {
                 chatRequest.advisors(
-                    PromptChatMemoryAdvisor.builder(chatMemory).build()
+                    MessageChatMemoryAdvisor.builder(chatMemory).build()
                 );
 
                 chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, input.threadId()));
