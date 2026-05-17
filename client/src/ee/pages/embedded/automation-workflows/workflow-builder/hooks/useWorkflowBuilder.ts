@@ -135,7 +135,24 @@ export const useWorkflowBuilder = () => {
             bottomResizablePanelRef.current.resize(0);
         }
 
+        const parentOriginsRaw = (import.meta.env.VITE_EMBEDDED_PARENT_ORIGINS as string | undefined) ?? '';
+        const allowedParentOrigins = parentOriginsRaw
+            .split(',')
+            .map((origin) => origin.trim())
+            .filter(Boolean);
+
+        const isAllowedOrigin = (origin: string) =>
+            allowedParentOrigins.length === 0 || allowedParentOrigins.includes(origin);
+
         const listener = (event: MessageEvent) => {
+            if (event.source !== window.parent || event.source === window) {
+                return;
+            }
+
+            if (!isAllowedOrigin(event.origin)) {
+                return;
+            }
+
             if (event.data.type === 'EMBED_INIT') {
                 const sharedConnectionIds = event.data.params.sharedConnectionIds;
                 const connectionDialogAllowed = event.data.params.connectionDialogAllowed ?? false;
@@ -159,7 +176,13 @@ export const useWorkflowBuilder = () => {
         window.addEventListener('message', listener);
 
         if (window.parent !== window) {
-            window.parent.postMessage({type: 'EMBED_READY'}, '*');
+            if (allowedParentOrigins.length === 0) {
+                window.parent.postMessage({type: 'EMBED_READY'}, '*');
+            } else {
+                for (const origin of allowedParentOrigins) {
+                    window.parent.postMessage({type: 'EMBED_READY'}, origin);
+                }
+            }
         }
 
         return () => {
