@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -115,27 +116,28 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
-
-        contexts.add(new Context("n8n Workflow Schema Hint", """
-            Typical n8n workflow structure:
-            - nodes: array of nodes (name, type, parameters)
-            - connections: graph describing node relationships
-            - credentials: optional authentication configs
-            """));
+        contexts.add(
+            new Context(
+                "n8n Workflow Schema Hint", """
+                    Typical n8n workflow structure:
+                    - nodes: array of nodes (name, type, parameters)
+                    - connections: graph describing node relationships
+                    - credentials: optional authentication configs
+                    """));
 
         String resolvedMessage = Objects.nonNull(this.systemMessageProvider)
             ? this.systemMessageProvider.apply(this)
             : this.systemMessage;
 
+        String join = String.join("\n", contexts.stream()
+            .map(Context::toString)
+            .toList());
+
         String message = "%s%n%s%n%nState:%n%s%n%nContext:%n%s%n".formatted(
-            resolvedMessage,
-            ADDITIONAL_RULES,
-            state,
-            String.join("\n", contexts.stream()
-                .map(Context::toString)
-                .toList()));
+            resolvedMessage, ADDITIONAL_RULES, state, join);
 
         SystemMessage systemMessage = new SystemMessage();
+
         systemMessage.setId(String.valueOf(UUID.randomUUID()));
         systemMessage.setContent(message);
 
@@ -154,8 +156,7 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
             int blockEnd = text.indexOf("```", contentStart);
 
             if (blockEnd > contentStart) {
-                return text.substring(contentStart, blockEnd)
-                    .strip();
+                return StringUtils.strip(text.substring(contentStart, blockEnd));
             }
         }
 
@@ -166,8 +167,7 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
             int blockEnd = text.indexOf("```", contentStart);
 
             if (blockEnd > contentStart) {
-                return text.substring(contentStart, blockEnd)
-                    .strip();
+                return StringUtils.strip(text.substring(contentStart, blockEnd));
             }
         }
 
@@ -213,6 +213,7 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
 
             if (type == EventType.TEXT_MESSAGE_CONTENT || type == EventType.TEXT_MESSAGE_CHUNK
                 || type == EventType.TEXT_MESSAGE_END) {
+
                 return;
             }
 
@@ -229,8 +230,9 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
         @Override
         public void onTextMessageEndEvent(TextMessageEndEvent event) {
             String cleanJson = extractJson(buffer.toString());
-            TextMessageContentEvent contentEvent =
-                EventFactory.textMessageContentEvent(event.getMessageId(), cleanJson);
+
+            TextMessageContentEvent contentEvent = EventFactory.textMessageContentEvent(
+                event.getMessageId(), cleanJson);
 
             delegate.onEvent(contentEvent);
             delegate.onTextMessageContentEvent(contentEvent);
@@ -241,6 +243,7 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
         @Override
         public void onNewMessage(BaseMessage message) {
             message.setContent(extractJson(message.getContent()));
+
             delegate.onNewMessage(message);
         }
 
@@ -354,62 +357,74 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
+
             return this;
         }
 
         public Builder advisors(List<Advisor> advisors) {
             super.advisors(advisors);
+
             return this;
         }
 
         public Builder advisor(Advisor advisor) {
             super.advisor(advisor);
+
             return this;
         }
 
         public Builder tools(List<Object> tools) {
             super.tools(tools);
+
             return this;
         }
 
         @Override
         public Builder tool(Object tool) {
             super.tool(tool);
+
             return this;
         }
 
         public Builder agentId(String agentId) {
             super.agentId(agentId);
+
             return this;
         }
 
         public Builder state(State state) {
             super.state(state);
+
             return this;
         }
 
         public Builder toolCallbacks(List<ToolCallback> toolCallbacks) {
             super.toolCallbacks(toolCallbacks);
+
             return this;
         }
 
         public Builder toolCallback(ToolCallback toolCallback) {
             super.toolCallback(toolCallback);
+
             return this;
         }
 
         public Builder systemMessage(String systemMessage) {
             super.systemMessage(systemMessage);
+
             return this;
         }
 
         public Builder systemMessageProvider(Function<LocalAgent, String> systemMessageProvider) {
             super.systemMessageProvider(systemMessageProvider);
+
             return this;
         }
 
         public Builder chatMemory(ChatMemory chatMemory) {
             super.chatMemory(null);
+
             return this;
         }
 
