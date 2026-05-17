@@ -33,7 +33,9 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
@@ -44,6 +46,7 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
+import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
 
@@ -131,40 +134,18 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
-        var streamResponseSpec = chatClientRequestSpec.stream();
+        Flux<Object> contentFlux = chatClientRequestSpec.stream()
+            .chatResponse()
+            .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context)));
 
-        Flow.Publisher<?> publisher;
+        return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
+    }
 
-        try {
-            Flux<String> contentFlux = streamResponseSpec.content();
+    static SseEmitterHandler createSseHandler(
+        Flux<Object> contentFlux, AtomicReference<@Nullable SseEmitter> emitterReference,
+        Queue<Map<String, @Nullable Object>> bufferedEvents, ActionContext context) {
 
-            publisher = FlowAdapters.toFlowPublisher(contentFlux);
-        } catch (Throwable ignoredContent) {
-            Flux<?> contentFlux = streamResponseSpec.chatResponse()
-                .map(chatResponse -> {
-                    Object payload = chatResponse;
-
-                    Generation result = chatResponse.getResult();
-
-                    if (result == null) {
-                        return payload;
-                    }
-
-                    AssistantMessage output = result.getOutput();
-
-                    String text = output.getText();
-
-                    if (text != null) {
-                        payload = text;
-                    }
-
-                    return payload;
-                });
-
-            publisher = FlowAdapters.toFlowPublisher(contentFlux);
-        }
-
-        Flow.Publisher<?> effectivePublisher = publisher;
+        Flow.Publisher<?> effectivePublisher = FlowAdapters.toFlowPublisher(contentFlux);
 
         return emitter -> {
             emitterReference.set(emitter);
@@ -199,7 +180,9 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                         try {
                             emitter.send(item);
                         } catch (Exception exception) {
-                            context.log(log -> log.trace(exception.getMessage(), exception));
+                            context.log(log -> log.warn(
+                                "SSE send failed for stream item; cancelling subscription. {}",
+                                exception.getMessage(), exception));
 
                             if (subscription != null) {
                                 subscription.cancel();
@@ -218,5 +201,39 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                     }
                 });
         };
+    }
+
+    private static List<Object> toSseEvents(ChatResponse chatResponse, ActionContext context) {
+        List<Object> events = new ArrayList<>();
+
+        Generation result = chatResponse.getResult();
+
+        if (result != null) {
+            AssistantMessage output = result.getOutput();
+
+            if (output != null) {
+                String text = output.getText();
+
+                if (text != null && !text.isEmpty()) {
+                    events.add(text);
+                }
+            }
+        }
+
+        Map<String, Object> guardrailMetadata = ModelUtils.extractGuardrailMetadata(chatResponse);
+
+        if (!guardrailMetadata.isEmpty()) {
+            Map<String, @Nullable Object> guardrailEvent = new LinkedHashMap<>();
+
+            guardrailEvent.put("__eventType", "guardrail");
+            guardrailEvent.putAll(guardrailMetadata);
+
+            events.add(guardrailEvent);
+
+            context.log(log -> log.warn(
+                "SSE guardrail metadata forwarded to subscriber: {}", guardrailMetadata.keySet()));
+        }
+
+        return events;
     }
 }

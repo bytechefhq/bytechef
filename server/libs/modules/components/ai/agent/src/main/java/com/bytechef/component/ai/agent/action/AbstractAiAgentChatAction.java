@@ -26,6 +26,8 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
@@ -55,6 +57,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -79,7 +82,9 @@ import tools.jackson.core.type.TypeReference;
  */
 public abstract class AbstractAiAgentChatAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractAiAgentChatAction.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractAiAgentChatAction.class);
+
+    private static final String TOOL_SIMULATION_UNAVAILABLE = "[tool simulation unavailable]";
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final AiAgentToolFacade aiAgentToolFacade;
@@ -118,9 +123,13 @@ public abstract class AbstractAiAgentChatAction {
 
                 String id = chatMemoryParameters.getString("conversationId");
 
+                if (id != null) {
+                    return id;
+                }
+
                 UUID uuid = UUID.randomUUID();
 
-                return id != null ? id : uuid.toString();
+                return uuid.toString();
             })
             .orElse(null);
 
@@ -163,25 +172,40 @@ public abstract class AbstractAiAgentChatAction {
 
         List<Advisor> advisors = new ArrayList<>();
 
-        // guardrails (first to block early)
+        List<ClusterElement> guardrailClusterElements = clusterElementMap.getClusterElements(GUARDRAILS);
 
-        clusterElementMap.fetchClusterElement(GUARDRAILS)
-            .map(clusterElement -> getGuardrailsAdvisor(connectionParameters, clusterElement))
-            .ifPresent(advisors::add);
+        long checkForViolationsCount = guardrailClusterElements.stream()
+            .filter(clusterElement -> Objects.equals(CHECK_FOR_VIOLATIONS.key(), clusterElement.getComponentName()))
+            .count();
 
-        // memory
+        if (checkForViolationsCount > 1) {
+            throw new IllegalStateException(
+                "Multiple CheckForViolations parent cluster elements configured — advisor order collides at " +
+                    "HIGHEST_PRECEDENCE and Spring AI ordering becomes undefined. Configure at most one.");
+        }
+
+        long sanitizeTextCount = guardrailClusterElements.stream()
+            .filter(clusterElement -> Objects.equals(SANITIZE_TEXT.key(), clusterElement.getComponentName()))
+            .count();
+
+        if (sanitizeTextCount > 1) {
+            throw new IllegalStateException(
+                "Multiple SanitizeText parent cluster elements configured — advisor order collides at " +
+                    "DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER - 1 and Spring AI ordering becomes undefined. " +
+                    "Configure at most one.");
+        }
+
+        for (ClusterElement clusterElement : guardrailClusterElements) {
+            advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement, context));
+        }
 
         clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> getChatMemoryAdvisor(connectionParameters, clusterElement))
+            .map(clusterElement -> getChatMemoryAdvisor(connectionParameters, clusterElement, context))
             .ifPresent(advisors::add);
-
-        // RAG
 
         clusterElementMap.fetchClusterElement(RAG)
-            .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement))
+            .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
             .ifPresent(advisors::add);
-
-        // logger
 
         advisors.add(new ContextLoggerAdvisor(context));
 
@@ -189,7 +213,8 @@ public abstract class AbstractAiAgentChatAction {
     }
 
     private Advisor getChatMemoryAdvisor(
-        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
+        ActionContext context) {
 
         ChatMemoryFunction chatMemoryFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -201,7 +226,7 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "chat memory", e, context);
         }
     }
 
@@ -214,7 +239,7 @@ public abstract class AbstractAiAgentChatAction {
     }
 
     private Advisor getGuardrailsAdvisor(
-        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement, ActionContext context) {
 
         GuardrailsFunction guardrailsFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -224,9 +249,9 @@ public abstract class AbstractAiAgentChatAction {
             return guardrailsFunction.apply(
                 ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "guardrails", e, context);
         }
     }
 
@@ -239,7 +264,8 @@ public abstract class AbstractAiAgentChatAction {
     }
 
     private Advisor getRagAdvisor(
-        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
+        ActionContext context) {
 
         RagFunction ragFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -251,8 +277,24 @@ public abstract class AbstractAiAgentChatAction {
                 getConnectionParameters(componentConnections, clusterElement),
                 ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw clusterElementInitializationException(clusterElement, "RAG", e, context);
         }
+    }
+
+    private static RuntimeException clusterElementInitializationException(
+        ClusterElement clusterElement, String kind, Throwable cause, ActionContext context) {
+
+        Class<? extends Throwable> causeClass = cause.getClass();
+
+        String message = String.format(
+            "Failed to initialize %s advisor for cluster element '%s' (component=%s v%d): %s",
+            kind, clusterElement.getClusterElementName(), clusterElement.getComponentName(),
+            clusterElement.getComponentVersion(),
+            cause.getMessage() == null ? causeClass.getSimpleName() : cause.getMessage());
+
+        context.log(log -> log.error(message, cause));
+
+        return new IllegalStateException(message, cause);
     }
 
     private List<ToolCallback> getToolCallbacks(
@@ -280,7 +322,7 @@ public abstract class AbstractAiAgentChatAction {
 
                     toolCallbacks.addAll(Arrays.asList(providerCallbacks));
                 } catch (Exception exception) {
-                    throw new RuntimeException(exception);
+                    throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
                 }
             } else if (clusterElementFunction instanceof MultipleConnectionsToolFunction) {
                 toolCallbacks.add(
@@ -389,13 +431,11 @@ public abstract class AbstractAiAgentChatAction {
             String generatedResponse = requestSpec.call()
                 .content();
 
-            return generatedResponse != null ? generatedResponse : responsePrompt;
+            return generatedResponse != null ? generatedResponse : TOOL_SIMULATION_UNAVAILABLE;
         } catch (Exception exception) {
-            context.log(
-                log -> log.warn(
-                    "Failed to generate simulated response, falling back to verbatim: {}", exception.getMessage()));
+            context.log(log -> log.warn("Failed to generate simulated response", exception));
 
-            return responsePrompt;
+            return TOOL_SIMULATION_UNAVAILABLE;
         }
     }
 
@@ -423,7 +463,7 @@ public abstract class AbstractAiAgentChatAction {
             }
 
             private String observeAndCall(String toolInput, Supplier<String> execution) {
-                AbstractAiAgentChatAction.logger.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
+                log.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
 
                 Map<String, Object> inputs;
 
@@ -450,9 +490,8 @@ public abstract class AbstractAiAgentChatAction {
                             agentThinking != null ? agentThinking.confidence() : null));
                 } catch (Exception exception) {
                     context.log(
-                        log -> log.debug(
-                            "Tool execution listener failed for '{}': {}", toolDefinition.name(),
-                            exception.getMessage(), exception));
+                        log -> log.warn(
+                            "Tool execution listener failed for '{}'", toolDefinition.name(), exception));
                 }
 
                 return result;

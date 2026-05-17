@@ -47,8 +47,10 @@ import com.bytechef.platform.ai.util.TokenUsageHolder;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient.CallResponseSpec;
 import org.springframework.ai.chat.messages.AssistantMessage;
@@ -76,6 +78,9 @@ import org.springframework.web.client.RestClient;
  */
 public class ModelUtils {
 
+    /** Metadata-key prefix used by guardrail advisors when stamping telemetry on a {@link ChatResponse}. */
+    public static final String GUARDRAIL_METADATA_PREFIX = "guardrail.";
+
     private ModelUtils() {
     }
 
@@ -88,7 +93,24 @@ public class ModelUtils {
     public static @Nullable Object getChatResponse(
         CallResponseSpec callResponseSpec, Parameters parameters, boolean responseFormatRequired, Context context) {
 
+        return getChatActionResult(callResponseSpec, parameters, responseFormatRequired, context).response();
+    }
+
+    /**
+     * Same as {@link #getChatResponse(CallResponseSpec, Parameters, boolean, Context)} but also surfaces every
+     * {@code guardrail.*} metadata key stamped on the underlying {@link ChatResponse}.
+     */
+    public static ChatActionResult getChatActionResult(
+        CallResponseSpec callResponseSpec, Parameters parameters, Context context) {
+
+        return getChatActionResult(callResponseSpec, parameters, true, context);
+    }
+
+    public static ChatActionResult getChatActionResult(
+        CallResponseSpec callResponseSpec, Parameters parameters, boolean responseFormatRequired, Context context) {
+
         Object response = null;
+        Map<String, Object> guardrailMetadata = Map.of();
         ResponseFormat responseFormat = TEXT;
 
         if (responseFormatRequired) {
@@ -100,6 +122,8 @@ public class ModelUtils {
 
             if (chatResponse != null) {
                 captureTokenUsage(chatResponse);
+
+                guardrailMetadata = extractGuardrailMetadata(chatResponse);
 
                 if (responseFormat == TEXT) {
                     Generation result = chatResponse.getResult();
@@ -148,7 +172,39 @@ public class ModelUtils {
             throw new ProviderException(message);
         }
 
-        return response;
+        return new ChatActionResult(response, guardrailMetadata);
+    }
+
+    /**
+     * Extracts every {@code guardrail.*} key from a {@link ChatResponse}'s metadata into an immutable map preserving
+     * insertion order.
+     */
+    public static Map<String, Object> extractGuardrailMetadata(@Nullable ChatResponse chatResponse) {
+        if (chatResponse == null) {
+            return Map.of();
+        }
+
+        ChatResponseMetadata metadata = chatResponse.getMetadata();
+
+        if (metadata == null || metadata.isEmpty()) {
+            return Map.of();
+        }
+
+        Set<String> keys = metadata.keySet();
+
+        Map<String, Object> extracted = new LinkedHashMap<>();
+
+        for (String key : keys) {
+            if (key.startsWith(GUARDRAIL_METADATA_PREFIX)) {
+                extracted.put(key, metadata.get(key));
+            }
+        }
+
+        if (extracted.isEmpty()) {
+            return Map.of();
+        }
+
+        return Map.copyOf(extracted);
     }
 
     @SuppressWarnings("unchecked")
@@ -303,5 +359,20 @@ public class ModelUtils {
         // Remove braces to avoid issues with prompt template
         return messageContent.replace("{", " ")
             .replace("}", " ");
+    }
+
+    /**
+     * Result of a chat-action invocation. Carries the assistant payload and any guardrail telemetry stamped on the
+     * underlying {@link ChatResponse}.
+     */
+    public record ChatActionResult(@Nullable Object response, Map<String, Object> guardrailMetadata) {
+
+        public ChatActionResult {
+            guardrailMetadata = guardrailMetadata == null ? Map.of() : Map.copyOf(guardrailMetadata);
+        }
+
+        public boolean hasGuardrailMetadata() {
+            return !guardrailMetadata.isEmpty();
+        }
     }
 }

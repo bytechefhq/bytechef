@@ -16,12 +16,18 @@
 
 package com.bytechef.component.ai.agent.action;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
@@ -115,6 +121,266 @@ class AbstractAiAgentChatActionTest {
             assertDoesNotThrow(() -> action.getChatClientRequestSpec(
                 inputParameters, connectionParameters, extensions, null, actionContext));
         }
+    }
+
+    @Test
+    void testMultipleCheckForViolationsRejectedAtAdvisorBuild() throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+        Map<String, Object> checkForViolationsA = buildGuardrailElement(
+            "checkForViolationsA", "checkForViolations/v1/checkForViolations");
+        Map<String, Object> checkForViolationsB = buildGuardrailElement(
+            "checkForViolationsB", "checkForViolations/v1/checkForViolations");
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "model", modelElement,
+                    "guardrails", List.of(checkForViolationsA, checkForViolationsB))));
+
+        stubModelLookup();
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            assertThatThrownBy(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Multiple CheckForViolations");
+        }
+    }
+
+    @Test
+    void testMultipleSanitizeTextRejectedAtAdvisorBuild() throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+        Map<String, Object> sanitizeTextA = buildGuardrailElement(
+            "sanitizeTextA", "sanitizeText/v1/sanitizeText");
+        Map<String, Object> sanitizeTextB = buildGuardrailElement(
+            "sanitizeTextB", "sanitizeText/v1/sanitizeText");
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "model", modelElement,
+                    "guardrails", List.of(sanitizeTextA, sanitizeTextB))));
+
+        stubModelLookup();
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            assertThatThrownBy(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("Multiple SanitizeText");
+        }
+    }
+
+    @Test
+    void testSingleCheckForViolationsAndSingleSanitizeTextAccepted() throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+        Map<String, Object> checkForViolations = buildGuardrailElement(
+            "checkForViolations_1", "checkForViolations/v1/checkForViolations");
+        Map<String, Object> sanitizeText = buildGuardrailElement(
+            "sanitizeText_1", "sanitizeText/v1/sanitizeText");
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "model", modelElement,
+                    "guardrails", List.of(checkForViolations, sanitizeText))));
+
+        ModelFunction modelFunction = mock(ModelFunction.class);
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
+        when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
+
+        com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction guardrailsFunction = mock(
+            com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.class);
+        org.springframework.ai.chat.client.advisor.api.Advisor advisor = mock(
+            org.springframework.ai.chat.client.advisor.api.Advisor.class);
+
+        when(
+            clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
+                eq("checkForViolations"), eq(1), eq("checkForViolations")))
+                    .thenReturn(guardrailsFunction);
+        when(
+            clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
+                eq("sanitizeText"), eq(1), eq("sanitizeText")))
+                    .thenReturn(guardrailsFunction);
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any()))
+            .thenReturn(advisor);
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = new HashMap<>();
+
+        connectionParameters.put("model_1", componentConnection);
+        connectionParameters.put("checkForViolations_1", componentConnection);
+        connectionParameters.put("sanitizeText_1", componentConnection);
+
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            assertDoesNotThrow(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext));
+        }
+
+        assertThat(advisor).isNotNull();
+    }
+
+    @Test
+    void testGuardrailAdvisorBuildFailureInvokesContextLog() throws Exception {
+        // Pins the Context-threading promise from commit ee185584cf5: when a cluster element fails to initialize,
+        // the error path MUST go through ActionContext.log(...) rather than raw SLF4J, so tenant-aware structured
+        // logging captures the failure. A refactor dropping context.log for raw SLF4J would otherwise pass CI.
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+        Map<String, Object> guardrailElement = buildGuardrailElement(
+            "checkForViolations_1", "checkForViolations/v1/checkForViolations");
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of(
+                    "model", modelElement,
+                    "guardrails", List.of(guardrailElement))));
+
+        stubModelLookup();
+
+        com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction guardrailsFunction = mock(
+            com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.class);
+
+        when(
+            clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
+                eq("checkForViolations"), eq(1), eq("checkForViolations")))
+                    .thenReturn(guardrailsFunction);
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any()))
+            .thenThrow(new RuntimeException("simulated guardrail init failure"));
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = new HashMap<>();
+
+        connectionParameters.put("model_1", componentConnection);
+        connectionParameters.put("checkForViolations_1", componentConnection);
+
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            assertThatThrownBy(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext))
+                    .isInstanceOf(IllegalStateException.class)
+                    .hasMessageContaining("guardrails");
+        }
+
+        verify(actionContext, org.mockito.Mockito.atLeastOnce()).log(any());
+    }
+
+    @Test
+    void testNoGuardrailsConfiguredRunsModelChainWithoutAddingAdvisor() throws Exception {
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of(
+                "clusterElements",
+                Map.of("model", modelElement)));
+
+        stubModelLookup();
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = new HashMap<>();
+
+        connectionParameters.put("model_1", componentConnection);
+
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(clusterElementDefinitionService, aiAgentToolFacade);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            assertDoesNotThrow(() -> action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext));
+        }
+
+        verify(clusterElementDefinitionService,
+            never()).<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
+                eq("checkForViolations"), anyInt(), anyString());
+        verify(clusterElementDefinitionService,
+            never()).<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
+                eq("sanitizeText"), anyInt(), anyString());
+    }
+
+    private static Map<String, Object> buildModelElement() {
+        HashMap<String, Object> modelParams = new HashMap<>();
+        modelParams.put("model", "gpt-4o");
+
+        Map<String, Object> modelElement = new HashMap<>();
+        modelElement.put("name", "model_1");
+        modelElement.put("type", "testComponent/v1/testModel");
+        modelElement.put("parameters", modelParams);
+
+        return modelElement;
+    }
+
+    private static Map<String, Object> buildGuardrailElement(String workflowNodeName, String type) {
+        Map<String, Object> element = new HashMap<>();
+        element.put("name", workflowNodeName);
+        element.put("type", type);
+        element.put("parameters", new HashMap<>());
+
+        return element;
+    }
+
+    private void stubModelLookup() throws Exception {
+        ModelFunction modelFunction = mock(ModelFunction.class);
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
+        when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
     }
 
     private static class TestAiAgentChatAction extends AbstractAiAgentChatAction {

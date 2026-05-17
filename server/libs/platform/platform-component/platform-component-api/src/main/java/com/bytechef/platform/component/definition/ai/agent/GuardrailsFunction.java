@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.definition.ai.agent;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
@@ -28,20 +29,17 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 @FunctionalInterface
 public interface GuardrailsFunction {
 
-    /**
-     * Cluster element type for guardrails.
-     */
-    ClusterElementType GUARDRAILS = new ClusterElementType("GUARDRAILS", "guardrails", "Guardrails");
+    ClusterElementType GUARDRAILS = new ClusterElementType("GUARDRAILS", "guardrails", "Guardrails", true, false);
 
     /**
      * @param inputParameters      the input parameters for the guardrails configuration
      * @param connectionParameters the connection parameters
      * @param extensions           the extensions containing nested cluster elements
      * @param componentConnections the component connections map
+     * @param context              the component invocation context
      * @return the guardrails advisor
-     * @throws Exception if an error occurs
      */
     Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections) throws Exception;
+        Map<String, ComponentConnection> componentConnections, Context context) throws Exception;
 }
