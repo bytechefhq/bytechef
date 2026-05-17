@@ -68,7 +68,7 @@ class AiModelConfiguration {
 
     @Bean
     @Primary
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "anthropic")
+    @ConditionalOnProperty(prefix = "bytechef.ai.provider.anthropic", name = "api-key")
     AnthropicChatModel anthropicChatModel(
         ObjectProvider<ToolExecutionEligibilityPredicate> anthropicToolExecutionEligibilityPredicate,
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
@@ -106,7 +106,7 @@ class AiModelConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "provider", havingValue = "openai")
+    @ConditionalOnProperty(prefix = "bytechef.ai.provider.openai", name = "api-key")
     OpenAiChatModel openAiChatModel(
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<ChatModelObservationConvention> observationConvention,
