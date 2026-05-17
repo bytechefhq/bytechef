@@ -53,7 +53,15 @@ public class JobResumeId implements Serializable {
                 "Invalid JobResumeId format, expected 3 colon-separated parts but got " + items.length);
         }
 
-        return new JobResumeId(items[0], Long.parseLong(items[1]), items[2]);
+        UUID parsedUuid;
+
+        try {
+            parsedUuid = UUID.fromString(items[2]);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new IllegalArgumentException("Invalid JobResumeId UUID component", illegalArgumentException);
+        }
+
+        return new JobResumeId(items[0], Long.parseLong(items[1]), parsedUuid.toString());
     }
 
     public long getJobId() {

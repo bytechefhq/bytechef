@@ -82,6 +82,14 @@ class JobResumeIdTest {
     }
 
     @Test
+    void testParseRejectsNonUuidThirdPart() {
+        String notAUuid = java.util.Base64.getEncoder()
+            .encodeToString("tenant:42:not-a-uuid".getBytes(StandardCharsets.UTF_8));
+
+        assertThrows(IllegalArgumentException.class, () -> JobResumeId.parse(notAUuid));
+    }
+
+    @Test
     void testEqualsAndHashCode() {
         TenantContext.setCurrentTenantId("tenant1");
 
