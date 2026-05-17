@@ -14,15 +14,18 @@ export const useConvertN8nToWorkflow = () => {
     const extractJson = (text: string) => {
         const firstBrace = text.indexOf('{');
         const lastBrace = text.lastIndexOf('}');
+
         if (firstBrace === -1 || lastBrace === -1) {
             throw new Error('No JSON found in response');
         }
+
         return text.slice(firstBrace, lastBrace + 1);
     };
 
     const convertN8nWorkflow = useCallback(
         async (workflowJson: string) => {
             const json = JSON.parse(workflowJson);
+
             const messageContent = JSON.stringify(json, null, 2);
 
             const agent = new HttpAgent({
@@ -53,7 +56,9 @@ export const useConvertN8nToWorkflow = () => {
                 onTextMessageEndEvent: () => {
                     try {
                         const cleaned = extractJson(convertedWorkflowBuffer);
+
                         const parsedWorkflow = JSON.parse(cleaned);
+
                         setWorkflow(parsedWorkflow);
                     } catch (e) {
                         console.error('Failed to parse workflow', e);
@@ -64,6 +69,7 @@ export const useConvertN8nToWorkflow = () => {
             };
 
             await agent.runAgent({runId: getRandomId()}, subscriber);
+
             return convertedWorkflowBuffer;
         },
         [workflow.id, currentComponent?.name, setWorkflow]

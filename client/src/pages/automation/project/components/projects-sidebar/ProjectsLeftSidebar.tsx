@@ -366,7 +366,9 @@ const ProjectsLeftSidebar = ({
                 accept=".json"
                 className="hidden"
                 onChange={async (event) => {
-                    if (!event.target.files?.length) return;
+                    if (!event.target.files?.length) {
+                        return;
+                    }
 
                     try {
                         setIsImportingN8nWorkflow(true);
@@ -378,6 +380,7 @@ const ProjectsLeftSidebar = ({
                         );
                     } finally {
                         setIsImportingN8nWorkflow(false);
+
                         if (converterHiddenFileInputRef.current) {
                             converterHiddenFileInputRef.current.value = '';
                         }
