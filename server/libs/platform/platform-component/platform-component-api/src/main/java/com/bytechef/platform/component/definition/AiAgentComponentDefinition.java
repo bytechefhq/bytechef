@@ -21,9 +21,16 @@ import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunc
 import static com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction.GUARDRAILS;
 import static com.bytechef.platform.component.definition.ai.agent.ModelFunction.MODEL;
 import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RAG;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailKeys.CUSTOM;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailKeys.JAILBREAK;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailKeys.NSFW;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailKeys.TOPICAL_ALIGNMENT;
+import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Ivica Cardic
@@ -33,5 +40,16 @@ public interface AiAgentComponentDefinition extends ClusterRootComponentDefiniti
     @Override
     default List<ClusterElementType> getClusterElementTypes() {
         return List.of(MODEL, CHAT_MEMORY, RAG, GUARDRAILS, TOOLS);
+    }
+
+    @Override
+    default Map<String, List<String>> getClusterElementClusterElementTypes() {
+        return Map.of(
+            CHECK_FOR_VIOLATIONS.key(), List.of(CHECK_FOR_VIOLATIONS.key()),
+            SANITIZE_TEXT.key(), List.of(SANITIZE_TEXT.key()),
+            JAILBREAK, List.of(MODEL.key()),
+            NSFW, List.of(MODEL.key()),
+            TOPICAL_ALIGNMENT, List.of(MODEL.key()),
+            CUSTOM, List.of(MODEL.key()));
     }
 }

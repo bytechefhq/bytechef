@@ -114,13 +114,23 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
 
-        Object chatResponse = ModelUtils.getChatResponse(call, inputParameters, context);
+        ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
+            call, inputParameters, context);
 
-        if (context.isEditorEnvironment() && !toolExecutionEvents.isEmpty()) {
-            Map<String, @Nullable Object> response = new LinkedHashMap<>();
+        Object chatResponse = chatActionResult.response();
 
-            response.put("response", chatResponse);
+        boolean editorWithToolEvents = context.isEditorEnvironment() && !toolExecutionEvents.isEmpty();
+        boolean hasGuardrailMetadata = chatActionResult.hasGuardrailMetadata();
 
+        if (!editorWithToolEvents && !hasGuardrailMetadata) {
+            return chatResponse;
+        }
+
+        Map<String, @Nullable Object> response = new LinkedHashMap<>();
+
+        response.put("response", chatResponse);
+
+        if (editorWithToolEvents) {
             List<Map<String, @Nullable Object>> toolExecutions = toolExecutionEvents.stream()
                 .map(toolExecutionEvent -> {
                     Map<String, @Nullable Object> eventData = new LinkedHashMap<>();
@@ -136,10 +146,12 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                 .toList();
 
             response.put("toolExecutions", toolExecutions);
-
-            return response;
         }
 
-        return chatResponse;
+        if (hasGuardrailMetadata) {
+            response.put("guardrail", chatActionResult.guardrailMetadata());
+        }
+
+        return response;
     }
 }

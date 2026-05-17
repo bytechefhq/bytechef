@@ -1,0 +1,478 @@
+{
+  "actionClusterElementTypes": { },
+  "actions": [ ],
+  "clusterElementClusterElementTypes": { },
+  "clusterElementTypes": [ ],
+  "clusterElements": [ {
+    "name": "urlsCheck",
+    "description": "Flags URLs outside the allowlist.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Check user input before sending to model.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Validate Input",
+      "metadata": { },
+      "name": "validateInput",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Check model response before returning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Validate Output",
+      "metadata": { },
+      "name": "validateOutput",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Allowlist of URLs or host names that are permitted",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Allowed URLs",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "allowedUrls",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": [ "https", "http" ],
+      "description": "Which URL schemes are permitted; URLs using any other scheme are flagged.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Allowed Schemes",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "allowedSchemes",
+      "options": [ {
+        "description": null,
+        "label": "https",
+        "value": "https"
+      }, {
+        "description": null,
+        "label": "http",
+        "value": "http"
+      }, {
+        "description": null,
+        "label": "ftp",
+        "value": "ftp"
+      }, {
+        "description": null,
+        "label": "data",
+        "value": "data"
+      }, {
+        "description": null,
+        "label": "javascript",
+        "value": "javascript"
+      }, {
+        "description": null,
+        "label": "vbscript",
+        "value": "vbscript"
+      }, {
+        "description": null,
+        "label": "mailto",
+        "value": "mailto"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Block URLs that contain user credentials (user:pass@host).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Block Userinfo",
+      "metadata": { },
+      "name": "blockUserinfo",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Extends each entry in 'Allowed URLs' to cover its subdomains. When on, allowing 'example.com' also allows 'api.example.com' and 'staging.api.example.com'. When off, only the exact host matches.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Allow Subdomain",
+      "metadata": { },
+      "name": "allowSubdomain",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "URLs",
+    "type": {
+      "name": "CHECK_FOR_VIOLATIONS",
+      "key": "checkForViolations",
+      "label": "Check for Violations",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "urlsSanitize",
+    "description": "Detects URLs outside the allowlist.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Check user input before sending to model.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Validate Input",
+      "metadata": { },
+      "name": "validateInput",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Check model response before returning.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Validate Output",
+      "metadata": { },
+      "name": "validateOutput",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "ARRAY_BUILDER",
+      "defaultValue": null,
+      "description": "Allowlist of URLs or host names that are permitted",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Allowed URLs",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "allowedUrls",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "MULTI_SELECT",
+      "defaultValue": [ "https", "http" ],
+      "description": "Which URL schemes are permitted; URLs using any other scheme are masked.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "items": [ {
+        "advancedOption": null,
+        "controlType": "TEXT",
+        "defaultValue": null,
+        "description": null,
+        "displayCondition": null,
+        "exampleValue": null,
+        "expressionEnabled": null,
+        "hidden": null,
+        "label": null,
+        "languageId": null,
+        "maxLength": null,
+        "metadata": { },
+        "minLength": null,
+        "name": null,
+        "options": null,
+        "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
+        "placeholder": null,
+        "regex": null,
+        "required": null,
+        "type": "STRING"
+      } ],
+      "label": "Allowed Schemes",
+      "maxItems": null,
+      "metadata": { },
+      "minItems": null,
+      "multipleValues": null,
+      "name": "allowedSchemes",
+      "options": [ {
+        "description": null,
+        "label": "https",
+        "value": "https"
+      }, {
+        "description": null,
+        "label": "http",
+        "value": "http"
+      }, {
+        "description": null,
+        "label": "ftp",
+        "value": "ftp"
+      }, {
+        "description": null,
+        "label": "data",
+        "value": "data"
+      }, {
+        "description": null,
+        "label": "javascript",
+        "value": "javascript"
+      }, {
+        "description": null,
+        "label": "vbscript",
+        "value": "vbscript"
+      }, {
+        "description": null,
+        "label": "mailto",
+        "value": "mailto"
+      } ],
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": null,
+      "type": "ARRAY"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Mask URLs that contain user credentials (user:pass@host).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sanitize Userinfo",
+      "metadata": { },
+      "name": "blockUserinfo",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Extends each entry in 'Allowed URLs' to cover its subdomains. When on, allowing 'example.com' also allows 'api.example.com' and 'staging.api.example.com'. When off, only the exact host matches.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Allow Subdomain",
+      "metadata": { },
+      "name": "allowSubdomain",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": null,
+      "type": "BOOLEAN"
+    } ],
+    "title": "URLs",
+    "type": {
+      "name": "SANITIZE_TEXT",
+      "key": "sanitizeText",
+      "label": "Sanitize Text",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  } ],
+  "componentCategories": [ {
+    "name": "artificial-intelligence",
+    "label": "Artificial Intelligence"
+  } ],
+  "connection": null,
+  "customAction": null,
+  "customActionHelp": null,
+  "description": "Detects — and optionally masks — URLs outside a configured allowlist.",
+  "icon": "path:assets/urls.svg",
+  "metadata": null,
+  "name": "urls",
+  "resources": null,
+  "tags": null,
+  "title": "URLs",
+  "triggers": null,
+  "unifiedApi": null,
+  "version": 1
+}
