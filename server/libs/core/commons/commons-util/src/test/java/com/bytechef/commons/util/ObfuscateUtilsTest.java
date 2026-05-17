@@ -18,6 +18,7 @@ package com.bytechef.commons.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -46,190 +47,83 @@ public class ObfuscateUtilsTest {
     }
 
     @Test
-    public void testToObfuscatedMap() {
+    public void testToObfuscatedMapPreservesInsensitiveValues() {
         Map<String, Object> map = createParametersMap();
 
         Map<String, Object> obfuscatedMap = ObfuscateUtils.toObfuscatedMap(map, 5, 2);
 
-        assertThat(obfuscatedMap.get("addTo"))
-            .isEqualTo("to-value");
-
-        assertThat(obfuscatedMap.get("authorizationType"))
-            .isEqualTo("auth-type");
-
-        assertThat(obfuscatedMap.get("authorizationUrl"))
-            .isEqualTo("https://example.com/auth");
-
-        assertThat(obfuscatedMap.get("base"))
-            .isEqualTo("base-value");
-
-        assertThat(obfuscatedMap.get("baseUri"))
-            .isEqualTo("base-uri");
-
-        assertThat(obfuscatedMap.get("baseUrl"))
-            .isEqualTo("base-url");
-
-        assertThat(obfuscatedMap.get("bucketName"))
-            .isEqualTo("project-mandragora");
-
-        assertThat(obfuscatedMap.get("clientId"))
-            .isEqualTo("client-id-123");
-
-        assertThat(obfuscatedMap.get("collection"))
-            .isEqualTo("collection-value");
-
-        assertThat(obfuscatedMap.get("collectionName"))
-            .isEqualTo("collection-name");
-
-        assertThat(obfuscatedMap.get("companyDomain"))
-            .isEqualTo("company-domain");
-
-        assertThat(obfuscatedMap.get("companyId"))
-            .isEqualTo("company-id");
-
-        assertThat(obfuscatedMap.get("connectionString"))
-            .isEqualTo("connection-string");
-
-        assertThat(obfuscatedMap.get("containerName"))
-            .isEqualTo("container-name");
-
-        assertThat(obfuscatedMap.get("contactPoints"))
-            .isEqualTo("contact-points");
-
-        assertThat(obfuscatedMap.get("cryptoProtocol"))
-            .isEqualTo("crypto-protocol");
-
-        assertThat(obfuscatedMap.get("database"))
-            .isEqualTo("database-value");
-
-        assertThat(obfuscatedMap.get("databaseName"))
-            .isEqualTo("database-name");
-
-        assertThat(obfuscatedMap.get("datacenter"))
-            .isEqualTo("datacenter-value");
-
-        assertThat(obfuscatedMap.get("deployment"))
-            .isEqualTo("deployment-value");
-
-        assertThat(obfuscatedMap.get("dimensions"))
-            .isEqualTo("dimensions-value");
-
-        assertThat(obfuscatedMap.get("distanceType"))
-            .isEqualTo("distance-type");
-
-        assertThat(obfuscatedMap.get("domain"))
-            .isEqualTo("domain-value");
-
-        assertThat(obfuscatedMap.get("embeddingDimension"))
-            .isEqualTo("embedding-dimension");
-
-        assertThat(obfuscatedMap.get("endpoint"))
-            .isEqualTo("endpoint-value");
-
-        assertThat(obfuscatedMap.get("headerPrefix"))
-            .isEqualTo("header-prefix");
-
-        assertThat(obfuscatedMap.get("host"))
-            .isEqualTo("localhost");
-
-        assertThat(obfuscatedMap.get("indexName"))
-            .isEqualTo("index-name");
-
-        assertThat(obfuscatedMap.get("initializeSchema"))
-            .isEqualTo("initialize-schema");
-
-        assertThat(obfuscatedMap.get("instance_url"))
-            .isEqualTo("instance-url");
-
-        assertThat(obfuscatedMap.get("keyPrefix"))
-            .isEqualTo("key-prefix");
-
-        assertThat(obfuscatedMap.get("keyspace"))
-            .isEqualTo("keyspace-value");
-
-        assertThat(obfuscatedMap.get("optimization"))
-            .isEqualTo("optimization-value");
-
-        assertThat(obfuscatedMap.get("organization_id"))
-            .isEqualTo("organization-id");
-
-        assertThat(obfuscatedMap.get("port"))
-            .isEqualTo("8080");
-
-        assertThat(obfuscatedMap.get("protocol"))
-            .isEqualTo("protocol-value");
-
-        assertThat(obfuscatedMap.get("publicEndpoint"))
-            .isEqualTo("public-endpoint");
-
-        assertThat(obfuscatedMap.get("refreshUrl"))
-            .isEqualTo("refresh-url");
-
-        assertThat(obfuscatedMap.get("region"))
-            .isEqualTo("eu-ireland");
-
-        assertThat(obfuscatedMap.get("schemaName"))
-            .isEqualTo("schema-name");
-
-        assertThat(obfuscatedMap.get("scopeName"))
-            .isEqualTo("scope-name");
-
-        assertThat(obfuscatedMap.get("scopes"))
-            .isEqualTo("scopes-value");
-
-        assertThat(obfuscatedMap.get("serverUrl"))
-            .isEqualTo("server-url");
-
-        assertThat(obfuscatedMap.get("shopName"))
-            .isEqualTo("shop-name");
-
-        assertThat(obfuscatedMap.get("similarity"))
-            .isEqualTo("similarity-value");
-
-        assertThat(obfuscatedMap.get("siteName"))
-            .isEqualTo("site-name");
-
-        assertThat(obfuscatedMap.get("subdomain"))
-            .isEqualTo("subdomain-value");
-
-        assertThat(obfuscatedMap.get("table"))
-            .isEqualTo("table-value");
-
-        assertThat(obfuscatedMap.get("tableName"))
-            .isEqualTo("table-name");
-
-        assertThat(obfuscatedMap.get("timeToLive"))
-            .isEqualTo("time-to-live");
-
-        assertThat(obfuscatedMap.get("tokenUrl"))
-            .isEqualTo("token-url");
-
-        assertThat(obfuscatedMap.get("uri"))
-            .isEqualTo("uri-value");
-
-        assertThat(obfuscatedMap.get("url"))
-            .isEqualTo("https://api.example.com");
-
-        assertThat(obfuscatedMap.get("username"))
-            .isEqualTo("user-789");
-
-        assertThat(obfuscatedMap.get("website"))
-            .isEqualTo("website-value");
-
-        assertThat(obfuscatedMap.get("password"))
-            .isEqualTo(".....");
-
-        assertThat(obfuscatedMap.get("apiKey"))
-            .isEqualTo(".....90");
-
-        assertThat(obfuscatedMap.get("token"))
-            .isEqualTo(".....AB");
-
-        assertThat(obfuscatedMap.get("clientSecret"))
-            .isEqualTo(".....56");
-
+        assertThat(obfuscatedMap)
+            .containsEntry("addTo", "to-value")
+            .containsEntry("authorizationType", "auth-type")
+            .containsEntry("authorizationUrl", "https://example.com/auth")
+            .containsEntry("base", "base-value")
+            .containsEntry("baseUri", "base-uri")
+            .containsEntry("baseUrl", "base-url")
+            .containsEntry("bucketName", "project-mandragora")
+            .containsEntry("clientId", "client-id-123")
+            .containsEntry("collection", "collection-value")
+            .containsEntry("collectionName", "collection-name")
+            .containsEntry("companyDomain", "company-domain")
+            .containsEntry("companyId", "company-id")
+            .containsEntry("connectionString", "connection-string")
+            .containsEntry("containerName", "container-name")
+            .containsEntry("contactPoints", "contact-points")
+            .containsEntry("cryptoProtocol", "crypto-protocol")
+            .containsEntry("database", "database-value")
+            .containsEntry("databaseName", "database-name")
+            .containsEntry("datacenter", "datacenter-value")
+            .containsEntry("deployment", "deployment-value")
+            .containsEntry("dimensions", "dimensions-value")
+            .containsEntry("distanceType", "distance-type")
+            .containsEntry("domain", "domain-value")
+            .containsEntry("embeddingDimension", "embedding-dimension")
+            .containsEntry("endpoint", "endpoint-value")
+            .containsEntry("headerPrefix", "header-prefix")
+            .containsEntry("host", "localhost")
+            .containsEntry("indexName", "index-name")
+            .containsEntry("initializeSchema", "initialize-schema")
+            .containsEntry("instance_url", "instance-url")
+            .containsEntry("keyPrefix", "key-prefix")
+            .containsEntry("keyspace", "keyspace-value")
+            .containsEntry("optimization", "optimization-value")
+            .containsEntry("organization_id", "organization-id")
+            .containsEntry("port", "8080")
+            .containsEntry("protocol", "protocol-value")
+            .containsEntry("publicEndpoint", "public-endpoint")
+            .containsEntry("refreshUrl", "refresh-url")
+            .containsEntry("region", "eu-ireland")
+            .containsEntry("schemaName", "schema-name")
+            .containsEntry("scopeName", "scope-name")
+            .containsEntry("scopes", "scopes-value")
+            .containsEntry("serverUrl", "server-url")
+            .containsEntry("shopName", "shop-name")
+            .containsEntry("similarity", "similarity-value")
+            .containsEntry("siteName", "site-name")
+            .containsEntry("subdomain", "subdomain-value")
+            .containsEntry("table", "table-value")
+            .containsEntry("tableName", "table-name")
+            .containsEntry("timeToLive", "time-to-live")
+            .containsEntry("tokenUrl", "token-url")
+            .containsEntry("uri", "uri-value")
+            .containsEntry("url", "https://api.example.com")
+            .containsEntry("username", "user-789")
+            .containsEntry("website", "website-value");
     }
 
+    @Test
+    public void testToObfuscatedMapObfuscatesSensitiveValues() {
+        Map<String, Object> map = createParametersMap();
+
+        Map<String, Object> obfuscatedMap = ObfuscateUtils.toObfuscatedMap(map, 5, 2);
+
+        assertThat(obfuscatedMap)
+            .containsEntry("password", ".....")
+            .containsEntry("apiKey", ".....90")
+            .containsEntry("token", ".....AB")
+            .containsEntry("clientSecret", ".....et");
+    }
+
+    @SuppressFBWarnings("HARD_CODE_PASSWORD")
     private static Map<String, Object> createParametersMap() {
         Map<String, Object> map = new HashMap<>();
 
