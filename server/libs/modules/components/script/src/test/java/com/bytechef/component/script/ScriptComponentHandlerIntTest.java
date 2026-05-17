@@ -96,7 +96,7 @@ public class ScriptComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_python".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3),
-            Map.of("var/v1/set", taskHandler, "python/v1/javascript", scriptPythonTaskHandler));
+            Map.of("var/v1/set", taskHandler, "script/v1/python", scriptPythonTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
@@ -124,7 +124,7 @@ public class ScriptComponentHandlerIntTest {
         Job job = componentJobTestExecutor.execute(
             ENCODER.encodeToString("script_v1_ruby".getBytes(StandardCharsets.UTF_8)),
             Map.of("factor", 3),
-            Map.of("var/v1/set", taskHandler, "ruby/v1/javascript", scriptRubyTaskHandler));
+            Map.of("var/v1/set", taskHandler, "script/v1/ruby", scriptRubyTaskHandler));
 
         assertThat(job.getStatus()).isEqualTo(Job.Status.COMPLETED);
 
