@@ -19,10 +19,13 @@ package com.bytechef.platform.workflow.execution.facade;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,11 +77,40 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 return JobResumeOutcome.GONE;
             }
 
+            String storedJobResumeIdString = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
+
+            if (storedJobResumeIdString == null || !uuidMatches(storedJobResumeIdString, jobResumeId)) {
+                log.warn("Resume token UUID does not match stored value for job {}", jobResumeId.getJobId());
+
+                return JobResumeOutcome.INVALID_ID;
+            }
+
             jobFacade.resumeJob(jobResumeId.getJobId(), data);
 
             applicationEventPublisher.publishEvent(new JobResumedEvent(id));
 
             return JobResumeOutcome.OK;
         });
+    }
+
+    private static boolean uuidMatches(String storedJobResumeIdString, JobResumeId suppliedJobResumeId) {
+        JobResumeId storedJobResumeId;
+
+        try {
+            storedJobResumeId = JobResumeId.parse(storedJobResumeIdString);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return false;
+        }
+
+        if (storedJobResumeId.getJobId() != suppliedJobResumeId.getJobId()) {
+            return false;
+        }
+
+        byte[] storedUuidBytes = storedJobResumeId.getUuidAsString()
+            .getBytes(StandardCharsets.UTF_8);
+        byte[] suppliedUuidBytes = suppliedJobResumeId.getUuidAsString()
+            .getBytes(StandardCharsets.UTF_8);
+
+        return MessageDigest.isEqual(storedUuidBytes, suppliedUuidBytes);
     }
 }

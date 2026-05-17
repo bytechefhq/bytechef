@@ -8,5 +8,6 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
 }
