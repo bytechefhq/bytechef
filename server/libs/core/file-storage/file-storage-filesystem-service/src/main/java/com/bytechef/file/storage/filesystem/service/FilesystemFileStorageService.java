@@ -251,12 +251,7 @@ public class FilesystemFileStorageService implements FileStorageService {
         return filePath.toFile();
     }
 
-    /**
-     * Resolves {@code url} relative to {@code directoryPath} and asserts that the resulting path stays inside
-     * {@code directoryPath}. Rejects absolute paths and parent-traversal segments. The {@code url} value can originate
-     * from attacker-controlled input on the {@code /file-entries/{id}/content} endpoint, so this check is a security
-     * boundary, not a defensive nicety.
-     */
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private static Path resolveFilePath(Path directoryPath, String directory, String url) {
         String relative = removeUrlPrefix(url, directory);
         Path candidate = Paths.get(relative);

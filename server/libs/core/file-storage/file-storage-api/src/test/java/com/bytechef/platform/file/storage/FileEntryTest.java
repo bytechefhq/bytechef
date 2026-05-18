@@ -18,12 +18,15 @@ package com.bytechef.platform.file.storage;
 
 import static com.bytechef.atlas.configuration.constant.WorkflowConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
+import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
@@ -122,5 +125,65 @@ public class FileEntryTest {
             .isEqualTo(".env");
         Assertions.assertThat(parsed.getUrl())
             .isEqualTo("base64:///tmp/.env");
+    }
+
+    @Test
+    public void testParseRejectsAbsolutePosixPath() {
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("txt", "text/plain", "file",
+            "/etc/passwd")));
+    }
+
+    @Test
+    public void testParseRejectsAbsoluteWindowsPath() {
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("ini", "text/plain", "file",
+            "\\Windows\\system.ini")));
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("ini", "text/plain", "file",
+            "C:\\Windows\\system.ini")));
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("ini", "text/plain", "file",
+            "d:/Windows/system.ini")));
+    }
+
+    @Test
+    public void testParseRejectsParentTraversal() {
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("txt", "text/plain", "file",
+            "file:/temp/../../etc/passwd")));
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("txt", "text/plain", "file",
+            "../../etc/passwd")));
+    }
+
+    @Test
+    public void testParseRejectsNullByteInjection() {
+        assertThrows(IllegalArgumentException.class, () -> FileEntry.parse(encodeId("txt", "text/plain", "file",
+            "file:/temp/safe.txt\0/etc/passwd")));
+    }
+
+    @Test
+    public void testParseRejectsEmptyUrl() {
+        assertThrows(IllegalArgumentException.class,
+            () -> FileEntry.parse(encodeId("txt", "text/plain", "file", "")));
+    }
+
+    @Test
+    public void testParseAcceptsLegitimateFilesystemUrl() {
+        FileEntry parsed = FileEntry.parse(encodeId("txt", "text/plain", "report.txt",
+            "file:/temp/3a2b1c4d-5e6f-7081-9203-405060708090.txt"));
+
+        Assertions.assertThat(parsed.getUrl())
+            .isEqualTo("file:/temp/3a2b1c4d-5e6f-7081-9203-405060708090.txt");
+    }
+
+    @Test
+    public void testParseAcceptsLegitimateBase64Url() {
+        FileEntry parsed = FileEntry.parse(encodeId("txt", "text/plain", "data.txt",
+            "base64://aGVsbG8gd29ybGQ="));
+
+        Assertions.assertThat(parsed.getUrl())
+            .isEqualTo("base64://aGVsbG8gd29ybGQ=");
+    }
+
+    private static String encodeId(String extension, String mimeType, String name, String url) {
+        String raw = String.join("_;_", extension, mimeType, name, url);
+
+        return EncodingUtils.base64EncodeToString(raw.getBytes(StandardCharsets.UTF_8));
     }
 }

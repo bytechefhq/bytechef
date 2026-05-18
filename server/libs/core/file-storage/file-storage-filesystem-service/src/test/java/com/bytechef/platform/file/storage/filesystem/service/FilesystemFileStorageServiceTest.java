@@ -16,7 +16,10 @@
 
 package com.bytechef.platform.file.storage.filesystem.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.exception.FileStorageException;
 import com.bytechef.file.storage.filesystem.service.FilesystemFileStorageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
@@ -129,5 +132,77 @@ public class FilesystemFileStorageServiceTest {
                 Files.contentOf(
                     new File("/tmp/test/bytechef/files/public" + url.replace("file:", "")), StandardCharsets.UTF_8))
             .isEqualTo(TEST_STRING);
+    }
+
+    @Test
+    public void testGetInputStreamRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.getInputStream("data", malicious));
+    }
+
+    @Test
+    public void testGetInputStreamRejectsParentTraversal() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "file:/data/../../../etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.getInputStream("data", malicious));
+    }
+
+    @Test
+    public void testReadFileToStringRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.readFileToString("data", malicious));
+    }
+
+    @Test
+    public void testReadFileToBytesRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.readFileToBytes("data", malicious));
+    }
+
+    @Test
+    public void testGetContentLengthRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.getContentLength("data", malicious));
+    }
+
+    @Test
+    public void testGetOutputStreamRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.getOutputStream("data", malicious));
+    }
+
+    @Test
+    public void testDeleteFileRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.deleteFile("data", malicious));
+    }
+
+    @Test
+    public void testGetFileEntryURLRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.getFileEntryURL("data", malicious));
+    }
+
+    @Test
+    public void testFileExistsRejectsAbsolutePath() {
+        FileEntry malicious = new FileEntry("file", "txt", "text/plain", "/etc/passwd");
+
+        assertThrows(FileStorageException.class,
+            () -> fileStorageService.fileExists("data", malicious));
     }
 }

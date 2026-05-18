@@ -87,8 +87,29 @@ public class FileEntry {
 
         String extension = parts[0].isEmpty() ? null : parts[0];
         String mimeType = parts[1].isEmpty() ? null : parts[1];
+        String url = parts[3];
 
-        return new FileEntry(parts[2], extension, mimeType, parts[3]);
+        validateUrl(url);
+
+        return new FileEntry(parts[2], extension, mimeType, url);
+    }
+
+    private static void validateUrl(String url) {
+        if (url.isEmpty() || url.indexOf('\0') >= 0 || url.startsWith("/") || url.startsWith("\\")
+            || url.contains("..") || hasWindowsDriveLetter(url)) {
+
+            throw new IllegalArgumentException("Invalid FileEntry id");
+        }
+    }
+
+    private static boolean hasWindowsDriveLetter(String url) {
+        if (url.length() < 2 || url.charAt(1) != ':') {
+            return false;
+        }
+
+        char drive = url.charAt(0);
+
+        return (drive >= 'a' && drive <= 'z') || (drive >= 'A' && drive <= 'Z');
     }
 
     public boolean equals(Object o) {
