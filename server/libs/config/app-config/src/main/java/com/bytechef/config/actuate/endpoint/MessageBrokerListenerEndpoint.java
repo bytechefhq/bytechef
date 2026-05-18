@@ -41,7 +41,7 @@ import org.springframework.stereotype.Component;
 @Endpoint(id = "messageBrokerListeners")
 public class MessageBrokerListenerEndpoint {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageBrokerListenerEndpoint.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageBrokerListenerEndpoint.class);
 
     private final List<MessageBrokerListenerRegistrar<?>> registrars;
 
@@ -62,7 +62,7 @@ public class MessageBrokerListenerEndpoint {
                         registrar.stopListenerEndpoints();
                         total++;
                     } catch (Exception e) {
-                        logger.warn("Failed to stop listeners for registrar {}: {}",
+                        log.warn("Failed to stop listeners for registrar {}: {}",
                             registrar.getClass()
                                 .getName(),
                             e.getMessage());
@@ -75,7 +75,7 @@ public class MessageBrokerListenerEndpoint {
                         registrar.startListenerEndpoints();
                         total++;
                     } catch (Exception e) {
-                        logger.warn("Failed to start listeners for registrar {}: {}",
+                        log.warn("Failed to start listeners for registrar {}: {}",
                             registrar.getClass()
                                 .getName(),
                             e.getMessage());

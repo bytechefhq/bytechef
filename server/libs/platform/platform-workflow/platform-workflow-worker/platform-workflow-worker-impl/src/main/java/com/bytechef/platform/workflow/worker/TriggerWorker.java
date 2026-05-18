@@ -55,7 +55,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class TriggerWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerWorker.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerWorker.class);
 
     private static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -76,8 +76,8 @@ public class TriggerWorker {
     }
 
     public void onTriggerExecutionEvent(TriggerExecutionEvent triggerExecutionEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTriggerExecutionEvent: triggerExecutionEvent={}", triggerExecutionEvent);
         }
 
         TriggerExecution triggerExecution = triggerExecutionEvent.getTriggerExecution();
@@ -96,8 +96,8 @@ public class TriggerWorker {
                     eventPublisher.publishEvent(new TriggerExecutionCompleteEvent(execution));
                 }
             } catch (InterruptedException e) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(e.getMessage(), e);
+                if (log.isTraceEnabled()) {
+                    log.trace(e.getMessage(), e);
                 }
             } catch (Exception e) {
                 TriggerExecutionFuture<?> triggerExecutionFuture = triggerExecutions.get(
@@ -119,7 +119,7 @@ public class TriggerWorker {
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             handleException(triggerExecution, e);
         } catch (CancellationException e) {
-            logger.debug("Cancelled trigger: {}", triggerExecution.getWorkflowExecutionId());
+            log.debug("Cancelled trigger: {}", triggerExecution.getWorkflowExecutionId());
         } finally {
             try {
                 latch.await();
@@ -135,13 +135,13 @@ public class TriggerWorker {
         if (event instanceof CancelControlTriggerEvent cancelControlTriggerEvent) {
             CancelControlTrigger cancelControlTrigger = cancelControlTriggerEvent.getControlTrigger();
 
-            logger.debug("onCancelControlTriggerEvent: cancelControlTrigger={}", cancelControlTrigger);
+            log.debug("onCancelControlTriggerEvent: cancelControlTrigger={}", cancelControlTrigger);
 
             long id = cancelControlTrigger.getTriggerExecutionId();
 
             for (TriggerExecutionFuture<?> triggerExecutionFuture : triggerExecutions.values()) {
                 if (Objects.equals(triggerExecutionFuture.triggerExecution.getId(), id)) {
-                    logger.info("Cancelling trigger id={}", triggerExecutionFuture.triggerExecution.getId());
+                    log.info("Cancelling trigger id={}", triggerExecutionFuture.triggerExecution.getId());
 
                     triggerExecutionFuture.cancel(true);
                 }
@@ -204,7 +204,7 @@ public class TriggerWorker {
     }
 
     private void handleException(TriggerExecution triggerExecution, Exception exception) {
-        logger.error(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
 
         Instant endDate = Instant.now();
         Instant startDate = triggerExecution.getStartDate();
