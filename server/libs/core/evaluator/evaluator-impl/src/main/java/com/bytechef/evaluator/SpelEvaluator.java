@@ -42,6 +42,7 @@ import org.springframework.expression.common.CompositeStringExpression;
 import org.springframework.expression.common.LiteralExpression;
 import org.springframework.expression.common.TemplateParserContext;
 import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.SpelMessage;
 import org.springframework.expression.spel.standard.SpelExpression;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
@@ -80,7 +81,7 @@ public class SpelEvaluator implements Evaluator {
     private static final String ACCESSOR_SUFFIX = "}";
     private static final String FORMULA_PREFIX = "=";
     private static final Pattern FORMULA_EXPRESSION_PATTERN =
-        Pattern.compile("^(?!.*T\\()(?!.*\\.\\w+\\()(?!.*new\\s+\\w+(?:<[^>]*>)?\\s*\\[).*$");
+        Pattern.compile("^(?!.*\\bT\\s*\\()(?!.*\\.\\s*\\w+\\s*\\()(?!.*\\bnew\\s+).*$");
     private static final Pattern INVALID_ACCESSOR_PATTERN = Pattern.compile(
         "\\$\\{(?!(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*})");
 
@@ -164,6 +165,10 @@ public class SpelEvaluator implements Evaluator {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
+        evaluationContext.setConstructorResolvers(List.of());
+        evaluationContext.setTypeLocator(typeName -> {
+            throw new SpelEvaluationException(SpelMessage.TYPE_NOT_FOUND, typeName);
+        });
 
         if (formulaExpression) {
             evaluationContext.addMethodResolver(methodResolver());

