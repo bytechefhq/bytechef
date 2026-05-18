@@ -37,7 +37,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class ApprovalTaskCompletionListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApprovalTaskCompletionListener.class);
+    private static final Logger log = LoggerFactory.getLogger(ApprovalTaskCompletionListener.class);
 
     private final ApprovalTaskService approvalTaskService;
 
@@ -65,8 +65,8 @@ public class ApprovalTaskCompletionListener {
 
         approvalTaskService.update(approvalTask);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Marked approval task id={} as COMPLETED after job resume", approvalTask.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Marked approval task id={} as COMPLETED after job resume", approvalTask.getId());
         }
     }
 }
