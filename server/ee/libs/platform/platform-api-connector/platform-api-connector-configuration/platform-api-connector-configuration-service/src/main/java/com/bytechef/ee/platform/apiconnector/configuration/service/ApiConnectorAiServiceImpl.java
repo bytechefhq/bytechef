@@ -41,7 +41,7 @@ import org.springframework.stereotype.Service;
 @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
 public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiConnectorAiServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiConnectorAiServiceImpl.class);
 
     private static final String SYSTEM_PROMPT =
         """
@@ -152,13 +152,13 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     @Override
     @Async
     public void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userInstructions) {
-        logger.debug("Starting async OpenAPI generation for job {}", jobId);
+        log.debug("Starting async OpenAPI generation for job {}", jobId);
 
         apiConnectorGenerationJobService.markAsProcessing(jobId);
 
         try {
             if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                logger.debug("Job {} was cancelled before processing started", jobId);
+                log.debug("Job {} was cancelled before processing started", jobId);
 
                 return;
             }
@@ -166,7 +166,7 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
             String documentationContent = fetchDocumentation(documentationUrl);
 
             if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                logger.debug("Job {} was cancelled after fetching documentation", jobId);
+                log.debug("Job {} was cancelled after fetching documentation", jobId);
 
                 return;
             }
@@ -187,7 +187,7 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
                 .getText();
 
             if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
-                logger.debug("Job {} was cancelled after AI generation", jobId);
+                log.debug("Job {} was cancelled after AI generation", jobId);
 
                 return;
             }
@@ -196,9 +196,9 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
             apiConnectorGenerationJobService.markAsCompleted(jobId, specification);
 
-            logger.debug("Job {} completed successfully", jobId);
+            log.debug("Job {} completed successfully", jobId);
         } catch (Exception exception) {
-            logger.error("Job {} failed", jobId, exception);
+            log.error("Job {} failed", jobId, exception);
 
             apiConnectorGenerationJobService.markAsFailed(jobId, exception.getMessage());
         }

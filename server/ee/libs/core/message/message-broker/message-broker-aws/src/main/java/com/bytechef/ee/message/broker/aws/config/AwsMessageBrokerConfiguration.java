@@ -34,11 +34,11 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnMessageBrokerAws
 public class AwsMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(AwsMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AwsMessageBrokerConfiguration.class);
 
     public AwsMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: aws");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: aws");
         }
     }
 
@@ -61,7 +61,7 @@ public class AwsMessageBrokerConfiguration {
                     try {
                         targetClass = Class.forName(type);
                     } catch (ClassNotFoundException e) {
-                        logger.warn("Class not found: " + type, e);
+                        log.warn("Class not found: " + type, e);
                     }
                 }
 

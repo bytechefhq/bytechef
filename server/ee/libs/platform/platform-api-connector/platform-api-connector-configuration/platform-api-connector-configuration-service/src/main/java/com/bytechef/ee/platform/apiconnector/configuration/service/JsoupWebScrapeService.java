@@ -42,7 +42,7 @@ import org.springframework.stereotype.Service;
 @ConditionalOnMissingBean(name = "firecrawlWebScrapeService")
 public class JsoupWebScrapeService implements WebScrapeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(JsoupWebScrapeService.class);
+    private static final Logger log = LoggerFactory.getLogger(JsoupWebScrapeService.class);
 
     private static final int DEFAULT_TIMEOUT_SECONDS = 30;
     private static final int DEFAULT_MAX_CRAWL_PAGES = 20;
@@ -63,7 +63,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
 
             return ScrapeResult.success(content);
         } catch (Exception exception) {
-            logger.error("Failed to scrape URL: {}", url, exception);
+            log.error("Failed to scrape URL: {}", url, exception);
 
             return ScrapeResult.failure(exception.getMessage());
         }
@@ -109,13 +109,13 @@ public class JsoupWebScrapeService implements WebScrapeService {
                             .append(content);
                     }
                 } catch (Exception exception) {
-                    logger.warn("Failed to crawl URL: {}", currentUrl, exception);
+                    log.warn("Failed to crawl URL: {}", currentUrl, exception);
                 }
             }
 
             return CrawlResult.success(combinedContent.toString(), crawledUrls);
         } catch (Exception exception) {
-            logger.error("Failed to crawl starting from URL: {}", url, exception);
+            log.error("Failed to crawl starting from URL: {}", url, exception);
 
             return CrawlResult.failure(exception.getMessage());
         }
@@ -236,7 +236,7 @@ public class JsoupWebScrapeService implements WebScrapeService {
                     queue.add(href);
                 }
             } catch (Exception exception) {
-                logger.debug("Invalid URL: {}", href);
+                log.debug("Invalid URL: {}", href);
             }
         }
 

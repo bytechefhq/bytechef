@@ -55,7 +55,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     // Reject uploaded skill archives larger than 10 MB
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
 
-    private static final Logger logger = LoggerFactory.getLogger(AiSkillFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AiSkillFacadeImpl.class);
 
     private final AiSkillFileStorage aiSkillFileStorage;
     private final AiSkillService aiSkillService;
@@ -112,7 +112,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                     try {
                         aiSkillFileStorage.deleteAiSkillFile(fileEntry);
                     } catch (RuntimeException exception) {
-                        logger.error(
+                        log.error(
                             "Failed to clean up skill file after rollback, fileEntry={}", fileEntry, exception);
                     }
                 }
@@ -132,7 +132,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 throw dataIntegrityViolationException;
             }
 
-            logger.debug(
+            log.debug(
                 "Unique name conflict during save for '{}', retrying with new suffix",
                 aiSkill.getName());
 
@@ -160,7 +160,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
         FileEntry fileEntry = aiSkill.getSkillFile();
 
-        logger.debug("Deleting agent skill id={}, name='{}', fileEntry={}", id, aiSkill.getName(), fileEntry);
+        log.debug("Deleting agent skill id={}, name='{}', fileEntry={}", id, aiSkill.getName(), fileEntry);
 
         aiSkillService.deleteAiSkill(id);
 
@@ -171,7 +171,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 try {
                     aiSkillFileStorage.deleteAiSkillFile(fileEntry);
                 } catch (RuntimeException exception) {
-                    logger.error("Failed to delete skill file after DB commit, fileEntry={}", fileEntry, exception);
+                    log.error("Failed to delete skill file after DB commit, fileEntry={}", fileEntry, exception);
                 }
             }
         });
@@ -320,7 +320,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             }
         }
 
-        logger.warn("Exhausted 100 suffix attempts for skill name '{}', falling back to timestamp", name);
+        log.warn("Exhausted 100 suffix attempts for skill name '{}', falling back to timestamp", name);
 
         return name + " (" + System.currentTimeMillis() + ")";
     }
@@ -347,7 +347,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                     byte[] entryBytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
 
                     if (entryBytes.length > MAX_ZIP_ENTRY_SIZE) {
-                        logger.warn("SKILL.md exceeds maximum allowed size, skipping frontmatter extraction");
+                        log.warn("SKILL.md exceeds maximum allowed size, skipping frontmatter extraction");
 
                         return null;
                     }
@@ -355,7 +355,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                     String content = new String(entryBytes, StandardCharsets.UTF_8);
 
                     if (!content.startsWith("---")) {
-                        logger.warn(
+                        log.warn(
                             "SKILL.md does not contain frontmatter (no opening ---), using provided name/description");
 
                         return null;
@@ -364,7 +364,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                     int endIndex = content.indexOf("---", 3);
 
                     if (endIndex < 0) {
-                        logger.warn("SKILL.md frontmatter has no closing ---, using provided name/description");
+                        log.warn("SKILL.md frontmatter has no closing ---, using provided name/description");
 
                         return null;
                     }
@@ -403,7 +403,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 "Failed to read the uploaded skill archive. The file may be corrupt.", ioException);
         }
 
-        logger.debug("No SKILL.md found in skill archive, using provided name/description");
+        log.debug("No SKILL.md found in skill archive, using provided name/description");
 
         return null;
     }

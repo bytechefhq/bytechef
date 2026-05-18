@@ -33,7 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiAgentEvalWorkflowPreDeleteListener implements WorkflowPreDeleteListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentEvalWorkflowPreDeleteListener.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentEvalWorkflowPreDeleteListener.class);
 
     private final AiAgentEvalTestService agentEvalTestService;
     private final AiAgentJudgeService agentJudgeService;
@@ -47,7 +47,7 @@ public class AiAgentEvalWorkflowPreDeleteListener implements WorkflowPreDeleteLi
 
     @Override
     public void onWorkflowPreDelete(String workflowId) {
-        logger.debug("Cleaning up agent eval data for workflow {}", workflowId);
+        log.debug("Cleaning up agent eval data for workflow {}", workflowId);
 
         agentEvalTestService.deleteAgentEvalTestsByWorkflowId(workflowId);
         agentJudgeService.deleteAgentJudgesByWorkflowId(workflowId);

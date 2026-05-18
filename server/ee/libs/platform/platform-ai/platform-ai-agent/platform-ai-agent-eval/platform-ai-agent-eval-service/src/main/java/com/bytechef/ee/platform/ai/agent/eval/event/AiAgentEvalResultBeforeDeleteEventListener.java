@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiAgentEvalResultBeforeDeleteEventListener extends AbstractRelationalEventListener<AiAgentEvalResult> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentEvalResultBeforeDeleteEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentEvalResultBeforeDeleteEventListener.class);
 
     private final AiAgentEvalFileStorage agentEvalFileStorage;
     private final AiAgentEvalResultService agentEvalResultService;
@@ -63,7 +63,7 @@ public class AiAgentEvalResultBeforeDeleteEventListener extends AbstractRelation
             try {
                 agentEvalFileStorage.deleteTranscriptFile(transcriptFileEntry);
             } catch (Exception exception) {
-                logger.warn("Failed to delete transcript file for result {}", resultId, exception);
+                log.warn("Failed to delete transcript file for result {}", resultId, exception);
             }
         }
     }

@@ -23,7 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
  */
 public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisServiceRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisServiceRegistry.class);
 
     private RedisRegistration redisRegistration;
     private final RedisTemplate<String, RedisRegistration> redisTemplate;
@@ -58,7 +58,7 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
     public void close() {
         stopped = true;
 
-        logger.info("Redis Service Registry is closed");
+        log.info("Redis Service Registry is closed");
     }
 
     @Override
@@ -84,13 +84,13 @@ public class RedisServiceRegistry implements ServiceRegistry<RedisRegistration> 
                 TimeUnit.SECONDS.sleep(10);
             } catch (Exception e) {
                 if (!stopped) {
-                    logger.error(e.getMessage(), e);
+                    log.error(e.getMessage(), e);
 
                     try {
                         TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException ex) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(e.getMessage(), e);
+                        if (log.isTraceEnabled()) {
+                            log.trace(e.getMessage(), e);
                         }
                     }
                 }

@@ -99,7 +99,7 @@ import org.slf4j.LoggerFactory;
 @SuppressFBWarnings("PATH_TRAVERSAL_IN")
 public class ComponentInitOpenApiGenerator {
 
-    private static final Logger logger = LoggerFactory.getLogger(ComponentInitOpenApiGenerator.class);
+    private static final Logger log = LoggerFactory.getLogger(ComponentInitOpenApiGenerator.class);
 
     private static final ClassName AUTHORIZATION_CLASS_NAME = ClassName.get(
         "com.bytechef.component.definition", "Authorization");
@@ -207,7 +207,7 @@ public class ComponentInitOpenApiGenerator {
         if (result.getMessages() != null) {
             List<String> messages = result.getMessages();
 
-            messages.forEach(logger::error);
+            messages.forEach(log::error);
         }
 
         return openAPI;
@@ -512,8 +512,8 @@ public class ComponentInitOpenApiGenerator {
         try {
             return OBJECT_MAPPER.convertValue(fromValue, toValueType);
         } catch (IllegalArgumentException e1) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e1.getMessage(), e1);
+            if (log.isTraceEnabled()) {
+                log.trace(e1.getMessage(), e1);
             }
         }
 
@@ -1803,8 +1803,8 @@ public class ComponentInitOpenApiGenerator {
                 try {
                     jsonNode = OBJECT_MAPPER.readTree(string);
                 } catch (JsonProcessingException e) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(e.getMessage(), e);
+                    if (log.isTraceEnabled()) {
+                        log.trace(e.getMessage(), e);
                     }
                 }
 

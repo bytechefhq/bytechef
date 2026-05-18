@@ -80,7 +80,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  */
 public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(EmbeddedMcpToolFacade.class);
+    private static final Logger log = LoggerFactory.getLogger(EmbeddedMcpToolFacade.class);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -423,7 +423,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                     return callableResponse.output();
                 });
         } catch (IllegalArgumentException | ClassCastException exception) {
-            logger.warn(
+            log.warn(
                 "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
 
             return Optional.empty();

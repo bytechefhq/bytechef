@@ -41,7 +41,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Transactional
 class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentEvalRunFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentEvalRunFacadeImpl.class);
 
     private final AiAgentEvalRunExecutor agentEvalRunExecutor;
     private final AiAgentEvalRunService agentEvalRunService;
@@ -124,7 +124,7 @@ class AiAgentEvalRunFacadeImpl implements AiAgentEvalRunFacade {
         List<AiAgentEvalRun> orphanedRuns = agentEvalRunService.getAgentEvalRunsByStatus(AiAgentEvalRunStatus.RUNNING);
 
         for (AiAgentEvalRun orphanedRun : orphanedRuns) {
-            logger.warn("Recovering orphaned eval run {}: server restarted during execution", orphanedRun.getId());
+            log.warn("Recovering orphaned eval run {}: server restarted during execution", orphanedRun.getId());
 
             orphanedRun.setStatus(AiAgentEvalRunStatus.FAILED);
 
