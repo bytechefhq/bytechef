@@ -12,7 +12,6 @@ import {applicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {ReactQueryDevtools} from '@tanstack/react-query-devtools';
-import {init} from 'commandbar';
 import {StrictMode} from 'react';
 import {RouterProvider} from 'react-router-dom';
 
@@ -49,27 +48,30 @@ async function renderApp() {
         ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
         : getMainRouter(queryClient);
 
-    await applicationInfoStore.getState().getApplicationInfo();
+    if (!isEmbeddedWorkflowBuilder) {
+        await applicationInfoStore.getState().getApplicationInfo();
 
-    if (applicationInfoStore.getState().helpHub.enabled && applicationInfoStore.getState().helpHub.commandBar.orgId) {
-        init(applicationInfoStore.getState().helpHub.commandBar.orgId!);
-    }
+        const {helpHub, userGuiding} = applicationInfoStore.getState();
 
-    const {userGuiding} = applicationInfoStore.getState();
+        if (helpHub.enabled && helpHub.commandBar.orgId) {
+            const {init} = await import('commandbar');
 
-    if (userGuiding.enabled && userGuiding.containerId) {
-        initUserGuiding(userGuiding.containerId);
-    }
+            init(helpHub.commandBar.orgId);
+        }
 
-    if (
-        !isEmbeddedWorkflowBuilder &&
-        !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
-        !authenticationStore.getState().sessionHasBeenFetched
-    ) {
-        const result = await authenticationStore.getState().getAccount();
+        if (userGuiding.enabled && userGuiding.containerId) {
+            initUserGuiding(userGuiding.containerId);
+        }
 
-        if (!result && window.location.pathname !== '/login') {
-            window.location.pathname = '/login';
+        if (
+            !publicRoutes.find((publicRoute) => window.location.pathname.startsWith(publicRoute)) &&
+            !authenticationStore.getState().sessionHasBeenFetched
+        ) {
+            const result = await authenticationStore.getState().getAccount();
+
+            if (!result && window.location.pathname !== '/login') {
+                window.location.pathname = '/login';
+            }
         }
     }
 
