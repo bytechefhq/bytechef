@@ -136,6 +136,7 @@
         "@eslint/js": "10.0.1",
         "@graphql-codegen/cli": "^7.0.0",
         "@graphql-codegen/typescript": "^6.0.1",
+        "@graphql-codegen/typescript-operations": "5.1.0",
         "@graphql-codegen/typescript-react-query": "^7.0.1",
         "@lingui/babel-plugin-lingui-macro": "^6.0.1",
         "@lingui/cli": "^6.0.1",
