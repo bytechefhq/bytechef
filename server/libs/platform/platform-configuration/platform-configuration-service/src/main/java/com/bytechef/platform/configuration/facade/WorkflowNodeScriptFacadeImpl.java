@@ -56,7 +56,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowNodeScriptFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowNodeScriptFacadeImpl.class);
 
     private final List<CodeEditorScriptInputProvider> codeEditorScriptInputProviders;
     private final ConnectionService connectionService;
@@ -126,7 +126,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
                 sourceClusterElement.getComponentVersion(), sourceClusterElement.getClusterElementName(),
                 sourceInputParameters, sourceComponentConnection);
         } catch (Exception exception) {
-            logger.warn("Error getting script input from provider: {}", exception.getMessage(), exception);
+            log.warn("Error getting script input from provider: {}", exception.getMessage(), exception);
 
             return Map.of();
         }
@@ -137,8 +137,8 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
     public Map<String, Object> getWorkflowNodeScriptInput(
         String workflowId, String workflowNodeName, long environmentId) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "getWorkflowNodeScriptInput called with workflowId={}, workflowNodeName={}, environmentId={}",
                 workflowId, workflowNodeName, environmentId);
         }
@@ -147,8 +147,8 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
 
         WorkflowTask workflowTask = workflow.getTask(workflowNodeName);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Found workflow task: name={}, type={}", workflowTask.getName(), workflowTask.getType());
+        if (log.isDebugEnabled()) {
+            log.debug("Found workflow task: name={}, type={}", workflowTask.getName(), workflowTask.getType());
         }
 
         Map<String, ?> parameters = workflowTask.getParameters();
@@ -165,16 +165,16 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         Map<String, ?> outputs = workflowNodeOutputFacade.getPreviousWorkflowNodeSampleOutputs(
             workflowId, workflowNodeName, environmentId);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Context for evaluation - inputs: {}, outputs: {}", inputs, outputs);
+        if (log.isDebugEnabled()) {
+            log.debug("Context for evaluation - inputs: {}, outputs: {}", inputs, outputs);
         }
 
         Map<String, Object> evaluatedInput = evaluator.evaluate(
             (Map<String, Object>) inputMap,
             MapUtils.concat((Map<String, Object>) inputs, (Map<String, Object>) outputs));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Evaluated input: {}", evaluatedInput);
+        if (log.isDebugEnabled()) {
+            log.debug("Evaluated input: {}", evaluatedInput);
         }
 
         return evaluatedInput;
@@ -220,7 +220,7 @@ public class WorkflowNodeScriptFacadeImpl implements WorkflowNodeScriptFacade {
         try {
             workflowNodeTestOutput = testOutputSupplier.get();
         } catch (Exception exception) {
-            logger.warn(exception.getMessage(), exception);
+            log.warn(exception.getMessage(), exception);
 
             executionError = extractExecutionError(exception);
         }

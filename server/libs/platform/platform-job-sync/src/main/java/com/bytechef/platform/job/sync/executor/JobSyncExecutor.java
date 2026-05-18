@@ -101,7 +101,7 @@ import org.springframework.core.task.TaskExecutor;
  */
 public class JobSyncExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobSyncExecutor.class);
+    private static final Logger log = LoggerFactory.getLogger(JobSyncExecutor.class);
 
     private static final int NO_TIMEOUT = -1;
     private static final int UNLIMITED_TASK_EXECUTIONS = -1;
@@ -402,8 +402,8 @@ public class JobSyncExecutor {
             try {
                 listenerHandle.close();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -573,8 +573,8 @@ public class JobSyncExecutor {
         try {
             notifyErrorListeners(event);
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (log.isDebugEnabled()) {
+                log.debug(exception.getMessage(), exception);
             }
         }
 
@@ -583,12 +583,12 @@ public class JobSyncExecutor {
         try {
             taskExecutionErrorEventListener.onErrorEvent(event);
         } catch (IllegalStateException exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Error while handling ERROR_EVENTS in default listener", exception);
+            if (log.isTraceEnabled()) {
+                log.trace("Error while handling ERROR_EVENTS in default listener", exception);
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Error while handling ERROR_EVENTS in default listener (ignored in this context)", exception);
             }
         }
@@ -604,8 +604,8 @@ public class JobSyncExecutor {
         Job job = jobOptional.get();
 
         if (job.getStatus() != Job.Status.STARTED) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Skipping stop event for job id={} as it is already in status {}", event.getJobId(),
                     job.getStatus());
             }
@@ -626,8 +626,8 @@ public class JobSyncExecutor {
         try {
             taskCoordinator.onTaskExecutionCompleteEvent(event);
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Error while handling TASK_EXECUTION_COMPLETE_EVENTS in coordinator", exception);
             }
         }
@@ -648,8 +648,8 @@ public class JobSyncExecutor {
         Job job = jobService.getJob(jobId);
 
         if (job.getStatus() != Job.Status.STARTED) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Skipping task scheduling for non-STARTED job (status={}): {}", job.getStatus(), jobId);
+            if (log.isDebugEnabled()) {
+                log.debug("Skipping task scheduling for non-STARTED job (status={}): {}", job.getStatus(), jobId);
             }
 
             return;
@@ -673,8 +673,8 @@ public class JobSyncExecutor {
             String message =
                 "Task execution failed for job " + job.getId() + " but no error details are available.";
 
-            if (logger.isWarnEnabled()) {
-                logger.warn(
+            if (log.isWarnEnabled()) {
+                log.warn(
                     "Detected FAILED task execution without error details for jobId={}, taskExecutionId={}",
                     job.getId(), taskExecution.getId());
             }
@@ -691,8 +691,8 @@ public class JobSyncExecutor {
 
             String message = "Job " + job.getId() + " failed but no error details are available.";
 
-            if (logger.isWarnEnabled()) {
-                logger.warn("Detected FAILED job without error details for jobId={}", job.getId());
+            if (log.isWarnEnabled()) {
+                log.warn("Detected FAILED job without error details for jobId={}", job.getId());
             }
 
             throw new ExecutionException(message, JobErrorType.JOB_FAILED);
@@ -747,8 +747,8 @@ public class JobSyncExecutor {
                 jobId = Validate.notNull(taskExecution.getJobId(), "jobId");
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (log.isDebugEnabled()) {
+                log.debug(exception.getMessage(), exception);
             }
         }
 
@@ -766,8 +766,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (log.isDebugEnabled()) {
+                    log.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -785,8 +785,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(exception.getMessage(), exception);
+            if (log.isDebugEnabled()) {
+                log.debug(exception.getMessage(), exception);
             }
         }
 
@@ -804,8 +804,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (log.isDebugEnabled()) {
+                    log.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -822,8 +822,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (log.isDebugEnabled()) {
+                    log.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -840,8 +840,8 @@ public class JobSyncExecutor {
             try {
                 listener.accept(event);
             } catch (Exception exception) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(exception.getMessage(), exception);
+                if (log.isDebugEnabled()) {
+                    log.debug(exception.getMessage(), exception);
                 }
             }
         }
@@ -881,8 +881,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
 
@@ -895,8 +895,8 @@ public class JobSyncExecutor {
                 }
             }
         } catch (InterruptedException | TimeoutException exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage());
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage());
             }
 
             job.setStatus(Job.Status.FAILED);

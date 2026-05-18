@@ -664,7 +664,7 @@ class ContextImpl implements Context {
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
         private final @Nullable LogFileStorageWriter logFileStorageWriter;
-        private final org.slf4j.Logger logger;
+        private final org.slf4j.Logger log;
         private final long taskExecutionId;
 
         public LogImpl(
@@ -675,15 +675,15 @@ class ContextImpl implements Context {
             this.componentOperationName = componentOperationName;
             this.jobId = jobId;
             this.logFileStorageWriter = logFileStorageWriter;
-            this.logger = LoggerFactory.getLogger(
+            this.log = LoggerFactory.getLogger(
                 componentName + (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
         }
 
         @Override
         public void debug(String message) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(message);
+            if (log.isDebugEnabled()) {
+                log.debug(message);
             }
 
             storeLogEntry(LogEntry.Level.DEBUG, message, null);
@@ -691,8 +691,8 @@ class ContextImpl implements Context {
 
         @Override
         public void debug(String format, Object... args) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(format, args);
+            if (log.isDebugEnabled()) {
+                log.debug(format, args);
             }
 
             storeLogEntry(LogEntry.Level.DEBUG, formatMessage(format, args), null);
@@ -700,8 +700,8 @@ class ContextImpl implements Context {
 
         @Override
         public void debug(String message, Exception exception) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(message, exception);
+            if (log.isDebugEnabled()) {
+                log.debug(message, exception);
             }
 
             storeLogEntry(LogEntry.Level.DEBUG, message, exception);
@@ -709,8 +709,8 @@ class ContextImpl implements Context {
 
         @Override
         public void error(String message) {
-            if (logger.isErrorEnabled()) {
-                logger.error(message);
+            if (log.isErrorEnabled()) {
+                log.error(message);
             }
 
             storeLogEntry(LogEntry.Level.ERROR, message, null);
@@ -718,8 +718,8 @@ class ContextImpl implements Context {
 
         @Override
         public void error(String format, Object... args) {
-            if (logger.isErrorEnabled()) {
-                logger.error(format, args);
+            if (log.isErrorEnabled()) {
+                log.error(format, args);
             }
 
             storeLogEntry(LogEntry.Level.ERROR, formatMessage(format, args), null);
@@ -727,8 +727,8 @@ class ContextImpl implements Context {
 
         @Override
         public void error(String message, Exception exception) {
-            if (logger.isErrorEnabled()) {
-                logger.error(message, exception);
+            if (log.isErrorEnabled()) {
+                log.error(message, exception);
             }
 
             storeLogEntry(LogEntry.Level.ERROR, message, exception);
@@ -736,8 +736,8 @@ class ContextImpl implements Context {
 
         @Override
         public void info(String message) {
-            if (logger.isInfoEnabled()) {
-                logger.info(message);
+            if (log.isInfoEnabled()) {
+                log.info(message);
             }
 
             storeLogEntry(LogEntry.Level.INFO, message, null);
@@ -745,8 +745,8 @@ class ContextImpl implements Context {
 
         @Override
         public void info(String format, Object... args) {
-            if (logger.isInfoEnabled()) {
-                logger.info(format, args);
+            if (log.isInfoEnabled()) {
+                log.info(format, args);
             }
 
             storeLogEntry(LogEntry.Level.INFO, formatMessage(format, args), null);
@@ -754,8 +754,8 @@ class ContextImpl implements Context {
 
         @Override
         public void info(String message, Exception exception) {
-            if (logger.isInfoEnabled()) {
-                logger.info(message, exception);
+            if (log.isInfoEnabled()) {
+                log.info(message, exception);
             }
 
             storeLogEntry(LogEntry.Level.INFO, message, exception);
@@ -763,8 +763,8 @@ class ContextImpl implements Context {
 
         @Override
         public void warn(String message) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(message);
+            if (log.isWarnEnabled()) {
+                log.warn(message);
             }
 
             storeLogEntry(LogEntry.Level.WARN, message, null);
@@ -772,8 +772,8 @@ class ContextImpl implements Context {
 
         @Override
         public void warn(String format, Object... args) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(format, args);
+            if (log.isWarnEnabled()) {
+                log.warn(format, args);
             }
 
             storeLogEntry(LogEntry.Level.WARN, formatMessage(format, args), null);
@@ -781,8 +781,8 @@ class ContextImpl implements Context {
 
         @Override
         public void warn(String message, Exception exception) {
-            if (logger.isWarnEnabled()) {
-                logger.warn(message, exception);
+            if (log.isWarnEnabled()) {
+                log.warn(message, exception);
             }
 
             storeLogEntry(LogEntry.Level.WARN, message, exception);
@@ -790,8 +790,8 @@ class ContextImpl implements Context {
 
         @Override
         public void trace(String message) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(message);
+            if (log.isTraceEnabled()) {
+                log.trace(message);
             }
 
             storeLogEntry(LogEntry.Level.TRACE, message, null);
@@ -799,8 +799,8 @@ class ContextImpl implements Context {
 
         @Override
         public void trace(String format, Object... args) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(format, args);
+            if (log.isTraceEnabled()) {
+                log.trace(format, args);
             }
 
             storeLogEntry(LogEntry.Level.TRACE, formatMessage(format, args), null);
@@ -808,8 +808,8 @@ class ContextImpl implements Context {
 
         @Override
         public void trace(String message, Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(message, exception);
+            if (log.isTraceEnabled()) {
+                log.trace(message, exception);
             }
 
             storeLogEntry(LogEntry.Level.TRACE, message, exception);

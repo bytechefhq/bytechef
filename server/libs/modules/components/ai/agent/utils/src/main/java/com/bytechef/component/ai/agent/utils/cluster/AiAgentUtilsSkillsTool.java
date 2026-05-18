@@ -56,7 +56,7 @@ import org.springframework.ai.tool.ToolCallbackProvider;
  */
 public class AiAgentUtilsSkillsTool {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentUtilsSkillsTool.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentUtilsSkillsTool.class);
 
     private static final String SKILLS = "skills";
     private static final String SKILL_ID = "skillId";
@@ -108,7 +108,7 @@ public class AiAgentUtilsSkillsTool {
             if (skillId == null) {
                 String reason = "Unexpected null skill item in configuration";
 
-                logger.warn("{}, skipping", reason);
+                log.warn("{}, skipping", reason);
                 skippedSkillReasons.add(reason);
 
                 continue;
@@ -123,7 +123,7 @@ public class AiAgentUtilsSkillsTool {
             } catch (RuntimeException runtimeException) {
                 String reason = "Failed to load skill ID " + skillId + ": " + runtimeException.getMessage();
 
-                logger.warn(reason, runtimeException);
+                log.warn(reason, runtimeException);
                 skippedSkillReasons.add(reason);
             }
         }

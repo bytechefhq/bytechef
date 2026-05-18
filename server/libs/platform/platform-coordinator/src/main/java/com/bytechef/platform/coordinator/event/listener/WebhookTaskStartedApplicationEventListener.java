@@ -37,7 +37,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class WebhookTaskStartedApplicationEventListener implements ApplicationEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookTaskStartedApplicationEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookTaskStartedApplicationEventListener.class);
 
     private final JobService jobService;
 
@@ -56,7 +56,7 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
             Job job = jobService.getJob(jobId);
 
             if (job == null) {
-                logger.warn("Unknown job: {}", jobId);
+                log.warn("Unknown job: {}", jobId);
 
                 return;
             }
@@ -69,8 +69,8 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
 
                     rest.postForObject(webhook.url(), webhookEvent, String.class);
 
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Webhook url={}, type='{}' called", webhook.url(), webhook.type());
+                    if (log.isDebugEnabled()) {
+                        log.debug("Webhook url={}, type='{}' called", webhook.url(), webhook.type());
                     }
                 }
             }

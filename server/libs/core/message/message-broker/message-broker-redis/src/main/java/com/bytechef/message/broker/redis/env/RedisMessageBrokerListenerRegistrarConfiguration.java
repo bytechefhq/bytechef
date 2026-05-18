@@ -47,7 +47,7 @@ import org.springframework.data.redis.listener.adapter.MessageListenerAdapter;
 public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartInitializingSingleton, DisposableBean,
     MessageBrokerListenerRegistrar<RedisListenerEndpointRegistrar> {
 
-    private static final Logger logger = LoggerFactory.getLogger(
+    private static final Logger log = LoggerFactory.getLogger(
         RedisMessageBrokerListenerRegistrarConfiguration.class);
 
     private final List<MessageBrokerConfigurer<RedisListenerEndpointRegistrar>> messageBrokerConfigurers;
@@ -109,8 +109,8 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
 
         Class<?> delegateClass = delegate.getClass();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering Redis Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
         }
 
         if (messageRoute.isControlExchange()) {
@@ -128,14 +128,14 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
                 redisListenerEndpointRegistrar.stop();
             }
         } catch (Exception e) {
-            logger.warn("Failed to stop Redis listener endpoint registrar: {}", e.getMessage());
+            log.warn("Failed to stop Redis listener endpoint registrar: {}", e.getMessage());
         }
         try {
             if (redisMessageListenerContainer != null) {
                 redisMessageListenerContainer.stop();
             }
         } catch (Exception e) {
-            logger.warn("Failed to stop Redis message listener container: {}", e.getMessage());
+            log.warn("Failed to stop Redis message listener container: {}", e.getMessage());
         }
     }
 
@@ -146,14 +146,14 @@ public class RedisMessageBrokerListenerRegistrarConfiguration implements SmartIn
                 redisListenerEndpointRegistrar.start();
             }
         } catch (Exception e) {
-            logger.warn("Failed to start Redis listener endpoint registrar: {}", e.getMessage());
+            log.warn("Failed to start Redis listener endpoint registrar: {}", e.getMessage());
         }
         try {
             if (redisMessageListenerContainer != null) {
                 redisMessageListenerContainer.start();
             }
         } catch (Exception e) {
-            logger.warn("Failed to start Redis message listener container: {}", e.getMessage());
+            log.warn("Failed to start Redis message listener container: {}", e.getMessage());
         }
     }
 }

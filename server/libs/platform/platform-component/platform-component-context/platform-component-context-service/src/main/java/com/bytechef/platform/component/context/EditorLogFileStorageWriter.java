@@ -38,7 +38,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
 
     private static final String EDITOR_LOG_DIR = "editor/logs";
 
-    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
+    private static final Logger log = LoggerFactory.getLogger(EditorLogFileStorageWriter.class);
 
     private final ExecutorService asyncExecutor = Executors.newVirtualThreadPerTaskExecutor();
     private final FileStorageService fileStorageService;
@@ -64,7 +64,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
                 fileStorageService.deleteFile(EDITOR_LOG_DIR, fileEntry);
             }
         } catch (Exception exception) {
-            logger.warn("Failed to delete editor log entries for job {}", jobId, exception);
+            log.warn("Failed to delete editor log entries for job {}", jobId, exception);
         }
     }
 
@@ -88,7 +88,7 @@ public class EditorLogFileStorageWriter implements LogFileStorageWriter {
                 fileStorageService.storeFileContent(EDITOR_LOG_DIR, filename, logLineBytes, false);
             }
         } catch (Exception exception) {
-            logger.error("Failed to append log entry for job {}", jobId, exception);
+            log.error("Failed to append log entry for job {}", jobId, exception);
         }
     }
 }

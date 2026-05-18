@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SseStreamApplicationEventListener implements ApplicationEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(SseStreamApplicationEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(SseStreamApplicationEventListener.class);
 
     private final MessageBroker messageBroker;
 
@@ -63,8 +63,8 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }
@@ -84,8 +84,8 @@ public class SseStreamApplicationEventListener implements ApplicationEventListen
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }

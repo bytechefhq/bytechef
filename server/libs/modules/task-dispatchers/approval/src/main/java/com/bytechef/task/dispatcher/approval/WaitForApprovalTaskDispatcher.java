@@ -40,7 +40,7 @@ import org.springframework.context.ApplicationEventPublisher;
 @Deprecated
 public class WaitForApprovalTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(WaitForApprovalTaskDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(WaitForApprovalTaskDispatcher.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
@@ -69,8 +69,8 @@ public class WaitForApprovalTaskDispatcher implements TaskDispatcher<TaskExecuti
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Wait for Approval task execution completed: {}", taskExecution);
+        if (log.isDebugEnabled()) {
+            log.debug("Wait for Approval task execution completed: {}", taskExecution);
         }
     }
 

@@ -36,7 +36,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public final class KnowledgeBaseVectorStoreMetadataService {
 
-    private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseVectorStoreMetadataService.class);
+    private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseVectorStoreMetadataService.class);
     private static final Pattern SAFE_TABLE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.]*$");
 
     private final JdbcTemplate pgVectorJdbcTemplate;
@@ -72,7 +72,7 @@ public final class KnowledgeBaseVectorStoreMetadataService {
             String.class, vectorStoreId);
 
         if (rows.isEmpty()) {
-            logger.warn("Vector store entry not found for id={}, skipping tag metadata update", vectorStoreId);
+            log.warn("Vector store entry not found for id={}, skipping tag metadata update", vectorStoreId);
 
             return;
         }

@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
  */
 class SseEmitter implements SseEmitterHandler.SseEmitter {
 
-    private static final Logger logger = LoggerFactory.getLogger(SseEmitter.class);
+    private static final Logger log = LoggerFactory.getLogger(SseEmitter.class);
 
     private final CopyOnWriteArrayList<Consumer<Object>> eventListeners = new CopyOnWriteArrayList<>();
 
@@ -67,8 +67,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 callback.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -81,8 +81,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 consumer.accept(Objects.requireNonNull(lastError));
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -95,8 +95,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -116,8 +116,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -136,8 +136,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 listener.accept(throwable);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -155,8 +155,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 listener.accept(object);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -169,8 +169,8 @@ class SseEmitter implements SseEmitterHandler.SseEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }

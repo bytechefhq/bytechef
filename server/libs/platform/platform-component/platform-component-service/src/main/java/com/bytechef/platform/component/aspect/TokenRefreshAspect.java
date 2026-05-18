@@ -50,7 +50,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TokenRefreshAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(TokenRefreshAspect.class);
+    private static final Logger log = LoggerFactory.getLogger(TokenRefreshAspect.class);
 
     private final ContextFactory contextFactory;
     private final TokenRefreshHandler tokenRefreshHandler;
@@ -107,8 +107,8 @@ public class TokenRefreshAspect {
             throw wrapException(exception, withTokenRefresh);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Token refresh triggered for component {} due to exception: {}",
                 componentName, exception.getMessage());
         }
@@ -120,8 +120,8 @@ public class TokenRefreshAspect {
 
         Object[] updatedArgs = updateArgsWithRefreshedConnection(args, parameters, refreshedConnection);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Retrying method {} with refreshed credentials", method.getName());
+        if (log.isDebugEnabled()) {
+            log.debug("Retrying method {} with refreshed credentials", method.getName());
         }
 
         try {
@@ -267,7 +267,7 @@ public class TokenRefreshAspect {
 
             return (ErrorType) field.get(null);
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            logger.warn("Could not get error type from {} field {}", errorTypeClass.getName(), errorTypeField, e);
+            log.warn("Could not get error type from {} field {}", errorTypeClass.getName(), errorTypeField, e);
 
             return null;
         }

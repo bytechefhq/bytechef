@@ -44,7 +44,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
  */
 public class S3Constants {
 
-    private static final Logger logger = LoggerFactory.getLogger(S3Constants.class);
+    private static final Logger log = LoggerFactory.getLogger(S3Constants.class);
 
     public static final String ACCESS_KEY_ID = "accessKeyId";
     public static final String BUCKET_NAME = "bucketName";
@@ -117,7 +117,7 @@ public class S3Constants {
 
                     vectorStore.load(tempFile);
                 } catch (NoSuchKeyException e) {
-                    logger.debug("No existing vector store data found in S3 at {}/{}, starting with empty store",
+                    log.debug("No existing vector store data found in S3 at {}/{}, starting with empty store",
                         bucketName, key);
                 } finally {
                     Files.delete(tempFile.toPath());
