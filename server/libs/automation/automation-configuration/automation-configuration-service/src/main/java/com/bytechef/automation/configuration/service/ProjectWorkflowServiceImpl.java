@@ -153,6 +153,13 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
     }
 
     @Override
+    public Optional<String> fetchProjectWorkflowWorkflowId(long projectDeploymentId, String workflowUuid) {
+        return projectWorkflowRepository
+            .findByProjectDeploymentIdAndUuid(projectDeploymentId, UUID.fromString(workflowUuid))
+            .map(ProjectWorkflow::getWorkflowId);
+    }
+
+    @Override
     public String getProjectWorkflowUuid(long projectDeploymentId, String workflowId) {
         return projectWorkflowRepository
             .findByProjectDeploymentIdAndWorkflowId(projectDeploymentId, workflowId)
