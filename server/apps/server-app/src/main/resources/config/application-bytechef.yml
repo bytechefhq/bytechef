@@ -115,6 +115,7 @@ bytechef:
   tenant:
     mode: single
   user-guiding:
+    container-id: 38U111210PF6ID
     enabled: false
   upgrade:
     enabled: true
