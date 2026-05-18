@@ -83,7 +83,7 @@ import org.springframework.util.Assert;
 @Transactional
 public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
@@ -803,7 +803,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
                     triggerWorkflowNodeType.name(), triggerWorkflowNodeType.version(),
                     Objects.requireNonNull(triggerWorkflowNodeType.operation()));
             } catch (Exception exception) {
-                logger.error(
+                log.error(
                     "Failed to get trigger definition for workflow trigger type={}",
                     triggerWorkflowNodeType.name(),
                     exception);

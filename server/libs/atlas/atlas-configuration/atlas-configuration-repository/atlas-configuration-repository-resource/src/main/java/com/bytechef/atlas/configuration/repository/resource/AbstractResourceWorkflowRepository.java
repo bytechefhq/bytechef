@@ -41,7 +41,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
  */
 public abstract class AbstractResourceWorkflowRepository implements WorkflowRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractResourceWorkflowRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractResourceWorkflowRepository.class);
 
     private final String locationPattern;
     private final String protocol;
@@ -100,8 +100,8 @@ public abstract class AbstractResourceWorkflowRepository implements WorkflowRepo
         try {
             return WorkflowReader.readWorkflow(workflowResource);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage());
             }
         }
 

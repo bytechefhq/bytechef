@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskTools.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskTools.class);
 
     private static final String INVALID_TASK_TYPE =
         "Invalid task type. Must be 'action', 'trigger', 'taskDispatcher', or 'clusterElement'";
@@ -126,7 +126,7 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error("getTask({}, {}, {}, {}): Failed to get task '{}' of type '{}'", type, name, componentName,
+            log.error("getTask({}, {}, {}, {}): Failed to get task '{}' of type '{}'", type, name, componentName,
                 version, name, type, e);
 
             throw new ExecutionException(FAILED_TO_GET_TASK, e, TaskToolErrorType.GET_TASK);
@@ -155,7 +155,7 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskProperties({}, {}, {}, {}): Failed to get properties for task '{}' of type '{}'", type, name,
                 componentName, version, name, type, e);
 
@@ -186,7 +186,7 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskOutputProperty({}, {}, {}, {}): Failed to get output property for task '{}' of type '{}'",
                 type, name, componentName, version, name, type, e);
             throw e;
@@ -220,7 +220,7 @@ public class TaskTools {
                 default -> throw new IllegalArgumentException(INVALID_TASK_TYPE);
             };
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskDefinition({}, {}, {}, {}): Failed to get definition for task '{}' of type '{}'", type, name,
                 componentName, version, name, type, e);
 
@@ -308,11 +308,11 @@ public class TaskTools {
                 allTasks = allTasks.subList(0, limit);
             }
 
-            if (logger.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 String typeFilter = normalizedType != null ? " (filtered by type: " + normalizedType + ")" : "";
                 String limitInfo = limit != null ? " (limited to " + limit + ")" : "";
 
-                logger.debug(
+                log.debug(
                     "listTasks({}, {}): Found {} total tasks{}{} ({} actions, {} triggers, {} taskDispatchers)",
                     type, limit, allTasks.size(), typeFilter, limitInfo, actionsCount, triggersCount,
                     taskDispatchersCount);
@@ -320,7 +320,7 @@ public class TaskTools {
 
             return allTasks;
         } catch (Exception e) {
-            logger.error("listTasks({}, {}): " + FAILED_TO_LIST_TASKS, type, limit, e);
+            log.error("listTasks({}, {}): " + FAILED_TO_LIST_TASKS, type, limit, e);
 
             throw new ExecutionException(FAILED_TO_LIST_TASKS, e, TaskToolErrorType.LIST_TASKS);
         }
@@ -393,11 +393,11 @@ public class TaskTools {
                 matchingTasks = matchingTasks.subList(0, effectiveLimit);
             }
 
-            if (logger.isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 String typeFilter = normalizedType != null ? " (filtered by type: " + normalizedType + ")" : "";
                 String limitInfo = " (limited to " + effectiveLimit + ")";
 
-                logger.debug(
+                log.debug(
                     "searchTasks({}, {}, {}): Found {} tasks matching query '{}'{}{} ({} actions, {} triggers, {} taskDispatchers)",
                     query, type, limit, matchingTasks.size(), query, typeFilter, limitInfo, actionsCount,
                     triggersCount, taskDispatchersCount);
@@ -405,7 +405,7 @@ public class TaskTools {
 
             return matchingTasks;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "searchTasks({}, {}, {}): Failed to search tasks with query '{}'", query, type, limit, query, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_TASKS, e, TaskToolErrorType.SEARCH_TASKS);
@@ -442,8 +442,8 @@ public class TaskTools {
                 .trim();
             boolean isValid = errorMessages.equals("[]");
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "validateTask({}, {}, {}, {}): Validated task '{}' of type '{}'. Valid: {}, Errors: {}, Warnings: {}",
                     type, name, componentName, version, name, type, isValid, errorMessages, warningMessages);
             }
@@ -451,7 +451,7 @@ public class TaskTools {
             return new TaskValidationResult(isValid, errorMessages, warningMessages);
 
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "validateTask({}, {}, {}, {}): Failed to validate task '{}' of type '{}'", type, name, componentName,
                 version, name, type, e);
 

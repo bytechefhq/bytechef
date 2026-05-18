@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
 @Transactional
 public class WorkflowServiceImpl implements WorkflowService {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowServiceImpl.class);
 
     private static final String WORKFLOW_CACHE = WorkflowService.class.getName() + ".workflow";
     private static final String WORKFLOWS_CACHE = WorkflowService.class.getName() + ".workflows";
@@ -163,7 +163,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     return Optional.of(workflow);
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
 
@@ -235,7 +235,7 @@ public class WorkflowServiceImpl implements WorkflowService {
                     workflow.setSourceType(workflowRepository.getSourceType());
                 }
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
 

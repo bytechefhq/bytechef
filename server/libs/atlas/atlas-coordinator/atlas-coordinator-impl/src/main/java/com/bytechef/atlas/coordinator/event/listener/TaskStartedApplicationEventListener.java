@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TaskStartedApplicationEventListener implements ApplicationEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskStartedApplicationEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskStartedApplicationEventListener.class);
 
     private final TaskExecutionService taskExecutionService;
     private final TaskDispatcher<? super Task> taskDispatcher;
@@ -63,8 +63,8 @@ public class TaskStartedApplicationEventListener implements ApplicationEventList
 
             TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Task id={}, name='{}', type='{}' started", taskExecution.getId(), taskExecution.getName(),
                     taskExecution.getType());
             }

@@ -53,7 +53,7 @@ import org.springframework.util.Assert;
  */
 public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultTaskCompletionHandler.class);
 
     private final ContextService contextService;
     private final Evaluator evaluator;
@@ -90,14 +90,14 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         Assert.notNull(taskExecution, "'taskExecution' must not be null");
         Assert.notNull(taskExecution.getId(), "'taskExecution.id' must not be null");
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("handle: taskExecution={}", taskExecution);
+        if (log.isTraceEnabled()) {
+            log.trace("handle: taskExecution={}", taskExecution);
         }
 
         Job job = jobService.getTaskExecutionJob(Validate.notNull(taskExecution.getId(), "id"));
 
         if (job == null) {
-            logger.error("Unknown job id={}", taskExecution.getJobId());
+            log.error("Unknown job id={}", taskExecution.getJobId());
         } else {
             taskExecution.setStatus(Status.COMPLETED);
 
@@ -124,7 +124,7 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
                 jobId, Context.Classname.JOB,
                 taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
 
-            logger.debug(
+            log.debug(
                 "Task id={}, type='{}', name='{}' completed", taskExecution.getId(), taskExecution.getType(), name);
 
             if (hasMoreTasks(job)) {
@@ -142,8 +142,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
     private void complete(Job job) {
         Assert.notNull(job, "'job' must not be null");
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("complete: job={}", job);
+        if (log.isTraceEnabled()) {
+            log.trace("complete: job={}", job);
         }
 
         Map<String, ?> context = taskFileStorage.readContextValue(
@@ -164,8 +164,8 @@ public class DefaultTaskCompletionHandler implements TaskCompletionHandler {
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Validate.notNull(job.getId(), "id"), job.getStatus()));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' completed", job.getId(), job.getLabel());
         }
     }
 

@@ -34,7 +34,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(DefaultTaskDispatcher.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors;
@@ -55,15 +55,15 @@ public class DefaultTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         taskExecution = preProcess(taskExecution);
 
         if (taskExecution.getStatus() == TaskExecution.Status.CANCELLED) {
-            logger.debug("Task id={} is not eligible for dispatching", taskExecution.getId());
+            log.debug("Task id={} is not eligible for dispatching", taskExecution.getId());
 
             return;
         }
 
         TaskWorkerMessageRoute messageRoute = calculateQueueName(taskExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Task id={}, type='{}' sent to route='{}'", taskExecution.getId(), taskExecution.getType(),
                 messageRoute);
         }

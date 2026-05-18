@@ -47,7 +47,7 @@ import org.springframework.util.Assert;
  */
 public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskExecutionErrorEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskExecutionErrorEventListener.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final ContextService contextService;
@@ -79,7 +79,7 @@ public class TaskExecutionErrorEventListener implements ErrorEventListener {
 
             Assert.notNull(error, "'error' must not be null");
 
-            logger.error(
+            log.error(
                 "Task id={}: message={}\nstackTrace={}", taskExecution.getId(), error.getMessage(),
                 error.getStackTrace());
 

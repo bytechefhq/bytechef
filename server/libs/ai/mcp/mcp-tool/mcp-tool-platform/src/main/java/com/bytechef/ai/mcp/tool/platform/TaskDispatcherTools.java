@@ -43,7 +43,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskDispatcherTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskDispatcherTools.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskDispatcherTools.class);
 
     private static final String FAILED_TO_LIST_TASK_DISPATCHERS = "Failed to list task dispatchers";
     private static final String FAILED_TO_GET_TASK_DISPATCHER = "Failed to get task dispatcher";
@@ -74,8 +74,8 @@ public class TaskDispatcherTools {
             List<TaskDispatcherDefinition> taskDispatcherDefinitions =
                 taskDispatcherDefinitionService.getTaskDispatcherDefinitions();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("listTaskDispatchers(): Found {} task dispatchers", taskDispatcherDefinitions.size());
+            if (log.isDebugEnabled()) {
+                log.debug("listTaskDispatchers(): Found {} task dispatchers", taskDispatcherDefinitions.size());
             }
 
             return taskDispatcherDefinitions.stream()
@@ -86,7 +86,7 @@ public class TaskDispatcherTools {
                     taskDispatcherDefinition.getVersion()))
                 .toList();
         } catch (Exception e) {
-            logger.error("listTaskDispatchers(): " + FAILED_TO_LIST_TASK_DISPATCHERS, e);
+            log.error("listTaskDispatchers(): " + FAILED_TO_LIST_TASK_DISPATCHERS, e);
 
             throw new ExecutionException(
                 FAILED_TO_LIST_TASK_DISPATCHERS, e, TaskDispatcherToolErrorType.LIST_TASK_DISPATCHERS);
@@ -103,8 +103,8 @@ public class TaskDispatcherTools {
             TaskDispatcherDefinition taskDispatcherDefinition =
                 taskDispatcherDefinitionService.getTaskDispatcherDefinition(name, version);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getTaskDispatcher({}, {}): Retrieved task dispatcher {}", name, version, name);
+            if (log.isDebugEnabled()) {
+                log.debug("getTaskDispatcher({}, {}): Retrieved task dispatcher {}", name, version, name);
             }
 
             List<Property> properties = new ArrayList<>(taskDispatcherDefinition.getProperties());
@@ -126,7 +126,7 @@ public class TaskDispatcherTools {
                 taskDispatcherDefinition.getName(), taskDispatcherDefinition.getDescription(),
                 taskDispatcherDefinition.getTitle(), type, propertiesJSON, outputPropertiesJson);
         } catch (Exception e) {
-            logger.error("getTaskDispatcher({}, {}): Failed to get task dispatcher {}", name, version, name, e);
+            log.error("getTaskDispatcher({}, {}): Failed to get task dispatcher {}", name, version, name, e);
 
             throw new ExecutionException(
                 FAILED_TO_GET_TASK_DISPATCHER, e, TaskDispatcherToolErrorType.GET_TASK_DISPATCHER);
@@ -159,15 +159,15 @@ public class TaskDispatcherTools {
                 return null;
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getTaskDispatcherOutput({}, {}): Retrieved output properties for task dispatcher '{}'", name,
                     version, name);
             }
 
             return ToolUtils.convertToPropertyInfo(outputResponse.outputSchema());
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskDispatcherOutput({}, {}): Failed to get output properties for task dispatcher '{}'", name,
                 version, name, e);
 
@@ -189,8 +189,8 @@ public class TaskDispatcherTools {
             List<? extends BaseProperty> properties = taskDispatcherDefinition.getProperties();
             List<? extends BaseProperty> taskProperties = taskDispatcherDefinition.getTaskProperties();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getTaskDispatcherProperties({}, {}): Retrieved {} properties for task dispatcher '{}'", name,
                     version, properties.size(), name);
             }
@@ -201,7 +201,7 @@ public class TaskDispatcherTools {
 
             return propertyInfos;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskDispatcherProperties({}, {}): Failed to get properties for task dispatcher '{}'", name, version,
                 name, e);
 
@@ -235,15 +235,15 @@ public class TaskDispatcherTools {
                     td1.name(), td1.description(), null, td2.name(), td2.description(), null, lowerQuery))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "searchTaskDispatchers({}): Found {} task dispatchers matching query '{}'", query,
                     matchingTaskDispatchers.size(), query);
             }
 
             return matchingTaskDispatchers;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "searchTaskDispatchers({}): Failed to search task dispatchers with query '{}'", query, query, e);
 
             throw new ExecutionException(
@@ -274,15 +274,15 @@ public class TaskDispatcherTools {
                 .replace("{taskDispatcherVersion}", String.valueOf(taskDispatcherDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getTaskDispatcherDefinition({}, {}): Generated task dispatcher definition for {}", name, version,
                     name);
             }
 
             return taskDispatcherDefinitionString;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTaskDispatcherDefinition({}, {}): Failed to generate task dispatcher definition for '{}'", name,
                 version, name, e);
 
