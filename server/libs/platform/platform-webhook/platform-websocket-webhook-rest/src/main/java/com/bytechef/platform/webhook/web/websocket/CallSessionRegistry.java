@@ -36,7 +36,7 @@ import org.springframework.web.socket.WebSocketSession;
 @Component
 public class CallSessionRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger(CallSessionRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(CallSessionRegistry.class);
 
     private final Cache<String, CallSession> callSessions;
     private final Cache<String, WebSocketSession> webSocketSessions;
@@ -64,7 +64,7 @@ public class CallSessionRegistry {
      */
     public CallSession registerPendingCall(String callReference, String subWorkflowId, Long actionJobId) {
         if (callReference == null) {
-            logger.warn("Cannot register pending call with null callReference");
+            log.warn("Cannot register pending call with null callReference");
 
             return null;
         }
@@ -78,8 +78,8 @@ public class CallSessionRegistry {
 
         callSessions.put(callReference, callSession);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Registered pending call session: callReference={}, subWorkflowId={}, actionJobId={}",
                 StringUtils.sanitize(callReference), subWorkflowId, actionJobId);
         }
@@ -105,8 +105,8 @@ public class CallSessionRegistry {
             callSessions.invalidate(callReference);
             callSessions.put(callSid, callSession);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Updated call session with real callSid: callReference={}, callSid={}",
                     StringUtils.sanitize(callReference), StringUtils.sanitize(callSid));
             }
@@ -122,7 +122,7 @@ public class CallSessionRegistry {
      */
     public void registerSession(String callSid, WebSocketSession session, CallMetadata metadata) {
         if (callSid == null || session == null) {
-            logger.warn("Cannot register session with null callSid or session");
+            log.warn("Cannot register session with null callSid or session");
 
             return;
         }
@@ -132,8 +132,8 @@ public class CallSessionRegistry {
         callSessions.put(callSid, callSession);
         webSocketSessions.put(session.getId(), session);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Registered call session: callSid={}, sessionId={}", StringUtils.sanitize(callSid),
                 session.getId());
         }
@@ -197,21 +197,21 @@ public class CallSessionRegistry {
         if (callSession != null) {
             callSession.setCallStatus(callStatus);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Updated call status: callSid={}, status={}", StringUtils.sanitize(callSid),
                     StringUtils.sanitize(callStatus));
             }
 
-            if (logger.isDebugEnabled() &&
+            if (log.isDebugEnabled() &&
                 ("completed".equalsIgnoreCase(callStatus) || "failed".equalsIgnoreCase(callStatus) ||
                     "busy".equalsIgnoreCase(callStatus) || "no-answer".equalsIgnoreCase(callStatus))) {
 
-                logger.debug(
+                log.debug(
                     "Call ended, will remove session after expiry: callSid={}", StringUtils.sanitize(callSid));
             }
         } else {
-            logger.warn("Call session not found for status update: callSid={}", StringUtils.sanitize(callSid));
+            log.warn("Call session not found for status update: callSid={}", StringUtils.sanitize(callSid));
         }
     }
 
@@ -233,8 +233,8 @@ public class CallSessionRegistry {
 
         callSessions.invalidate(callSid);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Removed call session: callSid={}", StringUtils.sanitize(callSid));
+        if (log.isDebugEnabled()) {
+            log.debug("Removed call session: callSid={}", StringUtils.sanitize(callSid));
         }
     }
 
@@ -250,8 +250,8 @@ public class CallSessionRegistry {
 
         webSocketSessions.invalidate(sessionId);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Removed WebSocket session: sessionId={}", sessionId);
+        if (log.isDebugEnabled()) {
+            log.debug("Removed WebSocket session: sessionId={}", sessionId);
         }
     }
 

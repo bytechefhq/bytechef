@@ -66,7 +66,7 @@ import tools.jackson.databind.ObjectMapper;
 @Component
 public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookWebSocketHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookWebSocketHandler.class);
     private static final int MAX_PENDING_EVENTS = 100;
     private static final String WEBSOCKET_TASKS = "websocketTasks";
 
@@ -125,14 +125,14 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         String sessionKey = session.getId();
         String callSid = extractCallSid(uri);
 
-        logger.info(
+        log.info(
             "WebSocket connection established for webhook: {}, sessionId: {}, callSid: {}",
             webhookId, sessionKey, callSid);
 
         if (callSid != null) {
 
             if (callSessionRegistry.hasSession(callSid)) {
-                logger.info("Reusing existing session for callSid: {}", callSid);
+                log.info("Reusing existing session for callSid: {}", callSid);
 
                 Optional<CallSessionRegistry.CallSession> existingSessionOpt = callSessionRegistry.getSessionByCallSid(
                     callSid);
@@ -148,7 +148,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                         WebSocketSession existingWebSocketSession = existingWebSocketSessionOpt.get();
 
-                        logger.info(
+                        log.info(
                             "Existing session is still open, reusing: callSid={}, existingSessionId={}", callSid,
                             existingWebSocketSession.getId());
 
@@ -165,7 +165,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                         return;
                     } else {
-                        logger.info("Existing session is closed, creating new session: callSid={}", callSid);
+                        log.info("Existing session is closed, creating new session: callSid={}", callSid);
 
                         callSessionRegistry.removeSessionByCallSid(callSid);
                     }
@@ -199,8 +199,8 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         String sessionKey = session.getId();
         String payload = message.getPayload();
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Webhook WS inbound: sessionId={}, payload={}", sessionKey, payload);
+        if (log.isDebugEnabled()) {
+            log.debug("Webhook WS inbound: sessionId={}, payload={}", sessionKey, payload);
         }
 
         try {
@@ -218,7 +218,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                 sendMessage(session, ack);
             }
         } catch (Exception exception) {
-            logger.error("Error processing WebSocket message", exception);
+            log.error("Error processing WebSocket message", exception);
 
             Map<String, Object> error = new LinkedHashMap<>();
             error.put("event", "error");
@@ -232,7 +232,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         String sessionKey = session.getId();
 
-        logger.info("WebSocket connection closed: sessionId={}, status={}", sessionKey, status);
+        log.info("WebSocket connection closed: sessionId={}, status={}", sessionKey, status);
 
         String callSid = sessionIdToCallSid.getIfPresent(sessionKey);
 
@@ -244,7 +244,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                 CallSessionRegistry.CallSession callSession = callSessionOpt.get();
 
                 if (callSession.isSignalCompletionOnClose()) {
-                    logger.info(
+                    log.info(
                         "Signaling workflow completion on WebSocket close: callSid={}", callSid);
 
                     Long subJobId = callSession.getSubJobId();
@@ -253,7 +253,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                         try {
                             jobFacade.stopJob(subJobId);
                         } catch (Exception exception) {
-                            logger.warn(
+                            log.warn(
                                 "Failed to stop sub-workflow on WebSocket close: callSid={}, subJobId={}",
                                 callSid, subJobId, exception);
                         }
@@ -320,7 +320,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
             webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest, streamBridge);
         } catch (Exception exception) {
-            logger.error("Error executing workflow", exception);
+            log.error("Error executing workflow", exception);
 
             Map<String, Object> error = new LinkedHashMap<>();
             error.put("event", "error");
@@ -339,7 +339,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         Optional<CallSessionRegistry.CallSession> callSessionOpt = callSessionRegistry.getSessionByCallSid(callSid);
 
         if (callSessionOpt.isEmpty()) {
-            logger.warn("Cannot start websocket subflow: no session found for callSid={}", callSid);
+            log.warn("Cannot start websocket subflow: no session found for callSid={}", callSid);
 
             return;
         }
@@ -355,13 +355,13 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                 String websocketSubflowDefinition = getWebsocketSubflowDefinition(workflowExecutionId);
 
                 if (websocketSubflowDefinition == null || websocketSubflowDefinition.isBlank()) {
-                    logger.warn(
+                    log.warn(
                         "No websocket subflow definition found in trigger for callSid={}", callSid);
 
                     return;
                 }
 
-                logger.info("Starting websocket subflow: callSid={}", callSid);
+                log.info("Starting websocket subflow: callSid={}", callSid);
 
                 Workflow subflowWorkflow = workflowService.create(
                     websocketSubflowDefinition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
@@ -377,10 +377,10 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
                 callSession.setSubJobId(subJobId);
 
-                logger.info(
+                log.info(
                     "Websocket subflow started: callSid={}, subJobId={}", callSid, subJobId);
             } catch (Exception exception) {
-                logger.error("Failed to start websocket subflow: callSid={}", callSid, exception);
+                log.error("Failed to start websocket subflow: callSid={}", callSid, exception);
             }
         });
     }
@@ -442,11 +442,11 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
 
             session.sendMessage(new TextMessage(json));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Sent WebSocket message: sessionId={}, event={}", session.getId(), data.get("event"));
+            if (log.isDebugEnabled()) {
+                log.debug("Sent WebSocket message: sessionId={}, event={}", session.getId(), data.get("event"));
             }
         } catch (IOException ioException) {
-            logger.error("Failed to send WebSocket message to session: {}", session.getId(), ioException);
+            log.error("Failed to send WebSocket message to session: {}", session.getId(), ioException);
         }
     }
 
@@ -506,8 +506,8 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
         try {
             handle.close();
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Failed to close handle", exception);
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to close handle", exception);
             }
         }
     }
@@ -566,7 +566,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                     try {
                         session.close(CloseStatus.NORMAL);
                     } catch (IOException ioException) {
-                        logger.error("Error closing WebSocket session: {}", sessionKey, ioException);
+                        log.error("Error closing WebSocket session: {}", sessionKey, ioException);
                     }
                 }
 
@@ -611,7 +611,7 @@ public class WebhookWebSocketHandler extends TextWebSocketHandler {
                 try {
                     session.close(CloseStatus.SERVER_ERROR);
                 } catch (IOException ioException) {
-                    logger.error("Error closing WebSocket session: {}", sessionKey, ioException);
+                    log.error("Error closing WebSocket session: {}", sessionKey, ioException);
                 }
             }
 

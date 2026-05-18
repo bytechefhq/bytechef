@@ -63,7 +63,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @ConditionalOnCoordinator
 public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookTriggerController.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookTriggerController.class);
 
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
@@ -207,8 +207,8 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                     .name(name)
                     .data(data instanceof String ? JsonUtils.write(data) : data));
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }
@@ -261,8 +261,8 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
             try {
                 emitter.complete();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -279,8 +279,8 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                 try {
                     emitter.complete();
                 } catch (Exception exception) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(exception.getMessage(), exception);
+                    if (log.isTraceEnabled()) {
+                        log.trace(exception.getMessage(), exception);
                     }
                 }
             }
