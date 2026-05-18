@@ -22,6 +22,14 @@ import {useForm} from 'react-hook-form';
 
 const MonacoEditor = lazy(() => import('@/shared/components/MonacoEditorWrapper'));
 
+const EXAMPLE_SCHEMA = `{
+  "userId": "12345",
+  "email": "user@example.com",
+  "name": "John Doe",
+  "eventType": "user.signed_up",
+  "timestamp": "2026-05-18T10:00:00Z"
+}`;
+
 interface AppEventDialogProps {
     appEvent?: AppEvent;
     onClose?: () => void;
@@ -34,7 +42,7 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
     const form = useForm({
         defaultValues: {
             name: appEvent?.name || '',
-            schema: appEvent?.schema || '',
+            schema: appEvent?.schema || EXAMPLE_SCHEMA,
         } as AppEvent,
     });
 
@@ -150,7 +158,7 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
                                                         tabSize: 2,
                                                         wordWrap: 'on',
                                                     }}
-                                                    value={field.value || '{}'}
+                                                    value={field.value}
                                                 />
                                             </Suspense>
                                         </div>
