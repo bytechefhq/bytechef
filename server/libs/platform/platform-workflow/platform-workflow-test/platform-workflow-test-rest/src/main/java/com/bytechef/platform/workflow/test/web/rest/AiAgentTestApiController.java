@@ -52,7 +52,7 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 @ConditionalOnCoordinator
 class AiAgentTestApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentTestApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentTestApiController.class);
 
     private final Cache<String, SseEmitter> activeTests = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -114,7 +114,7 @@ class AiAgentTestApiController {
                     completeEmitter(sseEmitter, testId);
                 }
             } catch (Exception exception) {
-                logger.warn(
+                log.warn(
                     "AI agent test failed for workflow '{}', node '{}': {}",
                     StringUtils.sanitize(aiAgentTestRequest.workflowId()),
                     StringUtils.sanitize(aiAgentTestRequest.workflowNodeName()),
@@ -167,8 +167,8 @@ class AiAgentTestApiController {
         try {
             sseEmitter.complete();
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }
@@ -180,8 +180,8 @@ class AiAgentTestApiController {
                     .name(name)
                     .data(data instanceof String ? JsonUtils.write(data) : data));
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Failed to send SSE '{}' event: {}", name, exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace("Failed to send SSE '{}' event: {}", name, exception.getMessage(), exception);
             }
         }
     }
@@ -258,8 +258,8 @@ class AiAgentTestApiController {
 
                 eventData.remove("__eventType");
 
-                if (logger.isTraceEnabled()) {
-                    logger.trace("Sending tool_execution SSE event: toolName={}", eventData.get("toolName"));
+                if (log.isTraceEnabled()) {
+                    log.trace("Sending tool_execution SSE event: toolName={}", eventData.get("toolName"));
                 }
 
                 sendEvent(springSseEmitter, "tool_execution", eventData);

@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerDispatcher {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerDispatcher.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final List<TriggerDispatcherPreSendProcessor> triggerDispatcherPreSendProcessors;
@@ -49,8 +49,8 @@ public class TriggerDispatcher {
     public void dispatch(TriggerExecution triggerExecution) {
         triggerExecution = preProcess(triggerExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Trigger id={}, type='{}' sent to route='{}'", triggerExecution.getId(), triggerExecution.getType(),
                 TriggerWorkerMessageRoute.TRIGGER_EXECUTION_EVENTS);
         }

@@ -62,7 +62,7 @@ import tools.jackson.core.type.TypeReference;
 @ConditionalOnCoordinator
 public class WorkflowTestApiController implements WorkflowTestApi {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowTestApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowTestApiController.class);
 
     private final Cache<String, SseEmitter> emitter = createCache();
     private final int maxPendingEvents;
@@ -120,8 +120,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                         try {
                             emitter.send(eventBuilder);
                         } catch (IOException exception) {
-                            if (logger.isTraceEnabled()) {
-                                logger.trace(
+                            if (log.isTraceEnabled()) {
+                                log.trace(
                                     "Failed to send buffered SSE event for job {}: {}", jobId,
                                     StringUtils.sanitize(exception.getMessage()), exception);
                             }
@@ -129,8 +129,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                             try {
                                 emitter.send(createEvent("error", "Failed to deliver buffered events"));
                             } catch (IOException ioException) {
-                                if (logger.isTraceEnabled()) {
-                                    logger.trace(
+                                if (log.isTraceEnabled()) {
+                                    log.trace(
                                         "Failed to send SSE error event for job {}: {}", jobId,
                                         StringUtils.sanitize(ioException.getMessage()), ioException);
                                 }
@@ -150,8 +150,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
                 try {
                     emitter.send(createEvent("error", "Not running"));
                 } catch (Exception exception) {
-                    if (logger.isTraceEnabled()) {
-                        logger.trace(exception.getMessage(), exception);
+                    if (log.isTraceEnabled()) {
+                        log.trace(exception.getMessage(), exception);
                     }
                 } finally {
                     emitter.complete();
@@ -270,8 +270,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
             try {
                 emitter.complete();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -323,8 +323,8 @@ public class WorkflowTestApiController implements WorkflowTestApi {
         try {
             emitter.send(event);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
 
             this.emitter.invalidate(key);

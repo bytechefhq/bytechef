@@ -62,7 +62,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerCoordinator {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerCoordinator.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerCoordinator.class);
 
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
@@ -105,8 +105,8 @@ public class TriggerCoordinator {
      * @param applicationEvent
      */
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onApplicationEvent: applicationEvent={}", applicationEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onApplicationEvent: applicationEvent={}", applicationEvent);
         }
 
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
@@ -115,8 +115,8 @@ public class TriggerCoordinator {
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onErrorEvent: errorEvent={}", errorEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onErrorEvent: errorEvent={}", errorEvent);
         }
 
         for (ErrorEventListener errorEventListener : errorEventListeners) {
@@ -131,8 +131,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerExecutionCompleteEvent(TriggerExecutionCompleteEvent triggerExecutionCompleteEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace(
+        if (log.isTraceEnabled()) {
+            log.trace(
                 "onTriggerExecutionCompleteEvent: triggerExecutionCompleteEvent={}", triggerExecutionCompleteEvent);
         }
 
@@ -141,8 +141,8 @@ public class TriggerCoordinator {
 
     // TODO @Transactional
     public void onTriggerListenerEvent(TriggerListenerEvent triggerListenerEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTriggerListenerEvent: triggerListenerEvent={}", triggerListenerEvent);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerListenerEvent.getWorkflowExecutionId();
@@ -164,7 +164,7 @@ public class TriggerCoordinator {
 
                 handleTriggerExecutionCompletion(triggerExecution);
             } catch (IllegalArgumentException | ConfigurationException exception) {
-                logger.warn(
+                log.warn(
                     "Cancelling orphaned schedule trigger for workflowExecutionId='{}': {}",
                     workflowExecutionId, exception.getMessage());
 
@@ -181,8 +181,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerPollEvent(TriggerPollEvent triggerPollEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTriggerPollEvent: triggerPollEvent={}", triggerPollEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTriggerPollEvent: triggerPollEvent={}", triggerPollEvent);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerPollEvent.getWorkflowExecutionId();
@@ -196,14 +196,14 @@ public class TriggerCoordinator {
 
                 dispatch(triggerExecution);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
+                if (log.isDebugEnabled()) {
+                    log.debug(
                         "Poll trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
                         triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
                         triggerExecution.getWorkflowExecutionId());
                 }
             } catch (IllegalArgumentException | ConfigurationException exception) {
-                logger.warn(
+                log.warn(
                     "Cancelling orphaned polling trigger for workflowExecutionId='{}': {}",
                     workflowExecutionId, exception.getMessage());
 
@@ -218,8 +218,8 @@ public class TriggerCoordinator {
      */
     // TODO @Transactional
     public void onTriggerWebhookEvent(TriggerWebhookEvent triggerWebhookEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTriggerWebhookEvent: triggerWebhookEvent={}", triggerWebhookEvent);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerWebhookEvent.getWorkflowExecutionId();
@@ -234,14 +234,14 @@ public class TriggerCoordinator {
 
                 dispatch(triggerExecution);
 
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
+                if (log.isDebugEnabled()) {
+                    log.debug(
                         "Webhook trigger id={}, type='{}', name='{}', workflowExecutionId='{}' dispatched",
                         triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName(),
                         triggerExecution.getWorkflowExecutionId());
                 }
             } catch (IllegalArgumentException | ConfigurationException exception) {
-                logger.warn(
+                log.warn(
                     "Cancelling orphaned dynamic webhook trigger refresh for workflowExecutionId='{}': {}",
                     workflowExecutionId, exception.getMessage());
 
