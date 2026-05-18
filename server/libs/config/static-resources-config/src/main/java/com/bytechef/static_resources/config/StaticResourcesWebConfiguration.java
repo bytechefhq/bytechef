@@ -33,7 +33,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Profile("prod")
 public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
-    private static final Logger logger = LoggerFactory.getLogger(StaticResourcesWebConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(StaticResourcesWebConfiguration.class);
 
     private final Resources resources;
 
@@ -47,8 +47,8 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
         resourceHandlerRegistration.addResourceLocations(resources.getWeb());
 
-        if (logger.isInfoEnabled()) {
-            logger.debug("Serving static web content at {}", resources.getWeb());
+        if (log.isInfoEnabled()) {
+            log.debug("Serving static web content at {}", resources.getWeb());
         }
     }
 }

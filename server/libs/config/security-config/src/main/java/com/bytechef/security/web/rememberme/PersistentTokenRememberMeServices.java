@@ -83,7 +83,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class PersistentTokenRememberMeServices extends AbstractRememberMeServices implements ApplicationContextAware {
 
-    private static final Logger logger = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
+    private static final Logger log = LoggerFactory.getLogger(PersistentTokenRememberMeServices.class);
 
     private static final ReentrantLock LOCK = new ReentrantLock();
     // Token is valid for one month
@@ -123,7 +123,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
             if (upgradedToken != null) {
                 login = upgradedToken.getUserLoginIfValid(cookieTokens);
 
-                logger.debug("Detected previously upgraded login token for user '{}'", login);
+                log.debug("Detected previously upgraded login token for user '{}'", login);
             }
 
             if (login == null) {
@@ -140,7 +140,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 login = user.getLogin();
 
                 // Token also matches, so login is valid. Update the token value, keeping the *same* series number.
-                logger.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
+                log.debug("Refreshing persistent login token for user '{}', series '{}'", login, token.getSeries());
 
                 token.setTokenDate(LocalDate.now());
                 token.setTokenValue(RandomUtils.generateRandomAlphanumericString());
@@ -182,7 +182,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
 
         String login = successfulAuthentication.getName();
 
-        logger.debug("Creating new persistent login for user {}", login);
+        log.debug("Creating new persistent login for user {}", login);
 
         Optional<User> optionalUser;
 
@@ -226,7 +226,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                 addCookie(token, TenantContext.getCurrentTenantId(), request, response);
             }
         } catch (DataAccessException e) {
-            logger.error("Failed to save persistent token ", e);
+            log.error("Failed to save persistent token ", e);
         }
     }
 
@@ -257,9 +257,9 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                     persistentTokenService.delete(token.getSeries());
                 }
             } catch (InvalidCookieException ice) {
-                logger.info("Invalid cookie, no persistent token could be deleted", ice);
+                log.info("Invalid cookie, no persistent token could be deleted", ice);
             } catch (RememberMeAuthenticationException rmae) {
-                logger.debug("No persistent token found, so no token could be deleted", rmae);
+                log.debug("No persistent token found, so no token could be deleted", rmae);
             }
         }
 
@@ -296,7 +296,7 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
         PersistentToken token = optionalToken.orElseThrow();
 
         // We have a match for this user/series combination
-        logger.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
+        log.info("presentedToken={} / tokenValue={}", presentedToken, token.getTokenValue());
 
         if (!presentedToken.equals(token.getTokenValue())) {
             // Token doesn't match series value. Delete this session and throw an exception.

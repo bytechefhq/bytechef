@@ -80,7 +80,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecutionFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -279,8 +279,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             Job job = jobMap.get(jobId);
 
             if (job == null) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Skipping job id={}: job not found", jobId);
+                if (log.isWarnEnabled()) {
+                    log.warn("Skipping job id={}: job not found", jobId);
                 }
 
                 continue;
@@ -290,8 +290,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
 
             if (workflowOptional.isEmpty()) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(
+                if (log.isWarnEnabled()) {
+                    log.warn(
                         "Skipping job id={}: workflow '{}' not found", job.getId(), job.getWorkflowId());
                 }
 
@@ -305,8 +305,8 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     job.getWorkflowId()));
 
             if (projectOptional.isEmpty()) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(
+                if (log.isWarnEnabled()) {
+                    log.warn(
                         "Skipping job id={}: no project found for workflow '{}'",
                         job.getId(), job.getWorkflowId());
                 }
