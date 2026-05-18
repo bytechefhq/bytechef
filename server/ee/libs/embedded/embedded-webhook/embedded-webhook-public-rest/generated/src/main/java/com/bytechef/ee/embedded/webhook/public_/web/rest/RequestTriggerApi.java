@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-18T13:58:41.005994+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-18T14:02:09.725302+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
 @Tag(name = "request-trigger", description = "The Embedded Request Trigger Public API")
 public interface RequestTriggerApi {
@@ -51,7 +51,7 @@ public interface RequestTriggerApi {
      *
      * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
-     * @return The list of active integrations. (status code 200)
+     * @return The result returned by the workflow&#39;s request trigger. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
      *         or Forbidden (status code 403)
@@ -68,7 +68,7 @@ public interface RequestTriggerApi {
         description = "Execute workflows.",
         tags = { "request-trigger" },
         responses = {
-            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
+            @ApiResponse(responseCode = "200", description = "The result returned by the workflow's request trigger.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
             }),
             @ApiResponse(responseCode = "400", description = "Bad request", content = {
