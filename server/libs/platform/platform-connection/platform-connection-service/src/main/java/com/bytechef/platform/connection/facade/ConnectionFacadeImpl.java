@@ -353,10 +353,10 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
             uri = connectionDefinitionService.executeBaseUri(componentName, componentConnection)
                 .orElse(null);
-        } catch (IllegalStateException e) {
-            if (log.isDebugEnabled()) {
-                log.debug(e.getMessage());
-            }
+        } catch (Exception exception) {
+            log.warn(
+                "Failed to compute baseUri for connection id={} componentName={}; returning null",
+                connection.getId(), componentName, exception);
         }
 
         return uri;

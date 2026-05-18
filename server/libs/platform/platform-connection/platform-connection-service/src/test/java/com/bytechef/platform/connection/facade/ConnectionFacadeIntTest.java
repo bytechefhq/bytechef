@@ -204,6 +204,31 @@ public class ConnectionFacadeIntTest {
     }
 
     @Test
+    public void testGetConnectionWhenExecuteBaseUriThrowsNullPointerException() {
+        Connection connection = new Connection();
+
+        connection.setComponentName("componentName");
+        connection.setName("name");
+        connection.setType(PlatformType.AUTOMATION);
+
+        connection = connectionRepository.save(connection);
+
+        // Reproduces the OAuth2-without-token regression: the component's baseUri lambda calls
+        // getRequiredString(ACCESS_TOKEN) on a connection whose token hasn't been issued yet,
+        // and Validate.notNull throws NullPointerException — which must not crash the list view.
+        when(connectionDefinitionService.executeBaseUri(eq("componentName"), any()))
+            .thenThrow(new NullPointerException("Unknown value for : access_token"));
+
+        ConnectionDTO result = connectionFacade.getConnection(connection.getId());
+
+        Assertions.assertThat(result)
+            .isNotNull()
+            .hasFieldOrPropertyWithValue("baseUri", null)
+            .hasFieldOrPropertyWithValue("componentName", "componentName")
+            .hasFieldOrPropertyWithValue("name", "name");
+    }
+
+    @Test
     public void testGetConnections() {
         Connection connection = new Connection();
 
