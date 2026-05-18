@@ -85,7 +85,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkflowExecutionFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(IntegrationWorkflowExecutionFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(IntegrationWorkflowExecutionFacadeImpl.class);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
@@ -297,8 +297,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             Job job = jobMap.get(jobIdEntry);
 
             if (job == null) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn("Skipping job id={}: job not found", jobIdEntry);
+                if (log.isWarnEnabled()) {
+                    log.warn("Skipping job id={}: job not found", jobIdEntry);
                 }
 
                 continue;
@@ -309,8 +309,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             IntegrationInstance integrationInstance =
                 principalId == null ? null : instanceMap.get(principalId);
 
-            if (principalId != null && integrationInstance == null && logger.isWarnEnabled()) {
-                logger.warn(
+            if (principalId != null && integrationInstance == null && log.isWarnEnabled()) {
+                log.warn(
                     "Job id={}: integration instance not found for principalId={}",
                     jobIdEntry, principalId);
             }
@@ -321,8 +321,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 integrationInstanceConfiguration =
                     configMap.get(integrationInstance.getIntegrationInstanceConfigurationId());
 
-                if (integrationInstanceConfiguration == null && logger.isWarnEnabled()) {
-                    logger.warn(
+                if (integrationInstanceConfiguration == null && log.isWarnEnabled()) {
+                    log.warn(
                         "Job id={}: integration instance configuration not found for configId={}",
                         jobIdEntry, integrationInstance.getIntegrationInstanceConfigurationId());
                 }
@@ -334,8 +334,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                 workflows, workflow -> Objects.equals(workflow.getId(), job.getWorkflowId()));
 
             if (workflowOptional.isEmpty()) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(
+                if (log.isWarnEnabled()) {
+                    log.warn(
                         "Skipping job id={}: workflow '{}' not found", job.getId(), job.getWorkflowId());
                 }
 
@@ -348,8 +348,8 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                     getWorkflowIds(integration), job.getWorkflowId()));
 
             if (integrationOptional.isEmpty()) {
-                if (logger.isWarnEnabled()) {
-                    logger.warn(
+                if (log.isWarnEnabled()) {
+                    log.warn(
                         "Skipping job id={}: no integration found for workflow '{}'",
                         job.getId(), job.getWorkflowId());
                 }

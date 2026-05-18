@@ -38,7 +38,7 @@ import tools.jackson.databind.node.ArrayNode;
  */
 public class LlmRuleJudge extends LLMJudge {
 
-    private static final Logger logger = LoggerFactory.getLogger(LlmRuleJudge.class);
+    private static final Logger log = LoggerFactory.getLogger(LlmRuleJudge.class);
 
     private static final int MAX_TRANSCRIPT_LENGTH = 100_000;
 
@@ -146,7 +146,7 @@ public class LlmRuleJudge extends LLMJudge {
 
             return serialized.substring(serialized.length() - MAX_TRANSCRIPT_LENGTH);
         } catch (JacksonException jacksonException) {
-            logger.warn("Failed to parse transcript JSON for truncation, falling back to substring", jacksonException);
+            log.warn("Failed to parse transcript JSON for truncation, falling back to substring", jacksonException);
 
             return transcript.substring(transcript.length() - MAX_TRANSCRIPT_LENGTH);
         }

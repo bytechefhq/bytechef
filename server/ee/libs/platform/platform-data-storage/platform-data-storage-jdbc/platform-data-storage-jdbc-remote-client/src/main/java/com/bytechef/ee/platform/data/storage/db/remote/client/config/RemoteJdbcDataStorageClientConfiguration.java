@@ -30,11 +30,11 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnDataStorageProviderJdbc
 public class RemoteJdbcDataStorageClientConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(RemoteJdbcDataStorageClientConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(RemoteJdbcDataStorageClientConfiguration.class);
 
     public RemoteJdbcDataStorageClientConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Data storage provider type enabled: db");
+        if (log.isInfoEnabled()) {
+            log.info("Data storage provider type enabled: db");
         }
     }
 

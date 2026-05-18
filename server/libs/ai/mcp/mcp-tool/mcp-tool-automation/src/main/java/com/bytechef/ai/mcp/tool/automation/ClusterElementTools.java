@@ -37,7 +37,7 @@ import tools.jackson.databind.node.ObjectNode;
 @Component
 public class ClusterElementTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(ClusterElementTools.class);
+    private static final Logger log = LoggerFactory.getLogger(ClusterElementTools.class);
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
 
@@ -59,8 +59,8 @@ public class ClusterElementTools {
             String workflowDefinition = projectWorkflowDTO.getDefinition();
 
             if (!workflowDefinition.contains(taskName)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
+                if (log.isDebugEnabled()) {
+                    log.debug(
                         "updateClusterElementTask({}, {}): Task '{}' not found in workflow '{}'", workflowId, taskName,
                         taskName, projectWorkflowDTO.getId());
                 }
@@ -88,8 +88,8 @@ public class ClusterElementTools {
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "updateClusterElementTask({}, {}): Updated clusterElements for task '{}'", workflowId, taskName,
                     taskName);
             }
@@ -102,7 +102,7 @@ public class ClusterElementTools {
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "updateClusterElementTask({}, {}): Failed to update clusterElements for task '{}' in workflow {}",
                 workflowId, taskName, taskName, workflowId, e);
 

@@ -91,7 +91,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class AiAgentEvalRunExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(AiAgentEvalRunExecutor.class);
+    private static final Logger log = LoggerFactory.getLogger(AiAgentEvalRunExecutor.class);
 
     private final AiAgentEvalFileStorage agentEvalFileStorage;
     private final AiAgentEvalResultService agentEvalResultService;
@@ -166,7 +166,7 @@ public class AiAgentEvalRunExecutor {
 
             for (int runIndex = 1; runIndex <= numberOfRuns; runIndex++) {
                 if (isCancelled(evalRunId)) {
-                    logger.info("Eval run {} was cancelled, aborting execution", evalRunId);
+                    log.info("Eval run {} was cancelled, aborting execution", evalRunId);
 
                     finalizeRun(evalRunId, resultScores, totalInputTokens, totalOutputTokens);
 
@@ -206,7 +206,7 @@ public class AiAgentEvalRunExecutor {
 
                     resultScores.add(evalResult.getScore());
                 } catch (Exception exception) {
-                    logger.error(
+                    log.error(
                         "Error executing scenario {} (run {}) for eval run {}",
                         scenario.getId(), runIndex, evalRunId, exception);
 
@@ -256,7 +256,7 @@ public class AiAgentEvalRunExecutor {
                     aiAgentEvalRun.getEnvironmentId());
 
             if (testConfigurationConnections.isEmpty()) {
-                logger.warn(
+                log.warn(
                     "No test connection configured for MODEL cluster element '{}' in workflow '{}'. " +
                         "LLM judges will not be functional.",
                     modelClusterElement.getWorkflowNodeName(), aiAgentEvalRun.getWorkflowId());
@@ -283,7 +283,7 @@ public class AiAgentEvalRunExecutor {
 
             return ChatClient.builder(chatModel);
         } catch (Exception exception) {
-            logger.warn(
+            log.warn(
                 "Failed to build ChatClient for LLM judges in eval run {}. LLM judges will not be functional.",
                 aiAgentEvalRun.getId(), exception);
 
@@ -386,7 +386,7 @@ public class AiAgentEvalRunExecutor {
 
             return ChatClient.builder(chatModel);
         } catch (Exception exception) {
-            logger.warn(
+            log.warn(
                 "Failed to build ChatClient from connection {}. LLM judge will not be functional.",
                 connectionId, exception);
 
@@ -412,7 +412,7 @@ public class AiAgentEvalRunExecutor {
                 agentJudge.getConfiguration(), defaultChatClientBuilder);
 
             if (agentJudge.getType() == AiAgentJudgeType.LLM_RULE && chatClientBuilder == null) {
-                logger.warn("Skipping LLM judge '{}' — no ChatClient available", agentJudge.getName());
+                log.warn("Skipping LLM judge '{}' — no ChatClient available", agentJudge.getName());
 
                 continue;
             }
@@ -429,7 +429,7 @@ public class AiAgentEvalRunExecutor {
                 scenarioJudge.getConfiguration(), defaultChatClientBuilder);
 
             if (scenarioJudge.getType() == AiAgentJudgeType.LLM_RULE && chatClientBuilder == null) {
-                logger.warn("Skipping LLM judge '{}' — no ChatClient available", scenarioJudge.getName());
+                log.warn("Skipping LLM judge '{}' — no ChatClient available", scenarioJudge.getName());
 
                 continue;
             }
@@ -759,7 +759,7 @@ public class AiAgentEvalRunExecutor {
             }
         }
 
-        logger.warn("Could not resolve judge type for judge '{}', defaulting to CONTAINS_TEXT", judgeName);
+        log.warn("Could not resolve judge type for judge '{}', defaulting to CONTAINS_TEXT", judgeName);
 
         return AiAgentJudgeType.CONTAINS_TEXT;
     }

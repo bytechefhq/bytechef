@@ -44,7 +44,7 @@ import org.springframework.ai.chat.model.Generation;
  */
 public class UserSimulator {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserSimulator.class);
+    private static final Logger log = LoggerFactory.getLogger(UserSimulator.class);
 
     private static final String CONVERSATION_COMPLETE_MARKER = "[CONVERSATION_COMPLETE]";
 
@@ -93,7 +93,7 @@ public class UserSimulator {
         int completionTokens = 0;
 
         if (chatResponse == null) {
-            logger.warn("UserSimulator received null ChatResponse for persona: {}", personaPrompt);
+            log.warn("UserSimulator received null ChatResponse for persona: {}", personaPrompt);
         } else {
             Generation result = chatResponse.getResult();
 
@@ -101,7 +101,7 @@ public class UserSimulator {
                 message = Objects.toString(result.getOutput()
                     .getText(), "");
             } else {
-                logger.warn("UserSimulator received null result from ChatResponse for persona: {}", personaPrompt);
+                log.warn("UserSimulator received null result from ChatResponse for persona: {}", personaPrompt);
             }
 
             ChatResponseMetadata metadata = chatResponse.getMetadata();

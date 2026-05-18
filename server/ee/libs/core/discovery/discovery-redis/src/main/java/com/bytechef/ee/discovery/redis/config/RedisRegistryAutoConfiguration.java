@@ -46,11 +46,11 @@ import tools.jackson.databind.ObjectMapper;
 @AutoConfigureAfter(DataRedisAutoConfiguration.class)
 public class RedisRegistryAutoConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisRegistryAutoConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisRegistryAutoConfiguration.class);
 
     public RedisRegistryAutoConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Discovery service provider type enabled: redis");
+        if (log.isInfoEnabled()) {
+            log.info("Discovery service provider type enabled: redis");
         }
     }
 

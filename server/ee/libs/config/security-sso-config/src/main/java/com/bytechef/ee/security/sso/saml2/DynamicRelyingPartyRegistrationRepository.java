@@ -35,7 +35,7 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
 
     public static final String SAML_PREFIX = "saml-";
 
-    private static final Logger logger = LoggerFactory.getLogger(DynamicRelyingPartyRegistrationRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(DynamicRelyingPartyRegistrationRepository.class);
 
     private final IdentityProviderService identityProviderService;
 
@@ -55,7 +55,7 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         try {
             identityProviderId = Long.parseLong(registrationId.substring(SAML_PREFIX.length()));
         } catch (NumberFormatException numberFormatException) {
-            logger.debug("Invalid SAML registration ID format: {}", registrationId);
+            log.debug("Invalid SAML registration ID format: {}", registrationId);
 
             return null;
         }
@@ -65,7 +65,7 @@ public class DynamicRelyingPartyRegistrationRepository implements RelyingPartyRe
         try {
             identityProvider = identityProviderService.getIdentityProvider(identityProviderId);
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.debug("Identity provider not found for ID: {}", identityProviderId);
+            log.debug("Identity provider not found for ID: {}", identityProviderId);
 
             return null;
         }

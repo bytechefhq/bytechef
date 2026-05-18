@@ -36,7 +36,7 @@ import tools.jackson.databind.node.ObjectNode;
  */
 @Component
 public class ScriptTools {
-    private static final Logger logger = LoggerFactory.getLogger(ScriptTools.class);
+    private static final Logger log = LoggerFactory.getLogger(ScriptTools.class);
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
 
@@ -58,8 +58,8 @@ public class ScriptTools {
             String workflowDefinition = projectWorkflowDTO.getDefinition();
 
             if (!workflowDefinition.contains(scriptName)) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(
+                if (log.isDebugEnabled()) {
+                    log.debug(
                         "updateScriptComponentCode({}, {}): Script component '{}' not found in workflow '{}'",
                         workflowId, scriptName, scriptName, projectWorkflowDTO.getId());
                 }
@@ -86,8 +86,8 @@ public class ScriptTools {
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "updateScriptComponentCode({}, {}): Updated script component '{}'", workflowId, scriptName,
                     scriptName);
             }
@@ -100,7 +100,7 @@ public class ScriptTools {
                 projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
                 projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "updateScriptComponentCode({}, {}): Failed to update Script component in workflow {}", workflowId,
                 scriptName, workflowId, e);
 

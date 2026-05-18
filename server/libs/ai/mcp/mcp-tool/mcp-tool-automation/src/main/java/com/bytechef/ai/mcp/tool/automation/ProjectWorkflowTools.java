@@ -51,7 +51,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectWorkflowTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowTools.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowTools.class);
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -109,8 +109,8 @@ public class ProjectWorkflowTools {
         try {
             ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getWorkflow({}): Retrieved workflow {}", workflowId, projectWorkflowDTO.getProjectWorkflowId());
             }
 
@@ -121,7 +121,7 @@ public class ProjectWorkflowTools {
                 projectWorkflowDTO.getVersion(), projectWorkflowDTO.getCreatedDate(),
                 projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
-            logger.error("getWorkflow({}): Failed to get workflow {}", workflowId, workflowId, e);
+            log.error("getWorkflow({}): Failed to get workflow {}", workflowId, workflowId, e);
 
             throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e, GET_WORKFLOW);
         }
@@ -150,13 +150,13 @@ public class ProjectWorkflowTools {
                     workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("listWorkflows({}): Found {} workflows", projectId, workflowInfos.size());
+            if (log.isDebugEnabled()) {
+                log.debug("listWorkflows({}): Found {} workflows", projectId, workflowInfos.size());
             }
 
             return workflowInfos;
         } catch (Exception e) {
-            logger.error("listWorkflows({}): Failed to list project workflows", projectId, e);
+            log.error("listWorkflows({}): Failed to list project workflows", projectId, e);
 
             throw new ExecutionException(
                 "Failed to list project workflows: " + e.getMessage(), e, ProjectWorkflowToolErrorType.LIST_WORKFLOWS);
@@ -195,15 +195,15 @@ public class ProjectWorkflowTools {
                     workflow.getLastModifiedDate() != null ? workflow.getLastModifiedDate() : null))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "searchWorkflows({}, {}): Found {} workflows matching query '{}'", query, projectId,
                     matchingWorkflow.size(), query);
             }
 
             return matchingWorkflow;
         } catch (Exception e) {
-            logger.error("searchWorkflows({}, {}): Failed to search workflows with query '{}'", query, projectId, query,
+            log.error("searchWorkflows({}, {}): Failed to search workflows with query '{}'", query, projectId, query,
                 e);
             throw new ExecutionException(
                 "Failed to search workflows: " + e.getMessage(), e, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
@@ -229,15 +229,15 @@ public class ProjectWorkflowTools {
 
             boolean isValid = errorMessages.equals("[]");
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "validateWorkflow(): Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid,
                     errorMessages, warningMessages);
             }
 
             return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
         } catch (Exception e) {
-            logger.error("validateWorkflow(): Failed to validate workflow", e);
+            log.error("validateWorkflow(): Failed to validate workflow", e);
 
             throw new ExecutionException(
                 "Failed to validate workflow", e, ProjectWorkflowToolErrorType.VALIDATE_WORKFLOW);
@@ -255,8 +255,8 @@ public class ProjectWorkflowTools {
         try {
             ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(projectId, definition);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("createProjectWorkflow({}): Created workflow for project {}", projectId, projectId);
+            if (log.isDebugEnabled()) {
+                log.debug("createProjectWorkflow({}): Created workflow for project {}", projectId, projectId);
             }
 
             return new ProjectWorkflowInfo(
@@ -265,7 +265,7 @@ public class ProjectWorkflowTools {
                 projectWorkflow.getCreatedDate() != null ? projectWorkflow.getCreatedDate() : null,
                 projectWorkflow.getLastModifiedDate() != null ? projectWorkflow.getLastModifiedDate() : null);
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "createProjectWorkflow({}): Failed to create workflow for project {}", projectId, projectId, e);
 
             throw new ExecutionException(
@@ -285,14 +285,14 @@ public class ProjectWorkflowTools {
 
             projectWorkflowFacade.deleteWorkflow(projectWorkflowDTO.getId());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "deleteWorkflow({}): Deleted workflow {} with name '{}'", workflowId, workflowId, workflowName);
             }
 
             return "Workflow '" + workflowName + "' (ID: " + workflowId + ") has been successfully deleted.";
         } catch (Exception e) {
-            logger.error("deleteWorkflow({}): Failed to delete workflow {}", workflowId, workflowId, e);
+            log.error("deleteWorkflow({}): Failed to delete workflow {}", workflowId, workflowId, e);
 
             throw new ExecutionException(
                 "Failed to delete workflow: " + e.getMessage(), e, ProjectWorkflowToolErrorType.DELETE_WORKFLOW);
@@ -313,8 +313,8 @@ public class ProjectWorkflowTools {
             projectWorkflowFacade.updateWorkflow(
                 projectWorkflowDTO.getId(), definition, projectWorkflowDTO.getVersion());
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "updateWorkflow({}): Updated workflow {} with name '{}'", workflowId, projectWorkflowDTO.getId(),
                     projectWorkflowDTO.getLabel());
             }
@@ -325,7 +325,7 @@ public class ProjectWorkflowTools {
                 projectWorkflowDTO.getDescription(), definition, projectWorkflowDTO.getVersion(),
                 projectWorkflowDTO.getCreatedDate(), projectWorkflowDTO.getLastModifiedDate());
         } catch (Exception e) {
-            logger.error("updateWorkflow({}): Failed to update workflow {}", workflowId, workflowId, e);
+            log.error("updateWorkflow({}): Failed to update workflow {}", workflowId, workflowId, e);
 
             throw new ExecutionException(
                 "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);

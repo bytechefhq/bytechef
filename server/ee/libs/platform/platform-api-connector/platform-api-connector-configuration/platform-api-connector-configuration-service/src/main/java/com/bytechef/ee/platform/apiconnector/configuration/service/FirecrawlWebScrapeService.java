@@ -39,7 +39,7 @@ import tools.jackson.databind.ObjectMapper;
 @ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled", havingValue = "true")
 public class FirecrawlWebScrapeService implements WebScrapeService {
 
-    private static final Logger logger = LoggerFactory.getLogger(FirecrawlWebScrapeService.class);
+    private static final Logger log = LoggerFactory.getLogger(FirecrawlWebScrapeService.class);
 
     private static final int DEFAULT_TIMEOUT_SECONDS = 60;
     private static final int POLL_INTERVAL_MS = 2000;
@@ -91,7 +91,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
                 return ScrapeResult.failure(error);
             }
         } catch (Exception exception) {
-            logger.error("Failed to scrape URL via Firecrawl: {}", url, exception);
+            log.error("Failed to scrape URL via Firecrawl: {}", url, exception);
 
             return ScrapeResult.failure(exception.getMessage());
         }
@@ -125,7 +125,7 @@ public class FirecrawlWebScrapeService implements WebScrapeService {
 
             return pollCrawlStatus(crawlId);
         } catch (Exception exception) {
-            logger.error("Failed to crawl URL via Firecrawl: {}", url, exception);
+            log.error("Failed to crawl URL via Firecrawl: {}", url, exception);
 
             return CrawlResult.failure(exception.getMessage());
         }
