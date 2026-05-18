@@ -79,9 +79,9 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store provider (PGVECTOR) | `PGVECTOR` |
-| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_URL` | JDBC URL for the pgvector PostgreSQL database | - |
-| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_USERNAME` | pgvector database username (sensitive) | - |
-| `BYTECHEF_AI_VECTORSTORE_PG_VECTOR_PASSWORD` | pgvector database password (sensitive) | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL for the pgvector PostgreSQL database | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_USERNAME` | pgvector database username (sensitive) | - |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_PASSWORD` | pgvector database password (sensitive) | - |
 
 ## Analytics Configuration
 
