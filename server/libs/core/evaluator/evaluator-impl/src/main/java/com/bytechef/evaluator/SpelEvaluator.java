@@ -161,7 +161,7 @@ public class SpelEvaluator implements Evaluator {
         return evaluateInternal(map, context, lenient);
     }
 
-    private StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
+    StandardEvaluationContext createEvaluationContext(Map<String, ?> context, boolean formulaExpression) {
         StandardEvaluationContext evaluationContext = new StandardEvaluationContext(context);
 
         evaluationContext.addPropertyAccessor(new MapPropertyAccessor());
