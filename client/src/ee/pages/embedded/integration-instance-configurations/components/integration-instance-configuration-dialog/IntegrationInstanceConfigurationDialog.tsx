@@ -462,7 +462,13 @@ const IntegrationInstanceConfigurationDialog = ({
                                         <Button label="Next" onClick={handleSubmit(handleNextClick)} />
                                     )}
 
-                                {!updateIntegrationVersion && integrationInstanceConfiguration?.id && (
+                                {((!updateIntegrationVersion && integrationInstanceConfiguration?.id) ||
+                                    (!integrationInstanceConfiguration?.id &&
+                                        !updateIntegrationVersion &&
+                                        connectionDefinition &&
+                                        !oAuth2Authorization &&
+                                        workflows !== undefined &&
+                                        workflows.length === 0)) && (
                                     <Button
                                         disabled={isSaving}
                                         icon={isSaving ? <LoadingIcon /> : undefined}
