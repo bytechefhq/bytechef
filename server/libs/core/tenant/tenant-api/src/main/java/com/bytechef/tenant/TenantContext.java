@@ -88,9 +88,7 @@ public class TenantContext {
             try {
                 runnable.run();
             } catch (Exception e) {
-                log.error("Unable to execute run with tenant ID {}", tenantId);
-
-                throw new RuntimeException(e);
+                throw new RuntimeException("Unable to execute run with tenant ID " + tenantId, e);
             }
         } finally {
             setCurrentTenantId(curTenantId);

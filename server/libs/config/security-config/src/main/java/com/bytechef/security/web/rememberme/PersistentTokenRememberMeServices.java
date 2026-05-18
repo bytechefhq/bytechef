@@ -160,8 +160,6 @@ public class PersistentTokenRememberMeServices extends AbstractRememberMeService
                         addCookie(token, TenantContext.getCurrentTenantId(), request, response);
                     }
                 } catch (DataAccessException e) {
-                    logger.error("Failed to update token: ", e);
-
                     throw new RememberMeAuthenticationException("Autologin failed due to data access problem", e);
                 }
 
