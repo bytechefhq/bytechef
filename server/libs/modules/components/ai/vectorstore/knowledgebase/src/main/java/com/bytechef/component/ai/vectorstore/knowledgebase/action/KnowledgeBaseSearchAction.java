@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.SIMILARITY_THRESHOLD;
@@ -33,6 +35,7 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBase
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
@@ -40,10 +43,13 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.ai.vectorstore.filter.Filter;
 import org.springframework.ai.vectorstore.filter.Filter.Expression;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * Search action for querying the internal knowledge base vector store. Supports three search modes:
@@ -78,7 +84,7 @@ public final class KnowledgeBaseSearchAction {
                 string(QUERY)
                     .label("Query")
                     .description(
-                        "The search query for semantic similarity search. Leave empty for tag-only search.")
+                        "The search query for semantic similarity search. Leave empty for filter-only search.")
                     .required(false),
                 array(TAG_NAMES)
                     .label("Tags")
@@ -87,6 +93,7 @@ public final class KnowledgeBaseSearchAction {
                     .items(string())
                     .options(getTagOptions(knowledgeBaseDocumentTagService))
                     .required(false),
+                METADATA_PROPERTY,
                 integer(TOP_K)
                     .label("Top K")
                     .description("Maximum number of results to return.")
@@ -109,6 +116,7 @@ public final class KnowledgeBaseSearchAction {
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
         List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
+        List<Map<String, Object>> metadataFilters = inputParameters.getList(METADATA, new TypeReference<>() {});
         int topK = inputParameters.getInteger(TOP_K, 10);
         double similarityThreshold = inputParameters.getDouble(SIMILARITY_THRESHOLD, 0.0);
 
@@ -116,43 +124,35 @@ public final class KnowledgeBaseSearchAction {
             vectorStore, knowledgeBaseId);
 
         boolean hasQuery = query != null && !query.isBlank();
-        boolean hasTags = tagNames != null && !tagNames.isEmpty();
 
-        if (!hasQuery && !hasTags) {
+        Expression combinedFilter = buildCombinedFilter(tagNames, metadataFilters);
+
+        if (!hasQuery && combinedFilter == null) {
             return List.of();
         }
 
         if (!hasQuery) {
-            return searchByTagsOnly(wrappedVectorStore, tagNames, topK);
+            return searchByFilterOnly(wrappedVectorStore, combinedFilter, topK);
         }
 
-        if (!hasTags) {
+        if (combinedFilter == null) {
             return searchByVectorOnly(wrappedVectorStore, query, topK, similarityThreshold);
         }
 
-        return searchWithTagFilter(wrappedVectorStore, query, tagNames, topK, similarityThreshold);
+        return searchWithFilter(wrappedVectorStore, query, combinedFilter, topK, similarityThreshold);
     }
 
-    /**
-     * Tag-only search: retrieves documents that match any of the specified tags (OR logic). Uses a dummy query with tag
-     * filtering since vector stores require a query.
-     */
-    private static List<Document> searchByTagsOnly(VectorStore vectorStore, List<String> tagNames, int topK) {
-        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
-
+    private static List<Document> searchByFilterOnly(VectorStore vectorStore, Expression filter, int topK) {
         SearchRequest searchRequest = SearchRequest.builder()
             .query("")
             .topK(topK)
             .similarityThreshold(0.0)
-            .filterExpression(tagFilter)
+            .filterExpression(filter)
             .build();
 
         return vectorStore.similaritySearch(searchRequest);
     }
 
-    /**
-     * Vector search only: performs semantic similarity search without tag filtering.
-     */
     private static List<Document> searchByVectorOnly(
         VectorStore vectorStore, String query, int topK, double similarityThreshold) {
 
@@ -165,22 +165,61 @@ public final class KnowledgeBaseSearchAction {
         return vectorStore.similaritySearch(searchRequest);
     }
 
-    /**
-     * Combined search: filters by tags (OR logic), then performs semantic similarity search.
-     */
-    private static List<Document> searchWithTagFilter(
-        VectorStore vectorStore, String query, List<String> tagNames, int topK, double similarityThreshold) {
-
-        Expression tagFilter = KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames);
+    private static List<Document> searchWithFilter(
+        VectorStore vectorStore, String query, Expression filter, int topK, double similarityThreshold) {
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(query)
             .topK(topK)
             .similarityThreshold(similarityThreshold)
-            .filterExpression(tagFilter)
+            .filterExpression(filter)
             .build();
 
         return vectorStore.similaritySearch(searchRequest);
+    }
+
+    private static Expression buildCombinedFilter(
+        List<String> tagNames, List<Map<String, Object>> metadataFilters) {
+
+        Expression tagFilter = (tagNames != null && !tagNames.isEmpty())
+            ? KnowledgeBaseVectorStoreWrapper.buildTagFilter(tagNames) : null;
+
+        Expression metadataFilter = buildMetadataFilter(metadataFilters);
+
+        if (tagFilter == null) {
+            return metadataFilter;
+        }
+
+        if (metadataFilter == null) {
+            return tagFilter;
+        }
+
+        return new Filter.Expression(Filter.ExpressionType.AND, tagFilter, metadataFilter);
+    }
+
+    private static Expression buildMetadataFilter(List<Map<String, Object>> metadataFilters) {
+        if (metadataFilters == null || metadataFilters.isEmpty()) {
+            return null;
+        }
+
+        FilterExpressionBuilder builder = new FilterExpressionBuilder();
+        FilterExpressionBuilder.Op result = null;
+
+        for (Map<String, Object> group : metadataFilters) {
+            FilterExpressionBuilder.Op groupExpression = null;
+
+            for (Map.Entry<String, Object> entry : group.entrySet()) {
+                FilterExpressionBuilder.Op condition = builder.eq(entry.getKey(), entry.getValue());
+
+                groupExpression = groupExpression == null ? condition : builder.and(groupExpression, condition);
+            }
+
+            if (groupExpression != null) {
+                result = result == null ? groupExpression : builder.or(result, groupExpression);
+            }
+        }
+
+        return result == null ? null : result.build();
     }
 
     private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(

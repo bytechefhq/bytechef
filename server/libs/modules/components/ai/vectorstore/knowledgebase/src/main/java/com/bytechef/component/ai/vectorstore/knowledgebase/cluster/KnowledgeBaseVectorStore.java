@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
@@ -31,6 +32,7 @@ import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
@@ -201,6 +203,15 @@ public final class KnowledgeBaseVectorStore {
                     metadata.put(METADATA_KNOWLEDGE_BASE_ID, knowledgeBaseId);
                     metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
                     metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
+
+                    List<Map<String, Object>> userMetadataList = inputParameters.getList(
+                        METADATA, new TypeReference<>() {});
+
+                    if (userMetadataList != null) {
+                        for (Map<String, Object> userMetadataEntry : userMetadataList) {
+                            metadata.putAll(userMetadataEntry);
+                        }
+                    }
 
                     String text = document.getText();
 
