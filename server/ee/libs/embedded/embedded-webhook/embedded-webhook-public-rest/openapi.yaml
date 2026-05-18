@@ -68,7 +68,7 @@ paths:
             $ref: '#/components/schemas/Environment'
       responses:
         "200":
-          description: "The list of active integrations."
+          description: "The result returned by the workflow's request trigger."
           content:
             application/json:
               schema:
