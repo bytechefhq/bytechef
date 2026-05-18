@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  */
 public class KafkaMessageBroker implements MessageBroker {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBroker.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaMessageBroker.class);
 
     private KafkaTemplate<String, Object> kafkaTemplate;
 
@@ -59,8 +59,8 @@ public class KafkaMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(aValue);
         } catch (InterruptedException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage(), e);
             }
         }
     }

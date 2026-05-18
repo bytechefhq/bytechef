@@ -43,7 +43,7 @@ public class MemoryMessageBrokerListenerRegistrarConfiguration
     MessageBrokerListenerRegistrar<MemoryListenerEndpointRegistrar>,
     SmartInitializingSingleton {
 
-    private static final Logger logger = LoggerFactory.getLogger(
+    private static final Logger log = LoggerFactory.getLogger(
         MemoryMessageBrokerListenerRegistrarConfiguration.class);
 
     private final List<MessageBrokerConfigurer<MemoryListenerEndpointRegistrar>> messageBrokerConfigurers;
@@ -77,8 +77,8 @@ public class MemoryMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering Local Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering Local Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
         }
 
         listenerEndpointRegistrar.registerListenerEndpoint(messageRoute, delegate, methodName);

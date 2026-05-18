@@ -55,7 +55,7 @@ import org.springframework.context.annotation.Configuration;
 public class AmqpMessageBrokerListenerRegistrarConfiguration
     implements RabbitListenerConfigurer, MessageBrokerListenerRegistrar<RabbitListenerEndpointRegistrar> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerListenerRegistrarConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AmqpMessageBrokerListenerRegistrarConfiguration.class);
 
     private final ConnectionFactory connectionFactory;
     private final MessageConverter jacksonAmqpMessageConverter;
@@ -98,8 +98,8 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering AMQP Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering AMQP Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
         }
 
         Exchange exchange;
@@ -181,7 +181,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
                 rabbitListenerEndpointRegistry.stop();
             }
         } catch (Exception e) {
-            logger.warn("Failed to stop Rabbit listener containers: {}", e.getMessage());
+            log.warn("Failed to stop Rabbit listener containers: {}", e.getMessage());
         }
     }
 
@@ -192,7 +192,7 @@ public class AmqpMessageBrokerListenerRegistrarConfiguration
                 rabbitListenerEndpointRegistry.start();
             }
         } catch (Exception e) {
-            logger.warn("Failed to start Rabbit listener containers: {}", e.getMessage());
+            log.warn("Failed to start Rabbit listener containers: {}", e.getMessage());
         }
     }
 }

@@ -51,11 +51,11 @@ import tools.jackson.databind.ser.jackson.JsonValueSerializer;
 @ConditionalOnMessageBrokerKafka
 public class KafkaMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(KafkaMessageBrokerConfiguration.class);
 
     public KafkaMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: kafka");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: kafka");
         }
     }
 
@@ -110,7 +110,7 @@ public class KafkaMessageBrokerConfiguration {
                     try {
                         targetClass = Class.forName(type);
                     } catch (ClassNotFoundException e) {
-                        logger.warn("Class not found: " + type, e);
+                        log.warn("Class not found: " + type, e);
                     }
                 }
 

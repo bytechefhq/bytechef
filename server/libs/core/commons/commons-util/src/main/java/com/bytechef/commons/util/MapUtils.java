@@ -53,7 +53,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 public class MapUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(MapUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(MapUtils.class);
 
     private static ObjectMapper objectMapper;
 
@@ -852,8 +852,8 @@ public class MapUtils {
                     // Try strict ISO_INSTANT first (expects 'Z' or offset)
                     return elementType.cast(Instant.parse(string));
                 } catch (DateTimeParseException e) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (log.isDebugEnabled()) {
+                        log.debug(
                             "Failed to parse Instant using ISO_INSTANT from value '{}'; attempting ISO_LOCAL_DATE_TIME assuming UTC",
                             string, e);
                     }
@@ -863,8 +863,8 @@ public class MapUtils {
 
                         return elementType.cast(localDateTime.toInstant(ZoneOffset.UTC));
                     } catch (DateTimeParseException e2) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(
+                        if (log.isDebugEnabled()) {
+                            log.debug(
                                 "Failed to parse Instant using ISO_LOCAL_DATE_TIME from value '{}'; falling back to ObjectMapper.convertValue",
                                 string, e2);
                         }
@@ -899,8 +899,8 @@ public class MapUtils {
                     .build()
                     .convertValue(value, elementType);
             } catch (Exception e) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(e.getMessage(), e);
+                if (log.isTraceEnabled()) {
+                    log.trace(e.getMessage(), e);
                 }
             }
 
@@ -938,8 +938,8 @@ public class MapUtils {
         try {
             value = JsonPath.read(map, path);
         } catch (PathNotFoundException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage());
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage());
             }
         }
         return value;

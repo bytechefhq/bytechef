@@ -33,7 +33,7 @@ import org.springframework.util.Assert;
  */
 public class JmsMessageBroker implements MessageBroker {
 
-    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBroker.class);
+    private static final Logger log = LoggerFactory.getLogger(JmsMessageBroker.class);
 
     private final JmsTemplate jmsTemplate;
 
@@ -57,8 +57,8 @@ public class JmsMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage(), e);
             }
         }
     }

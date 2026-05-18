@@ -50,7 +50,7 @@ import org.springframework.util.Assert;
  */
 public class AsyncMessageBroker extends AbstractMessageBroker implements DisposableBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(AsyncMessageBroker.class);
+    private static final Logger log = LoggerFactory.getLogger(AsyncMessageBroker.class);
 
     /**
      * Backpressure threshold for ordered per-route executors. Large enough to absorb typical SSE streaming bursts (LLM
@@ -88,8 +88,8 @@ public class AsyncMessageBroker extends AbstractMessageBroker implements Disposa
         List<Receiver> receivers = receiverMap.get(messageRoute);
 
         if (receivers == null || receivers.isEmpty()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("No listeners subscribed for: " + messageRoute);
+            if (log.isDebugEnabled()) {
+                log.debug("No listeners subscribed for: " + messageRoute);
             }
 
             return;
@@ -200,8 +200,8 @@ public class AsyncMessageBroker extends AbstractMessageBroker implements Disposa
         try {
             TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage(), e);
             }
         }
     }

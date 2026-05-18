@@ -52,7 +52,7 @@ import tools.jackson.dataformat.xml.XmlMapper;
  */
 public class XmlUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(XmlUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(XmlUtils.class);
 
     private static final DocumentBuilderFactory DOCUMENT_BUILDER_FACTORY;
     private static final XPathFactory X_PATH_FACTORY = XPathFactory.newInstance();
@@ -218,7 +218,7 @@ public class XmlUtils {
             // Disable DTD processing entirely (strongest protection)
             factory.setFeature("http://apache.org/xml/features/disallow-doctype-decl", true);
         } catch (ParserConfigurationException e) {
-            logger.warn("Could not disable DOCTYPE declaration, applying fallback XXE protections", e);
+            log.warn("Could not disable DOCTYPE declaration, applying fallback XXE protections", e);
 
             // Fallback: disable external entities if DOCTYPE cannot be disabled
             try {
@@ -226,7 +226,7 @@ public class XmlUtils {
                 factory.setFeature("http://xml.org/sax/features/external-parameter-entities", false);
                 factory.setFeature("http://apache.org/xml/features/nonvalidating/load-external-dtd", false);
             } catch (ParserConfigurationException ex) {
-                logger.warn("Could not configure all XXE protections", ex);
+                log.warn("Could not configure all XXE protections", ex);
             }
         }
 
@@ -236,7 +236,7 @@ public class XmlUtils {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_SCHEMA, "");
         } catch (IllegalArgumentException e) {
             // Some parsers may not support these attributes
-            logger.debug("Parser does not support ACCESS_EXTERNAL_DTD/SCHEMA attributes", e);
+            log.debug("Parser does not support ACCESS_EXTERNAL_DTD/SCHEMA attributes", e);
         }
 
         factory.setXIncludeAware(false);
@@ -256,7 +256,7 @@ public class XmlUtils {
             factory.setAttribute(XMLConstants.ACCESS_EXTERNAL_STYLESHEET, "");
         } catch (IllegalArgumentException e) {
             // Some transformers may not support these attributes
-            logger.debug("Transformer does not support ACCESS_EXTERNAL_DTD/STYLESHEET attributes", e);
+            log.debug("Transformer does not support ACCESS_EXTERNAL_DTD/STYLESHEET attributes", e);
         }
 
         return factory;

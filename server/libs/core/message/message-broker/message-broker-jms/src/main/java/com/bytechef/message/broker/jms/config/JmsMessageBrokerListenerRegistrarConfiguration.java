@@ -49,7 +49,7 @@ import org.springframework.jms.support.converter.MessageConverter;
 public class JmsMessageBrokerListenerRegistrarConfiguration
     implements JmsListenerConfigurer, MessageBrokerListenerRegistrar<JmsListenerEndpointRegistrar> {
 
-    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerListenerRegistrarConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(JmsMessageBrokerListenerRegistrarConfiguration.class);
 
     private final ConnectionFactory connectionFactory;
     private final MessageConverter jacksonJmsMessageConverter;
@@ -84,8 +84,8 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering JMS Listener: {} -> {}:{}", messageRoute, delegateClass, methodName);
         }
 
         MessageListenerAdapter messageListenerAdapter = new NoReplyMessageListenerAdapter(delegate);
@@ -109,7 +109,7 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
                 jmsListenerEndpointRegistry.stop();
             }
         } catch (Exception e) {
-            logger.warn("Failed to stop JMS listener containers: {}", e.getMessage());
+            log.warn("Failed to stop JMS listener containers: {}", e.getMessage());
         }
     }
 
@@ -120,7 +120,7 @@ public class JmsMessageBrokerListenerRegistrarConfiguration
                 jmsListenerEndpointRegistry.start();
             }
         } catch (Exception e) {
-            logger.warn("Failed to start JMS listener containers: {}", e.getMessage());
+            log.warn("Failed to start JMS listener containers: {}", e.getMessage());
         }
     }
 

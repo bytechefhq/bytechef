@@ -31,11 +31,11 @@ import org.springframework.core.env.Environment;
 @ConditionalOnMessageBrokerMemory
 public class MemoryMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(MemoryMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(MemoryMessageBrokerConfiguration.class);
 
     public MemoryMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: memory");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: memory");
         }
     }
 

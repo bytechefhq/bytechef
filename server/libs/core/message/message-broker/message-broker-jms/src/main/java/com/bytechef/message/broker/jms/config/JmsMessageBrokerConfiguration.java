@@ -40,11 +40,11 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnMessageBrokerJms
 public class JmsMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(JmsMessageBrokerConfiguration.class);
 
     public JmsMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: jms");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: jms");
         }
     }
 
