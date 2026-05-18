@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TaskFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskFileStorageConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskFileStorageConfiguration.class);
 
     @Bean
     TaskFileStorage taskFileStorage(

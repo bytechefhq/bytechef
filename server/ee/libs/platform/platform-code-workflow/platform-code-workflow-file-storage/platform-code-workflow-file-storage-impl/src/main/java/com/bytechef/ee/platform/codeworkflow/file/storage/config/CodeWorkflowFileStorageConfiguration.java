@@ -27,7 +27,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnEEVersion
 public class CodeWorkflowFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(CodeWorkflowFileStorageConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(CodeWorkflowFileStorageConfiguration.class);
 
     @Bean
     CodeWorkflowFileStorage codeWorkflowFileStorage(
