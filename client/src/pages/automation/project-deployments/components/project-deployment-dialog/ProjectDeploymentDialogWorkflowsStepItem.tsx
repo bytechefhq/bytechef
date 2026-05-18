@@ -7,6 +7,7 @@ import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {FileInputIcon, Link2Icon, WorkflowIcon} from 'lucide-react';
 import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
@@ -46,9 +47,14 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     });
 
     return (
-        <div>
+        <div
+            className={twMerge(
+                showWorkflowToggle &&
+                    'flex flex-col gap-3 rounded-lg border border-stroke-neutral-secondary bg-surface-main p-2'
+            )}
+        >
             {showWorkflowToggle && (
-                <div className="flex items-center rounded-lg py-2">
+                <div className="flex items-center rounded-lg">
                     <Label
                         className="flex w-full cursor-pointer items-center gap-2 text-base font-semibold"
                         htmlFor={`projectDeploymentWorkflows.${workflowIndex}`}
@@ -73,7 +79,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             )}
 
             {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
-                <Tabs className="mt-2" defaultValue="connections">
+                <Tabs className="flex flex-col gap-2.5" defaultValue="connections">
                     <TabsList className="flex w-full">
                         <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
                             <Link2Icon className="mr-2 size-4" />
@@ -92,12 +98,13 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent className="py-3" value="connections">
+                    <TabsContent className="mt-0" value="connections">
                         <ConnectionConfigurationList
                             componentConnections={componentConnections}
                             connections={connections ?? []}
                             connectionsGrouped={connectionsGrouped}
                             control={control as unknown as Control<FieldValues>}
+                            fieldNamePrefix={`projectDeploymentWorkflows.${workflowIndex}.connections`}
                             getCurrentConnectionId={(connectionIndex) =>
                                 watchedConnections?.[connectionIndex]?.connectionId
                             }
@@ -111,7 +118,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         />
                     </TabsContent>
 
-                    <TabsContent className="py-3" value="inputs">
+                    <TabsContent className="mt-0" value="inputs">
                         <InputConfigurationList
                             control={control as unknown as Control<FieldValues>}
                             controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
