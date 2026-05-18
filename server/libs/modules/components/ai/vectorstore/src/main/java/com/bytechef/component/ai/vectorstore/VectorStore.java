@@ -90,7 +90,11 @@ public interface VectorStore {
         List<Map<String, Object>> metadataFilters = inputParameters.getList(
             METADATA, new TypeReference<>() {});
 
-        Optional<Filter.Expression> filterExpression = getFilterExpression(metadataFilters);
+        Optional<Filter.Expression> filterExpression = Optional.empty();
+        if (metadataFilters != null && !metadataFilters.isEmpty()) {
+            filterExpression = getFilterExpression(metadataFilters);
+
+        }
 
         filterExpression.ifPresent(vectorStore::delete);
     }
@@ -104,7 +108,10 @@ public interface VectorStore {
         List<Map<String, Object>> metadata = inputParameters.getList(
             METADATA, new TypeReference<>() {});
 
-        Optional<Filter.Expression> filterExpression = getFilterExpression(metadata);
+        Optional<Filter.Expression> filterExpression = Optional.empty();
+        if (metadata != null && !metadata.isEmpty()) {
+            filterExpression = getFilterExpression(metadata);
+        }
 
         SearchRequest searchRequest = SearchRequest.builder()
             .query(inputParameters.getRequiredString(QUERY))
