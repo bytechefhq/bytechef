@@ -47,7 +47,7 @@ import org.springframework.web.client.RestTemplate;
 @Component
 public class DataTableWebhookEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(DataTableWebhookEventListener.class);
 
     private final DataTableWebhookService dataTableWebhookService;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -87,8 +87,8 @@ public class DataTableWebhookEventListener {
 
             try {
                 retryTemplate.execute(() -> {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug("Calling data table webhook {} -> {}", hook.url(), body);
+                    if (log.isDebugEnabled()) {
+                        log.debug("Calling data table webhook {} -> {}", hook.url(), body);
                     }
 
                     return restTemplate.postForObject(hook.url(), body, String.class);

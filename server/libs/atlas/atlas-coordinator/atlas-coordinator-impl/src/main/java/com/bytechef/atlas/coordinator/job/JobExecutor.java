@@ -44,7 +44,7 @@ import org.springframework.util.Assert;
  */
 public class JobExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobExecutor.class);
+    private static final Logger log = LoggerFactory.getLogger(JobExecutor.class);
 
     private final ContextService contextService;
     private final Evaluator evaluator;
@@ -81,8 +81,8 @@ public class JobExecutor {
     private void executeNextTask(Job job, Workflow workflow) {
         Assert.notNull(job.getId(), "'job.id' must not be null");
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("executeNextTask: job={}, workflow={}", job, workflow);
+        if (log.isTraceEnabled()) {
+            log.trace("executeNextTask: job={}, workflow={}", job, workflow);
         }
 
         Map<String, ?> context = taskFileStorage.readContextValue(
@@ -98,8 +98,8 @@ public class JobExecutor {
 
         taskDispatcher.dispatch(nextTaskExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Task id={}, type='{}', name='{}' executed",
                 nextTaskExecution.getId(), nextTaskExecution.getType(), nextTaskExecution.getName());
         }

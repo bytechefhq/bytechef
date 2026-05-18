@@ -44,7 +44,7 @@ import org.springframework.web.client.RestClient;
 @ConditionalOnProperty(name = "bytechef.ai.firecrawl.enabled")
 public class FirecrawlTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(FirecrawlTools.class);
+    private static final Logger log = LoggerFactory.getLogger(FirecrawlTools.class);
 
     private final RestClient restClient;
 
@@ -68,8 +68,8 @@ public class FirecrawlTools {
             description = "ISO country code for geo-targeting (e.g., 'US', 'DE', 'JP')") String country) {
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "webSearch({}, {}, {}): Performing Firecrawl search for query: {}", query, limit, country, query);
             }
 
@@ -111,8 +111,8 @@ public class FirecrawlTools {
                     result.description() != null ? result.description() : ""))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "webSearch({}, {}, {}): Found {} search results for query: {}", query, limit, country,
                     results.size(), query);
             }
@@ -120,7 +120,7 @@ public class FirecrawlTools {
             return new FirecrawlSearchResult(query, results);
 
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "webSearch({}, {}, {}): Failed to perform Firecrawl search for query: {}", query, limit, country, query,
                 e);
 
@@ -138,8 +138,8 @@ public class FirecrawlTools {
             description = "Include only main content (excludes headers, navs, footers). Default: true") Boolean onlyMainContent) {
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug("webpageScrape({}, {}): Scraping URL with Firecrawl: {}", url, onlyMainContent, url);
+            if (log.isDebugEnabled()) {
+                log.debug("webpageScrape({}, {}): Scraping URL with Firecrawl: {}", url, onlyMainContent, url);
             }
 
             Map<String, Object> requestBody = new HashMap<>();
@@ -171,15 +171,15 @@ public class FirecrawlTools {
 
             String description = metadata != null && metadata.description() != null ? metadata.description() : null;
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "webpageScrape({}, {}): Successfully scraped URL: {}, content length: {}", url, onlyMainContent,
                     url, markdown.length());
             }
 
             return new FirecrawlScrapeResult(url, markdown, title, description);
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "webpageScrape({}, {}): Failed to scrape URL with Firecrawl: {}", url, onlyMainContent, url, e);
 
             throw new ExecutionException(
@@ -205,8 +205,8 @@ public class FirecrawlTools {
             description = "Exclude URLs with query parameters (default: true)") Boolean ignoreQueryParameters) {
 
         try {
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "websiteMap({}, {}, {}, {}, {}): Mapping website URLs for: {}", url, search, limit,
                     includeSubdomains, ignoreQueryParameters, url);
             }
@@ -250,8 +250,8 @@ public class FirecrawlTools {
                     link.description() != null ? link.description() : ""))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "websiteMap({}, {}, {}, {}, {}): Found {} URLs for website: {}", url, search, limit,
                     includeSubdomains, ignoreQueryParameters, results.size(), url);
             }
@@ -259,7 +259,7 @@ public class FirecrawlTools {
             return new FirecrawlMapResult(url, results);
 
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "websiteMap({}, {}, {}, {}, {}): Failed to map website URLs for: {}", url, search, limit,
                 includeSubdomains, ignoreQueryParameters, url, e);
 

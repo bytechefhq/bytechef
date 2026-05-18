@@ -71,7 +71,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  */
 public class AutomationMcpToolFacade extends AbstractToolFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(AutomationMcpToolFacade.class);
+    private static final Logger log = LoggerFactory.getLogger(AutomationMcpToolFacade.class);
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -262,7 +262,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
                     return callableResponse.output();
                 });
         } catch (Exception exception) {
-            logger.warn(
+            log.warn(
                 "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
 
             return Optional.empty();

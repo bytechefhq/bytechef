@@ -76,7 +76,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ProjectFacadeImpl implements ProjectFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectFacadeImpl.class);
 
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
@@ -319,7 +319,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
                         return null;
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to get workflow template", e);
+                    log.error("Failed to get workflow template", e);
 
                     return null;
                 }

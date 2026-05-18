@@ -43,7 +43,7 @@ import tools.jackson.databind.ObjectMapper;
  */
 abstract class AbstractWorkflowMapper implements WorkflowMapper {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractWorkflowMapper.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractWorkflowMapper.class);
 
     private static volatile List<String> additionalWorkflowReservedWords;
 
@@ -62,8 +62,8 @@ abstract class AbstractWorkflowMapper implements WorkflowMapper {
                             reservedWords.addAll(workflowReservedWordContributor.getReservedWords());
                         }
                     } catch (ServiceConfigurationError serviceConfigurationError) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(serviceConfigurationError.getMessage(), serviceConfigurationError);
+                        if (log.isDebugEnabled()) {
+                            log.debug(serviceConfigurationError.getMessage(), serviceConfigurationError);
                         }
                     }
 

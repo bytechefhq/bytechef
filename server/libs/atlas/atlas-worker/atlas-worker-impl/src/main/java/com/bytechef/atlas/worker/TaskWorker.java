@@ -74,7 +74,7 @@ import org.springframework.core.task.AsyncTaskExecutor;
  */
 public class TaskWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskWorker.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskWorker.class);
 
     public static final long DEFAULT_TIME_OUT = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -108,8 +108,8 @@ public class TaskWorker {
      * @param taskExecutionEvent The task event which contains task to execute.
      */
     public void onTaskExecutionEvent(TaskExecutionEvent taskExecutionEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTaskExecutionEvent: taskExecutionEvent={}", taskExecutionEvent);
         }
 
         TaskExecution taskExecution = taskExecutionEvent.getTaskExecution();
@@ -126,8 +126,8 @@ public class TaskWorker {
 
                 eventPublisher.publishEvent(new TaskExecutionCompleteEvent(completedTaskExecution));
             } catch (InterruptedException e) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(e.getMessage(), e);
+                if (log.isTraceEnabled()) {
+                    log.trace(e.getMessage(), e);
                 }
             } catch (Exception e) {
                 TaskExecutionFuture<?> taskExecutionFuture = taskExecutionFutureMap.get(taskExecution.getId());
@@ -149,7 +149,7 @@ public class TaskWorker {
 
             handleException(taskExecution, e);
         } catch (CancellationException e) {
-            logger.debug("Cancelled task: {}", taskExecution.getId());
+            log.debug("Cancelled task: {}", taskExecution.getId());
         } finally {
             try {
                 latch.await();
@@ -169,13 +169,13 @@ public class TaskWorker {
         if (event instanceof CancelControlTaskEvent cancelControlTaskEvent) {
             CancelControlTask cancelControlTask = cancelControlTaskEvent.getControlTask();
 
-            logger.debug("onCancelControlTaskEvent: cancelControlTask={}", cancelControlTask);
+            log.debug("onCancelControlTaskEvent: cancelControlTask={}", cancelControlTask);
 
             Long jobId = cancelControlTask.getJobId();
 
             for (TaskExecutionFuture<?> taskExecutionFuture : taskExecutionFutureMap.values()) {
                 if (Objects.equals(taskExecutionFuture.taskExecution.getJobId(), jobId)) {
-                    logger.info(
+                    log.info(
                         "Cancelling task jobId={}->taskExecutionId={}", jobId,
                         taskExecutionFuture.taskExecution.getId());
 
@@ -286,7 +286,7 @@ public class TaskWorker {
             exception = cause;
         }
 
-        logger.error(exception.getMessage(), exception);
+        log.error(exception.getMessage(), exception);
 
         taskExecution.setError(
             new ExecutionError(exception.getMessage(), Arrays.asList(ExceptionUtils.getStackFrames(exception))));

@@ -61,7 +61,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class TaskCoordinator {
 
-    private static final Logger logger = LoggerFactory.getLogger(TaskCoordinator.class);
+    private static final Logger log = LoggerFactory.getLogger(TaskCoordinator.class);
 
     private final List<ApplicationEventListener> applicationEventListeners;
     private final List<ErrorEventListener> errorEventListeners;
@@ -94,8 +94,8 @@ public class TaskCoordinator {
      * @param applicationEvent
      */
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onApplicationEvent: applicationEvent={}", applicationEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onApplicationEvent: applicationEvent={}", applicationEvent);
         }
 
         for (ApplicationEventListener applicationEventListener : applicationEventListeners) {
@@ -104,8 +104,8 @@ public class TaskCoordinator {
     }
 
     public void onErrorEvent(ErrorEvent errorEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onErrorEvent: errorEvent={}", errorEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onErrorEvent: errorEvent={}", errorEvent);
         }
 
         for (ErrorEventListener errorEventListener : errorEventListeners) {
@@ -120,8 +120,8 @@ public class TaskCoordinator {
      */
 // TODO @Transactional
     public void onResumeJobEvent(ResumeJobEvent resumeJobEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onResumeJobEvent: resumeJobEvent={}", resumeJobEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onResumeJobEvent: resumeJobEvent={}", resumeJobEvent);
         }
 
         Job job = jobService.resumeToStatusStarted(resumeJobEvent.getJobId());
@@ -138,8 +138,8 @@ public class TaskCoordinator {
             jobService.update(job);
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} resumed", resumeJobEvent.getJobId());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={} resumed", resumeJobEvent.getJobId());
         }
 
         try {
@@ -156,14 +156,14 @@ public class TaskCoordinator {
      */
 // TODO @Transactional
     public void onStartJobEvent(StartJobEvent startJobEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onStartJobEvent: startJobEvent={}", startJobEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onStartJobEvent: startJobEvent={}", startJobEvent);
         }
 
         Job job = jobService.setStatusToStarted(startJobEvent.getJobId());
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={}, label='{}' started", job.getId(), job.getLabel());
         }
 
         try {
@@ -185,8 +185,8 @@ public class TaskCoordinator {
      */
 // TODO @Transactional
     public void onStopJobEvent(StopJobEvent stopJobEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onStopJobEvent: stopJobEvent={}", stopJobEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onStopJobEvent: stopJobEvent={}", stopJobEvent);
         }
 
         Job job = jobService.setStatusToStopped(stopJobEvent.getJobId());
@@ -210,8 +210,8 @@ public class TaskCoordinator {
                     Validate.notNull(currentTaskExecution.getId(), "id")));
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Job id={} stopped", stopJobEvent.getJobId());
+        if (log.isDebugEnabled()) {
+            log.debug("Job id={} stopped", stopJobEvent.getJobId());
         }
     }
 
@@ -222,8 +222,8 @@ public class TaskCoordinator {
      */
 // TODO @Transactional
     public void onTaskExecutionCompleteEvent(TaskExecutionCompleteEvent taskExecutionCompleteEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onTaskExecutionCompleteEvent: taskExecutionCompleteEvent={}", taskExecutionCompleteEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onTaskExecutionCompleteEvent: taskExecutionCompleteEvent={}", taskExecutionCompleteEvent);
         }
 
         TaskExecution taskExecution = taskExecutionCompleteEvent.getTaskExecution();

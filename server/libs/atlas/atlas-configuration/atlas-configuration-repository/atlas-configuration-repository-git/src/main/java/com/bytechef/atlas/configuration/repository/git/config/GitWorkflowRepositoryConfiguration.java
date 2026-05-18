@@ -32,12 +32,10 @@ import org.springframework.core.annotation.Order;
 @ConditionalOnWorkflowRepositoryGit
 public class GitWorkflowRepositoryConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(GitWorkflowRepositoryConfiguration.class);
 
     public GitWorkflowRepositoryConfiguration() {
-        if (logger.isInfoEnabled()) {
-            logger.info("Workflow repository type enabled: git");
-        }
+        log.info("Workflow repository type enabled: git");
     }
 
     @Bean

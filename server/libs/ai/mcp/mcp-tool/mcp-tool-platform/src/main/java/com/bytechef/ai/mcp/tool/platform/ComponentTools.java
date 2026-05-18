@@ -61,7 +61,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ComponentTools {
 
-    private static final Logger logger = LoggerFactory.getLogger(ComponentTools.class);
+    private static final Logger log = LoggerFactory.getLogger(ComponentTools.class);
 
     private static final String TRIGGER_NOT_FOUND = "Trigger '%s' not found in component '%s'";
     private static final String ACTION_NOT_FOUND = "Action '%s' not found in component '%s'";
@@ -125,8 +125,8 @@ public class ComponentTools {
         try {
             ComponentDefinition componentDefinition = getComponentDefinition(componentName, version);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getComponent({}, {}): Retrieved component {}", componentName, version, componentName);
+            if (log.isDebugEnabled()) {
+                log.debug("getComponent({}, {}): Retrieved component {}", componentName, version, componentName);
             }
 
             String extraInstructions = null;
@@ -171,7 +171,7 @@ public class ComponentTools {
                     .toList(),
                 extraInstructions);
         } catch (Exception e) {
-            logger.error("getComponent({}, {}): Failed to get component {}", componentName, version, componentName, e);
+            log.error("getComponent({}, {}): Failed to get component {}", componentName, version, componentName, e);
 
             throw new ExecutionException(FAILED_TO_GET_COMPONENT, e, ComponentToolErrorType.GET_COMPONENT);
         }
@@ -213,7 +213,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTrigger({}, {}, {}): Failed to get trigger '{}' from component '{}'", componentName, triggerName,
                 version, triggerName, componentName, e);
 
@@ -253,8 +253,8 @@ public class ComponentTools {
                 .replace("{componentVersion}", String.valueOf(componentDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getTriggerDefinition({}, {}, {}): Generated trigger definition for {}:{}", componentName,
                     triggerName, version, componentName, triggerName);
             }
@@ -263,7 +263,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getTriggerDefinition({}, {}, {}): Failed to generate trigger definition for '{}:{}'",
                 componentName, triggerName, version, componentName, triggerName, e);
 
@@ -285,13 +285,13 @@ public class ComponentTools {
                         action.getName(), action.getDescription(), component.getName())))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("listActions(): Found {} actions across all components", actions.size());
+            if (log.isDebugEnabled()) {
+                log.debug("listActions(): Found {} actions across all components", actions.size());
             }
 
             return actions;
         } catch (Exception e) {
-            logger.error("listActions(): " + FAILED_TO_LIST_ACTIONS, e);
+            log.error("listActions(): " + FAILED_TO_LIST_ACTIONS, e);
 
             throw new ExecutionException(FAILED_TO_LIST_ACTIONS, e, ComponentToolErrorType.LIST_ACTIONS);
         }
@@ -303,8 +303,8 @@ public class ComponentTools {
         try {
             List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("listComponents(): Found {} components", componentDefinitions.size());
+            if (log.isDebugEnabled()) {
+                log.debug("listComponents(): Found {} components", componentDefinitions.size());
             }
 
             return componentDefinitions.stream()
@@ -312,7 +312,7 @@ public class ComponentTools {
                     component.getName(), component.getDescription(), component.getVersion()))
                 .toList();
         } catch (Exception e) {
-            logger.error("listComponents(): " + FAILED_TO_LIST_COMPONENTS, e);
+            log.error("listComponents(): " + FAILED_TO_LIST_COMPONENTS, e);
 
             throw new ExecutionException(FAILED_TO_LIST_COMPONENTS, e, ComponentToolErrorType.LIST_COMPONENTS);
         }
@@ -331,13 +331,13 @@ public class ComponentTools {
                         trigger.getName(), trigger.getDescription(), component.getName())))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("listTriggers(): Found {} triggers across all components", triggers.size());
+            if (log.isDebugEnabled()) {
+                log.debug("listTriggers(): Found {} triggers across all components", triggers.size());
             }
 
             return triggers;
         } catch (Exception e) {
-            logger.error("listTriggers(): " + FAILED_TO_LIST_TRIGGERS, e);
+            log.error("listTriggers(): " + FAILED_TO_LIST_TRIGGERS, e);
 
             throw new ExecutionException(FAILED_TO_LIST_TRIGGERS, e, ComponentToolErrorType.LIST_TRIGGERS);
         }
@@ -363,15 +363,15 @@ public class ComponentTools {
                     null, lowerQuery))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "searchComponents({}): Found {} components matching query '{}'", query, matchingComponents.size(),
                     query);
             }
 
             return matchingComponents;
         } catch (Exception e) {
-            logger.error("searchComponents({}): Failed to search components with query '{}'", query, query, e);
+            log.error("searchComponents({}): Failed to search components with query '{}'", query, query, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_COMPONENTS, e, ComponentToolErrorType.SEARCH_COMPONENTS);
         }
@@ -401,14 +401,14 @@ public class ComponentTools {
                     trigger2.description(), trigger2.componentName(), lowerQuery))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "searchTriggers({}): Found {} triggers matching query '{}'", query, matchingTriggers.size(), query);
             }
 
             return matchingTriggers;
         } catch (Exception e) {
-            logger.error("searchTriggers({}): Failed to search triggers with query '{}'", query, query, e);
+            log.error("searchTriggers({}): Failed to search triggers with query '{}'", query, query, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_TRIGGERS, e, ComponentToolErrorType.SEARCH_TRIGGERS);
         }
@@ -454,8 +454,8 @@ public class ComponentTools {
                 .orElseThrow(() -> new ExecutionException(
                     String.format(ACTION_NOT_FOUND, actionName, componentName), ComponentToolErrorType.GET_ACTION));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getAction({}, {}, {}): Found action '{}' from component '{}'", componentName, actionName, version,
                     actionName, componentName);
             }
@@ -464,7 +464,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getAction({}, {}, {}): Failed to get action '{}' from component '{}'", componentName, actionName,
                 version, actionName, componentName, e);
 
@@ -519,14 +519,14 @@ public class ComponentTools {
                     null))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("searchClusterElements({}, {}): Found {} components matching cluster element type '{}'",
+            if (log.isDebugEnabled()) {
+                log.debug("searchClusterElements({}, {}): Found {} components matching cluster element type '{}'",
                     clusterElementType, componentName, matchingComponents.size(), clusterElementType);
             }
 
             return matchingComponents;
         } catch (Exception e) {
-            logger.error("searchClusterElements({}, {}): Failed to search cluster elements with type '{}'",
+            log.error("searchClusterElements({}, {}): Failed to search cluster elements with type '{}'",
                 clusterElementType, componentName, clusterElementType, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
@@ -575,8 +575,8 @@ public class ComponentTools {
                     String.format(ACTION_NOT_FOUND, clusterElementName, componentName),
                     ComponentToolErrorType.GET_ACTION));
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getClusterElement({}, {}, {}): Found cluster element '{}' from component '{}'",
+            if (log.isDebugEnabled()) {
+                log.debug("getClusterElement({}, {}, {}): Found cluster element '{}' from component '{}'",
                     componentName, clusterElementName, version, clusterElementName, componentName);
             }
 
@@ -585,7 +585,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getClusterElement({}, {}, {}): Failed to get cluster element '{}' from component '{}'", componentName,
                 clusterElementName, version, clusterElementName, componentName, e);
 
@@ -616,14 +616,14 @@ public class ComponentTools {
                     action2.description(), action2.componentName(), lowerQuery))
                 .toList();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "searchActions({}): Found {} actions matching query '{}'", query, matchingActions.size(), query);
             }
 
             return matchingActions;
         } catch (Exception e) {
-            logger.error("searchActions({}): Failed to search actions with query '{}'", query, query, e);
+            log.error("searchActions({}): Failed to search actions with query '{}'", query, query, e);
 
             throw new ExecutionException(FAILED_TO_SEARCH_ACTIONS, e, ComponentToolErrorType.SEARCH_ACTIONS);
         }
@@ -657,8 +657,8 @@ public class ComponentTools {
                 .replace("{componentVersion}", String.valueOf(componentDefinition.getVersion()))
                 .replace("\"parameters\": {}", "\"parameters\": " + parametersJson);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getActionDefinition({}, {}, {}): Generated action definition for {}:{}", componentName, actionName,
                     version, componentName, actionName);
             }
@@ -667,7 +667,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getActionDefinition({}, {}, {}): Failed to generate action definition for '{}:{}'", componentName,
                 actionName, version, componentName, actionName, e);
 
@@ -781,8 +781,8 @@ public class ComponentTools {
                 return null;
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "getOutputProperty({}, {}, {}): Retrieved output properties for {}:{}", componentName,
                     operationName, version, componentName, operationName);
             }
@@ -791,7 +791,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getOutputProperty({}, {}, {}): Failed to get output properties for '{}:{}'", componentName,
                 operationName, version, componentName, operationName, e);
 
@@ -862,8 +862,8 @@ public class ComponentTools {
                 }
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("getProperties({}, {}, {}): Retrieved {} properties for {}:{}", componentName,
+            if (log.isDebugEnabled()) {
+                log.debug("getProperties({}, {}, {}): Retrieved {} properties for {}:{}", componentName,
                     operationName, version, properties.size(), componentName, operationName);
             }
 
@@ -871,7 +871,7 @@ public class ComponentTools {
         } catch (ExecutionException e) {
             throw e;
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "getProperties({}, {}, {}): Failed to get properties for '{}:{}'", componentName, operationName,
                 version, componentName, operationName, e);
 

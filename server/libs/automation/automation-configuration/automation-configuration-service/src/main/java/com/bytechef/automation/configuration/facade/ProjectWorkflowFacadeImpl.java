@@ -82,7 +82,7 @@ import tools.jackson.core.type.TypeReference;
 @Transactional
 public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectWorkflowFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ProjectWorkflowFacadeImpl.class);
 
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final EnvironmentService environmentService;
@@ -285,7 +285,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
                         return null;
                     }
                 } catch (Exception e) {
-                    logger.error("Failed to get workflow template", e);
+                    log.error("Failed to get workflow template", e);
 
                     return null;
                 }
