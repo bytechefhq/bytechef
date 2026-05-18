@@ -39,7 +39,7 @@ import org.springframework.stereotype.Service;
 @Service
 class TriggerCompletionServiceImpl implements TriggerCompletionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerCompletionServiceImpl.class);
 
     private final JobFacade jobFacade;
 
@@ -50,7 +50,7 @@ class TriggerCompletionServiceImpl implements TriggerCompletionService {
 
     @Override
     public void completeTrigger(String workflowExecutionId, Map<String, Object> triggerOutput) {
-        logger.info("Completing trigger for workflowExecutionId={}", workflowExecutionId);
+        log.info("Completing trigger for workflowExecutionId={}", workflowExecutionId);
 
         try {
             // The workflowExecutionId contains encoded workflow information
@@ -60,7 +60,7 @@ class TriggerCompletionServiceImpl implements TriggerCompletionService {
             String workflowId = extractWorkflowId(workflowExecutionId);
 
             if (workflowId == null) {
-                logger.error("Unable to extract workflow ID from workflowExecutionId={}", workflowExecutionId);
+                log.error("Unable to extract workflow ID from workflowExecutionId={}", workflowExecutionId);
 
                 return;
             }
@@ -69,11 +69,11 @@ class TriggerCompletionServiceImpl implements TriggerCompletionService {
 
             long jobId = jobFacade.createJob(jobParameters);
 
-            logger.info(
+            log.info(
                 "Trigger completed successfully for workflowExecutionId={}, created jobId={}", workflowExecutionId,
                 jobId);
         } catch (Exception exception) {
-            logger.error("Failed to complete trigger for workflowExecutionId={}", workflowExecutionId, exception);
+            log.error("Failed to complete trigger for workflowExecutionId={}", workflowExecutionId, exception);
 
             throw exception;
         }
@@ -81,12 +81,12 @@ class TriggerCompletionServiceImpl implements TriggerCompletionService {
 
     @Override
     public void completeTriggerWithError(String workflowExecutionId, String errorMessage) {
-        logger.info(
+        log.info(
             "Completing trigger with error for workflowExecutionId={}, error={}", workflowExecutionId, errorMessage);
 
         // For error completion, we just log and don't continue the workflow
         // The workflow will not be started if the trigger fails
-        logger.error(
+        log.error(
             "Trigger failed for workflowExecutionId={}: {}", workflowExecutionId, errorMessage);
     }
 

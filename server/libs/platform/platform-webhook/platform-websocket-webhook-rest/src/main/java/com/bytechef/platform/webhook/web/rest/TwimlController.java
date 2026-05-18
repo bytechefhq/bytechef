@@ -43,7 +43,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/webhooks")
 class TwimlController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TwimlController.class);
+    private static final Logger log = LoggerFactory.getLogger(TwimlController.class);
 
     private final CallSessionRegistry callSessionRegistry;
     private final String publicUrl;
@@ -85,14 +85,14 @@ class TwimlController {
         @RequestParam(required = false) String callRef,
         @RequestParam(required = false) String subWorkflowId) {
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "TwiML request: workflowExecutionId={}, callSid={}, callRef={}, subWorkflowId={}",
                 workflowExecutionId, callSid, callRef, subWorkflowId);
         }
 
         if (publicUrl == null || publicUrl.isBlank()) {
-            logger.error("Public URL not configured. Cannot serve TwiML.");
+            log.error("Public URL not configured. Cannot serve TwiML.");
 
             return ResponseEntity.internalServerError()
                 .body(
@@ -107,7 +107,7 @@ class TwimlController {
         String effectiveCallSid = callSid != null ? callSid : callRef;
 
         if (effectiveCallSid == null) {
-            logger.warn("Missing callSid and callRef in TwiML request");
+            log.warn("Missing callSid and callRef in TwiML request");
 
             return ResponseEntity.badRequest()
                 .body(

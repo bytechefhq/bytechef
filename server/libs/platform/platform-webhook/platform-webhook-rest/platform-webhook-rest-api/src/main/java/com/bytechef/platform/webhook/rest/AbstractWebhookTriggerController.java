@@ -65,7 +65,7 @@ public abstract class AbstractWebhookTriggerController {
     public static final String HEADER_WORKFLOW_EXECUTION_ID = "X-ByteChef-Workflow-Execution-Id";
     public static final String HEADER_PUBLIC_URL = "X-ByteChef-Public-Url";
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrl;
@@ -113,8 +113,8 @@ public abstract class AbstractWebhookTriggerController {
         // Add workflowExecutionId and publicUrl as headers for trigger access
         webhookRequest = addPlatformHeaders(webhookRequest, workflowExecutionId);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "doProcessTrigger: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId,
                 webhookRequest, webhookTriggerFlags);
         }
@@ -260,7 +260,7 @@ public abstract class AbstractWebhookTriggerController {
 
                     httpServletResponse.sendRedirect(redirectUrl);
                 } else {
-                    logger.warn("Blocked potentially unsafe redirect URL: {}", redirectUrl);
+                    log.warn("Blocked potentially unsafe redirect URL: {}", redirectUrl);
 
                     responseEntity = ResponseEntity.badRequest()
                         .body("Invalid redirect URL");

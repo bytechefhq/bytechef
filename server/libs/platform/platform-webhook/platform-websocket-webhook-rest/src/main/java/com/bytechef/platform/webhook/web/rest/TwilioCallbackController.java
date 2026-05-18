@@ -41,7 +41,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/webhooks/twilio")
 class TwilioCallbackController {
 
-    private static final Logger logger = LoggerFactory.getLogger(TwilioCallbackController.class);
+    private static final Logger log = LoggerFactory.getLogger(TwilioCallbackController.class);
 
     private final CallSessionRegistry callSessionRegistry;
     private final JobFacade jobFacade;
@@ -81,14 +81,14 @@ class TwilioCallbackController {
         String direction = params.get("Direction");
         String accountSid = params.get("AccountSid");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Twilio status callback: callSid={}, status={}, from={}, to={}, direction={}, accountSid={}",
                 callSid, callStatus, from, to, direction, accountSid);
         }
 
         if (callSid == null || callStatus == null) {
-            logger.warn("Missing required parameters in Twilio callback: callSid={}, callStatus={}", callSid,
+            log.warn("Missing required parameters in Twilio callback: callSid={}, callStatus={}", callSid,
                 callStatus);
 
             return ResponseEntity.badRequest()
@@ -102,20 +102,20 @@ class TwilioCallbackController {
         if (sessionOptional.isPresent()) {
             CallSession session = sessionOptional.get();
 
-            logger.info("Updated call status for active session: callSid={}, status={}, sessionId={}",
+            log.info("Updated call status for active session: callSid={}, status={}, sessionId={}",
                 callSid, callStatus, session.getWebSocketSessionId());
 
             if (isTerminalStatus(callStatus)) {
                 Long subJobId = session.getSubJobId();
 
                 if (subJobId != null) {
-                    logger.info("Stopping sub-workflow for terminated call: callSid={}, subJobId={}", callSid,
+                    log.info("Stopping sub-workflow for terminated call: callSid={}, subJobId={}", callSid,
                         subJobId);
 
                     try {
                         jobFacade.stopJob(subJobId);
                     } catch (Exception exception) {
-                        logger.warn("Failed to stop sub-workflow: callSid={}, subJobId={}", callSid, subJobId,
+                        log.warn("Failed to stop sub-workflow: callSid={}, subJobId={}", callSid, subJobId,
                             exception);
                     }
                 }
@@ -126,7 +126,7 @@ class TwilioCallbackController {
                     try {
                         session.setCallDuration(Integer.parseInt(durationStr));
                     } catch (NumberFormatException exception) {
-                        logger.warn("Failed to parse call duration: {}", durationStr);
+                        log.warn("Failed to parse call duration: {}", durationStr);
                     }
                 }
 
@@ -151,11 +151,11 @@ class TwilioCallbackController {
                     workflowContinuationHelper.createContinuationJob(workflowExecutionId, afterCallData);
                 }
 
-                logger.info("Signaled completion for call: callSid={}, actionJobId={}", callSid,
+                log.info("Signaled completion for call: callSid={}, actionJobId={}", callSid,
                     session.getActionJobId());
             }
         } else {
-            logger.info("Call status update for inactive session: callSid={}, status={}", callSid, callStatus);
+            log.info("Call status update for inactive session: callSid={}, status={}", callSid, callStatus);
         }
 
         return ResponseEntity.ok("OK");
@@ -187,8 +187,8 @@ class TwilioCallbackController {
         String recordingUrl = params.get("RecordingUrl");
         String recordingStatus = params.get("RecordingStatus");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Twilio recording callback: callSid={}, recordingSid={}, recordingUrl={}, recordingStatus={}",
                 callSid, recordingSid, recordingUrl, recordingStatus);
         }
@@ -215,8 +215,8 @@ class TwilioCallbackController {
         String streamSid = params.get("StreamSid");
         String event = params.get("Event");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Twilio media stream callback: callSid={}, streamSid={}, event={}", callSid, streamSid,
+        if (log.isDebugEnabled()) {
+            log.debug("Twilio media stream callback: callSid={}, streamSid={}, event={}", callSid, streamSid,
                 event);
         }
 

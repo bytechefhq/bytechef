@@ -39,7 +39,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class WorkflowContinuationHelper {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowContinuationHelper.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowContinuationHelper.class);
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
@@ -82,10 +82,10 @@ public class WorkflowContinuationHelper {
                     workflowExecutionId.getJobPrincipalId(),
                     workflowExecutionId.getType()));
 
-            logger.info(
+            log.info(
                 "Created continuation job: jobId={}, workflowExecutionId={}", jobId, workflowExecutionIdString);
         } catch (Exception exception) {
-            logger.error(
+            log.error(
                 "Failed to create continuation job: workflowExecutionId={}", workflowExecutionIdString, exception);
         }
     }
