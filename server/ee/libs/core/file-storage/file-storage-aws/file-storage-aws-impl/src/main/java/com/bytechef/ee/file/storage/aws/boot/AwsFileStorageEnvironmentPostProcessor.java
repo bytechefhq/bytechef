@@ -34,7 +34,7 @@ public class AwsFileStorageEnvironmentPostProcessor implements EnvironmentPostPr
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (Objects.equals(environment.getProperty("bytechef.file.storage.provider", String.class), "aws")) {
+        if (Objects.equals(environment.getProperty("bytechef.file-storage.provider", String.class), "aws")) {
             source.put("spring.cloud.aws.s3.enabled", true);
         }
 
