@@ -9,5 +9,6 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-jdbc")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation("org.springframework.data:spring-data-relational")
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:config:app-config"))
 }
