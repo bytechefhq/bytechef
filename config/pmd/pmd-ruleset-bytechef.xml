@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ruleset name="ByteChef Custom Rules"
+         xmlns="http://pmd.sourceforge.net/ruleset/2.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://pmd.sourceforge.net/ruleset/2.0.0
+                               http://pmd.sourceforge.net/ruleset_2_0_0.xsd">
+
+    <description>
+        ByteChef custom XPath rules — patterns not covered by built-in PMD categories.
+    </description>
+
+    <rule name="LoggedExceptionInCatchBlockAndRethrown"
+          language="java"
+          message="Avoid redundant log error entries, pass the message and caught exception as the last argument to preserve the stack trace"
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            In a catch block that re-throws, every SLF4J log call must pass the custom error message (if any) with
+            details about current context and the caught exception as its final argument. SLF4J appends the stack trace
+            when the last argument is a Throwable and the message should tell about the error context.
+        </description>
+        <properties>
+            <property name="xpath">
+                <value>
+                    //CatchClause/Block[
+                        let $exceptionVariableName := CatchParameter/@Name
+                        return
+                        ExpressionStatement/MethodCall[@MethodName = ('error')] and ThrowStatement/ConstructorCall/ArgumentList/VariableAccess[@Name = $exceptionVariableName]
+                    ]
+                </value>
+            </property>
+        </properties>
+        <priority>1</priority>
+        <example>
+            <![CDATA[
+                // BAD — stack trace silently discarded
+                } catch (IOException ioException) {
+                    log.error("Failed for tenant " + tenantId, ioException);
+                    throw new RuntimeException(ioException);
+                }
+
+                // GOOD — full stack trace preserved
+                } catch (IOException ioException) {
+                    throw new RuntimeException("Failed for tenant " + tenantId, ioException);
+                }
+            ]]>
+        </example>
+    </rule>
+
+    <rule name="LogVariableNameWithPrivateStaticFinalModifiers"
+          language="java"
+          message="Force Logger variable to be named as log and to be private, static, and final"
+          class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
+        <description>
+            Always decler Logger variable to be named as log and to be private, static, and final
+        </description>
+        <properties>
+            <property name="xpath">
+                <value>
+                    //ClassBody/FieldDeclaration[
+                        ClassType[@SimpleName = 'Logger']
+                        and
+                        (
+                            VariableDeclarator/VariableId[@Name != 'log']
+                            or
+                            ModifierList[@ExplicitModifiers != 'private,static,final']
+                        )
+                    ]
+                </value>
+            </property>
+        </properties>
+        <priority>4</priority>
+        <example>
+            <![CDATA[
+                // BAD — stack trace silently discarded
+                private static final Logger logger = LoggerFactory.getLogger(YourClass.class);
+                // BAD — stack trace silently discarded
+                private static  Logger log = LoggerFactory.getLogger(YourClass.class);
+                // BAD — stack trace silently discarded
+                private Logger log = LoggerFactory.getLogger(YourClass.class);
+
+                // GOOD — full stack trace preserved
+                private static final Logger log = LoggerFactory.getLogger(YourClass.class);
+            ]]>
+        </example>
+    </rule>
+
+</ruleset>
