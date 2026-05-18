@@ -1,4 +1,4 @@
-package com.bytechef.ee.embedded.execution.public_.web.rest.model;
+package com.bytechef.ee.embedded.webhook.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The environment of a project.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.894014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-18T13:58:41.005994+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public enum EnvironmentModel {
   
   DEVELOPMENT("DEVELOPMENT"),

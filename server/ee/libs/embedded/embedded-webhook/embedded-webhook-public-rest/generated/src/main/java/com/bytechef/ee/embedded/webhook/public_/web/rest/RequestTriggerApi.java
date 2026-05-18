@@ -3,10 +3,10 @@
  * https://openapi-generator.tech
  * Do not edit the class manually.
  */
-package com.bytechef.ee.embedded.execution.public_.web.rest;
+package com.bytechef.ee.embedded.webhook.public_.web.rest;
 
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.ExecuteWorkflows400ResponseModel;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.model.ExecuteWorkflows400ResponseModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,22 +35,23 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:00.894014+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-18T13:58:41.005994+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
-@Tag(name = "app-event-trigger", description = "The Embedded App Event Trigger Public API")
-public interface AppEventTriggerApi {
+@Tag(name = "request-trigger", description = "The Embedded Request Trigger Public API")
+public interface RequestTriggerApi {
 
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
 
-    String PATH_EXECUTE_WORKFLOWS = "/app-events";
+    String PATH_EXECUTE_WORKFLOW = "/workflows/{workflowUuid}";
     /**
-     * POST /app-events : Execute workflows
+     * POST /workflows/{workflowUuid} : Execute workflows
      * Execute workflows.
      *
+     * @param workflowUuid The workflow uuid. (required)
      * @param xEnvironment The environment. (optional)
-     * @return Successful operation. (status code 204)
+     * @return The list of active integrations. (status code 200)
      *         or Bad request (status code 400)
      *         or Unauthorized (status code 401)
      *         or Forbidden (status code 403)
@@ -62,12 +63,14 @@ public interface AppEventTriggerApi {
      *         or Not implemented (status code 501)
      */
     @Operation(
-        operationId = "executeWorkflows",
+        operationId = "executeWorkflow",
         summary = "Execute workflows",
         description = "Execute workflows.",
-        tags = { "app-event-trigger" },
+        tags = { "request-trigger" },
         responses = {
-            @ApiResponse(responseCode = "204", description = "Successful operation."),
+            @ApiResponse(responseCode = "200", description = "The list of active integrations.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Object.class))
+            }),
             @ApiResponse(responseCode = "400", description = "Bad request", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = ExecuteWorkflows400ResponseModel.class))
             }),
@@ -99,10 +102,11 @@ public interface AppEventTriggerApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = AppEventTriggerApi.PATH_EXECUTE_WORKFLOWS,
+        value = RequestTriggerApi.PATH_EXECUTE_WORKFLOW,
         produces = { "application/json" }
     )
-    default ResponseEntity<Void> executeWorkflows(
+    default ResponseEntity<Object> executeWorkflow(
+        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         getRequest().ifPresent(request -> {

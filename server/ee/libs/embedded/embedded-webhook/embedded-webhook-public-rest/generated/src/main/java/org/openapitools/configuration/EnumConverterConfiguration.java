@@ -1,6 +1,6 @@
 package org.openapitools.configuration;
 
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
