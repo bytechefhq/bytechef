@@ -82,28 +82,32 @@ const ConnectedUserTable = ({connectedUsers}: ConnectedUserTableProps) => {
             }),
             columnHelper.accessor('integrationInstances', {
                 cell: (info) => {
+                    const uniqueComponentNames = Array.from(
+                        new Set(
+                            info
+                                .getValue()
+                                ?.map((integrationInstance) => integrationInstance.componentName)
+                                .filter(Boolean) ?? []
+                        )
+                    );
+
                     return (
                         <div className="flex space-x-0.5">
-                            {info.getValue() ? (
-                                info.getValue()?.map((integrationInstance) => {
-                                    const componentDefinition = componentDefinitions?.find(
-                                        (componentDefinition) =>
-                                            componentDefinition.name === integrationInstance.componentName
-                                    );
+                            {uniqueComponentNames.map((componentName) => {
+                                const componentDefinition = componentDefinitions?.find(
+                                    (componentDefinition) => componentDefinition.name === componentName
+                                );
 
-                                    return (
-                                        componentDefinition && (
-                                            <InlineSVG
-                                                className="mr-2 size-6 flex-none"
-                                                key={componentDefinition.name!}
-                                                src={componentDefinition.icon!}
-                                            />
-                                        )
-                                    );
-                                })
-                            ) : (
-                                <></>
-                            )}
+                                return (
+                                    componentDefinition && (
+                                        <InlineSVG
+                                            className="mr-2 size-6 flex-none"
+                                            key={componentDefinition.name!}
+                                            src={componentDefinition.icon!}
+                                        />
+                                    )
+                                );
+                            })}
                         </div>
                     );
                 },
