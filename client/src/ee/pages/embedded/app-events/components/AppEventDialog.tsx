@@ -130,19 +130,30 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
                                     <FormLabel>Schema</FormLabel>
 
                                     <FormControl>
-                                        <Suspense fallback={<MonacoEditorLoader />}>
-                                            <MonacoEditor
-                                                className="rounded-md border border-input shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-                                                defaultLanguage="json"
-                                                onChange={(value) => {
-                                                    if (value) {
-                                                        form.setValue('schema', value);
-                                                    }
-                                                }}
-                                                onMount={() => {}}
-                                                value={field.value || '{}'}
-                                            />
-                                        </Suspense>
+                                        <div className="h-48 overflow-hidden rounded-md border border-input shadow-sm focus-within:outline-none focus-within:ring-1 focus-within:ring-ring">
+                                            <Suspense fallback={<MonacoEditorLoader />}>
+                                                <MonacoEditor
+                                                    defaultLanguage="json"
+                                                    onChange={(value) => {
+                                                        if (value) {
+                                                            form.setValue('schema', value);
+                                                        }
+                                                    }}
+                                                    onMount={() => {}}
+                                                    options={{
+                                                        automaticLayout: true,
+                                                        folding: true,
+                                                        fontSize: 12,
+                                                        lineNumbers: 'on',
+                                                        minimap: {enabled: false},
+                                                        scrollBeyondLastLine: false,
+                                                        tabSize: 2,
+                                                        wordWrap: 'on',
+                                                    }}
+                                                    value={field.value || '{}'}
+                                                />
+                                            </Suspense>
+                                        </div>
                                     </FormControl>
 
                                     <FormDescription>
