@@ -74,7 +74,7 @@ import org.springframework.expression.spel.support.StandardEvaluationContext;
 })
 public class SpelEvaluator implements Evaluator {
 
-    private static final Logger logger = LoggerFactory.getLogger(SpelEvaluator.class);
+    private static final Logger log = LoggerFactory.getLogger(SpelEvaluator.class);
 
     private static final String ACCESSOR_PREFIX = "${";
     private static final String ACCESSOR_SUFFIX = "}";
@@ -224,8 +224,8 @@ public class SpelEvaluator implements Evaluator {
 
                         if (!validateFormulaExpression(string)) {
                             if (lenient) {
-                                if (logger.isDebugEnabled()) {
-                                    logger.debug("Invalid formula expression: {}", string);
+                                if (log.isDebugEnabled()) {
+                                    log.debug("Invalid formula expression: {}", string);
                                 }
 
                                 return value;
@@ -237,8 +237,8 @@ public class SpelEvaluator implements Evaluator {
                         expression = expressionParser.parseExpression(string.substring(1));
                     } catch (ParseException parseException) {
                         if (lenient) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Unparseable formula expression: {}", string, parseException);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Unparseable formula expression: {}", string, parseException);
                             }
 
                             return value;
@@ -249,8 +249,8 @@ public class SpelEvaluator implements Evaluator {
                 } else {
                     if (!validateTextExpression(string)) {
                         if (lenient) {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Invalid expression: {}", string);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Invalid expression: {}", string);
                             }
 
                             return value;
@@ -271,8 +271,8 @@ public class SpelEvaluator implements Evaluator {
                     try {
                         return expression.getValue(createEvaluationContext(context, formulaExpression));
                     } catch (SpelEvaluationException spelEvaluationException) {
-                        if (logger.isDebugEnabled()) {
-                            logger.debug(spelEvaluationException.getMessage());
+                        if (log.isDebugEnabled()) {
+                            log.debug(spelEvaluationException.getMessage());
                         }
 
                         return value;

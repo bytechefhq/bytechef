@@ -38,11 +38,11 @@ import tools.jackson.databind.json.JsonMapper;
 @ConditionalOnMessageBrokerAmqp
 public class AmqpMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AmqpMessageBrokerConfiguration.class);
 
     public AmqpMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: amqp");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: amqp");
         }
     }
 

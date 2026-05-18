@@ -35,7 +35,7 @@ import tools.jackson.databind.type.TypeFactory;
  */
 public class ConvertUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConvertUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(ConvertUtils.class);
 
     private static ObjectMapper objectMapper;
 
@@ -86,8 +86,8 @@ public class ConvertUtils {
             try {
                 value = transformerFunction.apply(trimmedString);
             } catch (NumberFormatException | DateTimeParseException exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
 
                 continue;

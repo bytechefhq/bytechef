@@ -36,12 +36,12 @@ import org.springframework.stereotype.Component;
 @Component
 class GlobalDataFetcherExceptionResolver extends DataFetcherExceptionResolverAdapter {
 
-    private static final Logger logger = LoggerFactory.getLogger(GlobalDataFetcherExceptionResolver.class);
+    private static final Logger log = LoggerFactory.getLogger(GlobalDataFetcherExceptionResolver.class);
 
     @Override
     protected @Nullable GraphQLError resolveToSingleError(Throwable throwable, DataFetchingEnvironment environment) {
         if (throwable instanceof AbstractException abstractException) {
-            logger.error(abstractException.getMessage(), abstractException);
+            log.error(abstractException.getMessage(), abstractException);
 
             String detailMessage = getDeepestCauseMessage(abstractException);
 

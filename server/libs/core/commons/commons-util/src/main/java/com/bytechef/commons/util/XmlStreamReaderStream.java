@@ -56,7 +56,7 @@ import tools.jackson.dataformat.xml.XmlMapper;
  */
 final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
 
-    private static final Logger logger = LoggerFactory.getLogger(XmlStreamReaderStream.class);
+    private static final Logger log = LoggerFactory.getLogger(XmlStreamReaderStream.class);
 
     private static final XMLInputFactory xmlInputFactory;
 
@@ -285,8 +285,8 @@ final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
             try {
                 xmlStreamReader.close();
             } catch (XMLStreamException e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(e.getMessage(), e);
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage(), e);
                 }
             }
         }
@@ -308,7 +308,7 @@ final class XmlStreamReaderStream implements Stream<Map<String, ?>> {
         try {
             factory.setProperty("javax.xml.stream.isSupportingExternalEntities", false);
         } catch (IllegalArgumentException e) {
-            logger.debug("Property javax.xml.stream.isSupportingExternalEntities not supported", e);
+            log.debug("Property javax.xml.stream.isSupportingExternalEntities not supported", e);
         }
 
         return factory;

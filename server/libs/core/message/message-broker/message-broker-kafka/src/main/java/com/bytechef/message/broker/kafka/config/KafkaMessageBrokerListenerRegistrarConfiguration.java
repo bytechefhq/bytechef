@@ -45,7 +45,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
 public class KafkaMessageBrokerListenerRegistrarConfiguration
     implements KafkaListenerConfigurer, MessageBrokerListenerRegistrar<KafkaListenerEndpointRegistrar> {
 
-    private static final Logger logger = LoggerFactory.getLogger(
+    private static final Logger log = LoggerFactory.getLogger(
         KafkaMessageBrokerListenerRegistrarConfiguration.class);
 
     private final BeanFactory beanFactory;
@@ -82,8 +82,8 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
 
         Class<?> delegateClass = delegate.getClass();
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering Kafka Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
         }
 
         Method listenerMethod = Stream.of(delegateClass.getMethods())
@@ -105,7 +105,7 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
                 kafkaListenerEndpointRegistry.stop();
             }
         } catch (Exception e) {
-            logger.warn("Failed to stop Kafka listener containers: {}", e.getMessage());
+            log.warn("Failed to stop Kafka listener containers: {}", e.getMessage());
         }
     }
 
@@ -116,7 +116,7 @@ public class KafkaMessageBrokerListenerRegistrarConfiguration
                 kafkaListenerEndpointRegistry.start();
             }
         } catch (Exception e) {
-            logger.warn("Failed to start Kafka listener containers: {}", e.getMessage());
+            log.warn("Failed to start Kafka listener containers: {}", e.getMessage());
         }
     }
 
