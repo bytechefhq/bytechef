@@ -39,7 +39,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class SuspendTaskDispatcher implements TaskDispatcher<TaskExecution>, TaskDispatcherResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(SuspendTaskDispatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(SuspendTaskDispatcher.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobService jobService;
@@ -68,8 +68,8 @@ public class SuspendTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         eventPublisher.publishEvent(
             new JobStatusApplicationEvent(Objects.requireNonNull(job.getId()), job.getStatus()));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Suspend task execution completed: {}", taskExecution);
+        if (log.isDebugEnabled()) {
+            log.debug("Suspend task execution completed: {}", taskExecution);
         }
     }
 

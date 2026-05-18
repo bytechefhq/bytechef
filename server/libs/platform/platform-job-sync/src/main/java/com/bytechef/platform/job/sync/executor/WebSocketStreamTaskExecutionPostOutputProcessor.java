@@ -40,7 +40,7 @@ import org.slf4j.LoggerFactory;
  */
 class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger logger =
+    private static final Logger log =
         LoggerFactory.getLogger(WebSocketStreamTaskExecutionPostOutputProcessor.class);
 
     private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges;
@@ -71,8 +71,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onEvent(payload);
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -89,8 +89,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onComplete();
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -107,8 +107,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onError(throwable);
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -123,8 +123,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onError(new TimeoutException("WebSocket stream timed out for job " + jobId));
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }

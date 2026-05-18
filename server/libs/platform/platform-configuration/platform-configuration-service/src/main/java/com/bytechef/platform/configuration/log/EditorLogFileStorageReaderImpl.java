@@ -42,7 +42,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
 
     private static final String EDITOR_LOG_DIR = "editor/logs";
 
-    private static final Logger logger = LoggerFactory.getLogger(EditorLogFileStorageReaderImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(EditorLogFileStorageReaderImpl.class);
 
     private final FileStorageService fileStorageService;
 
@@ -81,7 +81,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
 
             return parseJsonLines(content);
         } catch (Exception exception) {
-            logger.error("Failed to read editor log entries for job {}", jobId, exception);
+            log.error("Failed to read editor log entries for job {}", jobId, exception);
 
             return List.of();
         }

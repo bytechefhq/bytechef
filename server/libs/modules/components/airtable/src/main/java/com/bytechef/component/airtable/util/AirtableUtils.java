@@ -112,7 +112,7 @@ public class AirtableUtils extends AbstractAirtableUtils {
                 .getBody(new TypeReference<>() {});
 
             context.log(
-                logger -> logger.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
+                log -> log.debug("Response for url='https://api.airtable.com/v0/meta/bases': " + body));
 
             if (body.get("bases") instanceof List<?> list) {
                 bases.addAll(list);

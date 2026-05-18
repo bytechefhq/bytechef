@@ -36,11 +36,11 @@ import tools.jackson.databind.ObjectMapper;
 @ConditionalOnMessageBrokerRedis
 public class RedisMessageBrokerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisMessageBrokerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisMessageBrokerConfiguration.class);
 
     public RedisMessageBrokerConfiguration() {
-        if (logger.isDebugEnabled()) {
-            logger.debug("Message broker provider type enabled: redis");
+        if (log.isDebugEnabled()) {
+            log.debug("Message broker provider type enabled: redis");
         }
     }
 

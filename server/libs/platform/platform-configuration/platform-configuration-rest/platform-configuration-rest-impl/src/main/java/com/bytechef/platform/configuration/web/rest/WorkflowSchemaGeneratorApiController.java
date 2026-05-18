@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WorkflowSchemaGeneratorApiController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowSchemaGeneratorApiController.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowSchemaGeneratorApiController.class);
 
     private final SchemaGenerator schemaGenerator;
 

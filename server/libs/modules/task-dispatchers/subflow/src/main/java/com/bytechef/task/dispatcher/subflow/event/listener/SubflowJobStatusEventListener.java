@@ -55,7 +55,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class SubflowJobStatusEventListener implements ApplicationEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(SubflowJobStatusEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(SubflowJobStatusEventListener.class);
 
     private final Evaluator evaluator;
     private final ApplicationEventPublisher eventPublisher;
@@ -153,7 +153,7 @@ public class SubflowJobStatusEventListener implements ApplicationEventListener {
                     return callableResponse.output();
                 });
         } catch (Exception exception) {
-            logger.warn(
+            log.warn(
                 "Failed to extract callable response output from job {}: {}", job.getId(), exception.getMessage());
 
             return Optional.empty();

@@ -51,7 +51,7 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookTriggerTestController.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
@@ -92,8 +92,8 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
 
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "executeWorkflow: id={}, webhookRequest={}, webhookTriggerFlags={}", workflowExecutionId,
                     webhookRequest, webhookTriggerFlags);
             }

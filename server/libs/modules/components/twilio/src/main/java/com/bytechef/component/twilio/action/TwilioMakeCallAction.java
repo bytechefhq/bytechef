@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TwilioMakeCallAction implements RealtimeCallAction {
 
-    private static final Logger logger = LoggerFactory.getLogger(TwilioMakeCallAction.class);
+    private static final Logger log = LoggerFactory.getLogger(TwilioMakeCallAction.class);
 
     public static final String SUB_WORKFLOW = "subWorkflow";
     private static final String TIMEOUT = "timeout";
@@ -131,7 +131,7 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
         String publicUrl = contextAware.getPublicUrl();
 
         if (publicUrl == null || publicUrl.isBlank()) {
-            logger.error("Public URL not configured. Cannot make outbound call.");
+            log.error("Public URL not configured. Cannot make outbound call.");
 
             return Map.of(
                 "callSid", "",
@@ -154,8 +154,8 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
             "?callRef=" + callReference +
             "&subWorkflowId=" + (subWorkflowId != null ? subWorkflowId : "");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Making outbound call: to={}, from={}, callRef={}, twimlUrl={}", to, from, callReference, twimlUrl);
         }
 
@@ -183,7 +183,7 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
             String callSid = (String) response.get("sid");
             String status = (String) response.get("status");
 
-            logger.info("Outbound call initiated: callSid={}, status={}, callRef={}", callSid, status, callReference);
+            log.info("Outbound call initiated: callSid={}, status={}, callRef={}", callSid, status, callReference);
 
             // For now, return immediately with the call status
             // In the full implementation, we would register a session and block until completion
@@ -196,7 +196,7 @@ public class TwilioMakeCallAction implements RealtimeCallAction {
                 "direction", "outbound-api");
 
         } catch (Exception exception) {
-            logger.error("Failed to make outbound call: to={}, from={}", to, from, exception);
+            log.error("Failed to make outbound call: to={}, from={}", to, from, exception);
 
             return Map.of(
                 "callSid", "",

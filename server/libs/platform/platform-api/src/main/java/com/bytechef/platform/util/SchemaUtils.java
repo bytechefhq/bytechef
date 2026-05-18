@@ -56,7 +56,7 @@ import tools.jackson.databind.JsonNode;
  */
 public class SchemaUtils {
 
-    private static final Logger logger = LoggerFactory.getLogger(SchemaUtils.class);
+    private static final Logger log = LoggerFactory.getLogger(SchemaUtils.class);
 
     public static BaseProperty getOutputSchema(Object value, SchemaPropertyFactory schemaPropertyFactory) {
         return getOutputSchema(null, value, schemaPropertyFactory);
@@ -180,8 +180,8 @@ public class SchemaUtils {
                 try {
                     sampleOutput = JsonUtils.readMap(string);
                 } catch (Exception exception) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (log.isDebugEnabled()) {
+                        log.debug(
                             "Failed to parse sample output as JSON map: {}", exception.getMessage(), exception);
                     }
                 }
@@ -189,8 +189,8 @@ public class SchemaUtils {
                 try {
                     sampleOutput = JsonUtils.readList(string);
                 } catch (Exception exception) {
-                    if (logger.isDebugEnabled()) {
-                        logger.debug(
+                    if (log.isDebugEnabled()) {
+                        log.debug(
                             "Failed to parse sample output as JSON list: {}", exception.getMessage(), exception);
                     }
                 }
@@ -241,8 +241,8 @@ public class SchemaUtils {
         String type;
 
         if (typeJsonNode == null) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("JSON schema node missing 'type' field, defaulting to string");
+            if (log.isDebugEnabled()) {
+                log.debug("JSON schema node missing 'type' field, defaulting to string");
             }
 
             type = "string";

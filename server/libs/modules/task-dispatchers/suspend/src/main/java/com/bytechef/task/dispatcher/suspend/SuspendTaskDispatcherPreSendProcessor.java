@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreSendProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(SuspendTaskDispatcherPreSendProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(SuspendTaskDispatcherPreSendProcessor.class);
 
     private final JobService jobService;
     private final TaskStateService taskStateService;
@@ -66,7 +66,7 @@ public class SuspendTaskDispatcherPreSendProcessor implements TaskDispatcherPreS
         Optional<Suspend> suspendOptional = taskStateService.fetchValue(jobResumeId);
 
         if (suspendOptional.isEmpty()) {
-            logger.warn("No suspend state found for jobResumeId={}", jobResumeId);
+            log.warn("No suspend state found for jobResumeId={}", jobResumeId);
         }
 
         suspendOptional.ifPresent(suspend -> taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend));

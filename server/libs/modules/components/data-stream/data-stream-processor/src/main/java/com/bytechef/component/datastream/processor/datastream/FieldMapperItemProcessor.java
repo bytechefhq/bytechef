@@ -59,7 +59,7 @@ import org.slf4j.LoggerFactory;
  */
 public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(FieldMapperItemProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(FieldMapperItemProcessor.class);
 
     public static final String DESTINATION_SCHEMA = "destinationSchema";
     public static final String SCHEMAS = "schemas";
@@ -273,7 +273,7 @@ public class FieldMapperItemProcessor implements ItemProcessor<Object, Object> {
 
             return fields;
         } catch (Exception exception) {
-            logger.warn("Failed to parse JSON schema: {}", exception.getMessage());
+            log.warn("Failed to parse JSON schema: {}", exception.getMessage());
 
             return List.of();
         }

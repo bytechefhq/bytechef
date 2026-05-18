@@ -43,7 +43,7 @@ import org.springframework.web.client.RestTemplate;
  */
 public class WebhookJobStatusApplicationEventListener implements ApplicationEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookJobStatusApplicationEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookJobStatusApplicationEventListener.class);
 
     private final JobService jobService;
     private final RestTemplate restTemplate = new RestTemplate();
@@ -70,8 +70,8 @@ public class WebhookJobStatusApplicationEventListener implements ApplicationEven
 
                     try {
                         retryTemplate.execute(() -> {
-                            if (logger.isDebugEnabled()) {
-                                logger.debug("Calling data table webhook {} -> {}", webhook.url(), webhookEvent);
+                            if (log.isDebugEnabled()) {
+                                log.debug("Calling data table webhook {} -> {}", webhook.url(), webhookEvent);
                             }
 
                             return restTemplate.postForObject(webhook.url(), webhookEvent, String.class);

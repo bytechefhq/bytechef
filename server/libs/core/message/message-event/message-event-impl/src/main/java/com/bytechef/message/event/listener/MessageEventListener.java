@@ -37,7 +37,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Component
 public class MessageEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(MessageEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(MessageEventListener.class);
 
     private final MessageBroker messageBroker;
     private final List<MessageEventPreSendProcessor> messageEventPreSendProcessors;
@@ -53,8 +53,8 @@ public class MessageEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT, fallbackExecution = true)
     @Async
     public void onMessageEvent(MessageEvent<?> messageEvent) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("onMessageEvent: " + messageEvent);
+        if (log.isTraceEnabled()) {
+            log.trace("onMessageEvent: " + messageEvent);
         }
 
         for (MessageEventPreSendProcessor messageEventPreSendProcessor : messageEventPreSendProcessors) {

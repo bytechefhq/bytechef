@@ -35,7 +35,7 @@ import org.springframework.util.Assert;
  */
 public class RedisMessageBroker implements MessageBroker {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisMessageBroker.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisMessageBroker.class);
 
     private final RedisMessageSerializer redisMessageSerializer;
     private final StringRedisTemplate stringRedisTemplate;
@@ -85,8 +85,8 @@ public class RedisMessageBroker implements MessageBroker {
         try {
             TimeUnit.MILLISECONDS.sleep(value);
         } catch (InterruptedException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage(), e);
             }
         }
     }

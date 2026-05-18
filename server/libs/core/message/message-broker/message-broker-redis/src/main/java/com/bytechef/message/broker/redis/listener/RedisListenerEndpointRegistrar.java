@@ -43,7 +43,7 @@ import org.springframework.util.MethodInvoker;
  */
 public class RedisListenerEndpointRegistrar implements MessageListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(RedisListenerEndpointRegistrar.class);
+    private static final Logger log = LoggerFactory.getLogger(RedisListenerEndpointRegistrar.class);
 
     private static final String CONSUMER_GROUP = "message_event_group";
 
@@ -70,7 +70,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         Consumer<String> invokerConsumer = invokerMap.get(queueName);
 
         if (invokerConsumer == null) {
-            logger.warn("No message listeners registered for queue='{}'", queueName);
+            log.warn("No message listeners registered for queue='{}'", queueName);
 
             return;
         }
@@ -87,8 +87,8 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
             stringRedisTemplate.opsForStream()
                 .createGroup(messageRoute.getName(), CONSUMER_GROUP);
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Consumer group already exists or error occurred: {}", e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("Consumer group already exists or error occurred: {}", e.getMessage());
             }
         }
 
@@ -141,7 +141,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
 
                 sleep();
             } catch (Exception e) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -161,7 +161,7 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
             methodInvoker.invoke();
         } catch (Exception e) {
             if (!stopped) {
-                logger.error(e.getMessage(), e);
+                log.error(e.getMessage(), e);
             }
         }
     }
@@ -170,8 +170,8 @@ public class RedisListenerEndpointRegistrar implements MessageListener {
         try {
             TimeUnit.MILLISECONDS.sleep(100);
         } catch (InterruptedException e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage(), e);
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage(), e);
             }
         }
     }

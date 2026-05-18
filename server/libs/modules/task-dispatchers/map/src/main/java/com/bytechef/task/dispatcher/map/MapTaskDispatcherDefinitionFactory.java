@@ -51,7 +51,7 @@ import tools.jackson.core.type.TypeReference;
 @Component
 public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinitionFactory {
 
-    private static final Logger logger = org.slf4j.LoggerFactory.getLogger(MapTaskDispatcherDefinitionFactory.class);
+    private static final Logger log = org.slf4j.LoggerFactory.getLogger(MapTaskDispatcherDefinitionFactory.class);
 
     private final TaskDispatcherDefinition taskDispatcherDefinition;
 
@@ -124,8 +124,8 @@ public class MapTaskDispatcherDefinitionFactory implements TaskDispatcherDefinit
             try {
                 list = MapUtils.getList(inputParameters, ITEMS, List.of());
             } catch (Exception e) {
-                if (logger.isDebugEnabled()) {
-                    logger.debug(e.getMessage());
+                if (log.isDebugEnabled()) {
+                    log.debug(e.getMessage());
                 }
             }
         }

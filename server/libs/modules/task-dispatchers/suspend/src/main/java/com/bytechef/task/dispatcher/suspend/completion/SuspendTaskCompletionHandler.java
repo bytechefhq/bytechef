@@ -46,7 +46,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(SuspendTaskCompletionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(SuspendTaskCompletionHandler.class);
 
     private final ContextService contextService;
     private final ApplicationEventPublisher eventPublisher;
@@ -135,8 +135,8 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         eventPublisher.publishEvent(new JobStatusApplicationEvent(jobId, job.getStatus()));
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("Suspend completion handler completed for job id={}", jobId);
+        if (log.isDebugEnabled()) {
+            log.debug("Suspend completion handler completed for job id={}", jobId);
         }
     }
 }
