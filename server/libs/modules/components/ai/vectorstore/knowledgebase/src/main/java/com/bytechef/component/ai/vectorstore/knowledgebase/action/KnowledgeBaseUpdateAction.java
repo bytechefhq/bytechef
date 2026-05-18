@@ -23,7 +23,7 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.LOAD;
+import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.UPDATE;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
@@ -50,61 +50,59 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 
 /**
- * Load action for adding documents to a knowledge base using document readers and transformers.
- *
- * <p>
- * Unlike other vector store components, the Knowledge Base does not accept an {@code EMBEDDING} cluster element — all
- * knowledge bases share one pgvector index with fixed dimensions, so the embedding model is globally configured via
- * {@code bytechef.ai.provider.embedding.*}.
- *
- * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
-public final class KnowledgeBaseLoadAction {
+public final class KnowledgeBaseUpdateAction {
 
-    private KnowledgeBaseLoadAction() {
+    private KnowledgeBaseUpdateAction() {
     }
 
     public static ActionDefinition of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFileStorage knowledgeBaseFileStorage,
-        KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService,
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
 
-        VectorStore kbVectorStore = createVectorStore(
+        VectorStore deleteVectorStore = createVectorStore(vectorStore);
+        VectorStore loadVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
 
-        return action(LOAD)
-            .title("Load Data")
-            .description("Loads data into the knowledge base.")
+        return action(UPDATE)
+            .title("Update Documents")
+            .description(
+                "Updates documents in the knowledge base by deleting existing ones matching the metadata filter " +
+                    "and loading new ones.")
             .properties(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
-                    .description("The knowledge base to load documents into.")
+                    .description("The knowledge base to update documents in.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
                 METADATA_PROPERTY)
             .perform((MultipleConnectionsPerformFunction) (
-                inputParameters, componentConnections, extensions,
-                context) -> perform(
-                    inputParameters, componentConnections, extensions, context, kbVectorStore,
+                inputParameters, componentConnections, extensions, context) -> perform(
+                    inputParameters, componentConnections, extensions, context, deleteVectorStore, loadVectorStore,
                     clusterElementDefinitionService));
     }
 
     private static Object perform(
         Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
-        ActionContext context, VectorStore vectorStore,
+        ActionContext context, VectorStore deleteVectorStore, VectorStore loadVectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
         ComponentConnection vectorStoreComponentConnection = componentConnections.get(KNOWLEDGE_BASE);
 
-        vectorStore.load(
+        deleteVectorStore.delete(inputParameters, ParametersFactory.create(Map.of()), null);
+
+        loadVectorStore.load(
             inputParameters,
             ParametersFactory.create(
                 vectorStoreComponentConnection == null ? Map.of() : vectorStoreComponentConnection.getParameters()),
@@ -181,14 +179,14 @@ public final class KnowledgeBaseLoadAction {
             List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
 
             for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String name = knowledgeBase.getName();
+                String knowledgeBaseName = knowledgeBase.getName();
 
-                String lowerCase = name.toLowerCase();
+                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase(Locale.ROOT);
 
-                if (searchText == null || lowerCase.contains(searchText.toLowerCase())) {
+                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
                     Long knowledgeBaseId = knowledgeBase.getId();
 
-                    options.add(option(name, knowledgeBaseId.longValue()));
+                    options.add(option(knowledgeBaseName, knowledgeBaseId.longValue()));
                 }
             }
 

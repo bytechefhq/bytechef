@@ -22,8 +22,10 @@ import static com.bytechef.platform.component.definition.ai.vectorstore.Document
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseDeleteAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseLoadAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseSearchAction;
+import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseUpdateAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
@@ -94,11 +96,15 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                     .icon("path:assets/knowledge-base.svg")
                     .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
                     .actions(
+                        KnowledgeBaseDeleteAction.of(vectorStore, knowledgeBaseService),
                         KnowledgeBaseLoadAction.of(
                             vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseSearchAction.of(
-                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService))
+                            vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
+                        KnowledgeBaseUpdateAction.of(
+                            vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService))
                     .clusterElements(
                         KnowledgeBaseSearchTool.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
@@ -115,8 +121,10 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         @Override
         public Map<String, List<String>> getActionClusterElementTypes() {
             return Map.of(
+                DELETE, List.of(),
                 LOAD, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()),
-                SEARCH, List.of());
+                SEARCH, List.of(),
+                UPDATE, List.of(DOCUMENT_READER.name(), DOCUMENT_TRANSFORMER.name()));
         }
 
         @Override
