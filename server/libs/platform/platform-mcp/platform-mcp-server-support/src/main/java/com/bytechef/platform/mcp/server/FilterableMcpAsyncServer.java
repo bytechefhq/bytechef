@@ -76,7 +76,7 @@ import reactor.core.publisher.Mono;
  */
 public class FilterableMcpAsyncServer {
 
-    private static final Logger logger = LoggerFactory.getLogger(FilterableMcpAsyncServer.class);
+    private static final Logger log = LoggerFactory.getLogger(FilterableMcpAsyncServer.class);
 
     private final McpServerTransportProviderBase mcpTransportProvider;
 
@@ -218,7 +218,7 @@ public class FilterableMcpAsyncServer {
             rootsChangeConsumers;
 
         if (Utils.isEmpty(effectiveConsumers)) {
-            effectiveConsumers = List.of((exchange, roots) -> Mono.fromRunnable(() -> logger
+            effectiveConsumers = List.of((exchange, roots) -> Mono.fromRunnable(() -> log
                 .warn(
                     "Roots list changed notification, but no consumers provided. Roots list changed: {}",
                     roots)));
@@ -284,7 +284,7 @@ public class FilterableMcpAsyncServer {
         McpSchema.InitializeRequest initializeRequest) {
 
         return Mono.defer(() -> {
-            logger.info("Client initialize request - Protocol: {}, Capabilities: {}, Info: {}",
+            log.info("Client initialize request - Protocol: {}, Capabilities: {}, Info: {}",
                 initializeRequest.protocolVersion(), initializeRequest.capabilities(),
                 initializeRequest.clientInfo());
 
@@ -297,7 +297,7 @@ public class FilterableMcpAsyncServer {
                 // with the same version.
                 serverProtocolVersion = initializeRequest.protocolVersion();
             } else {
-                logger.warn(
+                log.warn(
                     "Client requested unsupported protocol version: {}, "
                         + "so the server will suggest the {} version instead",
                     initializeRequest.protocolVersion(), serverProtocolVersion);
@@ -360,7 +360,7 @@ public class FilterableMcpAsyncServer {
             .flatMap(listRootsResult -> Flux.fromIterable(rootsChangeConsumers)
                 .flatMap(consumer -> Mono.defer(() -> consumer.apply(exchange, listRootsResult.roots())))
                 .onErrorResume(error -> {
-                    logger.error("Error handling roots list change notification", error);
+                    log.error("Error handling roots list change notification", error);
 
                     return Mono.empty();
                 })
@@ -404,13 +404,13 @@ public class FilterableMcpAsyncServer {
                     .equals(wrappedToolSpecification.tool()
                         .name()))) {
 
-                logger.warn("Replace existing Tool with name '{}'", wrappedToolSpecification.tool()
+                log.warn("Replace existing Tool with name '{}'", wrappedToolSpecification.tool()
                     .name());
             }
 
             this.tools.add(wrappedToolSpecification);
 
-            logger.debug("Added tool handler: {}", wrappedToolSpecification.tool()
+            log.debug("Added tool handler: {}", wrappedToolSpecification.tool()
                 .name());
 
             if (this.serverCapabilities.tools()
@@ -455,7 +455,7 @@ public class FilterableMcpAsyncServer {
 
                     if (outputSchema == null) {
                         if (result.structuredContent() != null) {
-                            logger.warn(
+                            log.warn(
                                 "Tool call with no outputSchema is not expected to have a result "
                                     + "with structured content, but got: {}",
                                 result.structuredContent());
@@ -472,7 +472,7 @@ public class FilterableMcpAsyncServer {
                             "Response missing structured content which is expected when calling tool "
                                 + "with non-empty outputSchema";
 
-                        logger.warn(content);
+                        log.warn(content);
 
                         return CallToolResult.builder()
                             .content(List.of(new McpSchema.TextContent(content)))
@@ -484,7 +484,7 @@ public class FilterableMcpAsyncServer {
                     var validation = this.jsonSchemaValidator.validate(outputSchema, result.structuredContent());
 
                     if (!validation.valid()) {
-                        logger.warn("Tool call result validation failed: {}", validation.errorMessage());
+                        log.warn("Tool call result validation failed: {}", validation.errorMessage());
 
                         return CallToolResult.builder()
                             .content(List.of(new McpSchema.TextContent(validation.errorMessage())))
@@ -573,14 +573,14 @@ public class FilterableMcpAsyncServer {
                     .name()
                     .equals(toolName))) {
 
-                logger.debug("Removed tool handler: {}", toolName);
+                log.debug("Removed tool handler: {}", toolName);
 
                 if (this.serverCapabilities.tools()
                     .listChanged()) {
                     return notifyToolsListChanged();
                 }
             } else {
-                logger.warn("Ignore as a Tool with name '{}' not found", toolName);
+                log.warn("Ignore as a Tool with name '{}' not found", toolName);
             }
 
             return Mono.empty();
@@ -673,10 +673,10 @@ public class FilterableMcpAsyncServer {
                 .uri(), resourceSpecification);
 
             if (previous != null) {
-                logger.warn("Replace existing Resource with URI '{}'", resourceSpecification.resource()
+                log.warn("Replace existing Resource with URI '{}'", resourceSpecification.resource()
                     .uri());
             } else {
-                logger.debug("Added resource handler: {}", resourceSpecification.resource()
+                log.debug("Added resource handler: {}", resourceSpecification.resource()
                     .uri());
             }
 
@@ -719,7 +719,7 @@ public class FilterableMcpAsyncServer {
             McpServerFeatures.AsyncResourceSpecification removed = this.resources.remove(resourceUri);
 
             if (removed != null) {
-                logger.debug("Removed resource handler: {}", resourceUri);
+                log.debug("Removed resource handler: {}", resourceUri);
 
                 if (this.serverCapabilities.resources()
                     .listChanged()) {
@@ -728,7 +728,7 @@ public class FilterableMcpAsyncServer {
 
                 return Mono.empty();
             } else {
-                logger.warn("Ignore as a Resource with URI '{}' not found", resourceUri);
+                log.warn("Ignore as a Resource with URI '{}' not found", resourceUri);
             }
 
             return Mono.empty();
@@ -756,11 +756,11 @@ public class FilterableMcpAsyncServer {
                 resourceTemplateSpecification);
 
             if (previous != null) {
-                logger.warn("Replace existing Resource Template with URI '{}'",
+                log.warn("Replace existing Resource Template with URI '{}'",
                     resourceTemplateSpecification.resourceTemplate()
                         .uriTemplate());
             } else {
-                logger.debug("Added resource template handler: {}",
+                log.debug("Added resource template handler: {}",
                     resourceTemplateSpecification.resourceTemplate()
                         .uriTemplate());
             }
@@ -801,9 +801,9 @@ public class FilterableMcpAsyncServer {
                 this.resourceTemplates.remove(uriTemplate);
 
             if (removed != null) {
-                logger.debug("Removed resource template: {}", uriTemplate);
+                log.debug("Removed resource template: {}", uriTemplate);
             } else {
-                logger.warn("Ignore as a Resource Template with URI '{}' not found", uriTemplate);
+                log.warn("Ignore as a Resource Template with URI '{}' not found", uriTemplate);
             }
 
             return Mono.empty();
@@ -835,7 +835,7 @@ public class FilterableMcpAsyncServer {
             Set<String> subscribedSessions = this.resourceSubscriptions.get(uri);
 
             if (subscribedSessions == null || subscribedSessions.isEmpty()) {
-                logger.debug("No sessions subscribed to resource URI: {}", uri);
+                log.debug("No sessions subscribed to resource URI: {}", uri);
 
                 return Mono.empty();
             }
@@ -844,7 +844,7 @@ public class FilterableMcpAsyncServer {
                 .flatMap(sessionId -> this.mcpTransportProvider
                     .notifyClient(sessionId, McpSchema.METHOD_NOTIFICATION_RESOURCES_UPDATED,
                         resourcesUpdatedNotification)
-                    .doOnError(error -> logger.error(
+                    .doOnError(error -> log.error(
                         "Failed to notify session {} of resource update for {}", sessionId, uri, error))
                     .onErrorComplete())
                 .then();
@@ -908,7 +908,7 @@ public class FilterableMcpAsyncServer {
                 .computeIfAbsent(uri, key -> Collections.newSetFromMap(new ConcurrentHashMap<>()))
                 .add(sessionId);
 
-            logger.debug("Session {} subscribed to resource URI: {}", sessionId, uri);
+            log.debug("Session {} subscribed to resource URI: {}", sessionId, uri);
 
             return Mono.just(Map.of());
         });
@@ -932,7 +932,7 @@ public class FilterableMcpAsyncServer {
                 }
             }
 
-            logger.debug("Session {} unsubscribed from resource URI: {}", sessionId, uri);
+            log.debug("Session {} unsubscribed from resource URI: {}", sessionId, uri);
 
             return Mono.just(Map.of());
         });
@@ -983,10 +983,10 @@ public class FilterableMcpAsyncServer {
                 .name(), promptSpecification);
 
             if (previous != null) {
-                logger.warn("Replace existing Prompt with name '{}'", promptSpecification.prompt()
+                log.warn("Replace existing Prompt with name '{}'", promptSpecification.prompt()
                     .name());
             } else {
-                logger.debug("Added prompt handler: {}", promptSpecification.prompt()
+                log.debug("Added prompt handler: {}", promptSpecification.prompt()
                     .name());
             }
 
@@ -1028,7 +1028,7 @@ public class FilterableMcpAsyncServer {
             McpServerFeatures.AsyncPromptSpecification removed = this.prompts.remove(promptName);
 
             if (removed != null) {
-                logger.debug("Removed prompt handler: {}", promptName);
+                log.debug("Removed prompt handler: {}", promptName);
 
                 if (this.serverCapabilities.prompts()
                     .listChanged()) {
@@ -1037,7 +1037,7 @@ public class FilterableMcpAsyncServer {
 
                 return Mono.empty();
             } else {
-                logger.warn("Ignore as a Prompt with name '{}' not found", promptName);
+                log.warn("Ignore as a Prompt with name '{}' not found", promptName);
             }
 
             return Mono.empty();
@@ -1175,7 +1175,7 @@ public class FilterableMcpAsyncServer {
                     .noneMatch(arg -> arg.name()
                         .equals(argumentName))) {
 
-                    logger.warn("Argument not found: {} in prompt: {}", argumentName, promptReference.name());
+                    log.warn("Argument not found: {} in prompt: {}", argumentName, promptReference.name());
 
                     return EMPTY_COMPLETION_RESULT;
                 }

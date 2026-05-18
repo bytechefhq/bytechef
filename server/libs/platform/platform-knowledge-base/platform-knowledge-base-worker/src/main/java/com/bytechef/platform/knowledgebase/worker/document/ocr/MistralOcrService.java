@@ -46,7 +46,7 @@ import org.springframework.web.client.RestClient;
  */
 public class MistralOcrService implements OcrService {
 
-    private static final Logger logger = LoggerFactory.getLogger(MistralOcrService.class);
+    private static final Logger log = LoggerFactory.getLogger(MistralOcrService.class);
     private static final String DEFAULT_BASE_URL = "https://api.mistral.ai";
 
     private final MistralOcrApi mistralOcrApi;
@@ -69,18 +69,18 @@ public class MistralOcrService implements OcrService {
     public String perform(Resource resource) {
         String filename = resource.getFilename();
 
-        logger.debug("Running OCR on document: {}", filename);
+        log.debug("Running OCR on document: {}", filename);
 
         try {
             // Step 1: Upload the file to Mistral
             FileUploadResponse uploadResponse = uploadFile(resource);
 
-            logger.debug("File uploaded successfully: {}", uploadResponse.id());
+            log.debug("File uploaded successfully: {}", uploadResponse.id());
 
             // Step 2: Get signed URL for the uploaded file
             SignedUrlResponse signedUrlResponse = getSignedUrl(uploadResponse.id());
 
-            logger.debug("Got signed URL for file: {}", uploadResponse.id());
+            log.debug("Got signed URL for file: {}", uploadResponse.id());
 
             // Step 3: Run OCR using the signed URL
             String result = performOcr(signedUrlResponse.url());
@@ -90,7 +90,7 @@ public class MistralOcrService implements OcrService {
 
             return result;
         } catch (IOException exception) {
-            logger.error("Error processing document {}: {}", filename, exception.getMessage(), exception);
+            log.error("Error processing document {}: {}", filename, exception.getMessage(), exception);
 
             throw new RuntimeException("Failed to process document for OCR: " + filename, exception);
         }
@@ -152,7 +152,7 @@ public class MistralOcrService implements OcrService {
         OCRResponse body = responseEntity.getBody();
 
         if (body == null || body.pages() == null) {
-            logger.warn("OCR response was empty for document");
+            log.warn("OCR response was empty for document");
 
             return "";
         }
@@ -165,7 +165,7 @@ public class MistralOcrService implements OcrService {
         // Remove null bytes (0x00) which PostgreSQL text columns don't support
         markdown = markdown.replace("\0", "");
 
-        logger.debug("OCR completed, extracted {} pages", body.pagesProcessed());
+        log.debug("OCR completed, extracted {} pages", body.pagesProcessed());
 
         return markdown;
     }
@@ -177,9 +177,9 @@ public class MistralOcrService implements OcrService {
                 .retrieve()
                 .toBodilessEntity();
 
-            logger.debug("Deleted uploaded file: {}", fileId);
+            log.debug("Deleted uploaded file: {}", fileId);
         } catch (Exception exception) {
-            logger.warn("Failed to delete uploaded file {}: {}", fileId, exception.getMessage());
+            log.warn("Failed to delete uploaded file {}: {}", fileId, exception.getMessage());
         }
     }
 

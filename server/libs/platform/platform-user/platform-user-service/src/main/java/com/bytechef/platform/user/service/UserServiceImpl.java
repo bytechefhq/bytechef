@@ -64,7 +64,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class UserServiceImpl implements UserService {
 
-    private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private static final EmailValidator EMAIL_VALIDATOR = EmailValidator.getInstance();
 
@@ -93,7 +93,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> activateRegistration(String key) {
-        logger.debug("Activating user for activation key {}", key);
+        log.debug("Activating user for activation key {}", key);
 
         return userRepository.findByActivationKey(key)
             .map(user -> {
@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                logger.debug("Activated user: {}", user);
+                log.debug("Activated user: {}", user);
 
                 return user;
             });
@@ -113,7 +113,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> completePasswordReset(String newPassword, String key) {
-        logger.debug("Reset user password for reset key {}", key);
+        log.debug("Reset user password for reset key {}", key);
 
         return userRepository.findByResetKey(key)
             .filter(user -> {
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                logger.debug("Changed password for User: {}", user);
+                log.debug("Changed password for User: {}", user);
             });
     }
 
@@ -214,7 +214,7 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(user);
 
-        logger.debug("Created User: {}", user);
+        log.debug("Created User: {}", user);
 
         return user;
     }
@@ -227,7 +227,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                logger.debug("Deleted User: {}", user);
+                log.debug("Deleted User: {}", user);
             });
     }
 
@@ -358,7 +358,7 @@ public class UserServiceImpl implements UserService {
 
         clearUserCaches(newUser);
 
-        logger.debug("Created social login user: {}", newUser);
+        log.debug("Created social login user: {}", newUser);
 
         return newUser;
     }
@@ -416,7 +416,7 @@ public class UserServiceImpl implements UserService {
 
         persistentTokenRepository.findAllByTokenDateBefore(now.minusMonths(1))
             .forEach(token -> {
-                logger.debug("Deleting token {}", token.getSeries());
+                log.debug("Deleting token {}", token.getSeries());
 
                 persistentTokenRepository.delete(token);
             });
@@ -497,7 +497,7 @@ public class UserServiceImpl implements UserService {
 
         this.clearUserCaches(newUser);
 
-        logger.debug("Created User: {}", newUser);
+        log.debug("Created User: {}", newUser);
 
         return newUser;
     }
@@ -543,7 +543,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                logger.debug("Changed Information for User: {}", user);
+                log.debug("Changed Information for User: {}", user);
 
                 return user;
             });
@@ -582,7 +582,7 @@ public class UserServiceImpl implements UserService {
 
                 this.clearUserCaches(user);
 
-                logger.debug("Changed Information for User: {}", user);
+                log.debug("Changed Information for User: {}", user);
             });
     }
 
@@ -650,7 +650,7 @@ public class UserServiceImpl implements UserService {
                     Instant.now()
                         .minus(3, ChronoUnit.DAYS)))
             .forEach(user -> {
-                logger.debug("Deleting not activated user {}", user.getLogin());
+                log.debug("Deleting not activated user {}", user.getLogin());
 
                 userRepository.delete(user);
 

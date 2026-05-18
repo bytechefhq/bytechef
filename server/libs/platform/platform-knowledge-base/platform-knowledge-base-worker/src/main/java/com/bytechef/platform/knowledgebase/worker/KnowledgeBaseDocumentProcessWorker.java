@@ -47,7 +47,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
 public class KnowledgeBaseDocumentProcessWorker {
 
-    private static final Logger logger = LoggerFactory.getLogger(KnowledgeBaseDocumentProcessWorker.class);
+    private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseDocumentProcessWorker.class);
 
     private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
@@ -119,7 +119,7 @@ public class KnowledgeBaseDocumentProcessWorker {
 
             knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
         } catch (RuntimeException exception) {
-            logger.error(
+            log.error(
                 "Error processing document {}: {}", knowledgeBaseDocumentId, exception.getMessage(), exception);
 
             knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_ERROR);
@@ -147,7 +147,7 @@ public class KnowledgeBaseDocumentProcessWorker {
                 event.getContent(), knowledgeBaseDocument.getKnowledgeBaseId(), knowledgeBaseDocument.getId(),
                 knowledgeBaseDocumentChunkId, knowledgeBase.getEnvironmentId(), tagNames);
         } catch (RuntimeException exception) {
-            logger.error(
+            log.error(
                 "Error processing chunk update {}: {}", knowledgeBaseDocumentChunkId, exception.getMessage(),
                 exception);
 
@@ -162,7 +162,7 @@ public class KnowledgeBaseDocumentProcessWorker {
 
                 knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
             } catch (RuntimeException statusException) {
-                logger.error(
+                log.error(
                     "Failed to update document status for chunk {}: {}", knowledgeBaseDocumentChunkId,
                     statusException.getMessage(), statusException);
             }

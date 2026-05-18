@@ -56,7 +56,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(WebhookWorkflowExecutorImpl.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -123,8 +123,8 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
 
                 handle.close();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         });

@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SseStreamBridgeRegistry {
 
-    private static final Logger logger = LoggerFactory.getLogger(SseStreamBridgeRegistry.class);
+    private static final Logger log = LoggerFactory.getLogger(SseStreamBridgeRegistry.class);
 
     private final Cache<Long, CopyOnWriteArrayList<SseStreamBridge>> bridges = Caffeine.newBuilder()
         .expireAfterAccess(30, TimeUnit.MINUTES)
@@ -59,8 +59,8 @@ public class SseStreamBridgeRegistry {
                     try {
                         sseStreamBridge.onEvent(sseStreamEvent.getPayload());
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -71,8 +71,8 @@ public class SseStreamBridgeRegistry {
                     try {
                         sseStreamBridge.onComplete();
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -88,8 +88,8 @@ public class SseStreamBridgeRegistry {
                     try {
                         sseStreamBridge.onError(new RuntimeException(errorMessage));
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -102,16 +102,16 @@ public class SseStreamBridgeRegistry {
                     try {
                         sseStreamBridge.onEvent(sseStreamEvent.getPayload());
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
             }
 
             default -> {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Unknown SSE stream event type: {}", eventType);
+                if (log.isDebugEnabled()) {
+                    log.debug("Unknown SSE stream event type: {}", eventType);
                 }
             }
         }
@@ -152,8 +152,8 @@ public class SseStreamBridgeRegistry {
                             sseStreamBridge.onComplete();
                         }
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }

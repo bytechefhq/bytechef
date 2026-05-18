@@ -50,7 +50,7 @@ import org.springframework.scheduling.quartz.SpringBeanJobFactory;
     prefix = "bytechef", name = "scheduler.provider", havingValue = "quartz", matchIfMissing = true)
 public class QuartzSchedulerConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(QuartzSchedulerConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(QuartzSchedulerConfiguration.class);
 
     @Bean
     JobFactory jobFactory() {
@@ -102,8 +102,8 @@ public class QuartzSchedulerConfiguration {
         public void startLater() throws SchedulerException {
             scheduler.start();
 
-            if (logger.isDebugEnabled()) {
-                logger.debug("Quartz scheduler started");
+            if (log.isDebugEnabled()) {
+                log.debug("Quartz scheduler started");
             }
         }
     }
