@@ -86,7 +86,7 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 @Configuration
 public class WorkflowSubflowSyncExecutorConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(WorkflowSubflowSyncExecutorConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(WorkflowSubflowSyncExecutorConfiguration.class);
 
     @Bean
     SubflowSyncExecutor subflowSyncExecutor(

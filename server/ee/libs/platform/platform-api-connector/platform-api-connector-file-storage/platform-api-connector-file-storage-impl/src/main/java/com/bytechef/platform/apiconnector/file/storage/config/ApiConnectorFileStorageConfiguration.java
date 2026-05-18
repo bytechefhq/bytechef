@@ -34,7 +34,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnEEVersion
 public class ApiConnectorFileStorageConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(ApiConnectorFileStorageConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiConnectorFileStorageConfiguration.class);
 
     @Bean
     ApiConnectorFileStorage apiConnectorFileStorage(
