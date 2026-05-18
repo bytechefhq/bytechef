@@ -109,12 +109,7 @@ public interface RemoteFileClient extends Closeable {
         try {
             SSHClient sshClient = new SSHClient();
 
-            try {
-                sshClient.loadKnownHosts();
-            } catch (IOException ioException) {
-                sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-            }
-
+            sshClient.addHostKeyVerifier(new PromiscuousVerifier());
             sshClient.connect(host, port);
             sshClient.authPassword(username, password);
 
