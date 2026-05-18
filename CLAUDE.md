@@ -593,6 +593,16 @@ cd cli
 - Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
 - Get thread IDs via: `gh api graphql -f query='{ repository(owner: "X", name: "Y") { pullRequest(number: N) { reviewThreads(first: 20) { nodes { id isResolved path } } } }'`
 
+## Public URL Signing
+
+- `/file-entries/{id}/content` is intentionally unauthenticated (serves webhook outputs to anonymous callers). As of the 2026-05-18 signing rollout, the preferred form is an HMAC-SHA256 signed token (`v1.<exp>.<payload>.<sig>`) minted via `FileEntryTokens.toSignedToken`. Legacy unsigned `FileEntry.toId()` IDs are still accepted while `bytechef.file-storage.signed-url.required=false` (default).
+- **Use `FileEntry.toId()` for**: DB persistence, intra-process passing. No security claim, deterministic forever.
+- **Use `FileEntryTokens.toSignedToken(fileEntry)` for**: anything that leaves the server as part of a URL (webhook response body, etc.). TTL applies.
+- The signer lives in `file-storage-token-service` (not in `file-storage-api`, which stays interface-only). Consumers depend on `file-storage-api` for the `FileEntryTokens` interface and pull `file-storage-token-service` at runtime so the autoconfig fires.
+- **Signing key resolution order**: (1) explicit `bytechef.file-storage.signed-url.secret` property — power-user override for independent key rotation; (2) `EncryptionKey` bean present (standard ByteChef setup) — derived automatically via `HMAC-SHA256(decode(encryptionKey), "bytechef-file-storage-signed-url-v1")`; (3) neither present — unconfigured mode (mint throws, verify accepts legacy only). In practice, signed URLs work out of the box on every deployment because `EncryptionKey` is always configured. Setting `bytechef.file-storage.signed-url.secret` explicitly is not required for normal deployments.
+- The domain-separation label `"bytechef-file-storage-signed-url-v1"` ensures the derived signing key is mathematically independent from the AES master key (key-separation principle). The `-v1` suffix allows rolling forward to a new derivation scheme without rotating the encryption key.
+- Spec: `docs/superpowers/specs/2026-05-18-hmac-signed-file-entry-tokens-design.md`. Plan: `docs/superpowers/plans/2026-05-18-hmac-signed-file-entry-tokens.md`.
+
 ## Build and Deployment
 
 ### Docker

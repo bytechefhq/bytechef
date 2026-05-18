@@ -11,6 +11,9 @@ dependencies {
 
     compileOnly("jakarta.servlet:jakarta.servlet-api")
 
+    testImplementation(project(":server:libs:test:test-support"))
+    testRuntimeOnly("jakarta.servlet:jakarta.servlet-api")
+
     implementation(libs.io.swagger.core.v3.swagger.annotations)
     implementation("jakarta.annotation:jakarta.annotation-api")
     implementation("jakarta.validation:jakarta.validation-api")

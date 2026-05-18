@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:core:file-storage:file-storage-token-service"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))

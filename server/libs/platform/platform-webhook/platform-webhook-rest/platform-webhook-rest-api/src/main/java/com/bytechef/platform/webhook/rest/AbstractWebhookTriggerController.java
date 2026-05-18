@@ -20,6 +20,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.file.storage.token.FileEntryTokens;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
@@ -60,20 +61,25 @@ public abstract class AbstractWebhookTriggerController {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
+    private final FileEntryTokens fileEntryTokens;
     private String publicUrl;
     private final TempFileStorage tempFileStorage;
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
     protected AbstractWebhookTriggerController(
-        TempFileStorage tempFileStorage, WebhookWorkflowExecutor webhookWorkflowExecutor) {
+        FileEntryTokens fileEntryTokens, TempFileStorage tempFileStorage,
+        WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
+        this.fileEntryTokens = fileEntryTokens;
         this.tempFileStorage = tempFileStorage;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
     protected AbstractWebhookTriggerController(
-        String publicUrl, TempFileStorage tempFileStorage, WebhookWorkflowExecutor webhookWorkflowExecutor) {
+        FileEntryTokens fileEntryTokens, String publicUrl, TempFileStorage tempFileStorage,
+        WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
+        this.fileEntryTokens = fileEntryTokens;
         this.publicUrl = publicUrl;
         this.tempFileStorage = tempFileStorage;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
@@ -141,10 +147,12 @@ public abstract class AbstractWebhookTriggerController {
     }
 
     @SuppressWarnings("unchecked")
-    private String convertToFileEntryUrl(Map<?, ?> map) {
+    String convertToFileEntryUrl(Map<?, ?> map) {
         FileEntry fileEntry = new FileEntry((Map<String, ?>) map);
+        String tokenOrId = fileEntryTokens.toSignedTokenIfConfigured(fileEntry)
+            .orElseGet(fileEntry::toId);
 
-        return publicUrl + "/file-entries/%s/content".formatted(fileEntry.toId());
+        return publicUrl + "/file-entries/%s/content".formatted(tokenOrId);
     }
 
     @SuppressFBWarnings(
