@@ -40,7 +40,7 @@ public class LoggerWarnAction {
 
         Object text = inputParameters.get(TEXT);
 
-        context.log(logger -> logger.warn(String.valueOf(text)));
+        context.log(log -> log.warn(String.valueOf(text)));
 
         return null;
     }
