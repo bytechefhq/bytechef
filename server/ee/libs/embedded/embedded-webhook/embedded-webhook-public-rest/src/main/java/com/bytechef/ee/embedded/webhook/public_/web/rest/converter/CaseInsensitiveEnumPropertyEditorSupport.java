@@ -5,9 +5,9 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.embedded.webhook.converter;
+package com.bytechef.ee.embedded.webhook.public_.web.rest.converter;
 
-import com.bytechef.ee.embedded.execution.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 import java.beans.PropertyEditorSupport;
 
 /**
