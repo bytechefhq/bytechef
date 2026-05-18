@@ -36,7 +36,7 @@ import org.springframework.core.annotation.Order;
 @Profile("startup-timing")
 class StartupTimingConfiguration {
 
-    private static final Logger logger = LoggerFactory.getLogger(StartupTimingConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(StartupTimingConfiguration.class);
 
     @Bean
     @Order(Ordered.HIGHEST_PRECEDENCE)
@@ -66,7 +66,7 @@ class StartupTimingConfiguration {
                 beanDurations.put(beanName, duration);
 
                 if (duration > 100) {
-                    logger.warn("SLOW BEAN: {} took {}ms to initialize", beanName, duration);
+                    log.warn("SLOW BEAN: {} took {}ms to initialize", beanName, duration);
                 }
             }
 

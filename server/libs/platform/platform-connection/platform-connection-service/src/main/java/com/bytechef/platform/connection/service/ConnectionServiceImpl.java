@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
 @Transactional
 public class ConnectionServiceImpl implements ConnectionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ConnectionServiceImpl.class);
 
     private final ConnectionRepository connectionRepository;
 
@@ -82,8 +82,8 @@ public class ConnectionServiceImpl implements ConnectionService {
         connection.setParameters(parameters);
         connection.setType(platformType);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Saved..: {}", FormatUtils.toString(parameters));
+        if (log.isTraceEnabled()) {
+            log.trace("Saved..: {}", FormatUtils.toString(parameters));
         }
 
         return create(connection);
@@ -204,22 +204,22 @@ public class ConnectionServiceImpl implements ConnectionService {
 
         Connection connection = getConnection(connectionId);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("New....: {}", FormatUtils.toString(parameters));
+        if (log.isTraceEnabled()) {
+            log.trace("New....: {}", FormatUtils.toString(parameters));
         }
 
         Map<String, Object> curParameters = new HashMap<>(connection.getParameters());
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Current: {}", FormatUtils.toString(curParameters));
+        if (log.isTraceEnabled()) {
+            log.trace("Current: {}", FormatUtils.toString(curParameters));
         }
 
         curParameters.putAll(parameters);
 
         connection.setParameters(curParameters);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Saved..: {}", FormatUtils.toString(curParameters));
+        if (log.isTraceEnabled()) {
+            log.trace("Saved..: {}", FormatUtils.toString(curParameters));
         }
 
         return connectionRepository.save(connection);

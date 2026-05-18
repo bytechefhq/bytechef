@@ -38,7 +38,7 @@ import org.springframework.messaging.handler.annotation.support.MessageHandlerMe
 public class AwsMessageBrokerListenerRegistrarConfiguration
     implements SqsListenerConfigurer, MessageBrokerListenerRegistrar<EndpointRegistrar> {
 
-    private static final Logger logger = LoggerFactory.getLogger(AwsMessageBrokerListenerRegistrarConfiguration.class);
+    private static final Logger log = LoggerFactory.getLogger(AwsMessageBrokerListenerRegistrarConfiguration.class);
 
     private final List<MessageBrokerConfigurer<EndpointRegistrar>> messageBrokerConfigurers;
     private final MessageHandlerMethodFactory messageHandlerMethodFactory;
@@ -76,8 +76,8 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
             .orElseThrow(
                 () -> new IllegalArgumentException("No method found: " + methodName + " on " + delegate.getClass()));
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
+        if (log.isTraceEnabled()) {
+            log.trace("Registering AWS Listener: {} -> {}:{}", messageRoute, delegateClass.getName(), methodName);
         }
 
         SqsEndpoint endpoint = createListenerEndpoint(messageRoute.getName(), delegate, listenerMethod);
@@ -91,7 +91,7 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
             try {
                 container.stop();
             } catch (Exception e) {
-                logger.warn("Failed to stop AWS SQS listener container: {}", e.getMessage());
+                log.warn("Failed to stop AWS SQS listener container: {}", e.getMessage());
             }
         }
     }
@@ -102,7 +102,7 @@ public class AwsMessageBrokerListenerRegistrarConfiguration
             try {
                 container.start();
             } catch (Exception e) {
-                logger.warn("Failed to start AWS SQS listener container: {}", e.getMessage());
+                log.warn("Failed to start AWS SQS listener container: {}", e.getMessage());
             }
         }
     }

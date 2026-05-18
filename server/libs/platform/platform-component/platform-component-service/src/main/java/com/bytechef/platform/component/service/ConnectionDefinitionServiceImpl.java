@@ -91,7 +91,7 @@ import tools.jackson.core.type.TypeReference;
 @Service("connectionDefinitionService")
 public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionService {
 
-    private static final Logger logger = LoggerFactory.getLogger(ConnectionDefinitionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(ConnectionDefinitionServiceImpl.class);
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
@@ -203,15 +203,15 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with {} authorization type.", authorizationType);
+        if (log.isTraceEnabled()) {
+            log.trace("Executing with {} authorization type.", authorizationType);
         }
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
             componentName, connectionVersion, authorizationType);
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with persisted refresh token {}", authorization.getRefreshToken());
+        if (log.isTraceEnabled()) {
+            log.trace("Executing with persisted refresh token {}", authorization.getRefreshToken());
         }
 
         RefreshFunction refreshFunction = authorization.getRefresh()
@@ -233,8 +233,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
                                 context1))));
 
         try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Refreshing using {}", FormatUtils.toString(connectionParameters));
+            if (log.isTraceEnabled()) {
+                log.trace("Refreshing using {}", FormatUtils.toString(connectionParameters));
             }
 
             return refreshFunction.apply(ParametersFactory.create(connectionParameters), context);
@@ -265,7 +265,7 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
             componentName, connectionVersion, authorizationType);
 
         if (authorizationOptional.isEmpty()) {
-            logger.warn(
+            log.warn(
                 "Authorization not found for component '{}', version {}, type '{}'", componentName, connectionVersion,
                 authorizationType);
 
@@ -347,8 +347,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         String componentName, int connectionVersion, AuthorizationType authorizationType,
         Map<String, ?> connectionParameters, Context context, String redirectUri) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with {} authorization type.", authorizationType);
+        if (log.isTraceEnabled()) {
+            log.trace("Executing with {} authorization type.", authorizationType);
         }
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -407,8 +407,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
     }
 
     private static ApplyFunction getDefaultApplyFunction(AuthorizationType type) {
-        if (logger.isTraceEnabled()) {
-            logger.trace("Resolving applyFunction for {} authorization type.", type);
+        if (log.isTraceEnabled()) {
+            log.trace("Resolving applyFunction for {} authorization type.", type);
         }
 
         return switch (type) {
@@ -533,8 +533,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
         TokenUrlFunction tokenUrlFunction) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with clientId, clientSecret, tokenUrl");
+        if (log.isTraceEnabled()) {
+            log.trace("Executing with clientId, clientSecret, tokenUrl");
         }
 
         return (connectionParameters, code, redirectUri, codeVerifier, context) -> {
@@ -598,8 +598,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         ClientIdFunction clientIdFunction, ClientSecretFunction clientSecretFunction,
         RefreshTokenFunction refreshTokenFunction, RefreshUrlFunction refreshUrlFunction) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Default refresh function using refresh token function {}", refreshTokenFunction);
+        if (log.isTraceEnabled()) {
+            log.trace("Default refresh function using refresh token function {}", refreshTokenFunction);
         }
 
         return (connectionParameters, context) -> {
@@ -729,8 +729,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         Map<String, ?> connectionParameters,
         Context context) {
 
-        if (logger.isTraceEnabled()) {
-            logger.trace("Executing with {} authorization type.", authorizationType);
+        if (log.isTraceEnabled()) {
+            log.trace("Executing with {} authorization type.", authorizationType);
         }
 
         Authorization authorization = componentDefinitionRegistry.getAuthorization(
@@ -784,8 +784,8 @@ public class ConnectionDefinitionServiceImpl implements ConnectionDefinitionServ
         }
 
         try {
-            if (logger.isTraceEnabled()) {
-                logger.trace("Executing with parameters {}", parameters);
+            if (log.isTraceEnabled()) {
+                log.trace("Executing with parameters {}", parameters);
             }
 
             return new OAuth2AuthorizationParameters(

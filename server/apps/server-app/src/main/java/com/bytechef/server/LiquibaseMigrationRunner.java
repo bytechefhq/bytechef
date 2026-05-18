@@ -38,7 +38,7 @@ import org.springframework.stereotype.Component;
 @Profile("liquibase")
 class LiquibaseMigrationRunner implements CommandLineRunner {
 
-    private static final Logger logger = LoggerFactory.getLogger(LiquibaseMigrationRunner.class);
+    private static final Logger log = LoggerFactory.getLogger(LiquibaseMigrationRunner.class);
 
     private final ApplicationContext applicationContext;
 
@@ -48,7 +48,7 @@ class LiquibaseMigrationRunner implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        logger.info("Liquibase migration completed successfully");
+        log.info("Liquibase migration completed successfully");
 
         SpringApplication.exit(applicationContext, () -> 0);
     }

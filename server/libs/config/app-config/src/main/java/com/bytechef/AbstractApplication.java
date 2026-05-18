@@ -40,7 +40,7 @@ import org.springframework.core.env.Environment;
 @EnableConfigurationProperties(ApplicationProperties.class)
 public abstract class AbstractApplication implements InitializingBean {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractApplication.class);
+    private static final Logger log = LoggerFactory.getLogger(AbstractApplication.class);
 
     @Override
     public void afterPropertiesSet() {
@@ -69,7 +69,7 @@ public abstract class AbstractApplication implements InitializingBean {
 
         String[] activeProfiles = environment.getActiveProfiles();
 
-        logger.info(
+        log.info(
             CRLFLogConverter.CRLF_SAFE_MARKER,
             """
                 \n----------------------------------------------------------
@@ -103,7 +103,7 @@ public abstract class AbstractApplication implements InitializingBean {
 
             hostAddress = inetAddress.getHostAddress();
         } catch (UnknownHostException e) {
-            logger.warn("The host name could not be determined, using `localhost` as fallback");
+            log.warn("The host name could not be determined, using `localhost` as fallback");
         }
         return hostAddress;
     }
