@@ -73,8 +73,8 @@ export function DatePickerWithRange({
 
                 <PopoverContent align="start" className="w-auto p-0">
                     <Calendar
+                        autoFocus
                         defaultMonth={date?.from}
-                        initialFocus
                         mode="range"
                         numberOfMonths={2}
                         onSelect={(dateRange) => {
