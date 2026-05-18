@@ -49,7 +49,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-remote-client"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-remote-client"))
-    implementation(project(":server:ee:libs:embedded:embedded-webhook:embedded-webhook-rest"))
+    implementation(project(":server:ee:libs:embedded:embedded-webhook:embedded-webhook-public-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-workflow:embedded-workflow-coordinator"))
     implementation(project(":server:ee:libs:platform:platform-component:platform-component-remote-client"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-remote-client"))
