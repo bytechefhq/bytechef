@@ -51,7 +51,7 @@ import org.springframework.core.io.ByteArrayResource;
  */
 public class GitWorkflowRepository implements WorkflowRepository {
 
-    private static final Logger logger = LoggerFactory.getLogger(GitWorkflowRepository.class);
+    private static final Logger log = LoggerFactory.getLogger(GitWorkflowRepository.class);
 
     private static final ConcurrentHashMap<String, ReentrantLock> TENANT_LOCKS = new ConcurrentHashMap<>();
 
@@ -156,8 +156,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
 
             workflow.setId(encode(Validate.notNull(workflow.getId(), "id")));
         } catch (Exception e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage());
             }
         }
 
@@ -193,8 +193,8 @@ public class GitWorkflowRepository implements WorkflowRepository {
         try {
             return EncodingUtils.base64DecodeToString(str);
         } catch (IllegalArgumentException e) {
-            if (logger.isDebugEnabled()) {
-                logger.debug(e.getMessage());
+            if (log.isDebugEnabled()) {
+                log.debug(e.getMessage());
             }
         }
 
