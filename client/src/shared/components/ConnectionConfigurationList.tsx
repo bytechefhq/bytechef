@@ -2,7 +2,7 @@ import Button from '@/components/Button/Button';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
-import {PlusIcon} from 'lucide-react';
+import {InfoIcon, PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -17,6 +17,7 @@ interface ConnectionConfigurationListFormFieldProps {
     connections: ConnectionI[];
     control: Control<FieldValues>;
     currentConnectionId?: number;
+    fieldNamePrefix: string;
     groupedIndices?: number[];
     index: number;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
@@ -30,6 +31,7 @@ const ConnectionConfigurationListFormField = ({
     connections,
     control,
     currentConnectionId,
+    fieldNamePrefix,
     groupedIndices,
     handleConnectionDialogOpen,
     handleConnectionIdChange,
@@ -74,7 +76,7 @@ const ConnectionConfigurationListFormField = ({
         <FormField
             control={control}
             key={index}
-            name={`connections.${index}.connectionId`}
+            name={`${fieldNamePrefix}.${index}.connectionId`}
             render={({field}) => (
                 <FormItem>
                     <FormLabel className="flex items-center gap-1">
@@ -110,7 +112,7 @@ const ConnectionConfigurationListFormField = ({
                         }
                     >
                         <FormControl>
-                            <div className="flex space-x-2">
+                            <div className="flex space-x-2 bg-surface-neutral-primary">
                                 <SelectTrigger>
                                     {currentConnectionId ? (
                                         <SelectValue placeholder="Select a connection..." />
@@ -157,6 +159,14 @@ const ConnectionConfigurationListFormField = ({
                         </SelectContent>
                     </Select>
 
+                    {connectionList.length === 0 && (
+                        <div className="flex items-center gap-1">
+                            <InfoIcon className="size-4 text-content-destructive-primary" />
+
+                            <span className="text-sm text-content-destructive-primary">No connections available</span>
+                        </div>
+                    )}
+
                     <FormMessage />
                 </FormItem>
             )}
@@ -173,6 +183,7 @@ interface ConnectionConfigurationListProps {
     connections?: ConnectionI[];
     connectionsGrouped?: boolean;
     control: Control<FieldValues>;
+    fieldNamePrefix?: string;
     getCurrentConnectionId?: (index: number) => number | undefined;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
     handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
@@ -185,6 +196,7 @@ const ConnectionConfigurationList = ({
     connections,
     connectionsGrouped = false,
     control,
+    fieldNamePrefix = 'connections',
     getCurrentConnectionId,
     handleConnectionDialogOpen,
     handleConnectionIdChange,
@@ -258,6 +270,7 @@ const ConnectionConfigurationList = ({
                     connections={connections!}
                     control={control}
                     currentConnectionId={getCurrentConnectionId?.(index)}
+                    fieldNamePrefix={fieldNamePrefix}
                     groupedIndices={groupedIndices}
                     handleConnectionDialogOpen={handleConnectionDialogOpen}
                     handleConnectionIdChange={handleConnectionIdChange}

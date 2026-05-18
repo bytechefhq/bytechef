@@ -178,7 +178,10 @@ const WorkflowTestConfigurationDialog = ({
                 </DialogHeader>
 
                 <Form {...form}>
-                    <Tabs className="max-h-workflow-test-configuration-dialog-height" defaultValue="connections">
+                    <Tabs
+                        className="max-h-workflow-test-configuration-dialog-height max-w-workflow-test-configuration-dialog-width gap-2.5"
+                        defaultValue="connections"
+                    >
                         <TabsList className="mx-6 flex">
                             <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
                                 <Link2Icon className="mr-2 size-4" />
@@ -198,7 +201,7 @@ const WorkflowTestConfigurationDialog = ({
                         </TabsList>
 
                         <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
-                            <TabsContent className="px-6 py-3" value="connections">
+                            <TabsContent className="mt-0 px-6 py-2.5" value="connections">
                                 <ConnectionConfigurationList
                                     componentConnections={componentConnections}
                                     connectionDialogAllowed={connectionDialogAllowed}
@@ -218,7 +221,7 @@ const WorkflowTestConfigurationDialog = ({
                                 />
                             </TabsContent>
 
-                            <TabsContent className="px-6 py-3" value="inputs">
+                            <TabsContent className="mt-0 px-6 py-3" value="inputs">
                                 <InputConfigurationList
                                     control={control as unknown as Control<FieldValues>}
                                     controlPath="inputs"

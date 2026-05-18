@@ -5,6 +5,7 @@ import {
     DialogClose,
     DialogCloseButton,
     DialogContent,
+    DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
@@ -135,8 +136,14 @@ const ProjectDeploymentEditWorkflowDialog = ({
         >
             <DialogContent className="gap-0 p-0" onInteractOutside={(event) => event.preventDefault()}>
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
-                        <DialogTitle>{`Edit ${workflow?.label} Workflow`}</DialogTitle>
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 p-6">
+                        <div className="flex flex-col space-y-1">
+                            <DialogTitle>Edit {workflow?.label} Workflow</DialogTitle>
+
+                            <DialogDescription>
+                                Set workflow input, trigger output values and connections.
+                            </DialogDescription>
+                        </div>
 
                         <DialogCloseButton />
                     </DialogHeader>
