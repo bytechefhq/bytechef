@@ -1272,11 +1272,15 @@ export default function useWorkflowNodeDetailsPanel({
 
         // Prefer the server-synced operationName once available; otherwise fall back to the
         // optimistically-set currentNode.operationName so a newly added node can resolve its
-        // operation before the workflow mutation settles.
-        const resolvedOperationName = currentWorkflowNode?.operationName ?? currentNode?.operationName;
+        // operation before the workflow mutation settles. Always sync (including resetting to
+        // '') so a previous selection's operationName doesn't leak into the new node — e.g.
+        // selecting a Productboard `newNote` trigger and then a Productboard `getFeature`
+        // action would otherwise leave `currentOperationName = 'newNote'` long enough for the
+        // action-fetch effect to issue `GET /actions/newNote` (a trigger name) and 400.
+        const newOperationName = currentWorkflowNode?.operationName ?? currentNode?.operationName ?? '';
 
-        if (resolvedOperationName && resolvedOperationName !== currentOperationName) {
-            setCurrentOperationName(resolvedOperationName);
+        if (newOperationName !== currentOperationName) {
+            setCurrentOperationName(newOperationName);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1347,7 +1351,15 @@ export default function useWorkflowNodeDetailsPanel({
                 setCurrentActionDefinition(undefined);
             }
         } else {
-            if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingOperation) {
+            // Match against actions only — productboard (and any component with both triggers
+            // and actions) can share operation names across categories, so a stale
+            // currentOperationName like 'newNote' (a trigger) would otherwise satisfy
+            // matchingOperation and cause the action endpoint to be hit with a trigger name.
+            const matchingAction = currentComponentDefinition?.actions?.find(
+                (action) => action.name === currentOperationName
+            );
+
+            if (!!currentComponentDefinition?.actions && !currentNode?.trigger && !!matchingAction) {
                 fetchActionDefinition();
             } else {
                 setCurrentActionDefinition(undefined);

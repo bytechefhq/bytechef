@@ -189,3 +189,56 @@ describe('currentActionDefinition freshness guard', () => {
         expect(isActionDefinitionFresh(currentActionDefinition, {name: 'openrouter', version: 1}, 'ask')).toBe(false);
     });
 });
+
+/**
+ * Tests for the action-only match guard in the fetch-action-definition effect.
+ *
+ * Some components expose both triggers and actions (e.g., Productboard has a `newNote` trigger
+ * and a `getFeature` action). Before this guard, opening a trigger panel left
+ * `currentOperationName = 'newNote'`; clicking a sibling action node on the same component then
+ * fired `GET /component-definitions/productboard/1/actions/newNote` during the transitional
+ * render — a 400 because `newNote` is a trigger, not an action. The guard must match only
+ * against `currentComponentDefinition.actions`, not the union of actions/triggers/cluster
+ * elements that `matchingOperation` resolves against.
+ */
+type ComponentDefinitionWithOperationsType = {
+    actions?: Array<{name: string}>;
+    triggers?: Array<{name: string}>;
+};
+
+function shouldFireActionFetch(
+    componentDefinition: ComponentDefinitionWithOperationsType | undefined,
+    currentOperationName: string,
+    currentNodeIsTrigger: boolean
+): boolean {
+    const matchingAction = componentDefinition?.actions?.find((action) => action.name === currentOperationName);
+
+    return !!componentDefinition?.actions && !currentNodeIsTrigger && !!matchingAction;
+}
+
+describe('action-fetch effect: action-only match guard', () => {
+    const productboard: ComponentDefinitionWithOperationsType = {
+        actions: [{name: 'getFeature'}],
+        triggers: [{name: 'newNote'}],
+    };
+
+    it('does not fire the action fetch when stale operationName matches a trigger but not an action', () => {
+        expect(shouldFireActionFetch(productboard, 'newNote', false)).toBe(false);
+    });
+
+    it('fires the action fetch when operationName matches an action on the component', () => {
+        expect(shouldFireActionFetch(productboard, 'getFeature', false)).toBe(true);
+    });
+
+    it('does not fire when currentNode is a trigger, even if operationName matches an action', () => {
+        expect(shouldFireActionFetch(productboard, 'getFeature', true)).toBe(false);
+    });
+
+    it('does not fire when component has no actions', () => {
+        expect(shouldFireActionFetch({triggers: [{name: 'newNote'}]}, 'newNote', false)).toBe(false);
+    });
+
+    it('does not fire when operationName is empty (e.g., switching to a task dispatcher)', () => {
+        expect(shouldFireActionFetch(productboard, '', false)).toBe(false);
+    });
+});
