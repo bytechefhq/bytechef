@@ -27,6 +27,7 @@ public class WorkflowErrorType extends AbstractErrorType {
     public static final WorkflowErrorType WORKFLOW_NOT_FOUND = new WorkflowErrorType(100);
     public static final WorkflowErrorType WORKFLOW_NODE_NOT_FOUND = new WorkflowErrorType(101);
     public static final WorkflowErrorType CLUSTER_ELEMENT_NOT_FOUND = new WorkflowErrorType(102);
+    public static final WorkflowErrorType WORKFLOW_NOT_DEPLOYED = new WorkflowErrorType(103);
 
     public WorkflowErrorType(int errorKey) {
         super(Workflow.class, errorKey);

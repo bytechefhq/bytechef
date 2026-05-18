@@ -195,10 +195,27 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
 
+        long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
+            connectedUserProject.getProjectId(), environment);
+
         String workflowId = projectWorkflowService
-            .getProjectWorkflowWorkflowId(
-                projectDeploymentService.getProjectDeploymentId(connectedUserProject.getProjectId(), environment),
-                workflowUuid);
+            .fetchProjectWorkflowWorkflowId(projectDeploymentId, workflowUuid)
+            .orElseThrow(() -> {
+                boolean existsInProject = projectWorkflowService
+                    .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
+                    .isPresent();
+
+                if (existsInProject) {
+                    return new ConfigurationException(
+                        "Workflow with workflowUuid '%s' is not in the active deployment; publish the project before %s it"
+                            .formatted(workflowUuid, enable ? "enabling" : "disabling"),
+                        WorkflowErrorType.WORKFLOW_NOT_DEPLOYED);
+                }
+
+                return new ConfigurationException(
+                    "Workflow with workflowUuid '%s' does not exist".formatted(workflowUuid),
+                    WorkflowErrorType.WORKFLOW_NOT_FOUND);
+            });
 
         projectDeploymentFacade.enableProjectDeploymentWorkflow(
             connectedUserProject.getProjectId(), workflowId, enable, environment);
