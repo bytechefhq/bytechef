@@ -37,7 +37,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerLifecycleFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerLifecycleFacadeImpl.class);
 
     private final TriggerScheduler triggerScheduler;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
@@ -88,13 +88,13 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
                 }
             }
 
-            if (logger.isDebugEnabled()) {
-                logger.debug(
+            if (log.isDebugEnabled()) {
+                log.debug(
                     "Trigger type='{}', name='{}', workflowExecutionId={} disabled",
                     triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId);
             }
         } catch (Exception e) {
-            logger.error(
+            log.error(
                 "Error while disabling trigger type='{}', name='{}', workflowExecutionId={}",
                 triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId, e);
         }
@@ -135,8 +135,8 @@ public class TriggerLifecycleFacadeImpl implements TriggerLifecycleFacade {
             }
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Trigger type='{}', name='{}', workflowExecutionId={} enabled",
                 triggerWorkflowNodeType, workflowExecutionId.getTriggerName(), workflowExecutionId);
         }

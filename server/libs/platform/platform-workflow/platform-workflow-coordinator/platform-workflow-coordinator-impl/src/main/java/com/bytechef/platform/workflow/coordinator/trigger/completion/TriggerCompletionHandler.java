@@ -42,7 +42,7 @@ import org.springframework.util.Assert;
 @Component
 public class TriggerCompletionHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerCompletionHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerCompletionHandler.class);
 
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private final PrincipalJobFacade principalJobFacade;
@@ -68,8 +68,8 @@ public class TriggerCompletionHandler {
         Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
         Assert.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("handle: triggerExecution={}", triggerExecution);
+        if (log.isDebugEnabled()) {
+            log.debug("handle: triggerExecution={}", triggerExecution);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();
@@ -118,8 +118,8 @@ public class TriggerCompletionHandler {
 
         triggerExecutionService.update(triggerExecution);
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(
+        if (log.isDebugEnabled()) {
+            log.debug(
                 "Trigger id={}, type='{}', name='{}' completed",
                 triggerExecution.getId(), triggerExecution.getType(), triggerExecution.getName());
         }

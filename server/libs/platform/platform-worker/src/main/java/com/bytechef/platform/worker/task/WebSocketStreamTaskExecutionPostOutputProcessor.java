@@ -41,7 +41,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger logger =
+    private static final Logger log =
         LoggerFactory.getLogger(WebSocketStreamTaskExecutionPostOutputProcessor.class);
 
     private final MessageBroker messageBroker;
@@ -114,8 +114,8 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }

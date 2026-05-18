@@ -34,7 +34,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TriggerExecutionErrorEventListener implements ErrorEventListener {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerExecutionErrorEventListener.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerExecutionErrorEventListener.class);
 
     private final TriggerExecutionService triggerExecutionService;
     private final TriggerErrorHandler triggerErrorHandler;
@@ -52,14 +52,14 @@ public class TriggerExecutionErrorEventListener implements ErrorEventListener {
             TriggerExecution triggerExecution = triggerExecutionErrorEvent.getTriggerExecution();
             ExecutionError error = Validate.notNull(triggerExecutionErrorEvent.getError(), "'error' must not be null");
 
-            logger.error(
+            log.error(
                 "Trigger id={}: message={}\nstackTrace={}", triggerExecution.getId(), error.getMessage(),
                 error.getStackTrace());
 
             try {
                 triggerErrorHandler.handleError(triggerExecution);
             } catch (Exception ex) {
-                logger.debug("Job creation during trigger error handling failed: {}", ex.getMessage(), ex);
+                log.debug("Job creation during trigger error handling failed: {}", ex.getMessage(), ex);
             }
 
             triggerExecutionService.update(triggerExecution);

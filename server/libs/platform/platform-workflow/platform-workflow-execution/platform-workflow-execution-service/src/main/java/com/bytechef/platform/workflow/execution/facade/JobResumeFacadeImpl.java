@@ -37,7 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class JobResumeFacadeImpl implements JobResumeFacade {
 
-    private static final Logger logger = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
     private final JobFacade jobFacade;
@@ -60,7 +60,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         try {
             jobResumeId = JobResumeId.parse(id);
         } catch (IllegalArgumentException illegalArgumentException) {
-            logger.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
+            log.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
 
             return JobResumeOutcome.INVALID_ID;
         }
@@ -69,7 +69,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
             Job job = jobService.getJob(jobResumeId.getJobId());
 
             if (job.getStatus() != Job.Status.STOPPED) {
-                logger.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
+                log.warn("Cannot resume job {}; status is {}", jobResumeId.getJobId(), job.getStatus());
 
                 return JobResumeOutcome.GONE;
             }

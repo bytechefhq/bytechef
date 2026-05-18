@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger logger = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
+    private static final Logger log = LoggerFactory.getLogger(SseStreamTaskExecutionPostOutputProcessor.class);
 
     private final MessageBroker messageBroker;
 
@@ -132,8 +132,8 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }

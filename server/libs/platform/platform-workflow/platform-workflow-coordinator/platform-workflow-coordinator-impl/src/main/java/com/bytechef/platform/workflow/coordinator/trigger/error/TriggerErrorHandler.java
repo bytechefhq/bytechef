@@ -43,7 +43,7 @@ import org.springframework.util.Assert;
 @Component
 public class TriggerErrorHandler {
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerErrorHandler.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerErrorHandler.class);
 
     private final ApplicationEventPublisher eventPublisher;
     private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
@@ -65,8 +65,8 @@ public class TriggerErrorHandler {
         Assert.notNull(triggerExecution, "'triggerExecution' must not be null");
         Assert.notNull(triggerExecution.getId(), "'triggerExecution.id' must not be null");
 
-        if (logger.isDebugEnabled()) {
-            logger.debug("handleError: triggerExecution={}", triggerExecution);
+        if (log.isDebugEnabled()) {
+            log.debug("handleError: triggerExecution={}", triggerExecution);
         }
 
         WorkflowExecutionId workflowExecutionId = triggerExecution.getWorkflowExecutionId();

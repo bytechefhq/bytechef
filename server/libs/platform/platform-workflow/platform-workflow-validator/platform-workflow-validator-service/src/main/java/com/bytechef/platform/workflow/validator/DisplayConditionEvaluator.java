@@ -28,7 +28,7 @@ import tools.jackson.databind.JsonNode;
  */
 class DisplayConditionEvaluator {
 
-    private static final Logger logger = LoggerFactory.getLogger(DisplayConditionEvaluator.class);
+    private static final Logger log = LoggerFactory.getLogger(DisplayConditionEvaluator.class);
 
     private DisplayConditionEvaluator() {
     }
@@ -68,8 +68,8 @@ class DisplayConditionEvaluator {
 
             return DisplayConditionResult.of(shouldShow, false, null);
         } catch (Exception e) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(e.getMessage());
+            if (log.isTraceEnabled()) {
+                log.trace(e.getMessage());
             }
 
             return DisplayConditionResult.hidden();
@@ -83,8 +83,8 @@ class DisplayConditionEvaluator {
             return DisplayConditionResult.malformed(message);
         }
 
-        if (logger.isTraceEnabled()) {
-            logger.trace(exception.getMessage());
+        if (log.isTraceEnabled()) {
+            log.trace(exception.getMessage());
         }
 
         return DisplayConditionResult.hidden();
