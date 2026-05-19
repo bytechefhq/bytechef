@@ -7,17 +7,11 @@
 
 package com.bytechef.ee.tenant.multi.config;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Embedding;
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
-import com.openai.client.OpenAIClient;
-import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingModel;
-import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreProperties;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -48,33 +42,14 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
 
     @Bean
     VectorStore knowledgeBasePgVectorStore(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        @Qualifier("knowledgeBaseEmbeddingModel") EmbeddingModel knowledgeBaseEmbeddingModel,
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel,
         PgVectorStoreProperties properties, BatchingStrategy batchingStrategy) {
 
-        return MultiTenantPgVectorStore.builder(pgVectorJdbcTemplate, knowledgeBaseEmbeddingModel)
+        return MultiTenantPgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .vectorTableName("kb_" + properties.getTableName())
             .distanceType(properties.getDistanceType())
             .idType(properties.getIdType())
             .batchingStrategy(batchingStrategy)
             .build();
-    }
-
-    @Bean("knowledgeBaseEmbeddingModel")
-    OpenAiEmbeddingModel knowledgeBaseOpenAiEmbeddingModel(
-        ApplicationProperties applicationProperties, OpenAIClient openAIClient) {
-
-        Embedding.OpenAi.Options options = applicationProperties.getAi()
-            .getProvider()
-            .getEmbedding()
-            .getOpenAi()
-            .getOptions();
-
-        return new OpenAiEmbeddingModel(
-            openAIClient,
-            MetadataMode.ALL,
-            OpenAiEmbeddingOptions.builder()
-                .model(options.getModel())
-                .build());
     }
 }
