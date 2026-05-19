@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseTagService;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -35,21 +35,21 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseTagGraphQlController {
 
-    private final KnowledgeBaseTagService knowledgeBaseTagService;
+    private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagGraphQlController(KnowledgeBaseTagService knowledgeBaseTagService) {
-        this.knowledgeBaseTagService = knowledgeBaseTagService;
+    public KnowledgeBaseTagGraphQlController(KnowledgeBaseTagFacade knowledgeBaseTagFacade) {
+        this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
     }
 
     @QueryMapping
     public List<Tag> knowledgeBaseTags() {
-        return knowledgeBaseTagService.getAllTags();
+        return knowledgeBaseTagFacade.getAllTags();
     }
 
     @QueryMapping
     public List<KnowledgeBaseTagsEntry> knowledgeBaseTagsByKnowledgeBase() {
-        return knowledgeBaseTagService.getTagsByKnowledgeBaseId()
+        return knowledgeBaseTagFacade.getTagsByKnowledgeBaseId()
             .entrySet()
             .stream()
             .map(entry -> new KnowledgeBaseTagsEntry(entry.getKey(), entry.getValue()))
@@ -73,7 +73,7 @@ public class KnowledgeBaseTagGraphQlController {
             })
             .collect(Collectors.toList());
 
-        knowledgeBaseTagService.updateTags(input.knowledgeBaseId(), tags);
+        knowledgeBaseTagFacade.updateTags(input.knowledgeBaseId(), tags);
 
         return true;
     }
