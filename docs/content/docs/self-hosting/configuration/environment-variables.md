@@ -16,19 +16,19 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_FIRECRAWL_API_KEY` | Firecrawl API key (sensitive) | - |
-| `BYTECHEF_AI_FIRECRAWL_BASE_URL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
+| `BYTECHEF_AI_FIRECRAWL_APIKEY` | Firecrawl API key (sensitive) | - |
+| `BYTECHEF_AI_FIRECRAWL_BASEURL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
 | `BYTECHEF_AI_FIRECRAWL_ENABLED` | Enable or disable Firecrawl | `false` |
 
 ## AI Knowledge Base Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key (sensitive) | - |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
-| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_CHUNK_UPDATE_EVENTS` | Number of subscribers for document chunk update events | `1` |
+| `BYTECHEF_AI_KNOWLEDGEBASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
+| `BYTECHEF_AI_KNOWLEDGEBASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
+| `BYTECHEF_AI_KNOWLEDGEBASE_OCR_MISTRAL_APIKEY` | Mistral OCR API key (sensitive) | - |
+| `BYTECHEF_AI_KNOWLEDGEBASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
+| `BYTECHEF_AI_KNOWLEDGEBASE_SUBSCRIPTIONS_DOCUMENT_CHUNK_UPDATE_EVENTS` | Number of subscribers for document chunk update events | `1` |
 
 ## AI MCP Server Configuration
 
@@ -44,18 +44,18 @@ ByteChef can be configured using environment variables. This page documents all 
 
 ## AI Provider API Keys
 
-| Environment Variable | Description | Default Value |
-|---|---|---|
-| `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY` | Anthropic API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_API_KEY` | Azure OpenAI API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_DEEP_SEEK_API_KEY` | DeepSeek API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_GROQ_API_KEY` | Groq API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_MISTRAL_API_KEY` | Mistral API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY` | NVIDIA API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` | OpenAI API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_PERPLEXITY_API_KEY` | Perplexity API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_STABILITY_API_KEY` | Stability API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_API_KEY` | Vertex Gemini API key (sensitive) | - |
+| Environment Variable                        | Description | Default Value |
+|---------------------------------------------|---|---|
+| `BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY`     | Anthropic API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_APIKEY`  | Azure OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_DEEP_SEEK_APIKEY`     | DeepSeek API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_GROQ_APIKEY`          | Groq API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_MISTRAL_APIKEY`       | Mistral API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_NVIDIA_APIKEY`        | NVIDIA API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OPENAI_APIKEY`        | OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_PERPLEXITY_APIKEY`    | Perplexity API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_STABILITY_APIKEY`     | Stability API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_APIKEY` | Vertex Gemini API key (sensitive) | - |
 
 ## AI Chat Model Configuration
 
@@ -65,7 +65,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_PROVIDER_CHAT_ANTHROPIC_OPTIONS_TEMPERATURE` | Anthropic chat temperature (0.0-1.0) | `0.5` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
-| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONINGEFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_VERBOSITY` | OpenAI response verbosity (NONE, LOW, MEDIUM, HIGH) | `LOW` |
 
 ## AI Embedding Model Configuration
@@ -132,7 +132,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECK_PERIOD` | Trigger polling interval in minutes | `5` |
+| `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECKPERIOD` | Trigger polling interval in minutes | `5` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_COMPLETE_EVENTS` | Number of trigger execution complete event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_ERROR_EVENTS` | Number of trigger execution error event subscribers | `1` |
@@ -152,7 +152,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_DATA_STORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_DATASTORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
 
 ## Discovery Service Configuration
 
@@ -183,21 +183,21 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_FEATURE_FLAGS` | List of enabled feature flags | - |
+| `BYTECHEF_FEATUREFLAGS` | List of enabled feature flags | - |
 
 ## File Storage Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_FILE_STORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
-| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | `${user.home}/bytechef/data/file-storage` |
-| `BYTECHEF_FILE_STORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
+| `BYTECHEF_FILESTORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
+| `BYTECHEF_FILESTORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | `${user.home}/bytechef/data/file-storage` |
+| `BYTECHEF_FILESTORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
 
 ## Help Hub Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `false` |
+| `BYTECHEF_HELPHUB_ENABLED` | Enable or disable the help hub | `false` |
 
 ## Kafka Configuration
 
@@ -211,7 +211,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_MAIL_AUTH` | Enable mail authentication | `false` |
-| `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | `BYTECHEF_PUBLIC_URL` |
+| `BYTECHEF_MAIL_BASEURL` | Base URL for mail links | `BYTECHEF_PUBLICURL` |
 | `BYTECHEF_MAIL_DEBUG` | Enable mail debug | `false` |
 | `BYTECHEF_MAIL_FROM` | From email address | `noreply@app.bytechef.io` |
 | `BYTECHEF_MAIL_HOST` | Mail server host | `localhost` |
@@ -227,13 +227,13 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
+| `BYTECHEF_MESSAGEBROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
 
 ## OAuth2 Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL/callback` |
+| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLICURL/callback` |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
 
@@ -241,7 +241,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
+| `BYTECHEF_PUBLICURL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
 
 ## RabbitMQ Configuration
 
@@ -274,13 +274,13 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://.command.ai https://.commandbar.com https://.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://.commandbar.com https://cdn.jsdelivr.net https://.command.ai https://unpkg.com; img-src 'self' https://.command.ai data:; font-src 'self' data:; media-src 'self' https://.command.ai; connect-src 'self' https://.command.ai https://.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED` | Enable social login | `false` |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_ID` | Google OAuth2 client ID (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIALLOGIN_ENABLED` | Enable social login | `false` |
+| `BYTECHEF_SECURITY_SOCIALLOGIN_GOOGLE_CLIENTID` | Google OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIALLOGIN_GOOGLE_CLIENTSECRET` | Google OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIALLOGIN_GITHUB_CLIENTID` | GitHub OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIALLOGIN_GITHUB_CLIENTSECRET` | GitHub OAuth2 client secret (sensitive) | - |
 | `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On | `false` |
-| `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
+| `BYTECHEF_SECURITY_TWOFACTORAUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 
@@ -296,8 +296,8 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_SIGN_UP_ACTIVATION_REQUIRED` | Require account activation | `false` |
-| `BYTECHEF_SIGN_UP_ENABLED` | Enable sign up | `true` |
+| `BYTECHEF_SIGNUP_ACTIVATIONREQUIRED` | Require account activation | `false` |
+| `BYTECHEF_SIGNUP_ENABLED` | Enable sign up | `true` |
 
 ## Tenant Configuration
 
@@ -315,14 +315,14 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_USER_GUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials) | `false` |
-| `BYTECHEF_USER_GUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | - |
+| `BYTECHEF_USERGUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials) | `false` |
+| `BYTECHEF_USERGUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | - |
 
 ## Webhook URL Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
+| `BYTECHEF_WEBHOOKURL` | Webhook URL | `BYTECHEF_PUBLICURL/webhooks/{id}` |
 
 ## Observability Configuration
 
@@ -350,7 +350,7 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_WORKFLOW_OUTPUTSTORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
 
 ### Repository Configuration
 
