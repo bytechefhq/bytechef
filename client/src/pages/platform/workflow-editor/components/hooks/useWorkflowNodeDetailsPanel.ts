@@ -1272,9 +1272,7 @@ export default function useWorkflowNodeDetailsPanel({
 
         // Prefer the server-synced operationName once available; otherwise fall back to the
         // optimistically-set currentNode.operationName so a newly added node can resolve its
-        // operation before the workflow mutation settles. The trailing `?? ''` resets the
-        // value when neither source has it — without it, a prior node's operationName leaks
-        // into the next selection until the next render.
+        // operation before the workflow mutation settles.
         const newOperationName = currentWorkflowNode?.operationName ?? currentNode?.operationName ?? '';
 
         if (newOperationName !== currentOperationName) {
@@ -1349,10 +1347,6 @@ export default function useWorkflowNodeDetailsPanel({
                 setCurrentActionDefinition(undefined);
             }
         } else {
-            // Match against actions only, not the broader matchingOperation (actions ∪ triggers
-            // ∪ clusterElements). A component can reuse the same operation name across categories,
-            // so matchingOperation would let a trigger name satisfy this gate and hit the action
-            // endpoint with a trigger name.
             const matchingAction = currentComponentDefinition?.actions?.find(
                 (action) => action.name === currentOperationName
             );
