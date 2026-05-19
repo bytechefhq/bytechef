@@ -37,11 +37,12 @@ import tools.jackson.databind.ObjectMapper;
 public final class KnowledgeBaseVectorStoreMetadataService {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeBaseVectorStoreMetadataService.class);
+
     private static final Pattern SAFE_TABLE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.]*$");
 
-    private final JdbcTemplate pgVectorJdbcTemplate;
-    private final ObjectMapper objectMapper;
     private final String fullTableName;
+    private final ObjectMapper objectMapper;
+    private final JdbcTemplate pgVectorJdbcTemplate;
 
     @SuppressFBWarnings("EI2")
     public KnowledgeBaseVectorStoreMetadataService(
@@ -52,8 +53,8 @@ public final class KnowledgeBaseVectorStoreMetadataService {
             throw new IllegalArgumentException("Invalid table name: " + fullTableName);
         }
 
-        this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
         this.objectMapper = objectMapper;
+        this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
         this.fullTableName = fullTableName;
     }
 
