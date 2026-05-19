@@ -617,6 +617,19 @@ public class SpelEvaluatorTest {
 
     @ParameterizedTest
     @ValueSource(strings = {
+        "=concat({'brand new '}, {' product'})",
+        "=join(',', {'new item', 'old item'})",
+        "='new year 2024'",
+        "='brand new'"
+    })
+    void testShouldAcceptFormulasWithReservedTokensInsideStringLiterals(String formula) {
+        assertDoesNotThrow(
+            () -> EVALUATOR.evaluate(Map.of("value", formula), Collections.emptyMap()),
+            formula);
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {
         "newCustomer",
         "newOrder.amount",
         "newItems[0]",
