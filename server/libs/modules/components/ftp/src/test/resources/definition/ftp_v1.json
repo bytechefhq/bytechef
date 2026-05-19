@@ -46,6 +46,7 @@
             "name": "remotePath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -80,8 +81,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "remotePath": "/uploads/document.pdf",
-          "success": true
+          "success": true,
+          "remotePath": "/uploads/document.pdf"
         }
       },
       "outputSchema": {
@@ -118,6 +119,7 @@
           "name": "remotePath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -151,8 +153,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "remotePath": "/uploads/document.pdf",
-        "success": true
+        "success": true,
+        "remotePath": "/uploads/document.pdf"
       }
     },
     "perform": { },
@@ -187,6 +189,7 @@
         "name": "extension",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -208,6 +211,7 @@
         "name": "mimeType",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -229,6 +233,7 @@
         "name": "name",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -250,6 +255,7 @@
         "name": "url",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -274,6 +280,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/document.pdf",
       "regex": null,
       "required": true,
@@ -349,6 +356,7 @@
             "name": "extension",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -370,6 +378,7 @@
             "name": "mimeType",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -391,6 +400,7 @@
             "name": "name",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -412,6 +422,7 @@
             "name": "url",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -453,6 +464,7 @@
           "name": "extension",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -474,6 +486,7 @@
           "name": "mimeType",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -495,6 +508,7 @@
           "name": "name",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -516,6 +530,7 @@
           "name": "url",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -545,6 +560,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/downloads/document.pdf",
       "regex": null,
       "required": true,
@@ -609,6 +625,7 @@
               "name": "name",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -630,6 +647,7 @@
               "name": "path",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -651,6 +669,7 @@
               "name": "type",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -691,6 +710,7 @@
               "name": "modifiedAt",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -757,6 +777,7 @@
             "name": "name",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -778,6 +799,7 @@
             "name": "path",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -799,6 +821,7 @@
             "name": "type",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -839,6 +862,7 @@
             "name": "modifiedAt",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -880,6 +904,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads",
       "regex": null,
       "required": true,
@@ -959,6 +984,7 @@
             "name": "deletedPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -993,8 +1019,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "success": true,
-          "deletedPath": "/uploads/old-file.pdf"
+          "deletedPath": "/uploads/old-file.pdf",
+          "success": true
         }
       },
       "outputSchema": {
@@ -1031,6 +1057,7 @@
           "name": "deletedPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -1064,8 +1091,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "success": true,
-        "deletedPath": "/uploads/old-file.pdf"
+        "deletedPath": "/uploads/old-file.pdf",
+        "success": true
       }
     },
     "perform": { },
@@ -1087,6 +1114,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/old-file.pdf",
       "regex": null,
       "required": true,
@@ -1166,6 +1194,7 @@
             "name": "oldPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -1187,6 +1216,7 @@
             "name": "newPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -1221,9 +1251,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "newPath": "/archive/new-name.pdf",
+          "oldPath": "/uploads/old-name.pdf",
           "success": true,
-          "oldPath": "/uploads/old-name.pdf"
+          "newPath": "/archive/new-name.pdf"
         }
       },
       "outputSchema": {
@@ -1260,6 +1290,7 @@
           "name": "oldPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -1281,6 +1312,7 @@
           "name": "newPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -1314,9 +1346,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "newPath": "/archive/new-name.pdf",
+        "oldPath": "/uploads/old-name.pdf",
         "success": true,
-        "oldPath": "/uploads/old-name.pdf"
+        "newPath": "/archive/new-name.pdf"
       }
     },
     "perform": { },
@@ -1338,6 +1370,7 @@
       "name": "oldPath",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/old-name.pdf",
       "regex": null,
       "required": true,
@@ -1359,6 +1392,7 @@
       "name": "newPath",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/archive/new-name.pdf",
       "regex": null,
       "required": true,
@@ -1434,6 +1468,7 @@
             "name": "remotePath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -1468,8 +1503,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "remotePath": "/uploads/document.pdf",
-          "success": true
+          "success": true,
+          "remotePath": "/uploads/document.pdf"
         }
       },
       "outputSchema": {
@@ -1506,6 +1541,7 @@
           "name": "remotePath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -1539,8 +1575,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "remotePath": "/uploads/document.pdf",
-        "success": true
+        "success": true,
+        "remotePath": "/uploads/document.pdf"
       }
     },
     "processErrorResponse": null,
@@ -1574,6 +1610,7 @@
         "name": "extension",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -1595,6 +1632,7 @@
         "name": "mimeType",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -1616,6 +1654,7 @@
         "name": "name",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -1637,6 +1676,7 @@
         "name": "url",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -1661,6 +1701,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/document.pdf",
       "regex": null,
       "required": true,
@@ -1737,6 +1778,7 @@
             "name": "extension",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -1758,6 +1800,7 @@
             "name": "mimeType",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -1779,6 +1822,7 @@
             "name": "name",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -1800,6 +1844,7 @@
             "name": "url",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": true,
@@ -1841,6 +1886,7 @@
           "name": "extension",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -1862,6 +1908,7 @@
           "name": "mimeType",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -1883,6 +1930,7 @@
           "name": "name",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -1904,6 +1952,7 @@
           "name": "url",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": true,
@@ -1932,6 +1981,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/downloads/document.pdf",
       "regex": null,
       "required": true,
@@ -1997,6 +2047,7 @@
               "name": "name",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -2018,6 +2069,7 @@
               "name": "path",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -2039,6 +2091,7 @@
               "name": "type",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -2079,6 +2132,7 @@
               "name": "modifiedAt",
               "options": null,
               "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
               "required": null,
@@ -2145,6 +2199,7 @@
             "name": "name",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2166,6 +2221,7 @@
             "name": "path",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2187,6 +2243,7 @@
             "name": "type",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2227,6 +2284,7 @@
             "name": "modifiedAt",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2267,6 +2325,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads",
       "regex": null,
       "required": true,
@@ -2347,6 +2406,7 @@
             "name": "deletedPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2381,8 +2441,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "success": true,
-          "deletedPath": "/uploads/old-file.pdf"
+          "deletedPath": "/uploads/old-file.pdf",
+          "success": true
         }
       },
       "outputSchema": {
@@ -2419,6 +2479,7 @@
           "name": "deletedPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -2452,8 +2513,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "success": true,
-        "deletedPath": "/uploads/old-file.pdf"
+        "deletedPath": "/uploads/old-file.pdf",
+        "success": true
       }
     },
     "processErrorResponse": null,
@@ -2474,6 +2535,7 @@
       "name": "path",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/old-file.pdf",
       "regex": null,
       "required": true,
@@ -2554,6 +2616,7 @@
             "name": "oldPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2575,6 +2638,7 @@
             "name": "newPath",
             "options": null,
             "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
             "required": null,
@@ -2609,9 +2673,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "newPath": "/archive/new-name.pdf",
+          "oldPath": "/uploads/old-name.pdf",
           "success": true,
-          "oldPath": "/uploads/old-name.pdf"
+          "newPath": "/archive/new-name.pdf"
         }
       },
       "outputSchema": {
@@ -2648,6 +2712,7 @@
           "name": "oldPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -2669,6 +2734,7 @@
           "name": "newPath",
           "options": null,
           "optionsDataSource": null,
+          "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
           "required": null,
@@ -2702,9 +2768,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "newPath": "/archive/new-name.pdf",
+        "oldPath": "/uploads/old-name.pdf",
         "success": true,
-        "oldPath": "/uploads/old-name.pdf"
+        "newPath": "/archive/new-name.pdf"
       }
     },
     "processErrorResponse": null,
@@ -2725,6 +2791,7 @@
       "name": "oldPath",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/uploads/old-name.pdf",
       "regex": null,
       "required": true,
@@ -2746,6 +2813,7 @@
       "name": "newPath",
       "options": null,
       "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
       "placeholder": "/archive/new-name.pdf",
       "regex": null,
       "required": true,
@@ -2823,6 +2891,7 @@
         "name": "host",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -2863,6 +2932,7 @@
         "name": "username",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
@@ -2884,6 +2954,7 @@
         "name": "password",
         "options": null,
         "optionsDataSource": null,
+        "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
         "required": true,
