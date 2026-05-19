@@ -94,24 +94,6 @@ public class FileEntry {
         return new FileEntry(parts[2], extension, mimeType, url);
     }
 
-    private static void validateUrl(String url) {
-        if (url.isEmpty() || url.indexOf('\0') >= 0 || url.startsWith("/") || url.startsWith("\\")
-            || url.contains("..") || hasWindowsDriveLetter(url)) {
-
-            throw new IllegalArgumentException("Invalid FileEntry id");
-        }
-    }
-
-    private static boolean hasWindowsDriveLetter(String url) {
-        if (url.length() < 2 || url.charAt(1) != ':') {
-            return false;
-        }
-
-        char drive = url.charAt(0);
-
-        return (drive >= 'a' && drive <= 'z') || (drive >= 'A' && drive <= 'Z');
-    }
-
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -164,13 +146,6 @@ public class FileEntry {
             '}';
     }
 
-    private static int indexOfLastSeparator(final String fileName) {
-        int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
-        int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
-
-        return Math.max(lastUnixPos, lastWindowsPos);
-    }
-
     private static String getExtension(String fileName) {
         int lastDotIndex = fileName.lastIndexOf(".");
 
@@ -181,4 +156,28 @@ public class FileEntry {
         return DEFAULT_EXTENSION;
     }
 
+    private static boolean hasWindowsDriveLetter(String url) {
+        if (url.length() < 2 || url.charAt(1) != ':') {
+            return false;
+        }
+
+        char drive = url.charAt(0);
+
+        return (drive >= 'a' && drive <= 'z') || (drive >= 'A' && drive <= 'Z');
+    }
+
+    private static int indexOfLastSeparator(final String fileName) {
+        int lastUnixPos = fileName.lastIndexOf(UNIX_NAME_SEPARATOR);
+        int lastWindowsPos = fileName.lastIndexOf(WINDOWS_NAME_SEPARATOR);
+
+        return Math.max(lastUnixPos, lastWindowsPos);
+    }
+
+    private static void validateUrl(String url) {
+        if (url.isEmpty() || url.indexOf('\0') >= 0 || url.startsWith("/") || url.startsWith("\\")
+            || url.contains("..") || hasWindowsDriveLetter(url)) {
+
+            throw new IllegalArgumentException("Invalid FileEntry id");
+        }
+    }
 }
