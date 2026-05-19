@@ -378,7 +378,6 @@ const ConnectionTabConnectionSelect = ({
                     baseUri={currentConnection.baseUri}
                     connectionDefinition={connectionDefinition}
                     connectionParameters={currentConnection.connectionParameters}
-                    customAction={componentDefinition?.actions?.some((action) => action.name === 'customAction')}
                 />
             )}
 

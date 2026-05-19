@@ -1,14 +1,7 @@
 import {ConnectionDefinition} from '@/shared/middleware/platform/configuration';
 import {Fragment} from 'react';
 
-const ConnectionParameters = ({
-    authorizationParameters,
-    authorizationType,
-    baseUri,
-    connectionDefinition,
-    connectionParameters,
-    customAction,
-}: {
+interface ConnectionParametersProps {
     authorizationType?: string;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     authorizationParameters?: {[key: string]: any};
@@ -16,8 +9,15 @@ const ConnectionParameters = ({
     connectionDefinition: ConnectionDefinition;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     connectionParameters?: {[key: string]: any};
-    customAction?: boolean;
-}) => {
+}
+
+const ConnectionParameters = ({
+    authorizationParameters,
+    authorizationType,
+    baseUri,
+    connectionDefinition,
+    connectionParameters,
+}: ConnectionParametersProps) => {
     const {authorizations, properties: connectionProperties} = connectionDefinition;
 
     const existingAuthorizations = authorizations?.filter(
@@ -44,13 +44,13 @@ const ConnectionParameters = ({
 
     return (
         <div className="space-y-2 overflow-hidden">
-            {baseUri && customAction ? (
+            {baseUri && (
                 <div className="mb-8 flex">
                     <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
 
                     <span className="text-sm">{baseUri}</span>
                 </div>
-            ) : null}
+            )}
 
             <h2 className="heading-tertiary text-sm">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
