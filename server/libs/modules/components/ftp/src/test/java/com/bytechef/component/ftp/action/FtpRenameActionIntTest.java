@@ -62,6 +62,8 @@ public class FtpRenameActionIntTest {
      */
     private static final String FTP_PASSWORD = "T3st@Pass123";
     private static final String FTP_USERNAME = "ftpuser";
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static final String FTP_HOST_IP = "127.0.0.1";
 
     /**
      * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
@@ -96,7 +98,7 @@ public class FtpRenameActionIntTest {
     static final FixedHostPortGenericContainer<?> ftpContainer =
         new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
             .withEnv("USERS", FTP_USERNAME + "|" + FTP_PASSWORD)
-            .withEnv("ADDRESS", "127.0.0.1")
+            .withEnv("ADDRESS", FTP_HOST_IP)
             .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withExposedPorts(21)
@@ -126,7 +128,7 @@ public class FtpRenameActionIntTest {
     @Test
     void testRename() throws Exception {
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
-            HOST, "127.0.0.1",
+            HOST, FTP_HOST_IP,
             PORT, ftpContainer.getMappedPort(21),
             USERNAME, FTP_USERNAME,
             PASSWORD, FTP_PASSWORD,
@@ -150,7 +152,7 @@ public class FtpRenameActionIntTest {
     /**
      * Seeds the FTP test file directly inside the container using {@code execInContainer} rather than the FTP protocol.
      * This sidesteps passive-mode port-mapping complexity (the PASV data port must match host:container exactly) while
-     * still leaving the actual download path — exercised by {@link #testList} — as the thing under test.
+     * still leaving the actual download path — exercised by {@link #testRename} — as the thing under test.
      */
     private static void uploadTestFileViaFtp() throws Exception {
         String filePath = "/ftp/" + FTP_USERNAME + "/" + TEST_FILENAME;
@@ -169,7 +171,7 @@ public class FtpRenameActionIntTest {
     /**
      * Seeds the FTP test file directly inside the container using {@code execInContainer} rather than the FTP protocol.
      * This sidesteps passive-mode port-mapping complexity (the PASV data port must match host:container exactly) while
-     * still leaving the actual download path — exercised by {@link #testList} — as the thing under test.
+     * still leaving the actual download path — exercised by {@link #testRename} — as the thing under test.
      */
     private static void copyTestFileViaFtp(String newFileSuffix) throws Exception {
         String filePath = "/ftp/" + FTP_USERNAME + "/" + TEST_FILENAME;
@@ -192,7 +194,7 @@ public class FtpRenameActionIntTest {
         SSHClient sshClient = new SSHClient();
 
         sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-        sshClient.connect("127.0.0.1", sftpContainer.getMappedPort(22));
+        sshClient.connect(FTP_HOST_IP, sftpContainer.getMappedPort(22));
         sshClient.authPassword(FTP_USERNAME, FTP_PASSWORD);
 
         try (SFTPClient sftpClient = sshClient.newSFTPClient()) {

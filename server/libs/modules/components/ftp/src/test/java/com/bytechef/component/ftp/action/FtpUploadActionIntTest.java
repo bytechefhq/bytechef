@@ -36,13 +36,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import net.schmizz.sshj.SSHClient;
-import net.schmizz.sshj.sftp.SFTPClient;
-import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
-import net.schmizz.sshj.xfer.InMemorySourceFile;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
@@ -65,6 +60,8 @@ public class FtpUploadActionIntTest {
      */
     private static final String FTP_PASSWORD = "T3st@Pass123";
     private static final String FTP_USERNAME = "ftpuser";
+    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
+    private static final String FTP_HOST_IP = "127.0.0.1";
 
     /**
      * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
@@ -99,7 +96,7 @@ public class FtpUploadActionIntTest {
     static final FixedHostPortGenericContainer<?> ftpContainer =
         new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
             .withEnv("USERS", FTP_USERNAME + "|" + FTP_PASSWORD)
-            .withEnv("ADDRESS", "127.0.0.1")
+            .withEnv("ADDRESS", FTP_HOST_IP)
             .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withExposedPorts(21)
@@ -117,7 +114,7 @@ public class FtpUploadActionIntTest {
     @Test
     void testUpload() throws Exception {
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
-            HOST, "127.0.0.1",
+            HOST, FTP_HOST_IP,
             PORT, ftpContainer.getMappedPort(21),
             USERNAME, FTP_USERNAME,
             PASSWORD, FTP_PASSWORD,
@@ -136,57 +133,6 @@ public class FtpUploadActionIntTest {
 
         Assertions.assertTrue(remoteFileSystemPerformResult.containsKey("remotePath"));
         Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get("success"));
-    }
-
-    /**
-     * Seeds the FTP test file directly inside the container using {@code execInContainer} rather than the FTP protocol.
-     * This sidesteps passive-mode port-mapping complexity (the PASV data port must match host:container exactly) while
-     * still leaving the actual download path — exercised by {@link #testUpload()} — as the thing under test.
-     */
-    private static void uploadTestFileViaFtp() throws Exception {
-        String filePath = "/ftp/" + FTP_USERNAME + "/" + TEST_FILENAME;
-
-        var result = ftpContainer.execInContainer(
-            "sh", "-c",
-            "printf '%s' '" + TEST_CONTENT + "' > " + filePath
-                + " && chown " + FTP_USERNAME + ":" + FTP_USERNAME + " " + filePath);
-
-        if (result.getExitCode() != 0) {
-            throw new IllegalStateException(
-                "Failed to write FTP test file inside container: " + result.getStderr());
-        }
-    }
-
-    private static void uploadTestFileViaSftp() throws Exception {
-        SSHClient sshClient = new SSHClient();
-
-        sshClient.addHostKeyVerifier(new PromiscuousVerifier());
-        sshClient.connect("127.0.0.1", sftpContainer.getMappedPort(22));
-        sshClient.authPassword(FTP_USERNAME, FTP_PASSWORD);
-
-        try (SFTPClient sftpClient = sshClient.newSFTPClient()) {
-            byte[] contentBytes = TEST_CONTENT.getBytes(StandardCharsets.UTF_8);
-
-            sftpClient.put(new InMemorySourceFile() {
-
-                @Override
-                public String getName() {
-                    return TEST_FILENAME;
-                }
-
-                @Override
-                public long getLength() {
-                    return contentBytes.length;
-                }
-
-                @Override
-                public InputStream getInputStream() {
-                    return new ByteArrayInputStream(contentBytes);
-                }
-            }, SFTP_REMOTE_PATH);
-        }
-
-        sshClient.disconnect();
     }
 
     private static FileEntry mockFileEntry() throws Exception {
