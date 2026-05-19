@@ -46,6 +46,8 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         name: `projectDeploymentWorkflows.${workflowIndex}.connections`,
     });
 
+    const workflowEnabled = workflowEnabledMap.get(workflow.id!);
+
     return (
         <div
             className={twMerge(
@@ -56,18 +58,31 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
             {showWorkflowToggle && (
                 <div className="flex items-center rounded-lg">
                     <Label
-                        className="flex w-full cursor-pointer items-center gap-2 text-base font-semibold"
+                        className={twMerge(
+                            'flex w-full cursor-pointer items-center gap-2 text-base font-normal',
+                            workflowEnabled && 'font-semibold'
+                        )}
                         htmlFor={`projectDeploymentWorkflows.${workflowIndex}`}
                     >
-                        <div className="rounded-lg bg-surface-brand-secondary p-2">
-                            <WorkflowIcon className="size-4 text-content-brand-primary" />
+                        <div
+                            className={twMerge(
+                                'rounded-lg bg-surface-neutral-tertiary p-2',
+                                workflowEnabled && 'bg-surface-brand-secondary'
+                            )}
+                        >
+                            <WorkflowIcon
+                                className={twMerge(
+                                    'size-4 text-content-neutral-secondary transition-colors',
+                                    workflowEnabled && 'text-content-brand-primary'
+                                )}
+                            />
                         </div>
 
                         {label}
                     </Label>
 
                     <Switch
-                        checked={workflowEnabledMap.get(workflow.id!)}
+                        checked={workflowEnabled}
                         id={`projectDeploymentWorkflows.${workflowIndex}`}
                         onCheckedChange={(value) => {
                             setValue(`projectDeploymentWorkflows.${workflowIndex!}.enabled`, value);
@@ -78,7 +93,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                 </div>
             )}
 
-            {(workflowEnabledMap.get(workflow.id!) || !showWorkflowToggle) && (
+            {(workflowEnabled || !showWorkflowToggle) && (
                 <Tabs className="flex flex-col gap-2.5" defaultValue="connections">
                     <TabsList className="flex w-full">
                         <TabsTrigger className="flex w-full data-[state=active]:shadow-none" value="connections">
