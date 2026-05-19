@@ -81,7 +81,8 @@ public class SpelEvaluator implements Evaluator {
     private static final String ACCESSOR_SUFFIX = "}";
     private static final String FORMULA_PREFIX = "=";
     private static final Pattern FORMULA_EXPRESSION_PATTERN =
-        Pattern.compile("^(?!.*\\bT\\s*\\()(?!.*\\.\\s*\\w+\\s*\\()(?!.*\\bnew\\s+).*$");
+        Pattern.compile(
+            "^(?!.*\\bT\\s*\\()(?!.*\\.\\s*\\w+\\s*\\()(?!.*\\bnew\\s+[\\w.]+(?:<[^>]*>)?\\s*[\\[(]).*$");
     private static final Pattern INVALID_ACCESSOR_PATTERN = Pattern.compile(
         "\\$\\{(?!(?!T\\()[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*(?:\\.(?:[a-zA-Z_][a-zA-Z0-9_]*(?:\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')])*|\\[(?:\\d+|'[a-zA-Z0-9_\\- \\p{L}]*')]))*})");
 
