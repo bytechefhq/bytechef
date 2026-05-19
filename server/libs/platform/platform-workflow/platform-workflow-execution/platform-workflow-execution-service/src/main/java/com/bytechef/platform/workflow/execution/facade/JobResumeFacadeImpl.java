@@ -79,8 +79,8 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
 
             String storedJobResumeIdString = (String) job.getMetadata(MetadataConstants.JOB_RESUME_ID);
 
-            if (storedJobResumeIdString == null || !uuidMatches(storedJobResumeIdString, jobResumeId)) {
-                log.warn("Resume token UUID does not match stored value for job {}", jobResumeId.getJobId());
+            if (storedJobResumeIdString == null || !tokenMatches(storedJobResumeIdString, jobResumeId)) {
+                log.warn("Resume token does not match stored value for job {}", jobResumeId.getJobId());
 
                 return JobResumeOutcome.INVALID_ID;
             }
@@ -93,7 +93,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         });
     }
 
-    private static boolean uuidMatches(String storedJobResumeIdString, JobResumeId suppliedJobResumeId) {
+    private static boolean tokenMatches(String storedJobResumeIdString, JobResumeId suppliedJobResumeId) {
         JobResumeId storedJobResumeId;
 
         try {
@@ -103,6 +103,12 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
         }
 
         if (storedJobResumeId.getJobId() != suppliedJobResumeId.getJobId()) {
+            return false;
+        }
+
+        if (!storedJobResumeId.getTenantId()
+            .equals(suppliedJobResumeId.getTenantId())) {
+
             return false;
         }
 
