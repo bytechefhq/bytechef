@@ -24,6 +24,8 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.messages.MessageType;
@@ -35,13 +37,21 @@ import org.springframework.ai.content.Media;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.JdkClientHttpConnector;
+import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Flux;
 
 /**
  * @author Marko Kriskovic
  */
 public class OpenRouterChatModel implements org.springframework.ai.chat.model.ChatModel {
+
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
     private final RestClient restClient;
+    private final WebClient webClient;
     private final String model;
     private final Double frequencyPenalty;
     private final Map<String, Double> logitBias;
@@ -62,6 +72,11 @@ public class OpenRouterChatModel implements org.springframework.ai.chat.model.Ch
 
     private OpenRouterChatModel(Builder builder) {
         this.restClient = ModelUtils.getRestClientBuilder()
+            .baseUrl(BASE_URL)
+            .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + builder.apiKey)
+            .build();
+        this.webClient = WebClient.builder()
+            .clientConnector(new JdkClientHttpConnector())
             .baseUrl(BASE_URL)
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + builder.apiKey)
             .build();
@@ -101,6 +116,60 @@ public class OpenRouterChatModel implements org.springframework.ai.chat.model.Ch
             .body(new ParameterizedTypeReference<>() {});
 
         return buildChatResponse(response);
+    }
+
+    @Override
+    public Flux<ChatResponse> stream(Prompt prompt) {
+        List<Map<String, Object>> messages = buildMessages(prompt.getInstructions());
+        Map<String, Object> body = buildRequestBody(messages);
+
+        body.put("stream", true);
+
+        return webClient.post()
+            .uri("/chat/completions")
+            .contentType(MediaType.APPLICATION_JSON)
+            .bodyValue(body)
+            .retrieve()
+            .bodyToFlux(new ParameterizedTypeReference<ServerSentEvent<String>>() {})
+            .mapNotNull(event -> {
+                String data = event.data();
+
+                if (data == null || "[DONE]".equals(data)) {
+                    return null;
+                }
+
+                return parseStreamChunk(data);
+            });
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ChatResponse parseStreamChunk(String data) {
+        try {
+            Map<String, Object> chunk = OBJECT_MAPPER.readValue(
+                data, new com.fasterxml.jackson.core.type.TypeReference<Map<String, Object>>() {});
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) chunk.get("choices");
+
+            if (choices == null || choices.isEmpty()) {
+                return null;
+            }
+
+            Map<String, Object> delta = (Map<String, Object>) choices.get(0)
+                .get("delta");
+
+            if (delta == null) {
+                return null;
+            }
+
+            String content = (String) delta.get("content");
+
+            if (content == null) {
+                return null;
+            }
+
+            return new ChatResponse(List.of(new Generation(new AssistantMessage(content))));
+        } catch (Exception ignored) {
+            return null;
+        }
     }
 
     private List<Map<String, Object>> buildMessages(List<Message> messages) {
