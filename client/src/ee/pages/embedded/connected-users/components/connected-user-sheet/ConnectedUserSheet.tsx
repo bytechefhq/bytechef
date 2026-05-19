@@ -1,8 +1,9 @@
-import {Sheet, SheetCloseButton, SheetContent, SheetHeader, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
 import {useGetConnectedUserQuery} from '@/ee/shared/queries/embedded/connectedUsers.queries';
+import {VisuallyHidden} from 'radix-ui';
 import {useShallow} from 'zustand/react/shallow';
 
 const ConnectedUserSheet = () => {
@@ -21,20 +22,30 @@ const ConnectedUserSheet = () => {
 
     return (
         <Sheet onOpenChange={() => setConnectedUserSheetOpen(!connectedUserSheetOpen)} open={connectedUserSheetOpen}>
-            <SheetContent className="flex w-11/12 flex-col gap-0 p-4 sm:max-w-screen-md">
-                <SheetHeader className="flex flex-row items-center justify-between space-y-0">
-                    <SheetTitle className="flex justify-between">
+            <VisuallyHidden.Root>
+                <SheetTitle>{connectedUser?.name ?? connectedUser?.externalId ?? 'Connected user'}</SheetTitle>
+            </VisuallyHidden.Root>
+
+            <SheetContent
+                className="bottom-4 right-4 top-3 flex h-auto w-11/12 flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-screen-md"
+                onFocusOutside={(event) => event.preventDefault()}
+                onPointerDownOutside={(event) => event.preventDefault()}
+            >
+                <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
+                    <div className="flex flex-1 items-center justify-between">
                         {connectedUser && <ConnectedUserSheetTitle connectedUser={connectedUser} />}
-                    </SheetTitle>
+                    </div>
 
                     <SheetCloseButton />
-                </SheetHeader>
+                </header>
 
-                {connectedUserLoading ? (
-                    <span>Loading...</span>
-                ) : (
-                    connectedUser && <ConnectedUserSheetPanel connectedUser={connectedUser} />
-                )}
+                <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
+                    {connectedUserLoading ? (
+                        <span>Loading...</span>
+                    ) : (
+                        connectedUser && <ConnectedUserSheetPanel connectedUser={connectedUser} />
+                    )}
+                </div>
             </SheetContent>
         </Sheet>
     );
