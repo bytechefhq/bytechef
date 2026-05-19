@@ -22,6 +22,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,22 +42,17 @@ public final class KnowledgeBaseVectorStoreMetadataService {
 
     private static final Pattern SAFE_TABLE_NAME_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_.]*$");
 
-    private final String fullTableName;
+    private final Supplier<String> fullTableNameSupplier;
     private final ObjectMapper objectMapper;
     private final JdbcTemplate pgVectorJdbcTemplate;
 
     @SuppressFBWarnings("EI2")
     public KnowledgeBaseVectorStoreMetadataService(
-        JdbcTemplate pgVectorJdbcTemplate, ObjectMapper objectMapper, String fullTableName) {
-
-        if (!SAFE_TABLE_NAME_PATTERN.matcher(fullTableName)
-            .matches()) {
-            throw new IllegalArgumentException("Invalid table name: " + fullTableName);
-        }
+        JdbcTemplate pgVectorJdbcTemplate, ObjectMapper objectMapper, Supplier<String> fullTableNameSupplier) {
 
         this.objectMapper = objectMapper;
         this.pgVectorJdbcTemplate = pgVectorJdbcTemplate;
-        this.fullTableName = fullTableName;
+        this.fullTableNameSupplier = fullTableNameSupplier;
     }
 
     /**
@@ -68,6 +65,8 @@ public final class KnowledgeBaseVectorStoreMetadataService {
      */
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public void updateTagNames(String vectorStoreId, List<String> tagNames) {
+        String fullTableName = resolveFullTableName();
+
         List<String> rows = pgVectorJdbcTemplate.queryForList(
             "SELECT metadata::text FROM " + fullTableName + " WHERE id = ?::uuid",
             String.class, vectorStoreId);
@@ -103,5 +102,17 @@ public final class KnowledgeBaseVectorStoreMetadataService {
         pgVectorJdbcTemplate.update(
             "UPDATE " + fullTableName + " SET metadata = ?::jsonb WHERE id = ?::uuid",
             objectMapper.writeValueAsString(updatedMetadata), vectorStoreId);
+    }
+
+    private String resolveFullTableName() {
+        String fullTableName = fullTableNameSupplier.get();
+
+        Matcher matcher = SAFE_TABLE_NAME_PATTERN.matcher(fullTableName);
+
+        if (!matcher.matches()) {
+            throw new IllegalArgumentException("Invalid table name: " + fullTableName);
+        }
+
+        return fullTableName;
     }
 }

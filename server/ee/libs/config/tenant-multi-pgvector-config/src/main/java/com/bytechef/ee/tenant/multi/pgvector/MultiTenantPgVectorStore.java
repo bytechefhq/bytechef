@@ -73,7 +73,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
 
     private static final Map<PgVectorStore.PgDistanceType, VectorStoreSimilarityMetric> SIMILARITY_TYPE_MAPPING =
         Map.of(COSINE_DISTANCE, COSINE, EUCLIDEAN_DISTANCE, EUCLIDEAN, NEGATIVE_INNER_PRODUCT, DOT);
-    private static final String VECTORSTORE_SCHEMA_SUFFIX = "vectorstore";
+    public static final String VECTORSTORE_SCHEMA_SUFFIX = "vectorstore";
 
     public final FilterExpressionConverter filterExpressionConverter = new PgVectorFilterExpressionConverter();
 
