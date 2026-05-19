@@ -9,6 +9,8 @@ package com.bytechef.ee.tenant.multi.config;
 
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -20,6 +22,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
+import tools.jackson.databind.ObjectMapper;
 
 /**
  * Multi-tenant configuration for the Knowledge Base PgVector store.
@@ -51,5 +54,18 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
             .idType(properties.getIdType())
             .batchingStrategy(batchingStrategy)
             .build();
+    }
+
+    @Bean
+    KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService(
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        ObjectMapper objectMapper, PgVectorStoreProperties properties) {
+
+        String vectorTableName = "kb_" + properties.getTableName();
+
+        return new KnowledgeBaseVectorStoreMetadataService(
+            pgVectorJdbcTemplate, objectMapper,
+            () -> TenantContext.getCurrentDatabaseSchema(MultiTenantPgVectorStore.VECTORSTORE_SCHEMA_SUFFIX) + "."
+                + vectorTableName);
     }
 }

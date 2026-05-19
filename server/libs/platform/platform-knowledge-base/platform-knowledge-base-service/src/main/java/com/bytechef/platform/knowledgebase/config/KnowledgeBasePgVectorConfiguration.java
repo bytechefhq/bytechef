@@ -19,6 +19,7 @@ package com.bytechef.platform.knowledgebase.config;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.tenant.annotation.ConditionalOnSingleTenant;
 import io.micrometer.observation.ObservationRegistry;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -71,10 +72,11 @@ class KnowledgeBasePgVectorConfiguration {
 
         String schemaName = properties.getSchemaName();
         String tableName = "kb_" + properties.getTableName();
-        String fullTableName = (schemaName != null && !schemaName.isBlank())
+
+        String fullTableName = !StringUtils.isBlank(schemaName)
             ? schemaName + "." + tableName
             : tableName;
 
-        return new KnowledgeBaseVectorStoreMetadataService(pgVectorJdbcTemplate, objectMapper, fullTableName);
+        return new KnowledgeBaseVectorStoreMetadataService(pgVectorJdbcTemplate, objectMapper, () -> fullTableName);
     }
 }

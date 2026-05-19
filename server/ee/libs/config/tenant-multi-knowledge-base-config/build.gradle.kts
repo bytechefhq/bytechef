@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-service"))
 
     implementation(project(":server:ee:libs:config:tenant-multi-pgvector-config"))
 }
