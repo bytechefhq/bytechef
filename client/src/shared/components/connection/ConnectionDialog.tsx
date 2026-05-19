@@ -736,9 +736,6 @@ const ConnectionDialog = ({
                                 baseUri={connection.baseUri}
                                 connectionDefinition={connectionDefinition}
                                 connectionParameters={connection.connectionParameters}
-                                customAction={componentDefinition?.actions?.some(
-                                    (action) => action.name === 'customAction'
-                                )}
                             />
                         </div>
                     )}
