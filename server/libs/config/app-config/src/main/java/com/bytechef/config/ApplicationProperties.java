@@ -37,107 +37,175 @@ public class ApplicationProperties {
      * Application edition type.
      */
     public enum Edition {
-        /** Community Edition */
+        /**
+         * Community Edition
+         */
         CE,
-        /** Enterprise Edition */
+        /**
+         * Enterprise Edition
+         */
         EE
     }
 
-    /** AI and machine learning configuration */
+    /**
+     * AI and machine learning configuration
+     */
     private Ai ai = new Ai();
 
-    /** Analytics configuration */
+    /**
+     * Analytics configuration
+     */
     private Analytics analytics = new Analytics();
 
-    /** Cache provider configuration */
+    /**
+     * Cache provider configuration
+     */
     private Cache cache = new Cache();
 
-    /** Cloud provider configuration */
+    /**
+     * Cloud provider configuration
+     */
     private Cloud cloud = new Cloud();
 
-    /** Component registry configuration */
+    /**
+     * Component registry configuration
+     */
     private Component component = new Component();
 
-    /** Workflow coordinator configuration */
+    /**
+     * Workflow coordinator configuration
+     */
     private Coordinator coordinator = new Coordinator();
 
-    /** Database datasource configuration */
+    /**
+     * Database datasource configuration
+     */
     private Datasource datasource = new Datasource();
 
-    /** Data storage provider configuration */
+    /**
+     * Data storage provider configuration
+     */
     private DataStorage dataStorage;
 
-    /** Service discovery configuration */
+    /**
+     * Service discovery configuration
+     */
     private DiscoveryService discoveryService = new DiscoveryService();
 
-    /** Application edition (CE or EE) */
+    /**
+     * Application edition (CE or EE)
+     */
     private Edition edition = Edition.EE;
 
-    /** Optional environment override (DEVELOPMENT, STAGING, PRODUCTION) */
+    /**
+     * Optional environment override (DEVELOPMENT, STAGING, PRODUCTION)
+     */
     private Environment environment;
 
-    /** Encryption configuration */
+    /**
+     * Encryption configuration
+     */
     private Encryption encryption;
 
-    /** List of enabled feature flags */
+    /**
+     * List of enabled feature flags
+     */
     private List<String> featureFlags = List.of();
 
-    /** File storage provider configuration */
+    /**
+     * File storage provider configuration
+     */
     private FileStorage fileStorage = new FileStorage();
 
-    /** Help hub configuration */
+    /**
+     * Help hub configuration
+     */
     private HelpHub helpHub = new HelpHub();
 
-    /** Kafka connection configuration */
+    /**
+     * Kafka connection configuration
+     */
     private Kafka kafka = new Kafka();
 
-    /** Email configuration */
+    /**
+     * Email configuration
+     */
     private Mail mail = new Mail();
 
-    /** Message broker configuration */
+    /**
+     * Message broker configuration
+     */
     private MessageBroker messageBroker = new MessageBroker();
 
-    /** OAuth2 configuration */
+    /**
+     * OAuth2 configuration
+     */
     private Oauth2 oauth2 = new Oauth2();
 
-    /** Observability and logging configuration */
+    /**
+     * Observability and logging configuration
+     */
     private Observability observability = new Observability();
 
-    /** Public URL for the application */
+    /**
+     * Public URL for the application
+     */
     private String publicUrl;
 
-    /** RabbitMQ connection configuration */
+    /**
+     * RabbitMQ connection configuration
+     */
     private Rabbitmq rabbitmq = new Rabbitmq();
 
-    /** Redis connection configuration */
+    /**
+     * Redis connection configuration
+     */
     private Redis redis = new Redis();
 
-    /** Static resources configuration */
+    /**
+     * Static resources configuration
+     */
     private Resources resources = new Resources();
 
-    /** Security configuration */
+    /**
+     * Security configuration
+     */
     private Security security;
 
-    /** User sign-up configuration */
+    /**
+     * User sign-up configuration
+     */
     private SignUp signUp = new SignUp();
 
-    /** Scheduler configuration */
+    /**
+     * Scheduler configuration
+     */
     private Scheduler scheduler = new Scheduler();
 
-    /** Multi-tenancy configuration */
+    /**
+     * Multi-tenancy configuration
+     */
     private Tenant tenant = new Tenant();
 
-    /** Database upgrade (Liquibase) configuration */
+    /**
+     * Database upgrade (Liquibase) configuration
+     */
     private Upgrade upgrade = new Upgrade();
 
-    /** User guiding configuration */
+    /**
+     * User guiding configuration
+     */
     private UserGuiding userGuiding = new UserGuiding();
 
-    /** Webhook URL for external integrations */
+    /**
+     * Webhook URL for external integrations
+     */
     private String webhookUrl;
     private Worker worker = new Worker();
 
-    /** Workflow engine configuration */
+    /**
+     * Workflow engine configuration
+     */
     private Workflow workflow = new Workflow();
 
     public Ai getAi() {
@@ -409,13 +477,19 @@ public class ApplicationProperties {
      */
     public static class Observability {
 
-        /** Logging observability configuration */
+        /**
+         * Logging observability configuration
+         */
         private Logging logging = new Logging();
 
-        /** Metrics observability configuration */
+        /**
+         * Metrics observability configuration
+         */
         private Metrics metrics = new Metrics();
 
-        /** Tracing observability configuration */
+        /**
+         * Tracing observability configuration
+         */
         private Tracing tracing = new Tracing();
 
         public Logging getLogging() {
@@ -444,10 +518,14 @@ public class ApplicationProperties {
 
         public static class Logging {
 
-            /** Whether observability logging features are enabled */
+            /**
+             * Whether observability logging features are enabled
+             */
             private boolean enabled;
 
-            /** OTLP endpoint for logging export */
+            /**
+             * OTLP endpoint for logging export
+             */
             private String endpoint;
 
             public String getEndpoint() {
@@ -469,10 +547,14 @@ public class ApplicationProperties {
 
         public static class Metrics {
 
-            /** Whether observability features are enabled */
+            /**
+             * Whether observability features are enabled
+             */
             private boolean enabled;
 
-            /** OTLP endpoint for metrics export */
+            /**
+             * OTLP endpoint for metrics export
+             */
             private String endpoint;
 
             public String getEndpoint() {
@@ -493,9 +575,13 @@ public class ApplicationProperties {
         }
 
         public static class Tracing {
-            /** Whether observability features are enabled */
+            /**
+             * Whether observability features are enabled
+             */
             private boolean enabled;
-            /** OTLP endpoint for tracing export */
+            /**
+             * OTLP endpoint for tracing export
+             */
             private String endpoint;
 
             public String getEndpoint() {
@@ -595,17 +681,27 @@ public class ApplicationProperties {
              * Memory storage provider type.
              */
             public enum Provider {
-                /** AWS-based memory storage */
+                /**
+                 * AWS-based memory storage
+                 */
                 AWS,
-                /** In-memory storage (non-persistent) */
+                /**
+                 * In-memory storage (non-persistent)
+                 */
                 IN_MEMORY,
-                /** JDBC-based memory storage */
+                /**
+                 * JDBC-based memory storage
+                 */
                 JDBC,
-                /** Redis-based memory storage */
+                /**
+                 * Redis-based memory storage
+                 */
                 REDIS
             }
 
-            /** Memory storage provider */
+            /**
+             * Memory storage provider
+             */
             private Provider provider = Provider.JDBC;
 
             public Provider getProvider() {
@@ -623,16 +719,24 @@ public class ApplicationProperties {
              * AI provider for Copilot functionality.
              */
             public enum Provider {
-                /** OpenAI provider */
+                /**
+                 * OpenAI provider
+                 */
                 OPENAI,
-                /** Anthropic provider */
+                /**
+                 * Anthropic provider
+                 */
                 ANTHROPIC
             }
 
-            /** Whether Copilot is enabled */
+            /**
+             * Whether Copilot is enabled
+             */
             private boolean enabled;
 
-            /** AI provider for Copilot */
+            /**
+             * AI provider for Copilot
+             */
             private Provider provider = Provider.OPENAI;
 
             public boolean isEnabled() {
@@ -657,13 +761,19 @@ public class ApplicationProperties {
          */
         public static class Firecrawl {
 
-            /** Firecrawl API key */
+            /**
+             * Firecrawl API key
+             */
             private String apiKey;
 
-            /** Firecrawl API base URL */
+            /**
+             * Firecrawl API base URL
+             */
             private String baseUrl = "https://api.firecrawl.dev/v2";
 
-            /** Whether Firecrawl is enabled */
+            /**
+             * Whether Firecrawl is enabled
+             */
             private boolean enabled;
 
             public String getApiKey() {
@@ -696,13 +806,19 @@ public class ApplicationProperties {
          */
         public static class KnowledgeBase {
 
-            /** Whether knowledge base AI features are enabled */
+            /**
+             * Whether knowledge base AI features are enabled
+             */
             private boolean enabled;
 
-            /** OCR configuration */
+            /**
+             * OCR configuration
+             */
             private Ocr ocr = new Ocr();
 
-            /** Event subscription configuration */
+            /**
+             * Event subscription configuration
+             */
             private Subscriptions subscriptions = new Subscriptions();
 
             public boolean isEnabled() {
@@ -738,18 +854,28 @@ public class ApplicationProperties {
                  * OCR provider type.
                  */
                 public enum Provider {
-                    /** No OCR provider */
+                    /**
+                     * No OCR provider
+                     */
                     NONE,
-                    /** Azure OCR provider */
+                    /**
+                     * Azure OCR provider
+                     */
                     AZURE,
-                    /** Mistral OCR provider */
+                    /**
+                     * Mistral OCR provider
+                     */
                     MISTRAL
                 }
 
-                /** OCR provider */
+                /**
+                 * OCR provider
+                 */
                 private Provider provider = Provider.NONE;
 
-                /** Mistral OCR configuration */
+                /**
+                 * Mistral OCR configuration
+                 */
                 private Mistral mistral = new Mistral();
 
                 public Provider getProvider() {
@@ -773,7 +899,9 @@ public class ApplicationProperties {
                  */
                 public static class Mistral {
 
-                    /** Mistral API key */
+                    /**
+                     * Mistral API key
+                     */
                     private String apiKey;
 
                     public String getApiKey() {
@@ -791,10 +919,14 @@ public class ApplicationProperties {
              */
             public static class Subscriptions {
 
-                /** Number of subscribers for document process events */
+                /**
+                 * Number of subscribers for document process events
+                 */
                 private int documentProcessEvents = 1;
 
-                /** Number of subscribers for document chunk update events */
+                /**
+                 * Number of subscribers for document chunk update events
+                 */
                 private int documentChunkUpdateEvents = 1;
 
                 public int getDocumentProcessEvents() {
@@ -835,7 +967,9 @@ public class ApplicationProperties {
              */
             public static class Server {
 
-                /** Whether the MCP server is enabled */
+                /**
+                 * Whether the MCP server is enabled
+                 */
                 private boolean enabled;
 
                 public boolean isEnabled() {
@@ -871,40 +1005,64 @@ public class ApplicationProperties {
 //            /** Amazon Bedrock Titan configuration */
 //            private AmazonBedrockTitan amazonBedrockTitan = new AmazonBedrockTitan();
 
-            /** Anthropic Claude configuration */
+            /**
+             * Anthropic Claude configuration
+             */
             private Anthropic anthropic = new Anthropic();
 
-            /** Azure OpenAI configuration */
+            /**
+             * Azure OpenAI configuration
+             */
             private AzureOpenAi azureOpenAi = new AzureOpenAi();
 
-            /** Chat model configuration grouped by provider */
+            /**
+             * Chat model configuration grouped by provider
+             */
             private Chat chat = new Chat();
 
-            /** DeepSeek configuration */
+            /**
+             * DeepSeek configuration
+             */
             private DeepSeek deepSeek = new DeepSeek();
 
-            /** Embedding model configuration grouped by provider */
+            /**
+             * Embedding model configuration grouped by provider
+             */
             private Embedding embedding = new Embedding();
 
-            /** Groq configuration */
+            /**
+             * Groq configuration
+             */
             private Groq groq = new Groq();
 
-            /** Mistral AI configuration */
+            /**
+             * Mistral AI configuration
+             */
             private Mistral mistral = new Mistral();
 
-            /** NVIDIA AI configuration */
+            /**
+             * NVIDIA AI configuration
+             */
             private Nvidia nvidia = new Nvidia();
 
-            /** OpenAI configuration */
+            /**
+             * OpenAI configuration
+             */
             private OpenAi openAi = new OpenAi();
 
-            /** Perplexity AI configuration */
+            /**
+             * Perplexity AI configuration
+             */
             private Perplexity perplexity = new Perplexity();
 
-            /** Stability AI configuration */
+            /**
+             * Stability AI configuration
+             */
             private Stability stability = new Stability();
 
-            /** Google Vertex AI Gemini configuration */
+            /**
+             * Google Vertex AI Gemini configuration
+             */
             private VertexGemini vertexGemini = new VertexGemini();
 
 //            public AmazonBedrockAnthropic2 getAmazonBedrockAnthropic2() {
@@ -1051,9 +1209,13 @@ public class ApplicationProperties {
                 this.vertexGemini = vertexGemini;
             }
 
-            /** Amazon Bedrock Anthropic Claude 2 API configuration. */
+            /**
+             * Amazon Bedrock Anthropic Claude 2 API configuration.
+             */
             public static class AmazonBedrockAnthropic2 {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1065,9 +1227,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Amazon Bedrock Anthropic Claude 3 API configuration. */
+            /**
+             * Amazon Bedrock Anthropic Claude 3 API configuration.
+             */
             public static class AmazonBedrockAnthropic3 {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1079,9 +1245,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Amazon Bedrock Cohere API configuration. */
+            /**
+             * Amazon Bedrock Cohere API configuration.
+             */
             public static class AmazonBedrockCohere {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1093,9 +1263,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Amazon Bedrock Jurassic-2 API configuration. */
+            /**
+             * Amazon Bedrock Jurassic-2 API configuration.
+             */
             public static class AmazonBedrockJurassic2 {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1107,9 +1281,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Amazon Bedrock Llama API configuration. */
+            /**
+             * Amazon Bedrock Llama API configuration.
+             */
             public static class AmazonBedrockLlama {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1121,9 +1299,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Amazon Bedrock Titan API configuration. */
+            /**
+             * Amazon Bedrock Titan API configuration.
+             */
             public static class AmazonBedrockTitan {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1135,9 +1317,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Anthropic Claude API configuration. */
+            /**
+             * Anthropic Claude API configuration.
+             */
             public static class Anthropic {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1149,9 +1335,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Azure OpenAI API configuration. */
+            /**
+             * Azure OpenAI API configuration.
+             */
             public static class AzureOpenAi {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1163,9 +1353,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** DeepSeek API configuration. */
+            /**
+             * DeepSeek API configuration.
+             */
             public static class DeepSeek {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1177,9 +1371,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Groq API configuration. */
+            /**
+             * Groq API configuration.
+             */
             public static class Groq {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1191,9 +1389,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** NVIDIA AI API configuration. */
+            /**
+             * NVIDIA AI API configuration.
+             */
             public static class Nvidia {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1205,9 +1407,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Mistral AI API configuration. */
+            /**
+             * Mistral AI API configuration.
+             */
             public static class Mistral {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1219,9 +1425,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** OpenAI API configuration. */
+            /**
+             * OpenAI API configuration.
+             */
             public static class OpenAi {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1233,9 +1443,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Perplexity AI API configuration. */
+            /**
+             * Perplexity AI API configuration.
+             */
             public static class Perplexity {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1247,9 +1461,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Stability AI API configuration. */
+            /**
+             * Stability AI API configuration.
+             */
             public static class Stability {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1261,9 +1479,13 @@ public class ApplicationProperties {
                 }
             }
 
-            /** Google Vertex AI Gemini API configuration. */
+            /**
+             * Google Vertex AI Gemini API configuration.
+             */
             public static class VertexGemini {
-                /** API key */
+                /**
+                 * API key
+                 */
                 private String apiKey;
 
                 public String getApiKey() {
@@ -1280,10 +1502,14 @@ public class ApplicationProperties {
              */
             public static class Chat {
 
-                /** Anthropic chat model configuration */
+                /**
+                 * Anthropic chat model configuration
+                 */
                 private Anthropic anthropic = new Anthropic();
 
-                /** OpenAI chat model configuration */
+                /**
+                 * OpenAI chat model configuration
+                 */
                 private OpenAi openAi = new OpenAi();
 
                 public Anthropic getAnthropic() {
@@ -1307,7 +1533,9 @@ public class ApplicationProperties {
                  */
                 public static class Anthropic {
 
-                    /** Chat model options */
+                    /**
+                     * Chat model options
+                     */
                     private Options options = new Options();
 
                     public Options getOptions() {
@@ -1323,10 +1551,14 @@ public class ApplicationProperties {
                      */
                     public static class Options {
 
-                        /** AI model name (e.g., claude-3-opus-20240229) */
+                        /**
+                         * AI model name (e.g., claude-3-opus-20240229)
+                         */
                         private String model;
 
-                        /** Temperature for response randomness (0.0-1.0) */
+                        /**
+                         * Temperature for response randomness (0.0-1.0)
+                         */
                         private Double temperature;
 
                         public String getModel() {
@@ -1352,7 +1584,9 @@ public class ApplicationProperties {
                  */
                 public static class OpenAi {
 
-                    /** Chat model options */
+                    /**
+                     * Chat model options
+                     */
                     private Options options = new Options();
 
                     public Options getOptions() {
@@ -1375,10 +1609,14 @@ public class ApplicationProperties {
                             HIGH
                         }
 
-                        /** Chat model name (e.g., gpt-4, gpt-3.5-turbo) */
+                        /**
+                         * Chat model name (e.g., gpt-4, gpt-3.5-turbo)
+                         */
                         private String model;
 
-                        /** Temperature for response randomness (0.0-2.0) */
+                        /**
+                         * Temperature for response randomness (0.0-2.0)
+                         */
                         private Double temperature;
 
                         private Setting reasoningEffect = Setting.NONE;
@@ -1425,7 +1663,9 @@ public class ApplicationProperties {
              */
             public static class Embedding {
 
-                /** OpenAI embedding model configuration */
+                /**
+                 * OpenAI embedding model configuration
+                 */
                 private OpenAi openAi = new OpenAi();
 
                 public OpenAi getOpenAi() {
@@ -1441,7 +1681,9 @@ public class ApplicationProperties {
                  */
                 public static class OpenAi {
 
-                    /** Embedding model options */
+                    /**
+                     * Embedding model options
+                     */
                     private Options options = new Options();
 
                     public Options getOptions() {
@@ -1457,7 +1699,9 @@ public class ApplicationProperties {
                      */
                     public static class Options {
 
-                        /** Embedding model name (e.g., text-embedding-ada-002) */
+                        /**
+                         * Embedding model name (e.g., text-embedding-ada-002)
+                         */
                         private String model;
 
                         public String getModel() {
@@ -1481,14 +1725,20 @@ public class ApplicationProperties {
              * Vector store provider type.
              */
             public enum Provider {
-                /** PostgreSQL with pgvector extension */
+                /**
+                 * PostgreSQL with pgvector extension
+                 */
                 PGVECTOR
             }
 
-            /** Vector store provider */
+            /**
+             * Vector store provider
+             */
             private Provider provider;
 
-            /** PgVector configuration */
+            /**
+             * PgVector configuration
+             */
             private PgVector pgVector = new PgVector();
 
             public Provider getProvider() {
@@ -1512,13 +1762,19 @@ public class ApplicationProperties {
              */
             public static class PgVector {
 
-                /** Database password */
+                /**
+                 * Database password
+                 */
                 private String password;
 
-                /** JDBC URL for PostgreSQL database */
+                /**
+                 * JDBC URL for PostgreSQL database
+                 */
                 private String url;
 
-                /** Database username */
+                /**
+                 * Database username
+                 */
                 private String username;
 
                 public String getPassword() {
@@ -1553,7 +1809,9 @@ public class ApplicationProperties {
      */
     public static class Analytics {
 
-        /** Whether analytics features are enabled */
+        /**
+         * Whether analytics features are enabled
+         */
         private boolean enabled;
 
         public boolean isEnabled() {
@@ -1574,13 +1832,19 @@ public class ApplicationProperties {
          * Available cache providers.
          */
         public enum Provider {
-            /** Redis cache */
+            /**
+             * Redis cache
+             */
             REDIS,
-            /** Caffeine in-memory cache */
+            /**
+             * Caffeine in-memory cache
+             */
             CAFFEINE
         }
 
-        /** Cache provider */
+        /**
+         * Cache provider
+         */
         private Provider provider = Provider.CAFFEINE;
 
         public Provider getProvider() {
@@ -1601,16 +1865,24 @@ public class ApplicationProperties {
          * Supported cloud providers.
          */
         public enum Provider {
-            /** Amazon Web Services */
+            /**
+             * Amazon Web Services
+             */
             AWS,
-            /** No cloud provider */
+            /**
+             * No cloud provider
+             */
             NONE
         }
 
-        /** AWS configuration */
+        /**
+         * AWS configuration
+         */
         private Aws aws;
 
-        /** Cloud provider */
+        /**
+         * Cloud provider
+         */
         private Provider provider = Provider.NONE;
 
         public Aws getAws() {
@@ -1634,16 +1906,24 @@ public class ApplicationProperties {
          */
         public static class Aws {
 
-            /** AWS access key ID */
+            /**
+             * AWS access key ID
+             */
             private String accessKeyId;
 
-            /** AWS region */
+            /**
+             * AWS region
+             */
             private String region;
 
-            /** AWS secret access key */
+            /**
+             * AWS secret access key
+             */
             private String secretAccessKey;
 
-            /** AWS account ID */
+            /**
+             * AWS account ID
+             */
             private String accountId;
 
             public String getAccountId() {
@@ -1685,7 +1965,9 @@ public class ApplicationProperties {
      */
     public static class Component {
 
-        /** Component registry configuration */
+        /**
+         * Component registry configuration
+         */
         private Registry registry = new Registry();
 
         public Registry getRegistry() {
@@ -1701,7 +1983,9 @@ public class ApplicationProperties {
          */
         public static class Registry {
 
-            /** List of component names to exclude from registration */
+            /**
+             * List of component names to exclude from registration
+             */
             private List<String> exclude;
 
             public List<String> getExclude() {
@@ -1719,13 +2003,19 @@ public class ApplicationProperties {
      */
     public static class Coordinator {
 
-        /** Whether coordinator is enabled */
+        /**
+         * Whether coordinator is enabled
+         */
         private boolean enabled = true;
 
-        /** Task coordination configuration */
+        /**
+         * Task coordination configuration
+         */
         private Task task = new Task();
 
-        /** Trigger coordination configuration */
+        /**
+         * Trigger coordination configuration
+         */
         private Trigger trigger = new Trigger();
 
         public boolean isEnabled() {
@@ -1757,7 +2047,9 @@ public class ApplicationProperties {
          */
         public static class Task {
 
-            /** Event subscription configuration */
+            /**
+             * Event subscription configuration
+             */
             private Subscriptions subscriptions = new Subscriptions();
 
             public Subscriptions getSubscriptions() {
@@ -1773,22 +2065,34 @@ public class ApplicationProperties {
              */
             public static class Subscriptions {
 
-                /** Number of subscribers for application events */
+                /**
+                 * Number of subscribers for application events
+                 */
                 private int applicationEvents = 1;
 
-                /** Number of subscribers for resume job events */
+                /**
+                 * Number of subscribers for resume job events
+                 */
                 private int resumeJobEvents = 1;
 
-                /** Number of subscribers for start job events */
+                /**
+                 * Number of subscribers for start job events
+                 */
                 private int startJobEvents = 1;
 
-                /** Number of subscribers for stop job events */
+                /**
+                 * Number of subscribers for stop job events
+                 */
                 private int stopJobEvents = 1;
 
-                /** Number of subscribers for task execution complete events */
+                /**
+                 * Number of subscribers for task execution complete events
+                 */
                 private int taskExecutionCompleteEvents = 1;
 
-                /** Number of subscribers for task execution error events */
+                /**
+                 * Number of subscribers for task execution error events
+                 */
                 private int taskExecutionErrorEvents = 1;
 
                 public int getApplicationEvents() {
@@ -1846,10 +2150,14 @@ public class ApplicationProperties {
          */
         public static class Trigger {
 
-            /** Polling configuration for trigger checks */
+            /**
+             * Polling configuration for trigger checks
+             */
             private Polling polling = new Polling();
 
-            /** Event subscription configuration */
+            /**
+             * Event subscription configuration
+             */
             private Subscriptions subscriptions = new Subscriptions();
 
             public Polling getPolling() {
@@ -1873,7 +2181,9 @@ public class ApplicationProperties {
              */
             public static class Polling {
 
-                /** Check period in seconds */
+                /**
+                 * Check period in seconds
+                 */
                 private int checkPeriod = 5;
 
                 public int getCheckPeriod() {
@@ -1890,22 +2200,34 @@ public class ApplicationProperties {
              */
             public static class Subscriptions {
 
-                /** Number of subscribers for application events */
+                /**
+                 * Number of subscribers for application events
+                 */
                 private int applicationEvents = 1;
 
-                /** Number of subscribers for trigger execution complete events */
+                /**
+                 * Number of subscribers for trigger execution complete events
+                 */
                 private int triggerExecutionCompleteEvents = 1;
 
-                /** Number of subscribers for trigger execution error events */
+                /**
+                 * Number of subscribers for trigger execution error events
+                 */
                 private int triggerExecutionErrorEvents = 1;
 
-                /** Number of subscribers for trigger listener events */
+                /**
+                 * Number of subscribers for trigger listener events
+                 */
                 private int triggerListenerEvents = 1;
 
-                /** Number of subscribers for trigger poll events */
+                /**
+                 * Number of subscribers for trigger poll events
+                 */
                 private int triggerPollEvents = 1;
 
-                /** Number of subscribers for trigger webhook events */
+                /**
+                 * Number of subscribers for trigger webhook events
+                 */
                 private int triggerWebhookEvents = 1;
 
                 public int getApplicationEvents() {
@@ -1964,13 +2286,19 @@ public class ApplicationProperties {
      */
     public static class Datasource {
 
-        /** Database password */
+        /**
+         * Database password
+         */
         private String password;
 
-        /** JDBC URL for database connection */
+        /**
+         * JDBC URL for database connection
+         */
         private String url;
 
-        /** Database username */
+        /**
+         * Database username
+         */
         private String username;
 
         public String getPassword() {
@@ -2007,15 +2335,23 @@ public class ApplicationProperties {
          * Available data storage providers.
          */
         public enum Provider {
-            /** AWS-based storage */
+            /**
+             * AWS-based storage
+             */
             AWS,
-            /** Filesystem-based storage */
+            /**
+             * Filesystem-based storage
+             */
             FILESYSTEM,
-            /** JDBC database storage */
+            /**
+             * JDBC database storage
+             */
             JDBC
         }
 
-        /** Data storage provider */
+        /**
+         * Data storage provider
+         */
         private Provider provider = Provider.JDBC;
 
         public Provider getProvider() {
@@ -2036,11 +2372,15 @@ public class ApplicationProperties {
          * Available service discovery providers.
          */
         public enum Provider {
-            /** Redis-based service discovery */
+            /**
+             * Redis-based service discovery
+             */
             REDIS
         }
 
-        /** Service discovery provider */
+        /**
+         * Service discovery provider
+         */
         private Provider provider = Provider.REDIS;
 
         public Provider getProvider() {
@@ -2061,21 +2401,33 @@ public class ApplicationProperties {
          * Available file storage providers.
          */
         public enum Provider {
-            /** AWS S3 storage */
+            /**
+             * AWS S3 storage
+             */
             AWS,
-            /** Local filesystem storage */
+            /**
+             * Local filesystem storage
+             */
             FILESYSTEM,
-            /** JDBC database storage */
+            /**
+             * JDBC database storage
+             */
             JDBC
         }
 
-        /** AWS S3 configuration */
+        /**
+         * AWS S3 configuration
+         */
         private Aws aws = new Aws();
 
-        /** Filesystem storage configuration */
+        /**
+         * Filesystem storage configuration
+         */
         private Filesystem filesystem = new Filesystem();
 
-        /** File storage provider */
+        /**
+         * File storage provider
+         */
         private Provider provider = Provider.FILESYSTEM;
 
         public Aws getAws() {
@@ -2107,7 +2459,9 @@ public class ApplicationProperties {
          */
         public static class Aws {
 
-            /** S3 bucket name */
+            /**
+             * S3 bucket name
+             */
             private String bucket;
 
             public String getBucket() {
@@ -2124,7 +2478,9 @@ public class ApplicationProperties {
          */
         public static class Filesystem {
 
-            /** Base directory for file storage */
+            /**
+             * Base directory for file storage
+             */
             private String basedir = "";
 
             public String getBasedir() {
@@ -2146,16 +2502,24 @@ public class ApplicationProperties {
          * Available encryption key providers.
          */
         public enum Provider {
-            /** Filesystem-based key storage */
+            /**
+             * Filesystem-based key storage
+             */
             FILESYSTEM,
-            /** Property-based key storage */
+            /**
+             * Property-based key storage
+             */
             PROPERTY;
         }
 
-        /** Encryption provider */
+        /**
+         * Encryption provider
+         */
         private Provider provider = Provider.FILESYSTEM;
 
-        /** Property-based encryption configuration */
+        /**
+         * Property-based encryption configuration
+         */
         private Property property = new Property();
 
         public Provider getProvider() {
@@ -2179,7 +2543,9 @@ public class ApplicationProperties {
          */
         public static class Property {
 
-            /** Encryption key */
+            /**
+             * Encryption key
+             */
             private String key;
 
             public String getKey() {
@@ -2197,7 +2563,9 @@ public class ApplicationProperties {
      */
     public static class HelpHub {
 
-        /** Whether help hub is enabled */
+        /**
+         * Whether help hub is enabled
+         */
         private boolean enabled;
 
         public boolean isEnabled() {
@@ -2214,10 +2582,14 @@ public class ApplicationProperties {
      */
     public static class Kafka {
 
-        /** Comma-separated list of Kafka bootstrap servers (host:port) */
+        /**
+         * Comma-separated list of Kafka bootstrap servers (host:port)
+         */
         private String bootstrapServers;
 
-        /** Kafka consumer configuration */
+        /**
+         * Kafka consumer configuration
+         */
         private Consumer consumer = new Consumer();
 
         public String getBootstrapServers() {
@@ -2241,7 +2613,9 @@ public class ApplicationProperties {
          */
         public static class Consumer {
 
-            /** Consumer group identifier */
+            /**
+             * Consumer group identifier
+             */
             private String groupId;
 
             public String getGroupId() {
@@ -2259,37 +2633,59 @@ public class ApplicationProperties {
      */
     public static class Mail {
 
-        /** Whether SMTP authentication is required */
+        /**
+         * Whether SMTP authentication is required
+         */
         private boolean auth;
 
-        /** Whether to enable debug logging for mail */
+        /**
+         * Whether to enable debug logging for mail
+         */
         private boolean debug;
 
-        /** Email address to use as sender */
+        /**
+         * Email address to use as sender
+         */
         private String from;
 
-        /** SMTP server hostname */
+        /**
+         * SMTP server hostname
+         */
         private String host;
 
-        /** Base URL for email links */
+        /**
+         * Base URL for email links
+         */
         private String baseUrl;
 
-        /** SMTP server password */
+        /**
+         * SMTP server password
+         */
         private String password;
 
-        /** Email protocol (e.g., smtp, smtps) */
+        /**
+         * Email protocol (e.g., smtp, smtps)
+         */
         private String protocol;
 
-        /** SMTP server port */
+        /**
+         * SMTP server port
+         */
         private int port = 25;
 
-        /** STARTTLS configuration */
+        /**
+         * STARTTLS configuration
+         */
         private Starttls starttls = new Starttls();
 
-        /** SSL configuration */
+        /**
+         * SSL configuration
+         */
         private Ssl ssl = new Ssl();
 
-        /** SMTP server username */
+        /**
+         * SMTP server username
+         */
         private String username;
 
         public boolean isAuth() {
@@ -2385,7 +2781,9 @@ public class ApplicationProperties {
          */
         public static class Ssl {
 
-            /** Whether SSL is enabled */
+            /**
+             * Whether SSL is enabled
+             */
             private boolean enabled;
 
             public boolean isEnabled() {
@@ -2402,10 +2800,14 @@ public class ApplicationProperties {
          */
         public static class Starttls {
 
-            /** Whether STARTTLS is enabled */
+            /**
+             * Whether STARTTLS is enabled
+             */
             private boolean enable;
 
-            /** Whether STARTTLS is required */
+            /**
+             * Whether STARTTLS is required
+             */
             private boolean required;
 
             public boolean isEnable() {
@@ -2435,21 +2837,35 @@ public class ApplicationProperties {
          * Available message broker providers.
          */
         public enum Provider {
-            /** AMQP (e.g., RabbitMQ) */
+            /**
+             * AMQP (e.g., RabbitMQ)
+             */
             AMQP,
-            /** AWS SQS */
+            /**
+             * AWS SQS
+             */
             AWS,
-            /** JMS */
+            /**
+             * JMS
+             */
             JMS,
-            /** Apache Kafka */
+            /**
+             * Apache Kafka
+             */
             KAFKA,
-            /** In-memory message broker */
+            /**
+             * In-memory message broker
+             */
             MEMORY,
-            /** Redis-based message broker */
+            /**
+             * Redis-based message broker
+             */
             REDIS
         }
 
-        /** Message broker provider */
+        /**
+         * Message broker provider
+         */
         private Provider provider = Provider.JMS;
 
         public Provider getProvider() {
@@ -2466,10 +2882,14 @@ public class ApplicationProperties {
      */
     public static class Oauth2 {
 
-        /** Predefined OAuth2 applications mapped by component name */
+        /**
+         * Predefined OAuth2 applications mapped by component name
+         */
         private Map<String, OAuth2App> predefinedApps = new HashMap<>();
 
-        /** OAuth2 redirect URI */
+        /**
+         * OAuth2 redirect URI
+         */
         private String redirectUri;
 
         public Map<String, OAuth2App> getPredefinedApps() {
@@ -2493,10 +2913,14 @@ public class ApplicationProperties {
          */
         public static class OAuth2App {
 
-            /** OAuth2 client ID */
+            /**
+             * OAuth2 client ID
+             */
             private String clientId;
 
-            /** OAuth2 client secret */
+            /**
+             * OAuth2 client secret
+             */
             private String clientSecret;
 
             public String getClientId() {
@@ -2522,16 +2946,24 @@ public class ApplicationProperties {
      */
     public static class Rabbitmq {
 
-        /** RabbitMQ server hostname */
+        /**
+         * RabbitMQ server hostname
+         */
         private String host;
 
-        /** RabbitMQ server password */
+        /**
+         * RabbitMQ server password
+         */
         private String password;
 
-        /** RabbitMQ server port */
+        /**
+         * RabbitMQ server port
+         */
         private int port = 5672;
 
-        /** RabbitMQ server username */
+        /**
+         * RabbitMQ server username
+         */
         private String username;
 
         public String getHost() {
@@ -2572,19 +3004,29 @@ public class ApplicationProperties {
      */
     public static class Redis {
 
-        /** Redis database index */
+        /**
+         * Redis database index
+         */
         private int database;
 
-        /** Redis server hostname */
+        /**
+         * Redis server hostname
+         */
         private String host;
 
-        /** Redis server password */
+        /**
+         * Redis server password
+         */
         private String password;
 
-        /** Redis server port */
+        /**
+         * Redis server port
+         */
         private int port = 6379;
 
-        /** Connection timeout in milliseconds */
+        /**
+         * Connection timeout in milliseconds
+         */
         private long timeout;
 
         public int getDatabase() {
@@ -2633,7 +3075,9 @@ public class ApplicationProperties {
      */
     public static class Resources {
 
-        /** Web resources path */
+        /**
+         * Web resources path
+         */
         private String web;
 
         public String getWeb() {
@@ -2650,22 +3094,34 @@ public class ApplicationProperties {
      */
     public static class Security {
 
-        /** Content Security Policy header value */
+        /**
+         * Content Security Policy header value
+         */
         private String contentSecurityPolicy;
 
-        /** Remember-me authentication configuration */
+        /**
+         * Remember-me authentication configuration
+         */
         private RememberMe rememberMe = new RememberMe();
 
-        /** Enterprise SSO (OIDC + SAML) configuration */
+        /**
+         * Enterprise SSO (OIDC + SAML) configuration
+         */
         private Sso sso = new Sso();
 
-        /** Social login (OAuth2) configuration */
+        /**
+         * Social login (OAuth2) configuration
+         */
         private SocialLogin socialLogin = new SocialLogin();
 
-        /** System user credentials configuration */
+        /**
+         * System user credentials configuration
+         */
         private System system = new System();
 
-        /** Two-factor authentication configuration */
+        /**
+         * Two-factor authentication configuration
+         */
         private TwoFactorAuthentication twoFactorAuthentication = new TwoFactorAuthentication();
 
         public String getContentSecurityPolicy() {
@@ -2721,7 +3177,9 @@ public class ApplicationProperties {
          */
         public static class RememberMe {
 
-            /** Remember-me token encryption key */
+            /**
+             * Remember-me token encryption key
+             */
             private String key;
 
             public String getKey() {
@@ -2738,7 +3196,9 @@ public class ApplicationProperties {
          */
         public static class Sso {
 
-            /** Whether enterprise SSO is enabled */
+            /**
+             * Whether enterprise SSO is enabled
+             */
             private boolean enabled;
 
             public boolean isEnabled() {
@@ -2755,10 +3215,14 @@ public class ApplicationProperties {
          */
         public static class System {
 
-            /** System user username */
+            /**
+             * System user username
+             */
             private String username;
 
-            /** System user password */
+            /**
+             * System user password
+             */
             private String password;
 
             public String getUsername() {
@@ -2783,13 +3247,19 @@ public class ApplicationProperties {
          */
         public static class SocialLogin {
 
-            /** Whether social login is enabled */
+            /**
+             * Whether social login is enabled
+             */
             private boolean enabled;
 
-            /** Google OAuth2 configuration */
+            /**
+             * Google OAuth2 configuration
+             */
             private Provider google = new Provider();
 
-            /** GitHub OAuth2 configuration */
+            /**
+             * GitHub OAuth2 configuration
+             */
             private Provider github = new Provider();
 
             public boolean isEnabled() {
@@ -2821,10 +3291,14 @@ public class ApplicationProperties {
              */
             public static class Provider {
 
-                /** OAuth2 client ID */
+                /**
+                 * OAuth2 client ID
+                 */
                 private String clientId;
 
-                /** OAuth2 client secret */
+                /**
+                 * OAuth2 client secret
+                 */
                 private String clientSecret;
 
                 public String getClientId() {
@@ -2850,7 +3324,9 @@ public class ApplicationProperties {
          */
         public static class TwoFactorAuthentication {
 
-            /** Whether two-factor authentication is enabled */
+            /**
+             * Whether two-factor authentication is enabled
+             */
             private boolean enabled;
 
             public boolean isEnabled() {
@@ -2872,13 +3348,19 @@ public class ApplicationProperties {
          * Available scheduler providers.
          */
         public enum Provider {
-            /** AWS EventBridge Scheduler */
+            /**
+             * AWS EventBridge Scheduler
+             */
             AWS,
-            /** Quartz Scheduler */
+            /**
+             * Quartz Scheduler
+             */
             QUARTZ
         }
 
-        /** Scheduler provider */
+        /**
+         * Scheduler provider
+         */
         private Provider provider = Provider.QUARTZ;
 
         public Provider getProvider() {
@@ -2895,10 +3377,14 @@ public class ApplicationProperties {
      */
     public static class SignUp {
 
-        /** Whether email activation is required after sign-up */
+        /**
+         * Whether email activation is required after sign-up
+         */
         private boolean activationRequired;
 
-        /** Whether user sign-up is enabled */
+        /**
+         * Whether user sign-up is enabled
+         */
         private boolean enabled = true;
 
         public boolean isActivationRequired() {
@@ -2927,13 +3413,19 @@ public class ApplicationProperties {
          * Tenancy mode.
          */
         public enum Mode {
-            /** Multi-tenant mode */
+            /**
+             * Multi-tenant mode
+             */
             MULTI,
-            /** Single-tenant mode */
+            /**
+             * Single-tenant mode
+             */
             SINGLE
         }
 
-        /** Tenancy mode */
+        /**
+         * Tenancy mode
+         */
         private Mode mode = Mode.SINGLE;
 
         public Mode getMode() {
@@ -2952,7 +3444,9 @@ public class ApplicationProperties {
      */
     public static class Upgrade {
 
-        /** Whether database upgrades (Liquibase migrations) run at startup */
+        /**
+         * Whether database upgrades (Liquibase migrations) run at startup
+         */
         private boolean enabled = true;
 
         public boolean isEnabled() {
@@ -2969,10 +3463,14 @@ public class ApplicationProperties {
      */
     public static class UserGuiding {
 
-        /** Container ID for the UserGuiding SDK */
+        /**
+         * Container ID for the UserGuiding SDK
+         */
         private String containerId;
 
-        /** Whether user guiding is enabled */
+        /**
+         * Whether user guiding is enabled
+         */
         private boolean enabled;
 
         public String getContainerId() {
@@ -2997,10 +3495,14 @@ public class ApplicationProperties {
      */
     public static class Worker {
 
-        /** Whether worker is enabled */
+        /**
+         * Whether worker is enabled
+         */
         private boolean enabled = true;
 
-        /** Task execution configuration */
+        /**
+         * Task execution configuration
+         */
         private Task task = new Task();
 
         public boolean isEnabled() {
@@ -3024,10 +3526,14 @@ public class ApplicationProperties {
          */
         public static class Task {
 
-            /** Default timeout for task execution in milliseconds */
+            /**
+             * Default timeout for task execution in milliseconds
+             */
             private Long defaultTimeout;
 
-            /** Event subscriptions mapped by task type to number of subscribers */
+            /**
+             * Event subscriptions mapped by task type to number of subscribers
+             */
             private Map<String, Integer> subscriptions = new HashMap<>();
 
             public Long getDefaultTimeout() {
@@ -3053,10 +3559,14 @@ public class ApplicationProperties {
      */
     public static class Workflow {
 
-        /** Output storage configuration for workflow results */
+        /**
+         * Output storage configuration for workflow results
+         */
         private OutputStorage outputStorage = new OutputStorage();
 
-        /** Workflow repository configuration */
+        /**
+         * Workflow repository configuration
+         */
         private Repository repository = new Repository();
 
         public OutputStorage getOutputStorage() {
@@ -3084,15 +3594,23 @@ public class ApplicationProperties {
              * Available output storage providers.
              */
             public enum Provider {
-                /** AWS S3 storage */
+                /**
+                 * AWS S3 storage
+                 */
                 AWS,
-                /** Filesystem storage */
+                /**
+                 * Filesystem storage
+                 */
                 FILESYSTEM,
-                /** JDBC database storage */
+                /**
+                 * JDBC database storage
+                 */
                 JDBC
             }
 
-            /** Output storage provider */
+            /**
+             * Output storage provider
+             */
             private Provider provider = Provider.JDBC;
 
             public Provider getProvider() {
@@ -3109,16 +3627,24 @@ public class ApplicationProperties {
          */
         public static class Repository {
 
-            /** Classpath-based workflow repository */
+            /**
+             * Classpath-based workflow repository
+             */
             private Classpath classpath = new Classpath();
 
-            /** Filesystem-based workflow repository */
+            /**
+             * Filesystem-based workflow repository
+             */
             private Filesystem filesystem = new Filesystem();
 
-            /** Git-based workflow repository */
+            /**
+             * Git-based workflow repository
+             */
             private Git git = new Git();
 
-            /** JDBC-based workflow repository */
+            /**
+             * JDBC-based workflow repository
+             */
             private Jdbc jdbc = new Jdbc();
 
             public Classpath getClasspath() {
@@ -3158,10 +3684,14 @@ public class ApplicationProperties {
              */
             public static class Classpath {
 
-                /** Whether classpath repository is enabled */
+                /**
+                 * Whether classpath repository is enabled
+                 */
                 private boolean enabled;
 
-                /** Ant-style pattern for locating workflow files */
+                /**
+                 * Ant-style pattern for locating workflow files
+                 */
                 private String locationPattern;
 
                 public String getLocationPattern() {
@@ -3186,10 +3716,14 @@ public class ApplicationProperties {
              */
             public static class Filesystem {
 
-                /** Whether filesystem repository is enabled */
+                /**
+                 * Whether filesystem repository is enabled
+                 */
                 private boolean enabled;
 
-                /** Ant-style pattern for locating workflow files */
+                /**
+                 * Ant-style pattern for locating workflow files
+                 */
                 private String locationPattern;
 
                 public String getLocationPattern() {
@@ -3214,22 +3748,34 @@ public class ApplicationProperties {
              */
             public static class Git {
 
-                /** Git branch to use */
+                /**
+                 * Git branch to use
+                 */
                 private String branch;
 
-                /** Whether Git repository is enabled */
+                /**
+                 * Whether Git repository is enabled
+                 */
                 private boolean enabled;
 
-                /** Git repository password */
+                /**
+                 * Git repository password
+                 */
                 private String password;
 
-                /** Paths within repository to search for workflows */
+                /**
+                 * Paths within repository to search for workflows
+                 */
                 private String[] searchPaths;
 
-                /** Git repository URL */
+                /**
+                 * Git repository URL
+                 */
                 private String url;
 
-                /** Git repository username */
+                /**
+                 * Git repository username
+                 */
                 private String username;
 
                 public String getBranch() {
@@ -3286,7 +3832,9 @@ public class ApplicationProperties {
              */
             public static class Jdbc {
 
-                /** Whether JDBC repository is enabled */
+                /**
+                 * Whether JDBC repository is enabled
+                 */
                 private boolean enabled = true;
 
                 public boolean isEnabled() {
