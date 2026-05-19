@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
-import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
     DialogClose,
@@ -15,8 +14,8 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputType} from '@/shared/types';
-import {RefObject} from 'react';
-import {UseFormReturn} from 'react-hook-form';
+import {RefObject, useEffect} from 'react';
+import {UseFormReturn, useWatch} from 'react-hook-form';
 
 interface WorkflowInputsEditDialogProps {
     closeDialog: () => void;
@@ -36,150 +35,203 @@ const WorkflowInputsEditDialog = ({
     nameInputRef,
     openEditDialog,
     saveWorkflowInput,
-}: WorkflowInputsEditDialogProps) => (
-    <Dialog
-        onOpenChange={(open) => {
-            if (open) {
-                openEditDialog(currentInputIndex);
-            } else {
-                closeDialog();
-            }
-        }}
-        open={isEditDialogOpen}
-    >
-        <DialogContent>
-            <Form {...form}>
-                <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(saveWorkflowInput)}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0">
-                        <div className="flex flex-col space-y-1">
-                            <DialogTitle>{`${currentInputIndex === -1 ? 'Create a new' : 'Edit'} Input`}</DialogTitle>
+}: WorkflowInputsEditDialogProps) => {
+    const selectedType = useWatch({control: form.control, name: 'type'});
 
-                            <DialogDescription>Add a new workflow input definition.</DialogDescription>
-                        </div>
+    const testValueInputTypeMap: Record<string, string> = {
+        date: 'date',
+        date_time: 'datetime-local',
+        integer: 'number',
+        number: 'number',
+        time: 'time',
+    };
 
-                        <DialogCloseButton />
-                    </DialogHeader>
+    const testValueInputType = (selectedType && testValueInputTypeMap[selectedType]) ?? 'text';
 
-                    <FormField
-                        control={form.control}
-                        name="name"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Name <RequiredMark />
-                                </FormLabel>
+    useEffect(() => {
+        form.setValue('testValue', '');
+    }, [form, selectedType]);
 
-                                <FormControl>
-                                    <Input {...field} readOnly={currentInputIndex !== -1} ref={nameInputRef} />
-                                </FormControl>
+    return (
+        <Dialog
+            onOpenChange={(open) => {
+                if (open) {
+                    openEditDialog(currentInputIndex);
+                } else {
+                    closeDialog();
+                }
+            }}
+            open={isEditDialogOpen}
+        >
+            <DialogContent>
+                <Form {...form}>
+                    <form className="flex flex-col gap-4" onSubmit={form.handleSubmit(saveWorkflowInput)}>
+                        <DialogHeader className="flex flex-row items-center justify-between space-y-0">
+                            <div className="flex flex-col space-y-1">
+                                <DialogTitle>{`${currentInputIndex === -1 ? 'Create a new' : 'Edit'} Input`}</DialogTitle>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
+                                <DialogDescription>Add a new workflow input definition.</DialogDescription>
+                            </div>
 
-                    <FormField
-                        control={form.control}
-                        name="label"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Label <RequiredMark />
-                                </FormLabel>
+                            <DialogCloseButton />
+                        </DialogHeader>
 
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
+                        <FormField
+                            control={form.control}
+                            name="name"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Name <RequiredMark />
+                                    </FormLabel>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
+                                    <FormControl>
+                                        <Input
+                                            {...field}
+                                            placeholder="Input name (will be used as a dynamic value key)"
+                                            readOnly={currentInputIndex !== -1}
+                                            ref={nameInputRef}
+                                        />
+                                    </FormControl>
 
-                    <FormField
-                        control={form.control}
-                        name="type"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>
-                                    Type <RequiredMark />
-                                </FormLabel>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                                <FormControl>
-                                    <Select onValueChange={field.onChange} value={field.value ?? ''}>
-                                        <SelectTrigger className="w-full">
-                                            <SelectValue placeholder="Select input type" />
-                                        </SelectTrigger>
+                        <FormField
+                            control={form.control}
+                            name="label"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Label <RequiredMark />
+                                    </FormLabel>
 
-                                        <SelectContent>
-                                            <SelectItem value="boolean">Boolean</SelectItem>
+                                    <FormControl>
+                                        <Input {...field} placeholder="Input label" />
+                                    </FormControl>
 
-                                            <SelectItem value="date">Date</SelectItem>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                                            <SelectItem value="date_time">Date Time</SelectItem>
+                        <FormField
+                            control={form.control}
+                            name="type"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>
+                                        Type <RequiredMark />
+                                    </FormLabel>
 
-                                            <SelectItem value="integer">Integer</SelectItem>
+                                    <FormControl>
+                                        <Select onValueChange={field.onChange} value={field.value ?? ''}>
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue placeholder="Select input type" />
+                                            </SelectTrigger>
 
-                                            <SelectItem value="number">Number</SelectItem>
+                                            <SelectContent>
+                                                <SelectItem value="boolean">Boolean</SelectItem>
 
-                                            <SelectItem value="string">String</SelectItem>
+                                                <SelectItem value="date">Date</SelectItem>
 
-                                            <SelectItem value="time">Time</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </FormControl>
+                                                <SelectItem value="date_time">Date Time</SelectItem>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                        rules={{required: true}}
-                    />
+                                                <SelectItem value="integer">Integer</SelectItem>
 
-                    <FormField
-                        control={form.control}
-                        name="required"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col space-y-2">
-                                <FormLabel>Required</FormLabel>
+                                                <SelectItem value="number">Number</SelectItem>
 
-                                <FormControl>
-                                    <Checkbox checked={field.value} onCheckedChange={field.onChange} />
-                                </FormControl>
+                                                <SelectItem value="string">String</SelectItem>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                                <SelectItem value="time">Time</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
 
-                    <FormField
-                        control={form.control}
-                        name="testValue"
-                        render={({field}) => (
-                            <FormItem className="flex flex-col space-y-2">
-                                <FormLabel>Test Value</FormLabel>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                            rules={{required: true}}
+                        />
 
-                                <FormControl>
-                                    <Input {...field} />
-                                </FormControl>
+                        <FormField
+                            control={form.control}
+                            name="required"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Required</FormLabel>
 
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
+                                    <FormControl>
+                                        <Select
+                                            onValueChange={(value) => field.onChange(value === 'true')}
+                                            value={String(field.value ?? false)}
+                                        >
+                                            <SelectTrigger className="w-full">
+                                                <SelectValue />
+                                            </SelectTrigger>
 
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button label="Cancel" type="button" variant="outline" />
-                        </DialogClose>
+                                            <SelectContent>
+                                                <SelectItem value="true">True</SelectItem>
 
-                        <Button label="Save" type="submit" />
-                    </DialogFooter>
-                </form>
-            </Form>
-        </DialogContent>
-    </Dialog>
-);
+                                                <SelectItem value="false">False</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={form.control}
+                            name="testValue"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Test Value</FormLabel>
+
+                                    <FormControl>
+                                        {selectedType === 'boolean' ? (
+                                            <Select
+                                                onValueChange={(value) => field.onChange(value)}
+                                                value={field.value ?? ''}
+                                            >
+                                                <SelectTrigger className="w-full">
+                                                    <SelectValue placeholder="Select value" />
+                                                </SelectTrigger>
+
+                                                <SelectContent>
+                                                    <SelectItem value="true">True</SelectItem>
+
+                                                    <SelectItem value="false">False</SelectItem>
+                                                </SelectContent>
+                                            </Select>
+                                        ) : (
+                                            <Input {...field} placeholder="Enter value" type={testValueInputType} />
+                                        )}
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <DialogFooter>
+                            <DialogClose asChild>
+                                <Button label="Cancel" type="button" variant="outline" />
+                            </DialogClose>
+
+                            <Button label="Save" type="submit" />
+                        </DialogFooter>
+                    </form>
+                </Form>
+            </DialogContent>
+        </Dialog>
+    );
+};
 
 export default WorkflowInputsEditDialog;
