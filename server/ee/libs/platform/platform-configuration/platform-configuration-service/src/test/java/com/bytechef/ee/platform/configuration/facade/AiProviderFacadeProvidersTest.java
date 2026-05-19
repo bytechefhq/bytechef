@@ -21,6 +21,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +55,10 @@ class AiProviderFacadeProvidersTest {
     void setUp() {
         applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
-        facade = new AiProviderFacadeImpl(componentDefinitionService, propertyService, applicationProperties);
+        AiProviderConnectionSource aiProviderConnectionSource = mock(AiProviderConnectionSource.class);
+
+        facade = new AiProviderFacadeImpl(
+            aiProviderConnectionSource, componentDefinitionService, propertyService, applicationProperties);
     }
 
     @Test

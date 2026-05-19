@@ -21,6 +21,8 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialSecret;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,7 +49,7 @@ import org.springframework.data.relational.core.mapping.Table;
  * @author Ivica Cardic
  */
 @Table
-public final class Connection {
+public final class Connection implements CredentialSecret {
 
     public enum CredentialStatus {
         INVALID, VALID
@@ -67,6 +69,13 @@ public final class Connection {
 
     @MappedCollection(idColumn = "connection_id")
     private Set<ConnectionTag> connectionTags = new HashSet<>();
+
+    @Column("credential_ref")
+    @Nullable
+    private String credentialRef;
+
+    @Column("credential_store_type")
+    private int credentialStoreType;
 
     @Column("credential_status")
     private int credentialStatus = 1;
@@ -298,6 +307,36 @@ public final class Connection {
         this.credentialStatus = credentialStatus.ordinal();
     }
 
+    @Override
+    public @Nullable String getCredentialRef() {
+        return credentialRef;
+    }
+
+    @Override
+    public void setCredentialRef(@Nullable String credentialRef) {
+        this.credentialRef = credentialRef;
+    }
+
+    @Override
+    public CredentialStoreType getCredentialStoreType() {
+        return CredentialStoreType.values()[credentialStoreType];
+    }
+
+    @Override
+    public void setCredentialStoreType(CredentialStoreType credentialStoreType) {
+        this.credentialStoreType = credentialStoreType.ordinal();
+    }
+
+    @Override
+    public Map<String, ?> getPayload() {
+        return getParameters();
+    }
+
+    @Override
+    public void setPayload(Map<String, ?> payload) {
+        setParameters(payload);
+    }
+
     public void setStatus(ConnectionStatus status) {
         Objects.requireNonNull(status, "status");
 
@@ -332,9 +371,11 @@ public final class Connection {
     }
 
     public void setParameters(Map<String, ?> parameters) {
-        if (!MapUtils.isEmpty(parameters)) {
-            this.parameters = new EncryptedMapWrapper(parameters);
+        if (parameters == null) {
+            return;
         }
+
+        this.parameters = new EncryptedMapWrapper(parameters);
     }
 
     public void setType(PlatformType type) {
@@ -393,6 +434,8 @@ public final class Connection {
             ", status=" + status +
             ", type=" + type +
             ", visibility=" + visibility +
+            ", credentialStoreType=" + credentialStoreType +
+            ", credentialRef='" + credentialRef + '\'' +
             ", parameters=" + parameters +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +

@@ -19,7 +19,7 @@ package com.bytechef.automation.configuration.web.graphql;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.service.ConnectionCredentialStoreType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -65,7 +65,7 @@ public class ConnectionGraphQlController {
         String componentName,
         int connectionVersion,
         String credentialRef,
-        ConnectionCredentialStoreType credentialStoreType,
+        CredentialStoreType credentialStoreType,
         long environmentId,
         String name,
         long workspaceId) {

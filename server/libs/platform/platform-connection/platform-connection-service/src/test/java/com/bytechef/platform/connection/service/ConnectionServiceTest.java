@@ -19,6 +19,8 @@ package com.bytechef.platform.connection.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -27,16 +29,22 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
+import com.bytechef.platform.credential.store.CredentialStore;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -58,7 +66,7 @@ class ConnectionServiceTest {
 
     @BeforeEach
     void setUp() {
-        connectionService = new ConnectionServiceImpl(connectionRepository);
+        connectionService = new ConnectionServiceImpl(List.of(), connectionRepository);
 
         SecurityContextHolder.getContext()
             .setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -213,5 +221,57 @@ class ConnectionServiceTest {
     void testGetInactiveConnectionsEmptyShortCircuits() {
         assertThat(connectionService.getInactiveConnections(null)).isEmpty();
         assertThat(connectionService.getInactiveConnections(List.of())).isEmpty();
+    }
+
+    @Test
+    void testMetadataUpdateTagsDoesNotWriteExternalSecretToInlineParametersColumn() {
+        // Regression: update(id, tagIds) called getConnection(id) which populated parameters from
+        // the external store, then saved the connection — writing the secret into the inline column.
+        CredentialStore awsStore = Mockito.mock(CredentialStore.class);
+
+        lenient().when(awsStore.getType())
+            .thenReturn(CredentialStoreType.AWS_SECRETS_MANAGER);
+        lenient().when(awsStore.isReadOnly())
+            .thenReturn(false);
+        doReturn(Map.of("apiKey", "secret-value")).when(awsStore)
+            .getSecret(any());
+
+        CredentialStore dbStore = Mockito.mock(CredentialStore.class);
+
+        lenient().when(dbStore.getType())
+            .thenReturn(CredentialStoreType.DATABASE);
+        lenient().when(dbStore.isReadOnly())
+            .thenReturn(false);
+        lenient().doReturn(Map.of())
+            .when(dbStore)
+            .getSecret(any());
+
+        ConnectionServiceImpl serviceWithStores = new ConnectionServiceImpl(
+            List.of(dbStore, awsStore), connectionRepository);
+
+        Connection connection = new Connection();
+
+        connection.setId(CONNECTION_ID);
+        connection.setCredentialStoreType(CredentialStoreType.AWS_SECRETS_MANAGER);
+
+        when(connectionRepository.findById(CONNECTION_ID)).thenReturn(Optional.of(connection));
+
+        // Snapshot the parameters at the exact moment save() is called, before populateParameters
+        // mutates the returned object — this represents what Spring Data JDBC would persist to DB.
+        AtomicReference<Map<String, ?>> parametersAtSaveTime = new AtomicReference<>();
+
+        when(connectionRepository.save(any(Connection.class))).thenAnswer(inv -> {
+            Connection savedConnection = inv.getArgument(0);
+
+            parametersAtSaveTime.set(new HashMap<>(savedConnection.getParameters()));
+
+            return savedConnection;
+        });
+
+        serviceWithStores.update(CONNECTION_ID, List.of(42L));
+
+        // The inline parameters column must be empty for an external-store row.
+        assertThat(parametersAtSaveTime.get()).isEmpty();
+        assertThat(connection.getCredentialStoreType()).isEqualTo(CredentialStoreType.AWS_SECRETS_MANAGER);
     }
 }

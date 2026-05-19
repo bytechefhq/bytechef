@@ -12,6 +12,7 @@ import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;
@@ -86,6 +87,13 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Connection registerExisting(
+        Connection connection, CredentialStoreType storeType, String credentialRef) {
+
         throw new UnsupportedOperationException();
     }
 

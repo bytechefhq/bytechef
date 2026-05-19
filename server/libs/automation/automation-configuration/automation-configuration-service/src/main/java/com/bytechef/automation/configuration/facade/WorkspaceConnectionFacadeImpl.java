@@ -33,9 +33,9 @@ import com.bytechef.platform.connection.event.ConnectionCreatedEvent;
 import com.bytechef.platform.connection.event.ConnectionDeletedEvent;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
-import com.bytechef.platform.connection.service.ConnectionCredentialStoreType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -155,7 +155,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public long registerExisting(
-        long workspaceId, ConnectionDTO connectionDTO, ConnectionCredentialStoreType storeType, String credentialRef) {
+        long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef) {
 
         Connection connection = connectionDTO.toConnection();
 

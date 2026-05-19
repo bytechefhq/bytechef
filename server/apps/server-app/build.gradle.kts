@@ -195,6 +195,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql"))
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-service"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-graphql"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))

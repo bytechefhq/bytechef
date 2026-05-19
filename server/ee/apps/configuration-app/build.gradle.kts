@@ -57,6 +57,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-rest:platform-configuration-rest-impl"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-graphql"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-graphql"))
     implementation(project(":server:libs:platform:platform-mcp:platform-mcp-service"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-rest"))

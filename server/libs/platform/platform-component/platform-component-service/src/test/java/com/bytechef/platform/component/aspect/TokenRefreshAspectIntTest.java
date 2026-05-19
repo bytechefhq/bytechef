@@ -296,6 +296,8 @@ class TokenRefreshAspectIntTest {
 
         Connection updatedConnection = createMockConnection();
 
+        when(connectionService.getConnection(anyLong())).thenReturn(updatedConnection);
+
         when(connectionService.updateConnectionParameters(anyLong(), any()))
             .thenReturn(updatedConnection);
 
@@ -485,6 +487,8 @@ class TokenRefreshAspectIntTest {
                 .thenReturn(refreshResponse);
 
         Connection updatedConnection = createMockConnection();
+
+        when(connectionService.getConnection(anyLong())).thenReturn(updatedConnection);
 
         when(connectionService.updateConnectionParameters(anyLong(), any()))
             .thenReturn(updatedConnection);

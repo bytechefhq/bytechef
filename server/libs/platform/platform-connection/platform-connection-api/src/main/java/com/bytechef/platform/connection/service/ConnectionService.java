@@ -20,6 +20,7 @@ import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,15 @@ public interface ConnectionService {
     Connection update(long id, List<Long> tagIds);
 
     Connection update(long id, String name, List<Long> tagIds, int version);
+
+    /**
+     * Register a connection whose credential payload already exists in an external store. Used in read-only deployments
+     * where the operator provisioned the secret out-of-band. The credential payload is NOT written via the credential
+     * store — the caller asserts a secret already exists at the path derivable from {@code credentialRef}. Throws if
+     * {@code storeType} is {@link CredentialStoreType#DATABASE}.
+     */
+    Connection registerExisting(
+        Connection connection, CredentialStoreType storeType, String credentialRef);
 
     Connection updateConnectionCredentialStatus(long connectionId, Connection.CredentialStatus status);
 

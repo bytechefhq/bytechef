@@ -19,10 +19,12 @@ package com.bytechef.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
+import com.bytechef.automation.configuration.web.rest.model.RegisterExistingConnectionRequestModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -74,6 +76,36 @@ public class ConnectionApiController implements ConnectionApi {
             workspaceConnectionFacade.create(
                 Objects.requireNonNull(connectionModel.getWorkspaceId()),
                 conversionService.convert(connectionModel, ConnectionDTO.class)));
+    }
+
+    @Override
+    public ResponseEntity<Long> registerExistingConnection(
+        RegisterExistingConnectionRequestModel registerExistingConnectionRequestModel) {
+
+        List<Tag> tags = registerExistingConnectionRequestModel.getTags()
+            .stream()
+            .map(tagModel -> conversionService.convert(tagModel, Tag.class))
+            .toList();
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .componentName(registerExistingConnectionRequestModel.getComponentName())
+            .connectionVersion(registerExistingConnectionRequestModel.getConnectionVersion())
+            .environmentId(registerExistingConnectionRequestModel.getEnvironmentId()
+                .intValue())
+            .name(registerExistingConnectionRequestModel.getName())
+            .tags(tags)
+            .build();
+
+        CredentialStoreType storeType = CredentialStoreType.valueOf(
+            registerExistingConnectionRequestModel.getCredentialStoreType()
+                .getValue());
+
+        return ResponseEntity.ok(
+            workspaceConnectionFacade.registerExisting(
+                registerExistingConnectionRequestModel.getWorkspaceId(),
+                connectionDTO,
+                storeType,
+                registerExistingConnectionRequestModel.getCredentialRef()));
     }
 
     @Override

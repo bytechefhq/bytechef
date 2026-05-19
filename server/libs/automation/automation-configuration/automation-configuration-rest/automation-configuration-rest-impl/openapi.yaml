@@ -99,6 +99,29 @@ paths:
               schema:
                 type: integer
                 format: int64
+  /connections/register-existing:
+    post:
+      description: "Register a connection backed by an externally-provisioned credential."
+      summary: "Register a connection backed by an externally-provisioned credential"
+      tags:
+        - "connection"
+      operationId: "registerExistingConnection"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterExistingConnectionRequest"
+        required: true
+      responses:
+        "200":
+          description: "The connection id."
+          content:
+            application/json:
+              schema:
+                type: integer
+                format: int64
+        "400":
+          description: "Read-only store rejected the write, or secret not found at credentialRef."
   /connections/tags:
     get:
       description: "Get connection tags."
@@ -1480,6 +1503,49 @@ components:
           readOnly: true
         status:
           $ref: '#/components/schemas/ProjectStatus'
+    RegisterExistingConnectionRequest:
+      description: "Contains all required information to register a connection backed by an externally-provisioned credential."
+      type: "object"
+      required:
+        - "componentName"
+        - "connectionVersion"
+        - "credentialRef"
+        - "credentialStoreType"
+        - "environmentId"
+        - "name"
+        - "workspaceId"
+      properties:
+        componentName:
+          description: "The name of a component that uses this connection."
+          type: "string"
+        connectionVersion:
+          description: "The version of a component that uses this connection."
+          type: "integer"
+          format: "int32"
+        credentialRef:
+          description: "External-store path or UUID where the secret already lives."
+          type: "string"
+        credentialStoreType:
+          description: "Must be a non-DATABASE store. DATABASE values are rejected."
+          type: "string"
+          enum:
+            - "AWS_SECRETS_MANAGER"
+            - "HASHICORP_VAULT"
+        environmentId:
+          description: "The id of an environment."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of a connection."
+          type: "string"
+        tags:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Tag"
+        workspaceId:
+          description: "The id of a workspace."
+          type: "integer"
+          format: "int64"
     Tag:
       $ref: "../../../../platform/platform-tag/platform-tag-rest/openapi/components/schemas/objects/tag.yaml"
     UpdateConnectionRequest:

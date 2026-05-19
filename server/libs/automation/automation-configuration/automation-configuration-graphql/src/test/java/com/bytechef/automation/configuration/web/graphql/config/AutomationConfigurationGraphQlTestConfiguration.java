@@ -106,6 +106,11 @@ public class AutomationConfigurationGraphQlTestConfiguration {
     }
 
     @Bean
+    public RuntimeWiringConfigurer longScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.longScalar());
+    }
+
+    @Bean
     @Primary
     public WorkspaceUserService workspaceUserService() {
         return Mockito.mock(WorkspaceUserService.class);
