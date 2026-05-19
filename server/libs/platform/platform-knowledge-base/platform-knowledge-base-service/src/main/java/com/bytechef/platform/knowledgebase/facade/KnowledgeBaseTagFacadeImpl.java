@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.service;
+package com.bytechef.platform.knowledgebase.facade;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.repository.KnowledgeBaseRepository;
@@ -36,13 +36,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 @ConditionalOnProperty(prefix = "bytechef.ai.knowledge-base", name = "enabled", havingValue = "true")
-public class KnowledgeBaseTagServiceImpl implements KnowledgeBaseTagService {
+public class KnowledgeBaseTagFacadeImpl implements KnowledgeBaseTagFacade {
 
     private final KnowledgeBaseRepository knowledgeBaseRepository;
     private final TagService tagService;
 
     @SuppressFBWarnings("EI")
-    public KnowledgeBaseTagServiceImpl(
+    public KnowledgeBaseTagFacadeImpl(
         KnowledgeBaseRepository knowledgeBaseRepository, TagService tagService) {
 
         this.knowledgeBaseRepository = knowledgeBaseRepository;

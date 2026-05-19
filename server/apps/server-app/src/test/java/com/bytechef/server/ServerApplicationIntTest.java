@@ -28,11 +28,11 @@ import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseTagService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,7 +75,7 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentChunkService.class)).isEmpty();
-        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseTagService.class)).isEmpty();
+        assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseTagFacade.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(KnowledgeBaseDocumentTagService.class)).isEmpty();
         assertThat(applicationContext.getBeanNamesForType(WorkspaceKnowledgeBaseService.class)).isEmpty();
 

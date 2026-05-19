@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.service;
+package com.bytechef.platform.knowledgebase.facade;
 
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.Map;
  *
  * @author Ivica Cardic
  */
-public interface KnowledgeBaseTagService {
+public interface KnowledgeBaseTagFacade {
 
     /**
      * Retrieves a list of all tags.
