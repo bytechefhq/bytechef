@@ -40,6 +40,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -58,10 +59,13 @@ public class FtpUploadActionIntTest {
      * Shared credentials for both containers. Password must satisfy Alpine Linux's strength requirements used by
      * {@code delfer/alpine-ftp-server}'s entrypoint.
      */
-    private static final String FTP_PASSWORD = "T3st@Pass123";
-    private static final String FTP_USERNAME = "ftpuser";
+    @Value("${bytechef.test.ftp.password}")
+    private static String ftpPassword;
+    @Value("${bytechef.test.ftp.username}")
+    private static String ftpUsername;
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-    private static final String FTP_HOST_IP = "127.0.0.1";
+    @Value("${bytechef.test.ftp.host.ip}")
+    private static String ftpHostIp = "127.0.0.1";
 
     /**
      * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
@@ -95,8 +99,8 @@ public class FtpUploadActionIntTest {
     @SuppressWarnings("deprecation")
     static final FixedHostPortGenericContainer<?> ftpContainer =
         new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
-            .withEnv("USERS", FTP_USERNAME + "|" + FTP_PASSWORD)
-            .withEnv("ADDRESS", FTP_HOST_IP)
+            .withEnv("USERS", ftpUsername + "|" + ftpPassword)
+            .withEnv("ADDRESS", ftpHostIp)
             .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withExposedPorts(21)
@@ -108,16 +112,16 @@ public class FtpUploadActionIntTest {
      */
     @Container
     static final GenericContainer<?> sftpContainer = new GenericContainer<>("atmoz/sftp:latest")
-        .withCommand(FTP_USERNAME + ":" + FTP_PASSWORD + ":::" + SFTP_UPLOAD_DIR)
+        .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
         .withExposedPorts(22);
 
     @Test
     void testUpload() throws Exception {
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
-            HOST, FTP_HOST_IP,
+            HOST, ftpHostIp,
             PORT, ftpContainer.getMappedPort(21),
-            USERNAME, FTP_USERNAME,
-            PASSWORD, FTP_PASSWORD,
+            USERNAME, ftpUsername,
+            PASSWORD, ftpPassword,
             PASSIVE_MODE, true,
             SFTP, false));
 
