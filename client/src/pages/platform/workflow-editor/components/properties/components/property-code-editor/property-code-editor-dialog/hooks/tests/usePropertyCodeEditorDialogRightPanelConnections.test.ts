@@ -375,6 +375,127 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
         });
     });
 
+    describe('tool cluster element connections (array)', () => {
+        const toolClusterElementProps = {
+            componentConnections: [],
+            workflow: {
+                definition: JSON.stringify({
+                    tasks: [
+                        {
+                            clusterElements: {
+                                tools: [
+                                    {connections: {}, name: 'script_1', type: 'script/v1/script'},
+                                    {connections: {}, name: 'script_2', type: 'script/v1/script'},
+                                ],
+                            },
+                            name: 'aiAgent_1',
+                            type: 'aiAgent/v1/chat',
+                        },
+                    ],
+                }),
+                id: 'workflow-1',
+                version: 1,
+            },
+            workflowNodeName: 'script_1',
+        };
+
+        beforeEach(() => {
+            hoisted.storeState.currentNode = {clusterElementType: 'tools', name: 'script_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'aiAgent_1'};
+            vi.clearAllMocks();
+            vi.resetModules();
+        });
+
+        it('should add a connection to the matching tool cluster element', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() =>
+                usePropertyCodeEditorDialogRightPanelConnections(toolClusterElementProps)
+            );
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            expect(hoisted.mockMutate).toHaveBeenCalled();
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const definition = JSON.parse(callArg.workflow.definition);
+
+            expect(definition.tasks[0].clusterElements.tools[0].connections.github_connection).toEqual({
+                componentName: 'github',
+                componentVersion: 2,
+            });
+        });
+
+        it('should not modify other tools in the array when adding a connection', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() =>
+                usePropertyCodeEditorDialogRightPanelConnections(toolClusterElementProps)
+            );
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const definition = JSON.parse(callArg.workflow.definition);
+
+            expect(definition.tasks[0].clusterElements.tools[1].name).toBe('script_2');
+            expect(definition.tasks[0].clusterElements.tools[1].connections).toEqual({});
+        });
+
+        it('should remove a connection from the matching tool cluster element', async () => {
+            const propsWithConnection = {
+                ...toolClusterElementProps,
+                workflow: {
+                    ...toolClusterElementProps.workflow,
+                    definition: JSON.stringify({
+                        tasks: [
+                            {
+                                clusterElements: {
+                                    tools: [
+                                        {
+                                            connections: {slack_1: {componentName: 'slack', componentVersion: 1}},
+                                            name: 'script_1',
+                                            type: 'script/v1/script',
+                                        },
+                                    ],
+                                },
+                                name: 'aiAgent_1',
+                                type: 'aiAgent/v1/chat',
+                            },
+                        ],
+                    }),
+                },
+            };
+
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(propsWithConnection));
+
+            act(() => {
+                result.current.handleOnRemoveClick('slack_1');
+            });
+
+            expect(hoisted.mockMutate).toHaveBeenCalled();
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const definition = JSON.parse(callArg.workflow.definition);
+
+            expect(definition.tasks[0].clusterElements.tools[0].connections.slack_1).toBeUndefined();
+        });
+    });
+
     describe('query invalidation', () => {
         it('should invalidate workflowNodeComponentConnections on submit success for regular nodes', async () => {
             const {usePropertyCodeEditorDialogRightPanelConnections} =

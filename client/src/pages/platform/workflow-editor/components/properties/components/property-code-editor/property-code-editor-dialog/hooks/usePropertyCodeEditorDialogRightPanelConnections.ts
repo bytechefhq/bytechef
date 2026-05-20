@@ -77,35 +77,43 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 
             const clusterElementValue = parentTask?.clusterElements?.[clusterElementType];
 
-            if (!clusterElementValue || Array.isArray(clusterElementValue)) {
+            if (!clusterElementValue) {
                 return;
             }
+
+            const addConnection = (clusterElement: ClusterElementItemType): ClusterElementItemType => ({
+                ...clusterElement,
+                connections: {
+                    ...(clusterElement.connections ?? {}),
+                    [values.name]: {
+                        componentName: values.componentName,
+                        componentVersion: values.componentVersion,
+                    },
+                },
+            });
 
             workflowDefinition = {
                 ...workflowDefinition,
                 tasks: workflowDefinition.tasks!.map((task) => {
-                    if (task.name === parentTaskName) {
-                        const clusterElement = task.clusterElements![clusterElementType] as ClusterElementItemType;
-
-                        return {
-                            ...task,
-                            clusterElements: {
-                                ...task.clusterElements,
-                                [clusterElementType]: {
-                                    ...clusterElement,
-                                    connections: {
-                                        ...(clusterElement.connections ?? {}),
-                                        [values.name]: {
-                                            componentName: values.componentName,
-                                            componentVersion: values.componentVersion,
-                                        },
-                                    },
-                                },
-                            },
-                        } as WorkflowTaskType;
+                    if (task.name !== parentTaskName) {
+                        return task;
                     }
 
-                    return task;
+                    const taskClusterElementValue = task.clusterElements![clusterElementType];
+
+                    return {
+                        ...task,
+                        clusterElements: {
+                            ...task.clusterElements,
+                            [clusterElementType]: Array.isArray(taskClusterElementValue)
+                                ? taskClusterElementValue.map((clusterElement) =>
+                                      clusterElement.name === workflowNodeName
+                                          ? addConnection(clusterElement)
+                                          : clusterElement
+                                  )
+                                : addConnection(taskClusterElementValue as ClusterElementItemType),
+                        },
+                    } as WorkflowTaskType;
                 }),
             };
         } else {
@@ -178,32 +186,42 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 
             const clusterElementValue = parentTask?.clusterElements?.[clusterElementType];
 
-            if (!clusterElementValue || Array.isArray(clusterElementValue)) {
+            if (!clusterElementValue) {
                 return;
             }
 
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            const {[workflowConnectionKey]: removed, ...remainingConnections} = clusterElementValue.connections ?? {};
+            const removeConnection = (clusterElement: ClusterElementItemType): ClusterElementItemType => {
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                const {[workflowConnectionKey]: removed, ...remainingConnections} = clusterElement.connections ?? {};
+
+                return {
+                    ...clusterElement,
+                    connections: remainingConnections,
+                };
+            };
 
             workflowDefinition = {
                 ...workflowDefinition,
                 tasks: workflowDefinition.tasks!.map((task) => {
-                    if (task.name === parentTaskName) {
-                        const clusterElement = task.clusterElements![clusterElementType] as ClusterElementItemType;
-
-                        return {
-                            ...task,
-                            clusterElements: {
-                                ...task.clusterElements,
-                                [clusterElementType]: {
-                                    ...clusterElement,
-                                    connections: remainingConnections,
-                                },
-                            },
-                        } as WorkflowTaskType;
+                    if (task.name !== parentTaskName) {
+                        return task;
                     }
 
-                    return task;
+                    const taskClusterElementValue = task.clusterElements![clusterElementType];
+
+                    return {
+                        ...task,
+                        clusterElements: {
+                            ...task.clusterElements,
+                            [clusterElementType]: Array.isArray(taskClusterElementValue)
+                                ? taskClusterElementValue.map((clusterElement) =>
+                                      clusterElement.name === workflowNodeName
+                                          ? removeConnection(clusterElement)
+                                          : clusterElement
+                                  )
+                                : removeConnection(taskClusterElementValue as ClusterElementItemType),
+                        },
+                    } as WorkflowTaskType;
                 }),
             };
         } else {
