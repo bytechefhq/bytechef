@@ -25,27 +25,14 @@ import static com.bytechef.component.ftp.constant.FtpConstants.PORT;
 import static com.bytechef.component.ftp.constant.FtpConstants.SFTP;
 import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.ByteArrayInputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
-import org.testcontainers.containers.FixedHostPortGenericContainer;
 
 /**
  * Integration tests for {@link FtpUploadFileAction} using real FTP and SFTP servers spun up via Testcontainers.
@@ -53,66 +40,7 @@ import org.testcontainers.containers.FixedHostPortGenericContainer;
  * @author Igor Beslic
  */
 @SpringJUnitConfig(FtpUploadActionIntTest.TestConfig.class)
-@SuppressFBWarnings("HARD_CODE_PASSWORD")
-public class FtpUploadActionIntTest {
-
-    @Configuration
-    static class TestConfig {
-    }
-
-    /**
-     * Shared credentials for both containers. Password must satisfy Alpine Linux's strength requirements used by
-     * {@code delfer/alpine-ftp-server}'s entrypoint.
-     */
-    @Value("${bytechef.test.ftp.password:T3st@Pass123}")
-    private String ftpPassword;
-    @Value("${bytechef.test.ftp.username:ftpuser}")
-    private String ftpUsername;
-    @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-    @Value("${bytechef.test.ftp.host.ip:127.0.0.1}")
-    private String ftpHostIp;
-
-    /**
-     * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
-     * the FTP server embeds this port in its PASV response, so the host-side port must match the container port
-     * exactly.
-     */
-    private static final int PASSIVE_DATA_PORT = 30121;
-
-    private static final String TEST_CONTENT = "Hello from FTP Integration Test!";
-    private static final String TEST_FILENAME = "test-document.txt";
-
-    /**
-     * Pure-FTPd container. The {@code ADDRESS} env-var forces the PASV response to advertise {@code 127.0.0.1} so that
-     * the FTP client always connects to the host loopback. The passive port range is collapsed to a single value equal
-     * to {@link #PASSIVE_DATA_PORT} to make the fixed host-port binding deterministic.
-     * <p>
-     * {@link org.testcontainers.containers.FixedHostPortGenericContainer} is used because FTP passive mode requires the
-     * host port and container port to be identical: the server embeds the port number in the PASV response, so the FTP
-     * client connects directly to that port on the host — dynamic port mapping would break this contract.
-     */
-    @SuppressWarnings("deprecation")
-    private FixedHostPortGenericContainer<?> ftpContainer;
-
-    @BeforeEach
-    void setUpContainer() {
-        ftpContainer = new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
-            .withEnv("USERS", ftpUsername + "|" + ftpPassword)
-            .withEnv("ADDRESS", ftpHostIp)
-            .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
-            .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
-            .withExposedPorts(21)
-            .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
-
-        ftpContainer.start();
-    }
-
-    @AfterEach
-    void tearDownContainer() {
-        if (ftpContainer != null) {
-            ftpContainer.stop();
-        }
-    }
+public class FtpUploadActionIntTest extends BaseFtpActionIntTest {
 
     @Test
     void testUpload() throws Exception {
@@ -131,7 +59,7 @@ public class FtpUploadActionIntTest {
         FileEntry mockFileEntry = mockFileEntry();
 
         Parameters inputParameters =
-            MockParametersFactory.create(Map.of(PATH, "uploaded-" + TEST_FILENAME, FILE_ENTRY, mockFileEntry));
+            MockParametersFactory.create(Map.of(PATH, "uploaded-" + TEST_FILE_NAME, FILE_ENTRY, mockFileEntry));
 
         Map<String, Object> remoteFileSystemPerformResult =
             FtpUploadFileAction.perform(inputParameters, connectionParameters, getMockActionContext(mockFileEntry));
@@ -140,33 +68,5 @@ public class FtpUploadActionIntTest {
 
         Assertions.assertTrue(remoteFileSystemPerformResult.containsKey("remotePath"));
         Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get("success"));
-    }
-
-    private static FileEntry mockFileEntry() throws Exception {
-        FileEntry mockFileEntry = mock(FileEntry.class);
-        when(mockFileEntry.getName()).thenReturn(TEST_FILENAME);
-        when(mockFileEntry.getExtension()).thenReturn("txt");
-        when(mockFileEntry.getMimeType()).thenReturn("text/plain");
-
-        return mockFileEntry;
-    }
-
-    private static ActionContext getMockActionContext(FileEntry mockFileEntry) {
-        ActionContext context = mock(ActionContext.class);
-        Context.File mockContextFile = mock(Context.File.class);
-
-        when(
-            mockContextFile.getInputStream(mockFileEntry)).thenAnswer(
-                invocation -> new ByteArrayInputStream(TEST_CONTENT.getBytes(StandardCharsets.UTF_8)));
-
-        when(
-            context.file(any())).thenAnswer(
-                invocation -> {
-                    Context.ContextFunction<Context.File, FileEntry> fileFunction = invocation.getArgument(0);
-
-                    return fileFunction.apply(mockContextFile);
-                });
-
-        return context;
     }
 }
