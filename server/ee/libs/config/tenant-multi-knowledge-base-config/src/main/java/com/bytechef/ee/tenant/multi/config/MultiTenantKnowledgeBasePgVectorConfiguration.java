@@ -72,9 +72,10 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(prefix = "spring.liquibase", name = "enabled", havingValue = "true", matchIfMissing = true)
     MultiTenantPgVectorLoader knowledgeBaseMultiTenantPgVectorLoader(
-        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
-        PgVectorStoreProperties properties, TenantService tenantService) {
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate, PgVectorStoreProperties properties,
+        TenantService tenantService) {
 
         return new MultiTenantPgVectorLoader(
             pgVectorJdbcTemplate, properties, "kb_" + properties.getTableName(), tenantService);
