@@ -51,7 +51,7 @@
           message="Force Logger variable to be named as log and to be private, static, and final"
           class="net.sourceforge.pmd.lang.rule.xpath.XPathRule">
         <description>
-            Always decler Logger variable to be named as log and to be private, static, and final
+            Always declare a Logger variable named log with private, static, and final modifiers.
         </description>
         <properties>
             <property name="xpath">
@@ -62,7 +62,13 @@
                         (
                             VariableDeclarator/VariableId[@Name != 'log']
                             or
-                            ModifierList[@ExplicitModifiers != 'private,static,final']
+                            not(
+                                ModifierList[
+                                    @ExplicitModifiers = 'private'
+                                    and @ExplicitModifiers = 'static'
+                                    and @ExplicitModifiers = 'final'
+                                ]
+                            )
                         )
                     ]
                 </value>
@@ -71,14 +77,14 @@
         <priority>4</priority>
         <example>
             <![CDATA[
-                // BAD — stack trace silently discarded
+                // BAD — wrong variable name
                 private static final Logger logger = LoggerFactory.getLogger(YourClass.class);
-                // BAD — stack trace silently discarded
-                private static  Logger log = LoggerFactory.getLogger(YourClass.class);
-                // BAD — stack trace silently discarded
+                // BAD — missing final
+                private static Logger log = LoggerFactory.getLogger(YourClass.class);
+                // BAD — missing static and final
                 private Logger log = LoggerFactory.getLogger(YourClass.class);
 
-                // GOOD — full stack trace preserved
+                // GOOD
                 private static final Logger log = LoggerFactory.getLogger(YourClass.class);
             ]]>
         </example>
