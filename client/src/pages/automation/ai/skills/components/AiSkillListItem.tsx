@@ -8,30 +8,35 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
+import AiSkillEditDescriptionDialog from '@/pages/automation/ai/skills/components/AiSkillEditDescriptionDialog';
 import AiSkillRenameDialog from '@/pages/automation/ai/skills/components/AiSkillRenameDialog';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
-import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
+import {AlignLeftIcon, DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
 
 interface AiSkillListItemProps {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
+    onEditDescription: (id: string, description: string | null) => void;
     onRename: (id: string, newName: string, description?: string | null) => void;
     skill: AiSkill;
 }
 
-const AiSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiSkillListItemProps) => {
+const AiSkillListItem = ({deleteSkill, onDownload, onEditDescription, onRename, skill}: AiSkillListItemProps) => {
     const {
         handleClick,
         handleDeleteClick,
         handleDownloadClick,
+        handleEditDescriptionClick,
         handleRenameClick,
         setShowDeleteDialog,
+        setShowEditDescriptionDialog,
         setShowRenameDialog,
         showDeleteDialog,
+        showEditDescriptionDialog,
         showRenameDialog,
         skillColor,
-    } = useAiSkillListItem({deleteSkill, onDownload, onRename, skill});
+    } = useAiSkillListItem({deleteSkill, onDownload, onEditDescription, onRename, skill});
 
     return (
         <>
@@ -88,6 +93,11 @@ const AiSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiSkillList
                                 Rename
                             </DropdownMenuItem>
 
+                            <DropdownMenuItem onClick={() => setShowEditDescriptionDialog(true)}>
+                                <AlignLeftIcon className="mr-2 size-4" />
+                                Edit Description
+                            </DropdownMenuItem>
+
                             <DropdownMenuSeparator />
 
                             <DropdownMenuItem className="text-red-600" onClick={() => setShowDeleteDialog(true)}>
@@ -108,6 +118,14 @@ const AiSkillListItem = ({deleteSkill, onDownload, onRename, skill}: AiSkillList
                     currentName={skill.name}
                     onClose={() => setShowRenameDialog(false)}
                     onRename={handleRenameClick}
+                />
+            )}
+
+            {showEditDescriptionDialog && (
+                <AiSkillEditDescriptionDialog
+                    currentDescription={skill.description}
+                    onClose={() => setShowEditDescriptionDialog(false)}
+                    onSave={handleEditDescriptionClick}
                 />
             )}
         </>

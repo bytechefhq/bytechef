@@ -18,12 +18,20 @@ function getSkillColor(skillId: string): string {
 interface UseAiSkillListItemPropsI {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
+    onEditDescription: (id: string, description: string | null) => void;
     onRename: (id: string, newName: string, description?: string | null) => void;
     skill: AiSkill;
 }
 
-export default function useAiSkillListItem({deleteSkill, onDownload, onRename, skill}: UseAiSkillListItemPropsI) {
+export default function useAiSkillListItem({
+    deleteSkill,
+    onDownload,
+    onEditDescription,
+    onRename,
+    skill,
+}: UseAiSkillListItemPropsI) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+    const [showEditDescriptionDialog, setShowEditDescriptionDialog] = useState(false);
     const [showRenameDialog, setShowRenameDialog] = useState(false);
 
     const {openSkillDetail} = useAiSkillsStore();
@@ -50,6 +58,15 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onRename, s
         onDownload(skill.id, skill.name);
     }, [onDownload, skill.id, skill.name]);
 
+    const handleEditDescriptionClick = useCallback(
+        (description: string | null) => {
+            onEditDescription(skill.id, description);
+
+            setShowEditDescriptionDialog(false);
+        },
+        [onEditDescription, skill.id]
+    );
+
     const handleRenameClick = useCallback(
         (newName: string) => {
             onRename(skill.id, newName, skill.description);
@@ -65,10 +82,13 @@ export default function useAiSkillListItem({deleteSkill, onDownload, onRename, s
         handleClick,
         handleDeleteClick,
         handleDownloadClick,
+        handleEditDescriptionClick,
         handleRenameClick,
         setShowDeleteDialog,
+        setShowEditDescriptionDialog,
         setShowRenameDialog,
         showDeleteDialog,
+        showEditDescriptionDialog,
         showRenameDialog,
         skillColor,
     };

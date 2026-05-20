@@ -54,6 +54,19 @@ export default function useAiSkillsList(skills: AiSkill[]) {
         }
     }, []);
 
+    const editDescriptionSkill = useCallback(
+        (id: string, description: string | null) => {
+            const skill = skills.find((currentSkill) => currentSkill.id === id);
+
+            if (!skill) {
+                return;
+            }
+
+            updateAiSkillMutation.mutate({description: description || undefined, id, name: skill.name});
+        },
+        [skills, updateAiSkillMutation]
+    );
+
     const renameSkill = useCallback(
         (id: string, newName: string, description?: string | null) => {
             updateAiSkillMutation.mutate({description: description || undefined, id, name: newName});
@@ -63,6 +76,7 @@ export default function useAiSkillsList(skills: AiSkill[]) {
 
     return {
         deleteSkill,
+        editDescriptionSkill,
         filteredSkills,
         handleDownloadSkill,
         renameSkill,
