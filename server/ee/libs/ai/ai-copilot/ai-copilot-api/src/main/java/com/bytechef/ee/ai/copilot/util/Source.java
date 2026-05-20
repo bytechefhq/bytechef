@@ -14,5 +14,5 @@ package com.bytechef.ee.ai.copilot.util;
  */
 public enum Source {
 
-    WORKFLOW_EDITOR, CODE_EDITOR, CONVERTER, CLUSTER_ELEMENT
+    WORKFLOW_EDITOR, CODE_EDITOR, CONVERTER, CLUSTER_ELEMENT, SKILLS
 }
