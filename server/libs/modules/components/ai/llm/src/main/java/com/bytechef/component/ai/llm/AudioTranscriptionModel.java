@@ -18,13 +18,15 @@ package com.bytechef.component.ai.llm;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FILE;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.net.MalformedURLException;
 import org.springframework.ai.audio.transcription.AudioTranscriptionPrompt;
 import org.springframework.ai.audio.transcription.AudioTranscriptionResponse;
 import org.springframework.ai.model.Model;
-import org.springframework.core.io.UrlResource;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 
 /**
  * @author Marko Kriskovic
@@ -35,13 +37,13 @@ public interface AudioTranscriptionModel {
     Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> createAudioTranscriptionModel(
         Parameters inputParameters, Parameters connectionParameters);
 
-    default String getResponse(Parameters inputParameters, Parameters connectionParameters)
+    default String getResponse(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
         Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> transcriptionModel = createAudioTranscriptionModel(
             inputParameters, connectionParameters);
 
-        AudioTranscriptionPrompt transcriptionPrompt = getTranscriptionPrompt(inputParameters);
+        AudioTranscriptionPrompt transcriptionPrompt = getTranscriptionPrompt(inputParameters, context);
 
         AudioTranscriptionResponse response = transcriptionModel.call(transcriptionPrompt);
 
@@ -50,9 +52,13 @@ public interface AudioTranscriptionModel {
         return result.getOutput();
     }
 
-    private AudioTranscriptionPrompt getTranscriptionPrompt(Parameters inputParameters) throws MalformedURLException {
+    private AudioTranscriptionPrompt getTranscriptionPrompt(Parameters inputParameters, ActionContext context) {
         FileEntry fileEntry = inputParameters.getFileEntry(FILE);
 
-        return new AudioTranscriptionPrompt(new UrlResource(fileEntry.getUrl()));
+        byte[] bytes = context.file(file -> file.readAllBytes(fileEntry));
+
+        Resource resource = new ByteArrayResource(bytes);
+
+        return new AudioTranscriptionPrompt(resource);
     }
 }

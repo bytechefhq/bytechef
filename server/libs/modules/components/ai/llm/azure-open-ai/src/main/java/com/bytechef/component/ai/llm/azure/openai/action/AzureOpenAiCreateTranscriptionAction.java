@@ -97,7 +97,7 @@ public class AzureOpenAiCreateTranscriptionAction {
     public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
-        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters);
+        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters, context);
     }
 
     private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
