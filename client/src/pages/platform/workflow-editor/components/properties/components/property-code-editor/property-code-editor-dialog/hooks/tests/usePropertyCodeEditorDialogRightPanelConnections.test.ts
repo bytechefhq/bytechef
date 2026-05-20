@@ -41,11 +41,15 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => 
     default: () => hoisted.storeState.rootClusterElementNodeData,
 }));
 
-vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
-    default: {
-        getState: () => ({setWorkflow: hoisted.mockSetWorkflow}),
-    },
-}));
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => {
+    const workflowDataState = {setWorkflow: hoisted.mockSetWorkflow};
+
+    const useWorkflowDataStore = (selector?: (state: unknown) => unknown) => selector?.(workflowDataState);
+
+    useWorkflowDataStore.getState = () => workflowDataState;
+
+    return {default: useWorkflowDataStore};
+});
 
 vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({
@@ -513,7 +517,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
 
             act(() => {
-                mutateOptions.onSuccess();
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
             });
 
             expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
@@ -565,7 +569,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
 
             act(() => {
-                mutateOptions.onSuccess();
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
             });
 
             expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
@@ -585,7 +589,7 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
             const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
 
             act(() => {
-                mutateOptions.onSuccess();
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
             });
 
             expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
