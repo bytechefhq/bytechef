@@ -13330,6 +13330,30 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": false,
+      "description": "Whether to watch subfolders recursively. If false, only the specified folder will be watched. May return many results.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Recursive",
+      "metadata": { },
+      "name": "recursive",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": false,
+      "type": "BOOLEAN"
     } ],
     "title": "New File",
     "type": "POLLING",
