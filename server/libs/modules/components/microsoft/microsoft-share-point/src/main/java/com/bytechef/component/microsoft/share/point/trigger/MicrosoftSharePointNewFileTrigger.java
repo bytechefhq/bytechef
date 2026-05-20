@@ -72,9 +72,7 @@ public class MicrosoftSharePointNewFileTrigger {
             inputParameters.getString(PARENT_FOLDER, "root"));
 
         return MicrosoftTriggerUtils.poll(
-            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children",
-            "file",
-            closureParameters,
+            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children", "file", closureParameters,
             context);
     }
 }

@@ -67,9 +67,7 @@ public class MicrosoftOneDriveNewFileTrigger {
         String url = "/me/drive/items/%s/".formatted(getFolderId(inputParameters.getString(PARENT_ID)));
 
         return MicrosoftTriggerUtils.poll(
-            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children",
-            "file",
-            closureParameters,
+            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children", "file", closureParameters,
             context);
     }
 }
