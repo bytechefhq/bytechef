@@ -19,9 +19,10 @@ interface CopilotPanelProps {
     headerClassName?: string;
     onClose?: () => void;
     open: boolean;
+    source?: Source;
 }
 
-const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<CopilotPanelProps, 'open'>) => {
+const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit<CopilotPanelProps, 'open'>) => {
     const {context, generateConversationId, resetMessages, setContext} = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
@@ -70,34 +71,36 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
                 </div>
 
                 <div className="flex items-center gap-1">
-                    <ToggleGroup
-                        className="gap-0 rounded-md"
-                        onValueChange={(value) => {
-                            if (value) {
-                                setContext({
-                                    ...context,
-                                    mode: value as MODE,
-                                });
-                            }
-                        }}
-                        type="single"
-                        value={context?.mode}
-                        variant="outline"
-                    >
-                        <ToggleGroupItem
-                            className="h-7 rounded-none rounded-l-md border-r-0 bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
-                            value={MODE.ASK}
+                    {!source && (
+                        <ToggleGroup
+                            className="gap-0 rounded-md"
+                            onValueChange={(value) => {
+                                if (value) {
+                                    setContext({
+                                        ...context,
+                                        mode: value as MODE,
+                                    });
+                                }
+                            }}
+                            type="single"
+                            value={context?.mode}
+                            variant="outline"
                         >
-                            {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
-                        </ToggleGroupItem>
+                            <ToggleGroupItem
+                                className="h-7 rounded-none rounded-l-md border-r-0 bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                                value={MODE.ASK}
+                            >
+                                {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
+                            </ToggleGroupItem>
 
-                        <ToggleGroupItem
-                            className="h-7 rounded-none rounded-r-md bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
-                            value={MODE.BUILD}
-                        >
-                            {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
-                        </ToggleGroupItem>
-                    </ToggleGroup>
+                            <ToggleGroupItem
+                                className="h-7 rounded-none rounded-r-md bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                                value={MODE.BUILD}
+                            >
+                                {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
+                            </ToggleGroupItem>
+                        </ToggleGroup>
+                    )}
 
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -117,7 +120,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
             </div>
 
             <div className="absolute inset-x-0 bottom-0 top-16 -mx-1">
-                <CopilotRuntimeProvider>
+                <CopilotRuntimeProvider source={source}>
                     <Thread />
                 </CopilotRuntimeProvider>
             </div>
@@ -125,7 +128,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose}: Omit<Copilot
     );
 };
 
-const CopilotPanel = ({className, headerClassName, onClose, open}: CopilotPanelProps) => {
+const CopilotPanel = ({className, headerClassName, onClose, open, source}: CopilotPanelProps) => {
     const [shouldRender, setShouldRender] = useState(open);
     const [isVisible, setIsVisible] = useState(open);
 
@@ -187,6 +190,7 @@ const CopilotPanel = ({className, headerClassName, onClose, open}: CopilotPanelP
                         className={contentClassName}
                         headerClassName={headerClassName}
                         onClose={onClose}
+                        source={source}
                     />
                 )}
             </div>

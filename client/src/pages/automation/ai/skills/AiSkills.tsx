@@ -1,15 +1,20 @@
+import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {SearchIcon} from 'lucide-react';
-import {useEffect} from 'react';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {SearchIcon, SparklesIcon} from 'lucide-react';
+import {useEffect, useState} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
-type AiSkillsRouteType = 'createWithAi' | 'detail' | 'list' | 'uploadForm' | 'writeForm';
+type AiSkillsRouteType = 'detail' | 'list' | 'uploadForm' | 'writeForm';
 
 const SKILLS_BASE_PATH = '/automation/ai/skills';
 
@@ -20,10 +25,6 @@ const determineRoute = (pathname: string, skillId: string | undefined): AiSkills
 
     if (pathname.endsWith('/create/upload')) {
         return 'uploadForm';
-    }
-
-    if (pathname.endsWith('/create/ai')) {
-        return 'createWithAi';
     }
 
     if (skillId) {
@@ -47,6 +48,10 @@ const AiSkills = () => {
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
 
+    const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
+
+    const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
     const route = determineRoute(location.pathname, skillId);
 
     useEffect(() => {
@@ -59,7 +64,7 @@ const AiSkills = () => {
 
     useEffect(() => {
         if (route === 'list') {
-            if (skillsView === 'createWithAi' || skillsView === 'uploadForm' || skillsView === 'writeForm') {
+            if (skillsView === 'uploadForm' || skillsView === 'writeForm') {
                 setSkillsView('list');
             }
         } else if (route !== 'detail' && skillsView !== route) {
@@ -92,6 +97,22 @@ const AiSkills = () => {
             </div>
 
             <AiSkillsCreateDropdown />
+
+            {ff_4554 && (
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            className="[&_svg]:size-5"
+                            icon={<SparklesIcon />}
+                            onClick={() => setCopilotPanelOpen(true)}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Open Copilot panel</TooltipContent>
+                </Tooltip>
+            )}
         </div>
     ) : undefined;
 
@@ -102,8 +123,17 @@ const AiSkills = () => {
             leftSidebarHeader={<Header position="sidebar" title="AI" />}
             leftSidebarWidth="64"
         >
-            <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
-                <AiSkillsPanel />
+            <div className="flex min-h-0 flex-1 overflow-hidden">
+                <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
+                    <AiSkillsPanel />
+                </div>
+
+                <CopilotPanel
+                    className="h-full border-l border-l-border/50"
+                    onClose={() => setCopilotPanelOpen(false)}
+                    open={copilotPanelOpen}
+                    source={Source.SKILLS}
+                />
             </div>
         </LayoutContainer>
     );
