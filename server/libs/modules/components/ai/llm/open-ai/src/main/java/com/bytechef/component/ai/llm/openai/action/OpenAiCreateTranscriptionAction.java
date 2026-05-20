@@ -121,6 +121,6 @@ public class OpenAiCreateTranscriptionAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context)
         throws MalformedURLException {
 
-        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters);
+        return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters, context);
     }
 }

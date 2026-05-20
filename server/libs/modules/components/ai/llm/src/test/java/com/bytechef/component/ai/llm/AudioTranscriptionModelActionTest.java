@@ -71,6 +71,9 @@ public class AudioTranscriptionModelActionTest extends AbstractActionTest {
         when(mockedTranscription.createAudioTranscriptionModel(mockedParameters, mockedParameters))
             .thenReturn(mockedTranscriptModel);
 
+        when(mockedActionContext.file(any()))
+            .thenReturn(new byte[] {});
+
         AudioTranscriptionResponse transcriptionResponse = new AudioTranscriptionResponse(
             new org.springframework.ai.audio.transcription.AudioTranscription(ANSWER));
 
@@ -78,7 +81,7 @@ public class AudioTranscriptionModelActionTest extends AbstractActionTest {
 
         when(mockedTranscriptModel.call(any(AudioTranscriptionPrompt.class))).thenReturn(mockedTranscriptionResponse);
 
-        String response = mockedTranscription.getResponse(mockedParameters, mockedParameters);
+        String response = mockedTranscription.getResponse(mockedParameters, mockedParameters, mockedActionContext);
 
         assertEquals(ANSWER, response);
     }
