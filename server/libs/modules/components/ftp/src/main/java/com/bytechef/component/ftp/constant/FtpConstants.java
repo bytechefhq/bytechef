@@ -25,10 +25,13 @@ public class FtpConstants {
     }
 
     public static final String CREATE_DIRECTORIES = "createDirectories";
+    public static final String DELETED_PATH = "deletedPath";
     public static final String SFTP = "sftp";
     public static final String FILE_ENTRY = "fileEntry";
     public static final String FILENAME = "filename";
     public static final String HOST = "host";
+    public static final String MODIFIED_AT = "modifiedAt";
+    public static final String NAME = "name";
     public static final String NEW_PATH = "newPath";
     public static final String OLD_PATH = "oldPath";
     public static final String PASSIVE_MODE = "passiveMode";
@@ -36,5 +39,9 @@ public class FtpConstants {
     public static final String PATH = "path";
     public static final String PORT = "port";
     public static final String RECURSIVE = "recursive";
+    public static final String REMOTE_PATH = "remotePath";
+    public static final String SIZE = "size";
+    public static final String SUCCESS = "success";
+    public static final String TYPE = "type";
     public static final String USERNAME = "username";
 }

@@ -22,7 +22,9 @@ import static com.bytechef.component.ftp.constant.FtpConstants.PASSIVE_MODE;
 import static com.bytechef.component.ftp.constant.FtpConstants.PASSWORD;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.PORT;
+import static com.bytechef.component.ftp.constant.FtpConstants.REMOTE_PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.SFTP;
+import static com.bytechef.component.ftp.constant.FtpConstants.SUCCESS;
 import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -66,7 +68,7 @@ public class FtpUploadActionIntTest extends BaseFtpActionIntTest {
 
         assertEquals(2, remoteFileSystemPerformResult.size());
 
-        Assertions.assertTrue(remoteFileSystemPerformResult.containsKey("remotePath"));
-        Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get("success"));
+        Assertions.assertTrue(remoteFileSystemPerformResult.containsKey(REMOTE_PATH));
+        Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get(SUCCESS));
     }
 }

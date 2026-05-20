@@ -17,12 +17,16 @@
 package com.bytechef.component.ftp.action;
 
 import static com.bytechef.component.ftp.constant.FtpConstants.HOST;
+import static com.bytechef.component.ftp.constant.FtpConstants.MODIFIED_AT;
+import static com.bytechef.component.ftp.constant.FtpConstants.NAME;
 import static com.bytechef.component.ftp.constant.FtpConstants.PASSIVE_MODE;
 import static com.bytechef.component.ftp.constant.FtpConstants.PASSWORD;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.PORT;
 import static com.bytechef.component.ftp.constant.FtpConstants.RECURSIVE;
 import static com.bytechef.component.ftp.constant.FtpConstants.SFTP;
+import static com.bytechef.component.ftp.constant.FtpConstants.SIZE;
+import static com.bytechef.component.ftp.constant.FtpConstants.TYPE;
 import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -61,12 +65,12 @@ public class FtpListActionIntTest extends BaseFtpActionIntTest {
         assertEquals(7, remoteFileSystemEntryList.size());
 
         remoteFileSystemEntryList.forEach(stringObjectMap -> {
-            Assertions.assertTrue(stringObjectMap.containsKey("path"));
-            Assertions.assertTrue(stringObjectMap.containsKey("type"));
-            Assertions.assertTrue(stringObjectMap.containsKey("size"));
-            Assertions.assertTrue(stringObjectMap.containsKey("modifiedAt"));
+            Assertions.assertTrue(stringObjectMap.containsKey(PATH));
+            Assertions.assertTrue(stringObjectMap.containsKey(TYPE));
+            Assertions.assertTrue(stringObjectMap.containsKey(SIZE));
+            Assertions.assertTrue(stringObjectMap.containsKey(MODIFIED_AT));
 
-            String fileName = (String) stringObjectMap.get("name");
+            String fileName = (String) stringObjectMap.get(NAME);
 
             Assertions.assertTrue(fileName.contains(TEST_FILE_BASE_NAME),
                 "File name " + fileName + " should contain " + TEST_FILE_BASE_NAME);
@@ -92,12 +96,12 @@ public class FtpListActionIntTest extends BaseFtpActionIntTest {
         assertEquals(7, remoteFileSystemEntryList.size());
 
         remoteFileSystemEntryList.forEach(stringObjectMap -> {
-            Assertions.assertTrue(stringObjectMap.containsKey("path"));
-            Assertions.assertTrue(stringObjectMap.containsKey("type"));
-            Assertions.assertTrue(stringObjectMap.containsKey("size"));
-            Assertions.assertTrue(stringObjectMap.containsKey("modifiedAt"));
+            Assertions.assertTrue(stringObjectMap.containsKey(PATH));
+            Assertions.assertTrue(stringObjectMap.containsKey(TYPE));
+            Assertions.assertTrue(stringObjectMap.containsKey(SIZE));
+            Assertions.assertTrue(stringObjectMap.containsKey(MODIFIED_AT));
 
-            String fileName = (String) stringObjectMap.get("name");
+            String fileName = (String) stringObjectMap.get(NAME);
 
             Assertions.assertTrue(fileName.contains(TEST_FILE_BASE_NAME),
                 "File name " + fileName + " should contain " + TEST_FILE_BASE_NAME);

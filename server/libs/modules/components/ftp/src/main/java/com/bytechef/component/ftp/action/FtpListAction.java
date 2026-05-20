@@ -23,8 +23,12 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.ftp.constant.FtpConstants.MODIFIED_AT;
+import static com.bytechef.component.ftp.constant.FtpConstants.NAME;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.RECURSIVE;
+import static com.bytechef.component.ftp.constant.FtpConstants.SIZE;
+import static com.bytechef.component.ftp.constant.FtpConstants.TYPE;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -63,11 +67,11 @@ public class FtpListAction {
                     .items(
                         object()
                             .properties(
-                                string("name").description("Name of the file or directory."),
-                                string("path").description("Full path to the file or directory."),
-                                string("type").description("Type: 'file' or 'directory'."),
-                                integer("size").description("Size in bytes (for files)."),
-                                string("modifiedAt").description("Last modified timestamp.")))))
+                                string(NAME).description("Name of the file or directory."),
+                                string(PATH).description("Full path to the file or directory."),
+                                string(TYPE).description("Type: 'file' or 'directory'."),
+                                integer(SIZE).description("Size in bytes (for files)."),
+                                string(MODIFIED_AT).description("Last modified timestamp.")))))
         .perform(FtpListAction::perform);
 
     private FtpListAction() {
@@ -101,11 +105,11 @@ public class FtpListAction {
 
             Map<String, Object> fileInfo = new HashMap<>();
 
-            fileInfo.put("name", file.name());
-            fileInfo.put("path", file.path());
-            fileInfo.put("type", type);
-            fileInfo.put("size", file.size());
-            fileInfo.put("modifiedAt", file.modifiedAt() != null ? file.modifiedAt()
+            fileInfo.put(NAME, file.name());
+            fileInfo.put(PATH, file.path());
+            fileInfo.put(TYPE, type);
+            fileInfo.put(SIZE, file.size());
+            fileInfo.put(MODIFIED_AT, file.modifiedAt() != null ? file.modifiedAt()
                 .toString() : null);
 
             results.add(fileInfo);

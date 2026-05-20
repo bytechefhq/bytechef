@@ -16,12 +16,14 @@
 
 package com.bytechef.component.ftp.action;
 
+import static com.bytechef.component.ftp.constant.FtpConstants.DELETED_PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.HOST;
 import static com.bytechef.component.ftp.constant.FtpConstants.PASSIVE_MODE;
 import static com.bytechef.component.ftp.constant.FtpConstants.PASSWORD;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.PORT;
 import static com.bytechef.component.ftp.constant.FtpConstants.SFTP;
+import static com.bytechef.component.ftp.constant.FtpConstants.SUCCESS;
 import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -59,8 +61,8 @@ public class FtpDeleteActionIntTest extends BaseFtpActionIntTest {
 
         assertEquals(2, remoteFileSystemPerformResult.size());
 
-        Assertions.assertTrue(remoteFileSystemPerformResult.containsKey("deletedPath"));
-        Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get("success"));
+        Assertions.assertTrue(remoteFileSystemPerformResult.containsKey(DELETED_PATH));
+        Assertions.assertTrue((Boolean) remoteFileSystemPerformResult.get(SUCCESS));
     }
 
 }
