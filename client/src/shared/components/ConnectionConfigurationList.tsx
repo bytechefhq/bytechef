@@ -17,6 +17,7 @@ interface ConnectionConfigurationListFormFieldProps {
     connections: ConnectionI[];
     control: Control<FieldValues>;
     currentConnectionId?: number;
+    enforceRequiredConnection: boolean;
     fieldNamePrefix: string;
     groupedIndices?: number[];
     index: number;
@@ -31,6 +32,7 @@ const ConnectionConfigurationListFormField = ({
     connections,
     control,
     currentConnectionId,
+    enforceRequiredConnection,
     fieldNamePrefix,
     groupedIndices,
     handleConnectionDialogOpen,
@@ -113,7 +115,7 @@ const ConnectionConfigurationListFormField = ({
                     >
                         <FormControl>
                             <div className="flex space-x-2 bg-surface-neutral-primary">
-                                <SelectTrigger>
+                                <SelectTrigger className="min-w-0 flex-1">
                                     {currentConnectionId ? (
                                         <SelectValue placeholder="Select a connection..." />
                                     ) : (
@@ -127,9 +129,9 @@ const ConnectionConfigurationListFormField = ({
 
                                 {connectionDialogAllowed && (
                                     <Button
-                                        className="mt-auto p-2"
                                         icon={<PlusIcon className="size-5" />}
                                         onClick={openConnectionDialog}
+                                        size="icon"
                                         title="Create a new connection"
                                         type="button"
                                         variant="outline"
@@ -138,22 +140,28 @@ const ConnectionConfigurationListFormField = ({
                             </div>
                         </FormControl>
 
-                        <SelectContent>
+                        <SelectContent className="w-[var(--radix-select-trigger-width)]">
                             <SelectItem value="null">Select a connection...</SelectItem>
 
                             {connectionList.map((connection) => (
                                 <SelectItem
-                                    className="flex items-center"
+                                    className="flex [&>span:last-child]:min-w-0 [&>span:last-child]:flex-1"
                                     key={connection.id}
                                     value={connection.id!.toString()}
                                 >
-                                    <span className="mr-1">{connection.name}</span>
+                                    <div className="flex min-w-0 items-center gap-1">
+                                        <span className="min-w-0 flex-1 truncate">{connection.name}</span>
 
-                                    <span className="text-xs text-content-neutral-secondary">
-                                        {connection?.tags?.map((tag) => tag.name).join(', ')}
-                                    </span>
+                                        {connection?.tags && connection.tags.length > 0 && (
+                                            <span className="shrink-0 text-xs text-content-neutral-secondary">
+                                                {connection.tags.map((tag) => tag.name).join(', ')}
+                                            </span>
+                                        )}
 
-                                    <EnvironmentBadge environmentId={connection.environmentId!} />
+                                        <span className="shrink-0">
+                                            <EnvironmentBadge environmentId={connection.environmentId!} />
+                                        </span>
+                                    </div>
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -171,7 +179,7 @@ const ConnectionConfigurationListFormField = ({
                 </FormItem>
             )}
             rules={{
-                required: componentConnection.required,
+                required: enforceRequiredConnection && componentConnection.required,
             }}
         />
     );
@@ -183,6 +191,7 @@ interface ConnectionConfigurationListProps {
     connections?: ConnectionI[];
     connectionsGrouped?: boolean;
     control: Control<FieldValues>;
+    enforceRequiredConnection?: boolean;
     fieldNamePrefix?: string;
     getCurrentConnectionId?: (index: number) => number | undefined;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
@@ -196,6 +205,7 @@ const ConnectionConfigurationList = ({
     connections,
     connectionsGrouped = false,
     control,
+    enforceRequiredConnection = true,
     fieldNamePrefix = 'connections',
     getCurrentConnectionId,
     handleConnectionDialogOpen,
@@ -270,6 +280,7 @@ const ConnectionConfigurationList = ({
                     connections={connections!}
                     control={control}
                     currentConnectionId={getCurrentConnectionId?.(index)}
+                    enforceRequiredConnection={enforceRequiredConnection}
                     fieldNamePrefix={fieldNamePrefix}
                     groupedIndices={groupedIndices}
                     handleConnectionDialogOpen={handleConnectionDialogOpen}

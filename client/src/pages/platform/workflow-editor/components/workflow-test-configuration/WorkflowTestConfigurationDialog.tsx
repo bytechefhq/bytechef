@@ -200,14 +200,18 @@ const WorkflowTestConfigurationDialog = ({
                             </TabsTrigger>
                         </TabsList>
 
-                        <form onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}>
-                            <TabsContent className="mt-0 px-6 py-2.5" value="connections">
+                        <form
+                            id="workflow-test-configuration-form"
+                            onSubmit={handleSubmit((values) => saveWorkflowTestConfiguration(values))}
+                        >
+                            <TabsContent className="mt-2 px-6 py-2.5" value="connections">
                                 <ConnectionConfigurationList
                                     componentConnections={componentConnections}
                                     connectionDialogAllowed={connectionDialogAllowed}
                                     connections={connections}
                                     connectionsGrouped={connectionsGrouped}
                                     control={control as unknown as Control<FieldValues>}
+                                    enforceRequiredConnection={false}
                                     getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
                                     handleConnectionDialogOpen={(componentConnection) => {
                                         setComponentConnection(componentConnection);
@@ -215,13 +219,15 @@ const WorkflowTestConfigurationDialog = ({
                                         setShowNewConnectionDialog(true);
                                     }}
                                     handleConnectionIdChange={(index, connectionId) =>
-                                        setValue(`connections.${index}.connectionId`, connectionId)
+                                        setValue(`connections.${index}.connectionId`, connectionId, {
+                                            shouldDirty: true,
+                                        })
                                     }
                                     workflow={workflow}
                                 />
                             </TabsContent>
 
-                            <TabsContent className="mt-0 px-6 py-3" value="inputs">
+                            <TabsContent className="mt-2 px-6 py-2.5" value="inputs">
                                 <InputConfigurationList
                                     control={control as unknown as Control<FieldValues>}
                                     controlPath="inputs"
@@ -257,7 +263,22 @@ const WorkflowTestConfigurationDialog = ({
                         <Button label="Cancel" type="button" variant="outline" />
                     </DialogClose>
 
-                    <Button label="Save" type="submit" />
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <div>
+                                <Button
+                                    disabled={!formState.isDirty || saveWorkflowTestConfigurationMutation.isPending}
+                                    form="workflow-test-configuration-form"
+                                    label="Save"
+                                    type="submit"
+                                />
+                            </div>
+                        </TooltipTrigger>
+
+                        <TooltipContent>
+                            {!formState.isDirty ? 'Nothing to save.' : 'Save workflow test configuration.'}
+                        </TooltipContent>
+                    </Tooltip>
                 </DialogFooter>
 
                 {showNewConnectionDialog && componentDefinitions && (
