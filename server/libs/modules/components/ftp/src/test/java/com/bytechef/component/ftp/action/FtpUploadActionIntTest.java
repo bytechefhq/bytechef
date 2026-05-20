@@ -42,7 +42,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
@@ -60,12 +59,12 @@ public class FtpUploadActionIntTest {
      * {@code delfer/alpine-ftp-server}'s entrypoint.
      */
     @Value("${bytechef.test.ftp.password}")
-    private static String ftpPassword;
+    private String ftpPassword;
     @Value("${bytechef.test.ftp.username}")
-    private static String ftpUsername;
+    private String ftpUsername;
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
     @Value("${bytechef.test.ftp.host.ip}")
-    private static String ftpHostIp = "127.0.0.1";
+    private String ftpHostIp;
 
     /**
      * Single passive-mode data port shared by the FTP container and the host. Using a fixed port is required because
@@ -78,15 +77,6 @@ public class FtpUploadActionIntTest {
     private static final String TEST_FILENAME = "test-document.txt";
 
     /**
-     * {@code delfer/alpine-ftp-server} runs Pure-FTPd without per-user chroot. After login the server CWD is the user's
-     * home directory ({@code /ftp/<username>/}). Absolute paths resolve against the real filesystem root, so a relative
-     * path (no leading slash) is used here to land in the correct directory.
-     */
-    private static final String FTP_REMOTE_PATH = TEST_FILENAME;
-    private static final String SFTP_UPLOAD_DIR = "upload";
-    private static final String SFTP_REMOTE_PATH = "/" + SFTP_UPLOAD_DIR + "/" + TEST_FILENAME;
-
-    /**
      * Pure-FTPd container. The {@code ADDRESS} env-var forces the PASV response to advertise {@code 127.0.0.1} so that
      * the FTP client always connects to the host loopback. The passive port range is collapsed to a single value equal
      * to {@link #PASSIVE_DATA_PORT} to make the fixed host-port binding deterministic.
@@ -97,7 +87,7 @@ public class FtpUploadActionIntTest {
      */
     @Container
     @SuppressWarnings("deprecation")
-    static final FixedHostPortGenericContainer<?> ftpContainer =
+    protected FixedHostPortGenericContainer<?> ftpContainer =
         new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
             .withEnv("USERS", ftpUsername + "|" + ftpPassword)
             .withEnv("ADDRESS", ftpHostIp)
@@ -106,17 +96,12 @@ public class FtpUploadActionIntTest {
             .withExposedPorts(21)
             .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
 
-    /**
-     * OpenSSH/SFTP container (atmoz/sftp). The command argument creates user {@code ftpuser} and an {@code upload}
-     * subdirectory inside the user's chroot. SFTP uses a single SSH port so there is no passive-mode complexity.
-     */
-    @Container
-    static final GenericContainer<?> sftpContainer = new GenericContainer<>("atmoz/sftp:latest")
-        .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
-        .withExposedPorts(22);
-
     @Test
     void testUpload() throws Exception {
+        Assertions.assertNotNull(ftpPassword);
+        Assertions.assertNotNull(ftpUsername);
+        Assertions.assertNotNull(ftpHostIp);
+
         Parameters connectionParameters = MockParametersFactory.create(Map.of(
             HOST, ftpHostIp,
             PORT, ftpContainer.getMappedPort(21),
