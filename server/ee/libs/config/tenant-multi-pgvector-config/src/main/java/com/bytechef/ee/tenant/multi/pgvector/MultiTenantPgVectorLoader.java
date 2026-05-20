@@ -31,18 +31,20 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
     private static final Logger log = LoggerFactory.getLogger(MultiTenantPgVectorLoader.class);
 
     private static final Pattern IDENTIFIER_PATTERN = Pattern.compile("^[a-zA-Z_][a-zA-Z0-9_]*$");
-    private static final String TABLE_NAME = "kb_vector_store";
 
     private final JdbcTemplate jdbcTemplate;
     private final PgVectorStoreProperties properties;
+    private final String tableName;
     private final TenantService tenantService;
 
     @SuppressFBWarnings("EI")
     public MultiTenantPgVectorLoader(
-        JdbcTemplate jdbcTemplate, PgVectorStoreProperties properties, TenantService tenantService) {
+        JdbcTemplate jdbcTemplate, PgVectorStoreProperties properties, String tableName,
+        TenantService tenantService) {
 
         this.jdbcTemplate = jdbcTemplate;
         this.properties = properties;
+        this.tableName = tableName;
         this.tenantService = tenantService;
     }
 
@@ -73,8 +75,9 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
         String schemaName = TenantContext.getCurrentDatabaseSchema("vectorstore");
 
         validateIdentifier(schemaName);
+        validateIdentifier(tableName);
 
-        log.info("Initializing PgVectorStore schema for table: {} in schema: {}", TABLE_NAME, schemaName);
+        log.info("Initializing PgVectorStore schema for table: {} in schema: {}", tableName, schemaName);
 
         jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector");
         jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS hstore");
@@ -86,12 +89,12 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
         jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS " + schemaName);
 
         if (properties.isRemoveExistingVectorStoreTable()) {
-            jdbcTemplate.execute("DROP TABLE IF EXISTS " + schemaName + "." + TABLE_NAME);
+            jdbcTemplate.execute("DROP TABLE IF EXISTS " + schemaName + "." + tableName);
         }
 
         String idColumnType = properties.getIdType() == PgVectorStore.PgIdType.UUID ? "uuid" : "text";
 
-        String createTableSql = "CREATE TABLE IF NOT EXISTS " + schemaName + "." + TABLE_NAME + " (" +
+        String createTableSql = "CREATE TABLE IF NOT EXISTS " + schemaName + "." + tableName + " (" +
             "id " + idColumnType + " PRIMARY KEY, " +
             "content text, " +
             "metadata json, " +
@@ -100,14 +103,14 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
         jdbcTemplate.execute(createTableSql);
 
         if (properties.getIndexType() != PgVectorStore.PgIndexType.NONE) {
-            String indexName = TABLE_NAME + "_embedding_idx";
+            String indexName = tableName + "_embedding_idx";
             String indexType = properties.getIndexType()
                 .name()
                 .toLowerCase();
             String distanceType = properties.getDistanceType().index;
 
             String createIndexSql = "CREATE INDEX IF NOT EXISTS " + indexName +
-                " ON " + schemaName + "." + TABLE_NAME +
+                " ON " + schemaName + "." + tableName +
                 " USING " + indexType + " (embedding public." + distanceType + ")";
 
             jdbcTemplate.execute(createIndexSql);
