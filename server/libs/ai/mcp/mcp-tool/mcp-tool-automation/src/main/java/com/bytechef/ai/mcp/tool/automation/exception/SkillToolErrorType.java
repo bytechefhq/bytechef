@@ -30,6 +30,7 @@ public class SkillToolErrorType extends AbstractErrorType {
     public static final SkillToolErrorType GET_SKILL_FILE_PATHS = new SkillToolErrorType(104);
     public static final SkillToolErrorType LIST_SKILLS = new SkillToolErrorType(105);
     public static final SkillToolErrorType UPDATE_SKILL = new SkillToolErrorType(106);
+    public static final SkillToolErrorType UPDATE_SKILL_CONTENT = new SkillToolErrorType(107);
 
     private SkillToolErrorType(int errorKey) {
         super(SkillToolErrorType.class, errorKey);

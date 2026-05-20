@@ -17,6 +17,7 @@
 package com.bytechef.ee.platform.ai.skill.service;
 
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
+import com.bytechef.file.storage.domain.FileEntry;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -36,4 +37,6 @@ public interface AiSkillService {
     List<AiSkill> getAiSkills();
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
+
+    AiSkill updateAiSkillFile(long id, FileEntry fileEntry);
 }

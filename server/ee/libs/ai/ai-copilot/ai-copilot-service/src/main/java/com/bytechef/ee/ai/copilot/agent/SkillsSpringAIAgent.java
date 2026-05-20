@@ -14,16 +14,14 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
+import java.util.function.Function;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
-
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.UUID;
-import java.util.function.Function;
 
 /**
  * @version ee
