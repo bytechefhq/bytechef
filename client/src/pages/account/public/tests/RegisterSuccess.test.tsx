@@ -53,12 +53,22 @@ afterEach(() => {
     resetAll();
 });
 
-it('should render the register success page', () => {
+it('should render the register success page once the account is ready', () => {
+    mockActivateStore({activationSuccess: true});
+
     renderRegisterSuccessPage();
 
     expect(screen.getByText('Account created successfully')).toBeInTheDocument();
     expect(screen.getByText("You're ready to start using ByteChef.")).toBeInTheDocument();
-    expect(screen.getByRole('button', {name: 'Start'})).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Start'})).toBeEnabled();
+});
+
+it('should render the preparing state until the account is ready', () => {
+    renderRegisterSuccessPage();
+
+    expect(screen.getByText('Account is preparing...')).toBeInTheDocument();
+    expect(screen.getByText('Please wait until the account is ready')).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Start'})).toBeDisabled();
 });
 
 it('should call activate with the key from URL params', () => {
@@ -113,22 +123,9 @@ it('should navigate to error page when activationFailure is true', async () => {
     });
 });
 
-it('should show loading state when loading is true', () => {
-    mockActivateStore({
-        loading: true,
-    });
-
-    renderRegisterSuccessPage();
-
-    const startButton = screen.getByRole('button', {name: 'Start'});
-
-    expect(startButton).toBeDisabled();
-});
-
 it('should navigate to login page when "Start" button is clicked', async () => {
     mockActivateStore({
         activationSuccess: true,
-        loading: false,
     });
 
     renderRegisterSuccessPage();

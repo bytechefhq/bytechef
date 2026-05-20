@@ -10,12 +10,11 @@ import {useShallow} from 'zustand/react/shallow';
 import {useActivateStore} from './stores/useActivateStore';
 
 const RegisterSuccess = () => {
-    const {activate, activationFailure, activationSuccess, loading} = useActivateStore(
+    const {activate, activationFailure, activationSuccess} = useActivateStore(
         useShallow((state) => ({
             activate: state.activate,
             activationFailure: state.activationFailure,
             activationSuccess: state.activationSuccess,
-            loading: state.loading,
         }))
     );
 
@@ -40,26 +39,32 @@ const RegisterSuccess = () => {
     return (
         <PublicLayoutContainer>
             <Card className="mx-auto flex max-w-sm flex-col gap-6 rounded-xl p-6 text-center shadow-none">
-                <CircleCheckBig className="mx-auto size-12 text-success" />
+                {activationSuccess ? (
+                    <CircleCheckBig className="mx-auto size-12 text-success" />
+                ) : (
+                    <LoadingIcon className="mx-auto size-12 text-content-neutral-secondary" />
+                )}
 
                 <CardHeader className="p-0">
                     <CardTitle className="self-center text-xl font-bold text-content-neutral-primary">
-                        Account created successfully
+                        {activationSuccess ? 'Account created successfully' : 'Account is preparing...'}
                     </CardTitle>
 
                     <CardDescription className="self-center text-center text-content-neutral-secondary">
-                        You&apos;re ready to start using ByteChef.
+                        {activationSuccess
+                            ? "You're ready to start using ByteChef."
+                            : 'Please wait until the account is ready'}
                     </CardDescription>
                 </CardHeader>
 
-                {loading ? (
-                    <div>
-                        <Button disabled icon={<LoadingIcon className="text-white" />} label="Start" size="lg" />
-                    </div>
-                ) : (
+                {activationSuccess ? (
                     <Link to="/login">
                         <Button label="Start" size="lg" />
                     </Link>
+                ) : (
+                    <div>
+                        <Button disabled label="Start" size="lg" />
+                    </div>
                 )}
             </Card>
         </PublicLayoutContainer>
