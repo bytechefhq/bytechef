@@ -767,6 +767,7 @@ Type: POLLING
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | parentId | Parent Folder ID | STRING | ID of the folder to watch for new files. If no folder is specified, the root folder will be used. | false |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to watch subfolders recursively. If false, only the specified folder will be watched. May return many results. | false |
 
 
 #### Output
@@ -800,7 +801,8 @@ Type: OBJECT
   "label" : "New File",
   "name" : "newFile",
   "parameters" : {
-    "parentId" : ""
+    "parentId" : "",
+    "recursive" : false
   },
   "type" : "microsoftOneDrive/v1/newFile"
 }
