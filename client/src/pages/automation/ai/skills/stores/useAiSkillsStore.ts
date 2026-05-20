@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 
-type SkillsViewType = 'createWithAi' | 'detail' | 'empty' | 'list' | 'uploadForm' | 'writeForm';
+type SkillsViewType = 'detail' | 'empty' | 'list' | 'uploadForm' | 'writeForm';
 
 interface SkillsHeaderInfoI {
     subtitle?: string;
@@ -8,7 +8,6 @@ interface SkillsHeaderInfoI {
 }
 
 const SKILLS_HEADER_INFO: Record<SkillsViewType, SkillsHeaderInfoI> = {
-    createWithAi: {subtitle: 'Let AI generate a skill for you.', title: 'Create with AI'},
     detail: {},
     empty: {},
     list: {title: 'Skills'},

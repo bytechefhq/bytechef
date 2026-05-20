@@ -1,19 +1,15 @@
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
+import {ChevronDownIcon, PencilIcon, UploadIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 const CREATE_PATHS = {
-    createWithAi: '/automation/ai/skills/create/ai',
     uploadForm: '/automation/ai/skills/create/upload',
     writeForm: '/automation/ai/skills/create/write',
 } as const;
 
 const AiSkillsCreateDropdown = () => {
     const navigate = useNavigate();
-
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     const openCreateRoute = (view: keyof typeof CREATE_PATHS) => {
         navigate(CREATE_PATHS[view]);
@@ -29,22 +25,6 @@ const AiSkillsCreateDropdown = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-72">
-                {ff_4554 && (
-                    <DropdownMenuItem
-                        className="flex flex-col items-start gap-0.5 p-3"
-                        onClick={() => openCreateRoute('createWithAi')}
-                    >
-                        <div className="flex items-center gap-2 font-medium">
-                            <SparklesIcon className="size-4" />
-                            Create With AI
-                        </div>
-
-                        <span className="ml-6 text-xs text-content-neutral-secondary">
-                            Let AI generate a skill for you.
-                        </span>
-                    </DropdownMenuItem>
-                )}
-
                 <DropdownMenuItem
                     className="flex flex-col items-start gap-0.5 p-3"
                     onClick={() => openCreateRoute('uploadForm')}

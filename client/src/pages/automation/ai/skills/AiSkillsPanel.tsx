@@ -1,4 +1,3 @@
-import AiSkillCreateWithAi from '@/pages/automation/ai/skills/components/AiSkillCreateWithAi';
 import AiSkillDetail from '@/pages/automation/ai/skills/components/AiSkillDetail';
 import AiSkillUploadForm from '@/pages/automation/ai/skills/components/AiSkillUploadForm';
 import AiSkillWriteForm from '@/pages/automation/ai/skills/components/AiSkillWriteForm';
@@ -39,8 +38,6 @@ const AiSkillsPanel = () => {
             {currentView === 'writeForm' && <AiSkillWriteForm />}
 
             {currentView === 'uploadForm' && <AiSkillUploadForm />}
-
-            {currentView === 'createWithAi' && <AiSkillCreateWithAi />}
         </div>
     );
 };
