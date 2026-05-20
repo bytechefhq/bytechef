@@ -18,7 +18,7 @@ package com.bytechef.component.microsoft.share.point.trigger;
 
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSIVE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
@@ -41,7 +41,7 @@ import org.mockito.MockedStatic;
 class MicrosoftSharePointNewFileTriggerTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(SITE_ID, "siteId", PARENT_FOLDER, "parentFolder", RECURSION, false));
+        Map.of(SITE_ID, "siteId", PARENT_FOLDER, "parentFolder", RECURSIVE, false));
     private final PollOutput mockedPollOutput = mock(PollOutput.class);
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final ArgumentCaptor<Parameters> parametersArgumentCaptor = forClass(Parameters.class);
