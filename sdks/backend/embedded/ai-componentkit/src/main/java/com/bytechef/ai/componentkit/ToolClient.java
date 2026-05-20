@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.toolkit;
+package com.bytechef.ai.componentkit;
 
-import com.bytechef.ai.toolkit.model.ToolModel;
+import com.bytechef.ai.componentkit.model.ToolModel;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;

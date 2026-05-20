@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.toolkit.tool;
+package com.bytechef.ai.componentkit.tool;
 
-import com.bytechef.ai.toolkit.Environment;
-import com.bytechef.ai.toolkit.ToolClient;
-import com.bytechef.ai.toolkit.model.FunctionModel;
-import com.bytechef.ai.toolkit.model.ToolModel;
+import com.bytechef.ai.componentkit.Environment;
+import com.bytechef.ai.componentkit.ToolClient;
+import com.bytechef.ai.componentkit.model.FunctionModel;
+import com.bytechef.ai.componentkit.model.ToolModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

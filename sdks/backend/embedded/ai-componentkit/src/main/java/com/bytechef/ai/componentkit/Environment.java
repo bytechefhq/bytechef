@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.toolkit.model;
+package com.bytechef.ai.componentkit;
 
 /**
- * @param function
- * @param type
+ * Enum representing the environment in which the application is running. It can be either PRODUCTION or TEST.
  *
  * @author Ivica Cardic
  */
-public record ToolModel(FunctionModel function, String type) {
+public enum Environment {
+
+    DEVELOPMENT, STAGING, PRODUCTION
 }

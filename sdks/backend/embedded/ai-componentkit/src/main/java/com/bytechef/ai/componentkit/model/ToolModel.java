@@ -14,15 +14,13 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.toolkit.model;
+package com.bytechef.ai.componentkit.model;
 
 /**
- *
- * @param name
- * @param description
- * @param parameters
+ * @param function
+ * @param type
  *
  * @author Ivica Cardic
  */
-public record FunctionModel(String name, String description, String parameters) {
+public record ToolModel(FunctionModel function, String type) {
 }
