@@ -26,6 +26,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.ftp.constant.FtpConstants.CREATE_DIRECTORIES;
 import static com.bytechef.component.ftp.constant.FtpConstants.FILE_ENTRY;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
+import static com.bytechef.component.ftp.constant.FtpConstants.REMOTE_PATH;
+import static com.bytechef.component.ftp.constant.FtpConstants.SUCCESS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -63,9 +65,9 @@ public class FtpUploadFileAction {
             outputSchema(
                 object()
                     .properties(
-                        string("remotePath").description("The path where the file was uploaded."),
-                        bool("success").description("Whether the upload was successful."))),
-            sampleOutput(Map.of("remotePath", "/uploads/document.pdf", "success", true)))
+                        string(REMOTE_PATH).description("The path where the file was uploaded."),
+                        bool(SUCCESS).description("Whether the upload was successful."))),
+            sampleOutput(Map.of(REMOTE_PATH, "/uploads/document.pdf", SUCCESS, true)))
         .perform(FtpUploadFileAction::perform);
 
     private FtpUploadFileAction() {
@@ -88,7 +90,7 @@ public class FtpUploadFileAction {
             try (InputStream inputStream = context.file(file -> file.getInputStream(fileEntry))) {
                 remoteFileClient.storeFile(remotePath, inputStream);
 
-                return Map.of("remotePath", remotePath, "success", true);
+                return Map.of(REMOTE_PATH, remotePath, SUCCESS, true);
             }
         } catch (IOException ioException) {
             throw new ProviderException("Failed to upload file: " + ioException.getMessage(), ioException);

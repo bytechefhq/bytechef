@@ -25,6 +25,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.ftp.constant.FtpConstants.CREATE_DIRECTORIES;
 import static com.bytechef.component.ftp.constant.FtpConstants.NEW_PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.OLD_PATH;
+import static com.bytechef.component.ftp.constant.FtpConstants.SUCCESS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -61,14 +62,14 @@ public class FtpRenameAction {
             outputSchema(
                 object()
                     .properties(
-                        string("oldPath").description("The original path."),
-                        string("newPath").description("The new path."),
-                        bool("success").description("Whether the operation was successful."))),
+                        string(OLD_PATH).description("The original path."),
+                        string(NEW_PATH).description("The new path."),
+                        bool(SUCCESS).description("Whether the operation was successful."))),
             sampleOutput(
                 Map.of(
-                    "oldPath", "/uploads/old-name.pdf",
-                    "newPath", "/archive/new-name.pdf",
-                    "success", true)))
+                    OLD_PATH, "/uploads/old-name.pdf",
+                    NEW_PATH, "/archive/new-name.pdf",
+                    SUCCESS, true)))
         .perform(FtpRenameAction::perform);
 
     private FtpRenameAction() {
@@ -90,7 +91,7 @@ public class FtpRenameAction {
 
             remoteFileClient.rename(oldPath, newPath);
 
-            return Map.of("oldPath", oldPath, "newPath", newPath, "success", true);
+            return Map.of(OLD_PATH, oldPath, NEW_PATH, newPath, SUCCESS, true);
         } catch (IOException ioException) {
             throw new ProviderException("Failed to rename/move: " + ioException.getMessage(), ioException);
         }

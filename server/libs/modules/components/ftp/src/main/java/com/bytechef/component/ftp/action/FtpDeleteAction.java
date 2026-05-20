@@ -22,8 +22,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.ftp.constant.FtpConstants.DELETED_PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.PATH;
 import static com.bytechef.component.ftp.constant.FtpConstants.RECURSIVE;
+import static com.bytechef.component.ftp.constant.FtpConstants.SUCCESS;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
@@ -57,9 +59,9 @@ public class FtpDeleteAction {
             outputSchema(
                 object()
                     .properties(
-                        string("deletedPath").description("The path that was deleted."),
-                        bool("success").description("Whether the deletion was successful."))),
-            sampleOutput(Map.of("deletedPath", "/uploads/old-file.pdf", "success", true)))
+                        string(DELETED_PATH).description("The path that was deleted."),
+                        bool(SUCCESS).description("Whether the deletion was successful."))),
+            sampleOutput(Map.of(DELETED_PATH, "/uploads/old-file.pdf", SUCCESS, true)))
         .perform(FtpDeleteAction::perform);
 
     private FtpDeleteAction() {
@@ -82,7 +84,7 @@ public class FtpDeleteAction {
                 remoteFileClient.deleteFile(path);
             }
 
-            return Map.of("deletedPath", path, "success", true);
+            return Map.of(DELETED_PATH, path, SUCCESS, true);
         } catch (IOException ioException) {
             throw new ProviderException("Failed to delete: " + ioException.getMessage(), ioException);
         }
