@@ -20,8 +20,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSION_PROPERTY;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSIVE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSIVE_PROPERTY;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Parameters;
@@ -55,7 +55,7 @@ public class MicrosoftSharePointNewFileTrigger {
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
                 .required(false),
-            RECURSION_PROPERTY)
+            RECURSIVE_PROPERTY)
         .output()
         .poll(MicrosoftSharePointNewFileTrigger::poll)
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
@@ -72,7 +72,7 @@ public class MicrosoftSharePointNewFileTrigger {
             inputParameters.getString(PARENT_FOLDER, "root"));
 
         return MicrosoftTriggerUtils.poll(
-            inputParameters.getBoolean(RECURSION) ? url + "delta" : url + "children",
+            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children",
             "file",
             closureParameters,
             context);
