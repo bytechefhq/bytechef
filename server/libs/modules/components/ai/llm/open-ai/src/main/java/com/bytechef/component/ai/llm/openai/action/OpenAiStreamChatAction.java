@@ -41,6 +41,7 @@ public class OpenAiStreamChatAction {
         .description("Ask anything you want and stream the response.")
         .properties(ASK_PROPERTIES)
         .output(outputSchema(string()), sampleOutput("Sample stream"))
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#ask-stream")
         .perform(OpenAiStreamChatAction::perform);
 
     private OpenAiStreamChatAction() {

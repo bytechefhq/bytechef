@@ -92,6 +92,7 @@ public class OpenAiCreateSpeechAction {
                 .maxValue(4.0)
                 .required(false))
         .output(outputSchema(fileEntry().description("The generated audio file.")))
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#text-to-speech")
         .perform(OpenAiCreateSpeechAction::perform);
 
     private OpenAiCreateSpeechAction() {

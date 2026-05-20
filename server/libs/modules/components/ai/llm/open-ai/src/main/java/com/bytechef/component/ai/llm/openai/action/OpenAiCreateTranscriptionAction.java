@@ -90,26 +90,29 @@ public class OpenAiCreateTranscriptionAction {
                 .maxValue(1)
                 .required(false))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#create-transcriptions")
         .perform(OpenAiCreateTranscriptionAction::perform);
 
-    private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
-        Language language = inputParameters.get(LANGUAGE, Language.class);
+    public static final AudioTranscriptionModel AUDIO_TRANSCRIPTION =
+        (inputParameters, connectionParameters) -> {
 
-        return OpenAiAudioTranscriptionModel.builder()
-            .openAiClient(
-                OpenAIOkHttpClient.builder()
-                    .apiKey(connectionParameters.getString(TOKEN))
-                    .build())
-            .options(
-                OpenAiAudioTranscriptionOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .prompt(inputParameters.getString(PROMPT))
-                    .language(language.getCode())
-                    .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
-                    .temperature(inputParameters.getFloat(TEMPERATURE))
-                    .build())
-            .build();
-    };
+            Language language = inputParameters.get(LANGUAGE, Language.class);
+
+            return OpenAiAudioTranscriptionModel.builder()
+                .openAiClient(
+                    OpenAIOkHttpClient.builder()
+                        .apiKey(connectionParameters.getString(TOKEN))
+                        .build())
+                .options(
+                    OpenAiAudioTranscriptionOptions.builder()
+                        .model(inputParameters.getRequiredString(MODEL))
+                        .prompt(inputParameters.getString(PROMPT))
+                        .language(language.getCode())
+                        .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
+                        .temperature(inputParameters.getFloat(TEMPERATURE))
+                        .build())
+                .build();
+        };
 
     private OpenAiCreateTranscriptionAction() {
     }

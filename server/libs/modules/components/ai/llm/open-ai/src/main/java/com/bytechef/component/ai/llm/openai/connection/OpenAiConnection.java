@@ -31,6 +31,8 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class OpenAiConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://api.openai.com/v1")
         .authorizations(
             authorization(BEARER_TOKEN)

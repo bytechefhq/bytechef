@@ -43,6 +43,7 @@ public class OpenAiComponentHandler implements ComponentHandler {
         .description(
             "OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways " +
                 "that benefit humanity as a whole.")
+        .version(1)
         .icon("path:assets/open-ai.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenAiConnection.CONNECTION_DEFINITION)
