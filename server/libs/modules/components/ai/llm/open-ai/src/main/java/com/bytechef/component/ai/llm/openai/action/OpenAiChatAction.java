@@ -62,6 +62,7 @@ public class OpenAiChatAction {
         .description("Ask anything you want.")
         .properties(ASK_PROPERTIES)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#ask")
         .perform(OpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {

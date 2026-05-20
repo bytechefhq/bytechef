@@ -92,7 +92,9 @@ public class OpenAiCreateImageAction {
             string(STYLE)
                 .label("Style")
                 .description(
-                    "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to lean towards generating hyper-real and dramatic images. Natural causes the model to produce more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
+                    "The style of the generated images. Must be one of vivid or natural. Vivid causes the model to " +
+                        "lean towards generating hyper-real and dramatic images. Natural causes the model to produce " +
+                        "more natural, less hyper-real looking images. This parameter is only supported for dall-e-3.")
                 .options(
                     option("vivid", VIVID.name()),
                     option("natural", NATURAL.name()))
@@ -108,6 +110,7 @@ public class OpenAiCreateImageAction {
                             .description("URL of the generated image."),
                         string("b64Json")
                             .description("Base64 encoded JSON of the generated image."))))
+        .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#create-image")
         .perform(OpenAiCreateImageAction::perform);
 
     public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
