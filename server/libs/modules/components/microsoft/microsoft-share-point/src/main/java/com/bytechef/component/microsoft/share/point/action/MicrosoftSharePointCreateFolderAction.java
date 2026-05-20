@@ -25,12 +25,12 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;

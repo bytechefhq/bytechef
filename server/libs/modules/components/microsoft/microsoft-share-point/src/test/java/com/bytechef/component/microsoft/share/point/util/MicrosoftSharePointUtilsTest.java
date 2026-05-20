@@ -30,18 +30,17 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.T
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.READ_ONLY;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.REQUIRED;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -72,8 +71,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class MicrosoftSharePointUtilsTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(SITE_ID, "siteId", LIST_ID, "listId"));
+    private Parameters mockedParameters = MockParametersFactory.create(Map.of(SITE_ID, "siteId", LIST_ID, "listId"));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
@@ -249,15 +247,11 @@ class MicrosoftSharePointUtilsTest {
 
     @Test
     void testGetFolderId() {
-        Parameters mockedParameters = mock(Parameters.class);
-
-        when(mockedParameters.getString(PARENT_FOLDER))
-            .thenReturn(ID);
+        mockedParameters = MockParametersFactory.create(Map.of(PARENT_FOLDER, ID));
 
         assertEquals(ID, MicrosoftSharePointUtils.getFolderId(mockedParameters));
 
-        when(mockedParameters.getString(PARENT_FOLDER))
-            .thenReturn(null);
+        mockedParameters = MockParametersFactory.create(Map.of());
 
         assertEquals("root", MicrosoftSharePointUtils.getFolderId(mockedParameters));
     }

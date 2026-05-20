@@ -31,14 +31,14 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.T
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.READ_ONLY;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.REQUIRED;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
@@ -52,7 +52,6 @@ import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.share.point.constant.ColumnType;
-import com.bytechef.microsoft.commons.MicrosoftConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -223,7 +222,7 @@ public class MicrosoftSharePointUtils {
 
         List<Object> folders = new ArrayList<>();
 
-        if (body.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
+        if (body.get(VALUE) instanceof List<?> list) {
             list.stream()
                 .filter(o -> o instanceof Map<?, ?> map && map.containsKey(FOLDER))
                 .forEach(folders::add);
