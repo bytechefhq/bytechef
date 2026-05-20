@@ -71,6 +71,14 @@ it('should render the preparing state until the account is ready', () => {
     expect(screen.getByRole('button', {name: 'Start'})).toBeDisabled();
 });
 
+it('should render the ready state when entered via the internal flow without an activation key', () => {
+    renderRegisterSuccessPage('/activate');
+
+    expect(screen.getByText('Account created successfully')).toBeInTheDocument();
+    expect(screen.getByText("You're ready to start using ByteChef.")).toBeInTheDocument();
+    expect(screen.getByRole('button', {name: 'Start'})).toBeEnabled();
+});
+
 it('should call activate with the key from URL params', () => {
     const mockStore = mockActivateStore();
 
