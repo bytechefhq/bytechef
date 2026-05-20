@@ -62,23 +62,22 @@ public class FtpDownloadFileAction {
             try (PipedInputStream pipedInputStream = new PipedInputStream();
                 PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream)) {
 
-                Thread writerThread = new Thread(() -> {
-                    try {
-                        remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
-                    } catch (IOException ioException) {
-                        throw new ProviderException(
-                            "Failed to download file: " + ioException.getMessage(), ioException);
-                    } finally {
+                Thread.ofVirtual()
+                    .start(() -> {
                         try {
-                            pipedOutputStream.close();
+                            remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
                         } catch (IOException ioException) {
                             throw new ProviderException(
-                                "Failed to close pipe: " + ioException.getMessage(), ioException);
+                                "Failed to download file: " + ioException.getMessage(), ioException);
+                        } finally {
+                            try {
+                                pipedOutputStream.close();
+                            } catch (IOException ioException) {
+                                throw new ProviderException(
+                                    "Failed to close pipe: " + ioException.getMessage(), ioException);
+                            }
                         }
-                    }
-                });
-
-                writerThread.start();
+                    });
 
                 return context.file(file -> file.storeContent(filename, pipedInputStream));
             }
