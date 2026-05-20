@@ -42,14 +42,13 @@ public class TeamworkUtils extends AbstractTeamworkUtils {
         String searchText, Context context) {
 
         List<Option<Long>> options = new ArrayList<>();
-        Map<String, ?> body;
+
         boolean hasMore = false;
         int nextPageNumber = 1;
-        int pageSize = 50;
 
         do {
-            body = context.http(http -> http.get("/tasklists"))
-                .queryParameters(PAGE_SIZE, pageSize, PAGE_NUMBER, nextPageNumber)
+            Map<String, ?> body = context.http(http -> http.get("/tasklists"))
+                .queryParameters(PAGE_SIZE, 50, PAGE_NUMBER, nextPageNumber)
                 .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -65,8 +64,8 @@ public class TeamworkUtils extends AbstractTeamworkUtils {
             if (body.get("meta") instanceof Map<?, ?> meta && meta.get("page") instanceof Map<?, ?> page) {
                 hasMore = (Boolean) page.get("hasMore");
             }
-            nextPageNumber++;
 
+            nextPageNumber++;
         } while (hasMore);
 
         return options;

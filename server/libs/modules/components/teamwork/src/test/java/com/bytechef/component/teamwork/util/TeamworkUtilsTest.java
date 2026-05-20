@@ -34,10 +34,8 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -64,16 +62,14 @@ class TeamworkUtilsTest {
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("tasklists", List.of(Map.of("name", "name", "id", 123))));
-
-        List<Option<Long>> expectedOptions = new ArrayList<>();
-
-        expectedOptions.add(option("name", 123));
+            .thenReturn(Map.of("tasklists", List.of(Map.of("name", "abc", "id", 123)), "meta",
+                Map.of("page", Map.of("hasMore", true))))
+            .thenReturn(Map.of("tasklists", List.of(Map.of("name", "def", "id", 345)), "meta",
+                Map.of("page", Map.of("hasMore", false))));
 
         assertEquals(
-            expectedOptions,
-            TeamworkUtils.getTasklistIdOptions(
-                null, null, null, null, mockedContext));
+            List.of(option("abc", 123), option("def", 345)),
+            TeamworkUtils.getTasklistIdOptions(null, null, null, null, mockedContext));
 
         assertEquals("/tasklists", stringArgumentCaptor.getValue());
         assertNotNull(httpFunctionArgumentCaptor.getValue());
@@ -85,12 +81,17 @@ class TeamworkUtilsTest {
 
         List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
 
-        assertEquals(1, objectsArgumentCaptorAllValues.size());
+        assertEquals(2, objectsArgumentCaptorAllValues.size());
 
-        Object[] queryParameters = {
+        Object[] queryParameters1 = {
             PAGE_SIZE, 50, PAGE_NUMBER, 1
         };
 
-        assertArrayEquals(queryParameters, objectsArgumentCaptorAllValues.getFirst());
+        Object[] queryParameters2 = {
+            PAGE_SIZE, 50, PAGE_NUMBER, 2
+        };
+
+        assertArrayEquals(queryParameters1, objectsArgumentCaptorAllValues.getFirst());
+        assertArrayEquals(queryParameters2, objectsArgumentCaptorAllValues.getLast());
     }
 }
