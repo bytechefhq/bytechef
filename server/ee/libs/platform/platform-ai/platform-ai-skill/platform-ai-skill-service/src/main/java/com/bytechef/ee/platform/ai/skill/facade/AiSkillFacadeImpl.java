@@ -278,6 +278,47 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    public AiSkill updateAiSkillContent(long id, String instructions) {
+        Assert.hasText(instructions, "Instructions must not be blank");
+
+        AiSkill aiSkill = aiSkillService.getAiSkill(id);
+
+        FileEntry oldFileEntry = aiSkill.getSkillFile();
+
+        byte[] zipBytes = createSkillZip(aiSkill.getName(), aiSkill.getDescription(), instructions);
+
+        FileEntry newFileEntry = aiSkillFileStorage.storeAiSkillFile(
+            toSkillFilename(aiSkill.getName()), zipBytes);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                try {
+                    aiSkillFileStorage.deleteAiSkillFile(oldFileEntry);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Failed to delete old skill file after content update, fileEntry={}", oldFileEntry, exception);
+                }
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    try {
+                        aiSkillFileStorage.deleteAiSkillFile(newFileEntry);
+                    } catch (RuntimeException exception) {
+                        log.error(
+                            "Failed to clean up new skill file after rollback, fileEntry={}", newFileEntry, exception);
+                    }
+                }
+            }
+        });
+
+        return aiSkillService.updateAiSkillFile(id, newFileEntry);
+    }
+
+    @Override
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
         Assert.hasText(name, "Skill name must not be blank");
 

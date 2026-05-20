@@ -162,6 +162,28 @@ public class SkillsTools {
         }
     }
 
+    @Tool(
+        description = "Update the instructions (e.g. `SKILL.md` content) of an existing AI skill. Returns the updated skill.")
+    public AiSkill updateAiSkillContent(
+        @ToolParam(description = "The ID of the skill to update") long id,
+        @ToolParam(description = "The new instructions that define the skill behaviour") String instructions) {
+
+        try {
+            AiSkill aiSkill = aiSkillFacade.updateAiSkillContent(id, instructions);
+
+            if (log.isDebugEnabled()) {
+                log.debug("updateAiSkillContent({}): Updated skill content", id);
+            }
+
+            return aiSkill;
+        } catch (Exception e) {
+            log.error("updateAiSkillContent({}): Failed to update skill content", id, e);
+
+            throw new ExecutionException(
+                "Failed to update skill content: " + e.getMessage(), e, SkillToolErrorType.UPDATE_SKILL_CONTENT);
+        }
+    }
+
     @Tool(description = "Update the name and description of an existing AI skill. Returns the updated skill.")
     public AiSkill updateAiSkill(
         @ToolParam(description = "The ID of the skill to update") long id,

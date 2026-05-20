@@ -65,4 +65,6 @@ public interface AiSkillFacade {
     List<AiSkill> getAiSkills();
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
+
+    AiSkill updateAiSkillContent(long id, String instructions);
 }

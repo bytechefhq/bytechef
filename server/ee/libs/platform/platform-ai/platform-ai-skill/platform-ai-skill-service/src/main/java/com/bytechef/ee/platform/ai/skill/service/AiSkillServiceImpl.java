@@ -18,6 +18,7 @@ package com.bytechef.ee.platform.ai.skill.service;
 
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.repository.AiSkillRepository;
+import com.bytechef.file.storage.domain.FileEntry;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -71,6 +72,15 @@ class AiSkillServiceImpl implements AiSkillService {
 
         existingAiSkill.setName(name);
         existingAiSkill.setDescription(description);
+
+        return aiSkillRepository.save(existingAiSkill);
+    }
+
+    @Override
+    public AiSkill updateAiSkillFile(long id, FileEntry fileEntry) {
+        AiSkill existingAiSkill = getAiSkill(id);
+
+        existingAiSkill.setSkillFile(fileEntry);
 
         return aiSkillRepository.save(existingAiSkill);
     }
