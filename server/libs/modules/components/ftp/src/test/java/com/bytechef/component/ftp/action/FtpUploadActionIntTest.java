@@ -38,32 +38,38 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 /**
  * Integration tests for {@link FtpUploadFileAction} using real FTP and SFTP servers spun up via Testcontainers.
  *
  * @author Igor Beslic
  */
+@SpringJUnitConfig(FtpUploadActionIntTest.TestConfig.class)
 @SuppressFBWarnings("HARD_CODE_PASSWORD")
-@Testcontainers
 public class FtpUploadActionIntTest {
+
+    @Configuration
+    static class TestConfig {
+    }
 
     /**
      * Shared credentials for both containers. Password must satisfy Alpine Linux's strength requirements used by
      * {@code delfer/alpine-ftp-server}'s entrypoint.
      */
-    @Value("${bytechef.test.ftp.password}")
+    @Value("${bytechef.test.ftp.password:T3st@Pass123}")
     private String ftpPassword;
-    @Value("${bytechef.test.ftp.username}")
+    @Value("${bytechef.test.ftp.username:ftpuser}")
     private String ftpUsername;
     @SuppressWarnings("PMD.AvoidUsingHardCodedIP")
-    @Value("${bytechef.test.ftp.host.ip}")
+    @Value("${bytechef.test.ftp.host.ip:127.0.0.1}")
     private String ftpHostIp;
 
     /**
@@ -85,16 +91,28 @@ public class FtpUploadActionIntTest {
      * host port and container port to be identical: the server embeds the port number in the PASV response, so the FTP
      * client connects directly to that port on the host — dynamic port mapping would break this contract.
      */
-    @Container
     @SuppressWarnings("deprecation")
-    protected FixedHostPortGenericContainer<?> ftpContainer =
-        new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
+    private FixedHostPortGenericContainer<?> ftpContainer;
+
+    @BeforeEach
+    void setUpContainer() {
+        ftpContainer = new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
             .withEnv("USERS", ftpUsername + "|" + ftpPassword)
             .withEnv("ADDRESS", ftpHostIp)
             .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
             .withExposedPorts(21)
             .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
+
+        ftpContainer.start();
+    }
+
+    @AfterEach
+    void tearDownContainer() {
+        if (ftpContainer != null) {
+            ftpContainer.stop();
+        }
+    }
 
     @Test
     void testUpload() throws Exception {
