@@ -51,7 +51,9 @@ export function synchronizeGroupedConnections({
         }
 
         indices.forEach((index) => {
-            setConnectionId(index, targetConnectionId);
+            if (getConnectionId(index) !== targetConnectionId) {
+                setConnectionId(index, targetConnectionId);
+            }
         });
     });
 }
