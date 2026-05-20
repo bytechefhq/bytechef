@@ -185,7 +185,7 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
         String jsonPathFilter = "";
 
         if (StringUtils.hasText(nativeFilterExpression)) {
-            jsonPathFilter = " AND metadata::jsonb @@ '" + nativeFilterExpression + "'::jsonpath ";
+            jsonPathFilter = " AND " + nativeFilterExpression + " ";
         }
 
         double distance = 1 - request.getSimilarityThreshold();
@@ -202,12 +202,12 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
     @SuppressFBWarnings(
         value = "SQL_INJECTION_SPRING_JDBC", justification = "Table/schema names are trusted configuration")
     protected void doDelete(Filter.Expression filterExpression) {
-        String nativeFilterExpression = this.filterExpressionConverter.convertExpression(filterExpression);
+        String filterClause = this.filterExpressionConverter.convertExpression(filterExpression);
 
-        String sql = "DELETE FROM " + getFullyQualifiedTableName() + " WHERE metadata::jsonb @@ ?::jsonpath";
+        String sql = "DELETE FROM " + getFullyQualifiedTableName() + " WHERE " + filterClause;
 
         try {
-            this.jdbcTemplate.update(sql, nativeFilterExpression);
+            this.jdbcTemplate.update(sql);
         } catch (Exception e) {
             throw new IllegalStateException("Failed to delete documents by filter", e);
         }
