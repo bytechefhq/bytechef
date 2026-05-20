@@ -408,6 +408,7 @@ Type: POLLING
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | If no folder is selected, root folder will be monitored for new file. | false |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to watch subfolders recursively. If false, only the specified folder will be watched. May return many results. | false |
 
 
 #### Output
@@ -421,7 +422,8 @@ The output for this action is dynamic and may vary depending on the input parame
   "name" : "newFile",
   "parameters" : {
     "siteId" : "",
-    "parentFolder" : ""
+    "parentFolder" : "",
+    "recursive" : false
   },
   "type" : "microsoftSharePoint/v1/newFile"
 }
