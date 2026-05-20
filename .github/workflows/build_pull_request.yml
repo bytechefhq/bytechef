@@ -11,6 +11,11 @@ on:
   pull_request:
     branches: [ "master" ]
 
+env:
+  BYTECHEF_TEST_FTP_HOST_IP: ${{ secrets.BYTECHEF_TEST_FTP_HOST_IP }}
+  BYTECHEF_TEST_FTP_PASSWORD: ${{ secrets.BYTECHEF_TEST_FTP_PASSWORD }}
+  BYTECHEF_TEST_FTP_USERNAME: ${{ secrets.BYTECHEF_TEST_FTP_USERNAME }}
+
 permissions:
   contents: read
 
