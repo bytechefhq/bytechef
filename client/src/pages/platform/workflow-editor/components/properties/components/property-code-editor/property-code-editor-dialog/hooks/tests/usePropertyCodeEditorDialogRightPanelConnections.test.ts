@@ -6,6 +6,7 @@ const hoisted = vi.hoisted(() => {
         mockInvalidateQueries: vi.fn(),
         mockMutate: vi.fn(),
         mockSetShowConnectionNote: vi.fn(),
+        mockSetWorkflow: vi.fn(),
         storeState: {
             componentDefinitions: [{name: 'slack', title: 'Slack', version: 1}],
             currentEnvironmentId: 1,
@@ -38,6 +39,12 @@ vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStor
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => ({
     default: () => hoisted.storeState.rootClusterElementNodeData,
+}));
+
+vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowDataStore', () => ({
+    default: {
+        getState: () => ({setWorkflow: hoisted.mockSetWorkflow}),
+    },
 }));
 
 vi.mock('@tanstack/react-query', () => ({
@@ -462,6 +469,113 @@ describe('usePropertyCodeEditorDialogRightPanelConnections', () => {
 
             expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({
                 queryKey: ['workflowNodeComponentConnections'],
+            });
+        });
+    });
+
+    describe('workflow store synchronization', () => {
+        it('should sync the updated workflow into useWorkflowDataStore on submit success', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'github',
+                    componentVersion: 2,
+                    name: 'github_connection',
+                });
+            });
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
+            });
+
+            expect(hoisted.mockSetWorkflow).toHaveBeenCalledWith({
+                definition: callArg.workflow.definition,
+                id: 'workflow-1',
+                version: 2,
+            });
+        });
+
+        it('should sync the updated workflow into useWorkflowDataStore on remove success', async () => {
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(defaultProps));
+
+            act(() => {
+                result.current.handleOnRemoveClick('slack_1');
+            });
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
+            });
+
+            expect(hoisted.mockSetWorkflow).toHaveBeenCalledWith({
+                definition: callArg.workflow.definition,
+                id: 'workflow-1',
+                version: 2,
+            });
+        });
+
+        it('should sync the updated workflow into useWorkflowDataStore on cluster element submit success', async () => {
+            hoisted.storeState.currentNode = {clusterElementType: 'source', name: 'source_1'};
+            hoisted.storeState.rootClusterElementNodeData = {workflowNodeName: 'dataStream_1'};
+            vi.resetModules();
+
+            const clusterElementProps = {
+                componentConnections: [],
+                workflow: {
+                    definition: JSON.stringify({
+                        tasks: [
+                            {
+                                clusterElements: {
+                                    source: {
+                                        connections: {},
+                                        name: 'source_1',
+                                        type: 'amazonS3/v1/amazonS3Read',
+                                    },
+                                },
+                                name: 'dataStream_1',
+                                type: 'dataStream/v1/sync',
+                            },
+                        ],
+                    }),
+                    id: 'workflow-1',
+                    version: 1,
+                },
+                workflowNodeName: 'source_1',
+            };
+
+            const {usePropertyCodeEditorDialogRightPanelConnections} =
+                await import('../usePropertyCodeEditorDialogRightPanelConnections');
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnections(clusterElementProps));
+
+            act(() => {
+                result.current.handleOnSubmit({
+                    componentName: 'amazonS3',
+                    componentVersion: 1,
+                    name: 's3_connection',
+                });
+            });
+
+            const callArg = hoisted.mockMutate.mock.calls[0][0];
+            const mutateOptions = hoisted.mockMutate.mock.calls[0][1];
+
+            act(() => {
+                mutateOptions.onSuccess({id: 'workflow-1', version: 2});
+            });
+
+            expect(hoisted.mockSetWorkflow).toHaveBeenCalledWith({
+                definition: callArg.workflow.definition,
+                id: 'workflow-1',
+                version: 2,
             });
         });
     });
