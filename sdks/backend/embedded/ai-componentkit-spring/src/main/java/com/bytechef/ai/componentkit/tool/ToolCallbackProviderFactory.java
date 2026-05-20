@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.toolkit.tool;
+package com.bytechef.ai.componentkit.tool;
 
-import com.bytechef.ai.toolkit.Environment;
+import com.bytechef.ai.componentkit.Environment;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 public class ToolCallbackProviderFactory {
