@@ -1,6 +1,7 @@
 import {connectionFormSchema} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/PropertyCodeEditorDialogRightPanelConnectionsPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {useConnectionNoteStore} from '@/pages/platform/workflow-editor/stores/useConnectionNoteStore';
+import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {SPACE} from '@/shared/constants';
@@ -135,16 +136,23 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
+        const definition = JSON.stringify(workflowDefinition, null, SPACE);
+
         updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
                 workflow: {
-                    definition: JSON.stringify(workflowDefinition, null, SPACE),
+                    definition,
                     version: workflow.version,
                 },
             },
             {
-                onSuccess: () => {
+                onSuccess: (updatedWorkflow) => {
+                    useWorkflowDataStore.getState().setWorkflow({
+                        ...updatedWorkflow,
+                        definition,
+                    });
+
                     if (isClusterElement) {
                         queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
                     } else {
@@ -223,16 +231,23 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
             };
         }
 
+        const definition = JSON.stringify(workflowDefinition, null, SPACE);
+
         updateWorkflowMutation!.mutate(
             {
                 id: workflow.id!,
                 workflow: {
-                    definition: JSON.stringify(workflowDefinition, null, SPACE),
+                    definition,
                     version: workflow.version,
                 },
             },
             {
-                onSuccess: () => {
+                onSuccess: (updatedWorkflow) => {
+                    useWorkflowDataStore.getState().setWorkflow({
+                        ...updatedWorkflow,
+                        definition,
+                    });
+
                     if (isClusterElement) {
                         queryClient.invalidateQueries({queryKey: ['clusterElementComponentConnections']});
                     } else {
