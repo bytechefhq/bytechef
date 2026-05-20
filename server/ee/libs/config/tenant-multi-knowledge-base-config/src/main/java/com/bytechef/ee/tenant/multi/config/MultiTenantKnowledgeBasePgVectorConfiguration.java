@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.tenant.multi.config;
 
+import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorLoader;
 import com.bytechef.ee.tenant.multi.pgvector.MultiTenantPgVectorStore;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
+import com.bytechef.tenant.service.TenantService;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -67,5 +69,14 @@ class MultiTenantKnowledgeBasePgVectorConfiguration {
             pgVectorJdbcTemplate, objectMapper,
             () -> TenantContext.getCurrentDatabaseSchema(MultiTenantPgVectorStore.VECTORSTORE_SCHEMA_SUFFIX) + "."
                 + vectorTableName);
+    }
+
+    @Bean
+    MultiTenantPgVectorLoader knowledgeBaseMultiTenantPgVectorLoader(
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        PgVectorStoreProperties properties, TenantService tenantService) {
+
+        return new MultiTenantPgVectorLoader(
+            pgVectorJdbcTemplate, properties, "kb_" + properties.getTableName(), tenantService);
     }
 }
