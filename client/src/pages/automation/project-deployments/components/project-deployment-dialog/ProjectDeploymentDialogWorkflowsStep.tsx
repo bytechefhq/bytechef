@@ -32,6 +32,7 @@ const ProjectDeploymentDialogWorkflowsStep = ({
                 showWorkflowToggle
                 workflow={workflow}
                 workflowIndex={workflowIndex}
+                workflows={workflows}
             />
         ))}
     </div>

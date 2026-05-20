@@ -22,6 +22,7 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
     showWorkflowToggle?: boolean;
     workflow: Workflow;
     workflowIndex: number;
+    workflows: Workflow[];
 }
 
 const ProjectDeploymentDialogWorkflowsStepItem = ({
@@ -34,12 +35,21 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     showWorkflowToggle = false,
     workflow,
     workflowIndex,
+    workflows,
 }: ProjectDeploymentDialogWorkflowListItemProps) => {
     const [setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const componentConnections = getWorkflowComponentConnections(workflow);
+    const componentConnections = getWorkflowComponentConnections(workflow, workflows);
+
+    const subflowLabelMap = new Map<string, string>();
+
+    for (const subflowWorkflow of workflows) {
+        if (subflowWorkflow.workflowUuid && subflowWorkflow.label) {
+            subflowLabelMap.set(subflowWorkflow.workflowUuid, subflowWorkflow.label);
+        }
+    }
 
     const watchedConnections = useWatch({
         control,
@@ -129,6 +139,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                                     connectionId
                                 )
                             }
+                            subflowLabelMap={subflowLabelMap}
                             workflow={workflow}
                         />
                     </TabsContent>
