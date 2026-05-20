@@ -19,8 +19,10 @@ const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
 
 export function CopilotRuntimeProvider({
     children,
+    source: sourceProp,
 }: Readonly<{
     children: ReactNode;
+    source?: Source;
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
@@ -42,7 +44,7 @@ export function CopilotRuntimeProvider({
 
     const {projectId, projectWorkflowId} = useParams();
 
-    const sourceKey = context?.source ?? Source.WORKFLOW_EDITOR;
+    const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
 
     // Memoize the agent so it isn't reconstructed on every render. Without this, every render dropped the
     // accumulated agent.addMessage history and any in-flight onNew closure captured a stale reference.
