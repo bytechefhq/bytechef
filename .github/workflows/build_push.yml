@@ -21,7 +21,7 @@ permissions:
 
 jobs:
   cli:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -53,7 +53,7 @@ jobs:
         run: ../gradlew build jacocoTestReport sonar --quiet
 
   client:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
         with:
@@ -80,7 +80,7 @@ jobs:
           projectBaseDir: client/
 
   server:
-    runs-on: blacksmith-4vcpu-ubuntu-2404
+    runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
