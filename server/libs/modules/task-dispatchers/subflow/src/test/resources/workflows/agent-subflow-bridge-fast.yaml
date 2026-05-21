@@ -1,0 +1,11 @@
+---
+label: "Trivial fast sub-workflow with no suspending step"
+inputs:
+- name: "amount"
+  type: "integer"
+  required: false
+tasks:
+- name: "result"
+  type: "var/v1/set"
+  parameters:
+    value: "done"

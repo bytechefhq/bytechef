@@ -56,7 +56,24 @@ public class RemotePrincipalJobFacadeController {
                 createJobRequest.type));
     }
 
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = "/create-principal-linked-job")
+    public ResponseEntity<Long> createPrincipalLinkedJob(
+        @Valid @RequestBody CreatePrincipalLinkedJobRequest createPrincipalLinkedJobRequest) {
+
+        return ResponseEntity.ok(
+            principalJobFacade.createPrincipalLinkedJob(
+                createPrincipalLinkedJobRequest.referenceJobId, createPrincipalLinkedJobRequest.jobParameters,
+                createPrincipalLinkedJobRequest.platformType));
+    }
+
     @SuppressFBWarnings("EI")
     public record CreateJobRequest(JobParametersDTO jobParameters, long jobPrincipalId, PlatformType type) {
+    }
+
+    @SuppressFBWarnings("EI")
+    public record CreatePrincipalLinkedJobRequest(
+        long referenceJobId, JobParametersDTO jobParameters, PlatformType platformType) {
     }
 }

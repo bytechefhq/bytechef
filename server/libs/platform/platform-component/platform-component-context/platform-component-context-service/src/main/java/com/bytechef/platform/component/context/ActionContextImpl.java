@@ -17,6 +17,8 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.atlas.coordinator.event.TaskProgressedApplicationEvent;
+import com.bytechef.atlas.execution.domain.Job;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionContext.Approval.Links;
 import com.bytechef.component.definition.ClusterElementContext;
@@ -32,6 +34,8 @@ import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -39,6 +43,8 @@ import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -46,6 +52,8 @@ import org.springframework.context.ApplicationEventPublisher;
  * @author Ivica Cardic
  */
 class ActionContextImpl extends ContextImpl implements ActionContext, ActionContextAware {
+
+    private static final Logger log = LoggerFactory.getLogger(ActionContextImpl.class);
 
     private final String actionName;
     private @Nullable Approval approval;
@@ -59,6 +67,13 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalId;
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
+    private final @Nullable JobService jobService;
+    /**
+     * Phase 17b: cached parent-job metadata, lazily resolved on the first {@link #getJobMetadata()} call. Null until
+     * first call; empty map after a failed/skipped lookup. The two states cannot be merged because the lookup is
+     * genuinely lazy — pre-call we have no information; post-call we have "no metadata available".
+     */
+    private @Nullable Map<String, Object> jobMetadata;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
     private @Nullable String jobResumeId;
     private @Nullable Suspend suspend;
@@ -103,6 +118,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.jobPrincipalId = builder.jobPrincipalId;
         this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
         this.jobId = builder.jobId;
+        this.jobService = builder.jobService;
         this.publicUrl = builder.publicUrl;
         this.type = builder.type;
         this.workflowId = builder.workflowId;
@@ -111,11 +127,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     static Builder builder(
         String componentName, int componentVersion, String actionName, boolean editorEnvironment,
         CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
+        HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
+        @Nullable JobService jobService) {
 
         return new Builder(
             componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage, eventPublisher,
-            httpClientExecutor, tempFileStorage);
+            httpClientExecutor, tempFileStorage, jobService);
     }
 
     @Override
@@ -125,7 +142,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         return builder(
             componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
-            eventPublisher, httpClientExecutor, tempFileStorage)
+            eventPublisher, httpClientExecutor, tempFileStorage, jobService)
                 .componentConnection(componentConnection)
                 .environmentId(environmentId)
                 .jobId(jobId)
@@ -154,6 +171,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobId;
         private @Nullable Long jobPrincipalId;
         private @Nullable Long jobPrincipalWorkflowId;
+        private final @Nullable JobService jobService;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private long taskExecutionId;
@@ -165,7 +183,8 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private Builder(
             String componentName, int componentVersion, String actionName, boolean editorEnvironment,
             CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
-            HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage) {
+            HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
+            @Nullable JobService jobService) {
 
             this.componentName = componentName;
             this.componentVersion = componentVersion;
@@ -176,6 +195,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             this.eventPublisher = eventPublisher;
             this.httpClientExecutor = httpClientExecutor;
             this.tempFileStorage = tempFileStorage;
+            this.jobService = jobService;
         }
 
         Builder componentConnection(@Nullable ComponentConnection componentConnection) {
@@ -344,6 +364,79 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Nullable
     public Long getJobId() {
         return jobId;
+    }
+
+    /**
+     * Narrows a {@code Map<String, ?>} value-wildcard map into a defensively-copied {@code Map<String, Object>}.
+     * Required because {@code Job.getMetadata()} declares its return type with a wildcard (a "don't mutate me" marker
+     * for callers), but {@link ActionContextAware#getJobMetadata()} commits to {@code Map<String, Object>}. Defensive
+     * copy detaches the cached view from future Job mutations.
+     */
+    private static Map<String, Object> narrowToObjectMap(@Nullable Map<String, ?> source) {
+        if (source == null || source.isEmpty()) {
+            return Map.of();
+        }
+
+        HashMap<String, Object> copy = new HashMap<>(source.size());
+
+        source.forEach(copy::put);
+
+        return Collections.unmodifiableMap(copy);
+    }
+
+    @Override
+    public Map<String, Object> getJobMetadata() {
+        if (jobMetadata != null) {
+            return jobMetadata;
+        }
+
+        // Editor-environment runs and direct in-process invocations have no persisted Atlas Job; pre-17b
+        // workflows similarly never carried __jobParameters. In all these cases the dataStream action reads an
+        // empty map and falls back to its task-level baked parameters — same behavior as before Phase 17b.
+        if (jobId == null || jobService == null) {
+            jobMetadata = Map.of();
+
+            return jobMetadata;
+        }
+
+        try {
+            jobMetadata = jobService.fetchJob(jobId)
+                .map(job -> narrowToObjectMap(job.getMetadata()))
+                .orElseGet(Map::of);
+        } catch (RuntimeException ex) {
+            // A transient lookup failure can't be allowed to break the action's perform path. The reader-side
+            // contract treats an empty map identically to "no override" — same recovery as the missing-job
+            // case above.
+            log.warn("Failed to load job {} metadata for ActionContextAware.getJobMetadata: {}",
+                jobId, ex.getMessage());
+
+            jobMetadata = Map.of();
+        }
+
+        return jobMetadata;
+    }
+
+    @Override
+    @Nullable
+    public Long getParentTaskExecutionId() {
+        // No persisted Atlas Job in editor-environment / in-process invocations -- treat as top-level.
+        if (jobId == null || jobService == null) {
+            return null;
+        }
+
+        try {
+            return jobService.fetchJob(jobId)
+                .map(Job::getParentTaskExecutionId)
+                .orElse(null);
+        } catch (RuntimeException ex) {
+            // Mirror the recovery shape of getJobMetadata: a transient lookup failure must not break perform().
+            // The reader (WorkflowCallWorkflowTool) interprets null as "top-level", which is the safe direction --
+            // the guard fails open (suspend proceeds) rather than closed (block a legitimate top-level agent).
+            log.warn(
+                "Failed to load job {} for ActionContextAware.getParentTaskExecutionId: {}", jobId, ex.getMessage());
+
+            return null;
+        }
     }
 
     @Override

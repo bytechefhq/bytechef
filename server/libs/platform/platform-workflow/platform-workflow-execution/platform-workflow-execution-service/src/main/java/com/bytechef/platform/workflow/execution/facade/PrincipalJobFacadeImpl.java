@@ -89,6 +89,29 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     @Transactional
+    public long createPrincipalLinkedJob(
+        long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+
+        // The contract of this method is "linked to the same principal instance as referenceJobId." If we cannot
+        // establish the linkage, refusing to create the job is strictly safer than silently creating an orphan
+        // (no tenant attribution, no billing, invisible to workspace-scoped lookups). The caller is the agent-tool
+        // sub-workflow bridge; failing here surfaces as a coordinator-level error rather than a silent multi-tenant
+        // leak. See review finding C3.
+
+        long principalId = principalJobService.fetchJobPrincipalId(referenceJobId, platformType)
+            .orElseThrow(() -> new IllegalStateException(
+                "Cannot create principal-linked job: no principal found for reference job %d (type=%s)"
+                    .formatted(referenceJobId, platformType)));
+
+        long jobId = jobFacade.createJob(jobParametersDTO);
+
+        principalJobService.create(jobId, principalId, platformType);
+
+        return jobId;
+    }
+
+    @Override
+    @Transactional
     public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         licenceJobUsageService.consumeOrThrow();
 

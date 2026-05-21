@@ -26,35 +26,64 @@ import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_DESCRIPT
 import static com.bytechef.platform.ai.tool.constant.ToolConstants.TOOL_NAME;
 import static com.bytechef.platform.component.constant.WorkflowConstants.NEW_WORKFLOW_CALL;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ClusterElementDefinition.OutputFunction;
 import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunction;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
-import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
+import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.PendingSubflowRequest;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowRequestConstants;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class WorkflowCallWorkflowTool {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowCallWorkflowTool.class);
+
     private static final String WORKFLOW_UUID = "workflowUuid";
+
+    // Error tokens returned to the LLM. Extracted as constants so tests can assert by equality (not substring),
+    // and so callers downstream can branch on them without parsing free-form text.
+
+    static final String ERROR_NOT_AGENT_CONTEXT =
+        "Error: the Call Workflow tool can only be used by an AI agent.";
+
+    static final String ERROR_ALREADY_SUSPENDED =
+        "Error: another tool already suspended the agent in this turn; only one suspending tool call " +
+            "(including Call Workflow) is supported per turn.";
+
+    static final String ERROR_AGENT_IS_SUBFLOW =
+        "Error: calling a sub-workflow as a tool is not supported when the agent itself runs as a sub-workflow.";
+
+    static final String ERROR_RESOLVE_FAILED_PREFIX =
+        "Error: could not resolve the requested sub-workflow: ";
 
     private WorkflowCallWorkflowTool() {
     }
 
     public static ClusterElementDefinition<ToolFunction> of(
-        SubflowDataSource subflowDataSource, SubflowSyncExecutor subflowSyncExecutor) {
+        SubflowDataSource subflowDataSource, SubflowResolver subflowResolver) {
 
         return ComponentDsl.<ToolFunction>clusterElement("callWorkflow")
             .title("Call Workflow")
@@ -81,18 +110,81 @@ public class WorkflowCallWorkflowTool {
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
                     .properties(getPropertiesFunction(subflowDataSource)))
-            .object(() -> getToolFunction(subflowSyncExecutor))
+            .object(() -> getToolFunction(subflowResolver))
             .output(getOutputFunction(subflowDataSource));
     }
 
-    private static ToolFunction getToolFunction(SubflowSyncExecutor subflowSyncExecutor) {
+    private static ToolFunction getToolFunction(SubflowResolver subflowResolver) {
         return (inputParameters, connectionParameters, context) -> {
-            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
+            ActionContext agentActionContext = resolveAgentActionContext(context);
 
+            if (!(agentActionContext instanceof ActionContextAware actionContextAware)) {
+                log.warn("Call Workflow tool invoked outside an AI agent context (contract violation)");
+
+                return ERROR_NOT_AGENT_CONTEXT;
+            }
+
+            if (actionContextAware.getSuspend() != null) {
+                log.warn(
+                    "Call Workflow tool invoked after another tool already suspended the agent (jobId={})",
+                    actionContextAware.getJobId());
+
+                return ERROR_ALREADY_SUSPENDED;
+            }
+
+            // The agent is itself a sub-workflow (parentTaskExecutionId != null). JobServiceImpl.resumeToStatusStarted
+            // asserts parentTaskExecutionId == null, so a later resumeJob on the agent would throw and the agent
+            // would be parked forever -- exactly the silent-park failure mode #5055 was filed against. Fail fast
+            // with an LLM-readable error instead of suspending into an irrecoverable state.
+
+            if (actionContextAware.getParentTaskExecutionId() != null) {
+                log.warn(
+                    "Call Workflow tool invoked from an agent that itself runs as a sub-workflow "
+                        + "(jobId={}, parentTaskExecutionId={}); refusing to suspend",
+                    actionContextAware.getJobId(), actionContextAware.getParentTaskExecutionId());
+
+                return ERROR_AGENT_IS_SUBFLOW;
+            }
+
+            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
             Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
 
-            return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, context.isEditorEnvironment());
+            boolean editorEnvironment = context.isEditorEnvironment();
+
+            // Resolution can throw -- e.g., workflow missing/unpublished, trigger removed. Per the design spec's
+            // Error handling table, this must surface to the LLM as a tool-result error, not escape to Spring AI.
+
+            Subflow subflow;
+
+            try {
+                subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, editorEnvironment);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Sub-workflow resolution failed for uuid={} (jobId={}): {}",
+                    workflowUuid, actionContextAware.getJobId(), exception.getMessage());
+
+                return ERROR_RESOLVE_FAILED_PREFIX + exception.getMessage();
+            }
+
+            PendingSubflowRequest request = new PendingSubflowRequest(
+                subflow.workflowId(), subflow.inputsName(), inputs, editorEnvironment, PlatformType.AUTOMATION);
+
+            Map<String, Object> continueParameters = new HashMap<>();
+
+            continueParameters.put(SubflowRequestConstants.PENDING_SUBFLOW, request);
+
+            agentActionContext.suspend(new ActionContext.Suspend(continueParameters, null));
+
+            return ToolSuspendConstants.SUSPENDED_SENTINEL;
         };
+    }
+
+    private static ActionContext resolveAgentActionContext(ClusterElementContext context) {
+        if (context instanceof ClusterElementContextAware clusterElementContextAware) {
+            return clusterElementContextAware.getAgentActionContext();
+        }
+
+        return null;
     }
 
     private static ClusterElementDefinition.OptionsFunction<String> getWorkflowOptionsFunction(

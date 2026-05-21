@@ -13,7 +13,6 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-memory"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
-    implementation(project(":server:libs:platform:platform-job-sync"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
     implementation(project(":sdks:backend:java:component-api"))
 

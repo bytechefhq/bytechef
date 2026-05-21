@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.definition;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
@@ -58,6 +59,15 @@ public interface ClusterElementContextAware extends ClusterElementContext, JobCo
     ClusterElementContext toClusterElementContext(
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection);
+
+    /**
+     * Returns the {@link ActionContext} of the AI agent action that invoked this cluster element tool, or {@code null}
+     * when the cluster element was not invoked as an agent tool.
+     *
+     * @return the agent's action context, or {@code null}
+     */
+    @Nullable
+    ActionContext getAgentActionContext();
 
     /**
      * Represents a functional interface for applying operations to a specific cluster element in a cluster processing

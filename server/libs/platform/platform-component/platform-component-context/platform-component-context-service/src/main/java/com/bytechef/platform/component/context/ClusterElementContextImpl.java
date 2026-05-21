@@ -104,6 +104,11 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     }
 
     @Override
+    public @Nullable ActionContext getAgentActionContext() {
+        return agentActionContext;
+    }
+
+    @Override
     public ActionContext toActionContext(
         String componentName, int componentVersion, String actionName,
         @Nullable ComponentConnection componentConnection) {

@@ -23,6 +23,7 @@ import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
 import com.bytechef.atlas.coordinator.task.dispatcher.ControlTaskDispatcher;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.facade.JobFacadeImpl;
 import com.bytechef.atlas.execution.repository.memory.InMemoryContextRepository;
@@ -117,7 +118,9 @@ public class WorkflowTestConfiguration {
         ComponentDefinitionService componentDefinitionService, Environment environment, Evaluator evaluator,
         ObjectMapper objectMapper, SubflowResolver subflowResolver,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService, TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry, WorkflowNodeOutputFacade workflowNodeOutputFacade,
+        TaskHandlerRegistry taskHandlerRegistry,
+        com.bytechef.platform.job.sync.executor.WebSocketEmitterRegistry webSocketEmitterRegistry,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         ContextService contextService = new ContextServiceImpl(new InMemoryContextRepository());
@@ -149,7 +152,8 @@ public class WorkflowTestConfiguration {
                 getTaskDispatcherResolverFactories(
                     contextService, counterService, evaluator, coordinatorEventPublisher, jobService,
                     subflowResolver, taskExecutionService, taskFileStorage, workflowService),
-                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
+                taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300,
+                webSocketEmitterRegistry, workflowService),
             taskDispatcherDefinitionService, taskExecutionService, taskFileStorage, workflowService,
             workflowNodeOutputFacade, workflowTestConfigurationService);
     }
@@ -226,8 +230,17 @@ public class WorkflowTestConfiguration {
         JobFacade jobFacade = new JobFacadeImpl(
             eventPublisher, contextService, jobService, taskExecutionService, taskFileStorage, workflowService);
 
-        ChildJobPrincipalFactory childJobPrincipalFactory =
-            (parentJobId, jobParametersDTO) -> jobFacade.createJob(jobParametersDTO);
+        ChildJobPrincipalFactory childJobPrincipalFactory = new ChildJobPrincipalFactory() {
+            @Override
+            public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
+                return jobFacade.createJob(jobParametersDTO);
+            }
+
+            @Override
+            public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
+                return jobFacade.createJob(jobParametersDTO);
+            }
+        };
 
         return List.of(
             (taskDispatcher) -> new BranchTaskDispatcher(

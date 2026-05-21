@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.workflow.subflow.sync;
+package com.bytechef.platform.workflow.task.dispatcher.subflow;
 
+import com.bytechef.platform.constant.PlatformType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
-import org.jspecify.annotations.Nullable;
 
 /**
- * Executes a sub-workflow synchronously and returns its output.
+ * The request an AI agent's Call Workflow tool stores in its {@code Suspend.continueParameters} so the coordinator
+ * bridge can launch the sub-workflow as a top-level job after the agent is suspended.
  *
  * @author Ivica Cardic
  */
-public interface SubflowSyncExecutor {
-
-    @Nullable
-    Object execute(
-        String workflowUuid, String triggerName, Map<String, ?> inputs, boolean editorEnvironment);
+@SuppressFBWarnings("EI")
+public record PendingSubflowRequest(
+    String workflowId, String inputsName, Map<String, ?> inputs, boolean editorEnvironment,
+    PlatformType platformType) {
 }
