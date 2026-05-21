@@ -1,5 +1,5 @@
-mutation updateAiSkillContent($id: ID!, $instructions: String!) {
-    updateAiSkillContent(id: $id, instructions: $instructions) {
+mutation updateAiSkillContent($id: ID!, $path: String, $content: String!) {
+    updateAiSkillContent(id: $id, path: $path, content: $content) {
         description
         id
         lastModifiedDate

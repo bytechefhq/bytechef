@@ -206,7 +206,7 @@ export default function useAiSkillDetail() {
     );
 
     const handleSaveContent = useCallback(
-        async (instructions: string) => {
+        async (content: string) => {
             if (!selectedSkillId) {
                 return;
             }
@@ -214,7 +214,7 @@ export default function useAiSkillDetail() {
             setIsSaving(true);
 
             try {
-                await updateAiSkillContent({id: selectedSkillId, instructions});
+                await updateAiSkillContent({content, id: selectedSkillId, path: selectedFilePath});
 
                 toast.success('Skill content saved');
             } catch (error) {
@@ -225,7 +225,7 @@ export default function useAiSkillDetail() {
                 setIsSaving(false);
             }
         },
-        [selectedSkillId, updateAiSkillContent]
+        [selectedFilePath, selectedSkillId, updateAiSkillContent]
     );
 
     useEffect(() => {
