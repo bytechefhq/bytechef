@@ -21,6 +21,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
+import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -42,9 +43,14 @@ class ClusterRootComponentConnectionFactory
 
     private static final Logger log = LoggerFactory.getLogger(ClusterRootComponentConnectionFactory.class);
 
+    private final List<ClusterElementConnectionFactory> clusterElementConnectionFactories;
     private final ComponentDefinitionService componentDefinitionService;
 
-    public ClusterRootComponentConnectionFactory(ComponentDefinitionService componentDefinitionService) {
+    public ClusterRootComponentConnectionFactory(
+        List<ClusterElementConnectionFactory> clusterElementConnectionFactories,
+        ComponentDefinitionService componentDefinitionService) {
+
+        this.clusterElementConnectionFactories = clusterElementConnectionFactories;
         this.componentDefinitionService = componentDefinitionService;
     }
 
@@ -135,6 +141,16 @@ class ClusterRootComponentConnectionFactory
 
                 componentConnections.addAll(
                     getComponentConnections(ClusterElementMap.of(clusterElement.getExtensions()), workflowNodeName));
+
+                for (ClusterElementConnectionFactory clusterElementConnectionFactory : clusterElementConnectionFactories) {
+                    if (clusterElementConnectionFactory.supports(
+                        clusterElement.getComponentName(), clusterElement.getClusterElementName())) {
+
+                        componentConnections.addAll(
+                            clusterElementConnectionFactory.create(
+                                workflowNodeName, clusterElement.getParameters()));
+                    }
+                }
             }
         }
 

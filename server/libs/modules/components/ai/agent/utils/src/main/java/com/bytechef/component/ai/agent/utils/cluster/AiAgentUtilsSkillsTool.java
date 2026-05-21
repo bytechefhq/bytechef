@@ -31,15 +31,24 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import org.slf4j.Logger;
@@ -60,14 +69,34 @@ public class AiAgentUtilsSkillsTool {
 
     private static final String SKILLS = "skills";
     private static final String SKILL_ID = "skillId";
+    private static final String SCRIPTS_DIRECTORY = "scripts/";
+
+    /**
+     * Matches calls of the form: context.component.{componentName}.{actionName}({rawParameters})
+     * Parameters are captured as a raw string for later processing.
+     */
+    private static final Pattern COMPONENT_CALL_PATTERN = Pattern.compile(
+        "context\\.component\\.([A-Za-z][A-Za-z0-9_-]*)\\.([A-Za-z][A-Za-z0-9_]*)\\(([^)]*)\\)");
+
+    /**
+     * Detects a perform function declaration across the supported script languages:
+     * JavaScript: function perform(
+     * Python/Ruby: def perform(
+     * R:           perform <- function(
+     * Java:        ) perform(Map
+     */
+    private static final Pattern PERFORM_FUNCTION_PATTERN = Pattern.compile(
+        "(?:function\\s+perform\\s*\\(|def\\s+perform\\s*[\\s(]|perform\\s*<-\\s*function\\s*\\(|\\bperform\\s*\\(Map)");
 
     private final AiSkillFacade aiSkillFacade;
+    private final ComponentDefinitionService componentDefinitionService;
 
     public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsSkillsTool(AiSkillFacade aiSkillFacade) {
+    public AiAgentUtilsSkillsTool(AiSkillFacade aiSkillFacade, ComponentDefinitionService componentDefinitionService) {
         this.aiSkillFacade = aiSkillFacade;
+        this.componentDefinitionService = componentDefinitionService;
 
         this.clusterElementDefinition =
             ComponentDsl.<ToolCallbackProviderFunction>clusterElement("skillsTool")
@@ -161,6 +190,88 @@ public class AiAgentUtilsSkillsTool {
 
         return options;
     }
+
+    /**
+     * Scans all script files inside the skill zip archive for component calls of the form
+     * {@code context.component.{componentName}.{actionName}(...)}.
+     * Only files under the {@code scripts/} directory that contain a {@code perform} function are analysed.
+     *
+     * @return a map from script entry path to the list of component calls found in that script,
+     *         ordered by appearance in the archive; empty if no matching scripts exist
+     */
+    public static Map<String, List<ComponentCall>> analyzeSkillScripts(byte[] zipBytes) {
+        Map<String, List<ComponentCall>> result = new LinkedHashMap<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry zipEntry;
+            int entryCount = 0;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (++entryCount > MAX_ZIP_ENTRIES) {
+                    throw new IllegalArgumentException(
+                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                }
+
+                if (zipEntry.isDirectory() || !isScriptEntry(zipEntry.getName())) {
+                    continue;
+                }
+
+                byte[] bytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
+
+                if (bytes.length > MAX_ZIP_ENTRY_SIZE) {
+                    log.warn("Script '{}' exceeds maximum allowed size, skipping", zipEntry.getName());
+
+                    continue;
+                }
+
+                String content = new String(bytes, StandardCharsets.UTF_8);
+
+                if (!hasPerformFunction(content)) {
+                    continue;
+                }
+
+                List<ComponentCall> calls = extractComponentCalls(content);
+
+                if (!calls.isEmpty()) {
+                    result.put(zipEntry.getName(), calls);
+                }
+            }
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to analyse skill archive", ioException);
+        }
+
+        return result;
+    }
+
+    /**
+     * Returns true if the entry path falls inside a {@code scripts/} directory, handling both
+     * top-level ({@code scripts/foo.js}) and nested ({@code skill-name/scripts/foo.js}) layouts.
+     */
+    public static boolean isScriptEntry(String entryName) {
+        String normalized = entryName.replace('\\', '/');
+
+        return normalized.startsWith(SCRIPTS_DIRECTORY) || normalized.contains("/" + SCRIPTS_DIRECTORY);
+    }
+
+    public static boolean hasPerformFunction(String content) {
+        return PERFORM_FUNCTION_PATTERN.matcher(content)
+            .find();
+    }
+
+    public static List<ComponentCall> extractComponentCalls(String content) {
+        List<ComponentCall> calls = new ArrayList<>();
+
+        Matcher matcher = COMPONENT_CALL_PATTERN.matcher(content);
+
+        while (matcher.find()) {
+            calls.add(new ComponentCall(matcher.group(1), matcher.group(2), matcher.group(3).trim()));
+        }
+
+        return calls;
+    }
+
+    /** Represents a single {@code context.component.X.Y(...)} call found inside a skill script. */
+    public record ComponentCall(String componentName, String actionName, String rawParameters) {}
 
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {
