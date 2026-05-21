@@ -57,20 +57,30 @@ public class ApolloUtils extends AbstractApolloUtils {
     }
 
     private static List<Option<String>> getOptions(String path, String resources, Context context) {
-        Map<String, ?> body = context.http(http -> http.get(path))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        int currentPage = 1;
+        int totalPages = 1;
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get(resources) instanceof List<?> users) {
-            for (Object user : users) {
-                if (user instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get("name"), (String) map.get("id")));
+        do {
+            Map<String, ?> body = context.http(http -> http.get(path))
+                .queryParameters("page", currentPage, "per_page", 100)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("pagination") instanceof Map<?, ?> pagination) {
+                totalPages = (int) pagination.get("total_pages");
+            }
+
+            if (body.get(resources) instanceof List<?> list) {
+                for (Object object : list) {
+                    if (object instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get("name"), (String) map.get("id")));
+                    }
                 }
             }
-        }
+        } while (currentPage++ < totalPages);
 
         return options;
     }
