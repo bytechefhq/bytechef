@@ -29,29 +29,43 @@ import com.bytechef.component.definition.ClusterElementDefinition.PropertiesFunc
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
-import com.bytechef.component.workflow.subflow.sync.SubflowSyncExecutor;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseValueProperty;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
+import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver.Subflow;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Ivica Cardic
  */
 public class WorkflowCallWorkflowTool {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowCallWorkflowTool.class);
+
     private static final String WORKFLOW_UUID = "workflowUuid";
+
+    private static final String TOOL_LABEL = "Call Workflow";
+
+    static final String ERROR_NOT_AGENT_CONTEXT = SubflowToolSupport.notAgentContextError(TOOL_LABEL);
+
+    static final String ERROR_ALREADY_SUSPENDED = SubflowToolSupport.alreadySuspendedError(TOOL_LABEL);
+
+    static final String ERROR_RESOLVE_FAILED_PREFIX = SubflowToolSupport.ERROR_RESOLVE_FAILED_PREFIX;
 
     private WorkflowCallWorkflowTool() {
     }
 
     public static ClusterElementDefinition<ToolFunction> of(
-        SubflowDataSource subflowDataSource, SubflowSyncExecutor subflowSyncExecutor) {
+        SubflowDataSource subflowDataSource, SubflowResolver subflowResolver) {
 
         return ComponentDsl.<ToolFunction>clusterElement("callWorkflow")
             .title("Call Workflow")
@@ -67,17 +81,38 @@ public class WorkflowCallWorkflowTool {
                     .description("The input parameters for the sub-workflow.")
                     .propertiesLookupDependsOn(WORKFLOW_UUID)
                     .properties(getPropertiesFunction(subflowDataSource)))
-            .object(() -> getToolFunction(subflowSyncExecutor))
+            .object(() -> getToolFunction(subflowResolver))
             .output(getOutputFunction(subflowDataSource));
     }
 
-    private static ToolFunction getToolFunction(SubflowSyncExecutor subflowSyncExecutor) {
+    private static ToolFunction getToolFunction(SubflowResolver subflowResolver) {
         return (inputParameters, connectionParameters, context) -> {
-            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
+            ActionContextAware actionContextAware;
 
+            try {
+                actionContextAware = SubflowToolSupport.requireGuardsPassed(context, "callWorkflow", TOOL_LABEL);
+            } catch (SubflowToolSupport.GuardFailure guardFailure) {
+                return guardFailure.getMessage();
+            }
+
+            String workflowUuid = inputParameters.getRequiredString(WORKFLOW_UUID);
             Map<String, ?> inputs = inputParameters.getMap(INPUTS, Collections.emptyMap());
 
-            return subflowSyncExecutor.execute(workflowUuid, NEW_WORKFLOW_CALL, inputs, context.isEditorEnvironment());
+            boolean editorEnvironment = context.isEditorEnvironment();
+
+            Subflow subflow;
+
+            try {
+                subflow = subflowResolver.resolveSubflow(workflowUuid, NEW_WORKFLOW_CALL, editorEnvironment);
+            } catch (RuntimeException exception) {
+                log.warn(
+                    "Sub-workflow resolution failed for uuid={} (jobId={}): {}",
+                    workflowUuid, actionContextAware.getJobId(), exception.getMessage());
+
+                return ERROR_RESOLVE_FAILED_PREFIX + exception.getMessage();
+            }
+
+            return SubflowToolSupport.suspendForSubflow(actionContextAware, subflow, inputs, editorEnvironment);
         };
     }
 
