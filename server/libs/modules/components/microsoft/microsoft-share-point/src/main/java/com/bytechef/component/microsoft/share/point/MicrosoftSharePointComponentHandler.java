@@ -17,6 +17,7 @@
 package com.bytechef.component.microsoft.share.point;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -24,6 +25,10 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateFolderAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListItemAction;
+import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointDeleteFileOrFolderAction;
+import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointGetFileOrFolderByIdAction;
+import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointGetFolderContentsAction;
+import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointReplaceFileAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointUploadFileAction;
 import com.bytechef.component.microsoft.share.point.connection.MicrosoftSharePointConnection;
 import com.bytechef.component.microsoft.share.point.trigger.MicrosoftSharePointNewFileTrigger;
@@ -52,7 +57,20 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             MicrosoftSharePointCreateFolderAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION,
+            MicrosoftSharePointDeleteFileOrFolderAction.ACTION_DEFINITION,
+            MicrosoftSharePointGetFileOrFolderByIdAction.ACTION_DEFINITION,
+            MicrosoftSharePointGetFolderContentsAction.ACTION_DEFINITION,
+            MicrosoftSharePointReplaceFileAction.ACTION_DEFINITION,
             MicrosoftSharePointUploadFileAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MicrosoftSharePointCreateFolderAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointCreateListAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointDeleteFileOrFolderAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointGetFileOrFolderByIdAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointGetFolderContentsAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointReplaceFileAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointUploadFileAction.ACTION_DEFINITION))
         .triggers(MicrosoftSharePointNewFileTrigger.TRIGGER_DEFINITION)
         .version(1);
 
