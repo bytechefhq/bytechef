@@ -1,6 +1,13 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import downloadAiSkill from '@/pages/automation/ai/skills/utils/downloadAiSkill';
-import {useAiSkillFileContentQuery, useAiSkillFilePathsQuery, useAiSkillQuery} from '@/shared/middleware/graphql';
+import {
+    useAiSkillFileContentQuery,
+    useAiSkillFilePathsQuery,
+    useAiSkillQuery,
+    useUpdateAiSkillContentMutation,
+    useUpdateAiSkillMutation,
+} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
@@ -70,8 +77,16 @@ export type {FileTreeNodeI};
 
 export default function useAiSkillDetail() {
     const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+    const [isSaving, setIsSaving] = useState(false);
 
     const {closeSkillDetail, selectedSkillId} = useAiSkillsStore();
+
+    const queryClient = useQueryClient();
+
+    const {mutateAsync: updateAiSkillContent} = useUpdateAiSkillContentMutation();
+    const {mutateAsync: updateAiSkill} = useUpdateAiSkillMutation({
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]}),
+    });
 
     const {data: skillData, isError: isSkillError} = useAiSkillQuery(
         {id: selectedSkillId ?? ''},
@@ -152,6 +167,67 @@ export default function useAiSkillDetail() {
         setSelectedFilePath(path);
     }, []);
 
+    const handleRename = useCallback(
+        async (newName: string) => {
+            if (!selectedSkillId || !skill) {
+                return;
+            }
+
+            try {
+                await updateAiSkill({description: skill.description, id: selectedSkillId, name: newName});
+
+                toast.success('Skill renamed');
+            } catch (error) {
+                toast.error('Failed to rename skill', {
+                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
+                });
+            }
+        },
+        [selectedSkillId, skill, updateAiSkill]
+    );
+
+    const handleEditDescription = useCallback(
+        async (description: string | null) => {
+            if (!selectedSkillId || !skill) {
+                return;
+            }
+
+            try {
+                await updateAiSkill({description, id: selectedSkillId, name: skill.name});
+
+                toast.success('Description updated');
+            } catch (error) {
+                toast.error('Failed to update description', {
+                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
+                });
+            }
+        },
+        [selectedSkillId, skill, updateAiSkill]
+    );
+
+    const handleSaveContent = useCallback(
+        async (instructions: string) => {
+            if (!selectedSkillId) {
+                return;
+            }
+
+            setIsSaving(true);
+
+            try {
+                await updateAiSkillContent({id: selectedSkillId, instructions});
+
+                toast.success('Skill content saved');
+            } catch (error) {
+                toast.error('Failed to save skill content', {
+                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
+                });
+            } finally {
+                setIsSaving(false);
+            }
+        },
+        [selectedSkillId, updateAiSkillContent]
+    );
+
     useEffect(() => {
         if (isSkillError) {
             toast.error('Failed to load skill details');
@@ -176,9 +252,13 @@ export default function useAiSkillDetail() {
         fileTree,
         handleBack,
         handleDownload,
+        handleEditDescription,
         handleFileSelect,
+        handleRename,
+        handleSaveContent,
         isFileContentLoading,
         isMarkdown,
+        isSaving,
         selectedFilePath,
         skill,
     };

@@ -19,8 +19,6 @@ const config: CodegenConfig = {
                 {
                     add: {
                         content: [
-                            'export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };',
-                            "export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };",
                             'export class TypedDocumentString<TResult, TVariables> extends String {',
                             '  __apiType?: { result: TResult; variables: TVariables };',
                             '  __meta__?: Record<string, unknown>;',

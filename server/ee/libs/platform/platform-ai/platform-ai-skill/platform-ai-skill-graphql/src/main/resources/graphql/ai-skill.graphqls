@@ -9,6 +9,7 @@ extend type Mutation {
     createAiSkill(name: String!, description: String, filename: String!, "Base64-encoded bytes of the skill archive" fileBytes: String!): AiSkill!
     createAiSkillFromInstructions(name: String!, description: String, "Markdown instructions for the skill" instructions: String!): AiSkill!
     updateAiSkill(id: ID!, name: String!, description: String): AiSkill!
+    updateAiSkillContent(id: ID!, instructions: String!): AiSkill!
     deleteAiSkill(id: ID!): Boolean!
 }
 
