@@ -30,6 +30,7 @@ import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -278,14 +279,22 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
-    public AiSkill updateAiSkillContent(long id, String instructions) {
-        Assert.hasText(instructions, "Instructions must not be blank");
+    public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
+        Assert.hasText(content, "Content must not be blank");
+
+        String targetPath = (path != null && !path.isBlank()) ? path : "SKILL.md";
+
+        if (targetPath.contains("..") || targetPath.startsWith("/")) {
+            throw new IllegalArgumentException(
+                "Path must not contain path traversal sequences or be absolute: " + targetPath);
+        }
 
         AiSkill aiSkill = aiSkillService.getAiSkill(id);
 
         FileEntry oldFileEntry = aiSkill.getSkillFile();
 
-        byte[] zipBytes = createSkillZip(aiSkill.getName(), aiSkill.getDescription(), instructions);
+        byte[] existingZipBytes = aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry);
+        byte[] zipBytes = replaceZipEntry(existingZipBytes, targetPath, content);
 
         FileEntry newFileEntry = aiSkillFileStorage.storeAiSkillFile(
             toSkillFilename(aiSkill.getName()), zipBytes);
@@ -331,6 +340,50 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
             throw new IllegalArgumentException(
                 "A skill with the name '" + name + "' already exists", dataIntegrityViolationException);
+        }
+    }
+
+    /**
+     * Reads all entries from the existing zip, replaces (or adds) the entry at {@code targetPath} with
+     * {@code newContent}, and returns the bytes of the new zip. All other entries are copied verbatim.
+     */
+    private byte[] replaceZipEntry(byte[] existingZipBytes, String targetPath, String newContent) {
+        Map<String, byte[]> entries = new LinkedHashMap<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(existingZipBytes))) {
+            ZipEntry zipEntry;
+            int entryCount = 0;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (++entryCount > MAX_ZIP_ENTRIES) {
+                    throw new IllegalArgumentException(
+                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                }
+
+                if (!zipEntry.isDirectory()) {
+                    entries.put(zipEntry.getName(), zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1));
+                }
+            }
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to read existing skill archive", ioException);
+        }
+
+        entries.put(targetPath, newContent.getBytes(StandardCharsets.UTF_8));
+
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+
+            for (Map.Entry<String, byte[]> entry : entries.entrySet()) {
+                zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
+                zipOutputStream.write(entry.getValue());
+                zipOutputStream.closeEntry();
+            }
+
+            zipOutputStream.finish();
+
+            return byteArrayOutputStream.toByteArray();
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to write updated skill archive", ioException);
         }
     }
 

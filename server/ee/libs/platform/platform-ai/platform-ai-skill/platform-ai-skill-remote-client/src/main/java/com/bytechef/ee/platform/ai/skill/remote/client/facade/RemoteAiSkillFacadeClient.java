@@ -71,7 +71,7 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
     }
 
     @Override
-    public AiSkill updateAiSkillContent(long id, String instructions) {
+    public AiSkill updateAiSkillContent(long id, String path, String content) {
         throw new UnsupportedOperationException();
     }
 }

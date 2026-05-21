@@ -2193,8 +2193,9 @@ export type MutationUpdateAiSkillArgs = {
 
 
 export type MutationUpdateAiSkillContentArgs = {
+  content: Scalars['String']['input'];
   id: Scalars['ID']['input'];
-  instructions: Scalars['String']['input'];
+  path?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -3932,7 +3933,8 @@ export type UpdateAiSkillMutation = { __typename?: 'Mutation', updateAiSkill: { 
 
 export type UpdateAiSkillContentMutationVariables = Exact<{
   id: Scalars['ID']['input'];
-  instructions: Scalars['String']['input'];
+  path?: InputMaybe<Scalars['String']['input']>;
+  content: Scalars['String']['input'];
 }>;
 
 
@@ -6382,8 +6384,8 @@ export const useUpdateAiSkillMutation = <
     )};
 
 export const UpdateAiSkillContentDocument = new TypedDocumentString(`
-    mutation updateAiSkillContent($id: ID!, $instructions: String!) {
-  updateAiSkillContent(id: $id, instructions: $instructions) {
+    mutation updateAiSkillContent($id: ID!, $path: String, $content: String!) {
+  updateAiSkillContent(id: $id, path: $path, content: $content) {
     description
     id
     lastModifiedDate

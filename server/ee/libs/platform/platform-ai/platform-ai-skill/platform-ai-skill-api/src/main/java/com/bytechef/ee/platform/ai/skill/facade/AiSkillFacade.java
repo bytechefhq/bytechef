@@ -66,5 +66,9 @@ public interface AiSkillFacade {
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
 
-    AiSkill updateAiSkillContent(long id, String instructions);
+    /**
+     * Replaces the content of a single file inside the skill zip archive. If {@code path} is {@code null}, defaults to
+     * {@code SKILL.md}. The path must not contain traversal sequences (..) or be absolute.
+     */
+    AiSkill updateAiSkillContent(long id, @Nullable String path, String content);
 }

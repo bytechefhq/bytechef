@@ -166,10 +166,11 @@ public class SkillsTools {
         description = "Update the instructions (e.g. `SKILL.md` content) of an existing AI skill. Returns the updated skill.")
     public AiSkill updateAiSkillContent(
         @ToolParam(description = "The ID of the skill to update") long id,
-        @ToolParam(description = "The new instructions that define the skill behaviour") String instructions) {
+        @ToolParam(description = "Path to the file you want to update. Default is `SKILL.md`") String targetPath,
+        @ToolParam(description = "The modified content of the skill") String contents) {
 
         try {
-            AiSkill aiSkill = aiSkillFacade.updateAiSkillContent(id, instructions);
+            AiSkill aiSkill = aiSkillFacade.updateAiSkillContent(id, targetPath, contents);
 
             if (log.isDebugEnabled()) {
                 log.debug("updateAiSkillContent({}): Updated skill content", id);

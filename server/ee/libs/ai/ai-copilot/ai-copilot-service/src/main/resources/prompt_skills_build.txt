@@ -173,7 +173,7 @@ Always preserve the skill's `name` and directory identifier unless the user expl
 | `getAiSkillFilePaths(id)` | List all files bundled inside a skill archive |
 | `getAiSkillFileContent(id, path)` | Read the content of a specific file (e.g., `SKILL.md`) from a skill archive |
 | `updateAiSkill(id, name, description)` | Update the name and/or description of an existing skill |
-| `updateAiSkillContent(id, instructions)` | Update the instructions (e.g. `SKILL.md` content) of an existing AI skill |
+| `updateAiSkillContent(id, targetPath, contents)` | Update the contents of a specific file |
 
 ---
 

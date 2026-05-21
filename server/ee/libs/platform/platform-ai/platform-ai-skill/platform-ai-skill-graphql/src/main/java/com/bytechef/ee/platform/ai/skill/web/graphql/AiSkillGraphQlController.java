@@ -94,8 +94,8 @@ class AiSkillGraphQlController {
     }
 
     @MutationMapping
-    AiSkill updateAiSkillContent(@Argument long id, @Argument String instructions) {
-        return aiSkillFacade.updateAiSkillContent(id, instructions);
+    AiSkill updateAiSkillContent(@Argument long id, @Argument @Nullable String path, @Argument String content) {
+        return aiSkillFacade.updateAiSkillContent(id, path, content);
     }
 
     @MutationMapping
