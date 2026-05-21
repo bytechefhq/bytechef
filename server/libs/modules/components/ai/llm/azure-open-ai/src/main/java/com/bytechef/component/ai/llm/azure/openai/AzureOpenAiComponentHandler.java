@@ -47,7 +47,8 @@ public class AzureOpenAiComponentHandler implements ComponentHandler {
             AzureOpenAiChatAction.ACTION_DEFINITION,
             AzureOpenAiCreateImageAction.ACTION_DEFINITION,
             AzureOpenAiCreateTranscriptionAction.ACTION_DEFINITION)
-        .clusterElements(AzureOpenAiChatModel.CLUSTER_ELEMENT_DEFINITION);
+        .clusterElements(AzureOpenAiChatModel.CLUSTER_ELEMENT_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

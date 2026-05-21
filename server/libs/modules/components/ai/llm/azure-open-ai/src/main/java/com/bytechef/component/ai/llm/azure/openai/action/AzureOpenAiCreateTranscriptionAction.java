@@ -89,6 +89,8 @@ public class AzureOpenAiCreateTranscriptionAction {
                 .maxValue(1)
                 .required(false))
         .output()
+        .help(
+            "", "https://docs.bytechef.io/reference/components/azure-open-ai_v1#create-transcriptions")
         .perform(AzureOpenAiCreateTranscriptionAction::perform);
 
     private AzureOpenAiCreateTranscriptionAction() {
@@ -100,22 +102,23 @@ public class AzureOpenAiCreateTranscriptionAction {
         return AUDIO_TRANSCRIPTION.getResponse(inputParameters, connectionParameters, context);
     }
 
-    private static final AudioTranscriptionModel AUDIO_TRANSCRIPTION = (inputParameters, connectionParameters) -> {
-        Language language = inputParameters.get(LANGUAGE, Language.class);
+    public static final AudioTranscriptionModel AUDIO_TRANSCRIPTION =
+        (inputParameters, connectionParameters) -> {
+            Language language = inputParameters.get(LANGUAGE, Language.class);
 
-        return OpenAiAudioTranscriptionModel.builder()
-            .options(
-                OpenAiAudioTranscriptionOptions.builder()
-                    .baseUrl(connectionParameters.getString(ENDPOINT))
-                    .apiKey(connectionParameters.getString(TOKEN))
-                    .microsoftFoundry(true)
-                    .deploymentName(inputParameters.getRequiredString(MODEL))
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .prompt(inputParameters.getString(PROMPT))
-                    .language(language.getCode())
-                    .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
-                    .temperature(inputParameters.getFloat(TEMPERATURE))
-                    .build())
-            .build();
-    };
+            return OpenAiAudioTranscriptionModel.builder()
+                .options(
+                    OpenAiAudioTranscriptionOptions.builder()
+                        .baseUrl(connectionParameters.getString(ENDPOINT))
+                        .apiKey(connectionParameters.getString(TOKEN))
+                        .microsoftFoundry(true)
+                        .deploymentName(inputParameters.getRequiredString(MODEL))
+                        .model(inputParameters.getRequiredString(MODEL))
+                        .prompt(inputParameters.getString(PROMPT))
+                        .language(language.getCode())
+                        .responseFormat(AudioResponseFormat.of(inputParameters.getString(RESPONSE_FORMAT)))
+                        .temperature(inputParameters.getFloat(TEMPERATURE))
+                        .build())
+                .build();
+        };
 }

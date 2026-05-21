@@ -96,6 +96,7 @@ public class AzureOpenAiCreateImageAction {
                             .description("URL of the generated image."),
                         string("b64Json")
                             .description("Base64 encoded JSON of the generated image."))))
+        .help("", "https://docs.bytechef.io/reference/components/azure-open-ai_v1#create-image")
         .perform(AzureOpenAiCreateImageAction::perform);
 
     private AzureOpenAiCreateImageAction() {
