@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
@@ -1192,7 +1195,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want and stream the response.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#ask-stream"
+    },
     "metadata": null,
     "name": "streamAsk",
     "outputDefinition": {
@@ -2426,7 +2432,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#create-image"
+    },
     "metadata": null,
     "name": "createImage",
     "outputDefinition": {
@@ -2880,7 +2889,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generate an audio recording from the input text",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#text-to-speech"
+    },
     "metadata": null,
     "name": "createSpeech",
     "outputDefinition": {
@@ -3308,7 +3320,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Transcribes audio into the input language.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#create-transcriptions"
+    },
     "metadata": null,
     "name": "createTranscription",
     "outputDefinition": {
@@ -4493,7 +4508,10 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-ai_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
