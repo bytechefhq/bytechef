@@ -55,8 +55,9 @@ public class FtpDownloadFileAction {
     protected static FileEntry perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        String remotePath = inputParameters.getRequiredString(PATH);
+
         try (RemoteFileClient remoteFileClient = RemoteFileClient.of(connectionParameters)) {
-            String remotePath = inputParameters.getRequiredString(PATH);
             String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
 
             try (PipedInputStream pipedInputStream = new PipedInputStream();
@@ -67,8 +68,7 @@ public class FtpDownloadFileAction {
                         try {
                             remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
                         } catch (IOException ioException) {
-                            throw new ProviderException(
-                                "Failed to download file: " + ioException.getMessage(), ioException);
+                            throw new ProviderException("Failed to download file " + remotePath, ioException);
                         } finally {
                             try {
                                 pipedOutputStream.close();
@@ -82,7 +82,7 @@ public class FtpDownloadFileAction {
                 return context.file(file -> file.storeContent(filename, pipedInputStream));
             }
         } catch (IOException ioException) {
-            throw new ProviderException("Failed to download file: " + ioException.getMessage(), ioException);
+            throw new ProviderException("Failed to download file " + remotePath, ioException);
         }
     }
 }
