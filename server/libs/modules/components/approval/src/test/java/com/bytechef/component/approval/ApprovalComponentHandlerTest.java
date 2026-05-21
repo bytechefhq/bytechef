@@ -30,7 +30,7 @@ class ApprovalComponentHandlerTest {
     @Test
     void testGetComponentDefinition() {
         JsonFileAssert.assertEquals(
-            "definition/approval.json",
+            "definition/approval_v1.json",
             new ApprovalComponentHandler(mock(ClusterElementDefinitionService.class)).getDefinition());
     }
 }
