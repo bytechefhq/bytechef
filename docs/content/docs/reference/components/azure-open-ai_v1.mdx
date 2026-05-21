@@ -127,7 +127,7 @@ Name: createImage
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> <span>dall-e-2</span>, <span>dall-e-3</span>, <span>gpt-image-1-mini</span> </details> | The model to use for image generation. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>dall-e-2</span>, <span>dall-e-3</span> </details> | The model to use for image generation. | true |
 | imageMessages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(content), NUMBER\(weight)&#125;] </details> | A list of messages comprising the conversation so far. | true |
 | size | Size | STRING <details> <summary> Options </summary> <span>DALL_E_2_256x256</span>, <span>DALL_E_2_512x512</span>, <span>_1024x1024</span>, <span>DALL_E_3_1792x1024</span>, <span>DALL_E_3_1024x1792</span> </details> | The size of the generated images. | true |
 | n | Number of Responses | INTEGER | The number of images to generate. Must be between 1 and 10. For dall-e-3, only n=1 is supported.. | false |
@@ -194,10 +194,10 @@ Name: createTranscription
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | file | File Entry | FILE_ENTRY | The audio file object to transcribe, in one of these formats: flac, mp3, mp4, mpeg, mpga, m4a, ogg, wav, or webm. | true |
-| model | Model | STRING <details> <summary> Options </summary> <span>whisper</span> </details> | ID of the model to use. | true |
+| model | Model | STRING | Whisper deployment name. | true |
 | language | Language | STRING <details> <summary> Options </summary> <span>AF</span>, <span>AR</span>, <span>HY</span>, <span>AZ</span>, <span>BE</span>, <span>BS</span>, <span>BG</span>, <span>CA</span>, <span>ZH</span>, <span>HR</span>, <span>CS</span>, <span>DA</span>, <span>NL</span>, <span>EL</span>, <span>ET</span>, <span>EN</span>, <span>FI</span>, <span>FR</span>, <span>GL</span>, <span>DE</span>, <span>HE</span>, <span>HI</span>, <span>HU</span>, <span>IS</span>, <span>ID</span>, <span>IT</span>, <span>JA</span>, <span>KK</span>, <span>KN</span>, <span>KO</span>, <span>LT</span>, <span>LV</span>, <span>MA</span>, <span>MK</span>, <span>MR</span>, <span>MS</span>, <span>NE</span>, <span>NO</span>, <span>FA</span>, <span>PL</span>, <span>PT</span>, <span>RO</span>, <span>RU</span>, <span>SK</span>, <span>SL</span>, <span>SR</span>, <span>ES</span>, <span>SV</span>, <span>SW</span>, <span>TA</span>, <span>TL</span>, <span>TH</span>, <span>TR</span>, <span>UK</span>, <span>UR</span>, <span>VI</span>, <span>CY</span> </details> | The language of the input audio. | false |
 | prompt | Prompt | STRING | An optional text to guide the model's style or continue a previous audio segment. The prompt should match the audio language. | false |
-| responseFormat | Response Format | STRING <details> <summary> Options </summary> <span>JSON</span>, <span>SRT</span>, <span>TEXT</span>, <span>VERBOSE_JSON</span>, <span>VTT</span> </details> | The format of the transcript output | true |
+| responseFormat | Response Format | STRING <details> <summary> Options </summary> <span>json</span>, <span>text</span>, <span>srt</span>, <span>verbose_json</span>, <span>vtt</span> </details> | The format of the transcript output | true |
 | temperature | Temperature | NUMBER | The sampling temperature, between 0 and 1. Higher values like will make the output more random, while lower values will make it more focused and deterministic.  | false |
 
 #### Example JSON Structure
