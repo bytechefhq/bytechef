@@ -41,15 +41,13 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.ImageModel.Quality;
-import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
-import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.ai.llm.openai.definition.Size;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
+import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 
@@ -113,28 +111,48 @@ public class OpenAiCreateImageAction {
         .help("", "https://docs.bytechef.io/reference/components/open-ai_v1#create-image")
         .perform(OpenAiCreateImageAction::perform);
 
-    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
-        ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
-        Size size = inputParameters.getRequired(SIZE, Size.class);
-        Style style = inputParameters.get(STYLE, Style.class, NATURAL);
-        Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
+    public static final ImageModel IMAGE_MODEL = new ImageModel() {
 
-        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
-            .height(size.getDimensions()[1])
-            .model(inputParameters.getRequiredString(MODEL))
-            .N(inputParameters.getInteger(N))
-            .quality(quality.getValue())
-            .responseFormat(responseFormat.getValue())
-            .style(style.getValue())
-            .user(inputParameters.getString(USER))
-            .width(size.getDimensions()[0])
-            .build();
+        @Override
+        public org.springframework.ai.image.ImageModel createImageModel(
+            Parameters inputParameters, Parameters connectionParameters) {
 
-        return new OpenAiImageModel(
-            OpenAIOkHttpClient.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .build(),
-            imageOptions);
+            return new OpenAiImageModel(
+                OpenAIOkHttpClient.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .build(),
+                (OpenAiImageOptions) getImageOptions(inputParameters));
+        }
+
+        @Override
+        public ImageOptions getImageOptions(Parameters inputParameters) {
+            String model = inputParameters.getRequiredString(MODEL);
+            boolean isDallE = model.equals("dall-e-2") || model.equals("dall-e-3");
+            boolean isDallE3 = model.equals("dall-e-3");
+
+            OpenAiImageOptions.Builder builder = OpenAiImageOptions.builder()
+                .model(model)
+                .N(inputParameters.getInteger(N))
+                .user(inputParameters.getString(USER));
+
+            Size size = inputParameters.getRequired(SIZE, Size.class);
+            builder.height(size.getDimensions()[1])
+                .width(size.getDimensions()[0]);
+
+            if (isDallE) {
+                ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
+                builder.responseFormat(responseFormat.getValue());
+            }
+
+            if (isDallE3) {
+                Style style = inputParameters.get(STYLE, Style.class, NATURAL);
+                Quality quality = inputParameters.get(QUALITY, Quality.class, STANDARD);
+                builder.style(style.getValue())
+                    .quality(quality.getValue());
+            }
+
+            return builder.build();
+        }
     };
 
     private OpenAiCreateImageAction() {
