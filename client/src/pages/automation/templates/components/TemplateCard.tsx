@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {getTemplateCategoryLabel} from '@/pages/automation/templates/constants/templateCategories';
 import {Link} from 'react-router-dom';
 
 import type React from 'react';
@@ -33,7 +34,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
                             <Badge
                                 className="text-xs"
                                 key={index}
-                                label={category}
+                                label={getTemplateCategoryLabel(category)}
                                 styleType="outline-outline"
                                 weight="semibold"
                             />

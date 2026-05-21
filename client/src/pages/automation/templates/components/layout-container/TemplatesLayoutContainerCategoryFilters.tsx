@@ -1,18 +1,7 @@
 import Button from '@/components/Button/Button';
+import {TEMPLATE_CATEGORIES} from '@/pages/automation/templates/constants/templateCategories';
 import {useTemplatesStore} from '@/pages/automation/templates/stores/useTemplatesStore';
 import {useState} from 'react';
-
-const categories = [
-    {id: 'all', label: 'All'},
-    {id: 'ai', label: 'AI'},
-    {id: 'sales', label: 'Sales'},
-    {id: 'finance', label: 'Finance'},
-    {id: 'hr', label: 'HR'},
-    {id: 'social', label: 'Social'},
-    {id: 'marketing', label: 'Marketing'},
-    {id: 'it', label: 'IT Ops'},
-    {id: 'other', label: 'Other'},
-];
 
 export function TemplatesLayoutContainerCategoryFilters() {
     const [activeCategory, setActiveCategory] = useState<string>('all');
@@ -21,7 +10,7 @@ export function TemplatesLayoutContainerCategoryFilters() {
 
     return (
         <div className="flex flex-wrap gap-2">
-            {categories.map((category) => (
+            {TEMPLATE_CATEGORIES.map((category) => (
                 <Button
                     className="rounded-full"
                     key={category.id}
