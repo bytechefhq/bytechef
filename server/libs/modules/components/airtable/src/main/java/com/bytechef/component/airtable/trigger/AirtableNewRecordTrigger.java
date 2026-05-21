@@ -48,6 +48,7 @@ public class AirtableNewRecordTrigger {
         .title("New Record")
         .description("Trigger off when a new entry is added to the table that you have selected.")
         .type(TriggerType.POLLING)
+        .help("", "https://docs.bytechef.io/reference/components/airtable_v1#new-record")
         .properties(
             string(BASE_ID)
                 .label("Base ID")
