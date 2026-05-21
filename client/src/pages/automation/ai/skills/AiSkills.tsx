@@ -102,7 +102,7 @@ const AiSkills = () => {
             leftSidebarHeader={<Header position="sidebar" title="AI" />}
             leftSidebarWidth="64"
         >
-            <div className="flex min-h-0 flex-1 flex-col p-4">
+            <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
                 <AiSkillsPanel />
             </div>
         </LayoutContainer>
