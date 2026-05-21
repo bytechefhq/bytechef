@@ -31,14 +31,14 @@ import static com.bytechef.component.microsoft.share.point.constant.ColumnType.T
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DESCRIPTION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FOLDER;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LIST_ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.READ_ONLY;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.REQUIRED;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
-import static com.bytechef.microsoft.commons.MicrosoftConstants.VALUE;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.VALUE;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.ActionContext;
@@ -46,12 +46,15 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.exception.ProviderException;
 import com.bytechef.component.microsoft.share.point.constant.ColumnType;
+import com.bytechef.microsoft.commons.MicrosoftConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -205,30 +208,62 @@ public class MicrosoftSharePointUtils {
         return (parentId == null) ? "root" : parentId;
     }
 
-    public static List<Option<String>> getFolderIdOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
-        String searchText, Context context) {
-
+    private static Map<String, Object> fetchSiteChildren(Parameters inputParameters, Context context) {
         if (!inputParameters.containsKey(SITE_ID)) {
-            return List.of();
+            return Map.of();
         }
 
-        Map<String, ?> body = context.http(
+        Map<String, Object> body = context.http(
             http -> http.get("/sites/" + inputParameters.getRequiredString(SITE_ID) + "/drive/root/delta"))
             .queryParameter("$select", "id,name,folder,parentReference")
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
+        return body;
+    }
+
+    public static List<Option<String>> getFileIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> response = fetchSiteChildren(inputParameters, context);
+
         List<Object> folders = new ArrayList<>();
 
-        if (body.get(VALUE) instanceof List<?> list) {
+        if (response.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
+            list.stream()
+                .filter(o -> o instanceof Map<?, ?> map && !map.containsKey(FOLDER))
+                .forEach(folders::add);
+        }
+
+        return getOptions(context, Map.of(VALUE, folders), NAME, ID);
+    }
+
+    public static List<Option<String>> getFolderIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> response = fetchSiteChildren(inputParameters, context);
+
+        List<Object> folders = new ArrayList<>();
+
+        if (response.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
             list.stream()
                 .filter(o -> o instanceof Map<?, ?> map && map.containsKey(FOLDER))
                 .forEach(folders::add);
         }
 
         return getOptions(context, Map.of(VALUE, folders), NAME, ID);
+    }
+
+    public static List<Option<String>> getFolderAndFileIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
+        String searchText, Context context) {
+
+        Map<String, Object> response = fetchSiteChildren(inputParameters, context);
+
+        return getOptions(context, response, NAME, ID);
     }
 
     public static List<Option<String>> getListIdOptions(
@@ -246,6 +281,38 @@ public class MicrosoftSharePointUtils {
                 .getBody(new TypeReference<>() {});
 
         return getOptions(context, body, DISPLAY_NAME, ID);
+    }
+
+    public static String getSiteId(Context context, String fileId) {
+        Map<String, Object> body = context
+            .http(http -> http.post("/search/query"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .body(Body.of(getRequestBody(fileId)))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get(VALUE) instanceof List<?> valueList &&
+            valueList.getFirst() instanceof Map<?, ?> valueElement &&
+            valueElement.get("hitsContainers") instanceof List<?> hitContainers &&
+            hitContainers.getFirst() instanceof Map<?, ?> hitContainerElement &&
+            hitContainerElement.get("hits") instanceof List<?> hits &&
+            hits.getFirst() instanceof Map<?, ?> hit &&
+            hit.get("resource") instanceof Map<?, ?> resource &&
+            resource.get("parentReference") instanceof Map<?, ?> parentReference) {
+
+            return (String) parentReference.get("siteId");
+        }
+
+        throw new ProviderException("Folder or File can not be found.");
+    }
+
+    private static Map<String, Object> getRequestBody(String id) {
+        return Map.of("requests", List.of(Map.of(
+            "entityTypes", List.of("driveItem"),
+            "query", Map.of("queryString", "UniqueId:%s".formatted(id)),
+            "fields", List.of("id", "name", "webUrl", "size",
+                "createdDateTime", "lastModifiedDateTime",
+                "parentReference", "file", "folder"))));
     }
 
     public static List<Option<String>> getSiteOptions(
