@@ -29,7 +29,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
@@ -86,6 +85,7 @@ public class AzureOpenAiChatAction {
             STOP_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/azure-open-ai_v1#ask")
         .perform(AzureOpenAiChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
@@ -113,7 +113,6 @@ public class AzureOpenAiChatAction {
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .N(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                     .responseFormat(openAiResponseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
@@ -127,8 +126,7 @@ public class AzureOpenAiChatAction {
     private AzureOpenAiChatAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         return CHAT_MODEL.getResponse(inputParameters, connectionParameters, context);
     }

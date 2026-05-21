@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class AzureOpenAiConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
