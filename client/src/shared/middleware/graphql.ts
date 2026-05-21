@@ -1565,6 +1565,7 @@ export type Mutation = {
   updateAiAgentScenarioJudge: AiAgentScenarioJudge;
   updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
   updateAiSkill: AiSkill;
+  updateAiSkillContent: AiSkill;
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
@@ -2188,6 +2189,12 @@ export type MutationUpdateAiSkillArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+};
+
+
+export type MutationUpdateAiSkillContentArgs = {
+  id: Scalars['ID']['input'];
+  instructions: Scalars['String']['input'];
 };
 
 
@@ -3922,6 +3929,14 @@ export type UpdateAiSkillMutationVariables = Exact<{
 
 
 export type UpdateAiSkillMutation = { __typename?: 'Mutation', updateAiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+
+export type UpdateAiSkillContentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  instructions: Scalars['String']['input'];
+}>;
+
+
+export type UpdateAiSkillContentMutation = { __typename?: 'Mutation', updateAiSkillContent: { __typename?: 'AiSkill', description?: string | null, id: string, lastModifiedDate?: any | null, name: string } };
 
 export type ApprovalTaskQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -6362,6 +6377,30 @@ export const useUpdateAiSkillMutation = <
       {
     mutationKey: ['updateAiSkill'],
     mutationFn: (variables?: UpdateAiSkillMutationVariables) => fetcher<UpdateAiSkillMutation, UpdateAiSkillMutationVariables>(UpdateAiSkillDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAiSkillContentDocument = new TypedDocumentString(`
+    mutation updateAiSkillContent($id: ID!, $instructions: String!) {
+  updateAiSkillContent(id: $id, instructions: $instructions) {
+    description
+    id
+    lastModifiedDate
+    name
+  }
+}
+    `);
+
+export const useUpdateAiSkillContentMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAiSkillContent'],
+    mutationFn: (variables?: UpdateAiSkillContentMutationVariables) => fetcher<UpdateAiSkillContentMutation, UpdateAiSkillContentMutationVariables>(UpdateAiSkillContentDocument, variables)(),
     ...options
   }
     )};
