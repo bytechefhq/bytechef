@@ -1,0 +1,17 @@
+---
+label: "Sub-workflow with a Wait-style suspending step"
+inputs:
+- name: "amount"
+  type: "integer"
+  required: false
+tasks:
+- name: "beforeWait"
+  type: "var/v1/set"
+  parameters:
+    value: "reached the wait step"
+- name: "wait"
+  type: "suspend/v1"
+- name: "afterWait"
+  type: "var/v1/set"
+  parameters:
+    value: "wait elapsed"

@@ -25,4 +25,9 @@ public class RemoteChildJobPrincipalFactoryClient implements ChildJobPrincipalFa
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
+        throw new UnsupportedOperationException();
+    }
 }
