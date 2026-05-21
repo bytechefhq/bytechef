@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.exception.ProviderException;
 import com.google.auto.service.AutoService;
@@ -70,7 +71,17 @@ public class AirtableComponentHandler extends AbstractAirtableComponentHandler {
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://airtable.com/developers/web/api/introduction")
             .icon("path:assets/airtable.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION);
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .help("", "https://docs.bytechef.io/reference/components/airtable_v1#connection-setup")
+            .version(1);
     }
 }
