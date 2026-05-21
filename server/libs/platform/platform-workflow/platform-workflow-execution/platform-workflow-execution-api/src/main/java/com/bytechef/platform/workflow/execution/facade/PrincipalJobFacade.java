@@ -29,5 +29,10 @@ public interface PrincipalJobFacade {
 
     long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);
 
+    /**
+     * Creates a top-level job, with no parent task execution, owned by the same principal as the reference job.
+     */
+    long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType);
+
     Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);
 }

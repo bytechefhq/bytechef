@@ -38,4 +38,9 @@ class ChildJobPrincipalFactoryImpl implements ChildJobPrincipalFactory {
     public long createChildJob(long parentJobId, JobParametersDTO jobParametersDTO) {
         return principalJobFacade.createChildJob(parentJobId, jobParametersDTO, PlatformType.AUTOMATION);
     }
+
+    @Override
+    public long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO) {
+        return principalJobFacade.createPrincipalLinkedJob(referenceJobId, jobParametersDTO, PlatformType.AUTOMATION);
+    }
 }
