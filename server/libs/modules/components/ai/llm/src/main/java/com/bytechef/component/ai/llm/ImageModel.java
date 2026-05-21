@@ -22,6 +22,8 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import java.util.List;
 import org.springframework.ai.image.ImageGeneration;
+import org.springframework.ai.image.ImageOptions;
+import org.springframework.ai.image.ImageOptionsBuilder;
 import org.springframework.ai.image.ImagePrompt;
 import org.springframework.ai.image.ImageResponse;
 
@@ -76,6 +78,11 @@ public interface ImageModel {
         }
     }
 
+    default ImageOptions getImageOptions(Parameters inputParameters) {
+        return ImageOptionsBuilder.builder()
+            .build();
+    }
+
     org.springframework.ai.image.ImageModel createImageModel(
         Parameters inputParameters, Parameters connectionParameters);
 
@@ -84,7 +91,7 @@ public interface ImageModel {
 
         List<org.springframework.ai.image.ImageMessage> messages = getMessages(inputParameters);
 
-        ImageResponse response = imageModel.call(new ImagePrompt(messages));
+        ImageResponse response = imageModel.call(new ImagePrompt(messages, getImageOptions(inputParameters)));
 
         ImageGeneration result = response.getResult();
 
