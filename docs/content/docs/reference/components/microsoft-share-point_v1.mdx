@@ -291,6 +291,311 @@ To find the List ID, click [here](/reference/components/microsoft-share-point_v1
 
 
 
+### Delete File or Folder
+Name: deleteFileOrFolder
+
+`Deletes specified file or folder.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| id | File or Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | The ID of the file or folder that will be deleted. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete File or Folder",
+  "name" : "deleteFileOrFolder",
+  "parameters" : {
+    "siteId" : "",
+    "id" : ""
+  },
+  "type" : "microsoftSharePoint/v1/deleteFileOrFolder"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Get File or Folder by ID
+Name: getFileOrFolderById
+
+`Retrieves information about file or folder by its ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| id | File or Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | The ID of the file or folder to retrieve. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get File or Folder by ID",
+  "name" : "getFileOrFolderById",
+  "parameters" : {
+    "siteId" : "",
+    "id" : ""
+  },
+  "type" : "microsoftSharePoint/v1/getFileOrFolderById"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdDateTime | DATE_TIME | The date and time when the folder was created. |
+| eTag | STRING |  |
+| id | STRING | ID of the folder. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the folder was last modified. |
+| name | STRING | Name of the folder. |
+| size | INTEGER | Size of the folder in bytes. |
+| webUrl | STRING | URL to access the folder in a web browser. |
+| cTag | STRING |  |
+| commentSettings | OBJECT <details> <summary> Properties </summary> &#123;&#123;BOOLEAN\(isDisabled)&#125;\(commentingDisabled)&#125; </details> |  |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| folder | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(childCount)&#125; </details> |  |
+| shared | OBJECT <details> <summary> Properties </summary> &#123;STRING\(scope)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "cTag" : "",
+  "commentSettings" : {
+    "commentingDisabled" : {
+      "isDisabled" : false
+    }
+  },
+  "createdBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "folder" : {
+    "childCount" : 1
+  },
+  "shared" : {
+    "scope" : ""
+  }
+}
+```
+
+
+
+
+### Get Folder Contents
+Name: getFolderContents
+
+`The folder whose contents you want to list.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | ID of the folder whose contents you want to list. If no folder is selected, root folder will be listed. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Get Folder Contents",
+  "name" : "getFolderContents",
+  "parameters" : {
+    "siteId" : "",
+    "parentFolder" : ""
+  },
+  "type" : "microsoftSharePoint/v1/getFolderContents"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| @odata.context | STRING |  |
+| value | ARRAY <details> <summary> Items </summary> [&#123;DATE_TIME\(createdDateTime), STRING\(eTag), STRING\(id), DATE_TIME\(lastModifiedDateTime), STRING\(name), INTEGER\(size), STRING\(webUrl), STRING\(cTag), &#123;&#123;BOOLEAN\(isDisabled)&#125;\(commentingDisabled)&#125;\(commentSettings), &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125;\(createdBy), &#123;&#123;STRING\(id), STRING\(displayName)&#125;\(user)&#125;\(lastModifiedBy), &#123;INTEGER\(childCount)&#125;\(folder), &#123;STRING\(scope)&#125;\(shared)&#125;] </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "@odata.context" : "",
+  "value" : [ {
+    "createdDateTime" : "2021-01-01T00:00:00",
+    "eTag" : "",
+    "id" : "",
+    "lastModifiedDateTime" : "2021-01-01T00:00:00",
+    "name" : "",
+    "size" : 1,
+    "webUrl" : "",
+    "cTag" : "",
+    "commentSettings" : {
+      "commentingDisabled" : {
+        "isDisabled" : false
+      }
+    },
+    "createdBy" : {
+      "user" : {
+        "id" : "",
+        "displayName" : ""
+      }
+    },
+    "lastModifiedBy" : {
+      "user" : {
+        "id" : "",
+        "displayName" : ""
+      }
+    },
+    "folder" : {
+      "childCount" : 1
+    },
+    "shared" : {
+      "scope" : ""
+    }
+  } ]
+}
+```
+
+
+
+
+### Replace File
+Name: replaceFile
+
+`Replace file in Microsoft SharePoint folder. You can replace two files that are of same type.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> siteId </details> | ID of the file that will be replaced. | true |
+| file | File Entry | FILE_ENTRY | File that will be used to replace the existing file. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Replace File",
+  "name" : "replaceFile",
+  "parameters" : {
+    "siteId" : "",
+    "fileId" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "microsoftSharePoint/v1/replaceFile"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| createdDateTime | DATE_TIME | The date and time when the file was created. |
+| eTag | STRING | eTag for the entire item (metadata + content). |
+| id | STRING | ID of the file. |
+| lastModifiedDateTime | DATE_TIME | The date and time when the file was last modified. |
+| name | STRING | Name of the file. |
+| size | INTEGER | Size of the file in bytes. |
+| webUrl | STRING | URL to access the file in a web browser. |
+| createdBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(email), STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| lastModifiedBy | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(email), STRING\(id), STRING\(displayName)&#125;\(user)&#125; </details> |  |
+| file | OBJECT <details> <summary> Properties </summary> &#123;&#123;STRING\(quickXorHash)&#125;\(hashes), STRING\(mimeType)&#125; </details> |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "createdDateTime" : "2021-01-01T00:00:00",
+  "eTag" : "",
+  "id" : "",
+  "lastModifiedDateTime" : "2021-01-01T00:00:00",
+  "name" : "",
+  "size" : 1,
+  "webUrl" : "",
+  "createdBy" : {
+    "user" : {
+      "email" : "",
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "lastModifiedBy" : {
+    "user" : {
+      "email" : "",
+      "id" : "",
+      "displayName" : ""
+    }
+  },
+  "file" : {
+    "hashes" : {
+      "quickXorHash" : ""
+    },
+    "mimeType" : ""
+  }
+}
+```
+
+
+
+
 ### Upload File
 Name: uploadFile
 
