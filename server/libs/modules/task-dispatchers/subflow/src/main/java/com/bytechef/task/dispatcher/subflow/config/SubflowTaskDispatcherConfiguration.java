@@ -18,6 +18,7 @@ package com.bytechef.task.dispatcher.subflow.config;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
+import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -25,6 +26,8 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.ChildJobPrincipalFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowResolver;
 import com.bytechef.task.dispatcher.subflow.SubflowTaskDispatcher;
+import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowLauncher;
+import com.bytechef.task.dispatcher.subflow.event.listener.AgentSubflowResumeListener;
 import com.bytechef.task.dispatcher.subflow.event.listener.SubflowJobStatusEventListener;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
@@ -57,6 +60,27 @@ public class SubflowTaskDispatcherConfiguration {
 
             return new SubflowJobStatusEventListener(
                 evaluator, eventPublisher, jobService, taskExecutionService, taskFileStorage);
+        }
+    }
+
+    @Configuration
+    @ConditionalOnCoordinator
+    public static class AgentSubflowBridgeConfiguration {
+
+        @Bean
+        AgentSubflowLauncher agentSubflowLauncher(
+            ChildJobPrincipalFactory childJobPrincipalFactory, JobService jobService,
+            TaskExecutionService taskExecutionService) {
+
+            return new AgentSubflowLauncher(childJobPrincipalFactory, jobService, taskExecutionService);
+        }
+
+        @Bean
+        AgentSubflowResumeListener agentSubflowResumeListener(
+            JobFacade jobFacade, JobService jobService, TaskExecutionService taskExecutionService,
+            TaskFileStorage taskFileStorage) {
+
+            return new AgentSubflowResumeListener(jobFacade, jobService, taskExecutionService, taskFileStorage);
         }
     }
 }

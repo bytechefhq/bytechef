@@ -84,6 +84,27 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
 
     @Override
     @Transactional
+    public long createPrincipalLinkedJob(
+        long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType) {
+
+        Validate.isTrue(
+            jobParametersDTO.getParentTaskExecutionId() == null,
+            "A principal-linked job is a top-level job; use createChildJob for a sub-workflow");
+
+        long principalId = principalJobService.fetchJobPrincipalId(referenceJobId, platformType)
+            .orElseThrow(() -> new IllegalStateException(
+                "Cannot create principal-linked job: no principal found for reference job %d (type=%s)"
+                    .formatted(referenceJobId, platformType)));
+
+        long jobId = jobFacade.createJob(jobParametersDTO);
+
+        principalJobService.create(jobId, principalId, platformType);
+
+        return jobId;
+    }
+
+    @Override
+    @Transactional
     public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
