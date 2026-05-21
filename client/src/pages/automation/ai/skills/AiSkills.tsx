@@ -11,7 +11,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SearchIcon, SparklesIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useEffect} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
 type AiSkillsRouteType = 'detail' | 'list' | 'uploadForm' | 'writeForm';
@@ -40,15 +40,15 @@ const AiSkills = () => {
     const navigate = useNavigate();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
+    const copilotPanelOpen = useAiSkillsStore((state) => state.copilotPanelOpen);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
     const selectedSkillId = useAiSkillsStore((state) => state.selectedSkillId);
+    const setCopilotPanelOpen = useAiSkillsStore((state) => state.setCopilotPanelOpen);
     const setSearchQuery = useAiSkillsStore((state) => state.setSearchQuery);
     const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
-
-    const [copilotPanelOpen, setCopilotPanelOpen] = useState(false);
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 

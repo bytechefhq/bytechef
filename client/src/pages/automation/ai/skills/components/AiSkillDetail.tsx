@@ -1,11 +1,14 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillEditDescriptionDialog from '@/pages/automation/ai/skills/components/AiSkillEditDescriptionDialog';
 import AiSkillRenameDialog from '@/pages/automation/ai/skills/components/AiSkillRenameDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
+import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
-import {AlignLeftIcon, DownloadIcon, FileIcon, FileTextIcon, FolderIcon, PencilIcon, SaveIcon} from 'lucide-react';
+import {AlignLeftIcon, DownloadIcon, FileIcon, FileTextIcon, FolderIcon, PencilIcon, SaveIcon, SparklesIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
@@ -144,6 +147,10 @@ const AiSkillDetail = () => {
 
     const latestContentRef = useRef('');
 
+    const setCopilotPanelOpen = useAiSkillsStore((state) => state.setCopilotPanelOpen);
+
+    const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
     const {
         editorLanguage,
         fileContent,
@@ -201,6 +208,13 @@ const AiSkillDetail = () => {
                         />
                     </div>
                 </div>
+
+                <Button
+                    icon={<DownloadIcon className="size-4" />}
+                    onClick={handleDownload}
+                    size="icon"
+                    variant="ghost"
+                />
             </div>
 
             <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -238,12 +252,21 @@ const AiSkillDetail = () => {
                                     variant="ghost"
                                 />
 
-                                <Button
-                                    icon={<DownloadIcon className="size-4" />}
-                                    onClick={handleDownload}
-                                    size="icon"
-                                    variant="ghost"
-                                />
+                                {ff_4554 && (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                className="[&_svg]:size-5"
+                                                icon={<SparklesIcon />}
+                                                onClick={() => setCopilotPanelOpen(true)}
+                                                size="icon"
+                                                variant="ghost"
+                                            />
+                                        </TooltipTrigger>
+
+                                        <TooltipContent>Open Copilot panel</TooltipContent>
+                                    </Tooltip>
+                                )}
                             </div>
 
                             <div className="relative min-h-0 flex-1">
