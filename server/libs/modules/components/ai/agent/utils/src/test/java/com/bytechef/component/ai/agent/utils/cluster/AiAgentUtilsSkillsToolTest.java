@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.agent.utils.cluster;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -26,12 +28,14 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,6 +55,9 @@ class AiAgentUtilsSkillsToolTest {
     private AiSkillFacade aiSkillFacade;
 
     @Mock
+    private ComponentDefinitionService componentDefinitionService;
+
+    @Mock
     private Context context;
 
     @Mock
@@ -63,7 +70,7 @@ class AiAgentUtilsSkillsToolTest {
 
     @BeforeEach
     void setUp() {
-        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade);
+        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade, componentDefinitionService);
     }
 
     @Test
@@ -148,6 +155,174 @@ class AiAgentUtilsSkillsToolTest {
         assertNotNull(agentUtilsSkillsTool.clusterElementDefinition);
     }
 
+    // --- analyzeSkillScripts tests ---
+
+    @Test
+    void testAnalyzeSkillScriptsFindsComponentCallsInScriptsFolder() {
+        String script = """
+            function perform(input, context) {
+                context.component.slack.sendMessage({'channel': 'general', 'text': 'hello'})
+                context.component.logger.info({'text': 'done'})
+                return null;
+            }
+            """;
+
+        byte[] zipBytes = createZipWithEntries(
+            Map.of("my-skill/SKILL.md", createSkillMd("My Skill", "desc"),
+                "my-skill/scripts/main.js", script));
+
+        Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> result =
+            agentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+
+        assertFalse(result.isEmpty());
+
+        List<AiAgentUtilsSkillsTool.ComponentCall> calls = result.get("my-skill/scripts/main.js");
+
+        assertNotNull(calls);
+        assertEquals(2, calls.size());
+        assertEquals("slack", calls.get(0).componentName());
+        assertEquals("sendMessage", calls.get(0).actionName());
+        assertEquals("logger", calls.get(1).componentName());
+        assertEquals("info", calls.get(1).actionName());
+    }
+
+    @Test
+    void testAnalyzeSkillScriptsIgnoresFilesOutsideScriptsFolder() {
+        String script = """
+            function perform(input, context) {
+                context.component.slack.sendMessage({'text': 'hi'})
+                return null;
+            }
+            """;
+
+        byte[] zipBytes = createZipWithEntries(
+            Map.of("my-skill/SKILL.md", createSkillMd("My Skill", "desc"),
+                "my-skill/references/notes.js", script));
+
+        Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> result =
+            agentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testAnalyzeSkillScriptsSkipsScriptWithoutPerformFunction() {
+        String script = "context.component.slack.sendMessage({'text': 'hi'})";
+
+        byte[] zipBytes = createZipWithEntries(
+            Map.of("my-skill/scripts/helper.js", script));
+
+        Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> result =
+            agentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testAnalyzeSkillScriptsReturnsEmptyWhenPerformHasNoComponentCalls() {
+        String script = """
+            function perform(input, context) {
+                return null;
+            }
+            """;
+
+        byte[] zipBytes = createZipWithEntries(Map.of("my-skill/scripts/main.js", script));
+
+        Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> result =
+            agentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void testAnalyzeSkillScriptsHandlesEmptyParameterList() {
+        String script = """
+            function perform(input, context) {
+                context.component.http.get()
+                return null;
+            }
+            """;
+
+        byte[] zipBytes = createZipWithEntries(Map.of("skill/scripts/main.js", script));
+
+        Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> result =
+            agentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+
+        List<AiAgentUtilsSkillsTool.ComponentCall> calls = result.get("skill/scripts/main.js");
+
+        assertNotNull(calls);
+        assertEquals(1, calls.size());
+        assertEquals("", calls.get(0).rawParameters());
+    }
+
+    // --- isScriptEntry tests ---
+
+    @Test
+    void testIsScriptEntryTopLevel() {
+        assertTrue(AiAgentUtilsSkillsTool.isScriptEntry("scripts/main.js"));
+    }
+
+    @Test
+    void testIsScriptEntryNested() {
+        assertTrue(AiAgentUtilsSkillsTool.isScriptEntry("skill-name/scripts/main.py"));
+    }
+
+    @Test
+    void testIsScriptEntryReturnsFalseForMdFile() {
+        assertFalse(AiAgentUtilsSkillsTool.isScriptEntry("skill-name/SKILL.md"));
+    }
+
+    @Test
+    void testIsScriptEntryReturnsFalseForReferences() {
+        assertFalse(AiAgentUtilsSkillsTool.isScriptEntry("skill-name/references/guide.md"));
+    }
+
+    // --- hasPerformFunction tests ---
+
+    @Test
+    void testHasPerformFunctionJavaScript() {
+        assertTrue(AiAgentUtilsSkillsTool.hasPerformFunction("function perform(input, context) {\n  return null;\n}"));
+    }
+
+    @Test
+    void testHasPerformFunctionPython() {
+        assertTrue(AiAgentUtilsSkillsTool.hasPerformFunction("def perform(input, context):\n  return None"));
+    }
+
+    @Test
+    void testHasPerformFunctionR() {
+        assertTrue(AiAgentUtilsSkillsTool.hasPerformFunction("perform <- function(input, context) {\n  return(NULL)\n}"));
+    }
+
+    @Test
+    void testHasPerformFunctionReturnsFalseWhenAbsent() {
+        assertFalse(AiAgentUtilsSkillsTool.hasPerformFunction("function helper() {}"));
+    }
+
+    // --- extractComponentCalls tests ---
+
+    @Test
+    void testExtractComponentCallsParsesMultipleCalls() {
+        String content = """
+            context.component.slack.sendMessage({'channel': 'dev'})
+            context.component.gmail.sendEmail({'to': 'a@b.com', 'subject': 'hi'})
+            """;
+
+        List<AiAgentUtilsSkillsTool.ComponentCall> calls =
+            AiAgentUtilsSkillsTool.extractComponentCalls(content);
+
+        assertEquals(2, calls.size());
+        assertEquals("slack", calls.get(0).componentName());
+        assertEquals("sendMessage", calls.get(0).actionName());
+        assertEquals("gmail", calls.get(1).componentName());
+        assertEquals("sendEmail", calls.get(1).actionName());
+    }
+
+    @Test
+    void testExtractComponentCallsReturnsEmptyWhenNonePresent() {
+        assertTrue(AiAgentUtilsSkillsTool.extractComponentCalls("return null;").isEmpty());
+    }
+
     private ToolCallbackProvider invokeApply() throws Exception {
         Method applyMethod = AiAgentUtilsSkillsTool.class.getDeclaredMethod(
             "apply", Parameters.class, Parameters.class, Context.class);
@@ -177,12 +352,19 @@ class AiAgentUtilsSkillsToolTest {
     }
 
     private byte[] createZipWithMdFile(String entryName, String content) {
+        return createZipWithEntries(Map.of(entryName, content));
+    }
+
+    private byte[] createZipWithEntries(Map<String, String> entries) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
 
-            zipOutputStream.putNextEntry(new ZipEntry(entryName));
-            zipOutputStream.write(content.getBytes(StandardCharsets.UTF_8));
-            zipOutputStream.closeEntry();
+            for (Map.Entry<String, String> entry : entries.entrySet()) {
+                zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
+                zipOutputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                zipOutputStream.closeEntry();
+            }
+
             zipOutputStream.finish();
 
             return byteArrayOutputStream.toByteArray();

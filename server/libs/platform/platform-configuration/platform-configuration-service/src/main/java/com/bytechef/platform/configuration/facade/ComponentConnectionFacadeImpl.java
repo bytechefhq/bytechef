@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
 import com.bytechef.platform.configuration.workflow.connection.ComponentConnectionFactoryResolver;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final List<ClusterElementConnectionFactory> clusterElementConnectionFactories;
     private final ComponentDefinitionService componentDefinitionService;
     private final ComponentConnectionFactoryResolver componentConnectionFactoryResolver;
     private final WorkflowService workflowService;
@@ -50,10 +52,12 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
     @SuppressFBWarnings("EI")
     public ComponentConnectionFacadeImpl(
         ClusterElementDefinitionService clusterElementDefinitionService,
+        List<ClusterElementConnectionFactory> clusterElementConnectionFactories,
         ComponentDefinitionService componentDefinitionService,
         ComponentConnectionFactoryResolver componentConnectionFactoryResolver, WorkflowService workflowService) {
 
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.clusterElementConnectionFactories = clusterElementConnectionFactories;
         this.componentDefinitionService = componentDefinitionService;
         this.componentConnectionFactoryResolver = componentConnectionFactoryResolver;
         this.workflowService = workflowService;
@@ -106,6 +110,17 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
                     return componentDefinitionService.getComponentDefinition(name, version)
                         .isConnectionRequired();
                 }));
+
+        for (ClusterElementConnectionFactory clusterElementConnectionFactory : clusterElementConnectionFactories) {
+            if (clusterElementConnectionFactory.supports(
+                clusterElement.getComponentName(), clusterElement.getClusterElementName())) {
+
+                componentConnections.addAll(
+                    clusterElementConnectionFactory.create(
+                        clusterElementWorkflowNodeName,
+                        clusterElement.getParameters()));
+            }
+        }
 
         return componentConnections;
     }
