@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/azure-open-ai_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
@@ -776,7 +779,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/azure-open-ai_v1#create-image"
+    },
     "metadata": null,
     "name": "createImage",
     "outputDefinition": {
@@ -1188,7 +1194,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Transcribes audio into the input language.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/azure-open-ai_v1#create-transcriptions"
+    },
     "metadata": null,
     "name": "createTranscription",
     "outputDefinition": {
