@@ -16,8 +16,8 @@
 
 package com.bytechef.component.microsoft.share.point.action;
 
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -26,11 +26,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Context.Http.Configuration;
-import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
-import com.bytechef.component.definition.Context.Http.Response;
-import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -51,22 +47,15 @@ class MicrosoftSharePointDeleteFileOrFolderActionTest {
 
     @Test
     void testPerform(
-        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
 
-        MicrosoftSharePointDeleteFileOrFolderAction.perform(
-            mockedParameters, mockedParameters, mockedContext);
+        MicrosoftSharePointDeleteFileOrFolderAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
-
-        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/sites/siteId/drive/items/folder", stringArgumentCaptor.getValue());
     }
 }

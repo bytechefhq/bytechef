@@ -18,14 +18,13 @@ package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
@@ -37,12 +36,12 @@ public class MicrosoftSharePointDeleteFileOrFolderAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteFileOrFolder")
         .title("Delete File or Folder")
-        .description("Deletes specified file or folder ID")
+        .description("Deletes specified file or folder.")
         .properties(
             SITE_ID_PROPERTY,
             string(ID)
                 .label("File or Folder ID")
-                .description("The ID of the file or folder to retrieve.")
+                .description("The ID of the file or folder that will be deleted.")
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderAndFileIdOptions)
                 .optionsLookupDependsOn(SITE_ID)
                 .required(true))
@@ -59,7 +58,6 @@ public class MicrosoftSharePointDeleteFileOrFolderAction {
         context.http(http -> http.delete(
             "/sites/%s/drive/items/%s".formatted(
                 inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString(ID))))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         return null;

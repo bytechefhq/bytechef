@@ -16,17 +16,15 @@
 
 package com.bytechef.component.microsoft.share.point.action;
 
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Configuration;
@@ -36,15 +34,12 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
@@ -52,8 +47,7 @@ import org.mockito.MockedStatic;
 @ExtendWith(MockContextSetupExtension.class)
 class MicrosoftSharePointGetFileOrFolderByIdActionTest {
 
-    private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
-    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(ID, "folder"));
+    private final Parameters mockedParameters = MockParametersFactory.create(Map.of(SITE_ID, "xy", ID, "folder"));
     private final Map<String, Object> responseMap = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
@@ -63,30 +57,21 @@ class MicrosoftSharePointGetFileOrFolderByIdActionTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        try (MockedStatic<MicrosoftSharePointUtils> microsoftSharePointUtilsMockedStatic =
-            mockStatic(MicrosoftSharePointUtils.class)) {
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(responseMap);
 
-            microsoftSharePointUtilsMockedStatic.when(() -> MicrosoftSharePointUtils.getSiteId(
-                contextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(SITE_ID);
+        Object result = MicrosoftSharePointGetFileOrFolderByIdAction.perform(
+            mockedParameters, mockedParameters, mockedContext);
 
-            when(mockedHttp.get(stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
-            when(mockedResponse.getBody(any(TypeReference.class)))
-                .thenReturn(responseMap);
+        assertEquals(responseMap, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-            Object result = MicrosoftSharePointGetFileOrFolderByIdAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-            assertEquals(responseMap, result);
-            assertNotNull(httpFunctionArgumentCaptor.getValue());
-
-            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-            Configuration configuration = configurationBuilder.build();
-
-            assertEquals(ResponseType.JSON, configuration.getResponseType());
-            assertEquals(List.of("folder", "/sites/siteId/drive/items/folder"), stringArgumentCaptor.getAllValues());
-            assertEquals(mockedContext, contextArgumentCaptor.getValue());
-        }
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/sites/xy/drive/items/folder", stringArgumentCaptor.getValue());
     }
 }
