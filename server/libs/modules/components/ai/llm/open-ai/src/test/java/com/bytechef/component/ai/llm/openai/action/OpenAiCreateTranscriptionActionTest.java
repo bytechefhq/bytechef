@@ -82,7 +82,6 @@ class OpenAiCreateTranscriptionActionTest {
 
             assertNotNull(audioTranscriptionModel);
             assertInstanceOf(OpenAiAudioTranscriptionModel.class, audioTranscriptionModel);
-
             assertEquals("TOKEN", stringArgumentCaptor.getValue());
 
             OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel =

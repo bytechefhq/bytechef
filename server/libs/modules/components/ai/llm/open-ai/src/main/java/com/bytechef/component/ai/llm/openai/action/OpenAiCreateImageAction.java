@@ -121,11 +121,11 @@ public class OpenAiCreateImageAction {
                 OpenAIOkHttpClient.builder()
                     .apiKey(connectionParameters.getString(TOKEN))
                     .build(),
-                (OpenAiImageOptions) getImageOptions(inputParameters));
+                (OpenAiImageOptions) getImageOptions(inputParameters, connectionParameters));
         }
 
         @Override
-        public ImageOptions getImageOptions(Parameters inputParameters) {
+        public ImageOptions getImageOptions(Parameters inputParameters, Parameters connectionParameters) {
             String model = inputParameters.getRequiredString(MODEL);
             boolean isDallE = model.equals("dall-e-2") || model.equals("dall-e-3");
             boolean isDallE3 = model.equals("dall-e-3");

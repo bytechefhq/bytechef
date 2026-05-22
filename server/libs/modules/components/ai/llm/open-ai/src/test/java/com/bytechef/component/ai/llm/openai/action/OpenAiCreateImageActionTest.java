@@ -59,11 +59,7 @@ class OpenAiCreateImageActionTest {
     @Test
     void testCreateImageModelWithGptModel() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "gpt-image-1",
-                SIZE, Size._1024x1024,
-                N, 1,
-                USER, "user"));
+            Map.of(MODEL, "gpt-image-1", SIZE, Size._1024x1024, N, 1, USER, "user"));
 
         try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class)) {
             OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
@@ -100,13 +96,8 @@ class OpenAiCreateImageActionTest {
     void testCreateImageModelWithDallE3() {
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.of(
-                MODEL, "dall-e-3",
-                SIZE, Size._1024x1024,
-                N, 1,
-                USER, "user",
-                RESPONSE_FORMAT, ResponseFormat.URL,
-                STYLE, Style.VIVID,
-                QUALITY, Quality.HD));
+                MODEL, "dall-e-3", SIZE, Size._1024x1024, N, 1, USER, "user",
+                RESPONSE_FORMAT, ResponseFormat.URL, STYLE, Style.VIVID, QUALITY, Quality.HD));
 
         try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class)) {
             OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
@@ -131,7 +122,6 @@ class OpenAiCreateImageActionTest {
             assertEquals(Size._1024x1024.getDimensions()[1], openAiImageOptions.getHeight());
             assertEquals(1, openAiImageOptions.getN());
             assertEquals("user", openAiImageOptions.getUser());
-
             assertEquals(ResponseFormat.URL.getValue(), openAiImageOptions.getResponseFormat());
             assertEquals(Style.VIVID.getValue(), openAiImageOptions.getStyle());
             assertEquals(Quality.HD.getValue(), openAiImageOptions.getQuality());
@@ -141,11 +131,7 @@ class OpenAiCreateImageActionTest {
     @Test
     void testCreateImageModelWithDallE2() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "dall-e-2",
-                SIZE, Size.DALL_E_2_256x256,
-                N, 1,
-                USER, "user",
+            Map.of(MODEL, "dall-e-2", SIZE, Size.DALL_E_2_256x256, N, 1, USER, "user",
                 RESPONSE_FORMAT, ResponseFormat.B64_JSON));
 
         try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class)) {
@@ -171,7 +157,6 @@ class OpenAiCreateImageActionTest {
             assertEquals(Size.DALL_E_2_256x256.getDimensions()[1], openAiImageOptions.getHeight());
             assertEquals(1, openAiImageOptions.getN());
             assertEquals("user", openAiImageOptions.getUser());
-
             assertEquals(ResponseFormat.B64_JSON.getValue(), openAiImageOptions.getResponseFormat());
             assertNull(openAiImageOptions.getStyle());
             assertNull(openAiImageOptions.getQuality());
