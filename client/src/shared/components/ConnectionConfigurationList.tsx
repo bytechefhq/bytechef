@@ -126,8 +126,8 @@ const ConnectionConfigurationListFormField = ({
                         }
                     >
                         <FormControl>
-                            <div className="flex space-x-2 bg-surface-neutral-primary">
-                                <SelectTrigger className="shadow-none">
+                            <div className="flex min-w-0 space-x-2 bg-surface-neutral-primary">
+                                <SelectTrigger className="min-w-0 shadow-none">
                                     {currentConnectionId ? (
                                         <SelectValue placeholder="Select a connection..." />
                                     ) : (
