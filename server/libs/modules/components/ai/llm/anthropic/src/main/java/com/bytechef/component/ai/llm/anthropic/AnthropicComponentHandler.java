@@ -36,6 +36,7 @@ public class AnthropicComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("anthropic")
         .title("Anthropic")
+        .version(1)
         .description(
             "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and " +
                 "steerable AI systems.")
