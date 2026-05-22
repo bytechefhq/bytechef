@@ -172,11 +172,16 @@ const ConnectionTabConnectionSelect = ({
                         queryClient.removeQueries({
                             queryKey: [...WorkflowNodeOptionKeys.clusterElementNodeOptions, workflowId],
                         });
+
+                        queryClient.invalidateQueries({
+                            queryKey: ConnectionKeys!.connections,
+                        });
                     },
                 }
             );
         },
         [
+            ConnectionKeys,
             currentEnvironmentId,
             queryClient,
             rootClusterElementNodeData?.workflowNodeName,
@@ -196,13 +201,22 @@ const ConnectionTabConnectionSelect = ({
             skipServerSyncRef.current = true;
             clearedConnectionIdRef.current = connectionId;
 
-            deleteWorkflowTestConfigurationConnectionMutation.mutate({
-                deleteWorkflowTestConfigurationConnectionRequest: {connectionId: previousConnectionId},
-                environmentId: currentEnvironmentId,
-                workflowConnectionKey,
-                workflowId,
-                workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
-            });
+            deleteWorkflowTestConfigurationConnectionMutation.mutate(
+                {
+                    deleteWorkflowTestConfigurationConnectionRequest: {connectionId: previousConnectionId},
+                    environmentId: currentEnvironmentId,
+                    workflowConnectionKey,
+                    workflowId,
+                    workflowNodeName: rootClusterElementNodeData?.workflowNodeName || workflowNodeName,
+                },
+                {
+                    onSuccess: () => {
+                        queryClient.invalidateQueries({
+                            queryKey: ConnectionKeys!.connections,
+                        });
+                    },
+                }
+            );
 
             setConnectionId(undefined);
 
@@ -225,6 +239,7 @@ const ConnectionTabConnectionSelect = ({
             });
         },
         [
+            ConnectionKeys,
             connectionId,
             currentComponent,
             currentEnvironmentId,

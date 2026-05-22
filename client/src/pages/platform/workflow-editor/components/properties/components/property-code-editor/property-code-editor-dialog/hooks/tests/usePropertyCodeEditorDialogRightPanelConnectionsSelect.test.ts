@@ -18,6 +18,7 @@ const hoisted = vi.hoisted(() => {
             {id: 1, name: 'Connection 1'},
             {id: 2, name: 'Connection 2'},
         ],
+        mockInvalidateQueries: vi.fn(),
         mockMutateClusterElement: vi.fn(),
         mockMutateWorkflowNode: vi.fn(),
         rootClusterElementNodeData: undefined as {workflowNodeName: string} | undefined,
@@ -75,7 +76,7 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => ({
 
 vi.mock('@tanstack/react-query', () => ({
     useQueryClient: () => ({
-        invalidateQueries: vi.fn(),
+        invalidateQueries: hoisted.mockInvalidateQueries,
     }),
 }));
 
@@ -229,6 +230,41 @@ describe('usePropertyCodeEditorDialogRightPanelConnectionsSelect', () => {
             );
 
             expect(hoisted.mockMutateWorkflowNode).not.toHaveBeenCalled();
+        });
+
+        it('should invalidate the connections query in the workflow node mutation onSuccess', () => {
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnectionsSelect(defaultProps));
+
+            act(() => {
+                result.current.handleValueChange(456, 'connection-key');
+            });
+
+            const [, options] = hoisted.mockMutateWorkflowNode.mock.calls[0];
+
+            act(() => {
+                options.onSuccess();
+            });
+
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
+        });
+
+        it('should invalidate the connections query in the cluster element mutation onSuccess', () => {
+            hoisted.currentNode = {clusterElementType: 'model', name: 'script_1'};
+            hoisted.rootClusterElementNodeData = {workflowNodeName: 'ai_agent_1'};
+
+            const {result} = renderHook(() => usePropertyCodeEditorDialogRightPanelConnectionsSelect(defaultProps));
+
+            act(() => {
+                result.current.handleValueChange(789, 'connection-key');
+            });
+
+            const [, options] = hoisted.mockMutateClusterElement.mock.calls[0];
+
+            act(() => {
+                options.onSuccess();
+            });
+
+            expect(hoisted.mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
         });
     });
 
