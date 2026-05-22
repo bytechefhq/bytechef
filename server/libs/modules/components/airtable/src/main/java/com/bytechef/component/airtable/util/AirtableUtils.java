@@ -131,7 +131,7 @@ public class AirtableUtils extends AbstractAirtableUtils {
     }
 
     public static List<FieldDefinition> getFieldDefinitions(
-        Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
+        Parameters inputParameters, ClusterElementContext context) {
 
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
 
@@ -206,8 +206,7 @@ public class AirtableUtils extends AbstractAirtableUtils {
 
         AirtableTable table = tables
             .stream()
-            .filter(curTable -> Objects.equals(
-                curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
+            .filter(curTable -> Objects.equals(curTable.id(), inputParameters.getRequiredString(TABLE_ID)))
             .findFirst()
             .orElseThrow(() -> new ProviderException.BadRequestException("Requested table does not exist"));
 
@@ -302,7 +301,6 @@ public class AirtableUtils extends AbstractAirtableUtils {
         context.log(log -> log.debug("Response for url='%s': %s".formatted(url, body)));
 
         if (body.get("tables") instanceof List<?> list) {
-
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
                     options.add(option((String) map.get("name"), (String) map.get("id")));
