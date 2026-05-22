@@ -68,6 +68,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     copilot: {
                         enabled: false,
                     },
+                    knowledgeBase: {
+                        enabled: false,
+                    },
                 },
                 analytics: {
                     enabled: false,
@@ -136,9 +139,6 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     },
                     enabled: true,
                 },
-                knowledgeBase: {
-                    enabled: false,
-                },
                 loading: false,
                 signUp: {
                     activationRequired: false,
@@ -149,7 +149,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                 },
                 templatesSubmissionForm: {
                     projects: undefined,
-                    workflow: undefined,
+                    workflows: undefined,
                 },
                 userGuiding: {
                     containerId: undefined,
