@@ -88,6 +88,10 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                         queryClient.invalidateQueries({
                             queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
                         });
+
+                        queryClient.invalidateQueries({
+                            queryKey: ConnectionKeys.connections,
+                        });
                     },
                 }
             );
@@ -104,6 +108,10 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                     onSuccess: () => {
                         queryClient.invalidateQueries({
                             queryKey: WorkflowTestConfigurationKeys.workflowTestConfigurations,
+                        });
+
+                        queryClient.invalidateQueries({
+                            queryKey: ConnectionKeys.connections,
                         });
                     },
                 }

@@ -162,6 +162,14 @@ describe('ConnectionTabConnectionSelect', () => {
             }
         );
 
+        mockDeleteWorkflowTestConfigurationConnectionMutation.mockImplementation(
+            (mutationData: unknown, options?: {onSuccess?: () => void}) => {
+                if (options?.onSuccess) {
+                    options.onSuccess();
+                }
+            }
+        );
+
         mockInvalidateQueries = vi.fn().mockResolvedValue(undefined);
         mockRemoveQueries = vi.fn();
         mockSetCurrentNode = vi.fn();
@@ -512,6 +520,57 @@ describe('ConnectionTabConnectionSelect', () => {
                 },
                 expect.objectContaining({onSuccess: expect.any(Function)})
             );
+        });
+    });
+
+    it('should invalidate the connections query after a connection is selected', async () => {
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+            />
+        );
+
+        const selectTrigger = screen.getByRole('combobox');
+
+        fireEvent.click(selectTrigger);
+
+        const connection1Option = screen.getByText('Test Connection 1');
+
+        fireEvent.click(connection1Option);
+
+        await waitFor(() => {
+            expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
+        });
+    });
+
+    it('should invalidate the connections query after a connection is cleared', async () => {
+        const workflowTestConfigurationConnection = {
+            connectionId: 1,
+            workflowConnectionKey: 'connection_1',
+            workflowNodeName: 'node-1',
+        };
+
+        render(
+            <ConnectionTabConnectionSelect
+                componentConnection={mockComponentConnection}
+                componentConnectionsCount={1}
+                componentDefinition={mockComponentDefinition}
+                workflowId="workflow-1"
+                workflowNodeName="node-1"
+                workflowTestConfigurationConnection={workflowTestConfigurationConnection}
+            />
+        );
+
+        const clearButton = screen.getByTitle('Clear connection');
+
+        fireEvent.click(clearButton);
+
+        await waitFor(() => {
+            expect(mockInvalidateQueries).toHaveBeenCalledWith({queryKey: ['connections']});
         });
     });
 
