@@ -74,7 +74,8 @@ public class AirtableUpdateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .output();
+        .output()
+        .help("", "https://docs.bytechef.io/reference/components/airtable_v1#update-record");
 
     private AirtableUpdateRecordAction() {
     }
