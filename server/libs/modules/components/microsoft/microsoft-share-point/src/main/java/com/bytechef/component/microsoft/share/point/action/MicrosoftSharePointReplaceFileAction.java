@@ -23,12 +23,12 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.FILE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -52,13 +52,13 @@ public class MicrosoftSharePointReplaceFileAction {
             SITE_ID_PROPERTY,
             string(FILE_ID)
                 .label("File ID")
-                .description("File that will be replaced.")
+                .description("ID of the file that will be replaced.")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFileIdOptions)
                 .required(true),
             fileEntry(FILE)
                 .label("File Entry")
-                .description("File to replace old file.")
+                .description("File that will be used to replace the existing file.")
                 .required(true))
         .output(
             outputSchema(
@@ -122,7 +122,7 @@ public class MicrosoftSharePointReplaceFileAction {
         return context
             .http(http -> http.put(
                 "/sites/%s/drive/items/%s/content".formatted(
-                    inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString("fileId"))))
+                    inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString(FILE_ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .body(Http.Body.of(inputParameters.getRequiredFileEntry(FILE)))
             .execute()

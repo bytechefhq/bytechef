@@ -25,12 +25,12 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.PARENT_FOLDER;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -53,7 +53,8 @@ public class MicrosoftSharePointGetFolderContentsAction {
             SITE_ID_PROPERTY,
             string(PARENT_FOLDER)
                 .label("Parent Folder ID")
-                .description("If no folder is selected, folder will be created in the root folder.")
+                .description(
+                    "ID of the folder whose contents you want to list. If no folder is selected, root folder will be listed.")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
                 .required(false))

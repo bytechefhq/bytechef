@@ -24,9 +24,10 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.DISPLAY_NAME;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.NAME;
-import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getSiteId;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
+import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID_PROPERTY;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -113,8 +114,8 @@ public class MicrosoftSharePointGetFileOrFolderByIdAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context.http(
-                http -> http.get("/sites/%s/drive/items/%s".formatted(
-                    inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString(ID))))
+            http -> http.get("/sites/%s/drive/items/%s".formatted(
+                inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
