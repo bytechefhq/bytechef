@@ -1,17 +1,29 @@
+import SubflowIcon from '@/assets/subflow.svg';
 import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {CaretDownIcon} from '@radix-ui/react-icons';
-import {InfoIcon, PlusIcon, WorkflowIcon} from 'lucide-react';
+import {InfoIcon, PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
 import {ComponentConnection, Workflow} from '../middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '../queries/platform/componentDefinitions.queries';
-import EnvironmentBadge from './EnvironmentBadge';
+
+interface ConnectionRenderItemI {
+    connection: ComponentConnection;
+    groupedIndices?: number[];
+    index: number;
+}
+
+interface SubflowTreeNodeI {
+    children: Map<string, SubflowTreeNodeI>;
+    connections: ConnectionRenderItemI[];
+    subflowWorkflowUuid: string;
+}
 
 interface ConnectionConfigurationListFormFieldProps {
     componentConnection: ComponentConnection;
@@ -183,6 +195,103 @@ const ConnectionConfigurationListFormField = ({
     );
 };
 
+const countSubflowNodeConnections = (node: SubflowTreeNodeI): number => {
+    let count = node.connections.length;
+
+    for (const childNode of node.children.values()) {
+        count += countSubflowNodeConnections(childNode);
+    }
+
+    return count;
+};
+
+interface SubflowConnectionGroupProps {
+    connectionDialogAllowed: boolean;
+    connections?: ConnectionI[];
+    connectionsGrouped: boolean;
+    control: Control<FieldValues>;
+    fieldNamePrefix: string;
+    getCurrentConnectionId?: (index: number) => number | undefined;
+    handleConnectionIdChange: (index: number, connectionId: number) => void;
+    handleConnectionDialogOpen?: (componentConnection: ComponentConnection) => void;
+    node: SubflowTreeNodeI;
+    subflowLabelMap?: Map<string, string>;
+    workflowNodeLabelMap: Map<string, string>;
+}
+
+import EnvironmentBadge from './EnvironmentBadge';
+
+const SubflowConnectionGroup = ({
+    connectionDialogAllowed,
+    connections,
+    connectionsGrouped,
+    control,
+    fieldNamePrefix,
+    getCurrentConnectionId,
+    handleConnectionDialogOpen,
+    handleConnectionIdChange,
+    node,
+    subflowLabelMap,
+    workflowNodeLabelMap,
+}: SubflowConnectionGroupProps) => {
+    const connectionCount = countSubflowNodeConnections(node);
+
+    return (
+        <Collapsible className="group/subflow space-y-4 rounded-md border bg-surface-neutral-primary px-3 py-2.5 transition-all has-[>button:focus-visible]:ring-2 has-[>button:focus-visible]:ring-stroke-brand-focus data-[state=open]:p-3">
+            <CollapsibleTrigger className="group/trigger flex w-full items-center justify-between outline-none">
+                <div className="flex gap-2">
+                    <InlineSVG className="size-5" src={SubflowIcon} />
+
+                    <span className="text-sm font-medium text-content-neutral-primary underline-offset-2 group-hover/trigger:underline">
+                        {subflowLabelMap?.get(node.subflowWorkflowUuid) || 'Subflow connections'}
+                    </span>
+
+                    <span className="text-sm font-light text-content-neutral-primary">
+                        ({connectionCount > 1 ? `${connectionCount} connections` : '1 connection'})
+                    </span>
+                </div>
+
+                <CaretDownIcon className="size-4 text-content-neutral-secondary transition-all group-data-[state=open]/subflow:rotate-180" />
+            </CollapsibleTrigger>
+
+            <CollapsibleContent className="flex flex-col gap-4">
+                {node.connections.map((connectionItem) => (
+                    <ConnectionConfigurationListFormField
+                        componentConnection={connectionItem.connection}
+                        connectionDialogAllowed={connectionDialogAllowed}
+                        connections={connections!}
+                        control={control}
+                        currentConnectionId={getCurrentConnectionId?.(connectionItem.index)}
+                        fieldNamePrefix={fieldNamePrefix}
+                        handleConnectionDialogOpen={handleConnectionDialogOpen}
+                        handleConnectionIdChange={handleConnectionIdChange}
+                        index={connectionItem.index}
+                        key={`${connectionItem.connection.workflowNodeName}_${connectionItem.connection.key}_${connectionsGrouped}`}
+                        workflowNodeLabel={workflowNodeLabelMap.get(connectionItem.connection.workflowNodeName)}
+                    />
+                ))}
+
+                {Array.from(node.children.values()).map((childNode) => (
+                    <SubflowConnectionGroup
+                        connectionDialogAllowed={connectionDialogAllowed}
+                        connections={connections}
+                        connectionsGrouped={connectionsGrouped}
+                        control={control}
+                        fieldNamePrefix={fieldNamePrefix}
+                        getCurrentConnectionId={getCurrentConnectionId}
+                        handleConnectionDialogOpen={handleConnectionDialogOpen}
+                        handleConnectionIdChange={handleConnectionIdChange}
+                        key={childNode.subflowWorkflowUuid}
+                        node={childNode}
+                        subflowLabelMap={subflowLabelMap}
+                        workflowNodeLabelMap={workflowNodeLabelMap}
+                    />
+                ))}
+            </CollapsibleContent>
+        </Collapsible>
+    );
+};
+
 interface ConnectionConfigurationListProps {
     componentConnections: ComponentConnection[];
     connectionDialogAllowed?: boolean;
@@ -243,34 +352,46 @@ const ConnectionConfigurationList = ({
         return groupedConnections;
     }, [componentConnections, connectionsGrouped]);
 
-    const {regularConnections, subflowConnectionGroups} = useMemo(() => {
+    const {regularConnections, subflowConnectionTree} = useMemo(() => {
         if (connectionsGrouped) {
             return {
                 regularConnections: connectionsToRender,
-                subflowConnectionGroups: new Map<string, typeof connectionsToRender>(),
+                subflowConnectionTree: new Map<string, SubflowTreeNodeI>(),
             };
         }
 
         const regularConnections: typeof connectionsToRender = [];
-        const subflowConnectionGroups = new Map<string, typeof connectionsToRender>();
+        const subflowConnectionTree = new Map<string, SubflowTreeNodeI>();
 
         for (const item of connectionsToRender) {
-            const subflowWorkflowUuid = item.connection.subflowWorkflowUuid;
+            const uuidPath = item.connection.subflowWorkflowUuidPath ?? [];
 
-            if (subflowWorkflowUuid) {
-                const existingItems = subflowConnectionGroups.get(subflowWorkflowUuid);
-
-                if (existingItems) {
-                    existingItems.push(item);
-                } else {
-                    subflowConnectionGroups.set(subflowWorkflowUuid, [item]);
-                }
-            } else {
+            if (!uuidPath.length) {
                 regularConnections.push(item);
+
+                continue;
             }
+
+            let currentLevel = subflowConnectionTree;
+            let targetNode: SubflowTreeNodeI | undefined;
+
+            for (const uuid of uuidPath) {
+                let node = currentLevel.get(uuid);
+
+                if (!node) {
+                    node = {children: new Map<string, SubflowTreeNodeI>(), connections: [], subflowWorkflowUuid: uuid};
+
+                    currentLevel.set(uuid, node);
+                }
+
+                targetNode = node;
+                currentLevel = node.children;
+            }
+
+            targetNode!.connections.push(item);
         }
 
-        return {regularConnections, subflowConnectionGroups};
+        return {regularConnections, subflowConnectionTree};
     }, [connectionsToRender, connectionsGrouped]);
 
     const workflowNodeLabelMap = useMemo(() => {
@@ -320,51 +441,21 @@ const ConnectionConfigurationList = ({
                 />
             ))}
 
-            {Array.from(subflowConnectionGroups.entries()).map(([subflowWorkflowUuid, subflowComponentConnections]) => (
-                <Collapsible
-                    className="group/subflow space-y-4 rounded-md border px-3.5 py-2 transition-all data-[state=open]:border-stroke-brand-primary"
-                    key={subflowWorkflowUuid}
-                >
-                    <CollapsibleTrigger className="flex w-full items-center justify-between">
-                        <div className="flex gap-2">
-                            <WorkflowIcon className="size-5" />
-
-                            <span className="text-sm font-medium text-content-neutral-primary">
-                                {subflowLabelMap?.get(subflowWorkflowUuid) || 'Subflow connections'}
-                            </span>
-
-                            <span className="text-sm font-light text-content-neutral-primary">
-                                (
-                                {subflowComponentConnections.length > 1
-                                    ? `${subflowComponentConnections.length} connections`
-                                    : '1 connection'}
-                                )
-                            </span>
-                        </div>
-
-                        <CaretDownIcon className="size-4 text-content-neutral-secondary transition-all group-data-[state=open]/subflow:rotate-180" />
-                    </CollapsibleTrigger>
-
-                    <CollapsibleContent className="flex flex-col gap-4">
-                        {subflowComponentConnections.map((subflowComponentConnection) => (
-                            <ConnectionConfigurationListFormField
-                                componentConnection={subflowComponentConnection.connection}
-                                connectionDialogAllowed={connectionDialogAllowed}
-                                connections={connections!}
-                                control={control}
-                                currentConnectionId={getCurrentConnectionId?.(subflowComponentConnection.index)}
-                                fieldNamePrefix={fieldNamePrefix}
-                                handleConnectionDialogOpen={handleConnectionDialogOpen}
-                                handleConnectionIdChange={handleConnectionIdChange}
-                                index={subflowComponentConnection.index}
-                                key={`${subflowComponentConnection.connection.workflowNodeName}_${subflowComponentConnection.connection.key}_${connectionsGrouped}`}
-                                workflowNodeLabel={workflowNodeLabelMap.get(
-                                    subflowComponentConnection.connection.workflowNodeName
-                                )}
-                            />
-                        ))}
-                    </CollapsibleContent>
-                </Collapsible>
+            {Array.from(subflowConnectionTree.values()).map((node) => (
+                <SubflowConnectionGroup
+                    connectionDialogAllowed={connectionDialogAllowed}
+                    connections={connections}
+                    connectionsGrouped={connectionsGrouped}
+                    control={control}
+                    fieldNamePrefix={fieldNamePrefix}
+                    getCurrentConnectionId={getCurrentConnectionId}
+                    handleConnectionDialogOpen={handleConnectionDialogOpen}
+                    handleConnectionIdChange={handleConnectionIdChange}
+                    key={node.subflowWorkflowUuid}
+                    node={node}
+                    subflowLabelMap={subflowLabelMap}
+                    workflowNodeLabelMap={workflowNodeLabelMap}
+                />
             ))}
         </div>
     );

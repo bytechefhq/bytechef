@@ -10,7 +10,7 @@ import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
+import getWorkflowComponentConnections, {getWorkflowInputs} from './projectDeploymentDialog-utils';
 
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     connections?: Connection[];
@@ -42,6 +42,11 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     );
 
     const componentConnections = getWorkflowComponentConnections(workflow, workflows);
+
+    const workflowInputs = getWorkflowInputs(workflow, workflows);
+
+    console.log('workflow: ', workflow);
+    console.log('workflows: ', workflows);
 
     const subflowLabelMap = new Map<string, string>();
 
@@ -119,11 +124,11 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
 
                             <span>Inputs</span>
 
-                            <span className="ml-1">({workflow.inputs?.length})</span>
+                            <span className="ml-1">({workflowInputs.length})</span>
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent className="mt-0" value="connections">
+                    <TabsContent className="mt-0" tabIndex={-1} value="connections">
                         <ConnectionConfigurationList
                             componentConnections={componentConnections}
                             connections={connections ?? []}
@@ -144,12 +149,13 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         />
                     </TabsContent>
 
-                    <TabsContent className="mt-0" value="inputs">
+                    <TabsContent className="mt-0" tabIndex={-1} value="inputs">
                         <InputConfigurationList
                             control={control as unknown as Control<FieldValues>}
                             controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
                             formState={formState as unknown as FormState<FieldValues>}
-                            inputs={workflow.inputs}
+                            inputs={workflowInputs}
+                            subflowLabelMap={subflowLabelMap}
                         />
                     </TabsContent>
                 </Tabs>
