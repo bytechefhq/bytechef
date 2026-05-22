@@ -56,8 +56,8 @@ public class AirtableNewRecordTrigger {
                 .options((OptionsFunction<String>) AirtableUtils::getBaseIdOptions)
                 .required(true),
             string(TABLE_ID)
-                .label("Table")
-                .description("The table to monitor for new records.")
+                .label("Table ID")
+                .description("ID of the table to monitor for new records.")
                 .options((OptionsFunction<String>) AirtableUtils::getTableIdOptions)
                 .optionsLookupDependsOn(BASE_ID)
                 .required(true),
