@@ -29,10 +29,12 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getSiteId;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
@@ -44,9 +46,12 @@ public class MicrosoftSharePointGetFileOrFolderByIdAction {
         .title("Get File or Folder by ID")
         .description("Retrieves information about file or folder by its ID.")
         .properties(
+            SITE_ID_PROPERTY,
             string(ID)
                 .label("File or Folder ID")
                 .description("The ID of the file or folder to retrieve.")
+                .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderAndFileIdOptions)
+                .optionsLookupDependsOn(SITE_ID)
                 .required(true))
         .output(
             outputSchema(
@@ -107,11 +112,9 @@ public class MicrosoftSharePointGetFileOrFolderByIdAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-        String siteId = getSiteId(context, inputParameters.getRequiredString(ID));
-
-        return context.http(http -> http.get(
-            "/sites/%s/drive/items/%s".formatted(
-                siteId, inputParameters.getRequiredString(ID))))
+        return context.http(
+                http -> http.get("/sites/%s/drive/items/%s".formatted(
+                    inputParameters.getRequiredString(SITE_ID), inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
