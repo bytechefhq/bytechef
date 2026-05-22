@@ -37,6 +37,7 @@ public class AnthropicStreamChatAction {
         .description("Ask anything you want and stream the response.")
         .properties(ASK_PROPERTIES)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/anthropic_v1#ask-stream")
         .perform(AnthropicStreamChatAction::perform);
 
     private AnthropicStreamChatAction() {
