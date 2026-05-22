@@ -34,12 +34,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Discovers {@link ComponentConnection} instances for the {@code skillsTool} cluster element by analysing
- * the skill scripts referenced in the cluster element's {@code skills} parameter.
+ * Discovers {@link ComponentConnection} instances for the {@code skillsTool} cluster element by analysing the skill
+ * scripts referenced in the cluster element's {@code skills} parameter.
  *
- * <p>For each skill, the factory downloads the skill archive, scans script files for
- * {@code context.component.{name}.{action}(...)} calls, and creates a connection for every component
- * that exists in the registry. Unknown components are silently skipped.
+ * <p>
+ * For each skill, the factory downloads the skill archive, scans script files for
+ * {@code context.component.{name}.{action}(...)} calls, and creates a connection for every component that exists in the
+ * registry. Unknown components are silently skipped.
  *
  * @author Ivica Cardic
  */

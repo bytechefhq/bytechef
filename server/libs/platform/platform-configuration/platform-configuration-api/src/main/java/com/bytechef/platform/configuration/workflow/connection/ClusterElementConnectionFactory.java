@@ -21,11 +21,12 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Supplements {@link ComponentConnectionFactory} for cluster elements that require dynamic connection discovery
- * (e.g. connections inferred from embedded scripts rather than explicitly listed in workflow extensions).
+ * Supplements {@link ComponentConnectionFactory} for cluster elements that require dynamic connection discovery (e.g.
+ * connections inferred from embedded scripts rather than explicitly listed in workflow extensions).
  *
- * <p>Implementations are picked up by {@code ClusterRootComponentConnectionFactory} for each cluster element
- * whose {@code componentName} and {@code clusterElementName} are supported.
+ * <p>
+ * Implementations are picked up by {@code ClusterRootComponentConnectionFactory} for each cluster element whose
+ * {@code componentName} and {@code clusterElementName} are supported.
  *
  * @author Ivica Cardic
  */
