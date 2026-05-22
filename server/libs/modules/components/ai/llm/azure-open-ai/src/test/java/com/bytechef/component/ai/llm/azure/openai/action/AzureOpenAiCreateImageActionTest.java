@@ -27,6 +27,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
 import com.bytechef.component.ai.llm.ImageModel.Style;
@@ -44,17 +45,10 @@ import org.springframework.ai.openai.OpenAiImageOptions;
 class AzureOpenAiCreateImageActionTest {
 
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(
-        Map.of(
-            TOKEN, "TOKEN",
-            ENDPOINT, "https://my-resource.openai.azure.com"));
+        Map.of(TOKEN, "TOKEN", ENDPOINT, "https://my-resource.openai.azure.com"));
     private final Parameters mockedInputParameters = MockParametersFactory.create(
-        Map.of(
-            MODEL, "dall-e-3",
-            SIZE, Size._1024x1024,
-            N, 1,
-            RESPONSE_FORMAT, ResponseFormat.URL,
-            STYLE, Style.VIVID,
-            USER, "user"));
+        Map.of(MODEL, "dall-e-3", SIZE, Size._1024x1024, N, 1, RESPONSE_FORMAT,
+            ResponseFormat.URL, STYLE, Style.VIVID, USER, "user"));
 
     @Test
     void testCreateImageModel() {
@@ -68,6 +62,7 @@ class AzureOpenAiCreateImageActionTest {
 
         assertEquals("https://my-resource.openai.azure.com", openAiImageOptions.getBaseUrl());
         assertEquals("TOKEN", openAiImageOptions.getApiKey());
+        assertTrue(openAiImageOptions.isMicrosoftFoundry());
         assertEquals("dall-e-3", openAiImageOptions.getDeploymentName());
         assertEquals("dall-e-3", openAiImageOptions.getModel());
         assertEquals(Size._1024x1024.getDimensions()[0], openAiImageOptions.getWidth());

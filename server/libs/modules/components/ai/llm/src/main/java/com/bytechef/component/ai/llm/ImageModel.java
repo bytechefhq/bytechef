@@ -78,7 +78,7 @@ public interface ImageModel {
         }
     }
 
-    default ImageOptions getImageOptions(Parameters inputParameters) {
+    default ImageOptions getImageOptions(Parameters inputParameters, Parameters connectionParameters) {
         return ImageOptionsBuilder.builder()
             .build();
     }
@@ -91,7 +91,8 @@ public interface ImageModel {
 
         List<org.springframework.ai.image.ImageMessage> messages = getMessages(inputParameters);
 
-        ImageResponse response = imageModel.call(new ImagePrompt(messages, getImageOptions(inputParameters)));
+        ImageResponse response = imageModel.call(
+            new ImagePrompt(messages, getImageOptions(inputParameters, connectionParameters)));
 
         ImageGeneration result = response.getResult();
 

@@ -32,6 +32,8 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.ai.llm.ChatModel;
 import com.bytechef.component.definition.Parameters;
@@ -49,9 +51,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
 class AzureOpenAiChatActionTest {
 
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(
-        Map.of(
-            TOKEN, "TOKEN",
-            ENDPOINT, "https://my-resource.openai.azure.com"));
+        Map.of(TOKEN, "TOKEN", ENDPOINT, "https://my-resource.openai.azure.com"));
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.ofEntries(
             Map.entry(RESPONSE, Map.of(RESPONSE_FORMAT, ChatModel.ResponseFormat.TEXT.name())),
@@ -76,9 +76,11 @@ class AzureOpenAiChatActionTest {
         OpenAiChatModel openAiChatModel = (OpenAiChatModel) chatModel;
         OpenAiChatOptions openAiChatOptions = openAiChatModel.getOptions();
 
+        assertEquals("https://my-resource.openai.azure.com", openAiChatOptions.getBaseUrl());
+        assertEquals("TOKEN", openAiChatOptions.getApiKey());
+        assertTrue(openAiChatOptions.isMicrosoftFoundry());
         assertEquals("gpt-4o", openAiChatOptions.getModel());
         assertEquals("gpt-4o", openAiChatOptions.getDeploymentName());
-        assertEquals("https://my-resource.openai.azure.com", openAiChatOptions.getBaseUrl());
         assertEquals(0.5, openAiChatOptions.getFrequencyPenalty());
         assertEquals(Map.of(), openAiChatOptions.getLogitBias());
         assertEquals(100, openAiChatOptions.getMaxTokens());
@@ -105,6 +107,19 @@ class AzureOpenAiChatActionTest {
         OpenAiChatOptions openAiChatOptions = ((OpenAiChatModel) chatModel).getOptions();
 
         assertNotNull(openAiChatOptions);
+        assertEquals("https://my-resource.openai.azure.com", openAiChatOptions.getBaseUrl());
+        assertEquals("TOKEN", openAiChatOptions.getApiKey());
+        assertTrue(openAiChatOptions.isMicrosoftFoundry());
         assertEquals("gpt-4o", openAiChatOptions.getModel());
+        assertEquals("gpt-4o", openAiChatOptions.getDeploymentName());
+        assertEquals(0.5, openAiChatOptions.getFrequencyPenalty());
+        assertEquals(Map.of(), openAiChatOptions.getLogitBias());
+        assertEquals(100, openAiChatOptions.getMaxTokens());
+        assertEquals(0.5, openAiChatOptions.getPresencePenalty());
+        assertNull(openAiChatOptions.getResponseFormat());
+        assertEquals(List.of("stop"), openAiChatOptions.getStop());
+        assertEquals(0.7, openAiChatOptions.getTemperature());
+        assertEquals(0.9, openAiChatOptions.getTopP());
+        assertEquals("user", openAiChatOptions.getUser());
     }
 }

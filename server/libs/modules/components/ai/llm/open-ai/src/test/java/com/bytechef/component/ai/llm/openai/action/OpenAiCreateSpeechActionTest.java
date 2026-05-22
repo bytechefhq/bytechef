@@ -53,22 +53,19 @@ import org.springframework.ai.openai.OpenAiAudioSpeechOptions.Voice;
  */
 class OpenAiCreateSpeechActionTest {
 
-    private final Parameters mockedConnectionParameters = MockParametersFactory.create(
-        Map.of(TOKEN, "test-api-key"));
+    private final Parameters mockedConnectionParameters = MockParametersFactory.create(Map.of(TOKEN, "test-api-key"));
     private final ActionContext mockedContext = mock(ActionContext.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedInputParameters = MockParametersFactory.create(
-        Map.of(
-            MODEL, "tts-1",
-            INPUT, "Hello world",
-            VOICE, Voice.ALLOY.name(),
-            RESPONSE_FORMAT, AudioResponseFormat.MP3.name(),
-            SPEED, 1.0));
+        Map.of(MODEL, "tts-1", INPUT, "Hello world", VOICE, Voice.ALLOY.name(),
+            RESPONSE_FORMAT, AudioResponseFormat.MP3.name(), SPEED, 1.0));
     private final TextToSpeechResponse mockedResponse = mock(TextToSpeechResponse.class);
     private final Speech mockedSpeech = mock(Speech.class);
     private final OpenAiAudioSpeechModel mockedSpeechModel = mock(OpenAiAudioSpeechModel.class);
     private final ArgumentCaptor<OpenAiAudioSpeechOptions> optionsCaptor = forClass(OpenAiAudioSpeechOptions.class);
     private final ArgumentCaptor<TextToSpeechPrompt> promptArgumentCaptor = forClass(TextToSpeechPrompt.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<OpenAIClient> openAIClientArgumentCaptor = forClass(OpenAIClient.class);
 
     @Test
     void testPerform() {
@@ -91,16 +88,17 @@ class OpenAiCreateSpeechActionTest {
 
             openAIOkHttpClientMockedStatic.when(OpenAIOkHttpClient::builder)
                 .thenReturn(mockedClientBuilder);
-            when(mockedClientBuilder.apiKey("test-api-key"))
+            when(mockedClientBuilder.apiKey(stringArgumentCaptor.capture()))
                 .thenReturn(mockedClientBuilder);
+            OpenAIClient mockedOpenAIClient = mock(OpenAIClient.class);
             when(mockedClientBuilder.build())
-                .thenReturn(mock(OpenAIClient.class));
+                .thenReturn(mockedOpenAIClient);
 
             OpenAiAudioSpeechModel.Builder mockedSpeechModelBuilder = mock(OpenAiAudioSpeechModel.Builder.class);
 
             openAiAudioSpeechModelMockedStatic.when(OpenAiAudioSpeechModel::builder)
                 .thenReturn(mockedSpeechModelBuilder);
-            when(mockedSpeechModelBuilder.openAiClient(any()))
+            when(mockedSpeechModelBuilder.openAiClient(openAIClientArgumentCaptor.capture()))
                 .thenReturn(mockedSpeechModelBuilder);
             when(mockedSpeechModelBuilder.defaultOptions(optionsCaptor.capture()))
                 .thenReturn(mockedSpeechModelBuilder);
@@ -111,6 +109,8 @@ class OpenAiCreateSpeechActionTest {
                 mockedInputParameters, mockedConnectionParameters, mockedContext);
 
             assertEquals(mockedFileEntry, result);
+            assertEquals(mockedOpenAIClient, openAIClientArgumentCaptor.getValue());
+            assertEquals("test-api-key", stringArgumentCaptor.getValue());
 
             OpenAiAudioSpeechOptions capturedOptions = optionsCaptor.getValue();
 

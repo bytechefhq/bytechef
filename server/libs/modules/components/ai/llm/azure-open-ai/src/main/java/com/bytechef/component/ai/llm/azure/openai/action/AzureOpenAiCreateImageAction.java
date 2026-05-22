@@ -39,13 +39,12 @@ import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.ImageModel.ResponseFormat;
-import com.bytechef.component.ai.llm.ImageModel.Style;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.azure.openai.definition.Size;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
+import org.springframework.ai.image.ImageOptions;
 import org.springframework.ai.openai.OpenAiImageModel;
 import org.springframework.ai.openai.OpenAiImageOptions;
 
@@ -106,25 +105,34 @@ public class AzureOpenAiCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> {
-        ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
-        Size size = inputParameters.getRequired(SIZE, Size.class);
-        Style style = inputParameters.get(STYLE, Style.class, NATURAL);
+    public static final ImageModel IMAGE_MODEL = new ImageModel() {
 
-        OpenAiImageOptions imageOptions = OpenAiImageOptions.builder()
-            .baseUrl(connectionParameters.getString(ENDPOINT))
-            .apiKey(connectionParameters.getString(TOKEN))
-            .azure(true)
-            .deploymentName(inputParameters.getRequiredString(MODEL))
-            .height(size.getDimensions()[1])
-            .model(inputParameters.getRequiredString(MODEL))
-            .N(inputParameters.getInteger(N))
-            .responseFormat(responseFormat.getValue())
-            .style(style.getValue())
-            .user(inputParameters.getString(USER))
-            .width(size.getDimensions()[0])
-            .build();
+        @Override
+        public org.springframework.ai.image.ImageModel createImageModel(
+            Parameters inputParameters, Parameters connectionParameters) {
 
-        return new OpenAiImageModel(imageOptions);
+            return new OpenAiImageModel((OpenAiImageOptions) getImageOptions(inputParameters, connectionParameters));
+        }
+
+        @Override
+        public ImageOptions getImageOptions(Parameters inputParameters, Parameters connectionParameters) {
+            ResponseFormat responseFormat = inputParameters.get(RESPONSE_FORMAT, ResponseFormat.class, URL);
+            Size size = inputParameters.getRequired(SIZE, Size.class);
+            Style style = inputParameters.get(STYLE, Style.class, NATURAL);
+
+            return OpenAiImageOptions.builder()
+                .baseUrl(connectionParameters.getString(ENDPOINT))
+                .apiKey(connectionParameters.getString(TOKEN))
+                .azure(true)
+                .deploymentName(inputParameters.getRequiredString(MODEL))
+                .height(size.getDimensions()[1])
+                .model(inputParameters.getRequiredString(MODEL))
+                .N(inputParameters.getInteger(N))
+                .responseFormat(responseFormat.getValue())
+                .style(style.getValue())
+                .user(inputParameters.getString(USER))
+                .width(size.getDimensions()[0])
+                .build();
+        }
     };
 }

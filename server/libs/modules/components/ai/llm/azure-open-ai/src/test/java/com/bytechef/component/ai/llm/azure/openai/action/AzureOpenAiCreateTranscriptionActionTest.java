@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.bytechef.component.ai.llm.definition.Language;
 import com.bytechef.component.definition.Parameters;
@@ -45,9 +46,7 @@ import org.springframework.ai.openai.OpenAiAudioTranscriptionOptions;
 class AzureOpenAiCreateTranscriptionActionTest {
 
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(
-        Map.of(
-            TOKEN, "TOKEN",
-            ENDPOINT, "https://test.openai.azure.com"));
+        Map.of(TOKEN, "TOKEN", ENDPOINT, "https://test.openai.azure.com"));
 
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.ofEntries(
@@ -58,10 +57,10 @@ class AzureOpenAiCreateTranscriptionActionTest {
             Map.entry(TEMPERATURE, 0.0)));
 
     @Test
-    void testCreateAudioTranscriptionModelWithResponseFormat() {
-
+    void testCreateAudioTranscriptionModel() {
         Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> audioTranscriptionModel =
-            getAudioTranscriptionModel();
+            AzureOpenAiCreateTranscriptionAction.AUDIO_TRANSCRIPTION.createAudioTranscriptionModel(
+                mockedInputParameters, mockedConnectionParameters);
 
         assertNotNull(audioTranscriptionModel);
         assertInstanceOf(OpenAiAudioTranscriptionModel.class, audioTranscriptionModel);
@@ -69,44 +68,16 @@ class AzureOpenAiCreateTranscriptionActionTest {
         OpenAiAudioTranscriptionModel openAiAudioTranscriptionModel =
             (OpenAiAudioTranscriptionModel) audioTranscriptionModel;
 
-        OpenAiAudioTranscriptionOptions options =
-            openAiAudioTranscriptionModel.getOptions();
+        OpenAiAudioTranscriptionOptions options = openAiAudioTranscriptionModel.getOptions();
 
         assertEquals("https://test.openai.azure.com", options.getBaseUrl());
         assertEquals("TOKEN", options.getApiKey());
-
         assertEquals("whisper", options.getDeploymentName());
+        assertTrue(options.isMicrosoftFoundry());
         assertEquals("whisper", options.getModel());
-
         assertEquals("prompt", options.getPrompt());
         assertEquals(Language.HR.getCode(), options.getLanguage());
-
-        assertEquals(
-            AudioResponseFormat.of("json"),
-            options.getResponseFormat());
-
+        assertEquals(AudioResponseFormat.of("json"), options.getResponseFormat());
         assertEquals(0.0F, options.getTemperature());
-    }
-
-    private Model<AudioTranscriptionPrompt, AudioTranscriptionResponse> getAudioTranscriptionModel() {
-
-        Language language = mockedInputParameters.get(LANGUAGE, Language.class);
-
-        return OpenAiAudioTranscriptionModel.builder()
-            .options(
-                OpenAiAudioTranscriptionOptions.builder()
-                    .baseUrl(mockedConnectionParameters.getString(ENDPOINT))
-                    .apiKey(mockedConnectionParameters.getString(TOKEN))
-                    .microsoftFoundry(true)
-                    .deploymentName(mockedInputParameters.getRequiredString(MODEL))
-                    .model(mockedInputParameters.getRequiredString(MODEL))
-                    .prompt(mockedInputParameters.getString(PROMPT))
-                    .language(language.getCode())
-                    .responseFormat(
-                        AudioResponseFormat.of(
-                            mockedInputParameters.getString(RESPONSE_FORMAT)))
-                    .temperature(mockedInputParameters.getFloat(TEMPERATURE))
-                    .build())
-            .build();
     }
 }
