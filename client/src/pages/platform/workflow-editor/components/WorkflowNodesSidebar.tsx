@@ -1,5 +1,7 @@
 import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useMemo} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -20,13 +22,33 @@ const WorkflowNodesSidebar = ({
         data.componentDefinitions
     );
 
-    const filteredActionComponentDefinitions = useMemo(
-        () =>
-            componentsWithActions.filter(
-                (componentDefinition) => componentDefinition?.actionsCount && componentDefinition.actionsCount > 0
-            ),
-        [componentsWithActions]
-    );
+    const getFeatureFlag = useFeatureFlagsStore();
+
+    const ff_732 = getFeatureFlag('ff-732');
+    const ff_797 = getFeatureFlag('ff-797');
+    const ff_1652 = getFeatureFlag('ff-1652');
+    const ff_4000 = getFeatureFlag('ff-4000');
+
+    const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.ai.knowledgeBase.enabled);
+
+    const filteredActionComponentDefinitions = useMemo(() => {
+        if (!componentsWithActions) {
+            return [];
+        }
+
+        const actionComponents = componentsWithActions
+            .filter(({actionsCount}) => actionsCount && actionsCount > 0)
+            .filter(
+                ({name}) =>
+                    ((!ff_732 && name !== 'approval') || ff_732) &&
+                    ((!ff_797 && name !== 'dataStream') || ff_797) &&
+                    ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
+                    (((!ff_4000 || !knowledgeBaseEnabled) && name !== 'knowledgeBase') ||
+                        (ff_4000 && knowledgeBaseEnabled))
+            );
+
+        return actionComponents;
+    }, [componentsWithActions, ff_1652, ff_4000, ff_732, ff_797, knowledgeBaseEnabled]);
 
     const filteredTaskDispatcherDefinitions = useMemo(
         () =>
