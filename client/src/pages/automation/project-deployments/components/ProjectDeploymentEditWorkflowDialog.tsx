@@ -14,6 +14,7 @@ import {Form} from '@/components/ui/form';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogWorkflowsStepItem';
 import getWorkflowComponentConnections from '@/pages/automation/project-deployments/components/project-deployment-dialog/projectDeploymentDialog-utils';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
     ProjectDeployment,
     ProjectDeploymentWorkflow,
@@ -21,7 +22,9 @@ import {
     Workflow,
 } from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectDeploymentWorkflowMutation} from '@/shared/mutations/automation/projectDeploymentWorkflows.mutations';
+import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {ProjectDeploymentKeys} from '@/shared/queries/automation/projectDeployments.queries';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {InfoIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -41,7 +44,18 @@ const ProjectDeploymentEditWorkflowDialog = ({
     const [isOpen, setIsOpen] = useState(true);
     const [connectionsGrouped, setConnectionsGrouped] = useState(false);
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const componentConnections = getWorkflowComponentConnections(workflow);
+
+    const {data: connections} = useGetWorkspaceConnectionsQuery(
+        {
+            environmentId: currentEnvironmentId,
+            id: currentWorkspaceId!,
+        },
+        !!currentWorkspaceId
+    );
 
     const form = useForm<ProjectDeployment>({
         defaultValues: {
@@ -150,6 +164,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
 
                     <div className="max-h-dialog-height overflow-y-auto px-6">
                         <ProjectDeploymentDialogWorkflowsStepItem
+                            connections={connections}
                             connectionsGrouped={connectionsGrouped}
                             control={control}
                             formState={formState}
