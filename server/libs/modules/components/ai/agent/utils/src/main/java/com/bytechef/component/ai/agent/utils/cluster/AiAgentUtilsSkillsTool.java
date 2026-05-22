@@ -37,8 +37,6 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
-import com.bytechef.platform.component.domain.ComponentDefinition;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -49,10 +47,8 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
@@ -92,18 +88,15 @@ public class AiAgentUtilsSkillsTool {
         "java", "java");
 
     /**
-     * Matches calls of the form: context.component.{componentName}.{actionName}({rawParameters})
-     * Parameters are captured as a raw string for later processing.
+     * Matches calls of the form: context.component.{componentName}.{actionName}({rawParameters}) Parameters are
+     * captured as a raw string for later processing.
      */
     private static final Pattern COMPONENT_CALL_PATTERN = Pattern.compile(
         "context\\.component\\.([A-Za-z][A-Za-z0-9_-]*)\\.([A-Za-z][A-Za-z0-9_]*)\\(([^)]*)\\)");
 
     /**
-     * Detects a perform function declaration across the supported script languages:
-     * JavaScript: function perform(
-     * Python/Ruby: def perform(
-     * R:           perform <- function(
-     * Java:        ) perform(Map
+     * Detects a perform function declaration across the supported script languages: JavaScript: function perform(
+     * Python/Ruby: def perform( R: perform <- function( Java: ) perform(Map
      */
     private static final Pattern PERFORM_FUNCTION_PATTERN = Pattern.compile(
         "(?:function\\s+perform\\s*\\(|def\\s+perform\\s*[\\s(]|perform\\s*<-\\s*function\\s*\\(|\\bperform\\s*\\(Map)");
@@ -184,7 +177,8 @@ public class AiAgentUtilsSkillsTool {
 
                 SkillScripts skillScripts = extractSkillScripts(zipBytes);
 
-                if (!skillScripts.scripts().isEmpty()) {
+                if (!skillScripts.scripts()
+                    .isEmpty()) {
                     skillScriptsList.add(skillScripts);
                 }
             } catch (RuntimeException runtimeException) {
@@ -210,7 +204,8 @@ public class AiAgentUtilsSkillsTool {
         ToolCallback skillsToolCallback = builder.build();
 
         List<ToolCallback> allCallbacks = new ArrayList<>(
-            Arrays.asList(ToolCallbackProvider.from(skillsToolCallback).getToolCallbacks()));
+            Arrays.asList(ToolCallbackProvider.from(skillsToolCallback)
+                .getToolCallbacks()));
 
         JobContextAware jobContextAware = (JobContextAware) context;
 
@@ -325,7 +320,8 @@ public class AiAgentUtilsSkillsTool {
     private static String extractFrontmatterField(String content, Pattern pattern) {
         Matcher matcher = pattern.matcher(content);
 
-        return matcher.find() ? matcher.group(1).trim() : "";
+        return matcher.find() ? matcher.group(1)
+            .trim() : "";
     }
 
     private static String sanitizeToolName(String name) {
@@ -348,11 +344,11 @@ public class AiAgentUtilsSkillsTool {
 
     /**
      * Scans all script files inside the skill zip archive for component calls of the form
-     * {@code context.component.{componentName}.{actionName}(...)}.
-     * Only files under the {@code scripts/} directory that contain a {@code perform} function are analysed.
+     * {@code context.component.{componentName}.{actionName}(...)}. Only files under the {@code scripts/} directory that
+     * contain a {@code perform} function are analysed.
      *
-     * @return a map from script entry path to the list of component calls found in that script,
-     *         ordered by appearance in the archive; empty if no matching scripts exist
+     * @return a map from script entry path to the list of component calls found in that script, ordered by appearance
+     *         in the archive; empty if no matching scripts exist
      */
     public static Map<String, List<ComponentCall>> analyzeSkillScripts(byte[] zipBytes) {
         Map<String, List<ComponentCall>> result = new LinkedHashMap<>();
@@ -399,8 +395,8 @@ public class AiAgentUtilsSkillsTool {
     }
 
     /**
-     * Returns true if the entry path falls inside a {@code scripts/} directory, handling both
-     * top-level ({@code scripts/foo.js}) and nested ({@code skill-name/scripts/foo.js}) layouts.
+     * Returns true if the entry path falls inside a {@code scripts/} directory, handling both top-level
+     * ({@code scripts/foo.js}) and nested ({@code skill-name/scripts/foo.js}) layouts.
      */
     public static boolean isScriptEntry(String entryName) {
         String normalized = entryName.replace('\\', '/');
@@ -419,20 +415,24 @@ public class AiAgentUtilsSkillsTool {
         Matcher matcher = COMPONENT_CALL_PATTERN.matcher(content);
 
         while (matcher.find()) {
-            calls.add(new ComponentCall(matcher.group(1), matcher.group(2), matcher.group(3).trim()));
+            calls.add(new ComponentCall(matcher.group(1), matcher.group(2), matcher.group(3)
+                .trim()));
         }
 
         return calls;
     }
 
     /** Represents a single {@code context.component.X.Y(...)} call found inside a skill script. */
-    public record ComponentCall(String componentName, String actionName, String rawParameters) {}
+    public record ComponentCall(String componentName, String actionName, String rawParameters) {
+    }
 
     /** Holds the metadata and scripts extracted from a single skill zip archive. */
-    private record SkillScripts(String name, String description, List<ScriptEntry> scripts) {}
+    private record SkillScripts(String name, String description, List<ScriptEntry> scripts) {
+    }
 
     /** Represents a single executable script entry extracted from a skill archive. */
-    private record ScriptEntry(String fileName, String languageId, String content) {}
+    private record ScriptEntry(String fileName, String languageId, String content) {
+    }
 
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {

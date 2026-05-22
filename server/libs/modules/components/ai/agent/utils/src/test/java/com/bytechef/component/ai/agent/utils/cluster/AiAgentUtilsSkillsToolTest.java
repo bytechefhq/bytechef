@@ -29,7 +29,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
-import com.bytechef.platform.component.service.ComponentDefinitionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -184,10 +183,14 @@ class AiAgentUtilsSkillsToolTest {
 
         assertNotNull(calls);
         assertEquals(2, calls.size());
-        assertEquals("slack", calls.get(0).componentName());
-        assertEquals("sendMessage", calls.get(0).actionName());
-        assertEquals("logger", calls.get(1).componentName());
-        assertEquals("info", calls.get(1).actionName());
+        assertEquals("slack", calls.get(0)
+            .componentName());
+        assertEquals("sendMessage", calls.get(0)
+            .actionName());
+        assertEquals("logger", calls.get(1)
+            .componentName());
+        assertEquals("info", calls.get(1)
+            .actionName());
     }
 
     @Test
@@ -256,7 +259,8 @@ class AiAgentUtilsSkillsToolTest {
 
         assertNotNull(calls);
         assertEquals(1, calls.size());
-        assertEquals("", calls.get(0).rawParameters());
+        assertEquals("", calls.get(0)
+            .rawParameters());
     }
 
     // --- isScriptEntry tests ---
@@ -295,7 +299,8 @@ class AiAgentUtilsSkillsToolTest {
 
     @Test
     void testHasPerformFunctionR() {
-        assertTrue(AiAgentUtilsSkillsTool.hasPerformFunction("perform <- function(input, context) {\n  return(NULL)\n}"));
+        assertTrue(
+            AiAgentUtilsSkillsTool.hasPerformFunction("perform <- function(input, context) {\n  return(NULL)\n}"));
     }
 
     @Test
@@ -316,15 +321,20 @@ class AiAgentUtilsSkillsToolTest {
             AiAgentUtilsSkillsTool.extractComponentCalls(content);
 
         assertEquals(2, calls.size());
-        assertEquals("slack", calls.get(0).componentName());
-        assertEquals("sendMessage", calls.get(0).actionName());
-        assertEquals("gmail", calls.get(1).componentName());
-        assertEquals("sendEmail", calls.get(1).actionName());
+        assertEquals("slack", calls.get(0)
+            .componentName());
+        assertEquals("sendMessage", calls.get(0)
+            .actionName());
+        assertEquals("gmail", calls.get(1)
+            .componentName());
+        assertEquals("sendEmail", calls.get(1)
+            .actionName());
     }
 
     @Test
     void testExtractComponentCallsReturnsEmptyWhenNonePresent() {
-        assertTrue(AiAgentUtilsSkillsTool.extractComponentCalls("return null;").isEmpty());
+        assertTrue(AiAgentUtilsSkillsTool.extractComponentCalls("return null;")
+            .isEmpty());
     }
 
     private ToolCallbackProvider invokeApply() throws Exception {
@@ -366,7 +376,8 @@ class AiAgentUtilsSkillsToolTest {
 
             for (Map.Entry<String, String> entry : entries.entrySet()) {
                 zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
-                zipOutputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                zipOutputStream.write(entry.getValue()
+                    .getBytes(StandardCharsets.UTF_8));
                 zipOutputStream.closeEntry();
             }
 

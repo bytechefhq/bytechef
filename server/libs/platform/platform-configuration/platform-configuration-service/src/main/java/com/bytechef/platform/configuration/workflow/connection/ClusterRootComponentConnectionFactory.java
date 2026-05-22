@@ -21,7 +21,6 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
-import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
