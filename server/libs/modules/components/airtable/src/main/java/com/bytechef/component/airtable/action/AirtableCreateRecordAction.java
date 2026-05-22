@@ -66,7 +66,8 @@ public class AirtableCreateRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.BODY)))
-        .output();
+        .output()
+        .help("", "https://docs.bytechef.io/reference/components/airtable_v1#create-record");
 
     private AirtableCreateRecordAction() {
     }

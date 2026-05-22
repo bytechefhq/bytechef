@@ -64,7 +64,8 @@ public class AirtableGetRecordAction {
                 .metadata(
                     Map.of(
                         "type", PropertyType.PATH)))
-        .output();
+        .output()
+        .help("", "https://docs.bytechef.io/reference/components/airtable_v1#get-record");
 
     private AirtableGetRecordAction() {
     }
