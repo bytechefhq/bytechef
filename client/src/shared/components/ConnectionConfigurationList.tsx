@@ -237,7 +237,10 @@ const SubflowConnectionGroup = ({
     const connectionCount = countSubflowNodeConnections(node);
 
     return (
-        <Collapsible className="group/subflow space-y-4 rounded-md border bg-surface-neutral-primary px-3 py-2.5 transition-all has-[>button:focus-visible]:ring-2 has-[>button:focus-visible]:ring-stroke-brand-focus data-[state=open]:p-3">
+        <Collapsible
+            className="group/subflow space-y-4 rounded-md border bg-surface-neutral-primary px-3 py-2.5 transition-all has-[>button:focus-visible]:ring-2 has-[>button:focus-visible]:ring-stroke-brand-focus data-[state=open]:p-3"
+            defaultOpen
+        >
             <CollapsibleTrigger className="group/trigger flex w-full items-center justify-between outline-none">
                 <div className="flex gap-2">
                     <InlineSVG className="size-5" src={SubflowIcon} />
