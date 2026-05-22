@@ -91,6 +91,11 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Base ID and Table ID
+
+To find the Base ID, click [here](/reference/components/airtable_v1#how-to-find-the-base-id).
+
+To find the Table ID, click [here](/reference/components/airtable_v1#how-to-find-the-table-id).
 
 
 
@@ -146,6 +151,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Base ID, Table ID and Record ID
+
+To find the Base ID, click [here](/reference/components/airtable_v1#how-to-find-the-base-id).
+
+To find the Table ID, click [here](/reference/components/airtable_v1#how-to-find-the-table-id).
+
+To find the Record ID, click [here](/reference/components/airtable_v1#how-to-find-the-record-id).
 
 
 
@@ -182,6 +194,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Base ID, Table ID and Record ID
+
+To find the Base ID, click [here](/reference/components/airtable_v1#how-to-find-the-base-id).
+
+To find the Table ID, click [here](/reference/components/airtable_v1#how-to-find-the-table-id).
+
+To find the Record ID, click [here](/reference/components/airtable_v1#how-to-find-the-record-id).
 
 
 
@@ -220,6 +239,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Base ID, Table ID and Record ID
+
+To find the Base ID, click [here](/reference/components/airtable_v1#how-to-find-the-base-id).
+
+To find the Table ID, click [here](/reference/components/airtable_v1#how-to-find-the-table-id).
+
+To find the Record ID, click [here](/reference/components/airtable_v1#how-to-find-the-record-id).
 
 
 
@@ -239,7 +265,7 @@ Type: POLLING
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | baseId | Base ID | STRING | ID of the base which contains the table that you want to monitor. | true |
-| tableId | Table | STRING <details> <summary> Depends On </summary> baseId </details> | The table to monitor for new records. | true |
+| tableId | Table ID | STRING <details> <summary> Depends On </summary> baseId </details> | ID of the table to monitor for new records. | true |
 | triggerField | Trigger Field | STRING | It is essential to have a field for Created Time or Last Modified Time in your schema since this field is used to sort records, and the trigger will not function correctly without it. Therefore, if you don't have such a field in your schema, please create one. | true |
 
 
@@ -260,6 +286,11 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "airtable/v1/newRecord"
 }
 ```
+#### Find Base ID and Table ID
+
+To find the Base ID, click [here](/reference/components/airtable_v1#how-to-find-the-base-id).
+
+To find the Table ID, click [here](/reference/components/airtable_v1#how-to-find-the-table-id).
 
 
 
@@ -271,3 +302,28 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find the Base ID
+
+1. Open your Airtable home screen.
+2. Open the base with the base ID you want to find.
+3. After opening your base, the URL in your browser's address bar will display your base ID, which looks similar to: `https://airtable.com/appeqX9XTkHZNfSbn/pagIk60ZUF9P5UP72/`
+4. Your base ID starts with **app** and ends before the next forward slash `/`.
+
+### How to find the Table ID
+
+1. Open your Airtable home screen.
+2. Open the base hosting the table with the table ID you want to find.
+3. After opening your table, the URL in your browser's address bar will display a URL, which looks similar to: `https://airtable.com/appeqX9XTkHZNfSbn/tbl99vKzVh7NwLwm8/`
+4. Your table ID starts with **tbl** and ends before the next forward slash `/`.
+
+### How to find Record ID
+
+1. Open your Airtable home screen.
+2. Open the base with the record ID you want to find.
+3. Expand the record with the ID you want to find.
+4. After expanding your record, the URL in your browser's address bar will display your record ID, which looks similar to: `https://airtable.com/appSHwtnmVD5TiqSy/tblEzvkZks1VI3uyS/viwE3o43HKcqz6hFE/recbtRHd9o7vKZAQr?`
+5. Your record ID starts with **rec** and ends before the question mark `?`.
