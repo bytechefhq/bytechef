@@ -112,7 +112,7 @@ public class AirtableItemReader implements ItemReader {
     public List<FieldDefinition> getFields(
         Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context) {
 
-        return AirtableUtils.getFieldDefinitions(inputParameters, connectionParameters, context);
+        return AirtableUtils.getFieldDefinitions(inputParameters, context);
     }
 
     private void loadPage(String offset) {
