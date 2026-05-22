@@ -26,14 +26,19 @@ import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_EN
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.script.constant.ScriptConstants;
+import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
-import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
+import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.JobContextAware;
+import com.bytechef.platform.component.definition.ParametersFactory;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.domain.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -42,6 +47,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,10 +62,13 @@ import org.slf4j.LoggerFactory;
 import org.springaicommunity.agent.tools.SkillsTool;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
  * Provides a TOOLS cluster element that loads selected AiSkill zip archives, extracts .md files, and passes them to
- * Spring AI Community's SkillsTool as skill resources.
+ * Spring AI Community's SkillsTool as skill resources. Additionally, any executable scripts found in the
+ * {@code scripts/} directory are registered as individual {@link ToolCallback} instances backed by
+ * {@link PolyglotEngine}.
  *
  * @author Ivica Cardic
  */
@@ -70,6 +79,17 @@ public class AiAgentUtilsSkillsTool {
     private static final String SKILLS = "skills";
     private static final String SKILL_ID = "skillId";
     private static final String SCRIPTS_DIRECTORY = "scripts/";
+    private static final String SKILL_MD_FILENAME = "SKILL.md";
+
+    /**
+     * Maps file extensions to GraalVM polyglot language IDs.
+     */
+    private static final Map<String, String> EXTENSION_TO_LANGUAGE_ID = Map.of(
+        "js", "js",
+        "py", "python",
+        "rb", "ruby",
+        "r", "R",
+        "java", "java");
 
     /**
      * Matches calls of the form: context.component.{componentName}.{actionName}({rawParameters})
@@ -88,18 +108,28 @@ public class AiAgentUtilsSkillsTool {
     private static final Pattern PERFORM_FUNCTION_PATTERN = Pattern.compile(
         "(?:function\\s+perform\\s*\\(|def\\s+perform\\s*[\\s(]|perform\\s*<-\\s*function\\s*\\(|\\bperform\\s*\\(Map)");
 
-    private final AiSkillFacade aiSkillFacade;
-    private final ComponentDefinitionService componentDefinitionService;
+    /**
+     * Captures YAML frontmatter name and description fields from SKILL.md.
+     */
+    private static final Pattern FRONTMATTER_NAME_PATTERN = Pattern.compile(
+        "^---\\s*\\n.*?^name:\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.DOTALL);
+    private static final Pattern FRONTMATTER_DESCRIPTION_PATTERN = Pattern.compile(
+        "^---\\s*\\n.*?^description:\\s*(.+?)\\s*$", Pattern.MULTILINE | Pattern.DOTALL);
 
-    public final ClusterElementDefinition<ToolCallbackProviderFunction> clusterElementDefinition;
+    private final AiSkillFacade aiSkillFacade;
+    private final PolyglotEngine polyglotEngine;
+
+    public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
-    public AiAgentUtilsSkillsTool(AiSkillFacade aiSkillFacade, ComponentDefinitionService componentDefinitionService) {
+    public AiAgentUtilsSkillsTool(
+        AiSkillFacade aiSkillFacade, PolyglotEngine polyglotEngine) {
+
         this.aiSkillFacade = aiSkillFacade;
-        this.componentDefinitionService = componentDefinitionService;
+        this.polyglotEngine = polyglotEngine;
 
         this.clusterElementDefinition =
-            ComponentDsl.<ToolCallbackProviderFunction>clusterElement("skillsTool")
+            ComponentDsl.<MultipleConnectionsToolCallbackProviderFunction>clusterElement("skillsTool")
                 .title("Skills Tool")
                 .description(
                     "Extend AI agent capabilities with reusable, composable knowledge modules "
@@ -121,10 +151,12 @@ public class AiAgentUtilsSkillsTool {
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private ToolCallbackProvider apply(
-        Parameters inputParameters, Parameters connectionParameters,
-        com.bytechef.component.definition.Context context) throws Exception {
+        Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
+        Map<String, ComponentConnection> componentConnections,
+        Context context) throws Exception {
 
         List<Path> skillDirectories = new ArrayList<>();
+        List<SkillScripts> skillScriptsList = new ArrayList<>();
         List<String> skippedSkillReasons = new ArrayList<>();
 
         List<Long> skillIds = inputParameters.getList(SKILLS, Long.class, List.of());
@@ -149,6 +181,12 @@ public class AiAgentUtilsSkillsTool {
                 Path skillDirectory = extractSkillToTempDirectory(zipBytes, skillId);
 
                 skillDirectories.add(skillDirectory);
+
+                SkillScripts skillScripts = extractSkillScripts(zipBytes);
+
+                if (!skillScripts.scripts().isEmpty()) {
+                    skillScriptsList.add(skillScripts);
+                }
             } catch (RuntimeException runtimeException) {
                 String reason = "Failed to load skill ID " + skillId + ": " + runtimeException.getMessage();
 
@@ -171,7 +209,22 @@ public class AiAgentUtilsSkillsTool {
 
         ToolCallback skillsToolCallback = builder.build();
 
-        return ToolCallbackProvider.from(skillsToolCallback);
+        List<ToolCallback> allCallbacks = new ArrayList<>(
+            Arrays.asList(ToolCallbackProvider.from(skillsToolCallback).getToolCallbacks()));
+
+        JobContextAware jobContextAware = (JobContextAware) context;
+
+        for (SkillScripts skillScripts : skillScriptsList) {
+            for (ScriptEntry scriptEntry : skillScripts.scripts()) {
+                ToolCallback scriptCallback = createScriptToolCallback(
+                    skillScripts.name(), skillScripts.description(), scriptEntry, componentConnections,
+                    jobContextAware);
+
+                allCallbacks.add(scriptCallback);
+            }
+        }
+
+        return ToolCallbackProvider.from(allCallbacks.toArray(ToolCallback[]::new));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -189,6 +242,108 @@ public class AiAgentUtilsSkillsTool {
         }
 
         return options;
+    }
+
+    private ToolCallback createScriptToolCallback(
+        String skillName, String skillDescription, ScriptEntry scriptEntry,
+        Map<String, ComponentConnection> componentConnections, JobContextAware jobContextAware) {
+
+        String toolName = sanitizeToolName(skillName + "_" + stripExtension(scriptEntry.fileName()));
+        String scriptContent = scriptEntry.content();
+        String languageId = scriptEntry.languageId();
+
+        return FunctionToolCallback.builder(
+            toolName,
+            (Map<String, Object> toolInput) -> {
+                Parameters scriptParams = ParametersFactory.create(Map.of(
+                    "script", scriptContent,
+                    ScriptConstants.INPUT, toolInput != null ? toolInput : Map.of()));
+
+                return polyglotEngine.execute(languageId, scriptParams, componentConnections, jobContextAware);
+            })
+            .inputType(Map.class)
+            .description(skillDescription)
+            .build();
+    }
+
+    /**
+     * Extracts skill metadata and executable scripts from the zip archive. Only files inside {@code scripts/}
+     * directories that contain a {@code perform} function are included.
+     */
+    private static SkillScripts extractSkillScripts(byte[] zipBytes) {
+        String skillName = "";
+        String skillDescription = "";
+        List<ScriptEntry> scripts = new ArrayList<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry zipEntry;
+            int entryCount = 0;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (++entryCount > MAX_ZIP_ENTRIES) {
+                    throw new IllegalArgumentException(
+                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                }
+
+                if (zipEntry.isDirectory()) {
+                    continue;
+                }
+
+                String entryName = zipEntry.getName();
+                byte[] bytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
+
+                if (bytes.length > MAX_ZIP_ENTRY_SIZE) {
+                    log.warn("Entry '{}' exceeds maximum allowed size, skipping", entryName);
+
+                    continue;
+                }
+
+                String content = new String(bytes, StandardCharsets.UTF_8);
+
+                if (entryName.endsWith(SKILL_MD_FILENAME)) {
+                    skillName = extractFrontmatterField(content, FRONTMATTER_NAME_PATTERN);
+                    skillDescription = extractFrontmatterField(content, FRONTMATTER_DESCRIPTION_PATTERN);
+                } else if (isScriptEntry(entryName) && hasPerformFunction(content)) {
+                    String fileName = entryName.substring(entryName.lastIndexOf('/') + 1);
+                    String extension = getExtension(fileName);
+                    String languageId = EXTENSION_TO_LANGUAGE_ID.get(extension.toLowerCase());
+
+                    if (languageId != null) {
+                        scripts.add(new ScriptEntry(fileName, languageId, content));
+                    } else {
+                        log.warn("Unsupported script extension '{}' in '{}', skipping", extension, entryName);
+                    }
+                }
+            }
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to extract skill scripts from zip archive", ioException);
+        }
+
+        return new SkillScripts(skillName, skillDescription, scripts);
+    }
+
+    private static String extractFrontmatterField(String content, Pattern pattern) {
+        Matcher matcher = pattern.matcher(content);
+
+        return matcher.find() ? matcher.group(1).trim() : "";
+    }
+
+    private static String sanitizeToolName(String name) {
+        return name.replaceAll("[^A-Za-z0-9_]", "_")
+            .replaceAll("_+", "_")
+            .replaceAll("^_|_$", "");
+    }
+
+    private static String stripExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+
+        return dotIndex > 0 ? fileName.substring(0, dotIndex) : fileName;
+    }
+
+    private static String getExtension(String fileName) {
+        int dotIndex = fileName.lastIndexOf('.');
+
+        return dotIndex > 0 ? fileName.substring(dotIndex + 1) : "";
     }
 
     /**
@@ -272,6 +427,12 @@ public class AiAgentUtilsSkillsTool {
 
     /** Represents a single {@code context.component.X.Y(...)} call found inside a skill script. */
     public record ComponentCall(String componentName, String actionName, String rawParameters) {}
+
+    /** Holds the metadata and scripts extracted from a single skill zip archive. */
+    private record SkillScripts(String name, String description, List<ScriptEntry> scripts) {}
+
+    /** Represents a single executable script entry extracted from a skill archive. */
+    private record ScriptEntry(String fileName, String languageId, String content) {}
 
     @SuppressFBWarnings("PATH_TRAVERSAL_IN")
     private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {

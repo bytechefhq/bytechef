@@ -45,6 +45,7 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
+import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.definition.ai.agent.RagFunction;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
@@ -309,7 +310,21 @@ public abstract class AbstractAiAgentChatAction {
                 clusterElement.getComponentName(), clusterElement.getComponentVersion(),
                 clusterElement.getClusterElementName());
 
-            if (clusterElementFunction instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
+            if (clusterElementFunction instanceof MultipleConnectionsToolCallbackProviderFunction multipleConnectionsToolCallbackProviderFunction) {
+                try {
+                    ToolCallback[] providerCallbacks = multipleConnectionsToolCallbackProviderFunction
+                        .apply(
+                            ParametersFactory.create(clusterElement.getParameters()),
+                            getConnectionParameters(connectionParameters, clusterElement),
+                            ParametersFactory.create(clusterElement.getExtensions()),
+                            connectionParameters, context)
+                        .getToolCallbacks();
+
+                    toolCallbacks.addAll(Arrays.asList(providerCallbacks));
+                } catch (Exception exception) {
+                    throw clusterElementInitializationException(clusterElement, "tool callback", exception, context);
+                }
+            } else if (clusterElementFunction instanceof ToolCallbackProviderFunction toolCallbackProviderFunction) {
                 try {
                     ComponentConnection componentConnection = connectionParameters.get(
                         clusterElement.getWorkflowNodeName());

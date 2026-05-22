@@ -25,9 +25,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.script.engine.PolyglotEngine;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -55,22 +56,25 @@ class AiAgentUtilsSkillsToolTest {
     private AiSkillFacade aiSkillFacade;
 
     @Mock
-    private ComponentDefinitionService componentDefinitionService;
-
-    @Mock
-    private Context context;
+    private ClusterElementContextAware context;
 
     @Mock
     private Parameters connectionParameters;
 
     @Mock
+    private Parameters extensions;
+
+    @Mock
     private Parameters inputParameters;
+
+    @Mock
+    private PolyglotEngine polyglotEngine;
 
     private AiAgentUtilsSkillsTool agentUtilsSkillsTool;
 
     @BeforeEach
     void setUp() {
-        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade, componentDefinitionService);
+        agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(aiSkillFacade, polyglotEngine);
     }
 
     @Test
@@ -325,13 +329,14 @@ class AiAgentUtilsSkillsToolTest {
 
     private ToolCallbackProvider invokeApply() throws Exception {
         Method applyMethod = AiAgentUtilsSkillsTool.class.getDeclaredMethod(
-            "apply", Parameters.class, Parameters.class, Context.class);
+            "apply", Parameters.class, Parameters.class, Parameters.class, Map.class,
+            com.bytechef.component.definition.Context.class);
 
         applyMethod.setAccessible(true);
 
         try {
             return (ToolCallbackProvider) applyMethod.invoke(
-                agentUtilsSkillsTool, inputParameters, connectionParameters, context);
+                agentUtilsSkillsTool, inputParameters, connectionParameters, extensions, Map.of(), context);
         } catch (java.lang.reflect.InvocationTargetException invocationTargetException) {
             Throwable cause = invocationTargetException.getCause();
 
