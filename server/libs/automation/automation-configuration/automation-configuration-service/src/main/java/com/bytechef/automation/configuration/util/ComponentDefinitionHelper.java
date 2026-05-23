@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
@@ -33,6 +35,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class ComponentDefinitionHelper {
 
+    private static final Logger log = LoggerFactory.getLogger(ComponentDefinitionHelper.class);
+
     private final ComponentDefinitionService componentDefinitionService;
 
     public ComponentDefinitionHelper(ComponentDefinitionService componentDefinitionService) {
@@ -40,7 +44,7 @@ public class ComponentDefinitionHelper {
     }
 
     public List<ComponentDefinition> getComponentDefinitions(Workflow workflow) {
-        Set<ComponentDefinition> componentInfos = new HashSet<>();
+        Set<ComponentDefinition> componentDefinitions = new HashSet<>();
 
         for (WorkflowTask workflowTask : workflow.getTasks(true)) {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
@@ -52,9 +56,23 @@ public class ComponentDefinitionHelper {
             ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
                 workflowNodeType.name(), workflowNodeType.version());
 
-            componentInfos.add(componentDefinition);
+            componentDefinitions.add(componentDefinition);
         }
 
-        return new ArrayList<>(componentInfos);
+        return new ArrayList<>(componentDefinitions);
+    }
+
+    public List<ComponentDefinition> getComponentDefinitions(List<String> componentNames) {
+        List<ComponentDefinition> componentDefinitions = new ArrayList<>();
+
+        for (String componentName : componentNames) {
+            try {
+                componentDefinitions.add(componentDefinitionService.getComponentDefinition(componentName, null));
+            } catch (IllegalArgumentException e) {
+                log.warn("Skipping unknown component '{}' referenced by a workflow template", componentName);
+            }
+        }
+
+        return componentDefinitions;
     }
 }

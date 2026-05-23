@@ -40,7 +40,8 @@ import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
-import com.bytechef.platform.githubproxy.client.FileItem;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateSummary;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import java.io.ByteArrayInputStream;
@@ -58,6 +59,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 /**
  * @author Ivica Cardic
@@ -232,42 +235,27 @@ public class ProjectWorkflowFacadeIntTest {
 
     @Test
     public void testGetWorkflowTemplatePreBuilt() {
-        byte[] workflowZip;
+        ObjectNode workflowDefinition = JsonMapper.builder()
+            .build()
+            .createObjectNode();
 
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+        workflowDefinition.put("label", "WF Label PB");
+        workflowDefinition.put("description", "WF Desc PB");
 
-            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+        WorkflowTemplate workflowTemplate = new WorkflowTemplate(
+            "pb-workflow-slug", "WF Label PB", "WF Template PB", null, "ai",
+            List.of(), null, null, List.of(), List.of(), null, List.of(),
+            workflowDefinition, null, null);
 
-            String workflowJson =
-                "{\"label\":\"WF Label PB\",\"description\":\"WF Desc PB\",\"tasks\":[]}";
+        when(preBuiltTemplateService.getWorkflowTemplate(anyString()))
+            .thenReturn(workflowTemplate);
 
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
-
-            String templateJson = "{\"description\":\"WF Template PB\",\"projectVersion\":3}";
-
-            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-            zipOutputStream.finish();
-
-            workflowZip = byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString()))
-            .thenReturn(workflowZip);
-
-        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate("any-id", false);
+        WorkflowTemplateDTO importTemplate = projectWorkflowFacade.getWorkflowTemplate("pb-workflow-slug", false);
 
         assertThat(importTemplate).isNotNull();
+        assertThat(importTemplate.id()).isEqualTo("pb-workflow-slug");
         assertThat(importTemplate.description()).isEqualTo("WF Template PB");
-        assertThat(importTemplate.projectVersion()).isEqualTo(3);
+        assertThat(importTemplate.categories()).containsExactly("ai");
 
         WorkflowTemplateDTO.WorkflowInfo workflow = importTemplate.workflow();
 
@@ -333,49 +321,29 @@ public class ProjectWorkflowFacadeIntTest {
 
     @Test
     public void testGetPreBuiltWorkflowTemplates() {
-        byte[] workflowZip;
+        WorkflowTemplateSummary workflowTemplateSummary = new WorkflowTemplateSummary(
+            "pb-workflow-slug", "PB Label", "PB Template", "ai", List.of(), null, null);
 
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
-
-            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
-
-            String workflowJson =
-                "{\"label\":\"PB Label\",\"description\":\"PB Desc\",\"tasks\":[]}";
-
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
-
-            String templateJson = "{\"description\":\"PB Template\",\"projectVersion\":5}";
-
-            zipOutputStream.write(templateJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.finish();
-
-            workflowZip = byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        when(preBuiltTemplateService.getFiles("workflows"))
-            .thenReturn(List.of(new FileItem("workflows/pb-workflow.zip", 100L, "sha", "ref", "raw")));
-        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString())).thenReturn(workflowZip);
+        when(preBuiltTemplateService.getWorkflowTemplates())
+            .thenReturn(List.of(workflowTemplateSummary));
 
         List<WorkflowTemplateDTO> templates = projectWorkflowFacade.getPreBuiltWorkflowTemplates("", "");
 
         assertThat(templates).isNotNull();
         assertThat(templates).hasSize(1);
-        assertThat(templates.get(0)
-            .workflow()
-            .label()).isEqualTo("PB Label");
+
+        WorkflowTemplateDTO workflowTemplateDTO = templates.getFirst();
+        assertThat(workflowTemplateDTO.id()).isEqualTo("pb-workflow-slug");
+
+        WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
+
+        assertThat(workflow.label()).isEqualTo("PB Label");
+
+        assertThat(workflowTemplateDTO.categories()).containsExactly("ai");
 
         // simple query filter check
         List<WorkflowTemplateDTO> filtered = projectWorkflowFacade.getPreBuiltWorkflowTemplates("PB Label", "");
+
         assertThat(filtered).hasSize(1);
     }
 
@@ -391,37 +359,20 @@ public class ProjectWorkflowFacadeIntTest {
         int initialCount = projectWorkflowFacade.getProjectWorkflows(project.getId())
             .size();
 
-        byte[] workflowZip;
+        ObjectNode workflowDefinition = JsonMapper.builder()
+            .build()
+            .createObjectNode();
 
-        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
+        workflowDefinition.put("label", "PB Workflow");
 
-            zipOutputStream.putNextEntry(new ZipEntry("workflow-1.json"));
+        WorkflowTemplate workflowTemplate = new WorkflowTemplate(
+            "pb-workflow-slug", "PB Workflow", "pb desc", null, null, List.of(), null, null, List.of(), List.of(), null,
+            List.of(), workflowDefinition, null, null);
 
-            String workflowJson = "{\"label\":\"PB Workflow\",\"tasks\":[]}";
+        when(preBuiltTemplateService.getWorkflowTemplate(anyString()))
+            .thenReturn(workflowTemplate);
 
-            zipOutputStream.write(workflowJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-
-            zipOutputStream.putNextEntry(new ZipEntry("template.json"));
-
-            String metaJson = "{\"projectVersion\":1,\"description\":\"pb desc\"}";
-
-            zipOutputStream.write(metaJson.getBytes(StandardCharsets.UTF_8));
-
-            zipOutputStream.closeEntry();
-            zipOutputStream.finish();
-
-            workflowZip = byteArrayOutputStream.toByteArray();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-
-        when(preBuiltTemplateService.getPrebuiltTemplateData(anyString()))
-            .thenReturn(workflowZip);
-
-        projectWorkflowFacade.importWorkflowTemplate(project.getId(), "any-id", false);
+        projectWorkflowFacade.importWorkflowTemplate(project.getId(), "pb-workflow-slug", false);
 
         List<ProjectWorkflowDTO> updatedWorkflows = projectWorkflowFacade.getProjectWorkflows(project.getId());
 

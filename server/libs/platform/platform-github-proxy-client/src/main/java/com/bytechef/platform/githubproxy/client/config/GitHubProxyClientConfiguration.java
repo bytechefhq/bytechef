@@ -17,7 +17,9 @@
 package com.bytechef.platform.githubproxy.client.config;
 
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
 import com.bytechef.platform.githubproxy.client.internal.RestGitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.internal.RestWorkflowTemplateProxyClient;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,10 +40,25 @@ class GitHubProxyClientConfiguration {
             .build();
 
         RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getBaseUrl())
+            .baseUrl(properties.getGitHubBaseUrl())
             .requestFactory(new JdkClientHttpRequestFactory(httpClient))
             .build();
 
         return new RestGitHubProxyClient(restClient);
+    }
+
+    @Bean
+    WorkflowTemplateProxyClient workflowTemplateProxyClient(GitHubProxyClientProperties properties) {
+        HttpClient httpClient = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(30))
+            .followRedirects(HttpClient.Redirect.NORMAL)
+            .build();
+
+        RestClient restClient = RestClient.builder()
+            .baseUrl(properties.getWorkflowTemplatesBaseUrl())
+            .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+            .build();
+
+        return new RestWorkflowTemplateProxyClient(restClient);
     }
 }

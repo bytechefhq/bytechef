@@ -60,6 +60,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public Optional<Project> fetchProject(String name, long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Project getProjectDeploymentProject(long projectDeploymentId) {
         return loadBalancedRestClient.get(
             uriBuilder -> uriBuilder
