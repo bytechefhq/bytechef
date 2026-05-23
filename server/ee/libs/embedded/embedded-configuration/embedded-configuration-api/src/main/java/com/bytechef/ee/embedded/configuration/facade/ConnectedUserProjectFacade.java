@@ -35,6 +35,8 @@ public interface ConnectedUserProjectFacade {
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
+    List<ConnectedUserProjectDTO> getConnectedUserProjects(String externalUserId, Environment environment);
+
     void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId);
 

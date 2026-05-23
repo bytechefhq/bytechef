@@ -28,7 +28,9 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.ComponentScan.Filter;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
 
@@ -39,7 +41,10 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcAuditing;
     basePackages = {
         "com.bytechef.encryption", "com.bytechef.platform.category",
         "com.bytechef.ee.embedded.configuration", "com.bytechef.platform.tag"
-    })
+    },
+    excludeFilters = @Filter(
+        type = FilterType.REGEX,
+        pattern = "com\\.bytechef\\.ee\\.embedded\\.configuration\\.facade\\.AutomationWorkflowProjectFacadeIntTestConfiguration"))
 @EnableAutoConfiguration
 @EnableCaching
 @EnableConfigurationProperties(ApplicationProperties.class)

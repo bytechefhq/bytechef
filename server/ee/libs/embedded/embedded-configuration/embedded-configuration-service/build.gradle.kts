@@ -26,7 +26,9 @@ dependencies {
     testImplementation(project(":server:libs:core:evaluator:evaluator-impl"))
     testImplementation(project(":server:libs:platform:platform-category:platform-category-service"))
     testImplementation(project(":server:libs:platform:platform-configuration:platform-configuration-service"))
+    testImplementation(project(":server:libs:platform:platform-github-proxy-client"))
     testImplementation(project(":server:libs:platform:platform-security:platform-security-service"))
     testImplementation(project(":server:libs:platform:platform-tag:platform-tag-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
+    testImplementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
 }

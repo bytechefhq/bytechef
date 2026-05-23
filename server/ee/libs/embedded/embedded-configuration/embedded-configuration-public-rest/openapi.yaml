@@ -12,9 +12,65 @@ tags:
     description: "The Embedded Integration Instance Public API"
   - name: "integration-instance-workflow"
     description: "The Embedded Integration Instance Workflow Public API"
+  - name: "automation-workflow-project"
+    description: "The Embedded Automation Workflow Project Public API"
   - name: "connected-user-project-workflow"
-    description: "The Embedded Automation Workflow Public API"
+    description: "The Embedded Connected User Project Workflow Public API"
 paths:
+  /automation/projects:
+    get:
+      description: "Get automation workflow projects available to the connected user."
+      summary: "Get automation workflow projects available to the connected user"
+      tags:
+        - "automation-workflow-project"
+      operationId: "getFrontendProjects"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      responses:
+        "200":
+          description: "The list of automation workflow projects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AutomationWorkflowProject"
+      security:
+        - jwtBearerAuth: [ ]
+  /automation/workflow-templates/{workflowUuid}/copy:
+    post:
+      description: "Copy a catalog workflow template into a new user workflow."
+      summary: "Copy a catalog workflow template into a new user workflow"
+      tags:
+        - "automation-workflow-project"
+      operationId: "copyFrontendWorkflowTemplate"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The new workflow uuid."
+          content:
+            application/json:
+              schema:
+                type: "string"
+      security:
+        - jwtBearerAuth: [ ]
   /automation/workflows:
     get:
       description: "Get automation workflows for particular external user."
@@ -601,6 +657,72 @@ paths:
       responses:
         "204":
           description: "Successful operation."
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/projects:
+    get:
+      description: "Get automation workflow projects available to a connected user identified by external user id."
+      summary: "Get automation workflow projects available to a connected user identified by external user id"
+      tags:
+        - "automation-workflow-project"
+      operationId: "getProjects"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The list of automation workflow projects."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/AutomationWorkflowProject"
+      security:
+        - bearerAuth: [ ]
+  /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy:
+    post:
+      description: "Copy a catalog workflow template into a new user workflow."
+      summary: "Copy a catalog workflow template into a new user workflow"
+      tags:
+        - "automation-workflow-project"
+      operationId: "copyWorkflowTemplate"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "workflowUuid"
+          description: "The workflow template uuid."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      responses:
+        "200":
+          description: "The new workflow uuid."
+          content:
+            application/json:
+              schema:
+                type: "string"
       security:
         - bearerAuth: [ ]
   /{externalUserId}/automation/workflows:
@@ -1524,6 +1646,56 @@ components:
           type: "string"
         workflowUuid:
           description: "The reference code of a workflow."
+          type: "string"
+    AutomationWorkflowProject:
+      type: "object"
+      description: "An automation workflow catalog project."
+      properties:
+        id:
+          description: "The id of the automation workflow project."
+          type: "integer"
+          format: "int64"
+        name:
+          description: "The name of the automation workflow project."
+          type: "string"
+        description:
+          description: "The description of the automation workflow project."
+          type: "string"
+        workflowTemplates:
+          description: "The list of catalog workflow templates belonging to this project."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AutomationWorkflowProjectWorkflowTemplate"
+    AutomationWorkflowProjectWorkflowTemplate:
+      type: "object"
+      description: "A catalog workflow template within an automation workflow project."
+      properties:
+        id:
+          description: "The workflow UUID."
+          type: "string"
+        label:
+          description: "The label of the workflow."
+          type: "string"
+        description:
+          description: "The description of the workflow."
+          type: "string"
+        components:
+          description: "The list of components used in this workflow."
+          type: "array"
+          items:
+            $ref: "#/components/schemas/AutomationWorkflowProjectComponent"
+    AutomationWorkflowProjectComponent:
+      type: "object"
+      description: "A component used in a catalog workflow."
+      properties:
+        name:
+          description: "The name of the component."
+          type: "string"
+        title:
+          description: "The title of the component."
+          type: "string"
+        icon:
+          description: "The icon of the component."
           type: "string"
   responses:
     UnauthorizedError:
