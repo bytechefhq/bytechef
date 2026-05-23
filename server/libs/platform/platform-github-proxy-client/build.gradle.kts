@@ -1,4 +1,6 @@
 dependencies {
+    api("tools.jackson.core:jackson-databind")
+
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-web")

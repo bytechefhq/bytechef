@@ -20,7 +20,12 @@ import com.bytechef.automation.configuration.config.TemplatesProperties;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplatePage;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
@@ -30,13 +35,16 @@ public class PreBuiltTemplateService {
 
     private final GitHubProxyClient gitHubProxyClient;
     private final TemplatesProperties templatesProperties;
+    private final WorkflowTemplateProxyClient workflowTemplateProxyClient;
 
     @SuppressFBWarnings("EI")
     public PreBuiltTemplateService(
-        GitHubProxyClient gitHubProxyClient, TemplatesProperties templatesProperties) {
+        GitHubProxyClient gitHubProxyClient, TemplatesProperties templatesProperties,
+        WorkflowTemplateProxyClient workflowTemplateProxyClient) {
 
         this.gitHubProxyClient = gitHubProxyClient;
         this.templatesProperties = templatesProperties;
+        this.workflowTemplateProxyClient = workflowTemplateProxyClient;
     }
 
     public List<FileItem> getFiles(String directory) {
@@ -49,5 +57,27 @@ public class PreBuiltTemplateService {
         return gitHubProxyClient.getRaw(
             templatesProperties.getOwner(), templatesProperties.getRepo(),
             templatesProperties.getRef(), EncodingUtils.base64DecodeToString(id), null, null, null);
+    }
+
+    public List<WorkflowTemplateSummary> getWorkflowTemplates() {
+        List<WorkflowTemplateSummary> summaries = new ArrayList<>();
+
+        int page = 0;
+        int totalPages = 1;
+
+        while (page < totalPages) {
+            WorkflowTemplatePage workflowTemplatePage = workflowTemplateProxyClient.getWorkflowTemplates(page, 200);
+
+            summaries.addAll(workflowTemplatePage.content());
+
+            totalPages = workflowTemplatePage.totalPages();
+            page += 1;
+        }
+
+        return summaries;
+    }
+
+    public WorkflowTemplate getWorkflowTemplate(String slug) {
+        return workflowTemplateProxyClient.getWorkflowTemplate(slug);
     }
 }

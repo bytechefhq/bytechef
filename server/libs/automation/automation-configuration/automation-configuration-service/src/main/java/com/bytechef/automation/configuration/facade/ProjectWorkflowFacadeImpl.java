@@ -36,7 +36,6 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.configuration.service.SharedTemplateService;
 import com.bytechef.automation.configuration.util.ComponentDefinitionHelper;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.config.ApplicationProperties;
@@ -51,6 +50,9 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.configuration.workflow.WorkflowPreDeleteListener;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateAuthor;
+import com.bytechef.platform.githubproxy.client.WorkflowTemplateSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -68,6 +70,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -253,45 +256,47 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     public List<WorkflowTemplateDTO> getPreBuiltWorkflowTemplates(String query, String category) {
-        return preBuiltTemplateService.getFiles("workflows")
+        return preBuiltTemplateService.getWorkflowTemplates()
             .stream()
-            .map(fileItem -> {
+            .map(workflowTemplateSummary -> {
                 try {
-                    WorkflowTemplateDTO workflowTemplateDTO = getWorkflowTemplate(EncodingUtils.base64EncodeToString(
-                        fileItem.path()), false);
-
-                    if (StringUtils.isEmpty(query) && StringUtils.isEmpty(category)) {
-                        return workflowTemplateDTO;
-                    } else {
-                        if (StringUtils.isNotEmpty(query)) {
-                            WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
-
-                            if (StringUtils.containsIgnoreCase(workflowTemplateDTO.description(), query) ||
-                                StringUtils.containsIgnoreCase(workflow.label(), query) ||
-                                StringUtils.containsIgnoreCase(workflow.description(), query)) {
-
-                                return workflowTemplateDTO;
-                            }
-                        }
-
-                        if (StringUtils.isNotEmpty(category)) {
-                            List<String> categories = workflowTemplateDTO.categories();
-
-                            if (categories != null && categories.contains(category)) {
-                                return workflowTemplateDTO;
-                            }
-                        }
-
-                        return null;
-                    }
+                    return toWorkflowTemplateDTO(workflowTemplateSummary);
                 } catch (Exception e) {
-                    log.error("Failed to get workflow template", e);
+                    log.error("Failed to map workflow template '{}'", workflowTemplateSummary.slug(), e);
 
                     return null;
                 }
             })
             .filter(Objects::nonNull)
+            .filter(workflowTemplateDTO -> matchesQueryAndCategory(workflowTemplateDTO, query, category))
             .toList();
+    }
+
+    private static boolean matchesQueryAndCategory(
+        WorkflowTemplateDTO workflowTemplateDTO, String query, String category) {
+
+        if (StringUtils.isEmpty(query) && StringUtils.isEmpty(category)) {
+            return true;
+        }
+
+        if (StringUtils.isNotEmpty(query)) {
+            WorkflowTemplateDTO.WorkflowInfo workflow = workflowTemplateDTO.workflow();
+
+            if (Strings.CI.contains(workflowTemplateDTO.description(), query) ||
+                Strings.CI.contains(workflow.label(), query) ||
+                Strings.CI.contains(workflow.description(), query)) {
+
+                return true;
+            }
+        }
+
+        if (StringUtils.isNotEmpty(category)) {
+            List<String> categories = workflowTemplateDTO.categories();
+
+            return categories != null && categories.contains(category);
+        }
+
+        return false;
     }
 
     @Override
@@ -301,8 +306,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         WorkflowDTO workflowDTO = workflowFacade.getWorkflow(projectWorkflow.getWorkflowId());
 
-        return new ProjectWorkflowDTO(
-            workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
+        return new ProjectWorkflowDTO(workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
     }
 
     @Override
@@ -312,8 +316,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
         WorkflowDTO workflowDTO = workflowFacade.getWorkflow(workflowId);
 
-        return new ProjectWorkflowDTO(
-            workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
+        return new ProjectWorkflowDTO(workflowDTO, projectWorkflow, workflowFacade.hasSseStreamResponse(workflowDTO));
     }
 
     @Override
@@ -410,22 +413,22 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     @Override
     @Transactional(readOnly = true)
     public WorkflowTemplateDTO getWorkflowTemplate(String id, boolean sharedWorkflow) {
+        if (!sharedWorkflow) {
+            return toWorkflowTemplateDTO(preBuiltTemplateService.getWorkflowTemplate(id));
+        }
+
+        SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
+
+        if (sharedTemplate.getTemplate() == null) {
+            throw new IllegalStateException("Shared template is not available");
+        }
+
         byte[] data;
 
-        if (sharedWorkflow) {
-            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
-
-            if (sharedTemplate.getTemplate() == null) {
-                throw new IllegalStateException("Shared template is not available");
-            }
-
-            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
-                data = inputStream.readAllBytes();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to import shared project", e);
-            }
-        } else {
-            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
+        try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
+            data = inputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import shared project", e);
         }
 
         TemplateFiles templateFiles = readTemplate(data);
@@ -448,18 +451,24 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
+        if (!sharedWorkflow) {
+            WorkflowTemplate workflowTemplate = preBuiltTemplateService.getWorkflowTemplate(id);
+
+            ProjectWorkflow projectWorkflow = addWorkflow(
+                projectId, workflowTemplate.workflowDefinition()
+                    .toString());
+
+            return projectWorkflow.getId();
+        }
+
+        SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
+
         byte[] data;
 
-        if (sharedWorkflow) {
-            SharedTemplate sharedTemplate = sharedTemplateService.getSharedTemplate(UUID.fromString(id));
-
-            try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
-                data = inputStream.readAllBytes();
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to import shared project", e);
-            }
-        } else {
-            data = preBuiltTemplateService.getPrebuiltTemplateData(id);
+        try (InputStream inputStream = sharedTemplateFileStorage.getInputStream(sharedTemplate.getTemplate())) {
+            data = inputStream.readAllBytes();
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to import shared project", e);
         }
 
         TemplateFiles templateFiles = readTemplate(data);
@@ -480,6 +489,31 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         }
 
         return getProjectWorkflow(workflowId);
+    }
+
+    private WorkflowTemplateDTO toWorkflowTemplateDTO(WorkflowTemplate workflowTemplate) {
+        Workflow workflow = new Workflow(String.valueOf(workflowTemplate.workflowDefinition()), Workflow.Format.JSON);
+
+        WorkflowTemplateAuthor author = workflowTemplate.author();
+
+        return new WorkflowTemplateDTO(
+            author == null ? "" : author.name(), author == null ? "" : author.email(),
+            author == null ? "" : author.role(), author == null ? "" : author.socialLinks(),
+            toCategories(workflowTemplate.category()), componentDefinitionHelper.getComponentDefinitions(workflow),
+            workflowTemplate.description(), workflowTemplate.slug(), null, null, publicUrl,
+            new WorkflowInfo(workflow.getLabel(), workflow.getDescription()));
+    }
+
+    private WorkflowTemplateDTO toWorkflowTemplateDTO(WorkflowTemplateSummary workflowTemplateSummary) {
+        return new WorkflowTemplateDTO(
+            "", "", "", "", toCategories(workflowTemplateSummary.category()),
+            componentDefinitionHelper.getComponentDefinitions(workflowTemplateSummary.components()),
+            workflowTemplateSummary.description(), workflowTemplateSummary.slug(), null, null, publicUrl,
+            new WorkflowInfo(workflowTemplateSummary.title(), workflowTemplateSummary.description()));
+    }
+
+    private static List<String> toCategories(String category) {
+        return category == null || category.isBlank() ? List.of("other") : List.of(category);
     }
 
     private TemplateFiles readTemplate(byte[] data) {
