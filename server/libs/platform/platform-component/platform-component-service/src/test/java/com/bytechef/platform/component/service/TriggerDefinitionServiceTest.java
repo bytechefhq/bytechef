@@ -180,13 +180,17 @@ public class TriggerDefinitionServiceTest {
 
         List<?> records = (List<?>) output.value();
 
+        // The production cap is MAX_POLLING_TRIGGER_ITERATIONS=100 in-loop iterations, plus the initial poll that
+        // runs before the loop — so a single execution can call pollFunction at most 101 times. The bound is set to
+        // exactly that so any off-by-one regression in the iteration cap fails this test.
         assertTrue(
-            pollCount.get() <= 200,
-            "Polling must stop after a bounded number of iterations, but pollFunction was called " +
+            pollCount.get() <= 101,
+            "Polling must stop at MAX_POLLING_TRIGGER_ITERATIONS + 1 calls, but pollFunction was called " +
                 pollCount.get() + " times");
         assertTrue(
-            records.size() <= 200,
-            "Accumulated records must be bounded, but " + records.size() + " records were collected");
+            records.size() <= 101,
+            "Accumulated records must be bounded by the iteration cap, but " + records.size() +
+                " records were collected");
     }
 
     @Test
@@ -227,9 +231,12 @@ public class TriggerDefinitionServiceTest {
 
         List<?> records = (List<?>) output.value();
 
+        // The production cap is MAX_POLLING_TRIGGER_RECORDS=10_000. The pollFunction returns 500 records per page,
+        // so a correctly-capped run accumulates exactly 10_000; this bound catches any record-cap overshoot.
         assertTrue(
-            records.size() <= 20_000,
-            "Accumulated records must be bounded, but " + records.size() + " records were collected");
+            records.size() <= 10_000,
+            "Accumulated records must be bounded by MAX_POLLING_TRIGGER_RECORDS, but " + records.size() +
+                " records were collected");
     }
 
     @Test
