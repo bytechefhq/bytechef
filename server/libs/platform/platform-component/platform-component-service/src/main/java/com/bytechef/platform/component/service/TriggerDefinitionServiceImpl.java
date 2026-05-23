@@ -77,6 +77,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -89,6 +91,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static final int MAX_POLLING_TRIGGER_ITERATIONS = 100;
     private static final int MAX_POLLING_TRIGGER_RECORDS = 10_000;
+
+    private static final Logger logger = LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
@@ -436,7 +440,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     }
 
     private static TriggerOutput executePollingTrigger(
-        com.bytechef.component.definition.TriggerDefinition triggerDefinition,
+        String componentName, String triggerName, com.bytechef.component.definition.TriggerDefinition triggerDefinition,
         Map<String, ?> inputParameters, @Nullable ComponentConnection componentConnection,
         Map<String, ?> closureParameters, TriggerContext triggerContext, PollFunction pollFunction) {
 
@@ -481,6 +485,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             records.addAll(pollOutput.records());
         }
 
+        if (pollOutput.pollImmediately()) {
+            logger.warn(
+                "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
+                    "resume. Likely cause: component keeps requesting immediate re-poll without completing pagination.",
+                componentName, triggerName, iterations, records.size());
+        }
+
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
 
         return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
@@ -517,7 +528,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         } else if (TriggerType.POLLING == triggerType || TriggerType.HYBRID == triggerType) {
             triggerOutput = triggerDefinition.getPoll()
                 .map(pollFunction -> executePollingTrigger(
-                    triggerDefinition, inputParameters, componentConnection,
+                    componentName, triggerName, triggerDefinition, inputParameters, componentConnection,
                     triggerState == null ? Map.of() : (Map<String, ?>) triggerState, context, pollFunction))
                 .orElseThrow();
         } else {
