@@ -64,6 +64,7 @@ public class CacheConfiguration implements CachingConfigurer {
 
         caffeineCacheManager.setCaffeine(
             Caffeine.newBuilder()
+                .maximumSize(1_000)
                 .expireAfterWrite(10, TimeUnit.MINUTES));
 
         caffeineCacheManager.registerCustomCache(
