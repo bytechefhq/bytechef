@@ -71,7 +71,6 @@ import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -460,8 +459,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             throw new ExecutionException(e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
         }
 
-        List<Object> records = new ArrayList<>(
-            pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
+        List<Object> records = new ArrayList<>();
+        boolean truncated = appendCapped(records, pollOutput.records());
 
         int iterations = 0;
 
@@ -482,10 +481,10 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 throw new ExecutionException(e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
             }
 
-            records.addAll(pollOutput.records());
+            truncated |= appendCapped(records, pollOutput.records());
         }
 
-        if (pollOutput.pollImmediately()) {
+        if (truncated || pollOutput.pollImmediately()) {
             logger.warn(
                 "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
                     "resume. Likely cause: component keeps requesting immediate re-poll without completing pagination.",
@@ -495,6 +494,28 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
 
         return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
+    }
+
+    private static boolean appendCapped(List<Object> records, @Nullable List<?> pageRecords) {
+        if (pageRecords == null || pageRecords.isEmpty()) {
+            return false;
+        }
+
+        int remaining = MAX_POLLING_TRIGGER_RECORDS - records.size();
+
+        if (remaining <= 0) {
+            return true;
+        }
+
+        if (pageRecords.size() <= remaining) {
+            records.addAll(pageRecords);
+
+            return false;
+        }
+
+        records.addAll(pageRecords.subList(0, remaining));
+
+        return true;
     }
 
     @SuppressWarnings("unchecked")
