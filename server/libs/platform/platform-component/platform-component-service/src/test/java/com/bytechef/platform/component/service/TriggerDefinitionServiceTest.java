@@ -34,10 +34,12 @@ import com.bytechef.platform.component.ComponentDefinitionRegistry;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.constant.PlatformType;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -138,6 +140,91 @@ public class TriggerDefinitionServiceTest {
         assertSame(
             providerException, thrownException,
             "The thrown exception should be the same instance as the original ProviderException");
+    }
+
+    @Test
+    public void testExecutePollingTriggerStopsAfterMaxIterations() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        AtomicInteger pollCount = new AtomicInteger();
+
+        // A component that always asks to be polled again (pollImmediately = true), advancing its cursor every
+        // call. It stops only after a large, finite number of pages purely so this test cannot hang if the
+        // production poll loop is unbounded.
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> {
+                int page = pollCount.incrementAndGet();
+
+                return new PollOutput(List.of("record-" + page), Map.of("cursor", page), page < 5000);
+            };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        TriggerOutput output = triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            PlatformType.AUTOMATION, false);
+
+        List<?> records = (List<?>) output.value();
+
+        assertTrue(
+            pollCount.get() <= 200,
+            "Polling must stop after a bounded number of iterations, but pollFunction was called " +
+                pollCount.get() + " times");
+        assertTrue(
+            records.size() <= 200,
+            "Accumulated records must be bounded, but " + records.size() + " records were collected");
+    }
+
+    @Test
+    public void testExecutePollingTriggerStopsAfterMaxRecords() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        AtomicInteger pollCount = new AtomicInteger();
+
+        // Each poll returns a large batch and asks to be polled again. It stops only after a finite number of
+        // pages so the test terminates even if the production poll loop fails to bound accumulation.
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> {
+                int page = pollCount.incrementAndGet();
+
+                List<Object> batch = new ArrayList<>();
+
+                for (int i = 0; i < 500; i++) {
+                    batch.add("record-" + page + "-" + i);
+                }
+
+                return new PollOutput(batch, Map.of("cursor", page), page < 100);
+            };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        TriggerOutput output = triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+            PlatformType.AUTOMATION, false);
+
+        List<?> records = (List<?>) output.value();
+
+        assertTrue(
+            records.size() <= 20_000,
+            "Accumulated records must be bounded, but " + records.size() + " records were collected");
     }
 
     @Disabled
