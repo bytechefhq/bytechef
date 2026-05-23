@@ -24,6 +24,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PollFunction;
@@ -47,6 +51,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 
 /**
@@ -227,6 +232,49 @@ public class TriggerDefinitionServiceTest {
             "Accumulated records must be bounded, but " + records.size() + " records were collected");
     }
 
+    @Test
+    public void testExecutePollingTriggerLogsWarningWhenCapTrips() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+
+        // A component that never finishes paginating: it always asks to be polled again. The production poll
+        // loop must stop it at a safety cap and log a warning that names the runaway trigger.
+        PollFunction mockPollFunction =
+            (inputParameters, connectionParameters, closureParameters, context) -> new PollOutput(
+                List.of("record"), Map.of("cursor", System.nanoTime()), true);
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher);
+
+        ListAppender<ILoggingEvent> logAppender = attachLogAppender();
+
+        try {
+            triggerDefinitionService.executeTrigger(
+                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), null, null, null, null,
+                PlatformType.AUTOMATION, false);
+        } finally {
+            detachLogAppender(logAppender);
+        }
+
+        boolean warningLogged = logAppender.list.stream()
+            .anyMatch(event -> {
+                String formattedMessage = event.getFormattedMessage();
+
+                return event.getLevel() == Level.WARN && formattedMessage.contains("testComponent")
+                    && formattedMessage.contains("testTrigger");
+            });
+
+        assertTrue(
+            warningLogged, "A WARN log naming the runaway trigger should be emitted when a polling safety cap trips");
+    }
+
     @Disabled
     @Test
     public void testGetTriggerDefinition() {
@@ -237,5 +285,22 @@ public class TriggerDefinitionServiceTest {
     @Test
     public void testGetTriggerDefinitions() {
         // TODO
+    }
+
+    private static ListAppender<ILoggingEvent> attachLogAppender() {
+        Logger logger = (Logger) LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
+
+        ListAppender<ILoggingEvent> logAppender = new ListAppender<>();
+
+        logAppender.start();
+        logger.addAppender(logAppender);
+
+        return logAppender;
+    }
+
+    private static void detachLogAppender(ListAppender<ILoggingEvent> logAppender) {
+        Logger logger = (Logger) LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
+
+        logger.detachAppender(logAppender);
     }
 }
