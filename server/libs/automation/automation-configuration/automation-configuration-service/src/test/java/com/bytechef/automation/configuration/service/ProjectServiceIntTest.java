@@ -146,6 +146,66 @@ public class ProjectServiceIntTest {
     }
 
     @Test
+    public void testGetProjectsExcludesEmbeddedMarkerProjects() {
+        projectRepository.save(
+            Project.builder()
+                .name("Regular Project")
+                .workspaceId(workspace.getId())
+                .build());
+
+        projectRepository.save(
+            Project.builder()
+                .name("__EMBEDDED_AUTOMATION__Catalog")
+                .workspaceId(workspace.getId())
+                .build());
+
+        List<Project> projects = projectService.getProjects(null, null, null, null, null, workspace.getId());
+
+        assertThat(projects)
+            .extracting(Project::getName)
+            .contains("Regular Project")
+            .doesNotContain("__EMBEDDED_AUTOMATION__Catalog");
+    }
+
+    @Test
+    public void testFetchProjectByNameAndWorkspaceId() {
+        Workspace secondWorkspace = workspaceRepository.save(new Workspace("test2"));
+
+        Project projectInWorkspace1 = projectService.create(
+            Project.builder()
+                .name("__EMBEDDED_TEMPLATES__")
+                .workspaceId(workspace.getId())
+                .build());
+
+        Project projectInWorkspace2 = projectService.create(
+            Project.builder()
+                .name("__EMBEDDED_TEMPLATES__")
+                .workspaceId(secondWorkspace.getId())
+                .build());
+
+        // workspace isolation: each workspace returns its own project
+        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", workspace.getId()))
+            .isPresent()
+            .map(Project::getId)
+            .hasValue(projectInWorkspace1.getId());
+
+        assertThat(projectService.fetchProject("__EMBEDDED_TEMPLATES__", secondWorkspace.getId()))
+            .isPresent()
+            .map(Project::getId)
+            .hasValue(projectInWorkspace2.getId());
+
+        // case-insensitive lookup
+        assertThat(projectService.fetchProject("__embedded_templates__", workspace.getId()))
+            .isPresent()
+            .map(Project::getId)
+            .hasValue(projectInWorkspace1.getId());
+
+        // non-existent name returns empty
+        assertThat(projectService.fetchProject("__NOPE__", workspace.getId()))
+            .isEmpty();
+    }
+
+    @Test
     public void testUpdate() {
         Project project = projectRepository.save(getProject());
 

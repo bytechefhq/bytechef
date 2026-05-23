@@ -291,6 +291,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    public List<ConnectedUserProjectDTO> getConnectedUserProjects(String externalUserId, Environment environment) {
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
+
+        return getConnectedUserProjects(connectedUser.getId(), environment);
+    }
+
+    @Override
     public void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId) {
 

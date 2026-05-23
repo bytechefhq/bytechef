@@ -1,0 +1,60 @@
+type AutomationWorkflowProject {
+    id: ID!
+    name: String!
+    description: String
+    categoryId: ID
+    tagIds: [ID!]!
+    published: Boolean!
+    version: Int!
+    lastPublishedVersion: Int
+    workflowTemplates: [AutomationWorkflowProjectWorkflowTemplate!]!
+}
+
+type AutomationWorkflowProjectWorkflowTemplate {
+    workflowUuid: ID!
+    label: String
+    description: String
+    lastModifiedDate: String
+    triggers: [AutomationWorkflowProjectComponent!]!
+    components: [AutomationWorkflowProjectComponent!]!
+}
+
+type AutomationWorkflowProjectComponent {
+    name: String!
+    title: String
+    icon: String
+}
+
+type AutomationWorkflowProjectCategory {
+    id: ID!
+    name: String!
+}
+
+type AutomationWorkflowProjectTag {
+    id: ID!
+    name: String!
+}
+
+type AutomationWorkflowProjectVersion {
+    version: Int!
+    status: String!
+    publishedDate: String
+}
+
+extend type Query {
+    automationWorkflowProjects: [AutomationWorkflowProject!]!
+    automationWorkflowProjectCategories: [AutomationWorkflowProjectCategory!]!
+    automationWorkflowProjectTags: [AutomationWorkflowProjectTag!]!
+    automationWorkflowProjectVersions(id: ID!): [AutomationWorkflowProjectVersion!]!
+}
+
+extend type Mutation {
+    createAutomationWorkflowProject(name: String!, description: String, category: String, tags: [String!]): ID!
+    updateAutomationWorkflowProject(id: ID!, name: String!, description: String, category: String, tags: [String!]): Boolean!
+    deleteAutomationWorkflowProject(id: ID!): Boolean!
+    publishAutomationWorkflowProject(id: ID!): Boolean!
+    createAutomationWorkflowProjectWorkflow(projectId: ID!, definition: String): ID!
+    deleteAutomationWorkflowProjectWorkflow(workflowUuid: ID!): Boolean!
+    duplicateAutomationWorkflowProjectWorkflow(workflowUuid: ID!): ID!
+    duplicateAutomationWorkflowProject(id: ID!): ID!
+}

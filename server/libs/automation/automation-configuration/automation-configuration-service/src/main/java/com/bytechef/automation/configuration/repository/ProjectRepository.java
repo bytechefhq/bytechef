@@ -41,6 +41,8 @@ public interface ProjectRepository
 
     Optional<Project> findByNameIgnoreCase(String name);
 
+    Optional<Project> findByNameIgnoreCaseAndWorkspaceId(String name, long workspaceId);
+
     Optional<Project> findByUuid(UUID uuid);
 
     @Query("""
