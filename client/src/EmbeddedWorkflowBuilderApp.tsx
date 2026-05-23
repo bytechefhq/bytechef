@@ -1,5 +1,5 @@
 import {Toaster} from '@/components/ui/sonner';
-import useFetchInterceptor from '@/ee/pages/embedded/automation-workflows/workflow-builder/config/useFetchInterceptor';
+import useFetchInterceptor from '@/ee/pages/embedded/workflow-builder/config/useFetchInterceptor';
 import {Outlet} from 'react-router-dom';
 
 const EmbeddedWorkflowBuilderApp = () => {
