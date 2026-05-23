@@ -5,6 +5,7 @@ import TemplateLayoutContainer from '@/pages/automation/template/components/Temp
 import ProjectsComboBox from '@/pages/automation/template/workflow-template/components/ProjectsComboBox';
 import WorkflowPreviewSvg from '@/pages/automation/template/workflow-template/components/WorkflowPreviewSvg';
 import {useImportWorkflowTemplateMutation, useWorkflowTemplateQuery} from '@/shared/middleware/graphql';
+import {useGetProjectQuery} from '@/shared/queries/automation/projects.queries';
 import {useState} from 'react';
 import {useNavigate, useParams} from 'react-router-dom';
 
@@ -26,6 +27,8 @@ const WorkflowTemplate = ({
         id: id!,
         sharedWorkflow,
     });
+
+    const {data: project} = useGetProjectQuery(projectId ? +projectId : 0, undefined, !!projectId);
 
     const importWorkflowTemplateMutation = useImportWorkflowTemplateMutation({
         onSuccess: ({importWorkflowTemplate}) => {
@@ -58,14 +61,22 @@ const WorkflowTemplate = ({
                     </p>
                 </div>
 
-                <div className="flex flex-col space-y-2">
-                    <div>Choose Project:</div>
+                {projectId ? (
+                    <div className="flex flex-col space-y-2">
+                        <div>
+                            Project: <span className="font-medium text-primary">{project?.name}</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="flex flex-col space-y-2">
+                        <div>Choose Project:</div>
 
-                    <ProjectsComboBox
-                        onChange={handleOnChange}
-                        value={selectedProjectId ? +selectedProjectId : undefined}
-                    />
-                </div>
+                        <ProjectsComboBox
+                            onChange={handleOnChange}
+                            value={selectedProjectId ? +selectedProjectId : undefined}
+                        />
+                    </div>
+                )}
 
                 <div className="relative flex-1 space-y-4">
                     <span>This template contains the following components:</span>
