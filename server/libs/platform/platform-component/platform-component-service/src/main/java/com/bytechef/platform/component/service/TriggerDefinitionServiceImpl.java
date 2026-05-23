@@ -87,6 +87,9 @@ import org.springframework.stereotype.Service;
 @Service("triggerDefinitionService")
 public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
+    private static final int MAX_POLLING_TRIGGER_ITERATIONS = 100;
+    private static final int MAX_POLLING_TRIGGER_RECORDS = 10_000;
+
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
     private final ApplicationEventPublisher eventPublisher;
@@ -456,7 +459,13 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         List<Object> records = new ArrayList<>(
             pollOutput.records() == null ? Collections.emptyList() : pollOutput.records());
 
-        while (pollOutput.pollImmediately()) {
+        int iterations = 0;
+
+        while (pollOutput.pollImmediately() && iterations < MAX_POLLING_TRIGGER_ITERATIONS &&
+            records.size() < MAX_POLLING_TRIGGER_RECORDS) {
+
+            iterations++;
+
             try {
                 pollOutput = pollFunction.apply(
                     ParametersFactory.create(inputParameters), connectionParameters,
