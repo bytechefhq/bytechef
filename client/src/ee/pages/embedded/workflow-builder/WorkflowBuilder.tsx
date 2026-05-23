@@ -1,7 +1,7 @@
 import LoadingDots from '@/components/LoadingDots';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
-import WorkflowBuilderHeader from '@/ee/pages/embedded/automation-workflows/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
-import {useWorkflowBuilder} from '@/ee/pages/embedded/automation-workflows/workflow-builder/hooks/useWorkflowBuilder';
+import WorkflowBuilderHeader from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
+import {useWorkflowBuilder} from '@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder';
 import {getCreateConnectedUserProjectWorkflowConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
