@@ -36,15 +36,15 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
     return (
         <>
             <div
-                className="flex cursor-pointer items-center justify-between rounded-md px-2 py-4 hover:bg-gray-50"
+                className="flex cursor-pointer items-center justify-between gap-6 rounded-md px-2 py-4 hover:bg-gray-50"
                 onClick={handleClick}
             >
-                <div className="flex flex-1 items-center gap-3">
+                <div className="flex min-w-0 flex-1 items-center gap-3">
                     <div className={`flex size-8 items-center justify-center rounded ${skillColor}`}>
                         <ZapIcon className="size-4 text-white" />
                     </div>
 
-                    <div className="flex-1">
+                    <div className="min-w-0 flex-1">
                         <div className="text-sm font-semibold">{skill.name}</div>
 
                         {skill.description && (
@@ -55,7 +55,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4">
+                <div className="flex shrink-0 items-center gap-4">
                     {skill.lastModifiedDate && (
                         <Tooltip>
                             <TooltipTrigger className="text-xs text-content-neutral-secondary">
