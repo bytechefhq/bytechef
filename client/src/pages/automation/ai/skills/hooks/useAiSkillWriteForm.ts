@@ -4,7 +4,7 @@ import {useCallback, useState} from 'react';
 import {toast} from 'sonner';
 
 interface UseAiSkillWriteFormOptionsI {
-    onSuccess?: () => void;
+    onSuccess?: (createdSkillId: string) => void;
 }
 
 export default function useAiSkillWriteForm({onSuccess}: UseAiSkillWriteFormOptionsI = {}) {
@@ -20,14 +20,14 @@ export default function useAiSkillWriteForm({onSuccess}: UseAiSkillWriteFormOpti
                 description: error.message,
             });
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
             queryClient.invalidateQueries({queryKey: ['aiSkills']});
 
             setName('');
             setDescription('');
             setInstructions('');
 
-            onSuccess?.();
+            onSuccess?.(data.createAiSkillFromInstructions.id);
         },
     });
 

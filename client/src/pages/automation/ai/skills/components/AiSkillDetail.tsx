@@ -147,7 +147,7 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
     }, [body, editor]);
 
     return (
-        <div className="overflow-y-auto p-6">
+        <div className="overflow-y-auto px-6 pb-6 pt-0">
             {frontmatter && <FrontmatterTable frontmatter={frontmatter} />}
 
             <div className="prose prose-sm max-w-none">

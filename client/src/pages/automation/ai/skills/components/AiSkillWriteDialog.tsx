@@ -6,11 +6,12 @@ import {Textarea} from '@/components/ui/textarea';
 import useAiSkillWriteForm from '@/pages/automation/ai/skills/hooks/useAiSkillWriteForm';
 
 interface AiSkillWriteDialogProps {
+    onCreated?: (createdSkillId: string) => void;
     onOpenChange: (open: boolean) => void;
     open: boolean;
 }
 
-const AiSkillWriteDialog = ({onOpenChange, open}: AiSkillWriteDialogProps) => {
+const AiSkillWriteDialog = ({onCreated, onOpenChange, open}: AiSkillWriteDialogProps) => {
     const {
         createSkillFromInstructionsMutation,
         description,
@@ -20,7 +21,12 @@ const AiSkillWriteDialog = ({onOpenChange, open}: AiSkillWriteDialogProps) => {
         setDescription,
         setInstructions,
         setName,
-    } = useAiSkillWriteForm({onSuccess: () => onOpenChange(false)});
+    } = useAiSkillWriteForm({
+        onSuccess: (createdSkillId) => {
+            onCreated?.(createdSkillId);
+            onOpenChange(false);
+        },
+    });
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>
