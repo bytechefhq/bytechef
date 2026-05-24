@@ -2,6 +2,10 @@ extend type Query {
     connectedUserProjects(connectedUserId: ID, environmentId: ID): [ConnectedUserProject!]!
 }
 
+extend type Mutation {
+    enableConnectedUserProjectWorkflow(id: ID!, enable: Boolean!): Boolean
+}
+
 type ConnectedUserProject {
     id: ID!
     connectedUser: ConnectedUser!

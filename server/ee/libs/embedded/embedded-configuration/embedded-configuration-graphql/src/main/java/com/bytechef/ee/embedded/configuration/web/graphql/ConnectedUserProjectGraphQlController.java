@@ -15,6 +15,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -45,5 +46,12 @@ public class ConnectedUserProjectGraphQlController {
 
         return connectedUserProjectFacade.getConnectedUserProjects(
             connectedUserId, environmentService.getEnvironment(environmentId));
+    }
+
+    @MutationMapping
+    public boolean enableConnectedUserProjectWorkflow(@Argument long id, @Argument boolean enable) {
+        connectedUserProjectFacade.enableProjectWorkflow(id, enable);
+
+        return true;
     }
 }
