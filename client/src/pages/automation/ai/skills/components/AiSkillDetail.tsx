@@ -1,9 +1,9 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
-import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
+import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {EditorContent, useEditor} from '@tiptap/react';
@@ -65,36 +65,6 @@ const FileTreeNode = ({node, onSelect, selectedPath}: FileTreeNodeProps) => {
     );
 };
 
-interface ParsedFrontmatterI {
-    body: string;
-    frontmatter: Record<string, string> | null;
-    rawFrontmatter: string | null;
-}
-
-function parseFrontmatter(content: string): ParsedFrontmatterI {
-    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
-
-    if (!frontmatterMatch) {
-        return {body: content, frontmatter: null, rawFrontmatter: null};
-    }
-
-    const frontmatterLines = frontmatterMatch[1].split('\n');
-    const frontmatter: Record<string, string> = {};
-
-    for (const line of frontmatterLines) {
-        const colonIndex = line.indexOf(':');
-
-        if (colonIndex > 0) {
-            const key = line.substring(0, colonIndex).trim();
-            const value = line.substring(colonIndex + 1).trim();
-
-            frontmatter[key] = value.replace(/^"|"$/g, '');
-        }
-    }
-
-    return {body: frontmatterMatch[2].trim(), frontmatter, rawFrontmatter: frontmatterMatch[1]};
-}
-
 const FrontmatterTable = ({frontmatter}: {frontmatter: Record<string, string>}) => (
     <table className="mb-6 w-full border-collapse text-sm">
         <tbody>
@@ -111,23 +81,20 @@ const FrontmatterTable = ({frontmatter}: {frontmatter: Record<string, string>}) 
 
 interface MarkdownViewerProps {
     content: string;
+    editable: boolean;
     onContentChange: (markdown: string) => void;
 }
 
-const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
+const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProps) => {
     const {body, frontmatter, rawFrontmatter} = parseFrontmatter(content);
 
-    // The editor only sees the body, so onUpdate emits body-only markdown. Keep the raw frontmatter
-    // in a ref so the saved file preserves it verbatim — re-stringifying from the parsed object would
-    // drop quoting, comments, and any non key:value syntax (arrays, nested keys) the parser doesn't
-    // round-trip.
     const rawFrontmatterRef = useRef<string | null>(rawFrontmatter);
 
     rawFrontmatterRef.current = rawFrontmatter;
 
     const editor = useEditor({
         content: body,
-        editable: true,
+        editable,
         extensions: [StarterKit, Markdown],
         onUpdate: ({editor: updatedEditor}) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -147,6 +114,10 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
         }
     }, [body, editor]);
 
+    useEffect(() => {
+        editor?.setEditable(editable);
+    }, [editable, editor]);
+
     return (
         <div className="overflow-y-auto px-6 pb-6 pt-0">
             {frontmatter && <FrontmatterTable frontmatter={frontmatter} />}
@@ -159,7 +130,6 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
 };
 
 const AiSkillDetail = () => {
-    const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isContentDirty, setIsContentDirty] = useState(false);
 
@@ -169,8 +139,11 @@ const AiSkillDetail = () => {
     const setContext = useCopilotStore((state) => state.setContext);
 
     const setCanSave = useAiSkillDetailToolbarStore((state) => state.setCanSave);
+    const setCanToggleView = useAiSkillDetailToolbarStore((state) => state.setCanToggleView);
     const setHandlers = useAiSkillDetailToolbarStore((state) => state.setHandlers);
     const setIsSavingStore = useAiSkillDetailToolbarStore((state) => state.setIsSaving);
+    const setViewMode = useAiSkillDetailToolbarStore((state) => state.setViewMode);
+    const viewMode = useAiSkillDetailToolbarStore((state) => state.viewMode);
     const resetToolbar = useAiSkillDetailToolbarStore((state) => state.resetToolbar);
 
     const {
@@ -181,7 +154,6 @@ const AiSkillDetail = () => {
         handleDownload,
         handleFileSelect,
         handleSaveContent,
-        handleUpdate,
         isFileContentLoading,
         isMarkdown,
         isSaving,
@@ -192,11 +164,14 @@ const AiSkillDetail = () => {
     useEffect(() => {
         setIsContentDirty(false);
         latestContentRef.current = '';
-    }, [selectedFilePath]);
 
-    // Publish the toolbar handlers + flags so the page header (rendered in AiSkills) can show the
-    // action buttons aligned with the title. Re-runs whenever any of the captured values change so
-    // the header's button closures stay current.
+        setViewMode('preview');
+    }, [selectedFilePath, setViewMode]);
+
+    useEffect(() => {
+        setCanToggleView(selectedFilePath != null && isMarkdown);
+    }, [isMarkdown, selectedFilePath, setCanToggleView]);
+
     useEffect(() => {
         const openCopilot = () => {
             setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
@@ -214,7 +189,6 @@ const AiSkillDetail = () => {
             onCopilot: openCopilot,
             onDelete: () => setShowDeleteDialog(true),
             onDownload: handleDownload,
-            onEdit: () => setShowEditDialog(true),
             onSave: save,
         });
     }, [handleDownload, handleSaveContent, setCopilotPanelOpen, setContext, setHandlers]);
@@ -260,14 +234,12 @@ const AiSkillDetail = () => {
                                 <div className="flex items-center justify-center p-8">
                                     <LoadingIcon />
                                 </div>
-                            ) : isMarkdown ? (
+                            ) : isMarkdown && viewMode === 'preview' ? (
                                 <div className="absolute inset-0 overflow-y-auto">
                                     <MarkdownViewer
-                                        content={fileContent}
-                                        onContentChange={(markdown) => {
-                                            setIsContentDirty(true);
-                                            latestContentRef.current = markdown;
-                                        }}
+                                        content={isContentDirty ? latestContentRef.current : fileContent}
+                                        editable={false}
+                                        onContentChange={() => {}}
                                     />
                                 </div>
                             ) : (
@@ -280,7 +252,7 @@ const AiSkillDetail = () => {
                                         }
                                     >
                                         <MonacoEditorWrapper
-                                            defaultLanguage={editorLanguage}
+                                            defaultLanguage={isMarkdown ? 'markdown' : editorLanguage}
                                             onChange={(value) => {
                                                 setIsContentDirty(true);
                                                 latestContentRef.current = value ?? '';
@@ -294,7 +266,7 @@ const AiSkillDetail = () => {
                                                 scrollBeyondLastLine: false,
                                                 wordWrap: 'on',
                                             }}
-                                            value={fileContent}
+                                            value={isContentDirty ? latestContentRef.current : fileContent}
                                         />
                                     </Suspense>
                                 </div>
@@ -307,19 +279,6 @@ const AiSkillDetail = () => {
                     )}
                 </div>
             </div>
-
-            {showEditDialog && (
-                <AiSkillEditDialog
-                    currentDescription={skill.description}
-                    currentName={skill.name}
-                    onClose={() => setShowEditDialog(false)}
-                    onSave={async (name, description) => {
-                        await handleUpdate(name, description);
-
-                        setShowEditDialog(false);
-                    }}
-                />
-            )}
 
             {showDeleteDialog && (
                 <AiSkillDeleteAlertDialog
