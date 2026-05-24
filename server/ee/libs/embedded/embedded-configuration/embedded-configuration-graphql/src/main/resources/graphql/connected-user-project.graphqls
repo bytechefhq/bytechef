@@ -3,6 +3,7 @@ extend type Query {
 }
 
 extend type Mutation {
+    deleteConnectedUserProjectWorkflow(id: ID!): Boolean
     enableConnectedUserProjectWorkflow(id: ID!, enable: Boolean!): Boolean
 }
 
