@@ -1,15 +1,17 @@
 import {useCreateAiSkillFromInstructionsMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
-export default function useAiSkillWriteForm() {
+interface UseAiSkillWriteFormOptionsI {
+    onSuccess?: () => void;
+}
+
+export default function useAiSkillWriteForm({onSuccess}: UseAiSkillWriteFormOptionsI = {}) {
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
     const [instructions, setInstructions] = useState('');
 
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const createSkillFromInstructionsMutation = useCreateAiSkillFromInstructionsMutation({
@@ -25,7 +27,7 @@ export default function useAiSkillWriteForm() {
             setDescription('');
             setInstructions('');
 
-            navigate('/automation/ai/skills');
+            onSuccess?.();
         },
     });
 

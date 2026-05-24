@@ -1,6 +1,4 @@
 import AiSkillDetail from '@/pages/automation/ai/skills/components/AiSkillDetail';
-import AiSkillUploadForm from '@/pages/automation/ai/skills/components/AiSkillUploadForm';
-import AiSkillWriteForm from '@/pages/automation/ai/skills/components/AiSkillWriteForm';
 import AiSkillsEmptyState from '@/pages/automation/ai/skills/components/AiSkillsEmptyState';
 import AiSkillsList from '@/pages/automation/ai/skills/components/AiSkillsList';
 import useAiSkills from '@/pages/automation/ai/skills/hooks/useAiSkills';
@@ -34,10 +32,6 @@ const AiSkillsPanel = () => {
             {currentView === 'list' && <AiSkillsList skills={skills} />}
 
             {currentView === 'detail' && <AiSkillDetail />}
-
-            {currentView === 'writeForm' && <AiSkillWriteForm />}
-
-            {currentView === 'uploadForm' && <AiSkillUploadForm />}
         </div>
     );
 };

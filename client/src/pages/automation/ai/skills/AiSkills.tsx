@@ -16,37 +16,21 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
 import {useEffect} from 'react';
-import {useLocation, useParams} from 'react-router-dom';
+import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-type AiSkillsRouteType = 'detail' | 'list' | 'uploadForm' | 'writeForm';
+type AiSkillsRouteType = 'detail' | 'list';
 
-const determineRoute = (pathname: string, skillId: string | undefined): AiSkillsRouteType => {
-    if (pathname.endsWith('/create/write')) {
-        return 'writeForm';
-    }
-
-    if (pathname.endsWith('/create/upload')) {
-        return 'uploadForm';
-    }
-
-    if (skillId) {
-        return 'detail';
-    }
-
-    return 'list';
-};
+const determineRoute = (skillId: string | undefined): AiSkillsRouteType => (skillId ? 'detail' : 'list');
 
 const AiSkills = () => {
     const {skillId} = useParams<{skillId?: string}>();
-    const location = useLocation();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
     const selectedSkillId = useAiSkillsStore((state) => state.selectedSkillId);
     const setSearchQuery = useAiSkillsStore((state) => state.setSearchQuery);
-    const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
 
@@ -85,7 +69,7 @@ const AiSkills = () => {
             });
     }, []);
 
-    const route = determineRoute(location.pathname, skillId);
+    const route = determineRoute(skillId);
 
     useEffect(() => {
         if (route === 'detail' && skillId && selectedSkillId !== skillId) {
@@ -95,18 +79,7 @@ const AiSkills = () => {
         }
     }, [route, skillId, selectedSkillId, skillsView, openSkillDetail, closeSkillDetail]);
 
-    useEffect(() => {
-        if (route === 'list') {
-            if (skillsView === 'uploadForm' || skillsView === 'writeForm') {
-                setSkillsView('list');
-            }
-        } else if (route !== 'detail' && skillsView !== route) {
-            setSkillsView(route);
-        }
-    }, [route, skillsView, setSkillsView]);
-
-    const isDetailOrCreate = route !== 'list';
-    const headerTitle = isDetailOrCreate ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
+    const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
 
     const showToolbar = route === 'list' && skillsView !== 'empty';
 

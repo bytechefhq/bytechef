@@ -19,9 +19,7 @@ export default function useAiSkills(options?: UseAiSkillsOptionsI) {
     const previousSkillsLengthRef = useRef(skills.length);
 
     const handleClose = useCallback(() => {
-        const isOnSubScreen = skillsView === 'writeForm' || skillsView === 'uploadForm' || skillsView === 'detail';
-
-        if (isOnSubScreen) {
+        if (skillsView === 'detail') {
             setSkillsView('list');
         } else {
             setSkillsPanelOpen(false);

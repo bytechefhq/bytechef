@@ -760,27 +760,15 @@ export const getRouter = (queryClient: QueryClient) =>
                                     path: 'ai/skills',
                                 },
                                 {
-                                    loader: async () => redirect('/automation/ai/skills/create/write'),
+                                    loader: async () => redirect('/automation/ai/skills'),
                                     path: 'ai/skills/create',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
+                                    loader: async () => redirect('/automation/ai/skills'),
                                     path: 'ai/skills/create/write',
                                 },
                                 {
-                                    element: (
-                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
-                                            <LazyLoadWrapper hasLeftSidebar>
-                                                <AiSkills />
-                                            </LazyLoadWrapper>
-                                        </PrivateRoute>
-                                    ),
+                                    loader: async () => redirect('/automation/ai/skills'),
                                     path: 'ai/skills/create/upload',
                                 },
                                 {

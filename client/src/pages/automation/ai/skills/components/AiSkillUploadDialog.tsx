@@ -1,9 +1,15 @@
 import Button from '@/components/Button/Button';
+import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from '@/components/ui/dialog';
 import useAiSkillUploadForm from '@/pages/automation/ai/skills/hooks/useAiSkillUploadForm';
 import {FileIcon, UploadIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
-const AiSkillUploadForm = () => {
+interface AiSkillUploadDialogProps {
+    onOpenChange: (open: boolean) => void;
+    open: boolean;
+}
+
+const AiSkillUploadDialog = ({onOpenChange, open}: AiSkillUploadDialogProps) => {
     const {
         acceptedExtensions,
         dragActive,
@@ -16,14 +22,18 @@ const AiSkillUploadForm = () => {
         handleUpload,
         isUploadPending,
         selectedFiles,
-    } = useAiSkillUploadForm();
+    } = useAiSkillUploadForm({onSuccess: () => onOpenChange(false)});
 
     return (
-        <div className="mx-auto flex w-full max-w-2xl flex-1 flex-col py-6">
-            <fieldset className="border-0 p-0">
+        <Dialog onOpenChange={onOpenChange} open={open}>
+            <DialogContent className="sm:max-w-2xl">
+                <DialogHeader>
+                    <DialogTitle>Upload Skill Files</DialogTitle>
+                </DialogHeader>
+
                 <div
                     className={twMerge(
-                        'mb-4 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors',
+                        'flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed p-12 transition-colors',
                         dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 hover:border-gray-400'
                     )}
                     onClick={() => fileInputRef.current?.click()}
@@ -52,7 +62,7 @@ const AiSkillUploadForm = () => {
                 </div>
 
                 {selectedFiles.length > 0 && (
-                    <div className="mb-4 space-y-2">
+                    <div className="space-y-2">
                         {selectedFiles.map((file, index) => (
                             <div
                                 className="flex items-center gap-2 rounded border px-3 py-2"
@@ -79,14 +89,20 @@ const AiSkillUploadForm = () => {
                     </div>
                 )}
 
-                <Button disabled={selectedFiles.length === 0 || isUploadPending} onClick={handleUpload}>
-                    {isUploadPending
-                        ? 'Uploading...'
-                        : `Upload${selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ''}`}
-                </Button>
-            </fieldset>
-        </div>
+                <DialogFooter>
+                    <Button onClick={() => onOpenChange(false)} variant="outline">
+                        Cancel
+                    </Button>
+
+                    <Button disabled={selectedFiles.length === 0 || isUploadPending} onClick={handleUpload}>
+                        {isUploadPending
+                            ? 'Uploading...'
+                            : `Upload${selectedFiles.length > 1 ? ` (${selectedFiles.length})` : ''}`}
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 };
 
-export default AiSkillUploadForm;
+export default AiSkillUploadDialog;
