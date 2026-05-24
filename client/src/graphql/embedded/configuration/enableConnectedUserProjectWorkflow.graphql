@@ -1,0 +1,3 @@
+mutation enableConnectedUserProjectWorkflow($id: ID!, $enable: Boolean!) {
+    enableConnectedUserProjectWorkflow(id: $id, enable: $enable)
+}
