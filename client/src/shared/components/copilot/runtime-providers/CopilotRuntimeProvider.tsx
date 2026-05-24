@@ -1,6 +1,7 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {getCookie} from '@/shared/util/cookie-utils';
@@ -107,6 +108,10 @@ export function CopilotRuntimeProvider({
             await agent.runAgent({runId: getRandomId()}, subscriber);
         } finally {
             setIsRunning(false);
+
+            // Fire whatever post-turn callback the active consumer has registered for this Source —
+            // keeps source-specific refresh logic out of the shared provider.
+            useCopilotPostTurnRegistry.getState().runFor(sourceKey);
 
             queryClient.invalidateQueries({
                 queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
