@@ -23,7 +23,11 @@ const ConnectedUserProjectWorkflowListItem = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Badge
-                            label={`V${connectedUserProjectWorkflow.workflowVersion}`}
+                            label={
+                                connectedUserProjectWorkflow.workflowVersion == null
+                                    ? 'V1 DRAFT'
+                                    : `V${connectedUserProjectWorkflow.workflowVersion}`
+                            }
                             styleType="secondary-filled"
                             weight="semibold"
                         />
