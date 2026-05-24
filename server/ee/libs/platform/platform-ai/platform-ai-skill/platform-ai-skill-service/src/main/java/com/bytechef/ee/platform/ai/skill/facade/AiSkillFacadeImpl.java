@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -63,6 +64,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     private static final int MAX_SKILL_NAME_LENGTH = 64;
     private static final int MAX_SKILL_DESCRIPTION_LENGTH = 1024;
     private static final Pattern SKILL_NAME_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
+    private static final Pattern FRONTMATTER_BLOCK_PATTERN = Pattern.compile("^---\n([\\s\\S]*?)\n---\n([\\s\\S]*)$");
     private static final String SKILL_MD_FILENAME = "SKILL.md";
 
     private static final Logger log = LoggerFactory.getLogger(AiSkillFacadeImpl.class);
@@ -360,8 +362,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         validateSkillName(name);
         validateSkillDescription(description);
 
+        AiSkill updatedAiSkill;
+
         try {
-            return aiSkillService.updateAiSkill(id, name, description);
+            updatedAiSkill = aiSkillService.updateAiSkill(id, name, description);
         } catch (DataIntegrityViolationException dataIntegrityViolationException) {
             if (!isUniqueNameViolation(dataIntegrityViolationException)) {
                 throw dataIntegrityViolationException;
@@ -370,6 +374,75 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             throw new IllegalArgumentException(
                 "A skill with the name '" + name + "' already exists", dataIntegrityViolationException);
         }
+
+        // Keep the on-disk SKILL.md frontmatter in sync with the DB so an exported archive carries the
+        // same name/description the UI shows. Best-effort: a missing or malformed SKILL.md should not
+        // block the rename — the DB row is the source of truth and the file mismatch is recoverable.
+        syncSkillMdFrontmatter(id, name, description);
+
+        return updatedAiSkill;
+    }
+
+    /**
+     * Rewrites the {@code SKILL.md} archive entry so its {@code name} and {@code description} frontmatter fields
+     * match the supplied values. Other frontmatter keys (icon, color, related_server_ids, …) and the markdown body
+     * are preserved. Logs and swallows any failure so the calling rename/edit operation isn't aborted by an archive
+     * that lacks a SKILL.md or has unparseable frontmatter.
+     */
+    private void syncSkillMdFrontmatter(long id, String name, @Nullable String description) {
+        try {
+            String currentContent = getAiSkillFileContent(id, SKILL_MD_FILENAME);
+            String updatedContent = applyFrontmatterFields(currentContent, name, description);
+
+            if (!updatedContent.equals(currentContent)) {
+                updateAiSkillContent(id, SKILL_MD_FILENAME, updatedContent);
+            }
+        } catch (RuntimeException exception) {
+            log.warn(
+                "Failed to sync SKILL.md frontmatter for skill id={} (name='{}'); the DB row was updated but the archive may now disagree with the spec",
+                id, name, exception);
+        }
+    }
+
+    /**
+     * Returns {@code content} with the {@code name} and {@code description} frontmatter values replaced. Existing
+     * frontmatter is preserved key-by-key; when the input has no frontmatter at all we prepend a fresh one so the
+     * archive becomes spec-compliant after the rename.
+     */
+    private String applyFrontmatterFields(String content, String name, @Nullable String description) {
+        String nameLine = "name: \"" + escapeYamlValue(name) + "\"";
+        String descLine = "description: \"" + escapeYamlValue(description != null ? description : "") + "\"";
+
+        Matcher frontmatterMatcher = FRONTMATTER_BLOCK_PATTERN.matcher(content);
+
+        if (!frontmatterMatcher.find()) {
+            return "---\n" + nameLine + "\n" + descLine + "\n---\n\n" + content;
+        }
+
+        String frontmatterBlock = frontmatterMatcher.group(1);
+        String body = frontmatterMatcher.group(2);
+
+        String updatedBlock = replaceOrAppendKey(frontmatterBlock, "name", nameLine);
+
+        updatedBlock = replaceOrAppendKey(updatedBlock, "description", descLine);
+
+        return "---\n" + updatedBlock + "\n---\n\n" + body.stripLeading();
+    }
+
+    /**
+     * Replaces the first line matching {@code <key>:} in the frontmatter block with {@code newLine}, or appends
+     * {@code newLine} to the end if the key doesn't appear. Operates on the raw block (without the surrounding
+     * {@code ---} delimiters).
+     */
+    private String replaceOrAppendKey(String block, String key, String newLine) {
+        Pattern keyPattern = Pattern.compile("^\\s*" + Pattern.quote(key) + "\\s*:.*$", Pattern.MULTILINE);
+        Matcher matcher = keyPattern.matcher(block);
+
+        if (matcher.find()) {
+            return matcher.replaceFirst(Matcher.quoteReplacement(newLine));
+        }
+
+        return block + "\n" + newLine;
     }
 
     /**
