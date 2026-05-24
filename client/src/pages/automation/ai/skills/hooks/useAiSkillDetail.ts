@@ -167,37 +167,18 @@ export default function useAiSkillDetail() {
         setSelectedFilePath(path);
     }, []);
 
-    const handleRename = useCallback(
-        async (newName: string) => {
+    const handleUpdate = useCallback(
+        async (name: string, description: string | null) => {
             if (!selectedSkillId || !skill) {
                 return;
             }
 
             try {
-                await updateAiSkill({description: skill.description, id: selectedSkillId, name: newName});
+                await updateAiSkill({description, id: selectedSkillId, name});
 
-                toast.success('Skill renamed');
+                toast.success('Skill updated');
             } catch (error) {
-                toast.error('Failed to rename skill', {
-                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
-                });
-            }
-        },
-        [selectedSkillId, skill, updateAiSkill]
-    );
-
-    const handleEditDescription = useCallback(
-        async (description: string | null) => {
-            if (!selectedSkillId || !skill) {
-                return;
-            }
-
-            try {
-                await updateAiSkill({description, id: selectedSkillId, name: skill.name});
-
-                toast.success('Description updated');
-            } catch (error) {
-                toast.error('Failed to update description', {
+                toast.error('Failed to update skill', {
                     description: error instanceof Error ? error.message : 'An unexpected error occurred',
                 });
             }
@@ -252,10 +233,9 @@ export default function useAiSkillDetail() {
         fileTree,
         handleBack,
         handleDownload,
-        handleEditDescription,
         handleFileSelect,
-        handleRename,
         handleSaveContent,
+        handleUpdate,
         isFileContentLoading,
         isMarkdown,
         isSaving,

@@ -18,21 +18,13 @@ function getSkillColor(skillId: string): string {
 interface UseAiSkillListItemPropsI {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
-    onEditDescription: (id: string, description: string | null) => void;
-    onRename: (id: string, newName: string, description?: string | null) => void;
+    onUpdate: (id: string, name: string, description: string | null) => void;
     skill: AiSkill;
 }
 
-export default function useAiSkillListItem({
-    deleteSkill,
-    onDownload,
-    onEditDescription,
-    onRename,
-    skill,
-}: UseAiSkillListItemPropsI) {
+export default function useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill}: UseAiSkillListItemPropsI) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [showEditDescriptionDialog, setShowEditDescriptionDialog] = useState(false);
-    const [showRenameDialog, setShowRenameDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
 
     const {openSkillDetail} = useAiSkillsStore();
 
@@ -58,22 +50,13 @@ export default function useAiSkillListItem({
         onDownload(skill.id, skill.name);
     }, [onDownload, skill.id, skill.name]);
 
-    const handleEditDescriptionClick = useCallback(
-        (description: string | null) => {
-            onEditDescription(skill.id, description);
+    const handleEditSave = useCallback(
+        (name: string, description: string | null) => {
+            onUpdate(skill.id, name, description);
 
-            setShowEditDescriptionDialog(false);
+            setShowEditDialog(false);
         },
-        [onEditDescription, skill.id]
-    );
-
-    const handleRenameClick = useCallback(
-        (newName: string) => {
-            onRename(skill.id, newName, skill.description);
-
-            setShowRenameDialog(false);
-        },
-        [onRename, skill.description, skill.id]
+        [onUpdate, skill.id]
     );
 
     const skillColor = getSkillColor(skill.id);
@@ -82,14 +65,11 @@ export default function useAiSkillListItem({
         handleClick,
         handleDeleteClick,
         handleDownloadClick,
-        handleEditDescriptionClick,
-        handleRenameClick,
+        handleEditSave,
         setShowDeleteDialog,
-        setShowEditDescriptionDialog,
-        setShowRenameDialog,
+        setShowEditDialog,
         showDeleteDialog,
-        showEditDescriptionDialog,
-        showRenameDialog,
+        showEditDialog,
         skillColor,
     };
 }

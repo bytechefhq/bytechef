@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import AiSkillEditDescriptionDialog from '@/pages/automation/ai/skills/components/AiSkillEditDescriptionDialog';
-import AiSkillRenameDialog from '@/pages/automation/ai/skills/components/AiSkillRenameDialog';
+import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
-import {AlignLeftIcon, DownloadIcon, FileIcon, FileTextIcon, FolderIcon, PencilIcon, SaveIcon, SparklesIcon} from 'lucide-react';
+import {DownloadIcon, FileIcon, FileTextIcon, FolderIcon, PencilIcon, SaveIcon, SparklesIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
@@ -142,8 +141,7 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
 };
 
 const AiSkillDetail = () => {
-    const [showRenameDialog, setShowRenameDialog] = useState(false);
-    const [showEditDescriptionDialog, setShowEditDescriptionDialog] = useState(false);
+    const [showEditDialog, setShowEditDialog] = useState(false);
     const [isContentDirty, setIsContentDirty] = useState(false);
 
     const latestContentRef = useRef('');
@@ -153,21 +151,14 @@ const AiSkillDetail = () => {
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
-    const handleOpenCopilot = () => {
-        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
-
-        setCopilotPanelOpen(true);
-    };
-
     const {
         editorLanguage,
         fileContent,
         fileTree,
         handleDownload,
-        handleEditDescription,
         handleFileSelect,
-        handleRename,
         handleSaveContent,
+        handleUpdate,
         isFileContentLoading,
         isMarkdown,
         isSaving,
@@ -188,41 +179,84 @@ const AiSkillDetail = () => {
         );
     }
 
+    const handleOpenCopilot = () => {
+        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
+
+        setCopilotPanelOpen(true);
+    };
+
+    const handleSave = async () => {
+        await handleSaveContent(latestContentRef.current);
+
+        setIsContentDirty(false);
+    };
+
+    const canSave = selectedFilePath != null && isContentDirty && !isSaving;
+
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-start justify-between border-b border-b-border/50 px-4 py-3">
-                <div className="flex-1">
+            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-b-border/50 px-4 py-3">
+                <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1">
-                        <span className="text-sm font-semibold">{skill.name}</span>
+                        <span className="truncate text-sm font-semibold">{skill.name}</span>
 
                         <Button
                             icon={<PencilIcon className="size-3" />}
-                            onClick={() => setShowRenameDialog(true)}
+                            onClick={() => setShowEditDialog(true)}
                             size="icon"
                             variant="ghost"
                         />
                     </div>
 
-                    <div className="flex items-center gap-1">
-                        <span className="text-xs text-content-neutral-secondary">
-                            {skill.description || 'No description'}
-                        </span>
-
-                        <Button
-                            icon={<AlignLeftIcon className="size-3" />}
-                            onClick={() => setShowEditDescriptionDialog(true)}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </div>
+                    <span className="block text-xs text-content-neutral-secondary">
+                        {skill.description || 'No description'}
+                    </span>
                 </div>
 
-                <Button
-                    icon={<DownloadIcon className="size-4" />}
-                    onClick={handleDownload}
-                    size="icon"
-                    variant="ghost"
-                />
+                <div className="flex shrink-0 items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                disabled={!canSave}
+                                icon={<SaveIcon className="size-4" />}
+                                onClick={handleSave}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Save changes</TooltipContent>
+                    </Tooltip>
+
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                icon={<DownloadIcon className="size-4" />}
+                                onClick={handleDownload}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Download skill</TooltipContent>
+                    </Tooltip>
+
+                    {ff_4554 && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    className="[&_svg]:size-5"
+                                    icon={<SparklesIcon />}
+                                    onClick={handleOpenCopilot}
+                                    size="icon"
+                                    variant="ghost"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent>Open Copilot panel</TooltipContent>
+                        </Tooltip>
+                    )}
+                </div>
             </div>
 
             <div className="flex min-h-0 flex-1 overflow-hidden">
@@ -239,90 +273,51 @@ const AiSkillDetail = () => {
 
                 <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
                     {selectedFilePath ? (
-                        <>
-                            <div className="flex shrink-0 items-center border-b border-b-border/50 py-2 pl-4 pr-0">
-                                <span className="flex-1 text-center text-sm text-content-neutral-secondary">
-                                    {selectedFilePath}
-                                </span>
-
-                                <Button
-                                    className={twMerge(
-                                        'text-gray-300',
-                                        isContentDirty && 'text-gray-900 hover:text-gray-900'
-                                    )}
-                                    disabled={!isContentDirty || isSaving}
-                                    icon={<SaveIcon className="size-4" />}
-                                    onClick={async () => {
-                                        await handleSaveContent(latestContentRef.current);
-                                        setIsContentDirty(false);
-                                    }}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-
-                                {ff_4554 && (
-                                    <Tooltip>
-                                        <TooltipTrigger asChild>
-                                            <Button
-                                                className="[&_svg]:size-5"
-                                                icon={<SparklesIcon />}
-                                                onClick={handleOpenCopilot}
-                                                size="icon"
-                                                variant="ghost"
-                                            />
-                                        </TooltipTrigger>
-
-                                        <TooltipContent>Open Copilot panel</TooltipContent>
-                                    </Tooltip>
-                                )}
-                            </div>
-
-                            <div className="relative min-h-0 flex-1">
-                                {isFileContentLoading ? (
-                                    <div className="flex items-center justify-center p-8">
-                                        <LoadingIcon />
-                                    </div>
-                                ) : isMarkdown ? (
-                                    <div className="absolute inset-0 overflow-y-auto">
-                                        <MarkdownViewer
-                                            content={fileContent}
-                                            onContentChange={(markdown) => {
+                        <div className="relative min-h-0 flex-1">
+                            {isFileContentLoading ? (
+                                <div className="flex items-center justify-center p-8">
+                                    <LoadingIcon />
+                                </div>
+                            ) : isMarkdown ? (
+                                <div className="absolute inset-0 overflow-y-auto">
+                                    <MarkdownViewer
+                                        content={fileContent}
+                                        onContentChange={(markdown) => {
+                                            setIsContentDirty(true);
+                                            latestContentRef.current = markdown;
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="absolute inset-0">
+                                    <Suspense
+                                        fallback={
+                                            <div className="flex items-center justify-center p-8">
+                                                <LoadingIcon />
+                                            </div>
+                                        }
+                                    >
+                                        <MonacoEditorWrapper
+                                            defaultLanguage={editorLanguage}
+                                            onChange={(value) => {
                                                 setIsContentDirty(true);
-                                                latestContentRef.current = markdown;
+                                                latestContentRef.current = value ?? '';
                                             }}
+                                            onMount={() => {}}
+                                            options={{
+                                                automaticLayout: true,
+                                                folding: true,
+                                                lineNumbers: 'on',
+                                                minimap: {enabled: false},
+                                                scrollBeyondLastLine: false,
+                                                wordWrap: 'on',
+                                            }}
+                                            value={fileContent}
                                         />
-                                    </div>
-                                ) : (
-                                    <div className="absolute inset-0">
-                                        <Suspense
-                                            fallback={
-                                                <div className="flex items-center justify-center p-8">
-                                                    <LoadingIcon />
-                                                </div>
-                                            }
-                                        >
-                                            <MonacoEditorWrapper
-                                                defaultLanguage={editorLanguage}
-                                                onChange={(value) => {
-                                                    setIsContentDirty(true);
-                                                    latestContentRef.current = value ?? '';
-                                                }}
-                                                onMount={() => {}}
-                                                options={{
-                                                    automaticLayout: true,
-                                                    folding: true,
-                                                    lineNumbers: 'on',
-                                                    minimap: {enabled: false},
-                                                    scrollBeyondLastLine: false,
-                                                    wordWrap: 'on',
-                                                }}
-                                                value={fileContent}
-                                            />
-                                        </Suspense>
-                                    </div>
-                                )}
-                            </div>
-                        </>
+                                    </Suspense>
+                                </div>
+                            )}
+                        </div>
                     ) : (
                         <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
                             Select a file to view its contents
@@ -331,24 +326,15 @@ const AiSkillDetail = () => {
                 </div>
             </div>
 
-            {showRenameDialog && (
-                <AiSkillRenameDialog
-                    currentName={skill.name}
-                    onClose={() => setShowRenameDialog(false)}
-                    onRename={async (newName) => {
-                        await handleRename(newName);
-                        setShowRenameDialog(false);
-                    }}
-                />
-            )}
-
-            {showEditDescriptionDialog && (
-                <AiSkillEditDescriptionDialog
+            {showEditDialog && (
+                <AiSkillEditDialog
                     currentDescription={skill.description}
-                    onClose={() => setShowEditDescriptionDialog(false)}
-                    onSave={async (description) => {
-                        await handleEditDescription(description);
-                        setShowEditDescriptionDialog(false);
+                    currentName={skill.name}
+                    onClose={() => setShowEditDialog(false)}
+                    onSave={async (name, description) => {
+                        await handleUpdate(name, description);
+
+                        setShowEditDialog(false);
                     }}
                 />
             )}
