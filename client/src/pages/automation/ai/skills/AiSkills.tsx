@@ -33,15 +33,22 @@ import {
     Trash2Icon,
 } from 'lucide-react';
 import {useEffect} from 'react';
-import {useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-type AiSkillsRouteType = 'detail' | 'list';
+type AiSkillsRouteType = 'createWithAi' | 'detail' | 'list';
 
-const determineRoute = (skillId: string | undefined): AiSkillsRouteType => (skillId ? 'detail' : 'list');
+const determineRoute = (skillId: string | undefined, pathname: string): AiSkillsRouteType => {
+    if (pathname.endsWith('/create/ai')) {
+        return 'createWithAi';
+    }
+
+    return skillId ? 'detail' : 'list';
+};
 
 const AiSkills = () => {
     const {skillId} = useParams<{skillId?: string}>();
+    const location = useLocation();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
@@ -88,17 +95,34 @@ const AiSkills = () => {
         });
     }, []);
 
-    const route = determineRoute(skillId);
+    const route = determineRoute(skillId, location.pathname);
+
+    const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
 
     useEffect(() => {
         if (route === 'detail' && skillId && selectedSkillId !== skillId) {
             openSkillDetail(skillId, '');
-        } else if (route !== 'detail' && skillsView === 'detail') {
+        } else if (route === 'createWithAi' && skillsView !== 'createWithAi') {
+            setSkillsView('createWithAi');
+        } else if (route === 'list' && (skillsView === 'detail' || skillsView === 'createWithAi')) {
             closeSkillDetail();
         }
-    }, [route, skillId, selectedSkillId, skillsView, openSkillDetail, closeSkillDetail]);
+    }, [
+        closeSkillDetail,
+        openSkillDetail,
+        route,
+        selectedSkillId,
+        setSkillsView,
+        skillId,
+        skillsView,
+    ]);
 
-    const headerTitle = route === 'detail' ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
+    const headerTitle =
+        route === 'detail'
+            ? (skillsHeaderInfo.title ?? 'Skill')
+            : route === 'createWithAi'
+              ? 'Create with AI'
+              : 'Skills';
 
     const showToolbar = route === 'list' && skillsView !== 'empty';
 
