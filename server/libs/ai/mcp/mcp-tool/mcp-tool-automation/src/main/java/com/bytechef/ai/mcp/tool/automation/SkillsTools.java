@@ -43,11 +43,21 @@ public class SkillsTools {
         this.aiSkillFacade = aiSkillFacade;
     }
 
-    @Tool(description = "Create a new AI skill from text instructions. Returns the created skill.")
+    @Tool(
+        description = "Create a new AI skill from text instructions. The skill metadata must follow the " +
+            "agentskills.io SKILL.md spec — see parameter descriptions for the format rules. Returns the created skill.")
     public AiSkill createAiSkill(
-        @ToolParam(description = "The name of the skill") String name,
-        @ToolParam(description = "An optional description of the skill") @Nullable String description,
-        @ToolParam(description = "The instructions that define the skill behaviour") String instructions) {
+        @ToolParam(
+            description = "The skill name. 1-64 characters; lowercase letters (a-z), digits (0-9), and " +
+                "single hyphens (-) only. Must not start or end with a hyphen and must not contain " +
+                "consecutive hyphens. Example: 'pdf-processing'.") String name,
+        @ToolParam(
+            description = "A description (max 1024 characters) of what the skill does and when to use it. " +
+                "Include keywords that help identify relevant tasks.") @Nullable String description,
+        @ToolParam(
+            description = "The Markdown body of SKILL.md — the actual skill instructions. Do NOT include the " +
+                "YAML frontmatter (the --- block); it is generated automatically from the name and description.")
+        String instructions) {
 
         try {
             AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
@@ -185,11 +195,16 @@ public class SkillsTools {
         }
     }
 
-    @Tool(description = "Update the name and description of an existing AI skill. Returns the updated skill.")
+    @Tool(
+        description = "Update the name and description of an existing AI skill. The metadata must follow the " +
+            "agentskills.io SKILL.md spec. Returns the updated skill.")
     public AiSkill updateAiSkill(
         @ToolParam(description = "The ID of the skill to update") long id,
-        @ToolParam(description = "The new name of the skill") String name,
-        @ToolParam(description = "The new description of the skill") @Nullable String description) {
+        @ToolParam(
+            description = "The new skill name. 1-64 characters; lowercase letters (a-z), digits (0-9), and " +
+                "single hyphens (-) only. Must not start or end with a hyphen and must not contain " +
+                "consecutive hyphens.") String name,
+        @ToolParam(description = "The new description (max 1024 characters).") @Nullable String description) {
 
         try {
             AiSkill aiSkill = aiSkillFacade.updateAiSkill(id, name, description);

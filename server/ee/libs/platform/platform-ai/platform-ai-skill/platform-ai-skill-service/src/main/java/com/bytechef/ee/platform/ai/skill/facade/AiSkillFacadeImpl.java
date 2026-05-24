@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -55,6 +56,14 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
     // Reject uploaded skill archives larger than 10 MB
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
+
+    // Per agentskills.io spec: name must be 1-64 lowercase alphanumerics or hyphens, with no leading,
+    // trailing, or consecutive hyphens. The regex enforces all of those in one pass: one or more
+    // alphanumeric chars, optionally followed by repeating groups of "single hyphen + alphanumeric run".
+    private static final int MAX_SKILL_NAME_LENGTH = 64;
+    private static final int MAX_SKILL_DESCRIPTION_LENGTH = 1024;
+    private static final Pattern SKILL_NAME_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
+    private static final String SKILL_MD_FILENAME = "SKILL.md";
 
     private static final Logger log = LoggerFactory.getLogger(AiSkillFacadeImpl.class);
 
@@ -98,6 +107,12 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 skillDescription = frontmatterDescription;
             }
         }
+
+        // Validate the effective name + description against the agentskills.io spec AFTER any
+        // frontmatter override so the same rules apply whether the value came from the form/tool
+        // call or from the uploaded SKILL.md's frontmatter.
+        validateSkillName(skillName);
+        validateSkillDescription(skillDescription);
 
         skillName = generateUniqueName(skillName);
 
@@ -150,7 +165,12 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(instructions, "Instructions must not be blank");
 
-        byte[] zipBytes = createSkillZip(name, description, instructions);
+        // Strip any leading YAML frontmatter the caller (often an LLM) may have included so we don't
+        // end up nesting their `---` block inside the one we write. The frontmatter is rebuilt from
+        // the validated name/description below.
+        String body = stripLeadingFrontmatter(instructions);
+
+        byte[] zipBytes = createSkillZip(name, description, body);
 
         return createAiSkill(name, description, name + ".skill", zipBytes);
     }
@@ -282,11 +302,17 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
         Assert.hasText(content, "Content must not be blank");
 
-        String targetPath = (path != null && !path.isBlank()) ? path : "SKILL.md";
+        String targetPath = (path != null && !path.isBlank()) ? path : SKILL_MD_FILENAME;
 
         if (targetPath.contains("..") || targetPath.startsWith("/")) {
             throw new IllegalArgumentException(
                 "Path must not contain path traversal sequences or be absolute: " + targetPath);
+        }
+
+        // SKILL.md is the spec-mandated metadata file; enforce frontmatter validity on save so we
+        // can't end up persisting a skill whose archive disagrees with the agentskills.io spec.
+        if (SKILL_MD_FILENAME.equalsIgnoreCase(targetPath)) {
+            validateSkillMdFrontmatter(content);
         }
 
         AiSkill aiSkill = aiSkillService.getAiSkill(id);
@@ -330,6 +356,9 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     @Override
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
         Assert.hasText(name, "Skill name must not be blank");
+
+        validateSkillName(name);
+        validateSkillDescription(description);
 
         try {
             return aiSkillService.updateAiSkill(id, name, description);
@@ -400,14 +429,18 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return message != null && message.contains("agent_skill_name");
     }
 
-    /** Appends a numeric suffix (2)-(100) to avoid name collisions; falls back to a timestamp suffix if all taken. */
+    /**
+     * Appends a hyphen-numeric suffix (-2…-100) to avoid name collisions; falls back to a timestamp suffix if all
+     * taken. The hyphen form (rather than " (N)") keeps disambiguated names compliant with the
+     * agentskills.io name regex.
+     */
     private String generateUniqueName(String name) {
         if (!aiSkillService.existsByName(name)) {
             return name;
         }
 
         for (int suffix = 2; suffix <= 100; suffix++) {
-            String candidateName = name + " (" + suffix + ")";
+            String candidateName = name + "-" + suffix;
 
             if (!aiSkillService.existsByName(candidateName)) {
                 return candidateName;
@@ -416,7 +449,126 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
         log.warn("Exhausted 100 suffix attempts for skill name '{}', falling back to timestamp", name);
 
-        return name + " (" + System.currentTimeMillis() + ")";
+        return name + "-" + System.currentTimeMillis();
+    }
+
+    private void validateSkillName(String name) {
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("Skill name must not be blank");
+        }
+
+        if (name.length() > MAX_SKILL_NAME_LENGTH) {
+            throw new IllegalArgumentException(
+                "Skill name must be at most " + MAX_SKILL_NAME_LENGTH + " characters: '" + name + "'");
+        }
+
+        if (!SKILL_NAME_PATTERN.matcher(name)
+            .matches()) {
+
+            throw new IllegalArgumentException(
+                "Skill name must contain only lowercase letters, digits, and single hyphens — " +
+                    "no leading, trailing, or consecutive hyphens (got '" + name + "')");
+        }
+    }
+
+    private void validateSkillDescription(@Nullable String description) {
+        if (description != null && description.length() > MAX_SKILL_DESCRIPTION_LENGTH) {
+            throw new IllegalArgumentException(
+                "Skill description must be at most " + MAX_SKILL_DESCRIPTION_LENGTH + " characters");
+        }
+    }
+
+    /**
+     * Validates that the supplied SKILL.md text starts with a closed YAML frontmatter block carrying spec-compliant
+     * {@code name} and (when present) {@code description} values.
+     */
+    private void validateSkillMdFrontmatter(String content) {
+        Map<String, String> frontmatter = parseFrontmatter(content);
+
+        if (frontmatter == null) {
+            throw new IllegalArgumentException(
+                "SKILL.md must start with a YAML frontmatter block delimited by --- lines");
+        }
+
+        String name = frontmatter.get("name");
+
+        if (name == null || name.isBlank()) {
+            throw new IllegalArgumentException("SKILL.md frontmatter must include a 'name' field");
+        }
+
+        validateSkillName(name);
+
+        String description = frontmatter.get("description");
+
+        if (description != null) {
+            validateSkillDescription(description);
+        }
+    }
+
+    /**
+     * Parses the YAML frontmatter block at the start of a SKILL.md text into a flat key→value map. Returns
+     * {@code null} if no opening {@code ---} is present or the closing delimiter is missing. The parser is
+     * intentionally minimal — it only handles flat {@code key: value} lines (with optional double-quoted values
+     * carrying the same escape sequences {@code createSkillZip} emits) and is not a full YAML parser.
+     */
+    @Nullable
+    private Map<String, String> parseFrontmatter(String content) {
+        if (!content.startsWith("---")) {
+            return null;
+        }
+
+        int endIndex = content.indexOf("---", 3);
+
+        if (endIndex < 0) {
+            return null;
+        }
+
+        String frontmatterBlock = content.substring(3, endIndex)
+            .trim();
+
+        Map<String, String> frontmatter = new HashMap<>();
+
+        for (String line : frontmatterBlock.split("\n")) {
+            int colonIndex = line.indexOf(':');
+
+            if (colonIndex > 0) {
+                String key = line.substring(0, colonIndex)
+                    .trim();
+                String value = line.substring(colonIndex + 1)
+                    .trim();
+
+                if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
+                    value = value.substring(1, value.length() - 1)
+                        .replace("\\\"", "\"")
+                        .replace("\\n", "\n")
+                        .replace("\\r", "\r")
+                        .replace("\\\\", "\\");
+                }
+
+                frontmatter.put(key, value);
+            }
+        }
+
+        return frontmatter;
+    }
+
+    /**
+     * Returns {@code content} with any leading YAML frontmatter block stripped. If the input doesn't start with
+     * a frontmatter (or the closing delimiter is missing), it's returned unchanged.
+     */
+    private String stripLeadingFrontmatter(String content) {
+        if (!content.startsWith("---\n")) {
+            return content;
+        }
+
+        int closingDelimStart = content.indexOf("\n---\n", 4);
+
+        if (closingDelimStart < 0) {
+            return content;
+        }
+
+        return content.substring(closingDelimStart + "\n---\n".length())
+            .stripLeading();
     }
 
     /**
