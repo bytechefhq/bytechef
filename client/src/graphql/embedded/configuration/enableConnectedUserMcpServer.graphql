@@ -1,0 +1,3 @@
+mutation enableConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!, $enable: Boolean!) {
+    enableConnectedUserMcpServer(connectedUserId: $connectedUserId, mcpServerId: $mcpServerId, enable: $enable)
+}
