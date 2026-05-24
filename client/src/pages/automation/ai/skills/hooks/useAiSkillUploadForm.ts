@@ -6,7 +6,7 @@ import {toast} from 'sonner';
 const ACCEPTED_EXTENSIONS = ['.zip', '.skill', '.md'];
 
 interface UseAiSkillUploadFormOptionsI {
-    onSuccess?: () => void;
+    onSuccess?: (createdSkillId: string | null) => void;
 }
 
 export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOptionsI = {}) {
@@ -17,6 +17,7 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
     const totalToUploadRef = useRef(0);
     const completedCountRef = useRef(0);
     const successCountRef = useRef(0);
+    const createdIdsRef = useRef<string[]>([]);
 
     const queryClient = useQueryClient();
 
@@ -29,11 +30,12 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
         const totalCount = totalToUploadRef.current;
         const successCount = successCountRef.current;
         const failedCount = totalCount - successCount;
+        const createdIds = createdIdsRef.current;
 
         if (failedCount === 0) {
             setSelectedFiles([]);
 
-            onSuccess?.();
+            onSuccess?.(createdIds.length === 1 ? createdIds[0] : null);
         } else {
             toast.error(
                 `${successCount} of ${totalCount} skills created, ${failedCount} failed. Fix issues and retry.`
@@ -43,6 +45,7 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
         completedCountRef.current = 0;
         totalToUploadRef.current = 0;
         successCountRef.current = 0;
+        createdIdsRef.current = [];
     }, [onSuccess, queryClient]);
 
     const handleFilesSelect = useCallback((files: File[]) => {
@@ -126,10 +129,12 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
                 if (extension === '.md') {
                     const textContent = await file.text();
 
-                    await createSkillFromInstructionsMutation.mutateAsync({
+                    const result = await createSkillFromInstructionsMutation.mutateAsync({
                         instructions: textContent,
                         name: fileNameWithoutExtension,
                     });
+
+                    createdIdsRef.current.push(result.createAiSkillFromInstructions.id);
                 } else {
                     const base64Content = await new Promise<string>((resolve, reject) => {
                         const reader = new FileReader();
@@ -144,11 +149,13 @@ export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOp
                         reader.readAsDataURL(file);
                     });
 
-                    await createSkillMutation.mutateAsync({
+                    const result = await createSkillMutation.mutateAsync({
                         fileBytes: base64Content,
                         filename: file.name,
                         name: fileNameWithoutExtension,
                     });
+
+                    createdIdsRef.current.push(result.createAiSkill.id);
                 }
 
                 successCountRef.current++;

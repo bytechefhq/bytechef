@@ -5,11 +5,12 @@ import {FileIcon, UploadIcon, XIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 
 interface AiSkillUploadDialogProps {
+    onCreated?: (createdSkillId: string | null) => void;
     onOpenChange: (open: boolean) => void;
     open: boolean;
 }
 
-const AiSkillUploadDialog = ({onOpenChange, open}: AiSkillUploadDialogProps) => {
+const AiSkillUploadDialog = ({onCreated, onOpenChange, open}: AiSkillUploadDialogProps) => {
     const {
         acceptedExtensions,
         dragActive,
@@ -22,7 +23,12 @@ const AiSkillUploadDialog = ({onOpenChange, open}: AiSkillUploadDialogProps) => 
         handleUpload,
         isUploadPending,
         selectedFiles,
-    } = useAiSkillUploadForm({onSuccess: () => onOpenChange(false)});
+    } = useAiSkillUploadForm({
+        onSuccess: (createdSkillId) => {
+            onCreated?.(createdSkillId);
+            onOpenChange(false);
+        },
+    });
 
     return (
         <Dialog onOpenChange={onOpenChange} open={open}>

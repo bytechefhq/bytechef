@@ -7,6 +7,7 @@ import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {ReactNode, useState} from 'react';
+import {useNavigate, useParams} from 'react-router-dom';
 
 interface AiSkillsCreateDropdownProps {
     trigger?: ReactNode;
@@ -20,6 +21,15 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
     const setContext = useCopilotStore((state) => state.setContext);
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
+    const navigate = useNavigate();
+    const {skillId: currentDetailSkillId} = useParams<{skillId?: string}>();
+
+    const handleCreated = (createdSkillId: string | null) => {
+        if (currentDetailSkillId && createdSkillId) {
+            navigate(`/automation/ai/skills/${createdSkillId}`);
+        }
+    };
 
     const openCopilot = () => {
         setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
@@ -83,9 +93,17 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <AiSkillUploadDialog onOpenChange={setShowUploadDialog} open={showUploadDialog} />
+            <AiSkillUploadDialog
+                onCreated={handleCreated}
+                onOpenChange={setShowUploadDialog}
+                open={showUploadDialog}
+            />
 
-            <AiSkillWriteDialog onOpenChange={setShowWriteDialog} open={showWriteDialog} />
+            <AiSkillWriteDialog
+                onCreated={handleCreated}
+                onOpenChange={setShowWriteDialog}
+                open={showWriteDialog}
+            />
         </>
     );
 };
