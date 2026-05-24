@@ -23,6 +23,7 @@ import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.ee.platform.ai.skill.service.AiSkillService;
 import com.bytechef.file.storage.domain.FileEntry;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,14 +54,12 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
+@SuppressFBWarnings(
+    value = "REDOS",
+    justification = "SKILL_NAME_PATTERN is a kebab-case validator with a fixed '-' separator between character classes — runs in linear time")
 class AiSkillFacadeImpl implements AiSkillFacade {
 
-    // Reject uploaded skill archives larger than 10 MB
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
-
-    // Per agentskills.io spec: name must be 1-64 lowercase alphanumerics or hyphens, with no leading,
-    // trailing, or consecutive hyphens. The regex enforces all of those in one pass: one or more
-    // alphanumeric chars, optionally followed by repeating groups of "single hyphen + alphanumeric run".
     private static final int MAX_SKILL_NAME_LENGTH = 64;
     private static final int MAX_SKILL_DESCRIPTION_LENGTH = 1024;
     private static final Pattern SKILL_NAME_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
@@ -110,9 +109,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             }
         }
 
-        // Validate the effective name + description against the agentskills.io spec AFTER any
-        // frontmatter override so the same rules apply whether the value came from the form/tool
-        // call or from the uploaded SKILL.md's frontmatter.
         validateSkillName(skillName);
         validateSkillDescription(skillDescription);
 
@@ -167,9 +163,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(instructions, "Instructions must not be blank");
 
-        // Strip any leading YAML frontmatter the caller (often an LLM) may have included so we don't
-        // end up nesting their `---` block inside the one we write. The frontmatter is rebuilt from
-        // the validated name/description below.
         String body = stripLeadingFrontmatter(instructions);
 
         byte[] zipBytes = createSkillZip(name, description, body);
@@ -244,14 +237,13 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                         "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
                 }
 
-                if (zipEntry.getName()
-                    .equals(path)) {
+                String name = zipEntry.getName();
 
+                if (name.equals(path)) {
                     byte[] entryBytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
 
                     if (entryBytes.length > MAX_ZIP_ENTRY_SIZE) {
-                        throw new IllegalArgumentException(
-                            "File exceeds maximum allowed size: " + path);
+                        throw new IllegalArgumentException("File exceeds maximum allowed size: " + path);
                     }
 
                     return new String(entryBytes, StandardCharsets.UTF_8);
@@ -311,8 +303,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 "Path must not contain path traversal sequences or be absolute: " + targetPath);
         }
 
-        // SKILL.md is the spec-mandated metadata file; enforce frontmatter validity on save so we
-        // can't end up persisting a skill whose archive disagrees with the agentskills.io spec.
         if (SKILL_MD_FILENAME.equalsIgnoreCase(targetPath)) {
             validateSkillMdFrontmatter(content);
         }
@@ -375,20 +365,11 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 "A skill with the name '" + name + "' already exists", dataIntegrityViolationException);
         }
 
-        // Keep the on-disk SKILL.md frontmatter in sync with the DB so an exported archive carries the
-        // same name/description the UI shows. Best-effort: a missing or malformed SKILL.md should not
-        // block the rename — the DB row is the source of truth and the file mismatch is recoverable.
         syncSkillMdFrontmatter(id, name, description);
 
         return updatedAiSkill;
     }
 
-    /**
-     * Rewrites the {@code SKILL.md} archive entry so its {@code name} and {@code description} frontmatter fields
-     * match the supplied values. Other frontmatter keys (icon, color, related_server_ids, …) and the markdown body
-     * are preserved. Logs and swallows any failure so the calling rename/edit operation isn't aborted by an archive
-     * that lacks a SKILL.md or has unparseable frontmatter.
-     */
     private void syncSkillMdFrontmatter(long id, String name, @Nullable String description) {
         try {
             String currentContent = getAiSkillFileContent(id, SKILL_MD_FILENAME);
@@ -404,11 +385,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         }
     }
 
-    /**
-     * Returns {@code content} with the {@code name} and {@code description} frontmatter values replaced. Existing
-     * frontmatter is preserved key-by-key; when the input has no frontmatter at all we prepend a fresh one so the
-     * archive becomes spec-compliant after the rename.
-     */
     private String applyFrontmatterFields(String content, String name, @Nullable String description) {
         String nameLine = "name: \"" + escapeYamlValue(name) + "\"";
         String descLine = "description: \"" + escapeYamlValue(description != null ? description : "") + "\"";
@@ -429,11 +405,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return "---\n" + updatedBlock + "\n---\n\n" + body.stripLeading();
     }
 
-    /**
-     * Replaces the first line matching {@code <key>:} in the frontmatter block with {@code newLine}, or appends
-     * {@code newLine} to the end if the key doesn't appear. Operates on the raw block (without the surrounding
-     * {@code ---} delimiters).
-     */
     private String replaceOrAppendKey(String block, String key, String newLine) {
         Pattern keyPattern = Pattern.compile("^\\s*" + Pattern.quote(key) + "\\s*:.*$", Pattern.MULTILINE);
         Matcher matcher = keyPattern.matcher(block);
@@ -445,10 +416,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return block + "\n" + newLine;
     }
 
-    /**
-     * Reads all entries from the existing zip, replaces (or adds) the entry at {@code targetPath} with
-     * {@code newContent}, and returns the bytes of the new zip. All other entries are copied verbatim.
-     */
     private byte[] replaceZipEntry(byte[] existingZipBytes, String targetPath, String newContent) {
         Map<String, byte[]> entries = new LinkedHashMap<>();
 
@@ -502,11 +469,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return message != null && message.contains("agent_skill_name");
     }
 
-    /**
-     * Appends a hyphen-numeric suffix (-2…-100) to avoid name collisions; falls back to a timestamp suffix if all
-     * taken. The hyphen form (rather than " (N)") keeps disambiguated names compliant with the
-     * agentskills.io name regex.
-     */
     private String generateUniqueName(String name) {
         if (!aiSkillService.existsByName(name)) {
             return name;
@@ -539,8 +501,8 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             .matches()) {
 
             throw new IllegalArgumentException(
-                "Skill name must contain only lowercase letters, digits, and single hyphens — " +
-                    "no leading, trailing, or consecutive hyphens (got '" + name + "')");
+                "Skill name must contain only lowercase letters, digits, and single hyphens — no leading, trailing, " +
+                    "or consecutive hyphens (got '" + name + "')");
         }
     }
 
@@ -551,10 +513,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         }
     }
 
-    /**
-     * Validates that the supplied SKILL.md text starts with a closed YAML frontmatter block carrying spec-compliant
-     * {@code name} and (when present) {@code description} values.
-     */
     private void validateSkillMdFrontmatter(String content) {
         Map<String, String> frontmatter = parseFrontmatter(content);
 
@@ -578,12 +536,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         }
     }
 
-    /**
-     * Parses the YAML frontmatter block at the start of a SKILL.md text into a flat key→value map. Returns
-     * {@code null} if no opening {@code ---} is present or the closing delimiter is missing. The parser is
-     * intentionally minimal — it only handles flat {@code key: value} lines (with optional double-quoted values
-     * carrying the same escape sequences {@code createSkillZip} emits) and is not a full YAML parser.
-     */
     @Nullable
     private Map<String, String> parseFrontmatter(String content) {
         if (!content.startsWith("---")) {
@@ -625,10 +577,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return frontmatter;
     }
 
-    /**
-     * Returns {@code content} with any leading YAML frontmatter block stripped. If the input doesn't start with
-     * a frontmatter (or the closing delimiter is missing), it's returned unchanged.
-     */
     private String stripLeadingFrontmatter(String content) {
         if (!content.startsWith("---\n")) {
             return content;
@@ -644,10 +592,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             .stripLeading();
     }
 
-    /**
-     * Extracts YAML frontmatter (key-value pairs between opening and closing --- delimiters) from SKILL.md inside the
-     * zip archive. Returns null if no SKILL.md is found or the frontmatter is malformed.
-     */
     @Nullable
     private Map<String, String> extractFrontmatter(byte[] zipBytes) {
         try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
@@ -762,7 +706,6 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             .replace("\r", "\\r");
     }
 
-    // Normalizes uploaded filenames to use the .skill extension for consistent storage
     private String toSkillFilename(String filename) {
         if (filename.endsWith(".zip")) {
             return filename.substring(0, filename.length() - 4) + ".skill";

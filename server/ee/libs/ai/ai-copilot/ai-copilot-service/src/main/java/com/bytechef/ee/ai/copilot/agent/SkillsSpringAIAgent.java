@@ -48,8 +48,6 @@ public class SkillsSpringAIAgent extends SpringAIAgent {
 
     @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
-//        Map<?, ?> parameters = (Map<?, ?>) state.get("parameters");
-
         List<String> contextStrings = contexts.stream()
             .map(Context::toString)
             .toList();
