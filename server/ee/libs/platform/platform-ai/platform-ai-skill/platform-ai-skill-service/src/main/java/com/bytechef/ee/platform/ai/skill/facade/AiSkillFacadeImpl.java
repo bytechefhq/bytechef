@@ -296,6 +296,13 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     public AiSkill updateAiSkillContent(long id, @Nullable String path, String content) {
         Assert.hasText(content, "Content must not be blank");
 
+        byte[] contentBytes = content.getBytes(StandardCharsets.UTF_8);
+
+        if (contentBytes.length > MAX_ZIP_ENTRY_SIZE) {
+            throw new IllegalArgumentException(
+                "Skill file content exceeds maximum allowed size of " + (MAX_ZIP_ENTRY_SIZE / 1024 / 1024) + " MB");
+        }
+
         String targetPath = (path != null && !path.isBlank()) ? path : SKILL_MD_FILENAME;
 
         if (targetPath.contains("..") || targetPath.startsWith("/")) {
@@ -312,7 +319,13 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         FileEntry oldFileEntry = aiSkill.getSkillFile();
 
         byte[] existingZipBytes = aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry);
-        byte[] zipBytes = replaceZipEntry(existingZipBytes, targetPath, content);
+        byte[] zipBytes = replaceZipEntry(existingZipBytes, targetPath, contentBytes);
+
+        if (zipBytes.length > MAX_SKILL_FILE_SIZE) {
+            throw new IllegalArgumentException(
+                "Updated skill archive exceeds maximum allowed size of "
+                    + (MAX_SKILL_FILE_SIZE / 1024 / 1024) + " MB");
+        }
 
         FileEntry newFileEntry = aiSkillFileStorage.storeAiSkillFile(
             toSkillFilename(aiSkill.getName()), zipBytes);
@@ -416,7 +429,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return block + "\n" + newLine;
     }
 
-    private byte[] replaceZipEntry(byte[] existingZipBytes, String targetPath, String newContent) {
+    private byte[] replaceZipEntry(byte[] existingZipBytes, String targetPath, byte[] newContentBytes) {
         Map<String, byte[]> entries = new LinkedHashMap<>();
 
         try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(existingZipBytes))) {
@@ -437,7 +450,7 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             throw new UncheckedIOException("Failed to read existing skill archive", ioException);
         }
 
-        entries.put(targetPath, newContent.getBytes(StandardCharsets.UTF_8));
+        entries.put(targetPath, newContentBytes);
 
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -538,19 +551,17 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
     @Nullable
     private Map<String, String> parseFrontmatter(String content) {
-        if (!content.startsWith("---")) {
+        Matcher frontmatterMatcher = FRONTMATTER_BLOCK_PATTERN.matcher(content);
+
+        if (!frontmatterMatcher.find()) {
             return null;
         }
 
-        int endIndex = content.indexOf("---", 3);
+        return parseFrontmatterFields(frontmatterMatcher.group(1)
+            .trim());
+    }
 
-        if (endIndex < 0) {
-            return null;
-        }
-
-        String frontmatterBlock = content.substring(3, endIndex)
-            .trim();
-
+    private Map<String, String> parseFrontmatterFields(String frontmatterBlock) {
         Map<String, String> frontmatter = new HashMap<>();
 
         for (String line : frontmatterBlock.split("\n")) {
@@ -617,45 +628,12 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
                     String content = new String(entryBytes, StandardCharsets.UTF_8);
 
-                    if (!content.startsWith("---")) {
+                    Map<String, String> frontmatter = parseFrontmatter(content);
+
+                    if (frontmatter == null) {
                         log.warn(
-                            "SKILL.md does not contain frontmatter (no opening ---), using provided name/description");
-
-                        return null;
-                    }
-
-                    int endIndex = content.indexOf("---", 3);
-
-                    if (endIndex < 0) {
-                        log.warn("SKILL.md frontmatter has no closing ---, using provided name/description");
-
-                        return null;
-                    }
-
-                    String frontmatterBlock = content.substring(3, endIndex)
-                        .trim();
-
-                    Map<String, String> frontmatter = new HashMap<>();
-
-                    for (String line : frontmatterBlock.split("\n")) {
-                        int colonIndex = line.indexOf(':');
-
-                        if (colonIndex > 0) {
-                            String key = line.substring(0, colonIndex)
-                                .trim();
-                            String value = line.substring(colonIndex + 1)
-                                .trim();
-
-                            if (value.length() >= 2 && value.startsWith("\"") && value.endsWith("\"")) {
-                                value = value.substring(1, value.length() - 1)
-                                    .replace("\\\"", "\"")
-                                    .replace("\\n", "\n")
-                                    .replace("\\r", "\r")
-                                    .replace("\\\\", "\\");
-                            }
-
-                            frontmatter.put(key, value);
-                        }
+                            "SKILL.md has no valid YAML frontmatter block (must be delimited by --- on their own lines), "
+                                + "using provided name/description");
                     }
 
                     return frontmatter;

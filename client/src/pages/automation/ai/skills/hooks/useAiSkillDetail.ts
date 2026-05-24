@@ -217,7 +217,7 @@ export default function useAiSkillDetail() {
             setIsSaving(true);
 
             try {
-                const isSkillMd = selectedFilePath?.toLowerCase().endsWith('skill.md') === true;
+                const isSkillMd = selectedFilePath?.split('/').pop()?.toLowerCase() === 'skill.md';
 
                 if (isSkillMd && skill) {
                     const {frontmatter} = parseFrontmatter(content);
