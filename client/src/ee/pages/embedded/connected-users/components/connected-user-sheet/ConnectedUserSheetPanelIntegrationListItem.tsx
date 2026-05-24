@@ -72,11 +72,17 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
                                 <div
                                     className={twMerge(
-                                        'flex items-center space-x-1 text-base font-semibold',
+                                        'flex items-baseline gap-x-2 text-base font-semibold',
                                         !connectedUserIntegrationInstance.enabled && 'text-muted-foreground'
                                     )}
                                 >
                                     <span>{componentDefinition.title}</span>
+
+                                    {integrationInstance?.integrationInstanceConfiguration?.name && (
+                                        <span className="text-sm font-normal text-muted-foreground">
+                                            {integrationInstance.integrationInstanceConfiguration.name}
+                                        </span>
+                                    )}
                                 </div>
                             </div>
 
