@@ -1,5 +1,6 @@
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import downloadAiSkill from '@/pages/automation/ai/skills/utils/downloadAiSkill';
+import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import {
     useAiSkillFileContentQuery,
     useAiSkillFilePathsQuery,
@@ -37,7 +38,6 @@ const FILE_LANGUAGE_MAP: Record<string, string> = {
     yml: 'yaml',
 };
 
-/** Transforms flat slash-separated file paths into a nested tree for the file explorer UI. */
 function buildFileTree(paths: string[]): FileTreeNodeI[] {
     const root: FileTreeNodeI[] = [];
 
@@ -88,7 +88,10 @@ export default function useAiSkillDetail() {
 
     const {mutateAsync: updateAiSkillContent} = useUpdateAiSkillContentMutation();
     const {mutateAsync: updateAiSkill} = useUpdateAiSkillMutation({
-        onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]}),
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]});
+            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+        },
     });
     const {mutateAsync: deleteAiSkill} = useDeleteAiSkillMutation({
         onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkills']}),
@@ -192,25 +195,6 @@ export default function useAiSkillDetail() {
         }
     }, [closeSkillDetail, deleteAiSkill, navigate, selectedSkillId]);
 
-    const handleUpdate = useCallback(
-        async (name: string, description: string | null) => {
-            if (!selectedSkillId || !skill) {
-                return;
-            }
-
-            try {
-                await updateAiSkill({description, id: selectedSkillId, name});
-
-                toast.success('Skill updated');
-            } catch (error) {
-                toast.error('Failed to update skill', {
-                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
-                });
-            }
-        },
-        [selectedSkillId, skill, updateAiSkill]
-    );
-
     const handleSaveContent = useCallback(
         async (content: string) => {
             if (!selectedSkillId) {
@@ -220,7 +204,36 @@ export default function useAiSkillDetail() {
             setIsSaving(true);
 
             try {
+                const isSkillMd = selectedFilePath?.toLowerCase().endsWith('skill.md') === true;
+
+                if (isSkillMd && skill) {
+                    const {frontmatter} = parseFrontmatter(content);
+                    const nextName = frontmatter?.name?.trim();
+                    const nextDescription = frontmatter?.description?.trim() ?? null;
+                    const normalizedDescription = nextDescription === '' ? null : nextDescription;
+                    const metadataChanged =
+                        nextName != null &&
+                        nextName !== '' &&
+                        (nextName !== skill.name || normalizedDescription !== (skill.description ?? null));
+
+                    if (metadataChanged) {
+                        await updateAiSkill({
+                            description: normalizedDescription,
+                            id: selectedSkillId,
+                            name: nextName,
+                        });
+                    }
+                }
+
                 await updateAiSkillContent({content, id: selectedSkillId, path: selectedFilePath});
+
+                queryClient.setQueryData(
+                    ['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}],
+                    {aiSkillFileContent: content}
+                );
+                queryClient.invalidateQueries({
+                    queryKey: ['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}],
+                });
 
                 toast.success('Skill content saved');
             } catch (error) {
@@ -231,7 +244,7 @@ export default function useAiSkillDetail() {
                 setIsSaving(false);
             }
         },
-        [selectedFilePath, selectedSkillId, updateAiSkillContent]
+        [queryClient, selectedFilePath, selectedSkillId, skill, updateAiSkill, updateAiSkillContent]
     );
 
     useEffect(() => {
@@ -261,7 +274,6 @@ export default function useAiSkillDetail() {
         handleDownload,
         handleFileSelect,
         handleSaveContent,
-        handleUpdate,
         isFileContentLoading,
         isMarkdown,
         isSaving,

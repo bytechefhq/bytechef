@@ -21,7 +21,17 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, MoreVerticalIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon, Trash2Icon} from 'lucide-react';
+import {
+    CodeIcon,
+    DownloadIcon,
+    EyeIcon,
+    MoreVerticalIcon,
+    Plus,
+    SaveIcon,
+    SearchIcon,
+    SparklesIcon,
+    Trash2Icon,
+} from 'lucide-react';
 import {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -41,13 +51,17 @@ const AiSkills = () => {
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
 
-    const {canSave, handlers, isSaving} = useAiSkillDetailToolbarStore(
+    const {canSave, canToggleView, handlers, isSaving, viewMode} = useAiSkillDetailToolbarStore(
         useShallow((state) => ({
             canSave: state.canSave,
+            canToggleView: state.canToggleView,
             handlers: state.handlers,
             isSaving: state.isSaving,
+            viewMode: state.viewMode,
         }))
     );
+
+    const setViewMode = useAiSkillDetailToolbarStore((state) => state.setViewMode);
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
@@ -60,20 +74,18 @@ const AiSkills = () => {
     }, [queryClient]);
 
     useEffect(() => {
-        return useCopilotStateContributorRegistry.getState()
-            .register(() => {
-                const {selectedSkillId: activeSkillId, skillsHeaderInfo: activeHeaderInfo} = useAiSkillsStore
-                    .getState();
+        return useCopilotStateContributorRegistry.getState().register(() => {
+            const {selectedSkillId: activeSkillId, skillsHeaderInfo: activeHeaderInfo} = useAiSkillsStore.getState();
 
-                if (activeSkillId == null) {
-                    return {};
-                }
+            if (activeSkillId == null) {
+                return {};
+            }
 
-                return {
-                    currentSelectedSkillId: activeSkillId,
-                    currentSelectedSkillName: activeHeaderInfo.title,
-                };
-            });
+            return {
+                currentSelectedSkillId: activeSkillId,
+                currentSelectedSkillName: activeHeaderInfo.title,
+            };
+        });
     }, []);
 
     const route = determineRoute(skillId);
@@ -110,8 +122,26 @@ const AiSkills = () => {
             </div>
         );
     } else if (route === 'detail' && handlers) {
+        const inSourceMode = viewMode === 'source';
+
         toolbarRight = (
             <div className="flex items-center gap-1">
+                {canToggleView && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                aria-label={inSourceMode ? 'Show preview' : 'Show source'}
+                                icon={inSourceMode ? <EyeIcon className="size-4" /> : <CodeIcon className="size-4" />}
+                                onClick={() => setViewMode(inSourceMode ? 'preview' : 'source')}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>{inSourceMode ? 'Show preview' : 'Show source'}</TooltipContent>
+                    </Tooltip>
+                )}
+
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
@@ -153,10 +183,6 @@ const AiSkills = () => {
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={handlers.onEdit}>
-                            <PencilIcon className="mr-2 size-4" /> Edit Skill
-                        </DropdownMenuItem>
-
                         <DropdownMenuItem onClick={handlers.onDownload}>
                             <DownloadIcon className="mr-2 size-4" /> Download Skill
                         </DropdownMenuItem>
@@ -177,9 +203,11 @@ const AiSkills = () => {
 
     const isDetailView = route === 'detail';
 
-    // In the skill detail view, swap the AI section nav for a Skills list (search + create) sidebar so
-    // the user can switch between skills without leaving the detail surface — same pattern as Data Tables.
-    const leftSidebarBody = isDetailView ? <AiSkillsLeftSidebar currentId={skillId} /> : <AiSidebarNav currentSection="skills" />;
+    const leftSidebarBody = isDetailView ? (
+        <AiSkillsLeftSidebar currentId={skillId} />
+    ) : (
+        <AiSidebarNav currentSection="skills" />
+    );
 
     const leftSidebarHeader = isDetailView ? (
         <Header

@@ -4,34 +4,38 @@ interface ToolbarHandlersI {
     onCopilot: () => void;
     onDelete: () => void;
     onDownload: () => void;
-    onEdit: () => void;
     onSave: () => Promise<void>;
 }
 
+export type ViewModeType = 'preview' | 'source';
+
 interface AiSkillDetailToolbarStateI {
     canSave: boolean;
+    canToggleView: boolean;
     handlers: ToolbarHandlersI | null;
     isSaving: boolean;
     resetToolbar: () => void;
     setCanSave: (canSave: boolean) => void;
+    setCanToggleView: (canToggleView: boolean) => void;
     setHandlers: (handlers: ToolbarHandlersI | null) => void;
     setIsSaving: (isSaving: boolean) => void;
+    setViewMode: (viewMode: ViewModeType) => void;
+    viewMode: ViewModeType;
 }
 
-/**
- * Bridge state that lets AiSkillDetail publish its toolbar action handlers + dirty/saving flags so
- * AiSkills can render the action buttons in the page header. Lives outside the React tree (Zustand)
- * because the page header is rendered several layers above AiSkillDetail and prop-drilling would have
- * to cross LayoutContainer, the route detection, and AiSkillsPanel.
- */
 const useAiSkillDetailToolbarStore = create<AiSkillDetailToolbarStateI>((set) => ({
     canSave: false,
+    canToggleView: false,
     handlers: null,
     isSaving: false,
-    resetToolbar: () => set({canSave: false, handlers: null, isSaving: false}),
+    resetToolbar: () =>
+        set({canSave: false, canToggleView: false, handlers: null, isSaving: false, viewMode: 'preview'}),
     setCanSave: (canSave) => set({canSave}),
+    setCanToggleView: (canToggleView) => set({canToggleView}),
     setHandlers: (handlers) => set({handlers}),
     setIsSaving: (isSaving) => set({isSaving}),
+    setViewMode: (viewMode) => set({viewMode}),
+    viewMode: 'preview',
 }));
 
 export default useAiSkillDetailToolbarStore;
