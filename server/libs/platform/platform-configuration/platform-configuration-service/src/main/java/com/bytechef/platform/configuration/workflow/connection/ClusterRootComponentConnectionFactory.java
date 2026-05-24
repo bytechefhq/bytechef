@@ -115,6 +115,7 @@ class ClusterRootComponentConnectionFactory
 
             for (ClusterElement clusterElement : clusterElements) {
                 try {
+                    // TODO add behind ClusterElementConnectionFactory
                     ComponentConnection componentConnection = getComponentConnection(
                         workflowNodeName, clusterElement.getWorkflowNodeName(), clusterElement.getComponentName(),
                         clusterElement.getComponentVersion());
@@ -129,6 +130,7 @@ class ClusterRootComponentConnectionFactory
                 }
 
                 componentConnections.addAll(
+                    // TODO add behind ClusterElementConnectionFactory
                     ComponentConnection.of(
                         clusterElement.getExtensions(), workflowNodeName,
                         (name, version) -> {

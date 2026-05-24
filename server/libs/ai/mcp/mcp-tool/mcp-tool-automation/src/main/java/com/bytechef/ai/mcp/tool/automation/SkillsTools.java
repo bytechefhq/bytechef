@@ -56,8 +56,7 @@ public class SkillsTools {
                 "Include keywords that help identify relevant tasks.") @Nullable String description,
         @ToolParam(
             description = "The Markdown body of SKILL.md — the actual skill instructions. Do NOT include the " +
-                "YAML frontmatter (the --- block); it is generated automatically from the name and description.")
-        String instructions) {
+                "YAML frontmatter (the --- block); it is generated automatically from the name and description.") String instructions) {
 
         try {
             AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
