@@ -52,8 +52,7 @@ const AiSkillCreateWithAi = () => {
     const resetMessages = useCopilotStore((state) => state.resetMessages);
     const generateConversationId = useCopilotStore((state) => state.generateConversationId);
 
-    const origin: CreateWithAiOriginType =
-        (location.state as CreateWithAiLocationStateI | null)?.origin ?? 'list';
+    const origin: CreateWithAiOriginType = (location.state as CreateWithAiLocationStateI | null)?.origin ?? 'list';
 
     useEffect(() => {
         resetMessages();

@@ -107,15 +107,7 @@ const AiSkills = () => {
         } else if (route === 'list' && (skillsView === 'detail' || skillsView === 'createWithAi')) {
             closeSkillDetail();
         }
-    }, [
-        closeSkillDetail,
-        openSkillDetail,
-        route,
-        selectedSkillId,
-        setSkillsView,
-        skillId,
-        skillsView,
-    ]);
+    }, [closeSkillDetail, openSkillDetail, route, selectedSkillId, setSkillsView, skillId, skillsView]);
 
     const headerTitle =
         route === 'detail'
