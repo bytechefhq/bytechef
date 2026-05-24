@@ -72,24 +72,15 @@ const ConnectedUserProjectWorkflowListItem = ({
                                     <LoadingIcon className="absolute left-[-15px] top-[3px]" />
                                 )}
 
-                                <Tooltip>
-                                    <TooltipTrigger asChild>
-                                        <Switch
-                                            checked={connectedUserProjectWorkflow.enabled}
-                                            disabled={isDraft}
-                                            onCheckedChange={(value) => {
-                                                enableConnectedUserProjectWorkflowMutation.mutate({
-                                                    enable: value,
-                                                    id: connectedUserProjectWorkflow.id,
-                                                });
-                                            }}
-                                        />
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>
-                                        {isDraft ? 'Publish the workflow before enabling it' : 'Enable workflow'}
-                                    </TooltipContent>
-                                </Tooltip>
+                                <Switch
+                                    checked={connectedUserProjectWorkflow.enabled}
+                                    onCheckedChange={(value) => {
+                                        enableConnectedUserProjectWorkflowMutation.mutate({
+                                            enable: value,
+                                            id: connectedUserProjectWorkflow.id,
+                                        });
+                                    }}
+                                />
                             </div>
 
                             <Tooltip>
