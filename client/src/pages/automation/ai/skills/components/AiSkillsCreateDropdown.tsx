@@ -1,6 +1,9 @@
 import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {ChevronDownIcon, PencilIcon, UploadIcon} from 'lucide-react';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
+import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
 import {useNavigate} from 'react-router-dom';
 
 const CREATE_PATHS = {
@@ -11,8 +14,19 @@ const CREATE_PATHS = {
 const AiSkillsCreateDropdown = () => {
     const navigate = useNavigate();
 
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const setContext = useCopilotStore((state) => state.setContext);
+
+    const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
     const openCreateRoute = (view: keyof typeof CREATE_PATHS) => {
         navigate(CREATE_PATHS[view]);
+    };
+
+    const openCopilot = () => {
+        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
+
+        setCopilotPanelOpen(true);
     };
 
     return (
@@ -25,6 +39,19 @@ const AiSkillsCreateDropdown = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-72">
+                {ff_4554 && (
+                    <DropdownMenuItem className="flex flex-col items-start gap-0.5 p-3" onClick={openCopilot}>
+                        <div className="flex items-center gap-2 font-medium">
+                            <SparklesIcon className="size-4" />
+                            Create With AI
+                        </div>
+
+                        <span className="ml-6 text-xs text-content-neutral-secondary">
+                            Let AI generate a skill for you.
+                        </span>
+                    </DropdownMenuItem>
+                )}
+
                 <DropdownMenuItem
                     className="flex flex-col items-start gap-0.5 p-3"
                     onClick={() => openCreateRoute('uploadForm')}

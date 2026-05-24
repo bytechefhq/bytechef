@@ -1,16 +1,11 @@
-import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
-import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
-import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
-import {SearchIcon, SparklesIcon} from 'lucide-react';
+import {SearchIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 
@@ -47,17 +42,6 @@ const AiSkills = () => {
     const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
-
-    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
-    const setContext = useCopilotStore((state) => state.setContext);
-
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
-
-    const handleOpenCopilot = () => {
-        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
-
-        setCopilotPanelOpen(true);
-    };
 
     const route = determineRoute(location.pathname, skillId);
 
@@ -104,22 +88,6 @@ const AiSkills = () => {
             </div>
 
             <AiSkillsCreateDropdown />
-
-            {ff_4554 && (
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            className="[&_svg]:size-5"
-                            icon={<SparklesIcon />}
-                            onClick={handleOpenCopilot}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Open Copilot panel</TooltipContent>
-                </Tooltip>
-            )}
         </div>
     ) : undefined;
 
