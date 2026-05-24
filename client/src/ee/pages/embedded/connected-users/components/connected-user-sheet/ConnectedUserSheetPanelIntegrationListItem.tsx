@@ -1,5 +1,6 @@
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
@@ -8,7 +9,10 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import CredentialsStatus from '@/ee/pages/embedded/connected-users/components/CredentialsStatus';
 import ConnectedUserSheetPanelIntegrationWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationWorkflowList';
 import {ConnectedUserIntegrationInstance} from '@/ee/shared/middleware/embedded/connected-user';
-import {useEnableIntegrationInstanceMutation} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
+import {
+    useDeleteIntegrationInstanceMutation,
+    useEnableIntegrationInstanceMutation,
+} from '@/ee/shared/mutations/embedded/integrationInstances.mutations';
 import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.queries';
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
@@ -19,6 +23,7 @@ import {useGetIntegrationVersionWorkflowsQuery} from '@/ee/shared/queries/embedd
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
 import {EllipsisVerticalIcon} from 'lucide-react';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {twMerge} from 'tailwind-merge';
 
@@ -44,7 +49,19 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
 
     const {data: integrationInstance} = useGetIntegrationInstanceQuery(connectedUserIntegrationInstance.id!);
 
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
     const queryClient = useQueryClient();
+
+    const deleteIntegrationInstanceMutation = useDeleteIntegrationInstanceMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({
+                queryKey: ConnectedUserKeys.connectedUser(connectedUserId),
+            });
+
+            setShowDeleteDialog(false);
+        },
+    });
 
     const enableIntegrationInstanceMutation = useEnableIntegrationInstanceMutation({
         onSuccess: () => {
@@ -168,7 +185,12 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             </DropdownMenuTrigger>
 
                             <DropdownMenuContent align="end">
-                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                                <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() => setShowDeleteDialog(true)}
+                                >
+                                    Delete
+                                </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
@@ -185,6 +207,12 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                     />
                 )}
             </CollapsibleContent>
+
+            <DeleteAlertDialog
+                onCancel={() => setShowDeleteDialog(false)}
+                onDelete={() => deleteIntegrationInstanceMutation.mutate({id: connectedUserIntegrationInstance.id!})}
+                open={showDeleteDialog}
+            />
         </Collapsible>
     );
 };

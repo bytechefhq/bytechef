@@ -1,6 +1,4 @@
-import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Switch} from '@/components/ui/switch';
 import {
     IntegrationInstance,
@@ -13,7 +11,6 @@ import {ConnectedUserKeys} from '@/ee/shared/queries/embedded/connectedUsers.que
 import {IntegrationInstanceKeys} from '@/ee/shared/queries/embedded/integrationInstances.queries';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useQueryClient} from '@tanstack/react-query';
-import {EllipsisVerticalIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
@@ -68,38 +65,22 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
                 })}
             </div>
 
-            <div className="flex items-center space-x-1">
-                <div className="relative flex items-center">
-                    {enableIntegrationInstanceWorkflowMutation.isPending && (
-                        <LoadingIcon className="absolute left-[-15px] top-[3px]" />
-                    )}
+            <div className="relative flex items-center">
+                {enableIntegrationInstanceWorkflowMutation.isPending && (
+                    <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                )}
 
-                    <Switch
-                        checked={integrationInstanceWorkflow?.enabled}
-                        disabled={!integrationInstanceConfigurationWorkflow?.enabled}
-                        onCheckedChange={(value) => {
-                            enableIntegrationInstanceWorkflowMutation.mutate({
-                                enable: value,
-                                id: integrationInstance.id!,
-                                workflowId: workflow.id!,
-                            });
-                        }}
-                    />
-                </div>
-
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button
-                            icon={<EllipsisVerticalIcon className="size-4 hover:cursor-pointer" />}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </DropdownMenuTrigger>
-
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <Switch
+                    checked={integrationInstanceWorkflow?.enabled}
+                    disabled={!integrationInstanceConfigurationWorkflow?.enabled}
+                    onCheckedChange={(value) => {
+                        enableIntegrationInstanceWorkflowMutation.mutate({
+                            enable: value,
+                            id: integrationInstance.id!,
+                            workflowId: workflow.id!,
+                        });
+                    }}
+                />
             </div>
         </li>
     );
