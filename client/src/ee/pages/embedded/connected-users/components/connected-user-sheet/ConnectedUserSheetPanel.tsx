@@ -29,7 +29,7 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                     </TabsTrigger>
 
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
-                        Workflows
+                        Automation Workflows
                     </TabsTrigger>
                 </TabsList>
 
