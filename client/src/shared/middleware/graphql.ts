@@ -1,10 +1,14 @@
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { fetcher } from './graphqlFetcher';
+export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 export class TypedDocumentString<TResult, TVariables> extends String {
   __apiType?: { result: TResult; variables: TVariables };
+  __meta__?: Record<string, unknown>;
 
-  constructor(private value: string) {
+  constructor(private value: string, __meta__?: Record<string, unknown>) {
     super(value);
+    this.__meta__ = __meta__;
   }
 
   override toString(): string {
@@ -13,11 +17,6 @@ export class TypedDocumentString<TResult, TVariables> extends String {
 }
 export type Maybe<T> = T | null;
 export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -372,6 +371,55 @@ export enum AuthorizationType {
   Oauth2ImplicitCode = 'OAUTH2_IMPLICIT_CODE',
   Oauth2ResourceOwnerPassword = 'OAUTH2_RESOURCE_OWNER_PASSWORD'
 }
+
+export type AutomationWorkflowProject = {
+  __typename?: 'AutomationWorkflowProject';
+  categoryId?: Maybe<Scalars['ID']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  lastPublishedVersion?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  published: Scalars['Boolean']['output'];
+  tagIds: Array<Scalars['ID']['output']>;
+  version: Scalars['Int']['output'];
+  workflowTemplates: Array<AutomationWorkflowProjectWorkflowTemplate>;
+};
+
+export type AutomationWorkflowProjectCategory = {
+  __typename?: 'AutomationWorkflowProjectCategory';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AutomationWorkflowProjectComponent = {
+  __typename?: 'AutomationWorkflowProjectComponent';
+  icon?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  title?: Maybe<Scalars['String']['output']>;
+};
+
+export type AutomationWorkflowProjectTag = {
+  __typename?: 'AutomationWorkflowProjectTag';
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AutomationWorkflowProjectVersion = {
+  __typename?: 'AutomationWorkflowProjectVersion';
+  publishedDate?: Maybe<Scalars['String']['output']>;
+  status: Scalars['String']['output'];
+  version: Scalars['Int']['output'];
+};
+
+export type AutomationWorkflowProjectWorkflowTemplate = {
+  __typename?: 'AutomationWorkflowProjectWorkflowTemplate';
+  components: Array<AutomationWorkflowProjectComponent>;
+  description?: Maybe<Scalars['String']['output']>;
+  label?: Maybe<Scalars['String']['output']>;
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  triggers: Array<AutomationWorkflowProjectComponent>;
+  workflowUuid: Scalars['ID']['output'];
+};
 
 export type BooleanProperty = Property & {
   __typename?: 'BooleanProperty';
@@ -1409,6 +1457,8 @@ export type Mutation = {
   createApiConnector: ApiConnector;
   createApiKey: Scalars['String']['output'];
   createApprovalTask?: Maybe<ApprovalTask>;
+  createAutomationWorkflowProject: Scalars['ID']['output'];
+  createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   createDataTable: Scalars['Boolean']['output'];
   createEmbeddedMcpServer?: Maybe<McpServer>;
   createIdentityProvider: IdentityProviderType;
@@ -1432,6 +1482,8 @@ export type Mutation = {
   deleteApiConnector: Scalars['Boolean']['output'];
   deleteApiKey: Scalars['Boolean']['output'];
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
+  deleteAutomationWorkflowProject: Scalars['Boolean']['output'];
+  deleteAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -1454,6 +1506,8 @@ export type Mutation = {
   deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
   disconnectConnection: Scalars['Boolean']['output'];
   dropDataTable: Scalars['Boolean']['output'];
+  duplicateAutomationWorkflowProject: Scalars['ID']['output'];
+  duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
   enableApiConnector: Scalars['Boolean']['output'];
   enableCustomComponent: Scalars['Boolean']['output'];
@@ -1467,6 +1521,7 @@ export type Mutation = {
   importWorkflowTemplate: Scalars['ID']['output'];
   insertDataTableRow: DataTableRow;
   inviteUser: Scalars['Boolean']['output'];
+  publishAutomationWorkflowProject: Scalars['Boolean']['output'];
   removeDataTableColumn: Scalars['Boolean']['output'];
   renameDataTable: Scalars['Boolean']['output'];
   renameDataTableColumn: Scalars['Boolean']['output'];
@@ -1488,6 +1543,7 @@ export type Mutation = {
   updateApiConnector: ApiConnector;
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
+  updateAutomationWorkflowProject: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateIdentityProvider: IdentityProviderType;
@@ -1600,6 +1656,20 @@ export type MutationCreateApiKeyArgs = {
 
 export type MutationCreateApprovalTaskArgs = {
   approvalTask: ApprovalTaskInput;
+};
+
+
+export type MutationCreateAutomationWorkflowProjectArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
+  definition?: InputMaybe<Scalars['String']['input']>;
+  projectId: Scalars['ID']['input'];
 };
 
 
@@ -1722,6 +1792,16 @@ export type MutationDeleteApprovalTaskArgs = {
 };
 
 
+export type MutationDeleteAutomationWorkflowProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAutomationWorkflowProjectWorkflowArgs = {
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1832,6 +1912,16 @@ export type MutationDropDataTableArgs = {
 };
 
 
+export type MutationDuplicateAutomationWorkflowProjectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDuplicateAutomationWorkflowProjectWorkflowArgs = {
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
 export type MutationDuplicateDataTableArgs = {
   input: DuplicateDataTableInput;
 };
@@ -1904,6 +1994,11 @@ export type MutationInviteUserArgs = {
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
   role: Scalars['String']['input'];
+};
+
+
+export type MutationPublishAutomationWorkflowProjectArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -2055,6 +2150,15 @@ export type MutationUpdateApiKeyArgs = {
 
 export type MutationUpdateApprovalTaskArgs = {
   approvalTask: ApprovalTaskInput;
+};
+
+
+export type MutationUpdateAutomationWorkflowProjectArgs = {
+  category?: InputMaybe<Scalars['String']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
@@ -2431,6 +2535,10 @@ export type Query = {
   approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
   authorities: Array<Scalars['String']['output']>;
   automationSearch: Array<SearchResult>;
+  automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
+  automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
+  automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
+  automationWorkflowProjects: Array<AutomationWorkflowProject>;
   clusterElementComponentConnections: Array<ComponentConnection>;
   clusterElementDefinition: ClusterElementDefinition;
   clusterElementDefinitions: Array<ClusterElementDefinition>;
@@ -2649,6 +2757,11 @@ export type QueryApprovalTasksByIdsArgs = {
 export type QueryAutomationSearchArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   query: Scalars['String']['input'];
+};
+
+
+export type QueryAutomationWorkflowProjectVersionsArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -4310,6 +4423,78 @@ export type AutomationSearchQuery = { __typename?: 'Query', automationSearch: Ar
     | { __typename?: 'WorkflowSearchResult', projectId: string, label: string, id: string, name: string, description?: string | null, type: SearchAssetType }
   > };
 
+export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AutomationWorkflowProjectCategoriesQuery = { __typename?: 'Query', automationWorkflowProjectCategories: Array<{ __typename?: 'AutomationWorkflowProjectCategory', id: string, name: string }> };
+
+export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AutomationWorkflowProjectTagsQuery = { __typename?: 'Query', automationWorkflowProjectTags: Array<{ __typename?: 'AutomationWorkflowProjectTag', id: string, name: string }> };
+
+export type AutomationWorkflowProjectVersionsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type AutomationWorkflowProjectVersionsQuery = { __typename?: 'Query', automationWorkflowProjectVersions: Array<{ __typename?: 'AutomationWorkflowProjectVersion', version: number, status: string, publishedDate?: string | null }> };
+
+export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type AutomationWorkflowProjectsQuery = { __typename?: 'Query', automationWorkflowProjects: Array<{ __typename?: 'AutomationWorkflowProject', id: string, name: string, description?: string | null, categoryId?: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion?: number | null, workflowTemplates: Array<{ __typename?: 'AutomationWorkflowProjectWorkflowTemplate', workflowUuid: string, label?: string | null, description?: string | null, lastModifiedDate?: string | null, triggers: Array<{ __typename?: 'AutomationWorkflowProjectComponent', name: string, title?: string | null, icon?: string | null }>, components: Array<{ __typename?: 'AutomationWorkflowProjectComponent', name: string, title?: string | null, icon?: string | null }> }> }> };
+
+export type CreateAutomationWorkflowProjectMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type CreateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', createAutomationWorkflowProject: string };
+
+export type UpdateAutomationWorkflowProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  name: Scalars['String']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  category?: InputMaybe<Scalars['String']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+}>;
+
+
+export type UpdateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', updateAutomationWorkflowProject: boolean };
+
+export type DeleteAutomationWorkflowProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAutomationWorkflowProjectMutation = { __typename?: 'Mutation', deleteAutomationWorkflowProject: boolean };
+
+export type CreateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
+  projectId: Scalars['ID']['input'];
+  definition?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type CreateAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', createAutomationWorkflowProjectWorkflow: string };
+
+export type DeleteAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
+  workflowUuid: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', deleteAutomationWorkflowProjectWorkflow: boolean };
+
+export type PublishAutomationWorkflowProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type PublishAutomationWorkflowProjectMutation = { __typename?: 'Mutation', publishAutomationWorkflowProject: boolean };
+
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
@@ -4352,6 +4537,20 @@ export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 
 export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { __typename?: 'Mutation', deleteMcpIntegrationInstanceConfigurationWorkflow?: boolean | null };
+
+export type DuplicateAutomationWorkflowProjectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DuplicateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', duplicateAutomationWorkflowProject: string };
+
+export type DuplicateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
+  workflowUuid: Scalars['ID']['input'];
+}>;
+
+
+export type DuplicateAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', duplicateAutomationWorkflowProjectWorkflow: string };
 
 export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -8037,6 +8236,257 @@ export const useAutomationSearchQuery = <
   }
     )};
 
+export const AutomationWorkflowProjectCategoriesDocument = new TypedDocumentString(`
+    query automationWorkflowProjectCategories {
+  automationWorkflowProjectCategories {
+    id
+    name
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectCategoriesQuery = <
+      TData = AutomationWorkflowProjectCategoriesQuery,
+      TError = unknown
+    >(
+      variables?: AutomationWorkflowProjectCategoriesQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectCategoriesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectCategoriesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectCategoriesQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['automationWorkflowProjectCategories'] : ['automationWorkflowProjectCategories', variables],
+    queryFn: fetcher<AutomationWorkflowProjectCategoriesQuery, AutomationWorkflowProjectCategoriesQueryVariables>(AutomationWorkflowProjectCategoriesDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectTagsDocument = new TypedDocumentString(`
+    query automationWorkflowProjectTags {
+  automationWorkflowProjectTags {
+    id
+    name
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectTagsQuery = <
+      TData = AutomationWorkflowProjectTagsQuery,
+      TError = unknown
+    >(
+      variables?: AutomationWorkflowProjectTagsQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectTagsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectTagsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['automationWorkflowProjectTags'] : ['automationWorkflowProjectTags', variables],
+    queryFn: fetcher<AutomationWorkflowProjectTagsQuery, AutomationWorkflowProjectTagsQueryVariables>(AutomationWorkflowProjectTagsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectVersionsDocument = new TypedDocumentString(`
+    query automationWorkflowProjectVersions($id: ID!) {
+  automationWorkflowProjectVersions(id: $id) {
+    version
+    status
+    publishedDate
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectVersionsQuery = <
+      TData = AutomationWorkflowProjectVersionsQuery,
+      TError = unknown
+    >(
+      variables: AutomationWorkflowProjectVersionsQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectVersionsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectVersionsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectVersionsQuery, TError, TData>(
+      {
+    queryKey: ['automationWorkflowProjectVersions', variables],
+    queryFn: fetcher<AutomationWorkflowProjectVersionsQuery, AutomationWorkflowProjectVersionsQueryVariables>(AutomationWorkflowProjectVersionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const AutomationWorkflowProjectsDocument = new TypedDocumentString(`
+    query automationWorkflowProjects {
+  automationWorkflowProjects {
+    id
+    name
+    description
+    categoryId
+    tagIds
+    published
+    version
+    lastPublishedVersion
+    workflowTemplates {
+      workflowUuid
+      label
+      description
+      lastModifiedDate
+      triggers {
+        name
+        title
+        icon
+      }
+      components {
+        name
+        title
+        icon
+      }
+    }
+  }
+}
+    `);
+
+export const useAutomationWorkflowProjectsQuery = <
+      TData = AutomationWorkflowProjectsQuery,
+      TError = unknown
+    >(
+      variables?: AutomationWorkflowProjectsQueryVariables,
+      options?: Omit<UseQueryOptions<AutomationWorkflowProjectsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AutomationWorkflowProjectsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<AutomationWorkflowProjectsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['automationWorkflowProjects'] : ['automationWorkflowProjects', variables],
+    queryFn: fetcher<AutomationWorkflowProjectsQuery, AutomationWorkflowProjectsQueryVariables>(AutomationWorkflowProjectsDocument, variables),
+    ...options
+  }
+    )};
+
+export const CreateAutomationWorkflowProjectDocument = new TypedDocumentString(`
+    mutation createAutomationWorkflowProject($name: String!, $description: String, $category: String, $tags: [String!]) {
+  createAutomationWorkflowProject(
+    name: $name
+    description: $description
+    category: $category
+    tags: $tags
+  )
+}
+    `);
+
+export const useCreateAutomationWorkflowProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAutomationWorkflowProjectMutation, TError, CreateAutomationWorkflowProjectMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAutomationWorkflowProjectMutation, TError, CreateAutomationWorkflowProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['createAutomationWorkflowProject'],
+    mutationFn: (variables?: CreateAutomationWorkflowProjectMutationVariables) => fetcher<CreateAutomationWorkflowProjectMutation, CreateAutomationWorkflowProjectMutationVariables>(CreateAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const UpdateAutomationWorkflowProjectDocument = new TypedDocumentString(`
+    mutation updateAutomationWorkflowProject($id: ID!, $name: String!, $description: String, $category: String, $tags: [String!]) {
+  updateAutomationWorkflowProject(
+    id: $id
+    name: $name
+    description: $description
+    category: $category
+    tags: $tags
+  )
+}
+    `);
+
+export const useUpdateAutomationWorkflowProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateAutomationWorkflowProjectMutation, TError, UpdateAutomationWorkflowProjectMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateAutomationWorkflowProjectMutation, TError, UpdateAutomationWorkflowProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['updateAutomationWorkflowProject'],
+    mutationFn: (variables?: UpdateAutomationWorkflowProjectMutationVariables) => fetcher<UpdateAutomationWorkflowProjectMutation, UpdateAutomationWorkflowProjectMutationVariables>(UpdateAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAutomationWorkflowProjectDocument = new TypedDocumentString(`
+    mutation deleteAutomationWorkflowProject($id: ID!) {
+  deleteAutomationWorkflowProject(id: $id)
+}
+    `);
+
+export const useDeleteAutomationWorkflowProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAutomationWorkflowProjectMutation, TError, DeleteAutomationWorkflowProjectMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAutomationWorkflowProjectMutation, TError, DeleteAutomationWorkflowProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAutomationWorkflowProject'],
+    mutationFn: (variables?: DeleteAutomationWorkflowProjectMutationVariables) => fetcher<DeleteAutomationWorkflowProjectMutation, DeleteAutomationWorkflowProjectMutationVariables>(DeleteAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const CreateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
+    mutation createAutomationWorkflowProjectWorkflow($projectId: ID!, $definition: String) {
+  createAutomationWorkflowProjectWorkflow(
+    projectId: $projectId
+    definition: $definition
+  )
+}
+    `);
+
+export const useCreateAutomationWorkflowProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<CreateAutomationWorkflowProjectWorkflowMutation, TError, CreateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<CreateAutomationWorkflowProjectWorkflowMutation, TError, CreateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['createAutomationWorkflowProjectWorkflow'],
+    mutationFn: (variables?: CreateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<CreateAutomationWorkflowProjectWorkflowMutation, CreateAutomationWorkflowProjectWorkflowMutationVariables>(CreateAutomationWorkflowProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
+    mutation deleteAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
+  deleteAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
+}
+    `);
+
+export const useDeleteAutomationWorkflowProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteAutomationWorkflowProjectWorkflowMutation, TError, DeleteAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteAutomationWorkflowProjectWorkflowMutation, TError, DeleteAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteAutomationWorkflowProjectWorkflow'],
+    mutationFn: (variables?: DeleteAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<DeleteAutomationWorkflowProjectWorkflowMutation, DeleteAutomationWorkflowProjectWorkflowMutationVariables>(DeleteAutomationWorkflowProjectWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const PublishAutomationWorkflowProjectDocument = new TypedDocumentString(`
+    mutation publishAutomationWorkflowProject($id: ID!) {
+  publishAutomationWorkflowProject(id: $id)
+}
+    `);
+
+export const usePublishAutomationWorkflowProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<PublishAutomationWorkflowProjectMutation, TError, PublishAutomationWorkflowProjectMutationVariables, TContext>) => {
+    
+    return useMutation<PublishAutomationWorkflowProjectMutation, TError, PublishAutomationWorkflowProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['publishAutomationWorkflowProject'],
+    mutationFn: (variables?: PublishAutomationWorkflowProjectMutationVariables) => fetcher<PublishAutomationWorkflowProjectMutation, PublishAutomationWorkflowProjectMutationVariables>(PublishAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ConnectedUserProjectsDocument = new TypedDocumentString(`
     query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
   connectedUserProjects(
@@ -8192,6 +8642,44 @@ export const useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['deleteMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<DeleteMcpIntegrationInstanceConfigurationWorkflowMutation, DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(DeleteMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DuplicateAutomationWorkflowProjectDocument = new TypedDocumentString(`
+    mutation duplicateAutomationWorkflowProject($id: ID!) {
+  duplicateAutomationWorkflowProject(id: $id)
+}
+    `);
+
+export const useDuplicateAutomationWorkflowProjectMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DuplicateAutomationWorkflowProjectMutation, TError, DuplicateAutomationWorkflowProjectMutationVariables, TContext>) => {
+    
+    return useMutation<DuplicateAutomationWorkflowProjectMutation, TError, DuplicateAutomationWorkflowProjectMutationVariables, TContext>(
+      {
+    mutationKey: ['duplicateAutomationWorkflowProject'],
+    mutationFn: (variables?: DuplicateAutomationWorkflowProjectMutationVariables) => fetcher<DuplicateAutomationWorkflowProjectMutation, DuplicateAutomationWorkflowProjectMutationVariables>(DuplicateAutomationWorkflowProjectDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DuplicateAutomationWorkflowProjectWorkflowDocument = new TypedDocumentString(`
+    mutation duplicateAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
+  duplicateAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
+}
+    `);
+
+export const useDuplicateAutomationWorkflowProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DuplicateAutomationWorkflowProjectWorkflowMutation, TError, DuplicateAutomationWorkflowProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DuplicateAutomationWorkflowProjectWorkflowMutation, TError, DuplicateAutomationWorkflowProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['duplicateAutomationWorkflowProjectWorkflow'],
+    mutationFn: (variables?: DuplicateAutomationWorkflowProjectWorkflowMutationVariables) => fetcher<DuplicateAutomationWorkflowProjectWorkflowMutation, DuplicateAutomationWorkflowProjectWorkflowMutationVariables>(DuplicateAutomationWorkflowProjectWorkflowDocument, variables)(),
     ...options
   }
     )};
