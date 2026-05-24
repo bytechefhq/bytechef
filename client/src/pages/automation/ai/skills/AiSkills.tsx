@@ -4,6 +4,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
+import AiSkillsLeftSidebar from '@/pages/automation/ai/skills/components/AiSkillsLeftSidebar';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
@@ -12,7 +13,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, PencilIcon, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
+import {DownloadIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -181,11 +182,38 @@ const AiSkills = () => {
         );
     }
 
+    const isDetailView = route === 'detail';
+
+    // In the skill detail view, swap the AI section nav for a Skills list (search + create) sidebar so
+    // the user can switch between skills without leaving the detail surface — same pattern as Data Tables.
+    const leftSidebarBody = isDetailView ? <AiSkillsLeftSidebar currentId={skillId} /> : <AiSidebarNav currentSection="skills" />;
+
+    const leftSidebarHeader = isDetailView ? (
+        <Header
+            position="sidebar"
+            right={
+                <AiSkillsCreateDropdown
+                    trigger={
+                        <Button
+                            aria-label="Create skill"
+                            icon={<Plus className="size-4" />}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    }
+                />
+            }
+            title="Skills"
+        />
+    ) : (
+        <Header position="sidebar" title="AI" />
+    );
+
     return (
         <LayoutContainer
             header={<Header centerTitle position="main" right={toolbarRight} title={headerTitle} />}
-            leftSidebarBody={<AiSidebarNav currentSection="skills" />}
-            leftSidebarHeader={<Header position="sidebar" title="AI" />}
+            leftSidebarBody={leftSidebarBody}
+            leftSidebarHeader={leftSidebarHeader}
             leftSidebarWidth="64"
         >
             <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
