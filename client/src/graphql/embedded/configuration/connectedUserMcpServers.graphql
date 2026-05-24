@@ -1,0 +1,17 @@
+query connectedUserMcpServers($connectedUserId: ID!) {
+    connectedUserMcpServers(connectedUserId: $connectedUserId) {
+        id
+        name
+        enabled
+        environmentId
+        lastModifiedDate
+        tools {
+            id
+            componentName
+            componentVersion
+            integrationInstanceId
+            name
+            enabled
+        }
+    }
+}

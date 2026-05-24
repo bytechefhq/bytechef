@@ -1,5 +1,6 @@
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import ConnectedUserSheetPanelIntegrationList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelIntegrationList';
+import ConnectedUserSheetPanelMcpServerList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelMcpServerList';
 import ConnectedUserSheetPanelProfile from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelProfile';
 import ConnectedUserSheetPanelWorkflowList from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanelWorkflowList';
 import {ConnectedUser} from '@/ee/shared/middleware/embedded/connected-user';
@@ -28,6 +29,10 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                         Integrations
                     </TabsTrigger>
 
+                    <TabsTrigger className={tabsTriggerClassName} value="mcp-servers">
+                        MCP Servers
+                    </TabsTrigger>
+
                     <TabsTrigger className={tabsTriggerClassName} value="workflows">
                         Automation Workflows
                     </TabsTrigger>
@@ -39,6 +44,12 @@ const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) 
                             connectedUserId={connectedUser.id!}
                             connectedUserIntegrationInstances={connectedUser.integrationInstances}
                         />
+                    )}
+                </TabsContent>
+
+                <TabsContent value="mcp-servers">
+                    {connectedUser.id != null && (
+                        <ConnectedUserSheetPanelMcpServerList connectedUserId={connectedUser.id} />
                     )}
                 </TabsContent>
 
