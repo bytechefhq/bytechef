@@ -42,5 +42,6 @@ export default function useAiSkillsLeftSidebar(): UseAiSkillsLeftSidebarI {
         filteredSkills,
         handleSearchChange: setSearch,
         isLoading,
+        search,
     };
 }

@@ -8,6 +8,7 @@ import AiSkillsLeftSidebar from '@/pages/automation/ai/skills/components/AiSkill
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
@@ -66,6 +67,23 @@ const AiSkills = () => {
             queryClient.invalidateQueries({queryKey: ['aiSkills']});
         });
     }, [queryClient]);
+
+    useEffect(() => {
+        return useCopilotStateContributorRegistry.getState()
+            .register(() => {
+                const {selectedSkillId: activeSkillId, skillsHeaderInfo: activeHeaderInfo} = useAiSkillsStore
+                    .getState();
+
+                if (activeSkillId == null) {
+                    return {};
+                }
+
+                return {
+                    currentSelectedSkillId: activeSkillId,
+                    currentSelectedSkillName: activeHeaderInfo.title,
+                };
+            });
+    }, []);
 
     const route = determineRoute(location.pathname, skillId);
 
