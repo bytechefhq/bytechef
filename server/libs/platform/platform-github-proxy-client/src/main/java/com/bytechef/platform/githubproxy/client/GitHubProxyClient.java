@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.githubproxy.client;
 
+import com.bytechef.platform.githubproxy.client.model.FileItem;
 import java.util.List;
 
 /**

@@ -44,7 +44,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.repository.CategoryRepository;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
-import com.bytechef.platform.githubproxy.client.FileItem;
+import com.bytechef.platform.githubproxy.client.model.FileItem;
 import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.repository.TagRepository;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;

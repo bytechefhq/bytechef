@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.githubproxy.client;
+package com.bytechef.platform.githubproxy.client.model;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import tools.jackson.databind.JsonNode;
 
 /**
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record WorkflowTemplate(
-    String slug, String title, String description, String shortDescription, String category, List<String> components,
-    String trigger, String triggerLabel, List<String> keyFeatures, List<String> prerequisites, String idealFor,
-    List<String> steps, JsonNode workflowDefinition, WorkflowTemplateAuthor author, String lastModifiedDate) {
+public record WorkflowTemplateSummary(
+    String slug, String title, String description, String category, List<String> components, String trigger,
+    String triggerLabel) {
 }

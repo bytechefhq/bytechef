@@ -21,22 +21,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "github-proxy")
 class GitHubProxyClientProperties {
 
-    private String baseUrl = "http://localhost:6123/gh";
-    private String workflowTemplatesBaseUrl = "http://localhost:6123";
+    private String baseUrl = "http://localhost:6123";
 
-    public String getGitHubBaseUrl() {
+    public String getBaseUrl() {
         return baseUrl;
     }
 
-    public void setGitHubBaseUrl(String baseUrl) {
+    public void setBaseUrl(String baseUrl) {
         this.baseUrl = baseUrl;
-    }
-
-    public String getWorkflowTemplatesBaseUrl() {
-        return workflowTemplatesBaseUrl;
-    }
-
-    public void setWorkflowTemplatesBaseUrl(String workflowTemplatesBaseUrl) {
-        this.workflowTemplatesBaseUrl = workflowTemplatesBaseUrl;
     }
 }

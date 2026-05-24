@@ -39,10 +39,7 @@ class GitHubProxyClientConfiguration {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-        RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getGitHubBaseUrl())
-            .requestFactory(new JdkClientHttpRequestFactory(httpClient))
-            .build();
+        RestClient restClient = getRestClient(properties, httpClient);
 
         return new RestGitHubProxyClient(restClient);
     }
@@ -54,11 +51,15 @@ class GitHubProxyClientConfiguration {
             .followRedirects(HttpClient.Redirect.NORMAL)
             .build();
 
-        RestClient restClient = RestClient.builder()
-            .baseUrl(properties.getWorkflowTemplatesBaseUrl())
-            .requestFactory(new JdkClientHttpRequestFactory(httpClient))
-            .build();
+        RestClient restClient = getRestClient(properties, httpClient);
 
         return new RestWorkflowTemplateProxyClient(restClient);
+    }
+
+    private static RestClient getRestClient(GitHubProxyClientProperties properties, HttpClient httpClient) {
+        return RestClient.builder()
+            .baseUrl(properties.getBaseUrl())
+            .requestFactory(new JdkClientHttpRequestFactory(httpClient))
+            .build();
     }
 }
