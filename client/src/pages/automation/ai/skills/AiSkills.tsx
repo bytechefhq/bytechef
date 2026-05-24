@@ -1,4 +1,11 @@
 import Button from '@/components/Button/Button';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
@@ -14,7 +21,7 @@ import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {DownloadIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
+import {DownloadIcon, MoreVerticalIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon, Trash2Icon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -108,19 +115,6 @@ const AiSkills = () => {
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Button
-                            icon={<PencilIcon className="size-4" />}
-                            onClick={handlers.onEdit}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Edit skill</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
                             disabled={!canSave || isSaving}
                             icon={<SaveIcon className="size-4" />}
                             onClick={handlers.onSave}
@@ -130,19 +124,6 @@ const AiSkills = () => {
                     </TooltipTrigger>
 
                     <TooltipContent>Save changes</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            icon={<DownloadIcon className="size-4" />}
-                            onClick={handlers.onDownload}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Download skill</TooltipContent>
                 </Tooltip>
 
                 {ff_4554 && (
@@ -160,6 +141,36 @@ const AiSkills = () => {
                         <TooltipContent>Open Copilot panel</TooltipContent>
                     </Tooltip>
                 )}
+
+                <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                        <Button
+                            aria-label="More actions"
+                            icon={<MoreVerticalIcon className="size-4" />}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={handlers.onEdit}>
+                            <PencilIcon className="mr-2 size-4" /> Edit Skill
+                        </DropdownMenuItem>
+
+                        <DropdownMenuItem onClick={handlers.onDownload}>
+                            <DownloadIcon className="mr-2 size-4" /> Download Skill
+                        </DropdownMenuItem>
+
+                        <DropdownMenuSeparator />
+
+                        <DropdownMenuItem
+                            className="text-content-destructive focus:text-content-destructive-primary"
+                            onClick={handlers.onDelete}
+                        >
+                            <Trash2Icon className="mr-2 size-4" /> Delete Skill
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             </div>
         );
     }

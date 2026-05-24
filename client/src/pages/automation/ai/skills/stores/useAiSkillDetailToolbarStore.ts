@@ -2,6 +2,7 @@ import {create} from 'zustand';
 
 interface ToolbarHandlersI {
     onCopilot: () => void;
+    onDelete: () => void;
     onDownload: () => void;
     onEdit: () => void;
     onSave: () => Promise<void>;

@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
@@ -159,6 +160,7 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
 
 const AiSkillDetail = () => {
     const [showEditDialog, setShowEditDialog] = useState(false);
+    const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [isContentDirty, setIsContentDirty] = useState(false);
 
     const latestContentRef = useRef('');
@@ -175,6 +177,7 @@ const AiSkillDetail = () => {
         editorLanguage,
         fileContent,
         fileTree,
+        handleDelete,
         handleDownload,
         handleFileSelect,
         handleSaveContent,
@@ -209,6 +212,7 @@ const AiSkillDetail = () => {
 
         setHandlers({
             onCopilot: openCopilot,
+            onDelete: () => setShowDeleteDialog(true),
             onDownload: handleDownload,
             onEdit: () => setShowEditDialog(true),
             onSave: save,
@@ -313,6 +317,17 @@ const AiSkillDetail = () => {
                         await handleUpdate(name, description);
 
                         setShowEditDialog(false);
+                    }}
+                />
+            )}
+
+            {showDeleteDialog && (
+                <AiSkillDeleteAlertDialog
+                    onClose={() => setShowDeleteDialog(false)}
+                    onDelete={async () => {
+                        setShowDeleteDialog(false);
+
+                        await handleDelete();
                     }}
                 />
             )}

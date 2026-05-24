@@ -4,11 +4,13 @@ import {
     useAiSkillFileContentQuery,
     useAiSkillFilePathsQuery,
     useAiSkillQuery,
+    useDeleteAiSkillMutation,
     useUpdateAiSkillContentMutation,
     useUpdateAiSkillMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useCallback, useEffect, useMemo, useState} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 interface FileTreeNodeI {
@@ -81,11 +83,15 @@ export default function useAiSkillDetail() {
 
     const {closeSkillDetail, selectedSkillId} = useAiSkillsStore();
 
+    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const {mutateAsync: updateAiSkillContent} = useUpdateAiSkillContentMutation();
     const {mutateAsync: updateAiSkill} = useUpdateAiSkillMutation({
         onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkill', {id: selectedSkillId}]}),
+    });
+    const {mutateAsync: deleteAiSkill} = useDeleteAiSkillMutation({
+        onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkills']}),
     });
 
     const {data: skillData, isError: isSkillError} = useAiSkillQuery(
@@ -167,6 +173,25 @@ export default function useAiSkillDetail() {
         setSelectedFilePath(path);
     }, []);
 
+    const handleDelete = useCallback(async () => {
+        if (!selectedSkillId) {
+            return;
+        }
+
+        try {
+            await deleteAiSkill({id: selectedSkillId});
+
+            toast.success('Skill deleted');
+
+            closeSkillDetail();
+            navigate('/automation/ai/skills');
+        } catch (error) {
+            toast.error('Failed to delete skill', {
+                description: error instanceof Error ? error.message : 'An unexpected error occurred',
+            });
+        }
+    }, [closeSkillDetail, deleteAiSkill, navigate, selectedSkillId]);
+
     const handleUpdate = useCallback(
         async (name: string, description: string | null) => {
             if (!selectedSkillId || !skill) {
@@ -232,6 +257,7 @@ export default function useAiSkillDetail() {
         fileContent,
         fileTree,
         handleBack,
+        handleDelete,
         handleDownload,
         handleFileSelect,
         handleSaveContent,
