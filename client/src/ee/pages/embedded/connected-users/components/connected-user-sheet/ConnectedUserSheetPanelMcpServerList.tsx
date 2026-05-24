@@ -15,7 +15,11 @@ const ConnectedUserSheetPanelMcpServerList = ({connectedUserId}: {connectedUserI
     return mcpServers.length > 0 ? (
         <div className="divide-y">
             {mcpServers.map((mcpServer) => (
-                <ConnectedUserMcpServerListItem key={mcpServer.id} mcpServer={mcpServer} />
+                <ConnectedUserMcpServerListItem
+                    connectedUserId={connectedUserId}
+                    key={mcpServer.id}
+                    mcpServer={mcpServer}
+                />
             ))}
         </div>
     ) : (

@@ -1,10 +1,27 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import {Switch} from '@/components/ui/switch';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemToolRow';
-import {ConnectedUserMcpServer} from '@/shared/middleware/graphql';
+import {ConnectedUserMcpServer, useEnableConnectedUserMcpServerMutation} from '@/shared/middleware/graphql';
+import {useQueryClient} from '@tanstack/react-query';
 import {twMerge} from 'tailwind-merge';
 
-const ConnectedUserMcpServerListItem = ({mcpServer}: {mcpServer: ConnectedUserMcpServer}) => {
+const ConnectedUserMcpServerListItem = ({
+    connectedUserId,
+    mcpServer,
+}: {
+    connectedUserId: number;
+    mcpServer: ConnectedUserMcpServer;
+}) => {
+    const queryClient = useQueryClient();
+
+    const enableConnectedUserMcpServerMutation = useEnableConnectedUserMcpServerMutation({
+        onSuccess: () => {
+            queryClient.invalidateQueries({queryKey: ['connectedUserMcpServers']});
+        },
+    });
+
     const toolCount = mcpServer.tools.length;
 
     const lastModifiedDate = mcpServer.lastModifiedDate ? new Date(Date.parse(mcpServer.lastModifiedDate)) : undefined;
@@ -29,15 +46,34 @@ const ConnectedUserMcpServerListItem = ({mcpServer}: {mcpServer: ConnectedUserMc
                     </div>
                 </CollapsibleTrigger>
 
-                {lastModifiedDate && (
-                    <Tooltip>
-                        <TooltipTrigger className="text-xs text-muted-foreground">
-                            {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
-                        </TooltipTrigger>
+                <div className="flex min-w-52 flex-col items-end gap-y-2">
+                    <div className="relative flex items-center">
+                        {enableConnectedUserMcpServerMutation.isPending && (
+                            <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                        )}
 
-                        <TooltipContent>Last Modified Date</TooltipContent>
-                    </Tooltip>
-                )}
+                        <Switch
+                            checked={mcpServer.enabled}
+                            onCheckedChange={(value) => {
+                                enableConnectedUserMcpServerMutation.mutate({
+                                    connectedUserId: connectedUserId.toString(),
+                                    enable: value,
+                                    mcpServerId: mcpServer.id,
+                                });
+                            }}
+                        />
+                    </div>
+
+                    {lastModifiedDate && (
+                        <Tooltip>
+                            <TooltipTrigger className="text-xs text-muted-foreground">
+                                {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
+                            </TooltipTrigger>
+
+                            <TooltipContent>Last Modified Date</TooltipContent>
+                        </Tooltip>
+                    )}
+                </div>
             </div>
 
             <CollapsibleContent>
