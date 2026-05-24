@@ -1,12 +1,15 @@
 import {useCreateAiSkillFromInstructionsMutation, useCreateAiSkillMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {type ChangeEvent, type DragEvent, useCallback, useRef, useState} from 'react';
-import {useNavigate} from 'react-router-dom';
 import {toast} from 'sonner';
 
 const ACCEPTED_EXTENSIONS = ['.zip', '.skill', '.md'];
 
-export default function useAiSkillUploadForm() {
+interface UseAiSkillUploadFormOptionsI {
+    onSuccess?: () => void;
+}
+
+export default function useAiSkillUploadForm({onSuccess}: UseAiSkillUploadFormOptionsI = {}) {
     const [dragActive, setDragActive] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
@@ -15,7 +18,6 @@ export default function useAiSkillUploadForm() {
     const completedCountRef = useRef(0);
     const successCountRef = useRef(0);
 
-    const navigate = useNavigate();
     const queryClient = useQueryClient();
 
     const createSkillMutation = useCreateAiSkillMutation();
@@ -31,7 +33,7 @@ export default function useAiSkillUploadForm() {
         if (failedCount === 0) {
             setSelectedFiles([]);
 
-            navigate('/automation/ai/skills');
+            onSuccess?.();
         } else {
             toast.error(
                 `${successCount} of ${totalCount} skills created, ${failedCount} failed. Fix issues and retry.`
@@ -41,7 +43,7 @@ export default function useAiSkillUploadForm() {
         completedCountRef.current = 0;
         totalToUploadRef.current = 0;
         successCountRef.current = 0;
-    }, [navigate, queryClient]);
+    }, [onSuccess, queryClient]);
 
     const handleFilesSelect = useCallback((files: File[]) => {
         const validFiles = files.filter((file) => {

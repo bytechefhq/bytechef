@@ -1,6 +1,6 @@
 import {create} from 'zustand';
 
-type SkillsViewType = 'detail' | 'empty' | 'list' | 'uploadForm' | 'writeForm';
+type SkillsViewType = 'detail' | 'empty' | 'list';
 
 interface SkillsHeaderInfoI {
     subtitle?: string;
@@ -11,8 +11,6 @@ const SKILLS_HEADER_INFO: Record<SkillsViewType, SkillsHeaderInfoI> = {
     detail: {},
     empty: {},
     list: {title: 'Skills'},
-    uploadForm: {subtitle: 'Upload a file to create a skill.', title: 'Upload Skill Files'},
-    writeForm: {subtitle: 'Write a name, description, and instructions for the skill.', title: 'Add a Skill'},
 };
 
 interface AiSkillsStoreI {
