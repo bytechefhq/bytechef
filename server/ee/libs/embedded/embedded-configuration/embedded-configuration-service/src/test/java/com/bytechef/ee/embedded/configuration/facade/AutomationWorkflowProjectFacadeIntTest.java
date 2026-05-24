@@ -16,7 +16,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
-import com.bytechef.automation.configuration.facade.ConnectionReassignmentFacade;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
@@ -86,8 +85,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionReassignmentFacade.class,
-    ConnectionService.class, EnvironmentService.class,
+    ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class,
     GitHubProxyClient.class, JobFacade.class, JobService.class, OAuth2ParametersFacade.class,
     OAuth2Service.class, PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class,
