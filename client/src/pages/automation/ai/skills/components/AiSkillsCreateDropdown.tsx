@@ -46,10 +46,7 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
 
                 <DropdownMenuContent align="end" className="w-72">
                     {ff_4554 && (
-                        <DropdownMenuItem
-                            className="flex flex-col items-start gap-0.5 p-3"
-                            onClick={openCreateWithAi}
-                        >
+                        <DropdownMenuItem className="flex flex-col items-start gap-0.5 p-3" onClick={openCreateWithAi}>
                             <div className="flex items-center gap-2 font-medium">
                                 <SparklesIcon className="size-4" />
                                 Create With AI
@@ -91,17 +88,9 @@ const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => 
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            <AiSkillUploadDialog
-                onCreated={handleCreated}
-                onOpenChange={setShowUploadDialog}
-                open={showUploadDialog}
-            />
+            <AiSkillUploadDialog onCreated={handleCreated} onOpenChange={setShowUploadDialog} open={showUploadDialog} />
 
-            <AiSkillWriteDialog
-                onCreated={handleCreated}
-                onOpenChange={setShowWriteDialog}
-                open={showWriteDialog}
-            />
+            <AiSkillWriteDialog onCreated={handleCreated} onOpenChange={setShowWriteDialog} open={showWriteDialog} />
         </>
     );
 };

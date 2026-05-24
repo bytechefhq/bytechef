@@ -240,10 +240,9 @@ export default function useAiSkillDetail() {
 
                 await updateAiSkillContent({content, id: selectedSkillId, path: selectedFilePath});
 
-                queryClient.setQueryData(
-                    ['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}],
-                    {aiSkillFileContent: content}
-                );
+                queryClient.setQueryData(['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}], {
+                    aiSkillFileContent: content,
+                });
                 queryClient.invalidateQueries({
                     queryKey: ['aiSkillFileContent', {id: selectedSkillId, path: selectedFilePath}],
                 });

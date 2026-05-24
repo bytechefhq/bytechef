@@ -77,9 +77,7 @@ const AiSkillWriteDialog = ({onCreated, onOpenChange, open}: AiSkillWriteDialogP
                     </Button>
 
                     <Button
-                        disabled={
-                            !name.trim() || !instructions.trim() || createSkillFromInstructionsMutation.isPending
-                        }
+                        disabled={!name.trim() || !instructions.trim() || createSkillFromInstructionsMutation.isPending}
                         onClick={handleCreateFromInstructions}
                     >
                         {createSkillFromInstructionsMutation.isPending ? 'Creating...' : 'Create'}

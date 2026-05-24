@@ -23,8 +23,7 @@ export default function useAiSkillsLeftSidebar(): UseAiSkillsLeftSidebarI {
     const collator = useMemo(() => new Intl.Collator(undefined, {numeric: true, sensitivity: 'base'}), []);
 
     const filteredSkills = useMemo(() => {
-        const query = search.trim()
-            .toLowerCase();
+        const query = search.trim().toLowerCase();
         const skills = [...(data?.aiSkills ?? [])].sort((skillA, skillB) =>
             collator.compare(skillA.name.trim(), skillB.name.trim())
         );
@@ -33,8 +32,7 @@ export default function useAiSkillsLeftSidebar(): UseAiSkillsLeftSidebarI {
             return skills;
         }
 
-        return skills.filter((skill) => skill.name.toLowerCase()
-            .includes(query));
+        return skills.filter((skill) => skill.name.toLowerCase().includes(query));
     }, [data, search, collator]);
 
     return {
