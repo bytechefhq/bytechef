@@ -3,8 +3,11 @@ import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useQueryClient} from '@tanstack/react-query';
 import {SearchIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
@@ -42,6 +45,14 @@ const AiSkills = () => {
     const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.SKILLS, () => {
+            queryClient.invalidateQueries({queryKey: ['aiSkills']});
+        });
+    }, [queryClient]);
 
     const route = determineRoute(location.pathname, skillId);
 
