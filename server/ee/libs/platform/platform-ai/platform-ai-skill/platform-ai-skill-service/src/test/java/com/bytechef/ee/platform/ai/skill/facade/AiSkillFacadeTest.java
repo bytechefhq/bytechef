@@ -83,7 +83,7 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Test Skill");
+        expectedAiSkill.setName("test-skill");
         expectedAiSkill.setDescription("A test skill");
         expectedAiSkill.setSkillFile(fileEntry);
 
@@ -93,13 +93,13 @@ class AiSkillFacadeTest {
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
         AiSkill result = aiSkillFacade.createAiSkill(
-            "Test Skill", "A test skill", "test.skill", zipBytes);
+            "test-skill", "A test skill", "test.skill", zipBytes);
 
         assertEquals(expectedAiSkill, result);
 
         verify(aiSkillFileStorage).storeAiSkillFile(eq("test.skill"), eq(zipBytes));
         verify(aiSkillService)
-            .createAiSkill(argThat(aiSkill -> "Test Skill".equals(aiSkill.getName())
+            .createAiSkill(argThat(aiSkill -> "test-skill".equals(aiSkill.getName())
                 && "A test skill".equals(aiSkill.getDescription())));
     }
 
@@ -110,45 +110,45 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Frontmatter Name");
+        expectedAiSkill.setName("frontmatter-name");
         expectedAiSkill.setDescription("Frontmatter Description");
         expectedAiSkill.setSkillFile(fileEntry);
 
         String skillMdContent =
-            "---\nname: Frontmatter Name\ndescription: Frontmatter Description\n---\n\nInstructions";
+            "---\nname: frontmatter-name\ndescription: Frontmatter Description\n---\n\nInstructions";
 
         byte[] zipBytes = createZipBytes("SKILL.md", skillMdContent);
 
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), any(byte[].class))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Original Name", "Original Description", "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("original-name", "Original Description", "test.skill", zipBytes);
 
         verify(aiSkillService).createAiSkill(
-            argThat(aiSkill -> "Frontmatter Name".equals(aiSkill.getName())
+            argThat(aiSkill -> "frontmatter-name".equals(aiSkill.getName())
                 && "Frontmatter Description".equals(aiSkill.getDescription())));
     }
 
     @Test
     void testCreateAiSkillFromInstructions() throws IOException {
-        FileEntry fileEntry = new FileEntry("mySkill.skill", "file:///storage/mySkill.skill");
+        FileEntry fileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
 
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("mySkill");
+        expectedAiSkill.setName("my-skill");
         expectedAiSkill.setSkillFile(fileEntry);
 
-        when(aiSkillFileStorage.storeAiSkillFile(eq("mySkill.skill"), any(byte[].class)))
+        when(aiSkillFileStorage.storeAiSkillFile(eq("my-skill.skill"), any(byte[].class)))
             .thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
         AiSkill result = aiSkillFacade.createAiSkillFromInstructions(
-            "mySkill", "My description", "Do something useful");
+            "my-skill", "My description", "Do something useful");
 
         assertEquals(expectedAiSkill, result);
 
-        verify(aiSkillFileStorage).storeAiSkillFile(eq("mySkill.skill"), argThat(zipBytes -> {
+        verify(aiSkillFileStorage).storeAiSkillFile(eq("my-skill.skill"), argThat(zipBytes -> {
             try (ZipInputStream zipInputStream =
                 new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
 
@@ -161,7 +161,7 @@ class AiSkillFacadeTest {
                 String content = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
                 return content.contains("---") &&
-                    content.contains("name: \"mySkill\"") &&
+                    content.contains("name: \"my-skill\"") &&
                     content.contains("description: \"My description\"") &&
                     content.contains("Do something useful");
             } catch (IOException ioException) {
@@ -202,15 +202,15 @@ class AiSkillFacadeTest {
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
-        when(aiSkillService.existsByName("Duplicate")).thenReturn(true);
-        when(aiSkillService.existsByName("Duplicate (2)")).thenReturn(false);
+        when(aiSkillService.existsByName("duplicate")).thenReturn(true);
+        when(aiSkillService.existsByName("duplicate-2")).thenReturn(false);
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Duplicate", null, "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("duplicate", null, "test.skill", zipBytes);
 
         verify(aiSkillService).createAiSkill(
-            argThat(aiSkill -> "Duplicate (2)".equals(aiSkill.getName())));
+            argThat(aiSkill -> "duplicate-2".equals(aiSkill.getName())));
     }
 
     @Test
@@ -222,7 +222,7 @@ class AiSkillFacadeTest {
         AiSkill aiSkill = new AiSkill();
 
         aiSkill.setId(skillId);
-        aiSkill.setName("Test Skill");
+        aiSkill.setName("test-skill");
         aiSkill.setSkillFile(fileEntry);
 
         when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
@@ -257,7 +257,7 @@ class AiSkillFacadeTest {
         AiSkill aiSkill = new AiSkill();
 
         aiSkill.setId(skillId);
-        aiSkill.setName("Test Skill");
+        aiSkill.setName("test-skill");
         aiSkill.setSkillFile(fileEntry);
 
         when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
@@ -292,7 +292,7 @@ class AiSkillFacadeTest {
         AiSkill aiSkill = new AiSkill();
 
         aiSkill.setId(skillId);
-        aiSkill.setName("Test Skill");
+        aiSkill.setName("test-skill");
         aiSkill.setSkillFile(fileEntry);
 
         when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
@@ -310,17 +310,17 @@ class AiSkillFacadeTest {
         AiSkill updatedAiSkill = new AiSkill();
 
         updatedAiSkill.setId(skillId);
-        updatedAiSkill.setName("Updated Name");
+        updatedAiSkill.setName("updated-name");
         updatedAiSkill.setDescription("Updated Description");
 
-        when(aiSkillService.updateAiSkill(skillId, "Updated Name", "Updated Description"))
+        when(aiSkillService.updateAiSkill(skillId, "updated-name", "Updated Description"))
             .thenReturn(updatedAiSkill);
 
-        AiSkill result = aiSkillFacade.updateAiSkill(skillId, "Updated Name", "Updated Description");
+        AiSkill result = aiSkillFacade.updateAiSkill(skillId, "updated-name", "Updated Description");
 
-        assertEquals("Updated Name", result.getName());
+        assertEquals("updated-name", result.getName());
 
-        verify(aiSkillService).updateAiSkill(skillId, "Updated Name", "Updated Description");
+        verify(aiSkillService).updateAiSkill(skillId, "updated-name", "Updated Description");
     }
 
     @Test
@@ -337,7 +337,7 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Test Skill");
+        expectedAiSkill.setName("test-skill");
         expectedAiSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
@@ -345,7 +345,7 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(eq("uploaded.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Test Skill", null, "uploaded.zip", zipBytes);
+        aiSkillFacade.createAiSkill("test-skill", null, "uploaded.zip", zipBytes);
 
         verify(aiSkillFileStorage).storeAiSkillFile(eq("uploaded.skill"), eq(zipBytes));
     }
@@ -375,7 +375,7 @@ class AiSkillFacadeTest {
     }
 
     @Test
-    void testCreateAiSkillFromInstructionsEscapesYamlSpecialCharacters() throws IOException {
+    void testCreateAiSkillFromInstructionsEscapesYamlSpecialCharactersInDescription() throws IOException {
         FileEntry fileEntry = new FileEntry("test.skill", "file:///storage/test.skill");
 
         AiSkill expectedAiSkill = new AiSkill();
@@ -386,8 +386,12 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(any(), any(byte[].class))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
+        // The name field is now strictly validated against the agentskills.io regex (lowercase
+        // alphanumeric + hyphens only), so injection-style names are rejected upfront. Description has
+        // no content restrictions other than length, so it remains the place where YAML escaping
+        // matters — embedded newlines + a fake closing delimiter must not break out of the value.
         aiSkillFacade.createAiSkillFromInstructions(
-            "evil\n---\ninjected: true", "desc with \"quotes\"", "instructions");
+            "evil-skill", "desc with \"quotes\"\n---\ninjected: true", "instructions");
 
         verify(aiSkillFileStorage).storeAiSkillFile(any(), argThat(zipBytes -> {
             try (ZipInputStream zipInputStream =
@@ -401,9 +405,8 @@ class AiSkillFacadeTest {
 
                 String content = new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
 
-                // The newlines in the name should be escaped to literal \n inside quotes
-                // so "injected: true" does NOT appear as a standalone YAML key-value pair
-                return content.contains("name: \"evil\\n---\\ninjected: true\"") &&
+                return content.contains(
+                    "description: \"desc with \\\"quotes\\\"\\n---\\ninjected: true\"") &&
                     !content.contains("\ninjected: true");
             } catch (IOException ioException) {
                 return false;
@@ -413,14 +416,14 @@ class AiSkillFacadeTest {
 
     @Test
     void testUpdateAiSkillDuplicateNameThrows() {
-        when(aiSkillService.updateAiSkill(1L, "Existing Name", "description"))
+        when(aiSkillService.updateAiSkill(1L, "existing-name", "description"))
             .thenThrow(new DataIntegrityViolationException(
                 "unique constraint violated",
                 new SQLException("duplicate key value violates unique constraint", "23505")));
 
         IllegalArgumentException exception = assertThrows(
             IllegalArgumentException.class,
-            () -> aiSkillFacade.updateAiSkill(1L, "Existing Name", "description"));
+            () -> aiSkillFacade.updateAiSkill(1L, "existing-name", "description"));
 
         assertTrue(exception.getMessage()
             .contains("already exists"));
@@ -433,7 +436,7 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Test Skill");
+        expectedAiSkill.setName("test-skill");
         expectedAiSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
@@ -441,7 +444,7 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Test Skill", null, "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("test-skill", null, "test.skill", zipBytes);
 
         List<TransactionSynchronization> synchronizations =
             TransactionSynchronizationManager.getSynchronizations();
@@ -461,39 +464,39 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Test Skill (2)");
+        expectedAiSkill.setName("test-skill-2");
         expectedAiSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
-        when(aiSkillService.existsByName("Test Skill"))
+        when(aiSkillService.existsByName("test-skill"))
             .thenReturn(false)
             .thenReturn(true);
-        when(aiSkillService.existsByName("Test Skill (2)")).thenReturn(false);
+        when(aiSkillService.existsByName("test-skill-2")).thenReturn(false);
         when(aiSkillService.createAiSkill(any(AiSkill.class)))
             .thenThrow(new DataIntegrityViolationException(
                 "unique constraint violated",
                 new SQLException("duplicate key value violates unique constraint", "23505")))
             .thenReturn(expectedAiSkill);
 
-        AiSkill result = aiSkillFacade.createAiSkill("Test Skill", null, "test.skill", zipBytes);
+        AiSkill result = aiSkillFacade.createAiSkill("test-skill", null, "test.skill", zipBytes);
 
         assertEquals(expectedAiSkill, result);
 
-        verify(aiSkillService).existsByName("Test Skill (2)");
+        verify(aiSkillService).existsByName("test-skill-2");
     }
 
     @Test
     void testUpdateAiSkillNonNameConstraintViolationPropagates() {
-        when(aiSkillService.updateAiSkill(1L, "Valid Name", "description"))
+        when(aiSkillService.updateAiSkill(1L, "valid-name", "description"))
             .thenThrow(new DataIntegrityViolationException(
                 "foreign key constraint violated",
                 new SQLException("referential integrity violation", "23503")));
 
         assertThrows(
             DataIntegrityViolationException.class,
-            () -> aiSkillFacade.updateAiSkill(1L, "Valid Name", "description"));
+            () -> aiSkillFacade.updateAiSkill(1L, "valid-name", "description"));
     }
 
     @Test
@@ -503,7 +506,7 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Provided Name");
+        expectedAiSkill.setName("provided-name");
         expectedAiSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "Just some instructions without frontmatter");
@@ -511,10 +514,10 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Provided Name", "Provided Desc", "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("provided-name", "Provided Desc", "test.skill", zipBytes);
 
         verify(aiSkillService).createAiSkill(
-            argThat(aiSkill -> "Provided Name".equals(aiSkill.getName())
+            argThat(aiSkill -> "provided-name".equals(aiSkill.getName())
                 && "Provided Desc".equals(aiSkill.getDescription())));
     }
 
@@ -525,7 +528,7 @@ class AiSkillFacadeTest {
         AiSkill expectedAiSkill = new AiSkill();
 
         expectedAiSkill.setId(1L);
-        expectedAiSkill.setName("Provided Name");
+        expectedAiSkill.setName("provided-name");
         expectedAiSkill.setSkillFile(fileEntry);
 
         byte[] zipBytes = createZipBytes("SKILL.md", "---\nname: Unclosed\nInstructions without closing delimiter");
@@ -533,10 +536,10 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Provided Name", "Provided Desc", "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("provided-name", "Provided Desc", "test.skill", zipBytes);
 
         verify(aiSkillService).createAiSkill(
-            argThat(aiSkill -> "Provided Name".equals(aiSkill.getName())
+            argThat(aiSkill -> "provided-name".equals(aiSkill.getName())
                 && "Provided Desc".equals(aiSkill.getDescription())));
     }
 
@@ -551,20 +554,20 @@ class AiSkillFacadeTest {
 
         byte[] zipBytes = createZipBytes("SKILL.md", "content");
 
-        when(aiSkillService.existsByName("Popular")).thenReturn(true);
+        when(aiSkillService.existsByName("popular")).thenReturn(true);
 
         for (int suffix = 2; suffix <= 100; suffix++) {
-            when(aiSkillService.existsByName("Popular (" + suffix + ")")).thenReturn(true);
+            when(aiSkillService.existsByName("popular-" + suffix)).thenReturn(true);
         }
 
         when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        aiSkillFacade.createAiSkill("Popular", null, "test.skill", zipBytes);
+        aiSkillFacade.createAiSkill("popular", null, "test.skill", zipBytes);
 
         verify(aiSkillService).createAiSkill(
             argThat(aiSkill -> aiSkill.getName()
-                .matches("Popular \\(\\d{13,}\\)")));
+                .matches("popular-\\d{13,}")));
     }
 
     @Test
@@ -588,7 +591,7 @@ class AiSkillFacadeTest {
         AiSkill aiSkill = new AiSkill();
 
         aiSkill.setId(skillId);
-        aiSkill.setName("Test Skill");
+        aiSkill.setName("test-skill");
         aiSkill.setSkillFile(fileEntry);
 
         when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
