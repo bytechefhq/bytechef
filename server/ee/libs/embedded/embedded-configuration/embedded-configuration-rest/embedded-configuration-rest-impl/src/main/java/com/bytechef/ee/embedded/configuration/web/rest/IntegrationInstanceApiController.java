@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.web.rest.model.IntegrationInstanceModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,11 +31,20 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
     private final ConversionService conversionService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
 
+    @SuppressFBWarnings("EI")
     public IntegrationInstanceApiController(
         ConversionService conversionService, IntegrationInstanceFacade integrationInstanceFacade) {
 
         this.conversionService = conversionService;
         this.integrationInstanceFacade = integrationInstanceFacade;
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteIntegrationInstance(Long id) {
+        integrationInstanceFacade.deleteIntegrationInstance(id);
+
+        return ResponseEntity.noContent()
+            .build();
     }
 
     @Override

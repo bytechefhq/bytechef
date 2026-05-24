@@ -103,6 +103,20 @@ public class IntegrationInstanceFacadeImpl implements IntegrationInstanceFacade 
     }
 
     @Override
+    public void deleteIntegrationInstance(long integrationInstanceId) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
+            integrationInstanceId);
+
+        if (integrationInstance.isEnabled()) {
+            enableIntegrationInstanceWorkflowTriggers(integrationInstanceId, false);
+        }
+
+        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
+        integrationInstanceService.delete(integrationInstanceId);
+    }
+
+    @Override
     public void enableIntegrationInstance(long integrationInstanceId, boolean enable) {
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(
             integrationInstanceId);
