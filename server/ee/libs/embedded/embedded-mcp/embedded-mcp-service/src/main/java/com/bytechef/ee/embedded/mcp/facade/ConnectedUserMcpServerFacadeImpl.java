@@ -60,6 +60,41 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    public void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId) {
+        // Remove every per-user tool row whose underlying McpComponent points at the given server.
+        // Since the read query rebuilds the (server -> tools) shape from these rows, removing them
+        // makes the server vanish from this user's MCP Servers tab without any soft-delete flag.
+        Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            List<McpIntegrationInstanceTool> toolRows = mcpIntegrationInstanceToolService
+                .getMcpIntegrationInstanceTools(integrationInstance.getId());
+
+            for (McpIntegrationInstanceTool toolRow : toolRows) {
+                Optional<McpTool> mcpToolOptional = mcpToolService.fetchMcpTool(toolRow.getMcpToolId());
+
+                if (mcpToolOptional.isEmpty()) {
+                    continue;
+                }
+
+                McpTool mcpTool = mcpToolOptional.get();
+
+                McpComponent mcpComponent = mcpComponentCache.computeIfAbsent(
+                    mcpTool.getMcpComponentId(), mcpComponentService::getMcpComponent);
+
+                if (mcpComponent.getMcpServerId() != mcpServerId) {
+                    continue;
+                }
+
+                mcpIntegrationInstanceToolService.delete(toolRow.getId());
+            }
+        }
+    }
+
+    @Override
     public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
         // Bulk-flip every per-user tool whose underlying McpComponent points at the given server.
         // Computed "server enabled for user" = any tool enabled; toggling the card thus disables or

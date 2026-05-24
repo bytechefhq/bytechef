@@ -17,6 +17,8 @@ import java.util.List;
  */
 public interface ConnectedUserMcpServerFacade {
 
+    void deleteConnectedUserMcpServer(long connectedUserId, long mcpServerId);
+
     void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable);
 
     void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable);

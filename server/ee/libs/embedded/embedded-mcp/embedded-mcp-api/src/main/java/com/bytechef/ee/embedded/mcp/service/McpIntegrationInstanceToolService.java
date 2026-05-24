@@ -21,6 +21,8 @@ public interface McpIntegrationInstanceToolService {
     McpIntegrationInstanceTool createMcpIntegrationInstanceTool(
         long integrationInstanceId, long mcpToolId, boolean enabled);
 
+    void delete(long id);
+
     void deleteByIntegrationInstanceId(long integrationInstanceId);
 
     void deleteByMcpToolId(long mcpToolId);

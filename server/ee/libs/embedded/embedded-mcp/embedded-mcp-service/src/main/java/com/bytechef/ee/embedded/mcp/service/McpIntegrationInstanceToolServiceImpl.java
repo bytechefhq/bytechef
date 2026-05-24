@@ -36,6 +36,11 @@ public class McpIntegrationInstanceToolServiceImpl implements McpIntegrationInst
     }
 
     @Override
+    public void delete(long id) {
+        mcpIntegrationInstanceToolRepository.deleteById(id);
+    }
+
+    @Override
     public void deleteByIntegrationInstanceId(long integrationInstanceId) {
         mcpIntegrationInstanceToolRepository.deleteByIntegrationInstanceId(integrationInstanceId);
     }
