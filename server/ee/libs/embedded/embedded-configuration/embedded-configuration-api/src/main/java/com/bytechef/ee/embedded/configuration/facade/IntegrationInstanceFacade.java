@@ -17,6 +17,8 @@ import java.util.Map;
  */
 public interface IntegrationInstanceFacade {
 
+    void deleteIntegrationInstance(long integrationInstanceId);
+
     void enableIntegrationInstance(long integrationInstanceId, boolean enable);
 
     void enableIntegrationInstanceWorkflow(long integrationInstanceId, String workflowId, boolean enable);
