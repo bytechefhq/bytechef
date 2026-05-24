@@ -78,7 +78,7 @@ const AiSkills = () => {
         return useCopilotPostTurnRegistry.getState().register(Source.SKILLS, () => {
             queryClient.invalidateQueries({queryKey: ['aiSkills']});
         });
-    }, [queryClient]);
+    }, [queryClient, skillsView]);
 
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {

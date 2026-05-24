@@ -1,7 +1,9 @@
 import PageLoader from '@/components/PageLoader';
 import {Input} from '@/components/ui/input';
 import useAiSkillsLeftSidebar from '@/pages/automation/ai/skills/hooks/useAiSkillsLeftSidebar';
+import getSkillColor from '@/pages/automation/ai/skills/utils/getSkillColor';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {ZapIcon} from 'lucide-react';
 
 interface AiSkillsLeftSidebarProps {
     currentId?: string;
@@ -30,6 +32,13 @@ const AiSkillsLeftSidebar = ({currentId}: AiSkillsLeftSidebarProps) => {
 
                                     return (
                                         <LeftSidebarNavItem
+                                            icon={
+                                                <div
+                                                    className={`flex size-5 shrink-0 items-center justify-center rounded ${getSkillColor(skill.id)}`}
+                                                >
+                                                    <ZapIcon className="size-3 text-white" />
+                                                </div>
+                                            }
                                             item={{current: active, name: skill.name}}
                                             key={skill.id}
                                             toLink={`/automation/ai/skills/${skill.id}`}
