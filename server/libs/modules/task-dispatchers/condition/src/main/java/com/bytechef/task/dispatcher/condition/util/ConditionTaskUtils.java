@@ -24,17 +24,29 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.task.dispatcher.condition.constant.ConditionTaskDispatcherConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.SimpleEvaluationContext;
 import tools.jackson.core.type.TypeReference;
 
 /**
  * Utility class for evaluating condition expressions in workflow condition dispatchers.
+ *
+ * <p>
+ * <b>Security:</b> Expression evaluation runs against a {@link SimpleEvaluationContext} that disables Java type
+ * references ({@code T(...)}), constructors, and bean references. Method resolution is limited to instance methods via
+ * {@code withInstanceMethods()}, which blocks static methods as well as methods declared on {@link Object},
+ * {@link Class}, and {@link ClassLoader}. This closes the SpEL-injection sink reported in
+ * <a href="https://github.com/bytechefhq/bytechef/issues/5081">#5081</a> that was independent of the
+ * {@code SpelEvaluator} hardening in #5035.
  *
  * @author Matija Petanjek
  */
@@ -42,34 +54,19 @@ public class ConditionTaskUtils {
 
     private static final ExpressionParser expressionParser = new SpelExpressionParser();
 
-    /**
-     * Resolves the condition case by evaluating the expression from the task execution parameters.
-     *
-     * <p>
-     * <b>Security Note:</b> SpEL expression evaluation is an intentional core feature for workflow condition branching.
-     * This component evaluates conditions defined by workflow creators to determine workflow execution paths. The
-     * SPEL_INJECTION suppression is appropriate because:
-     *
-     * <ul>
-     * <li>Condition evaluation is the primary purpose of this component</li>
-     * <li>Expressions are constructed from predefined templates with URL-encoded user values</li>
-     * <li>Only specific comparison operations are supported (equals, contains, regex, etc.)</li>
-     * <li>Workflow conditions are authored by trusted users with platform access</li>
-     * </ul>
-     *
-     * <p>
-     * The REDOS suppression is for the regex pattern matching operations that are part of condition evaluation.
-     */
+    // SPEL_INJECTION is suppressed because SpotBugs flags any non-constant string flowing into
+    // SpelExpressionParser. The actual sink reported in #5081 is closed by evaluating against the
+    // SimpleEvaluationContext built below, which forbids T(...), constructors, bean references,
+    // and methods on Object/Class/ClassLoader.
     @SuppressFBWarnings({
         "SPEL_INJECTION", "REDOS"
     })
     public static boolean resolveCase(TaskExecution conditionTaskExecution) {
-        Boolean result;
+        Map<String, Object> variables = new LinkedHashMap<>();
+        String expression;
 
         if (MapUtils.getBoolean(conditionTaskExecution.getParameters(), RAW_EXPRESSION, false)) {
-            result = expressionParser
-                .parseExpression(MapUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION))
-                .getValue(Boolean.class);
+            expression = MapUtils.getString(conditionTaskExecution.getParameters(), EXPRESSION);
         } else {
             List<List<Map<String, ?>>> conditions = MapUtils.getList(
                 conditionTaskExecution.getParameters(), ConditionTaskDispatcherConstants.CONDITIONS,
@@ -78,18 +75,27 @@ public class ConditionTaskUtils {
             List<String> conditionExpressions = new ArrayList<>();
 
             for (List<Map<String, ?>> andConditions : conditions) {
-                conditionExpressions.add(String.join(" && ", getConditionExpressions(andConditions)));
+                conditionExpressions.add(String.join(" && ", getConditionExpressions(andConditions, variables)));
             }
 
-            result = expressionParser
-                .parseExpression(String.join(" || ", conditionExpressions))
-                .getValue(Boolean.class);
+            expression = String.join(" || ", conditionExpressions);
         }
+
+        EvaluationContext evaluationContext = SimpleEvaluationContext.forReadOnlyDataBinding()
+            .withInstanceMethods()
+            .build();
+
+        variables.forEach(evaluationContext::setVariable);
+
+        Boolean result = expressionParser.parseExpression(expression)
+            .getValue(evaluationContext, Boolean.class);
 
         return result != null && result;
     }
 
-    private static List<String> getConditionExpressions(List<Map<String, ?>> conditions) {
+    private static List<String> getConditionExpressions(
+        List<Map<String, ?>> conditions, Map<String, Object> variables) {
+
         List<String> conditionExpressions = new ArrayList<>();
 
         for (Map<String, ?> condition : conditions) {
@@ -102,15 +108,30 @@ public class ConditionTaskUtils {
             String value1 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_1, "");
             String value2 = MapUtils.getString(condition, ConditionTaskDispatcherConstants.VALUE_2, "");
 
-            if (operandType.equals(ConditionTaskDispatcherConstants.STRING)) {
-                value1 = EncodingUtils.urlEncode(value1);
-                value2 = EncodingUtils.urlEncode(value2);
+            String replacement1;
+            String replacement2;
+
+            if (operandType.equals(ConditionTaskDispatcherConstants.DATE_TIME)) {
+                String variableName1 = "dt" + variables.size();
+                String variableName2 = "dt" + (variables.size() + 1);
+
+                variables.put(variableName1, LocalDateTime.parse(value1));
+                variables.put(variableName2, LocalDateTime.parse(value2));
+
+                replacement1 = "#" + variableName1;
+                replacement2 = "#" + variableName2;
+            } else if (operandType.equals(ConditionTaskDispatcherConstants.STRING)) {
+                replacement1 = EncodingUtils.urlEncode(value1);
+                replacement2 = EncodingUtils.urlEncode(value2);
+            } else {
+                replacement1 = value1;
+                replacement2 = value2;
             }
 
             conditionExpressions.add(
                 conditionTemplate
-                    .replace("${value1}", value1)
-                    .replace("${value2}", value2));
+                    .replace("${value1}", replacement1)
+                    .replace("${value2}", replacement2));
         }
 
         return conditionExpressions;
@@ -130,10 +151,10 @@ public class ConditionTaskUtils {
             Map.ofEntries(
                 Map.entry(
                     ConditionTaskDispatcherConstants.Operation.AFTER.name(),
-                    "T(java.time.LocalDateTime).parse('${value1}').isAfter(T(java.time.LocalDateTime).parse('${value2}'))"),
+                    "${value1}.isAfter(${value2})"),
                 Map.entry(
                     ConditionTaskDispatcherConstants.Operation.BEFORE.name(),
-                    "T(java.time.LocalDateTime).parse('${value1}').isBefore(T(java.time.LocalDateTime).parse('${value2}'))")));
+                    "${value1}.isBefore(${value2})")));
 
         conditionTemplates.put(
             ConditionTaskDispatcherConstants.NUMBER,
