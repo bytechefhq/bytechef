@@ -1,0 +1,3 @@
+mutation deleteConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
+    deleteConnectedUserMcpServer(connectedUserId: $connectedUserId, mcpServerId: $mcpServerId)
+}

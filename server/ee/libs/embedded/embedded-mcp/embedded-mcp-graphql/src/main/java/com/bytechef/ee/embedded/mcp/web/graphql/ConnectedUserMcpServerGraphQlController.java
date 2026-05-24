@@ -42,6 +42,13 @@ class ConnectedUserMcpServerGraphQlController {
     }
 
     @MutationMapping
+    boolean deleteConnectedUserMcpServer(@Argument long connectedUserId, @Argument long mcpServerId) {
+        connectedUserMcpServerFacade.deleteConnectedUserMcpServer(connectedUserId, mcpServerId);
+
+        return true;
+    }
+
+    @MutationMapping
     boolean enableConnectedUserMcpServer(
         @Argument long connectedUserId, @Argument long mcpServerId, @Argument boolean enable) {
 
