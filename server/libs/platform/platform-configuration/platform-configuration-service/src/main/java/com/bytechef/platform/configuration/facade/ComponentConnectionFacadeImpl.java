@@ -97,19 +97,19 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
 
         List<ComponentConnection> componentConnections = new ArrayList<>();
 
-        ComponentConnection clusterElementConnection = getClusterElementConnection(clusterElement);
+        // TODO add behind ClusterElementConnectionFactory
+        ComponentConnection componentConnection = getClusterElementConnection(clusterElement);
 
-        if (clusterElementConnection != null) {
-            componentConnections.add(clusterElementConnection);
+        if (componentConnection != null) {
+            componentConnections.add(componentConnection);
         }
 
         componentConnections.addAll(
+            // TODO add behind ClusterElementConnectionFactory
             ComponentConnection.of(
                 clusterElement.getExtensions(), clusterElementWorkflowNodeName,
-                (name, version) -> {
-                    return componentDefinitionService.getComponentDefinition(name, version)
-                        .isConnectionRequired();
-                }));
+                (name, version) -> componentDefinitionService.getComponentDefinition(name, version)
+                    .isConnectionRequired()));
 
         for (ClusterElementConnectionFactory clusterElementConnectionFactory : clusterElementConnectionFactories) {
             if (clusterElementConnectionFactory.supports(
@@ -117,8 +117,7 @@ public class ComponentConnectionFacadeImpl implements ComponentConnectionFacade 
 
                 componentConnections.addAll(
                     clusterElementConnectionFactory.create(
-                        clusterElementWorkflowNodeName,
-                        clusterElement.getParameters()));
+                        clusterElementWorkflowNodeName, clusterElement.getParameters()));
             }
         }
 

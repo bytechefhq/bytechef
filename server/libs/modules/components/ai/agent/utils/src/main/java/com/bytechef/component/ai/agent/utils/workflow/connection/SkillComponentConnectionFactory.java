@@ -16,19 +16,32 @@
 
 package com.bytechef.component.ai.agent.utils.workflow.connection;
 
+import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
+import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
+
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSkillsTool;
+import com.bytechef.component.ai.agent.utils.util.AiAgentUtilsUtils;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -51,6 +64,8 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
     private static final Logger log = LoggerFactory.getLogger(SkillComponentConnectionFactory.class);
 
     private static final String AI_AGENT_UTILS = "aiAgentUtils";
+    private static final Pattern COMPONENT_CALL_PATTERN = Pattern.compile(
+        "context\\.component\\.([A-Za-z][A-Za-z0-9_-]*)\\.([A-Za-z][A-Za-z0-9_]*)\\(([^)]*)\\)");
     private static final String SKILLS_TOOL = "skillsTool";
     private static final String SKILLS = "skills";
 
@@ -65,14 +80,7 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
     }
 
     @Override
-    public boolean supports(String componentName, String clusterElementName) {
-        return AI_AGENT_UTILS.equals(componentName) && SKILLS_TOOL.equals(clusterElementName);
-    }
-
-    @Override
-    public List<ComponentConnection> create(
-        String workflowNodeName, Map<String, ?> parameters) {
-
+    public List<ComponentConnection> create(String workflowNodeName, Map<String, ?> parameters) {
         List<Long> skillIds = MapUtils.getList(parameters, SKILLS, Long.class, List.of());
 
         if (skillIds.isEmpty()) {
@@ -89,11 +97,11 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
             try {
                 byte[] zipBytes = aiSkillFacade.getAiSkillDownload(skillId);
 
-                Map<String, List<AiAgentUtilsSkillsTool.ComponentCall>> scriptAnalysis =
-                    AiAgentUtilsSkillsTool.analyzeSkillScripts(zipBytes);
+                Map<String, List<ComponentCall>> scriptAnalysis =
+                    getSkillScripts(zipBytes);
 
-                for (List<AiAgentUtilsSkillsTool.ComponentCall> calls : scriptAnalysis.values()) {
-                    for (AiAgentUtilsSkillsTool.ComponentCall call : calls) {
+                for (List<ComponentCall> calls : scriptAnalysis.values()) {
+                    for (ComponentCall call : calls) {
                         uniqueComponentNames.add(call.componentName());
                     }
                 }
@@ -119,5 +127,77 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
         }
 
         return connections;
+    }
+
+    @Override
+    public boolean supports(String componentName, String clusterElementName) {
+        return AI_AGENT_UTILS.equals(componentName) && SKILLS_TOOL.equals(clusterElementName);
+    }
+
+    static List<ComponentCall> extractComponentCalls(String content) {
+        List<ComponentCall> calls = new ArrayList<>();
+
+        Matcher matcher = COMPONENT_CALL_PATTERN.matcher(content);
+
+        while (matcher.find()) {
+            calls.add(new ComponentCall(matcher.group(1), matcher.group(2), StringUtils.trim(matcher.group(3))));
+        }
+
+        return calls;
+    }
+
+    /**
+     * Scans all script files inside the skill zip archive for component calls of the form
+     * {@code context.component.{componentName}.{actionName}(...)}. Only files under the {@code scripts/} directory that
+     * contain a {@code perform} function are analysed.
+     *
+     * @return a map from script entry path to the list of component calls found in that script, ordered by appearance
+     *         in the archive; empty if no matching scripts exist
+     */
+    static Map<String, List<ComponentCall>> getSkillScripts(byte[] zipBytes) {
+        Map<String, List<ComponentCall>> result = new LinkedHashMap<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry zipEntry;
+            int entryCount = 0;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (++entryCount > MAX_ZIP_ENTRIES) {
+                    throw new IllegalArgumentException(
+                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                }
+
+                if (zipEntry.isDirectory() || !AiAgentUtilsUtils.isScriptEntry(zipEntry.getName())) {
+                    continue;
+                }
+
+                byte[] bytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
+
+                if (bytes.length > MAX_ZIP_ENTRY_SIZE) {
+                    log.warn("Script '{}' exceeds maximum allowed size, skipping", zipEntry.getName());
+
+                    continue;
+                }
+
+                String content = new String(bytes, StandardCharsets.UTF_8);
+
+                if (!AiAgentUtilsUtils.hasPerformFunction(content)) {
+                    continue;
+                }
+
+                List<ComponentCall> calls = extractComponentCalls(content);
+
+                if (!calls.isEmpty()) {
+                    result.put(zipEntry.getName(), calls);
+                }
+            }
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to analyse skill archive", ioException);
+        }
+
+        return result;
+    }
+
+    public record ComponentCall(String componentName, String actionName, String rawParameters) {
     }
 }
