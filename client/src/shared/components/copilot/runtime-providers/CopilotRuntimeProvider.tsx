@@ -1,4 +1,3 @@
-import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -8,7 +7,7 @@ import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useEffect, useMemo, useState} from 'react';
+import {ReactNode, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
@@ -208,12 +207,6 @@ export function CopilotRuntimeProvider({
         onNew,
         onReload,
     });
-
-    useEffect(() => {
-        return useCopilotStateContributorRegistry
-            .getState()
-            .register(() => ({workspaceId: useWorkspaceStore.getState().currentWorkspaceId}));
-    }, []);
 
     return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
 }
