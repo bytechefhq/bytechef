@@ -14,6 +14,7 @@ import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.ReadProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ReadProjectWorkflowTools;
+import com.bytechef.ai.mcp.tool.automation.ReadSkillsTools;
 import com.bytechef.ai.mcp.tool.automation.ScriptTools;
 import com.bytechef.ai.mcp.tool.automation.SkillsTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
@@ -61,6 +62,7 @@ public class CopilotConfiguration {
     private final Resource promptConverterBuildResource;
     private final Resource promptClusterElementAskResource;
     private final Resource promptClusterElementBuildResource;
+    private final Resource promptSkillsAskResource;
     private final Resource promptSkillsBuildResource;
     private final State state = new State();
 
@@ -73,6 +75,7 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_converter_build.txt") Resource promptConverterBuildResource,
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource,
+        @Value("classpath:prompt_skills_ask.txt") Resource promptSkillsAskResource,
         @Value("classpath:prompt_skills_build.txt") Resource promptSkillsBuildResource) {
 
         this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
@@ -82,6 +85,7 @@ public class CopilotConfiguration {
         this.promptConverterBuildResource = promptConverterBuildResource;
         this.promptClusterElementAskResource = promptClusterElementAskResource;
         this.promptClusterElementBuildResource = promptClusterElementBuildResource;
+        this.promptSkillsAskResource = promptSkillsAskResource;
         this.promptSkillsBuildResource = promptSkillsBuildResource;
     }
 
@@ -229,6 +233,24 @@ public class CopilotConfiguration {
             .systemMessage(getSystemPrompt(promptConverterBuildResource))
             .state(state)
             .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools))
+            .build();
+    }
+
+    @Bean
+    SkillsSpringAIAgent skillsAskSpringAIAgent(
+        ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
+        ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools)
+        throws AGUIException {
+
+        String name = Source.SKILLS.name() + "_" + Mode.ASK.name();
+
+        return SkillsSpringAIAgent.builder()
+            .agentId(name.toLowerCase())
+            .chatMemory(chatMemory)
+            .chatModel(chatModel)
+            .systemMessage(getSystemPrompt(promptSkillsAskResource))
+            .state(state)
+            .tools(List.of(readSkillsTools, readProjectTools, readProjectWorkflowTools))
             .build();
     }
 
