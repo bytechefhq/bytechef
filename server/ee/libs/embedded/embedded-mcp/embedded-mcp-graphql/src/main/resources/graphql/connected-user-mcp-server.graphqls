@@ -3,6 +3,7 @@ extend type Query {
 }
 
 extend type Mutation {
+    enableConnectedUserMcpServer(connectedUserId: ID!, mcpServerId: ID!, enable: Boolean!): Boolean
     enableConnectedUserMcpTool(id: ID!, enable: Boolean!): Boolean
 }
 

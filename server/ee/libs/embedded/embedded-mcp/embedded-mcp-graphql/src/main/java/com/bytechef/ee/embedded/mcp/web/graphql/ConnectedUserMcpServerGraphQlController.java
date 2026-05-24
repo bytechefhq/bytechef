@@ -42,6 +42,15 @@ class ConnectedUserMcpServerGraphQlController {
     }
 
     @MutationMapping
+    boolean enableConnectedUserMcpServer(
+        @Argument long connectedUserId, @Argument long mcpServerId, @Argument boolean enable) {
+
+        connectedUserMcpServerFacade.enableConnectedUserMcpServer(connectedUserId, mcpServerId, enable);
+
+        return true;
+    }
+
+    @MutationMapping
     boolean enableConnectedUserMcpTool(@Argument long id, @Argument boolean enable) {
         connectedUserMcpServerFacade.enableMcpTool(id, enable);
 
