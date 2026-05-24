@@ -24,6 +24,8 @@ public interface ConnectedUserProjectFacade {
 
     void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment);
 
+    void deleteProjectWorkflow(long connectedUserProjectWorkflowId);
+
     void enableProjectWorkflow(
         String externalUserId, String workflowUuid, boolean enable, Long environmentId);
 

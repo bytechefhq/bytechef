@@ -49,6 +49,13 @@ public class ConnectedUserProjectGraphQlController {
     }
 
     @MutationMapping
+    public boolean deleteConnectedUserProjectWorkflow(@Argument long id) {
+        connectedUserProjectFacade.deleteProjectWorkflow(id);
+
+        return true;
+    }
+
+    @MutationMapping
     public boolean enableConnectedUserProjectWorkflow(@Argument long id, @Argument boolean enable) {
         connectedUserProjectFacade.enableProjectWorkflow(id, enable);
 
