@@ -181,19 +181,32 @@ export default function useAiSkillDetail() {
             return;
         }
 
+        const idToDelete = selectedSkillId;
+
+        closeSkillDetail();
+        navigate('/automation/ai/skills');
+
         try {
-            await deleteAiSkill({id: selectedSkillId});
+            await deleteAiSkill({id: idToDelete});
+
+            queryClient.removeQueries({queryKey: ['aiSkill', {id: idToDelete}]});
+            queryClient.removeQueries({queryKey: ['aiSkillFilePaths', {id: idToDelete}]});
+            queryClient.removeQueries({
+                predicate: (query) =>
+                    Array.isArray(query.queryKey) &&
+                    query.queryKey[0] === 'aiSkillFileContent' &&
+                    typeof query.queryKey[1] === 'object' &&
+                    query.queryKey[1] !== null &&
+                    (query.queryKey[1] as {id?: string}).id === idToDelete,
+            });
 
             toast.success('Skill deleted');
-
-            closeSkillDetail();
-            navigate('/automation/ai/skills');
         } catch (error) {
             toast.error('Failed to delete skill', {
                 description: error instanceof Error ? error.message : 'An unexpected error occurred',
             });
         }
-    }, [closeSkillDetail, deleteAiSkill, navigate, selectedSkillId]);
+    }, [closeSkillDetail, deleteAiSkill, navigate, queryClient, selectedSkillId]);
 
     const handleSaveContent = useCallback(
         async (content: string) => {
