@@ -54,7 +54,7 @@ const AiSkills = () => {
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     const handleOpenCopilot = () => {
-        setContext({mode: MODE.ASK, parameters: {}, source: Source.SKILLS});
+        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
 
         setCopilotPanelOpen(true);
     };
