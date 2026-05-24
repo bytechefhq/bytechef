@@ -7,8 +7,7 @@ interface AiSkillsListProps {
 }
 
 const AiSkillsList = ({skills}: AiSkillsListProps) => {
-    const {deleteSkill, editDescriptionSkill, filteredSkills, handleDownloadSkill, renameSkill} =
-        useAiSkillsList(skills);
+    const {deleteSkill, filteredSkills, handleDownloadSkill, updateSkill} = useAiSkillsList(skills);
 
     return (
         <div className="flex flex-1 flex-col">
@@ -19,8 +18,7 @@ const AiSkillsList = ({skills}: AiSkillsListProps) => {
                             deleteSkill={deleteSkill}
                             key={skill.id}
                             onDownload={handleDownloadSkill}
-                            onEditDescription={editDescriptionSkill}
-                            onRename={renameSkill}
+                            onUpdate={updateSkill}
                             skill={skill}
                         />
                     ))

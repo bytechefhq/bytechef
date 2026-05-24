@@ -8,35 +8,30 @@ import {
 } from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
-import AiSkillEditDescriptionDialog from '@/pages/automation/ai/skills/components/AiSkillEditDescriptionDialog';
-import AiSkillRenameDialog from '@/pages/automation/ai/skills/components/AiSkillRenameDialog';
+import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillListItem from '@/pages/automation/ai/skills/hooks/useAiSkillListItem';
 import {AiSkill} from '@/shared/middleware/graphql';
-import {AlignLeftIcon, DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
+import {DownloadIcon, EllipsisVerticalIcon, PencilIcon, TrashIcon, ZapIcon} from 'lucide-react';
 
 interface AiSkillListItemProps {
     deleteSkill: (id: string) => Promise<void>;
     onDownload: (id: string, name: string) => void;
-    onEditDescription: (id: string, description: string | null) => void;
-    onRename: (id: string, newName: string, description?: string | null) => void;
+    onUpdate: (id: string, name: string, description: string | null) => void;
     skill: AiSkill;
 }
 
-const AiSkillListItem = ({deleteSkill, onDownload, onEditDescription, onRename, skill}: AiSkillListItemProps) => {
+const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillListItemProps) => {
     const {
         handleClick,
         handleDeleteClick,
         handleDownloadClick,
-        handleEditDescriptionClick,
-        handleRenameClick,
+        handleEditSave,
         setShowDeleteDialog,
-        setShowEditDescriptionDialog,
-        setShowRenameDialog,
+        setShowEditDialog,
         showDeleteDialog,
-        showEditDescriptionDialog,
-        showRenameDialog,
+        showEditDialog,
         skillColor,
-    } = useAiSkillListItem({deleteSkill, onDownload, onEditDescription, onRename, skill});
+    } = useAiSkillListItem({deleteSkill, onDownload, onUpdate, skill});
 
     return (
         <>
@@ -88,14 +83,9 @@ const AiSkillListItem = ({deleteSkill, onDownload, onEditDescription, onRename, 
                                 Download
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem onClick={() => setShowRenameDialog(true)}>
+                            <DropdownMenuItem onClick={() => setShowEditDialog(true)}>
                                 <PencilIcon className="mr-2 size-4" />
-                                Rename
-                            </DropdownMenuItem>
-
-                            <DropdownMenuItem onClick={() => setShowEditDescriptionDialog(true)}>
-                                <AlignLeftIcon className="mr-2 size-4" />
-                                Edit Description
+                                Edit
                             </DropdownMenuItem>
 
                             <DropdownMenuSeparator />
@@ -113,19 +103,12 @@ const AiSkillListItem = ({deleteSkill, onDownload, onEditDescription, onRename, 
                 <AiSkillDeleteAlertDialog onClose={() => setShowDeleteDialog(false)} onDelete={handleDeleteClick} />
             )}
 
-            {showRenameDialog && (
-                <AiSkillRenameDialog
-                    currentName={skill.name}
-                    onClose={() => setShowRenameDialog(false)}
-                    onRename={handleRenameClick}
-                />
-            )}
-
-            {showEditDescriptionDialog && (
-                <AiSkillEditDescriptionDialog
+            {showEditDialog && (
+                <AiSkillEditDialog
                     currentDescription={skill.description}
-                    onClose={() => setShowEditDescriptionDialog(false)}
-                    onSave={handleEditDescriptionClick}
+                    currentName={skill.name}
+                    onClose={() => setShowEditDialog(false)}
+                    onSave={handleEditSave}
                 />
             )}
         </>
