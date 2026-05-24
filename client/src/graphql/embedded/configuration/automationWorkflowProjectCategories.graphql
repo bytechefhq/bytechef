@@ -1,0 +1,6 @@
+query automationWorkflowProjectCategories {
+    automationWorkflowProjectCategories {
+        id
+        name
+    }
+}

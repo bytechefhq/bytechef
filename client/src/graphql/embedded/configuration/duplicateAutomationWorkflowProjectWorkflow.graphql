@@ -1,0 +1,3 @@
+mutation duplicateAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
+    duplicateAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
+}

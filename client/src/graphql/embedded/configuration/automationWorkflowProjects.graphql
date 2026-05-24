@@ -1,0 +1,52 @@
+query automationWorkflowProjects {
+    automationWorkflowProjects {
+        id
+        name
+        description
+        categoryId
+        tagIds
+        published
+        version
+        lastPublishedVersion
+        workflowTemplates {
+            workflowUuid
+            label
+            description
+            lastModifiedDate
+            triggers {
+                name
+                title
+                icon
+            }
+            components {
+                name
+                title
+                icon
+            }
+        }
+    }
+}
+
+mutation createAutomationWorkflowProject($name: String!, $description: String, $category: String, $tags: [String!]) {
+    createAutomationWorkflowProject(name: $name, description: $description, category: $category, tags: $tags)
+}
+
+mutation updateAutomationWorkflowProject($id: ID!, $name: String!, $description: String, $category: String, $tags: [String!]) {
+    updateAutomationWorkflowProject(id: $id, name: $name, description: $description, category: $category, tags: $tags)
+}
+
+mutation deleteAutomationWorkflowProject($id: ID!) {
+    deleteAutomationWorkflowProject(id: $id)
+}
+
+mutation createAutomationWorkflowProjectWorkflow($projectId: ID!, $definition: String) {
+    createAutomationWorkflowProjectWorkflow(projectId: $projectId, definition: $definition)
+}
+
+mutation deleteAutomationWorkflowProjectWorkflow($workflowUuid: ID!) {
+    deleteAutomationWorkflowProjectWorkflow(workflowUuid: $workflowUuid)
+}
+
+mutation publishAutomationWorkflowProject($id: ID!) {
+    publishAutomationWorkflowProject(id: $id)
+}

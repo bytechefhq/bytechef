@@ -1,4 +1,5 @@
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import ConnectedUserSheetActions from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetActions';
 import ConnectedUserSheetPanel from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetPanel';
 import ConnectedUserSheetTitle from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/ConnectedUserSheetTitle';
 import useConnectedUserSheetStore from '@/ee/pages/embedded/connected-users/stores/useConnectedUserSheetStore';
@@ -32,11 +33,15 @@ const ConnectedUserSheet = () => {
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
                 <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
-                    <div className="flex flex-1 items-center justify-between">
+                    <div className="flex flex-1 items-center">
                         {connectedUser && <ConnectedUserSheetTitle connectedUser={connectedUser} />}
                     </div>
 
-                    <SheetCloseButton />
+                    <div className="flex items-center gap-x-1">
+                        {connectedUser && <ConnectedUserSheetActions connectedUser={connectedUser} />}
+
+                        <SheetCloseButton />
+                    </div>
                 </header>
 
                 <div className="flex min-h-0 flex-1 flex-col overflow-y-auto p-3">
