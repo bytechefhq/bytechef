@@ -460,7 +460,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
 
         List<Object> records = new ArrayList<>();
-        boolean truncated = appendCapped(records, pollOutput.records());
+        boolean truncated = appendWithinLimit(records, pollOutput.records());
 
         int iterations = 0;
 
@@ -481,7 +481,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 throw new ExecutionException(e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
             }
 
-            truncated |= appendCapped(records, pollOutput.records());
+            truncated |= appendWithinLimit(records, pollOutput.records());
         }
 
         if (truncated || pollOutput.pollImmediately()) {
@@ -496,7 +496,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
     }
 
-    private static boolean appendCapped(List<Object> records, @Nullable List<?> pageRecords) {
+    private static boolean appendWithinLimit(List<Object> records, @Nullable List<?> pageRecords) {
         if (pageRecords == null || pageRecords.isEmpty()) {
             return false;
         }
