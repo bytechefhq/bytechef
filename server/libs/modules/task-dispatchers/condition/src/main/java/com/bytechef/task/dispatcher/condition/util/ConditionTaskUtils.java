@@ -52,7 +52,62 @@ import tools.jackson.core.type.TypeReference;
  */
 public class ConditionTaskUtils {
 
-    private static final ExpressionParser expressionParser = new SpelExpressionParser();
+    private static final ExpressionParser EXPRESSION_PARSER = new SpelExpressionParser();
+    private static final Map<String, Map<String, String>> CONDITION_TEMPLATES = new HashMap<>();
+
+    static {
+        CONDITION_TEMPLATES.put(
+            ConditionTaskDispatcherConstants.BOOLEAN,
+            Map.ofEntries(
+                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "${value1} == ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(), "${value1} != ${value2}")));
+
+        CONDITION_TEMPLATES.put(
+            ConditionTaskDispatcherConstants.DATE_TIME,
+            Map.ofEntries(
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.AFTER.name(),
+                    "${value1}.isAfter(${value2})"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.BEFORE.name(),
+                    "${value1}.isBefore(${value2})")));
+
+        CONDITION_TEMPLATES.put(
+            ConditionTaskDispatcherConstants.NUMBER,
+            Map.ofEntries(
+                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "${value1} == ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(), "${value1} != ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.GREATER.name(), "${value1} > ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.LESS.name(), "${value1} < ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.GREATER_EQUALS.name(), "${value1} >= ${value2}"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.LESS_EQUALS.name(), "${value1} <= ${value2}")));
+
+        CONDITION_TEMPLATES.put(
+            ConditionTaskDispatcherConstants.STRING,
+            Map.ofEntries(
+                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "'${value1}'.equals('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.EQUALS_IGNORE_CASE.name(),
+                    "'${value1}'.equalsIgnoreCase('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(),
+                    "!'${value1}'.equals('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.CONTAINS.name(),
+                    "'${value1}'.contains('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.NOT_CONTAINS.name(),
+                    "!'${value1}'.contains('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.STARTS_WITH.name(),
+                    "'${value1}'.startsWith('${value2}')"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.ENDS_WITH.name(),
+                    "'${value1}'.endsWith('${value2}')"),
+                Map.entry(ConditionTaskDispatcherConstants.Operation.EMPTY.name(), "'${value1}'.isEmpty()"),
+                Map.entry(
+                    ConditionTaskDispatcherConstants.Operation.REGEX.name(), "'${value1}' matches '${value2}'")));
+    }
 
     // SPEL_INJECTION is suppressed because SpotBugs flags any non-constant string flowing into
     // SpelExpressionParser. The actual sink reported in #5081 is closed by evaluating against the
@@ -87,7 +142,7 @@ public class ConditionTaskUtils {
 
         variables.forEach(evaluationContext::setVariable);
 
-        Boolean result = expressionParser.parseExpression(expression)
+        Boolean result = EXPRESSION_PARSER.parseExpression(expression)
             .getValue(evaluationContext, Boolean.class);
 
         return result != null && result;
@@ -101,7 +156,7 @@ public class ConditionTaskUtils {
         for (Map<String, ?> condition : conditions) {
             String operandType = MapUtils.getRequiredString(condition, "type");
 
-            String conditionTemplate = conditionTemplates
+            String conditionTemplate = CONDITION_TEMPLATES
                 .get(operandType)
                 .get(MapUtils.getRequiredString(condition, ConditionTaskDispatcherConstants.OPERATION));
 
@@ -135,61 +190,5 @@ public class ConditionTaskUtils {
         }
 
         return conditionExpressions;
-    }
-
-    private static final Map<String, Map<String, String>> conditionTemplates = new HashMap<>();
-
-    static {
-        conditionTemplates.put(
-            ConditionTaskDispatcherConstants.BOOLEAN,
-            Map.ofEntries(
-                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "${value1} == ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(), "${value1} != ${value2}")));
-
-        conditionTemplates.put(
-            ConditionTaskDispatcherConstants.DATE_TIME,
-            Map.ofEntries(
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.AFTER.name(),
-                    "${value1}.isAfter(${value2})"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.BEFORE.name(),
-                    "${value1}.isBefore(${value2})")));
-
-        conditionTemplates.put(
-            ConditionTaskDispatcherConstants.NUMBER,
-            Map.ofEntries(
-                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "${value1} == ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(), "${value1} != ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.GREATER.name(), "${value1} > ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.LESS.name(), "${value1} < ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.GREATER_EQUALS.name(), "${value1} >= ${value2}"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.LESS_EQUALS.name(), "${value1} <= ${value2}")));
-
-        conditionTemplates.put(
-            ConditionTaskDispatcherConstants.STRING,
-            Map.ofEntries(
-                Map.entry(ConditionTaskDispatcherConstants.Operation.EQUALS.name(), "'${value1}'.equals('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.EQUALS_IGNORE_CASE.name(),
-                    "'${value1}'.equalsIgnoreCase('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.NOT_EQUALS.name(),
-                    "!'${value1}'.equals('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.CONTAINS.name(),
-                    "'${value1}'.contains('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.NOT_CONTAINS.name(),
-                    "!'${value1}'.contains('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.STARTS_WITH.name(),
-                    "'${value1}'.startsWith('${value2}')"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.ENDS_WITH.name(),
-                    "'${value1}'.endsWith('${value2}')"),
-                Map.entry(ConditionTaskDispatcherConstants.Operation.EMPTY.name(), "'${value1}'.isEmpty()"),
-                Map.entry(
-                    ConditionTaskDispatcherConstants.Operation.REGEX.name(), "'${value1}' matches '${value2}'")));
     }
 }
