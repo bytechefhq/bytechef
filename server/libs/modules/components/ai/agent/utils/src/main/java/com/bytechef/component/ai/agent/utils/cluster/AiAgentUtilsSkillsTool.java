@@ -142,11 +142,11 @@ public class AiAgentUtilsSkillsTool {
             try {
                 byte[] zipBytes = aiSkillFacade.getAiSkillDownload(skillId);
 
-                Path skillDirectory = extractSkillToTempDirectory(zipBytes, skillId);
+                SkillExtraction extraction = extractSkillResources(zipBytes, skillId, context);
 
-                skillDirectories.add(skillDirectory);
+                skillDirectories.add(extraction.skillDirectory());
 
-                SkillScripts skillScripts = extractSkillScripts(zipBytes, context);
+                SkillScripts skillScripts = extraction.skillScripts();
 
                 List<ScriptEntry> scriptEntries = skillScripts.scripts();
 
@@ -234,58 +234,100 @@ public class AiAgentUtilsSkillsTool {
             .build();
     }
 
-    private static SkillScripts extractSkillScripts(byte[] zipBytes, Context context) {
+    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
+    private static SkillExtraction extractSkillResources(byte[] zipBytes, long skillId, Context context) {
         String skillName = "";
         String skillDescription = "";
         List<ScriptEntry> scripts = new ArrayList<>();
 
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-            ZipEntry zipEntry;
-            int entryCount = 0;
+        try {
+            Path tempDirectory = Files.createTempDirectory("bytechef-skill-" + skillId + "-");
 
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                if (++entryCount > MAX_ZIP_ENTRIES) {
-                    throw new IllegalArgumentException(
-                        "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
-                }
+            try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+                ZipEntry zipEntry;
+                int entryCount = 0;
 
-                if (zipEntry.isDirectory()) {
-                    continue;
-                }
+                while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                    if (++entryCount > MAX_ZIP_ENTRIES) {
+                        throw new IllegalArgumentException(
+                            "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
+                    }
 
-                String entryName = zipEntry.getName();
-                byte[] bytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
+                    if (zipEntry.isDirectory()) {
+                        continue;
+                    }
 
-                if (bytes.length > MAX_ZIP_ENTRY_SIZE) {
-                    context.log(log -> log.warn("Entry '{}' exceeds maximum allowed size, skipping", entryName));
+                    String entryName = zipEntry.getName();
+                    boolean isMarkdown = entryName.toLowerCase()
+                        .endsWith(".md");
+                    boolean isScript = !isMarkdown && AiAgentUtilsUtils.isScriptEntry(entryName);
 
-                    continue;
-                }
+                    if (!isMarkdown && !isScript) {
+                        continue;
+                    }
 
-                String content = new String(bytes, StandardCharsets.UTF_8);
+                    byte[] entryBytes = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
 
-                if (entryName.endsWith(SKILL_MD_FILENAME)) {
-                    skillName = extractFrontmatterField(content, FRONTMATTER_NAME_PATTERN);
-                    skillDescription = extractFrontmatterField(content, FRONTMATTER_DESCRIPTION_PATTERN);
-                } else if (AiAgentUtilsUtils.isScriptEntry(entryName)
-                    && AiAgentUtilsUtils.hasPerformFunction(content)) {
-                    String fileName = entryName.substring(entryName.lastIndexOf('/') + 1);
-                    String extension = getExtension(fileName);
-                    String languageId = EXTENSION_TO_LANGUAGE_ID.get(extension.toLowerCase());
+                    if (entryBytes.length > MAX_ZIP_ENTRY_SIZE) {
+                        if (isMarkdown) {
+                            throw new IllegalArgumentException(
+                                "Skill file '%s' exceeds the maximum allowed size of %d MB".formatted(
+                                    entryName, MAX_ZIP_ENTRY_SIZE / 1024 / 1024));
+                        }
 
-                    if (languageId != null) {
-                        scripts.add(new ScriptEntry(fileName, languageId, content));
+                        context.log(
+                            log -> log.warn("Entry '{}' exceeds maximum allowed size, skipping", entryName));
+
+                        continue;
+                    }
+
+                    if (isMarkdown) {
+                        Path targetPath = tempDirectory.resolve(entryName)
+                            .normalize();
+
+                        if (!targetPath.startsWith(tempDirectory)) {
+                            throw new IllegalArgumentException("Zip entry path traversal detected: " + entryName);
+                        }
+
+                        Path parentPath = targetPath.getParent();
+
+                        if (parentPath != null) {
+                            Files.createDirectories(parentPath);
+                        }
+
+                        Files.write(targetPath, entryBytes);
+
+                        if (entryName.endsWith(SKILL_MD_FILENAME)) {
+                            String content = new String(entryBytes, StandardCharsets.UTF_8);
+
+                            skillName = extractFrontmatterField(content, FRONTMATTER_NAME_PATTERN);
+                            skillDescription = extractFrontmatterField(content, FRONTMATTER_DESCRIPTION_PATTERN);
+                        }
                     } else {
-                        context.log(log -> log.warn(
-                            "Unsupported script extension '{}' in '{}', skipping", extension, entryName));
+                        String content = new String(entryBytes, StandardCharsets.UTF_8);
+
+                        if (!AiAgentUtilsUtils.hasPerformFunction(content)) {
+                            continue;
+                        }
+
+                        String fileName = entryName.substring(entryName.lastIndexOf('/') + 1);
+                        String extension = getExtension(fileName);
+                        String languageId = EXTENSION_TO_LANGUAGE_ID.get(extension.toLowerCase());
+
+                        if (languageId != null) {
+                            scripts.add(new ScriptEntry(fileName, languageId, content));
+                        } else {
+                            context.log(log -> log.warn(
+                                "Unsupported script extension '{}' in '{}', skipping", extension, entryName));
+                        }
                     }
                 }
             }
-        } catch (IOException ioException) {
-            throw new UncheckedIOException("Failed to extract skill scripts from zip archive", ioException);
-        }
 
-        return new SkillScripts(skillName, skillDescription, scripts);
+            return new SkillExtraction(tempDirectory, new SkillScripts(skillName, skillDescription, scripts));
+        } catch (IOException ioException) {
+            throw new UncheckedIOException("Failed to extract skill resources from zip archive", ioException);
+        }
     }
 
     private static String extractFrontmatterField(String content, Pattern pattern) {
@@ -313,62 +355,7 @@ public class AiAgentUtilsSkillsTool {
         return dotIndex > 0 ? fileName.substring(dotIndex + 1) : "";
     }
 
-    @SuppressFBWarnings("PATH_TRAVERSAL_IN")
-    private Path extractSkillToTempDirectory(byte[] zipBytes, long skillId) {
-        try {
-            Path tempDirectory = Files.createTempDirectory("bytechef-skill-" + skillId + "-");
-
-            try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
-                ZipEntry zipEntry;
-                int entryCount = 0;
-
-                while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                    if (++entryCount > MAX_ZIP_ENTRIES) {
-                        throw new IllegalArgumentException(
-                            "Skill archive exceeds maximum allowed number of entries (" + MAX_ZIP_ENTRIES + ")");
-                    }
-
-                    if (zipEntry.isDirectory()) {
-                        continue;
-                    }
-
-                    String zipEntryName = zipEntry.getName();
-
-                    String zipEntryNameLowerCase = zipEntryName.toLowerCase();
-
-                    if (!zipEntryNameLowerCase.endsWith(".md")) {
-                        continue;
-                    }
-
-                    byte[] content = zipInputStream.readNBytes(MAX_ZIP_ENTRY_SIZE + 1);
-
-                    if (content.length > MAX_ZIP_ENTRY_SIZE) {
-                        throw new IllegalArgumentException(
-                            "Skill file '%s' exceeds the maximum allowed size of %d MB".formatted(
-                                zipEntryName, MAX_ZIP_ENTRY_SIZE / 1024 / 1024));
-                    }
-
-                    Path targetPath = tempDirectory.resolve(zipEntryName)
-                        .normalize();
-
-                    if (!targetPath.startsWith(tempDirectory)) {
-                        throw new IllegalArgumentException("Zip entry path traversal detected: " + zipEntryName);
-                    }
-
-                    Path parentPath = targetPath.getParent();
-
-                    if (parentPath != null) {
-                        Files.createDirectories(parentPath);
-                    }
-
-                    Files.write(targetPath, content);
-                }
-            }
-
-            return tempDirectory;
-        } catch (IOException ioException) {
-            throw new UncheckedIOException("Failed to extract skill resources from zip archive", ioException);
-        }
+    private record SkillExtraction(Path skillDirectory, SkillScripts skillScripts) {
     }
 
     private record SkillScripts(String name, String description, List<ScriptEntry> scripts) {

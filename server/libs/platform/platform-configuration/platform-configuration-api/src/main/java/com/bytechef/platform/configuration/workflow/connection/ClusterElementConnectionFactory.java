@@ -38,7 +38,7 @@ public interface ClusterElementConnectionFactory {
     boolean supports(String componentName, String clusterElementName);
 
     /**
-     * Creates component connections for the cluster element identified by the given workflow node name and extensions.
+     * Creates component connections for the cluster element identified by the given workflow node name and parameters.
      */
-    List<ComponentConnection> create(String workflowNodeName, Map<String, ?> extensions);
+    List<ComponentConnection> create(String workflowNodeName, Map<String, ?> parameters);
 }
