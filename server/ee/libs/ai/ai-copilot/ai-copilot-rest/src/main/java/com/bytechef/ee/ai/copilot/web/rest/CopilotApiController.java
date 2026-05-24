@@ -78,7 +78,11 @@ public class CopilotApiController {
         } else if (agentId.equals("converter")) {
             agentId = "converter_build";
         } else if (agentId.equals("skills")) {
-            agentId = "skills_build";
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "skills_build";
+            } else {
+                agentId = "skills_ask";
+            }
         }
 
         LocalAgent localAgent = localAgentMap.get(agentId);
