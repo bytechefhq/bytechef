@@ -8,7 +8,7 @@ import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
 import {useQueryClient} from '@tanstack/react-query';
-import {ReactNode, useMemo, useState} from 'react';
+import {ReactNode, useEffect, useMemo, useState} from 'react';
 import {useParams} from 'react-router-dom';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
@@ -37,7 +37,6 @@ export function CopilotRuntimeProvider({
                 messages: state.messages,
             }))
         );
-    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const queryClient = useQueryClient();
 
     const {projectId, projectWorkflowId} = useParams();
@@ -74,9 +73,7 @@ export function CopilotRuntimeProvider({
 
         const stateToSend = {
             ...contextWithoutError,
-            workspaceId: currentWorkspaceId,
-            ...useCopilotStateContributorRegistry.getState()
-                .contribute(),
+            ...useCopilotStateContributorRegistry.getState().contribute(),
         };
 
         agent.setState(stateToSend);
@@ -211,6 +208,12 @@ export function CopilotRuntimeProvider({
         onNew,
         onReload,
     });
+
+    useEffect(() => {
+        return useCopilotStateContributorRegistry
+            .getState()
+            .register(() => ({workspaceId: useWorkspaceStore.getState().currentWorkspaceId}));
+    }, []);
 
     return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
 }
