@@ -226,14 +226,16 @@ const AiSkills = () => {
     }
 
     const isDetailView = route === 'detail';
+    const createWithAiOrigin = (location.state as {origin?: 'detail' | 'list'} | null)?.origin;
+    const showSkillsSidebar = isDetailView || (route === 'createWithAi' && createWithAiOrigin === 'detail');
 
-    const leftSidebarBody = isDetailView ? (
+    const leftSidebarBody = showSkillsSidebar ? (
         <AiSkillsLeftSidebar currentId={skillId} />
     ) : (
         <AiSidebarNav currentSection="skills" />
     );
 
-    const leftSidebarHeader = isDetailView ? (
+    const leftSidebarHeader = showSkillsSidebar ? (
         <Header
             position="sidebar"
             right={
