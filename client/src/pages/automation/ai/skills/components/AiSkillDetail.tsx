@@ -65,11 +65,17 @@ const FileTreeNode = ({node, onSelect, selectedPath}: FileTreeNodeProps) => {
     );
 };
 
-function parseFrontmatter(content: string): {body: string; frontmatter: Record<string, string> | null} {
+interface ParsedFrontmatterI {
+    body: string;
+    frontmatter: Record<string, string> | null;
+    rawFrontmatter: string | null;
+}
+
+function parseFrontmatter(content: string): ParsedFrontmatterI {
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
 
     if (!frontmatterMatch) {
-        return {body: content, frontmatter: null};
+        return {body: content, frontmatter: null, rawFrontmatter: null};
     }
 
     const frontmatterLines = frontmatterMatch[1].split('\n');
@@ -86,7 +92,7 @@ function parseFrontmatter(content: string): {body: string; frontmatter: Record<s
         }
     }
 
-    return {body: frontmatterMatch[2].trim(), frontmatter};
+    return {body: frontmatterMatch[2].trim(), frontmatter, rawFrontmatter: frontmatterMatch[1]};
 }
 
 const FrontmatterTable = ({frontmatter}: {frontmatter: Record<string, string>}) => (
@@ -109,7 +115,15 @@ interface MarkdownViewerProps {
 }
 
 const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
-    const {body, frontmatter} = parseFrontmatter(content);
+    const {body, frontmatter, rawFrontmatter} = parseFrontmatter(content);
+
+    // The editor only sees the body, so onUpdate emits body-only markdown. Keep the raw frontmatter
+    // in a ref so the saved file preserves it verbatim — re-stringifying from the parsed object would
+    // drop quoting, comments, and any non key:value syntax (arrays, nested keys) the parser doesn't
+    // round-trip.
+    const rawFrontmatterRef = useRef<string | null>(rawFrontmatter);
+
+    rawFrontmatterRef.current = rawFrontmatter;
 
     const editor = useEditor({
         content: body,
@@ -119,7 +133,11 @@ const MarkdownViewer = ({content, onContentChange}: MarkdownViewerProps) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             const markdown = (updatedEditor.storage as any).markdown.getMarkdown() as string;
 
-            onContentChange(markdown);
+            const fullContent = rawFrontmatterRef.current
+                ? `---\n${rawFrontmatterRef.current}\n---\n\n${markdown}`
+                : markdown;
+
+            onContentChange(fullContent);
         },
     });
 
@@ -197,16 +215,7 @@ const AiSkillDetail = () => {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="flex shrink-0 items-start justify-between gap-4 border-b border-b-border/50 px-4 py-3">
                 <div className="min-w-0 flex-1">
-                    <div className="flex items-center gap-1">
-                        <span className="truncate text-sm font-semibold">{skill.name}</span>
-
-                        <Button
-                            icon={<PencilIcon className="size-3" />}
-                            onClick={() => setShowEditDialog(true)}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </div>
+                    <div className="truncate text-sm font-semibold">{skill.name}</div>
 
                     <span className="block text-xs text-content-neutral-secondary">
                         {skill.description || 'No description'}
@@ -214,6 +223,19 @@ const AiSkillDetail = () => {
                 </div>
 
                 <div className="flex shrink-0 items-center gap-1">
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                icon={<PencilIcon className="size-4" />}
+                                onClick={() => setShowEditDialog(true)}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Edit skill</TooltipContent>
+                    </Tooltip>
+
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
