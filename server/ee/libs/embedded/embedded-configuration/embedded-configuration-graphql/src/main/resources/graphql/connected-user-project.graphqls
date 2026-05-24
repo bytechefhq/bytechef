@@ -30,7 +30,7 @@ type ConnectedUserProjectWorkflow {
     projectId: ID!
     workflow: Workflow!
     workflowUuid: ID!
-    workflowVersion: Int!
+    workflowVersion: Int
     createdBy: String
     createdDate: String
     lastModifiedBy: String
