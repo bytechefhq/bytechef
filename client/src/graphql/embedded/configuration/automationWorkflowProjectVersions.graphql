@@ -1,0 +1,7 @@
+query automationWorkflowProjectVersions($id: ID!) {
+    automationWorkflowProjectVersions(id: $id) {
+        version
+        status
+        publishedDate
+    }
+}

@@ -32,7 +32,7 @@ const ConnectedUserProjectWorkflowListItem = ({
                     <TooltipContent>The workflow version</TooltipContent>
                 </Tooltip>
 
-                <div className="w-48">
+                <div className="flex w-48 items-center justify-end">
                     {connectedUserProjectWorkflow?.lastExecutionDate ? (
                         <Tooltip>
                             <TooltipTrigger className="flex items-center justify-end text-sm">
