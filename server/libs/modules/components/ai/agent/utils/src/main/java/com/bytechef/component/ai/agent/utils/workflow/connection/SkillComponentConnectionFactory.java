@@ -185,10 +185,10 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
                     continue;
                 }
 
-                List<ComponentCall> calls = extractComponentCalls(content);
+                List<ComponentCall> componentCalls = extractComponentCalls(content);
 
-                if (!calls.isEmpty()) {
-                    result.put(zipEntry.getName(), calls);
+                if (!componentCalls.isEmpty()) {
+                    result.put(zipEntry.getName(), componentCalls);
                 }
             }
         } catch (IOException ioException) {
