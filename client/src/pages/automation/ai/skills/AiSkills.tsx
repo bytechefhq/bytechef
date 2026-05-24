@@ -121,7 +121,7 @@ const AiSkills = () => {
         route === 'detail'
             ? (skillsHeaderInfo.title ?? 'Skill')
             : route === 'createWithAi'
-              ? 'Create with AI'
+              ? 'Create Skill with AI'
               : 'Skills';
 
     const showToolbar = route === 'list' && skillsView !== 'empty';

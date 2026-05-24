@@ -8,7 +8,7 @@ interface SkillsHeaderInfoI {
 }
 
 const SKILLS_HEADER_INFO: Record<SkillsViewType, SkillsHeaderInfoI> = {
-    createWithAi: {subtitle: 'Let AI generate a skill for you.', title: 'Create with AI'},
+    createWithAi: {subtitle: 'Let AI generate a skill for you.', title: 'Create Skill with AI'},
     detail: {},
     empty: {},
     list: {title: 'Skills'},

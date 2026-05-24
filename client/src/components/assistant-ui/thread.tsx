@@ -19,7 +19,7 @@ import {
   ThreadPrimitive,
 } from "@assistant-ui/react";
 
-import { type FC, useCallback } from "react";
+import { type FC, type ReactNode, useCallback } from "react";
 import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import * as m from "motion/react-m";
 
@@ -35,7 +35,18 @@ import {
 
 import { cn } from "@/shared/util/cn-utils";
 
-export const Thread: FC = () => {
+export interface ThreadSuggestionI {
+  action: string;
+  label: string;
+  title: string;
+}
+
+interface ThreadPropsI {
+  composerActions?: ReactNode;
+  suggestions?: ThreadSuggestionI[];
+}
+
+export const Thread: FC<ThreadPropsI> = ({composerActions, suggestions}) => {
   return (
     <LazyMotion features={domAnimation}>
       <MotionConfig reducedMotion="user">
@@ -47,7 +58,7 @@ export const Thread: FC = () => {
         >
           <ThreadPrimitive.Viewport className="aui-thread-viewport relative flex flex-1 flex-col overflow-x-auto overflow-y-scroll px-4">
             <ThreadPrimitive.If empty>
-              <ThreadWelcome />
+              <ThreadWelcome suggestions={suggestions} />
             </ThreadPrimitive.If>
 
             <ThreadPrimitive.Messages
@@ -84,7 +95,34 @@ const ThreadScrollToBottom: FC = () => {
   );
 };
 
-const ThreadWelcome: FC = () => {
+const DEFAULT_SUGGESTIONS: ThreadSuggestionI[] = [
+  {
+    title: "Describe what this workflow",
+    label: "does end-to-end.",
+    action: "Describe what this workflow does end-to-end",
+  },
+  {
+    title: "Which properties",
+    label: "of this node are required?",
+    action: "Which properties of this node are required?",
+  },
+  {
+    title: "Search for an action",
+    label: "that can send an email",
+    action: "Search for an action that can send an email",
+  },
+  {
+    title: "How do I implement",
+    label: "conditional branching in workflows?",
+    action: "How do I implement conditional branching in workflows?",
+  },
+];
+
+interface ThreadWelcomePropsI {
+  suggestions?: ThreadSuggestionI[];
+}
+
+const ThreadWelcome: FC<ThreadWelcomePropsI> = ({suggestions}) => {
   return (
     <div className="aui-thread-welcome-root mx-auto my-auto flex w-full max-w-[var(--thread-max-width)] flex-grow flex-col">
       <div className="aui-thread-welcome-center flex w-full flex-grow flex-col items-center justify-center">
@@ -108,36 +146,21 @@ const ThreadWelcome: FC = () => {
           </m.div>
         </div>
       </div>
-      <ThreadSuggestions />
+      <ThreadSuggestions suggestions={suggestions} />
     </div>
   );
 };
 
-const ThreadSuggestions: FC = () => {
+interface ThreadSuggestionsPropsI {
+  suggestions?: ThreadSuggestionI[];
+}
+
+const ThreadSuggestions: FC<ThreadSuggestionsPropsI> = ({suggestions}) => {
+  const items = suggestions ?? DEFAULT_SUGGESTIONS;
+
   return (
     <div className="aui-thread-welcome-suggestions grid w-full gap-2 pb-4 @md:grid-cols-2">
-      {[
-        {
-          title: "Describe what this workflow",
-          label: "does end-to-end.",
-          action: "Describe what this workflow does end-to-end",
-        },
-        {
-          title: "Which properties",
-          label: "of this node are required?",
-          action: "Which properties of this node are required?",
-        },
-        {
-          title: "Search for an action",
-          label: "that can send an email",
-          action: "Search for an action that can send an email",
-        },
-        {
-          title: "How do I implement",
-          label: "conditional branching in workflows?",
-          action: "How do I implement conditional branching in workflows?",
-        },
-      ].map((suggestedAction, index) => (
+      {items.map((suggestedAction, index) => (
         <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
