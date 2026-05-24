@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.githubproxy.client;
 
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplatePage;
+
 /**
  * Client for the bytechef-github-proxy's workflow-template endpoints ({@code /workflow-templates} and
  * {@code /workflow-templates/{slug}}).

@@ -18,6 +18,10 @@ package com.bytechef.platform.githubproxy.client;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateAuthor;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplatePage;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import tools.jackson.databind.JsonNode;

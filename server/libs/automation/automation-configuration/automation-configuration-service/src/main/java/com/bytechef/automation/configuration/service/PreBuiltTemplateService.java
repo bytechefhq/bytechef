@@ -18,12 +18,12 @@ package com.bytechef.automation.configuration.service;
 
 import com.bytechef.automation.configuration.config.TemplatesProperties;
 import com.bytechef.commons.util.EncodingUtils;
-import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
-import com.bytechef.platform.githubproxy.client.WorkflowTemplate;
-import com.bytechef.platform.githubproxy.client.WorkflowTemplatePage;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
-import com.bytechef.platform.githubproxy.client.WorkflowTemplateSummary;
+import com.bytechef.platform.githubproxy.client.model.FileItem;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplatePage;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;

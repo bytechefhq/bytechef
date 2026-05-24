@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.githubproxy.client;
+package com.bytechef.platform.githubproxy.client.model;
 
 /**
  * @author Ivica Cardic

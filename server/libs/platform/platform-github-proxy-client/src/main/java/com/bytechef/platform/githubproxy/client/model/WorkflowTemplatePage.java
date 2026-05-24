@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.githubproxy.client;
+package com.bytechef.platform.githubproxy.client.model;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

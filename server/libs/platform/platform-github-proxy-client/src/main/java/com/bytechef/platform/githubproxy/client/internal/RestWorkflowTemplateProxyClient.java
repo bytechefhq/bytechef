@@ -16,9 +16,9 @@
 
 package com.bytechef.platform.githubproxy.client.internal;
 
-import com.bytechef.platform.githubproxy.client.WorkflowTemplate;
-import com.bytechef.platform.githubproxy.client.WorkflowTemplatePage;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
+import com.bytechef.platform.githubproxy.client.model.WorkflowTemplatePage;
 import java.util.Objects;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;

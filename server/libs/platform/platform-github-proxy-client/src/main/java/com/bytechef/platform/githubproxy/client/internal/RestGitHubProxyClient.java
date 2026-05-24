@@ -16,8 +16,8 @@
 
 package com.bytechef.platform.githubproxy.client.internal;
 
-import com.bytechef.platform.githubproxy.client.FileItem;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.githubproxy.client.model.FileItem;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +42,7 @@ public class RestGitHubProxyClient implements GitHubProxyClient {
     @Override
     public List<FileItem> listFiles(String owner, String repo, String ref, String prefix) {
         List<FileItem> result = restClient.get()
-            .uri(uriBuilder -> buildListFilesUri(uriBuilder, owner, repo, ref, prefix))
+            .uri(uriBuilder -> buildListFilesUri(uriBuilder.path("/gh"), owner, repo, ref, prefix))
             .accept(MediaType.APPLICATION_JSON)
             .retrieve()
             .body(new ParameterizedTypeReference<>() {});
@@ -56,7 +56,7 @@ public class RestGitHubProxyClient implements GitHubProxyClient {
         String rangeHeader) {
 
         RestClient.RequestHeadersSpec<?> spec = restClient.get()
-            .uri(uriBuilder -> buildRawUri(uriBuilder, owner, repo, ref, filePath))
+            .uri(uriBuilder -> buildRawUri(uriBuilder.path("/gh"), owner, repo, ref, filePath))
             .accept(MediaType.ALL);
 
         if (StringUtils.hasText(ifNoneMatch)) {

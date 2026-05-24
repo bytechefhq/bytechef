@@ -14,16 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.githubproxy.client;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.List;
+package com.bytechef.platform.githubproxy.client.model;
 
 /**
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("EI")
-public record WorkflowTemplateSummary(
-    String slug, String title, String description, String category, List<String> components, String trigger,
-    String triggerLabel) {
+public record WorkflowTemplateAuthor(String name, String email, String role, String socialLinks) {
 }
