@@ -1,4 +1,3 @@
-import Badge from '@/components/Badge/Badge';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectedUserMcpServerListItemToolRow from '@/ee/pages/embedded/connected-users/components/connected-user-sheet/connected-user-mcp-server-list/ConnectedUserMcpServerListItemToolRow';
@@ -24,40 +23,26 @@ const ConnectedUserMcpServerListItem = ({mcpServer}: {mcpServer: ConnectedUserMc
                             {mcpServer.name}
                         </div>
 
-                        <div className="flex gap-4 text-xs text-muted-foreground">
-                            <span className="font-semibold">
-                                {toolCount === 1 ? `${toolCount} tool` : `${toolCount} tools`}
-                            </span>
-
-                            {lastModifiedDate && (
-                                <Tooltip>
-                                    <TooltipTrigger className="text-xs">
-                                        {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
-                                    </TooltipTrigger>
-
-                                    <TooltipContent>Last Modified Date</TooltipContent>
-                                </Tooltip>
-                            )}
+                        <div className="text-xs font-semibold text-muted-foreground">
+                            {toolCount === 1 ? `${toolCount} tool` : `${toolCount} tools`}
                         </div>
                     </div>
                 </CollapsibleTrigger>
 
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Badge
-                            label={mcpServer.enabled ? 'ENABLED' : 'DISABLED'}
-                            styleType={mcpServer.enabled ? 'secondary-filled' : 'secondary-outline'}
-                            weight="semibold"
-                        />
-                    </TooltipTrigger>
+                {lastModifiedDate && (
+                    <Tooltip>
+                        <TooltipTrigger className="text-xs text-muted-foreground">
+                            {`Updated ${lastModifiedDate.toLocaleDateString()} ${lastModifiedDate.toLocaleTimeString()}`}
+                        </TooltipTrigger>
 
-                    <TooltipContent>Server status (managed at the workspace level)</TooltipContent>
-                </Tooltip>
+                        <TooltipContent>Last Modified Date</TooltipContent>
+                    </Tooltip>
+                )}
             </div>
 
             <CollapsibleContent>
                 {toolCount > 0 ? (
-                    <div className="flex w-full flex-col py-3 pl-4">
+                    <div className="flex w-full flex-col gap-y-3 py-3 pl-4">
                         <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-muted-foreground">
                             Tools
                         </h3>
