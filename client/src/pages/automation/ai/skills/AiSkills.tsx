@@ -1,16 +1,21 @@
+import Button from '@/components/Button/Button';
 import {Input} from '@/components/ui/input';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
+import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {SearchIcon} from 'lucide-react';
+import {DownloadIcon, PencilIcon, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
 import {useEffect} from 'react';
 import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useShallow} from 'zustand/react/shallow';
 
 type AiSkillsRouteType = 'detail' | 'list' | 'uploadForm' | 'writeForm';
 
@@ -45,6 +50,16 @@ const AiSkills = () => {
     const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
+
+    const {canSave, handlers, isSaving} = useAiSkillDetailToolbarStore(
+        useShallow((state) => ({
+            canSave: state.canSave,
+            handlers: state.handlers,
+            isSaving: state.isSaving,
+        }))
+    );
+
+    const ff_4554 = useFeatureFlagsStore()('ff-4554');
 
     const queryClient = useQueryClient();
 
@@ -85,22 +100,86 @@ const AiSkills = () => {
 
     const showToolbar = route === 'list' && skillsView !== 'empty';
 
-    const toolbarRight = showToolbar ? (
-        <div className="flex items-center gap-2">
-            <div className="relative">
-                <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+    let toolbarRight: React.ReactNode = undefined;
 
-                <Input
-                    className="w-64 pl-9"
-                    onChange={(event) => setSearchQuery(event.target.value)}
-                    placeholder="Search skills..."
-                    value={searchQuery}
-                />
+    if (showToolbar) {
+        toolbarRight = (
+            <div className="flex items-center gap-2">
+                <div className="relative">
+                    <SearchIcon className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-400" />
+
+                    <Input
+                        className="w-64 pl-9"
+                        onChange={(event) => setSearchQuery(event.target.value)}
+                        placeholder="Search skills..."
+                        value={searchQuery}
+                    />
+                </div>
+
+                <AiSkillsCreateDropdown />
             </div>
+        );
+    } else if (route === 'detail' && handlers) {
+        toolbarRight = (
+            <div className="flex items-center gap-1">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={<PencilIcon className="size-4" />}
+                            onClick={handlers.onEdit}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
 
-            <AiSkillsCreateDropdown />
-        </div>
-    ) : undefined;
+                    <TooltipContent>Edit skill</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            disabled={!canSave || isSaving}
+                            icon={<SaveIcon className="size-4" />}
+                            onClick={handlers.onSave}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Save changes</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={<DownloadIcon className="size-4" />}
+                            onClick={handlers.onDownload}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Download skill</TooltipContent>
+                </Tooltip>
+
+                {ff_4554 && (
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <Button
+                                className="[&_svg]:size-5"
+                                icon={<SparklesIcon />}
+                                onClick={handlers.onCopilot}
+                                size="icon"
+                                variant="ghost"
+                            />
+                        </TooltipTrigger>
+
+                        <TooltipContent>Open Copilot panel</TooltipContent>
+                    </Tooltip>
+                )}
+            </div>
+        );
+    }
 
     return (
         <LayoutContainer

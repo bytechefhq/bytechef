@@ -1,14 +1,13 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillEditDialog from '@/pages/automation/ai/skills/components/AiSkillEditDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
+import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
-import {DownloadIcon, FileIcon, FileTextIcon, FolderIcon, PencilIcon, SaveIcon, SparklesIcon} from 'lucide-react';
+import {FileIcon, FileTextIcon, FolderIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
@@ -167,7 +166,10 @@ const AiSkillDetail = () => {
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const setContext = useCopilotStore((state) => state.setContext);
 
-    const ff_4554 = useFeatureFlagsStore()('ff-4554');
+    const setCanSave = useAiSkillDetailToolbarStore((state) => state.setCanSave);
+    const setHandlers = useAiSkillDetailToolbarStore((state) => state.setHandlers);
+    const setIsSavingStore = useAiSkillDetailToolbarStore((state) => state.setIsSaving);
+    const resetToolbar = useAiSkillDetailToolbarStore((state) => state.resetToolbar);
 
     const {
         editorLanguage,
@@ -189,6 +191,42 @@ const AiSkillDetail = () => {
         latestContentRef.current = '';
     }, [selectedFilePath]);
 
+    // Publish the toolbar handlers + flags so the page header (rendered in AiSkills) can show the
+    // action buttons aligned with the title. Re-runs whenever any of the captured values change so
+    // the header's button closures stay current.
+    useEffect(() => {
+        const openCopilot = () => {
+            setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
+
+            setCopilotPanelOpen(true);
+        };
+
+        const save = async () => {
+            await handleSaveContent(latestContentRef.current);
+
+            setIsContentDirty(false);
+        };
+
+        setHandlers({
+            onCopilot: openCopilot,
+            onDownload: handleDownload,
+            onEdit: () => setShowEditDialog(true),
+            onSave: save,
+        });
+    }, [handleDownload, handleSaveContent, setCopilotPanelOpen, setContext, setHandlers]);
+
+    useEffect(() => {
+        setCanSave(selectedFilePath != null && isContentDirty && !isSaving);
+    }, [isContentDirty, isSaving, selectedFilePath, setCanSave]);
+
+    useEffect(() => {
+        setIsSavingStore(isSaving);
+    }, [isSaving, setIsSavingStore]);
+
+    useEffect(() => {
+        return () => resetToolbar();
+    }, [resetToolbar]);
+
     if (!skill) {
         return (
             <div className="flex flex-1 items-center justify-center">
@@ -197,80 +235,8 @@ const AiSkillDetail = () => {
         );
     }
 
-    const handleOpenCopilot = () => {
-        setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
-
-        setCopilotPanelOpen(true);
-    };
-
-    const handleSave = async () => {
-        await handleSaveContent(latestContentRef.current);
-
-        setIsContentDirty(false);
-    };
-
-    const canSave = selectedFilePath != null && isContentDirty && !isSaving;
-
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-center justify-end gap-1 border-b border-b-border/50 px-4 py-2">
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            icon={<PencilIcon className="size-4" />}
-                            onClick={() => setShowEditDialog(true)}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Edit skill</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            disabled={!canSave}
-                            icon={<SaveIcon className="size-4" />}
-                            onClick={handleSave}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Save changes</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
-                        <Button
-                            icon={<DownloadIcon className="size-4" />}
-                            onClick={handleDownload}
-                            size="icon"
-                            variant="ghost"
-                        />
-                    </TooltipTrigger>
-
-                    <TooltipContent>Download skill</TooltipContent>
-                </Tooltip>
-
-                {ff_4554 && (
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                className="[&_svg]:size-5"
-                                icon={<SparklesIcon />}
-                                onClick={handleOpenCopilot}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Open Copilot panel</TooltipContent>
-                    </Tooltip>
-                )}
-            </div>
-
             <div className="flex min-h-0 flex-1 overflow-hidden">
                 <div className="w-60 shrink-0 border-r border-r-border/50 py-2 pr-2">
                     {fileTree.map((node) => (
