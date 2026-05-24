@@ -222,6 +222,24 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    public void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable) {
+        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = connectedUserProjectWorkflowService
+            .getConnectedUserProjectWorkflow(connectedUserProjectWorkflowId);
+
+        ConnectedUserProject connectedUserProject = connectUserProjectService.getConnectedUserProject(
+            connectedUserProjectWorkflow.getConnectedUserProjectId());
+
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserProject.getConnectedUserId());
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getProjectWorkflow(
+            connectedUserProjectWorkflow.getProjectWorkflowId());
+
+        enableProjectWorkflow(
+            connectedUser.getExternalId(), projectWorkflow.getUuidAsString(), enable,
+            connectedUser.getEnvironmentId());
+    }
+
+    @Override
     public ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
         String externalUserId, String workflowUuid, Long environmentId) {
 

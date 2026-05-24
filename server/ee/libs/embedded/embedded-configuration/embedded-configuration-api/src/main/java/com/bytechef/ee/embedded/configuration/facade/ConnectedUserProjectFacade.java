@@ -27,6 +27,8 @@ public interface ConnectedUserProjectFacade {
     void enableProjectWorkflow(
         String externalUserId, String workflowUuid, boolean enable, Long environmentId);
 
+    void enableProjectWorkflow(long connectedUserProjectWorkflowId, boolean enable);
+
     ConnectedUserProjectWorkflowDTO getConnectedUserProjectWorkflow(
         String externalUserId, String workflowUuid, Long environmentId);
 
