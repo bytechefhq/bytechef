@@ -24,5 +24,5 @@ import java.util.List;
  */
 @SuppressFBWarnings("EI")
 public record WorkflowTemplatePage(
-    List<WorkflowTemplateSummary> content, int page, int size, int totalElements, int totalPages) {
+    List<WorkflowTemplateSummary> content, int page, int size, long totalElements, int totalPages) {
 }

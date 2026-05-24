@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * @version ee
  *
- * @author @author Ivica Cardic
+ * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectDTO(
