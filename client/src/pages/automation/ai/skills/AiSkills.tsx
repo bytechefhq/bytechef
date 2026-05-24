@@ -5,8 +5,8 @@ import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';
 import AiSkillsCreateDropdown from '@/pages/automation/ai/skills/components/AiSkillsCreateDropdown';
 import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
-import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
-import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
@@ -40,17 +40,24 @@ const AiSkills = () => {
     const navigate = useNavigate();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
-    const copilotPanelOpen = useAiSkillsStore((state) => state.copilotPanelOpen);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
     const searchQuery = useAiSkillsStore((state) => state.searchQuery);
     const selectedSkillId = useAiSkillsStore((state) => state.selectedSkillId);
-    const setCopilotPanelOpen = useAiSkillsStore((state) => state.setCopilotPanelOpen);
     const setSearchQuery = useAiSkillsStore((state) => state.setSearchQuery);
     const setSkillsView = useAiSkillsStore((state) => state.setSkillsView);
     const skillsHeaderInfo = useAiSkillsStore((state) => state.skillsHeaderInfo);
     const skillsView = useAiSkillsStore((state) => state.skillsView);
 
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const setContext = useCopilotStore((state) => state.setContext);
+
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
+    const handleOpenCopilot = () => {
+        setContext({mode: MODE.ASK, parameters: {}, source: Source.SKILLS});
+
+        setCopilotPanelOpen(true);
+    };
 
     const route = determineRoute(location.pathname, skillId);
 
@@ -104,7 +111,7 @@ const AiSkills = () => {
                         <Button
                             className="[&_svg]:size-5"
                             icon={<SparklesIcon />}
-                            onClick={() => setCopilotPanelOpen(true)}
+                            onClick={handleOpenCopilot}
                             size="icon"
                             variant="ghost"
                         />
@@ -123,17 +130,8 @@ const AiSkills = () => {
             leftSidebarHeader={<Header position="sidebar" title="AI" />}
             leftSidebarWidth="64"
         >
-            <div className="flex min-h-0 flex-1 overflow-hidden">
-                <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
-                    <AiSkillsPanel />
-                </div>
-
-                <CopilotPanel
-                    className="h-full border-l border-l-border/50"
-                    onClose={() => setCopilotPanelOpen(false)}
-                    open={copilotPanelOpen}
-                    source={Source.SKILLS}
-                />
+            <div className="flex min-h-0 w-full flex-col px-4 3xl:mx-auto 3xl:w-4/5">
+                <AiSkillsPanel />
             </div>
         </LayoutContainer>
     );
