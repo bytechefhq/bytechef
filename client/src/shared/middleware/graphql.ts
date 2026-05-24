@@ -551,6 +551,26 @@ export type ConnectedUser = {
   version?: Maybe<Scalars['Int']['output']>;
 };
 
+export type ConnectedUserMcpServer = {
+  __typename?: 'ConnectedUserMcpServer';
+  enabled: Scalars['Boolean']['output'];
+  environmentId: Scalars['ID']['output'];
+  id: Scalars['ID']['output'];
+  lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  name: Scalars['String']['output'];
+  tools: Array<ConnectedUserMcpServerTool>;
+};
+
+export type ConnectedUserMcpServerTool = {
+  __typename?: 'ConnectedUserMcpServerTool';
+  componentName: Scalars['String']['output'];
+  componentVersion: Scalars['Int']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  integrationInstanceId: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type ConnectedUserPage = {
   __typename?: 'ConnectedUserPage';
   content: Array<Maybe<ConnectedUser>>;
@@ -1484,6 +1504,8 @@ export type Mutation = {
   deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
   deleteAutomationWorkflowProject: Scalars['Boolean']['output'];
   deleteAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
+  deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   deleteCustomComponent: Scalars['Boolean']['output'];
   deleteDataTableRow: Scalars['Boolean']['output'];
   deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
@@ -1510,6 +1532,9 @@ export type Mutation = {
   duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
   duplicateDataTable: Scalars['Boolean']['output'];
   enableApiConnector: Scalars['Boolean']['output'];
+  enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
+  enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
+  enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
   enableCustomComponent: Scalars['Boolean']['output'];
   exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
   exportSharedWorkflow: Scalars['Boolean']['output'];
@@ -1802,6 +1827,17 @@ export type MutationDeleteAutomationWorkflowProjectWorkflowArgs = {
 };
 
 
+export type MutationDeleteConnectedUserMcpServerArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteConnectedUserProjectWorkflowArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteCustomComponentArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1928,6 +1964,25 @@ export type MutationDuplicateDataTableArgs = {
 
 
 export type MutationEnableApiConnectorArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableConnectedUserMcpServerArgs = {
+  connectedUserId: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+  mcpServerId: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableConnectedUserMcpToolArgs = {
+  enable: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationEnableConnectedUserProjectWorkflowArgs = {
   enable: Scalars['Boolean']['input'];
   id: Scalars['ID']['input'];
 };
@@ -2551,6 +2606,7 @@ export type Query = {
   componentDefinitionVersions: Array<ComponentDefinition>;
   componentDefinitions: Array<ComponentDefinition>;
   connectedUser?: Maybe<ConnectedUser>;
+  connectedUserMcpServers: Array<ConnectedUserMcpServer>;
   connectedUserProjects: Array<ConnectedUserProject>;
   connectedUsers?: Maybe<ConnectedUserPage>;
   connectionComponentDefinition: ComponentDefinition;
@@ -2854,6 +2910,11 @@ export type QueryComponentDefinitionsArgs = {
 
 export type QueryConnectedUserArgs = {
   id?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryConnectedUserMcpServersArgs = {
+  connectedUserId: Scalars['ID']['input'];
 };
 
 
@@ -4495,6 +4556,13 @@ export type PublishAutomationWorkflowProjectMutationVariables = Exact<{
 
 export type PublishAutomationWorkflowProjectMutation = { __typename?: 'Mutation', publishAutomationWorkflowProject: boolean };
 
+export type ConnectedUserMcpServersQueryVariables = Exact<{
+  connectedUserId: Scalars['ID']['input'];
+}>;
+
+
+export type ConnectedUserMcpServersQuery = { __typename?: 'Query', connectedUserMcpServers: Array<{ __typename?: 'ConnectedUserMcpServer', id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate?: string | null, tools: Array<{ __typename?: 'ConnectedUserMcpServerTool', id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }> }> };
+
 export type ConnectedUserProjectsQueryVariables = Exact<{
   connectedUserId?: InputMaybe<Scalars['ID']['input']>;
   environmentId?: InputMaybe<Scalars['ID']['input']>;
@@ -4516,6 +4584,21 @@ export type CreateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
 
 
 export type CreateMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', createMcpIntegrationInstanceConfiguration?: { __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
+
+export type DeleteConnectedUserMcpServerMutationVariables = Exact<{
+  connectedUserId: Scalars['ID']['input'];
+  mcpServerId: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteConnectedUserMcpServerMutation = { __typename?: 'Mutation', deleteConnectedUserMcpServer?: boolean | null };
+
+export type DeleteConnectedUserProjectWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteConnectedUserProjectWorkflowMutation = { __typename?: 'Mutation', deleteConnectedUserProjectWorkflow?: boolean | null };
 
 export type DeleteEmbeddedMcpServerMutationVariables = Exact<{
   mcpServerId: Scalars['ID']['input'];
@@ -4556,6 +4639,31 @@ export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type EmbeddedMcpServersQuery = { __typename?: 'Query', embeddedMcpServers?: Array<{ __typename?: 'McpServer', id: string, enabled: boolean, environmentId: string, lastModifiedDate?: any | null, name: string, type: PlatformType, url: string, mcpComponents?: Array<{ __typename?: 'McpComponent', componentName: string, componentVersion: number, connectionId?: string | null, id: string, lastModifiedDate?: any | null, mcpServerId: string, title?: string | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string, title?: string | null, parameters?: any | null } | null> | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+
+export type EnableConnectedUserMcpServerMutationVariables = Exact<{
+  connectedUserId: Scalars['ID']['input'];
+  mcpServerId: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+}>;
+
+
+export type EnableConnectedUserMcpServerMutation = { __typename?: 'Mutation', enableConnectedUserMcpServer?: boolean | null };
+
+export type EnableConnectedUserMcpToolMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+}>;
+
+
+export type EnableConnectedUserMcpToolMutation = { __typename?: 'Mutation', enableConnectedUserMcpTool?: boolean | null };
+
+export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  enable: Scalars['Boolean']['input'];
+}>;
+
+
+export type EnableConnectedUserProjectWorkflowMutation = { __typename?: 'Mutation', enableConnectedUserProjectWorkflow?: boolean | null };
 
 export type IntegrationByIdQueryVariables = Exact<{
   id: Scalars['ID']['input'];
@@ -8487,6 +8595,42 @@ export const usePublishAutomationWorkflowProjectMutation = <
   }
     )};
 
+export const ConnectedUserMcpServersDocument = new TypedDocumentString(`
+    query connectedUserMcpServers($connectedUserId: ID!) {
+  connectedUserMcpServers(connectedUserId: $connectedUserId) {
+    id
+    name
+    enabled
+    environmentId
+    lastModifiedDate
+    tools {
+      id
+      componentName
+      componentVersion
+      integrationInstanceId
+      name
+      enabled
+    }
+  }
+}
+    `);
+
+export const useConnectedUserMcpServersQuery = <
+      TData = ConnectedUserMcpServersQuery,
+      TError = unknown
+    >(
+      variables: ConnectedUserMcpServersQueryVariables,
+      options?: Omit<UseQueryOptions<ConnectedUserMcpServersQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ConnectedUserMcpServersQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ConnectedUserMcpServersQuery, TError, TData>(
+      {
+    queryKey: ['connectedUserMcpServers', variables],
+    queryFn: fetcher<ConnectedUserMcpServersQuery, ConnectedUserMcpServersQueryVariables>(ConnectedUserMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
 export const ConnectedUserProjectsDocument = new TypedDocumentString(`
     query connectedUserProjects($connectedUserId: ID, $environmentId: ID) {
   connectedUserProjects(
@@ -8585,6 +8729,47 @@ export const useCreateMcpIntegrationInstanceConfigurationMutation = <
       {
     mutationKey: ['createMcpIntegrationInstanceConfiguration'],
     mutationFn: (variables?: CreateMcpIntegrationInstanceConfigurationMutationVariables) => fetcher<CreateMcpIntegrationInstanceConfigurationMutation, CreateMcpIntegrationInstanceConfigurationMutationVariables>(CreateMcpIntegrationInstanceConfigurationDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteConnectedUserMcpServerDocument = new TypedDocumentString(`
+    mutation deleteConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!) {
+  deleteConnectedUserMcpServer(
+    connectedUserId: $connectedUserId
+    mcpServerId: $mcpServerId
+  )
+}
+    `);
+
+export const useDeleteConnectedUserMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteConnectedUserMcpServerMutation, TError, DeleteConnectedUserMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteConnectedUserMcpServerMutation, TError, DeleteConnectedUserMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteConnectedUserMcpServer'],
+    mutationFn: (variables?: DeleteConnectedUserMcpServerMutationVariables) => fetcher<DeleteConnectedUserMcpServerMutation, DeleteConnectedUserMcpServerMutationVariables>(DeleteConnectedUserMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const DeleteConnectedUserProjectWorkflowDocument = new TypedDocumentString(`
+    mutation deleteConnectedUserProjectWorkflow($id: ID!) {
+  deleteConnectedUserProjectWorkflow(id: $id)
+}
+    `);
+
+export const useDeleteConnectedUserProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteConnectedUserProjectWorkflowMutation, TError, DeleteConnectedUserProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteConnectedUserProjectWorkflowMutation, TError, DeleteConnectedUserProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteConnectedUserProjectWorkflow'],
+    mutationFn: (variables?: DeleteConnectedUserProjectWorkflowMutationVariables) => fetcher<DeleteConnectedUserProjectWorkflowMutation, DeleteConnectedUserProjectWorkflowMutationVariables>(DeleteConnectedUserProjectWorkflowDocument, variables)(),
     ...options
   }
     )};
@@ -8730,6 +8915,67 @@ export const useEmbeddedMcpServersQuery = <
       {
     queryKey: variables === undefined ? ['embeddedMcpServers'] : ['embeddedMcpServers', variables],
     queryFn: fetcher<EmbeddedMcpServersQuery, EmbeddedMcpServersQueryVariables>(EmbeddedMcpServersDocument, variables),
+    ...options
+  }
+    )};
+
+export const EnableConnectedUserMcpServerDocument = new TypedDocumentString(`
+    mutation enableConnectedUserMcpServer($connectedUserId: ID!, $mcpServerId: ID!, $enable: Boolean!) {
+  enableConnectedUserMcpServer(
+    connectedUserId: $connectedUserId
+    mcpServerId: $mcpServerId
+    enable: $enable
+  )
+}
+    `);
+
+export const useEnableConnectedUserMcpServerMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableConnectedUserMcpServerMutation, TError, EnableConnectedUserMcpServerMutationVariables, TContext>) => {
+    
+    return useMutation<EnableConnectedUserMcpServerMutation, TError, EnableConnectedUserMcpServerMutationVariables, TContext>(
+      {
+    mutationKey: ['enableConnectedUserMcpServer'],
+    mutationFn: (variables?: EnableConnectedUserMcpServerMutationVariables) => fetcher<EnableConnectedUserMcpServerMutation, EnableConnectedUserMcpServerMutationVariables>(EnableConnectedUserMcpServerDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableConnectedUserMcpToolDocument = new TypedDocumentString(`
+    mutation enableConnectedUserMcpTool($id: ID!, $enable: Boolean!) {
+  enableConnectedUserMcpTool(id: $id, enable: $enable)
+}
+    `);
+
+export const useEnableConnectedUserMcpToolMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableConnectedUserMcpToolMutation, TError, EnableConnectedUserMcpToolMutationVariables, TContext>) => {
+    
+    return useMutation<EnableConnectedUserMcpToolMutation, TError, EnableConnectedUserMcpToolMutationVariables, TContext>(
+      {
+    mutationKey: ['enableConnectedUserMcpTool'],
+    mutationFn: (variables?: EnableConnectedUserMcpToolMutationVariables) => fetcher<EnableConnectedUserMcpToolMutation, EnableConnectedUserMcpToolMutationVariables>(EnableConnectedUserMcpToolDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const EnableConnectedUserProjectWorkflowDocument = new TypedDocumentString(`
+    mutation enableConnectedUserProjectWorkflow($id: ID!, $enable: Boolean!) {
+  enableConnectedUserProjectWorkflow(id: $id, enable: $enable)
+}
+    `);
+
+export const useEnableConnectedUserProjectWorkflowMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<EnableConnectedUserProjectWorkflowMutation, TError, EnableConnectedUserProjectWorkflowMutationVariables, TContext>) => {
+    
+    return useMutation<EnableConnectedUserProjectWorkflowMutation, TError, EnableConnectedUserProjectWorkflowMutationVariables, TContext>(
+      {
+    mutationKey: ['enableConnectedUserProjectWorkflow'],
+    mutationFn: (variables?: EnableConnectedUserProjectWorkflowMutationVariables) => fetcher<EnableConnectedUserProjectWorkflowMutation, EnableConnectedUserProjectWorkflowMutationVariables>(EnableConnectedUserProjectWorkflowDocument, variables)(),
     ...options
   }
     )};
