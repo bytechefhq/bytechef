@@ -36,7 +36,7 @@ interface EmbeddedWorkflowBuilderProps {
      * This limits which integration components are available to the user.
      * Example: ['slack', 'googleMail', 'productboard']
      */
-    includeComponents: string[];
+    includeComponents?: string[];
 
     /**
      * JWT token for authentication with the ByteChef API.
