@@ -1,14 +1,11 @@
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
 import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
-import {useQueryClient} from '@tanstack/react-query';
 import {ReactNode, useMemo, useState} from 'react';
-import {useParams} from 'react-router-dom';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -36,14 +33,9 @@ export function CopilotRuntimeProvider({
                 messages: state.messages,
             }))
         );
-    const queryClient = useQueryClient();
-
-    const {projectId, projectWorkflowId} = useParams();
 
     const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
 
-    // Memoize the agent so it isn't reconstructed on every render. Without this, every render dropped the
-    // accumulated agent.addMessage history and any in-flight onNew closure captured a stale reference.
     const agent = useMemo(() => {
         if (!conversationId) {
             return null;
@@ -94,13 +86,7 @@ export function CopilotRuntimeProvider({
         } finally {
             setIsRunning(false);
 
-            // Fire whatever post-turn callback the active consumer has registered for this Source —
-            // keeps source-specific refresh logic out of the shared provider.
             useCopilotPostTurnRegistry.getState().runFor(sourceKey);
-
-            queryClient.invalidateQueries({
-                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
-            });
         }
     };
 
