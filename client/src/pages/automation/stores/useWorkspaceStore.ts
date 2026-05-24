@@ -1,3 +1,4 @@
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {create} from 'zustand';
 import {devtools, persist} from 'zustand/middleware';
 
@@ -30,3 +31,7 @@ export const useWorkspaceStore = create<WorkspaceStateI>()(
         )
     )
 );
+
+useCopilotStateContributorRegistry
+    .getState()
+    .register(() => ({workspaceId: useWorkspaceStore.getState().currentWorkspaceId}));
