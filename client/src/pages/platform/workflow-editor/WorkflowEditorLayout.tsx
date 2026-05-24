@@ -12,6 +12,8 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
+import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {Suspense, lazy, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -98,6 +100,23 @@ const WorkflowEditorLayout = ({
 
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
+
+    useEffect(() => {
+        return useCopilotStateContributorRegistry.getState().register(() => {
+            const activeWorkflow = useWorkflowDataStore.getState().workflow;
+            const activeComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+            const copilotContext = useCopilotStore.getState().context as {
+                workflowExecutionError?: {workflowId?: string};
+            };
+            const workflowExecutionError = copilotContext.workflowExecutionError;
+
+            return {
+                currentSelectedNode: activeComponent?.name,
+                workflowId: activeWorkflow.id,
+                ...(activeWorkflow.id === workflowExecutionError?.workflowId ? {workflowExecutionError} : {}),
+            };
+        });
+    }, []);
 
     useEffect(() => {
         let outerRafId: number | undefined;

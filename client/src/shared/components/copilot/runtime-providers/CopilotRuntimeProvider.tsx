@@ -1,7 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
-import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {getCookie} from '@/shared/util/cookie-utils';
@@ -38,8 +37,6 @@ export function CopilotRuntimeProvider({
                 messages: state.messages,
             }))
         );
-    const workflow = useWorkflowDataStore((state) => state.workflow);
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
     const queryClient = useQueryClient();
 
@@ -71,23 +68,15 @@ export function CopilotRuntimeProvider({
 
         setIsRunning(true);
 
-        const {workflowExecutionError, ...contextWithoutError} = (context ?? {}) as typeof context & {
-            workflowExecutionError?: {
-                errorMessage?: string;
-                stackTrace?: string[];
-                title?: string;
-                workflowId?: string;
-            };
-        };
+        const contextWithoutError: Record<string, unknown> = {...(context ?? {})};
+
+        delete contextWithoutError.workflowExecutionError;
 
         const stateToSend = {
             ...contextWithoutError,
-            currentSelectedNode: currentComponent?.name,
-            workflowId: workflow.id,
             workspaceId: currentWorkspaceId,
-            ...(workflow.id === workflowExecutionError?.workflowId
-                ? {workflowExecutionError: workflowExecutionError}
-                : {}),
+            ...useCopilotStateContributorRegistry.getState()
+                .contribute(),
         };
 
         agent.setState(stateToSend);
