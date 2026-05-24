@@ -15,12 +15,10 @@ import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {DownloadIcon, PencilIcon, Plus, SaveIcon, SearchIcon, SparklesIcon} from 'lucide-react';
 import {useEffect} from 'react';
-import {useLocation, useNavigate, useParams} from 'react-router-dom';
+import {useLocation, useParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 type AiSkillsRouteType = 'detail' | 'list' | 'uploadForm' | 'writeForm';
-
-const SKILLS_BASE_PATH = '/automation/ai/skills';
 
 const determineRoute = (pathname: string, skillId: string | undefined): AiSkillsRouteType => {
     if (pathname.endsWith('/create/write')) {
@@ -41,7 +39,6 @@ const determineRoute = (pathname: string, skillId: string | undefined): AiSkills
 const AiSkills = () => {
     const {skillId} = useParams<{skillId?: string}>();
     const location = useLocation();
-    const navigate = useNavigate();
 
     const closeSkillDetail = useAiSkillsStore((state) => state.closeSkillDetail);
     const openSkillDetail = useAiSkillsStore((state) => state.openSkillDetail);
@@ -89,12 +86,6 @@ const AiSkills = () => {
             setSkillsView(route);
         }
     }, [route, skillsView, setSkillsView]);
-
-    useEffect(() => {
-        if (route === 'detail' && selectedSkillId && skillId !== selectedSkillId) {
-            navigate(`${SKILLS_BASE_PATH}/${selectedSkillId}`);
-        }
-    }, [route, selectedSkillId, skillId, navigate]);
 
     const isDetailOrCreate = route !== 'list';
     const headerTitle = isDetailOrCreate ? (skillsHeaderInfo.title ?? 'Skill') : 'Skills';
