@@ -12,9 +12,13 @@ import useRightSidebarStore from '@/pages/platform/workflow-editor/stores/useRig
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
-import {useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {useQueryClient} from '@tanstack/react-query';
 import {Suspense, lazy, useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
@@ -101,6 +105,9 @@ const WorkflowEditorLayout = ({
     const {invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
     const {handleClusterElementsCanvasOpenChange, isMainRootClusterElement} = useWorkflowEditorLayout();
 
+    const queryClient = useQueryClient();
+    const {projectId, projectWorkflowId} = useParams();
+
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
             const activeWorkflow = useWorkflowDataStore.getState().workflow;
@@ -117,6 +124,14 @@ const WorkflowEditorLayout = ({
             };
         });
     }, []);
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_EDITOR, () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+            });
+        });
+    }, [projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
         let outerRafId: number | undefined;
