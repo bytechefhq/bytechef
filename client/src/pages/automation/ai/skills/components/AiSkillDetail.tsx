@@ -213,72 +213,62 @@ const AiSkillDetail = () => {
 
     return (
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-            <div className="flex shrink-0 items-start justify-between gap-4 border-b border-b-border/50 px-4 py-3">
-                <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold">{skill.name}</div>
+            <div className="flex shrink-0 items-center justify-end gap-1 border-b border-b-border/50 px-4 py-2">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={<PencilIcon className="size-4" />}
+                            onClick={() => setShowEditDialog(true)}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
 
-                    <span className="block text-xs text-content-neutral-secondary">
-                        {skill.description || 'No description'}
-                    </span>
-                </div>
+                    <TooltipContent>Edit skill</TooltipContent>
+                </Tooltip>
 
-                <div className="flex shrink-0 items-center gap-1">
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            disabled={!canSave}
+                            icon={<SaveIcon className="size-4" />}
+                            onClick={handleSave}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Save changes</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Button
+                            icon={<DownloadIcon className="size-4" />}
+                            onClick={handleDownload}
+                            size="icon"
+                            variant="ghost"
+                        />
+                    </TooltipTrigger>
+
+                    <TooltipContent>Download skill</TooltipContent>
+                </Tooltip>
+
+                {ff_4554 && (
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Button
-                                icon={<PencilIcon className="size-4" />}
-                                onClick={() => setShowEditDialog(true)}
+                                className="[&_svg]:size-5"
+                                icon={<SparklesIcon />}
+                                onClick={handleOpenCopilot}
                                 size="icon"
                                 variant="ghost"
                             />
                         </TooltipTrigger>
 
-                        <TooltipContent>Edit skill</TooltipContent>
+                        <TooltipContent>Open Copilot panel</TooltipContent>
                     </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                disabled={!canSave}
-                                icon={<SaveIcon className="size-4" />}
-                                onClick={handleSave}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Save changes</TooltipContent>
-                    </Tooltip>
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Button
-                                icon={<DownloadIcon className="size-4" />}
-                                onClick={handleDownload}
-                                size="icon"
-                                variant="ghost"
-                            />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Download skill</TooltipContent>
-                    </Tooltip>
-
-                    {ff_4554 && (
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    className="[&_svg]:size-5"
-                                    icon={<SparklesIcon />}
-                                    onClick={handleOpenCopilot}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Open Copilot panel</TooltipContent>
-                        </Tooltip>
-                    )}
-                </div>
+                )}
             </div>
 
             <div className="flex min-h-0 flex-1 overflow-hidden">
