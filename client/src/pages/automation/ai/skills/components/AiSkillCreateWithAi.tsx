@@ -39,6 +39,8 @@ const AiSkillCreateWithAi = () => {
     const location = useLocation();
 
     const setContext = useCopilotStore((state) => state.setContext);
+    const resetMessages = useCopilotStore((state) => state.resetMessages);
+    const generateConversationId = useCopilotStore((state) => state.generateConversationId);
 
     const origin: CreateWithAiOriginType =
         (location.state as CreateWithAiLocationStateI | null)?.origin ?? 'list';
@@ -48,8 +50,10 @@ const AiSkillCreateWithAi = () => {
     const baselineIdsRef = useRef<Set<string> | null>(null);
 
     useEffect(() => {
+        resetMessages();
+        generateConversationId();
         setContext({mode: MODE.BUILD, parameters: {}, source: Source.SKILLS});
-    }, [setContext]);
+    }, [generateConversationId, resetMessages, setContext]);
 
     useEffect(() => {
         if (!skillsData?.aiSkills) {
