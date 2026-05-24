@@ -31,6 +31,11 @@ public class RemoteMcpIntegrationInstanceToolServiceClient implements McpIntegra
     }
 
     @Override
+    public void delete(long id) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void deleteByIntegrationInstanceId(long integrationInstanceId) {
         throw new UnsupportedOperationException();
     }
