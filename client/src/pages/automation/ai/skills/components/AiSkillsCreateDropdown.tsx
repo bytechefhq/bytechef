@@ -4,6 +4,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ChevronDownIcon, PencilIcon, SparklesIcon, UploadIcon} from 'lucide-react';
+import {ReactNode} from 'react';
 import {useNavigate} from 'react-router-dom';
 
 const CREATE_PATHS = {
@@ -11,7 +12,11 @@ const CREATE_PATHS = {
     writeForm: '/automation/ai/skills/create/write',
 } as const;
 
-const AiSkillsCreateDropdown = () => {
+interface AiSkillsCreateDropdownProps {
+    trigger?: ReactNode;
+}
+
+const AiSkillsCreateDropdown = ({trigger}: AiSkillsCreateDropdownProps = {}) => {
     const navigate = useNavigate();
 
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
@@ -32,10 +37,12 @@ const AiSkillsCreateDropdown = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Button>
-                    Create Skill
-                    <ChevronDownIcon className="ml-1 size-4" />
-                </Button>
+                {trigger ?? (
+                    <Button>
+                        Create Skill
+                        <ChevronDownIcon className="ml-1 size-4" />
+                    </Button>
+                )}
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="end" className="w-72">
