@@ -1,0 +1,3 @@
+mutation enableConnectedUserMcpTool($id: ID!, $enable: Boolean!) {
+    enableConnectedUserMcpTool(id: $id, enable: $enable)
+}
