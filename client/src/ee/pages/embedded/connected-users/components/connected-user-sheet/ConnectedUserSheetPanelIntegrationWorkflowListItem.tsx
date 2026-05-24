@@ -53,15 +53,16 @@ const ConnectedUserSheetPanelIntegrationWorkflowListItem = ({
         <li className="flex items-center justify-between rounded-md p-2 py-1 hover:bg-gray-50" key={workflow.id}>
             <div className="text-sm font-semibold">{workflow.label}</div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-1">
                 {filteredComponentDefinitions?.map((componentDefinition) => {
                     return (
                         componentDefinition && (
-                            <InlineSVG
-                                className="size-6 flex-none"
+                            <div
+                                className="flex items-center justify-center rounded-full border p-1"
                                 key={componentDefinition.name!}
-                                src={componentDefinition.icon!}
-                            />
+                            >
+                                <InlineSVG className="size-5 flex-none" src={componentDefinition.icon!} />
+                            </div>
                         )
                     );
                 })}
