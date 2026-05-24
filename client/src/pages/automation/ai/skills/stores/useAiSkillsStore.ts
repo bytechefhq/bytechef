@@ -17,11 +17,9 @@ const SKILLS_HEADER_INFO: Record<SkillsViewType, SkillsHeaderInfoI> = {
 
 interface AiSkillsStoreI {
     closeSkillDetail: () => void;
-    copilotPanelOpen: boolean;
     openSkillDetail: (id: string, name: string) => void;
     searchQuery: string;
     selectedSkillId: string | null;
-    setCopilotPanelOpen: (open: boolean) => void;
     setSearchQuery: (query: string) => void;
     setSkillsPanelOpen: (open: boolean) => void;
     setSkillsView: (view: SkillsViewType) => void;
@@ -38,7 +36,6 @@ export const useAiSkillsStore = create<AiSkillsStoreI>(() => ({
             skillsView: 'list',
         });
     },
-    copilotPanelOpen: false,
     openSkillDetail: (id: string, name: string) => {
         useAiSkillsStore.setState({
             selectedSkillId: id,
@@ -49,9 +46,6 @@ export const useAiSkillsStore = create<AiSkillsStoreI>(() => ({
     },
     searchQuery: '',
     selectedSkillId: null,
-    setCopilotPanelOpen: (open: boolean) => {
-        useAiSkillsStore.setState({copilotPanelOpen: open});
-    },
     setSearchQuery: (query: string) => {
         useAiSkillsStore.setState({searchQuery: query});
     },

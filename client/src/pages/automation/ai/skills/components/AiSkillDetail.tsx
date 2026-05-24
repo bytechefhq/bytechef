@@ -4,7 +4,8 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSkillEditDescriptionDialog from '@/pages/automation/ai/skills/components/AiSkillEditDescriptionDialog';
 import AiSkillRenameDialog from '@/pages/automation/ai/skills/components/AiSkillRenameDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
-import {useAiSkillsStore} from '@/pages/automation/ai/skills/stores/useAiSkillsStore';
+import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
+import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
@@ -147,9 +148,16 @@ const AiSkillDetail = () => {
 
     const latestContentRef = useRef('');
 
-    const setCopilotPanelOpen = useAiSkillsStore((state) => state.setCopilotPanelOpen);
+    const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
+    const setContext = useCopilotStore((state) => state.setContext);
 
     const ff_4554 = useFeatureFlagsStore()('ff-4554');
+
+    const handleOpenCopilot = () => {
+        setContext({mode: MODE.ASK, parameters: {}, source: Source.SKILLS});
+
+        setCopilotPanelOpen(true);
+    };
 
     const {
         editorLanguage,
@@ -258,7 +266,7 @@ const AiSkillDetail = () => {
                                             <Button
                                                 className="[&_svg]:size-5"
                                                 icon={<SparklesIcon />}
-                                                onClick={() => setCopilotPanelOpen(true)}
+                                                onClick={handleOpenCopilot}
                                                 size="icon"
                                                 variant="ghost"
                                             />
