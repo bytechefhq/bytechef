@@ -60,6 +60,41 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
     }
 
     @Override
+    public void enableConnectedUserMcpServer(long connectedUserId, long mcpServerId, boolean enable) {
+        // Bulk-flip every per-user tool whose underlying McpComponent points at the given server.
+        // Computed "server enabled for user" = any tool enabled; toggling the card thus disables or
+        // re-enables the whole group rather than introducing a separate per-(user, server) state row.
+        Map<Long, McpComponent> mcpComponentCache = new HashMap<>();
+
+        List<IntegrationInstance> integrationInstances = integrationInstanceService
+            .getConnectedUserIntegrationInstances(connectedUserId);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            List<McpIntegrationInstanceTool> toolRows = mcpIntegrationInstanceToolService
+                .getMcpIntegrationInstanceTools(integrationInstance.getId());
+
+            for (McpIntegrationInstanceTool toolRow : toolRows) {
+                Optional<McpTool> mcpToolOptional = mcpToolService.fetchMcpTool(toolRow.getMcpToolId());
+
+                if (mcpToolOptional.isEmpty()) {
+                    continue;
+                }
+
+                McpTool mcpTool = mcpToolOptional.get();
+
+                McpComponent mcpComponent = mcpComponentCache.computeIfAbsent(
+                    mcpTool.getMcpComponentId(), mcpComponentService::getMcpComponent);
+
+                if (mcpComponent.getMcpServerId() != mcpServerId) {
+                    continue;
+                }
+
+                mcpIntegrationInstanceToolService.updateEnabled(toolRow.getId(), enable);
+            }
+        }
+    }
+
+    @Override
     public void enableMcpTool(long mcpIntegrationInstanceToolId, boolean enable) {
         mcpIntegrationInstanceToolService.updateEnabled(mcpIntegrationInstanceToolId, enable);
     }
@@ -107,8 +142,13 @@ public class ConnectedUserMcpServerFacadeImpl implements ConnectedUserMcpServerF
 
             tools.sort(Comparator.comparing(ConnectedUserMcpServerToolDTO::name));
 
+            // "enabled for user" is computed per-user, not taken from the workspace-level flag: the
+            // server is considered active for this user when at least one of their tools is enabled.
+            boolean enabledForUser = tools.stream()
+                .anyMatch(ConnectedUserMcpServerToolDTO::enabled);
+
             connectedUserMcpServers.add(new ConnectedUserMcpServerDTO(
-                mcpServer.getId(), mcpServer.getName(), mcpServer.isEnabled(), mcpServer.getEnvironmentId(),
+                mcpServer.getId(), mcpServer.getName(), enabledForUser, mcpServer.getEnvironmentId(),
                 mcpServer.getLastModifiedDate(), tools));
         }
 
