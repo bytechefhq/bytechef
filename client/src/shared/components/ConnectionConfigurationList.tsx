@@ -1,17 +1,19 @@
 import SubflowIcon from '@/assets/subflow.svg';
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {CaretDownIcon} from '@radix-ui/react-icons';
-import {CornerDownRightIcon, ExpandIcon, InfoIcon, PlusIcon} from 'lucide-react';
+import {CornerDownRightIcon, InfoIcon, PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
 import {ComponentConnection, Workflow} from '../middleware/platform/configuration';
 import {useGetComponentDefinitionQuery} from '../queries/platform/componentDefinitions.queries';
+import EnvironmentBadge from './EnvironmentBadge';
 
 interface ConnectionRenderItemI {
     connection: ComponentConnection;
@@ -224,10 +226,6 @@ interface SubflowConnectionGroupProps {
     subflowLabelMap?: Map<string, string>;
     workflowNodeLabelMap: Map<string, string>;
 }
-
-import EnvironmentBadge from './EnvironmentBadge';
-
-import Badge from '@/components/Badge/Badge';
 
 interface SubflowDuplicateStubRowProps {
     stub: SubflowDuplicateStubI;

@@ -1,4 +1,10 @@
-import {ComponentConnection, Workflow, WorkflowInput} from '@/shared/middleware/automation/configuration';
+import {
+    ComponentConnection,
+    ProjectDeploymentWorkflow,
+    ProjectDeploymentWorkflowConnection,
+    Workflow,
+    WorkflowInput,
+} from '@/shared/middleware/automation/configuration';
 
 export interface SubflowDuplicateStubI {
     subflowWorkflowUuid: string;
@@ -230,5 +236,182 @@ export const getWorkflowInputs = (workflow: Workflow, workflows?: Workflow[]): W
 
 export const getSubflowInputStubs = (workflow: Workflow, workflows?: Workflow[]): SubflowDuplicateStubI[] =>
     walkWorkflowInputs(workflow, workflows).stubs;
+
+const collectReachableSubflowUuids = (workflow: Workflow, workflows: Workflow[], reachable: Set<string>): void => {
+    const subflows = workflow.tasks?.filter((task) => task.type.startsWith('subflow') && task.parameters?.workflowUuid);
+
+    if (!subflows?.length) {
+        return;
+    }
+
+    for (const subflow of subflows) {
+        const subflowWorkflowUuid = subflow.parameters?.workflowUuid;
+
+        if (!subflowWorkflowUuid || reachable.has(subflowWorkflowUuid)) {
+            continue;
+        }
+
+        reachable.add(subflowWorkflowUuid);
+
+        const subflowWorkflow = workflows.find((candidate) => candidate.workflowUuid === subflowWorkflowUuid);
+
+        if (subflowWorkflow) {
+            collectReachableSubflowUuids(subflowWorkflow, workflows, reachable);
+        }
+    }
+};
+
+/**
+ * Returns the workflowUuid set of every subflow transitively referenced by the given parent workflows. Subflows are
+ * visually nested under their parent in the deployment dialog and have no enable toggle of their own, so they are
+ * implicitly enabled whenever a parent is enabled.
+ */
+export const getReachableSubflowUuids = (parentWorkflows: Workflow[], workflows: Workflow[]): Set<string> => {
+    const reachable = new Set<string>();
+
+    for (const parentWorkflow of parentWorkflows) {
+        collectReachableSubflowUuids(parentWorkflow, workflows, reachable);
+    }
+
+    return reachable;
+};
+
+export interface SubflowDeploymentValuesI {
+    connections: ProjectDeploymentWorkflowConnection[];
+    inputs: Record<string, unknown>;
+}
+
+/**
+ * The deployment dialog renders a parent workflow together with all of its (transitive) subflow connections and inputs
+ * as one merged list, so the form stores every value under the parent's projectDeploymentWorkflow entry. At submit time
+ * each value must instead be attributed to the workflow it actually belongs to. This splits the parent's merged form
+ * values back out per owning workflowUuid by aligning them against the same merged connection/input lists the UI built.
+ *
+ * The returned map is keyed by owning subflow workflowUuid; the parent's own values are returned separately. Connection
+ * values are aligned positionally to the merged connection list (grouping is render-only, storage stays positional), so
+ * a grouped connection lands on whichever workflow/subflow physically owns that node.
+ */
+export const splitSubflowDeploymentValues = (
+    parentWorkflow: Workflow,
+    workflows: Workflow[],
+    formConnections: ProjectDeploymentWorkflowConnection[] | undefined,
+    formInputs: Record<string, unknown> | undefined
+): {ownValues: SubflowDeploymentValuesI; subflowValuesByUuid: Map<string, SubflowDeploymentValuesI>} => {
+    const ownValues: SubflowDeploymentValuesI = {connections: [], inputs: {}};
+    const subflowValuesByUuid = new Map<string, SubflowDeploymentValuesI>();
+
+    const getBucket = (subflowWorkflowUuid?: string): SubflowDeploymentValuesI => {
+        if (!subflowWorkflowUuid) {
+            return ownValues;
+        }
+
+        let bucket = subflowValuesByUuid.get(subflowWorkflowUuid);
+
+        if (!bucket) {
+            bucket = {connections: [], inputs: {}};
+
+            subflowValuesByUuid.set(subflowWorkflowUuid, bucket);
+        }
+
+        return bucket;
+    };
+
+    const mergedConnections = getWorkflowComponentConnections(parentWorkflow, workflows);
+
+    mergedConnections.forEach((mergedConnection, index) => {
+        const connectionId = formConnections?.[index]?.connectionId;
+
+        if (connectionId == null) {
+            return;
+        }
+
+        getBucket(mergedConnection.subflowWorkflowUuid).connections.push({
+            connectionId,
+            workflowConnectionKey: mergedConnection.key,
+            workflowNodeName: mergedConnection.workflowNodeName,
+        });
+    });
+
+    const mergedInputs = getWorkflowInputs(parentWorkflow, workflows);
+
+    for (const mergedInput of mergedInputs) {
+        if (!mergedInput.name || !(mergedInput.name in (formInputs ?? {}))) {
+            continue;
+        }
+
+        getBucket(mergedInput.subflowWorkflowUuid).inputs[mergedInput.name] = formInputs![mergedInput.name];
+    }
+
+    return {ownValues, subflowValuesByUuid};
+};
+
+const isSubflowWorkflow = (workflow?: Workflow): boolean =>
+    !!workflow?.workflowTriggerComponentNames?.includes('workflow');
+
+/**
+ * Maps the form's projectDeploymentWorkflow entries into the array sent to the backend. Subflows are nested under their
+ * parent in the dialog, so each subflow of an enabled parent is implicitly enabled and the parent's merged
+ * connection/input values are redistributed to the workflow that actually owns them (see splitSubflowDeploymentValues).
+ * Disabled workflows are submitted with their connections/inputs cleared.
+ */
+export const buildDeploymentWorkflows = (
+    formWorkflows: ProjectDeploymentWorkflow[] | undefined,
+    workflows: Workflow[]
+): ProjectDeploymentWorkflow[] | undefined => {
+    if (!formWorkflows) {
+        return formWorkflows;
+    }
+
+    const workflowsById = new Map(workflows.map((workflow) => [workflow.id, workflow]));
+
+    const enabledParentWorkflows = formWorkflows
+        .filter((formWorkflow) => formWorkflow.enabled)
+        .map((formWorkflow) => workflowsById.get(formWorkflow.workflowId))
+        .filter((workflow): workflow is Workflow => !!workflow && !isSubflowWorkflow(workflow));
+
+    const enabledSubflowUuids = getReachableSubflowUuids(enabledParentWorkflows, workflows);
+
+    const ownValuesByWorkflowId = new Map<string, SubflowDeploymentValuesI>();
+    const subflowValuesByUuid = new Map<string, SubflowDeploymentValuesI>();
+
+    for (const parentWorkflow of enabledParentWorkflows) {
+        const parentEntry = formWorkflows.find((formWorkflow) => formWorkflow.workflowId === parentWorkflow.id);
+
+        const {ownValues, subflowValuesByUuid: parentSubflowValues} = splitSubflowDeploymentValues(
+            parentWorkflow,
+            workflows,
+            parentEntry?.connections,
+            parentEntry?.inputs as Record<string, unknown> | undefined
+        );
+
+        ownValuesByWorkflowId.set(parentWorkflow.id!, ownValues);
+
+        for (const [subflowWorkflowUuid, values] of parentSubflowValues) {
+            subflowValuesByUuid.set(subflowWorkflowUuid, values);
+        }
+    }
+
+    return formWorkflows.map((formWorkflow) => {
+        const workflow = workflowsById.get(formWorkflow.workflowId);
+
+        const subflowEnabled = !!workflow?.workflowUuid && enabledSubflowUuids.has(workflow.workflowUuid);
+        const enabled = formWorkflow.enabled || subflowEnabled;
+
+        if (!enabled) {
+            return {...formWorkflow, connections: [], enabled, inputs: {}};
+        }
+
+        const values = subflowEnabled
+            ? subflowValuesByUuid.get(workflow!.workflowUuid!)
+            : ownValuesByWorkflowId.get(formWorkflow.workflowId!);
+
+        return {
+            ...formWorkflow,
+            connections: values?.connections ?? [],
+            enabled,
+            inputs: values?.inputs ?? {},
+        };
+    });
+};
 
 export default getWorkflowComponentConnections;
