@@ -45,7 +45,7 @@ import {useShallow} from 'zustand/react/shallow';
 
 import ProjectDeploymentDialogBasicStep from './ProjectDeploymentDialogBasicStep';
 import ProjectDeploymentDialogWorkflowsStep from './ProjectDeploymentDialogWorkflowsStep';
-import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
+import getWorkflowComponentConnections, {buildDeploymentWorkflows} from './projectDeploymentDialog-utils';
 
 interface ProjectDeploymentDialogProps {
     changeProjectVersion?: boolean;
@@ -376,33 +376,22 @@ const ProjectDeploymentDialog = ({
             return;
         }
 
+        const projectDeploymentWorkflows = buildDeploymentWorkflows(
+            formData.projectDeploymentWorkflows,
+            workflows ?? []
+        );
+
         if (effectiveProjectDeployment?.id) {
             updateProjectDeploymentMutation.mutate({
                 ...effectiveProjectDeployment,
                 ...formData,
-                projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
-                    return {
-                        ...projectDeploymentWorkflow,
-                        connections: projectDeploymentWorkflow.enabled
-                            ? projectDeploymentWorkflow.connections?.filter((connection) => connection.connectionId)
-                            : [],
-                        inputs: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.inputs : {},
-                    };
-                }),
+                projectDeploymentWorkflows,
             } as ProjectDeployment);
         } else {
             createProjectDeploymentMutation.mutate({
                 ...formData,
                 environmentId: formData.environmentId ?? currentEnvironmentId,
-                projectDeploymentWorkflows: formData.projectDeploymentWorkflows?.map((projectDeploymentWorkflow) => {
-                    return {
-                        ...projectDeploymentWorkflow,
-                        connections: projectDeploymentWorkflow.enabled
-                            ? projectDeploymentWorkflow.connections?.filter((connection) => connection.connectionId)
-                            : [],
-                        inputs: projectDeploymentWorkflow.enabled ? projectDeploymentWorkflow.inputs : {},
-                    };
-                }),
+                projectDeploymentWorkflows,
             });
         }
     };

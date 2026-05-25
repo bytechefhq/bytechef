@@ -172,6 +172,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                             setValue={setValue}
                             workflow={workflow}
                             workflowIndex={0}
+                            workflows={[workflow]}
                         />
                     </div>
 
