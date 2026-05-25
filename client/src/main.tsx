@@ -46,9 +46,9 @@ async function renderApp() {
         ? (await import('@/embeddedWorkflowBuilderRoutes')).getRouter()
         : getMainRouter(queryClient);
 
-    if (!isEmbeddedWorkflowBuilder) {
-        await applicationInfoStore.getState().getApplicationInfo();
+    await applicationInfoStore.getState().getApplicationInfo();
 
+    if (!isEmbeddedWorkflowBuilder) {
         const {helpHub, userGuiding} = applicationInfoStore.getState();
 
         if (helpHub.enabled && helpHub.commandBar.orgId) {

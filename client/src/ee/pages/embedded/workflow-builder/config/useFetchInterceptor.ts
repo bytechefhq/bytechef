@@ -57,7 +57,7 @@ export default function useFetchInterceptor() {
                     url = apiBasePath + url;
                 }
 
-                if (url.includes('/internal/')) {
+                if (url.includes('/internal/') || url.includes('/graphql')) {
                     return [
                         url,
                         {
