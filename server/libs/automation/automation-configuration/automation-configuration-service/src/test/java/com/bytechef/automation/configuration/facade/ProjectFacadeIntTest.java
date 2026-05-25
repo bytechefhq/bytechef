@@ -592,32 +592,84 @@ public class ProjectFacadeIntTest {
 
     @Test
     public void testGetProjectWorkflows() {
-        Workflow workflow = new Workflow("{\"tasks\":[]}", Workflow.Format.JSON);
+        List<Workflow> allWorkflows = workflowRepository.findAll();
 
-        workflow.setNew(true);
+        int initialWorkflowsCount = allWorkflows.size();
 
-        workflow = workflowRepository.save(workflow);
+        createTestProjectWorkflows(3, 7, 10);
 
-        Project project = new Project();
+        List<Workspace> workspaces = workspaceRepository.findAll();
 
-        project.setName("name");
-        project.setWorkspaceId(workspace.getId());
+        for (Workspace workspace : workspaces) {
+            String workspaceName = workspace.getName();
 
-        project = projectRepository.save(project);
+            if (!workspaceName.startsWith("test_workspace_")) {
+                continue;
+            }
 
-        projectWorkflowRepository.save(
-            new ProjectWorkflow(
-                project.getId(), project.getLastProjectVersion(), Validate.notNull(workflow.getId(), "id"),
-                UUID.randomUUID()));
+            List<ProjectDTO> workspaceProjects = projectFacade.getWorkspaceProjects(null, null, false, null,
+                null, null, workspace.getId());
 
-        List<ProjectWorkflowDTO> workflows = projectWorkflowFacade.getProjectWorkflows(
-            Validate.notNull(project.getId(), "id"));
+            assertThat(workspaceProjects.size()).isEqualTo(7);
 
-        List<String> ids = workflows.stream()
-            .map(ProjectWorkflowDTO::getId)
-            .toList();
+            for (ProjectDTO projectDTO : workspaceProjects) {
+                List<ProjectWorkflowDTO> projectWorkflows = projectWorkflowFacade.getProjectWorkflows(projectDTO.id());
 
-        assertThat(ids).contains(workflow.getId());
+                assertThat(projectWorkflows.size()).isEqualTo(10);
+            }
+
+            List<ProjectWorkflowDTO> workspaceProjectWorkflows =
+                projectFacade.getWorkspaceProjectWorkflows(workspace.getId());
+
+            assertThat(workspaceProjectWorkflows.size()).isEqualTo(70);
+
+            ProjectDTO firstWorkspaceProject = workspaceProjects.getFirst();
+
+            projectFacade.deleteProject(firstWorkspaceProject.id());
+
+            workspaceProjectWorkflows = projectFacade.getWorkspaceProjectWorkflows(workspace.getId());
+
+            assertThat(workspaceProjectWorkflows.size()).isEqualTo(60);
+
+            for (ProjectDTO workspaceProject : workspaceProjects) {
+                projectFacade.deleteProject(workspaceProject.id());
+            }
+        }
+
+        allWorkflows = workflowRepository.findAll();
+
+        assertThat(allWorkflows.size()).isEqualTo(initialWorkflowsCount);
+
+    }
+
+    private void createTestProjectWorkflows(int workspaceCount, int projectCount, int workflowCount) {
+        for (int i = 0; i < workspaceCount; i++) {
+            Workspace testWorkspace = workspaceRepository.save(new Workspace("test_workspace_" + i));
+            for (int j = 0; j < projectCount; j++) {
+                Project project = new Project();
+
+                project.setName("test_project_" + j);
+
+                project.setWorkspaceId(testWorkspace.getId());
+
+                project = projectRepository.save(project);
+
+                for (int k = 0; k < workflowCount; k++) {
+                    String workflowLabel = "test_workflow_label_" + k;
+                    Workflow workflow =
+                        new Workflow("{\"label\":\"" + workflowLabel + "\",\"tasks\":[]}", Workflow.Format.JSON);
+
+                    workflow.setNew(true);
+
+                    workflow = workflowRepository.save(workflow);
+
+                    ProjectWorkflow projectWorkflow = new ProjectWorkflow(
+                        project.getId(), project.getLastProjectVersion(), workflow.getId(), UUID.randomUUID());
+
+                    projectWorkflowRepository.save(projectWorkflow);
+                }
+            }
+        }
     }
 
     @Test
