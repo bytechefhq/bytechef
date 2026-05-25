@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -153,7 +154,7 @@ public class ProjectDeploymentFacadeIntTest {
             projectWorkflowRepository);
 
         // Default stub: no running jobs unless explicitly mocked by a test
-        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyInt()))
+        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyBoolean(), anyInt()))
             .thenReturn(Page.empty());
 
         // Mock trigger definition service to throw for unknown triggers (prevents NPE in getStaticWebhookUrl)
@@ -327,7 +328,7 @@ public class ProjectDeploymentFacadeIntTest {
         when(
             principalJobService.getJobIds(
                 eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(deploymentId)), eq(PlatformType.AUTOMATION),
-                eq(List.of(workflowId)), eq(0)))
+                eq(List.of(workflowId)), false, eq(0)))
                     .thenReturn(new PageImpl<>(runningJobIds, PageRequest.of(0, 20), runningJobIds.size()));
 
         // When - Disable the workflow
@@ -488,7 +489,7 @@ public class ProjectDeploymentFacadeIntTest {
             .thenReturn(mockJob2);
 
         // Re-stub getJobIds for other tests
-        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyInt()))
+        when(principalJobService.getJobIds(any(), any(), any(), any(), any(), any(), anyBoolean(), anyInt()))
             .thenReturn(Page.empty());
 
         // When - Get each deployment

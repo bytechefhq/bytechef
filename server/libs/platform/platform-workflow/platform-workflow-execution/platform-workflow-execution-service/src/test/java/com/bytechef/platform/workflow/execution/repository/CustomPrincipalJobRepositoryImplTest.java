@@ -71,7 +71,7 @@ class CustomPrincipalJobRepositoryImplTest {
             .thenReturn(List.of(1L, 2L, 3L));
 
         Page<Long> page = customPrincipalJobRepository.findAllJobIds(
-            null, null, null, null, 1, List.of(), PageRequest.of(0, 3));
+            null, null, null, null, 1, List.of(), false, PageRequest.of(0, 3));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -96,7 +96,7 @@ class CustomPrincipalJobRepositoryImplTest {
             .thenReturn(List.of(4L, 5L, 6L));
 
         customPrincipalJobRepository.findAllJobIds(
-            null, null, null, null, 1, List.of(), PageRequest.of(1, 3));
+            null, null, null, null, 1, List.of(), false, PageRequest.of(1, 3));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -113,7 +113,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class))).thenReturn(List.of(1L));
 
         customPrincipalJobRepository.findAllJobIds(
-            2, null, null, null, 1, List.of(), PageRequest.of(0, 10));
+            2, null, null, null, 1, List.of(), false, PageRequest.of(0, 10));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -135,7 +135,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class))).thenReturn(List.of(1L));
 
         customPrincipalJobRepository.findAllJobIds(
-            null, startDate, now, null, 1, List.of(), PageRequest.of(0, 10));
+            null, startDate, now, null, 1, List.of(), false, PageRequest.of(0, 10));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -152,7 +152,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class))).thenReturn(List.of(1L));
 
         customPrincipalJobRepository.findAllJobIds(
-            null, null, null, List.of(1L, 2L, 3L), 1, List.of(), PageRequest.of(0, 10));
+            null, null, null, List.of(1L, 2L, 3L), 1, List.of(), false, PageRequest.of(0, 10));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -170,7 +170,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class))).thenReturn(List.of(1L));
 
         customPrincipalJobRepository.findAllJobIds(
-            null, null, null, null, 1, List.of("workflow1", "workflow2"), PageRequest.of(0, 10));
+            null, null, null, null, 1, List.of("workflow1", "workflow2"), false, PageRequest.of(0, 10));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 
@@ -186,7 +186,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.queryForObject(anyString(), eq(Long.class), any(Object[].class))).thenReturn(0L);
 
         Page<Long> page = customPrincipalJobRepository.findAllJobIds(
-            null, null, null, null, 1, List.of(), PageRequest.of(0, 10));
+            null, null, null, null, 1, List.of(), false, PageRequest.of(0, 10));
 
         assertThat(page.isEmpty()).isTrue();
         assertThat(page.getTotalElements()).isZero();
@@ -203,7 +203,7 @@ class CustomPrincipalJobRepositoryImplTest {
         when(jdbcTemplate.query(anyString(), any(RowMapper.class), any(Object[].class))).thenReturn(List.of(1L, 2L));
 
         customPrincipalJobRepository.findAllJobIds(
-            1, startDate, now, List.of(10L, 20L), 2, List.of("wf1", "wf2"), PageRequest.of(2, 5));
+            1, startDate, now, List.of(10L, 20L), 2, List.of("wf1", "wf2"), false, PageRequest.of(2, 5));
 
         verify(jdbcTemplate).query(queryCaptor.capture(), any(RowMapper.class), argsCaptor.capture());
 

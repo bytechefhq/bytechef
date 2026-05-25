@@ -19,7 +19,6 @@ package com.bytechef.automation.workflow.execution.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
-import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
@@ -66,8 +65,6 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
                     embedded, environmentId, jobStatus == null ? null : Status.valueOf(jobStatus),
                     jobStartDate == null ? null : jobStartDate.toInstant(),
                     jobEndDate == null ? null : jobEndDate.toInstant(), projectId, projectDeploymentId,
-                    workflowId, workspaceId, pageNumber)
-                .map(workflowExecutionDTO -> conversionService.convert(
-                    workflowExecutionDTO, WorkflowExecutionBasicModel.class)));
+                    workflowId, workspaceId, pageNumber));
     }
 }

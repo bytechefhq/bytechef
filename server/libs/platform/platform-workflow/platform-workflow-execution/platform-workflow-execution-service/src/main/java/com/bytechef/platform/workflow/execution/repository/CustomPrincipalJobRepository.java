@@ -28,5 +28,5 @@ public interface CustomPrincipalJobRepository {
 
     Page<Long> findAllJobIds(
         Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type, List<String> workflowIds,
-        Pageable pageable);
+        boolean onlyRootJobs, Pageable pageable);
 }

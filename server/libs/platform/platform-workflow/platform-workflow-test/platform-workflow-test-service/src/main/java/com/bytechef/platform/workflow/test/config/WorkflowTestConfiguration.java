@@ -134,7 +134,7 @@ public class WorkflowTestConfiguration {
         ApplicationEventPublisher coordinatorEventPublisher = createEventPublisher(asyncMessageBroker);
 
         return new TestWorkflowExecutorImpl(
-            componentDefinitionService, contextService, evaluator,
+            componentDefinitionService, contextService, evaluator, jobService,
             new JobSyncExecutor(
                 contextService, evaluator, jobService, 1000, asyncMessageBroker,
                 getApplicationEventListeners(

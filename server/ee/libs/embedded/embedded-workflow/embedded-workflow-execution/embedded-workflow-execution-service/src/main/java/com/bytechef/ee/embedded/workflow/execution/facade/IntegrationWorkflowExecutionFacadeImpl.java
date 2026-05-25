@@ -210,7 +210,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             } else {
                 Page<Long> jobIdsPage = principalJobService.getJobIds(
                     jobStatus, jobStartDate, jobEndDate, integrationInstanceConfigurationIds, PlatformType.EMBEDDED,
-                    workflowIds, pageNumber);
+                    workflowIds, true, pageNumber);
 
                 List<Long> jobIds = jobIdsPage.getContent();
 
@@ -390,6 +390,12 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
+        List<Long> childJobIds = jobService.getChildJobIds(jobId);
+        Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
+            .stream()
+            .filter(job -> job.getParentTaskExecutionId() != null)
+            .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
+
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
@@ -403,10 +409,13 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
+                Job childJob = childJobMap.get(taskExecution.getId());
+
                 return new TaskExecutionDTO(
-                    taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
+                    taskExecution,
                     definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output);
+                    workflowTask.evaluateParameters(context, evaluator), output,
+                    childJob == null ? null : new JobDTO(childJob));
             });
 
         return buildHierarchy(taskExecutionDTOs);

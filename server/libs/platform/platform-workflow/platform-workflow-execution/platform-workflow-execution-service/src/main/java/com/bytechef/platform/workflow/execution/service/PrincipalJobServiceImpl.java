@@ -65,7 +65,7 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     @Override
     public Optional<Long> fetchLastWorkflowJobId(long principalId, List<String> workflowIds, PlatformType type) {
         Page<Long> page = principalJobRepository.findAllJobIds(
-            null, null, null, List.of(principalId), type.ordinal(), workflowIds, PageRequest.of(0, 1));
+            null, null, null, List.of(principalId), type.ordinal(), workflowIds, false, PageRequest.of(0, 1));
 
         return page.getContent()
             .stream()
@@ -99,12 +99,12 @@ public class PrincipalJobServiceImpl implements PrincipalJobService {
     @Override
     public Page<Long> getJobIds(
         Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
-        List<String> workflowIds, int pageNumber) {
+        List<String> workflowIds, boolean onlyRootJobs, int pageNumber) {
 
         PageRequest pageRequest = PageRequest.of(pageNumber, PrincipalJobRepository.DEFAULT_PAGE_SIZE);
 
         return principalJobRepository.findAllJobIds(
             status == null ? null : status.ordinal(), startDate, endDate, principalIds, type.ordinal(), workflowIds,
-            pageRequest);
+            onlyRootJobs, pageRequest);
     }
 }

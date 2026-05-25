@@ -38,10 +38,11 @@ public record TaskExecutionDTO(
     int maxRetries, Object output, @JsonFormat(shape = JsonFormat.Shape.STRING) Long parentId, int priority,
     int progress, int retryAttempts, String retryDelay, int retryDelayFactor, long retryDelayMillis,
     Instant startDate, TaskExecution.Status status, int taskNumber, String title, String type,
-    WorkflowTask workflowTask, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations) {
+    WorkflowTask workflowTask, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
+    JobDTO childJob) {
 
     public TaskExecutionDTO(
-        TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output) {
+        TaskExecution taskExecution, String title, String icon, Map<String, ?> input, Object output, JobDTO childJob) {
 
         this(
             taskExecution.getCreatedBy(), taskExecution.getCreatedDate(),
@@ -52,11 +53,12 @@ public record TaskExecutionDTO(
             taskExecution.getRetryAttempts(), taskExecution.getRetryDelay(), taskExecution.getRetryDelayFactor(),
             taskExecution.getRetryDelayMillis(), taskExecution.getStartDate(), taskExecution.getStatus(),
             taskExecution.getTaskNumber(), title, taskExecution.getType(), taskExecution.getWorkflowTask(),
-            List.of(), List.of());
+            List.of(), List.of(), childJob);
     }
 
     private TaskExecutionDTO(
-        TaskExecutionDTO taskExecutionDTO, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations) {
+        TaskExecutionDTO taskExecutionDTO, List<TaskExecutionDTO> children, List<List<TaskExecutionDTO>> iterations,
+        JobDTO childJob) {
 
         this(
             taskExecutionDTO.createdBy(), taskExecutionDTO.createdDate(), taskExecutionDTO.endDate(),
@@ -67,7 +69,7 @@ public record TaskExecutionDTO(
             taskExecutionDTO.retryAttempts(), taskExecutionDTO.retryDelay(), taskExecutionDTO.retryDelayFactor(),
             taskExecutionDTO.retryDelayMillis(), taskExecutionDTO.startDate(), taskExecutionDTO.status(),
             taskExecutionDTO.taskNumber(), taskExecutionDTO.title(), taskExecutionDTO.type(),
-            taskExecutionDTO.workflowTask(), children, iterations);
+            taskExecutionDTO.workflowTask(), children, iterations, childJob);
     }
 
     public static List<TaskExecutionDTO> buildHierarchy(List<TaskExecutionDTO> taskExecutionDTOS) {
@@ -116,13 +118,13 @@ public record TaskExecutionDTO(
                 iterationItems.add(new ArrayList<>(currentIterationItems));
             }
 
-            return new TaskExecutionDTO(taskExecutionDTO, List.of(), iterationItems);
+            return new TaskExecutionDTO(taskExecutionDTO, List.of(), iterationItems, taskExecutionDTO.childJob());
         }
 
         List<TaskExecutionDTO> children = matchingChildren.stream()
             .map(child -> buildTasksTree(child, tasksMap))
             .toList();
 
-        return new TaskExecutionDTO(taskExecutionDTO, children, List.of());
+        return new TaskExecutionDTO(taskExecutionDTO, children, List.of(), taskExecutionDTO.childJob());
     }
 }
