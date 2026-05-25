@@ -84,6 +84,7 @@ import org.springframework.stereotype.Service;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 @Service("triggerDefinitionService")
 public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
@@ -440,82 +441,49 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
     private static TriggerOutput executePollingTrigger(
         String componentName, String triggerName, com.bytechef.component.definition.TriggerDefinition triggerDefinition,
-        Map<String, ?> inputParameters, @Nullable ComponentConnection componentConnection,
-        Map<String, ?> closureParameters, TriggerContext triggerContext, PollFunction pollFunction) {
+        Map<String, ?> inputParameterMap, @Nullable ComponentConnection componentConnection,
+        Map<String, ?> closureParameterMap, TriggerContext triggerContext, PollFunction pollFunction) {
 
-        PollOutput pollOutput;
-
+        Parameters inputParameters = ParametersFactory.create(inputParameterMap);
         Parameters connectionParameters = ParametersFactory.create(componentConnection);
 
-        try {
-            pollOutput = pollFunction.apply(
-                ParametersFactory.create(inputParameters), connectionParameters,
-                ParametersFactory.create(closureParameters), triggerContext);
-        } catch (Exception e) {
-            if (e instanceof ProviderException pe) {
-                throw pe;
-            }
+        PollOutput pollOutput = pollFunctionApply(
+            pollFunction, inputParameters, connectionParameters, ParametersFactory.create(closureParameterMap),
+            triggerContext);
 
-            throw new ExecutionException(e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
-        }
-
+        List<?> polledRecords = pollOutput.records();
         List<Object> records = new ArrayList<>();
-        boolean truncated = appendWithinLimit(records, pollOutput.records());
+        int pollFunctionApplyCount = 1;
 
-        int iterations = 0;
+        while (!polledRecords.isEmpty() || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
+            records.addAll(polledRecords.subList(0, Math.min(MAX_POLLING_TRIGGER_RECORDS, polledRecords.size())));
 
-        while (pollOutput.pollImmediately() && iterations < MAX_POLLING_TRIGGER_ITERATIONS &&
-            records.size() < MAX_POLLING_TRIGGER_RECORDS) {
-
-            iterations++;
-
-            try {
-                pollOutput = pollFunction.apply(
-                    ParametersFactory.create(inputParameters), connectionParameters,
-                    ParametersFactory.create(pollOutput.closureParameters()), triggerContext);
-            } catch (Exception e) {
-                if (e instanceof ProviderException pe) {
-                    throw pe;
-                }
-
-                throw new ExecutionException(e, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
+            if (pollOutput.pollImmediately() || records.size() >= MAX_POLLING_TRIGGER_RECORDS
+                || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
+                break;
             }
 
-            truncated |= appendWithinLimit(records, pollOutput.records());
+            pollOutput = pollFunctionApply(
+                pollFunction, inputParameters, connectionParameters,
+                ParametersFactory.create(pollOutput.closureParameters()), triggerContext);
+
+            pollFunctionApplyCount++;
         }
 
-        if (truncated || pollOutput.pollImmediately()) {
+        if (pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS || records.size() >= MAX_POLLING_TRIGGER_RECORDS) {
             logger.warn(
                 "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
                     "resume. Likely cause: component keeps requesting immediate re-poll without completing pagination.",
-                componentName, triggerName, iterations, records.size());
+                componentName, triggerName, pollFunctionApplyCount, records.size());
+        }
+
+        if (pollOutput.pollImmediately()) {
+            logger.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
         }
 
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
 
         return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
-    }
-
-    private static boolean appendWithinLimit(List<Object> records, @Nullable List<?> pageRecords) {
-        if (pageRecords == null || pageRecords.isEmpty()) {
-            return false;
-        }
-
-        int remaining = MAX_POLLING_TRIGGER_RECORDS - records.size();
-
-        if (remaining <= 0) {
-            return true;
-        }
-
-        if (pageRecords.size() <= remaining) {
-            records.addAll(pageRecords);
-
-            return false;
-        }
-
-        records.addAll(pageRecords.subList(0, remaining));
-
-        return true;
     }
 
     @SuppressWarnings("unchecked")
@@ -792,6 +760,21 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         WebhookEnableOutput webhookEnableOutput = ConvertUtils.convertValue(triggerState, WebhookEnableOutput.class);
 
         return webhookEnableOutput.parameters();
+    }
+
+    private static PollOutput pollFunctionApply(
+        PollFunction pollFunction, Parameters inputParameters, Parameters connectionParameters,
+        Parameters closureParameters, TriggerContext triggerContext) {
+
+        try {
+            return pollFunction.apply(inputParameters, connectionParameters, closureParameters, triggerContext);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException pe) {
+                throw pe;
+            }
+
+            throw new ExecutionException(exception, inputParameters, TriggerDefinitionErrorType.POLLING_TRIGGER_FAILED);
+        }
     }
 
     private static WrapResult wrap(
