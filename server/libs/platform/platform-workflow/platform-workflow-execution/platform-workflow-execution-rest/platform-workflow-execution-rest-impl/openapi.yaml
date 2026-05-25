@@ -580,6 +580,10 @@ components:
             type: "array"
             items:
               $ref: "#/components/schemas/TaskExecution"
+        childJob:
+          description: "The job associated with the task execution."
+          type: "object"
+          $ref: "#/components/schemas/Job"
     TriggerExecution:
       description: "Adds execution semantics to a trigger."
       type: "object"

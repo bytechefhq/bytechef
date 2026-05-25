@@ -27,6 +27,7 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.commons.util.CollectionUtils;
@@ -72,6 +73,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,6 +91,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     private final ComponentDefinitionService componentDefinitionService;
     private final ContextService contextService;
     private final Evaluator evaluator;
+    private final JobService jobService;
     private final JobSyncExecutor jobSyncExecutor;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
     private final TaskExecutionService taskExecutionService;
@@ -100,7 +103,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     @SuppressFBWarnings("EI")
     public TestWorkflowExecutorImpl(
         ComponentDefinitionService componentDefinitionService, ContextService contextService, Evaluator evaluator,
-        JobSyncExecutor jobSyncExecutor, TaskDispatcherDefinitionService taskDispatcherDefinitionService,
+        JobService jobService, JobSyncExecutor jobSyncExecutor,
+        TaskDispatcherDefinitionService taskDispatcherDefinitionService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -108,6 +112,7 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         this.componentDefinitionService = componentDefinitionService;
         this.contextService = contextService;
         this.evaluator = evaluator;
+        this.jobService = jobService;
         this.jobSyncExecutor = jobSyncExecutor;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
         this.taskExecutionService = taskExecutionService;
@@ -210,6 +215,12 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
     }
 
     private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
+        List<Long> childJobIds = jobService.getChildJobIds(jobId);
+        Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
+            .stream()
+            .filter(job -> job.getParentTaskExecutionId() != null)
+            .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
+
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
@@ -222,11 +233,15 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 Object output = taskExecution.getOutput() == null
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+                Job childJob = childJobMap.get(taskExecution.getId());
 
                 return new TaskExecutionDTO(
                     taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
                     definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output);
+                    workflowTask.evaluateParameters(context, evaluator), output, childJob == null ? null : new JobDTO(
+                        childJob,
+                        childJob.getOutputs() == null ? null : taskFileStorage.readJobOutputs(childJob.getOutputs()),
+                        getJobTaskExecutions(childJob.getId())));
             });
 
         return buildHierarchy(taskExecutionDTOs);

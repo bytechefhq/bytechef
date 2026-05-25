@@ -703,7 +703,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         while (true) {
             Page<Long> page = principalJobService.getJobIds(
-                Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, pageNumber);
+                Job.Status.STARTED, null, null, principalIds, PlatformType.AUTOMATION, workflowIds, false, pageNumber);
 
             List<Long> jobIds = page.getContent();
 

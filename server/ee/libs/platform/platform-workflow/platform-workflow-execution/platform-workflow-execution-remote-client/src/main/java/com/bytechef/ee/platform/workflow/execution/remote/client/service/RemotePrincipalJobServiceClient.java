@@ -92,7 +92,7 @@ public class RemotePrincipalJobServiceClient implements PrincipalJobService {
     @Override
     public Page<Long> getJobIds(
         Status status, Instant startDate, Instant endDate, List<Long> principalIds, PlatformType type,
-        List<String> workflowIds, int pageNumber) {
+        List<String> workflowIds, boolean onlyRootJobs, int pageNumber) {
 
         throw new UnsupportedOperationException();
     }

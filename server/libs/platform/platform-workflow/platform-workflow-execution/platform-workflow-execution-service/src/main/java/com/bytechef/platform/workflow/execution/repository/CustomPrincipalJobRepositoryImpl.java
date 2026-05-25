@@ -50,17 +50,19 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         justification = "Query is safely built using parameterized placeholders; all user input passed via arguments array")
     public Page<Long> findAllJobIds(
         Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
-        @NonNull List<String> workflowIds, Pageable pageable) {
+        @NonNull List<String> workflowIds, boolean onlyRootJobs, Pageable pageable) {
 
         Page<Long> page;
-        Query query = buildQuery(status, startDate, endDate, instanceIds, type, workflowIds, pageable, true);
+        Query query = buildQuery(
+            status, startDate, endDate, instanceIds, type, workflowIds, onlyRootJobs, pageable, true);
 
         Long total = jdbcTemplate.queryForObject(query.query, Long.class, query.arguments);
 
         if (total == null || total == 0) {
             page = Page.empty();
         } else {
-            query = buildQuery(status, startDate, endDate, instanceIds, type, workflowIds, pageable, false);
+            query = buildQuery(status, startDate, endDate, instanceIds, type, workflowIds, onlyRootJobs, pageable,
+                false);
 
             List<Long> jobs = jdbcTemplate.query(query.query, (rs, rowNum) -> rs.getLong("job_id"), query.arguments);
 
@@ -72,7 +74,7 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
 
     private Query buildQuery(
         Integer status, Instant startDate, Instant endDate, List<Long> instanceIds, int type,
-        List<String> workflowIds, Pageable pageable, boolean countQuery) {
+        List<String> workflowIds, boolean onlyRootJobs, Pageable pageable, boolean countQuery) {
 
         String query;
 
@@ -83,6 +85,10 @@ public class CustomPrincipalJobRepositoryImpl implements CustomPrincipalJobRepos
         }
 
         query += "JOIN job ON principal_job.job_id = job.id WHERE type = ? ";
+
+        if (onlyRootJobs) {
+            query += "AND job.parent_task_execution_id IS NULL ";
+        }
 
         List<Object> arguments = new ArrayList<>();
 

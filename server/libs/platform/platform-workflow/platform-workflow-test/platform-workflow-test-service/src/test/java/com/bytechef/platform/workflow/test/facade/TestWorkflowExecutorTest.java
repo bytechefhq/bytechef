@@ -93,7 +93,8 @@ public class TestWorkflowExecutorTest {
     void beforeEach() {
         testWorkflowExecutor = new TestWorkflowExecutorImpl(
             componentDefinitionService, mock(com.bytechef.atlas.execution.service.ContextService.class),
-            mock(com.bytechef.evaluator.Evaluator.class), jobSyncExecutor,
+            mock(com.bytechef.evaluator.Evaluator.class), mock(com.bytechef.atlas.execution.service.JobService.class),
+            jobSyncExecutor,
             mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
             mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
             mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
