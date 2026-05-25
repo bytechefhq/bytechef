@@ -35,6 +35,7 @@ public final class RouterConnection {
     public static ModifiableConnectionDefinition connectionDefinition(String baseUrl) {
         return connection()
             .baseUri((connectionParameters, context) -> baseUrl)
+            .version(1)
             .authorizations(
                 authorization(BEARER_TOKEN)
                     .title("Bearer Token")

@@ -42,12 +42,15 @@ public class NanoGptComponentHandler implements ComponentHandler {
         .icon("path:assets/nano-gpt.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(NanoGptConnection.CONNECTION_DEFINITION)
-        .actions(NanoGptChatAction.ACTION_DEFINITION,
+        .actions(
+            NanoGptChatAction.ACTION_DEFINITION,
             NanoGptCreateImageAction.ACTION_DEFINITION,
             NanoGptCreateSpeechAction.ACTION_DEFINITION,
             NanoGptCreateTranscriptionAction.ACTION_DEFINITION)
-        .clusterElements(NanoGptChatModel.CLUSTER_ELEMENT_DEFINITION,
-            NanoGptEmbedding.CLUSTER_ELEMENT_DEFINITION);
+        .clusterElements(
+            NanoGptChatModel.CLUSTER_ELEMENT_DEFINITION,
+            NanoGptEmbedding.CLUSTER_ELEMENT_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

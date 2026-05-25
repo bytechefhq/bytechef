@@ -79,6 +79,7 @@ public class OpenRouterChatAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
+        .help("", "https://docs.bytechef.io/reference/components/open-router_v1#ask")
         .properties(
             SUPPORTED_PARAMETERS_PROPERTY,
             CHAT_MODEL_PROPERTY,

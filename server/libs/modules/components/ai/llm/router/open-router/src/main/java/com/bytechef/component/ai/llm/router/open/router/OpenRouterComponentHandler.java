@@ -48,7 +48,8 @@ public class OpenRouterComponentHandler implements ComponentHandler {
             OpenRouterCreateSpeechAction.ACTION_DEFINITION,
             OpenRouterCreateTranscriptionAction.ACTION_DEFINITION)
         .clusterElements(OpenRouterChatModel.CLUSTER_ELEMENT_DEFINITION,
-            OpenRouterEmbedding.CLUSTER_ELEMENT_DEFINITION);
+            OpenRouterEmbedding.CLUSTER_ELEMENT_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -63,6 +63,7 @@ public class NanoGptCreateSpeechAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
         .title("Create Speech")
         .description("Generate an audio file from the input text.")
+        .help("", "https://docs.bytechef.io/reference/components/nano-gpt_v1#create-speech")
         .properties(
             SPEECH_MODEL_PROPERTY,
             string(INPUT)
