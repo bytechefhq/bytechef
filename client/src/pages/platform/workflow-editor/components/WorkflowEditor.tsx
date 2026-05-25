@@ -6,12 +6,11 @@ import {
     TaskDispatcherDefinitionBasic,
     Workflow,
 } from '@/shared/middleware/platform/configuration';
-import {Background, BackgroundVariant, ControlButton, Controls, ReactFlow} from '@xyflow/react';
-import {ArrowDownIcon, ArrowRightIcon, BrushCleaningIcon} from 'lucide-react';
+import {Background, BackgroundVariant, ReactFlow} from '@xyflow/react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
-import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 
 type ConditionalWorkflowEditorPropsType =
     | {
@@ -44,29 +43,15 @@ const WorkflowEditor = ({
             onEdgesChange: state.onEdgesChange,
         }))
     );
-    const {layoutDirection, setLayoutDirection} = useLayoutDirectionStore(
-        useShallow((state) => ({
-            layoutDirection: state.layoutDirection,
-            setLayoutDirection: state.setLayoutDirection,
-        }))
-    );
 
-    const {
-        edgeTypes,
-        handleNodeDragStart,
-        handleNodeDragStop,
-        handleNodesChange,
-        handleResetLayout,
-        nodeTypes,
-        onDragOver,
-        onDrop,
-    } = useWorkflowEditorCanvas({
-        componentDefinitions,
-        customCanvasWidth,
-        leftSidebarOpen,
-        readOnlyWorkflow,
-        taskDispatcherDefinitions,
-    });
+    const {edgeTypes, handleNodeDragStart, handleNodeDragStop, handleNodesChange, nodeTypes, onDragOver, onDrop} =
+        useWorkflowEditorCanvas({
+            componentDefinitions,
+            customCanvasWidth,
+            leftSidebarOpen,
+            readOnlyWorkflow,
+            taskDispatcherDefinitions,
+        });
 
     return (
         <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
@@ -94,34 +79,7 @@ const WorkflowEditor = ({
             >
                 <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
-                <Controls
-                    className="m-2 mb-3 rounded-md border border-stroke-neutral-secondary bg-background"
-                    fitViewOptions={{duration: 500, minZoom: 0.2}}
-                    showInteractive={false}
-                >
-                    {!readOnlyWorkflow && (
-                        <>
-                            <ControlButton
-                                onClick={() => setLayoutDirection(layoutDirection === 'TB' ? 'LR' : 'TB')}
-                                title={
-                                    layoutDirection === 'TB'
-                                        ? 'Switch to horizontal layout'
-                                        : 'Switch to vertical layout'
-                                }
-                            >
-                                {layoutDirection === 'TB' ? (
-                                    <ArrowRightIcon className="size-3" />
-                                ) : (
-                                    <ArrowDownIcon className="size-3" />
-                                )}
-                            </ControlButton>
-
-                            <ControlButton onClick={handleResetLayout} title="Reset layout">
-                                <BrushCleaningIcon className="size-3" />
-                            </ControlButton>
-                        </>
-                    )}
-                </Controls>
+                <WorkflowEditorToolbar readOnly={!!readOnlyWorkflow} />
             </ReactFlow>
         </div>
     );
