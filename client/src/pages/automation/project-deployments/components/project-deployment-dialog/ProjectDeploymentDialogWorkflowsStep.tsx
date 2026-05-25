@@ -18,23 +18,30 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     formState,
     setValue,
     workflows,
-}: ProjectDeploymentDialogWorkflowsStepProps) => (
-    <div className="h-full space-y-5">
-        {workflows?.map((workflow, workflowIndex) => (
-            <ProjectDeploymentDialogWorkflowsStepItem
-                connections={connections}
-                connectionsGrouped={connectionsGrouped}
-                control={control}
-                formState={formState}
-                key={workflow.id!}
-                label={workflow.label!}
-                setValue={setValue}
-                showWorkflowToggle
-                workflow={workflow}
-                workflowIndex={workflowIndex}
-            />
-        ))}
-    </div>
-);
+}: ProjectDeploymentDialogWorkflowsStepProps) => {
+    const nonSubflowWorkflows = workflows.filter(
+        (workflow) => !workflow.workflowTriggerComponentNames?.includes('workflow')
+    );
+
+    return (
+        <div className="h-full space-y-5">
+            {nonSubflowWorkflows?.map((workflow, workflowIndex) => (
+                <ProjectDeploymentDialogWorkflowsStepItem
+                    connections={connections}
+                    connectionsGrouped={connectionsGrouped}
+                    control={control}
+                    formState={formState}
+                    key={workflow.id!}
+                    label={workflow.label!}
+                    setValue={setValue}
+                    showWorkflowToggle
+                    workflow={workflow}
+                    workflowIndex={workflowIndex}
+                    workflows={workflows}
+                />
+            ))}
+        </div>
+    );
+};
 
 export default ProjectDeploymentDialogWorkflowsStep;

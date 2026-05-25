@@ -10,7 +10,11 @@ import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import getWorkflowComponentConnections from './projectDeploymentDialog-utils';
+import getWorkflowComponentConnections, {
+    getSubflowConnectionStubs,
+    getSubflowInputStubs,
+    getWorkflowInputs,
+} from './projectDeploymentDialog-utils';
 
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     connections?: Connection[];
@@ -22,6 +26,7 @@ export interface ProjectDeploymentDialogWorkflowListItemProps {
     showWorkflowToggle?: boolean;
     workflow: Workflow;
     workflowIndex: number;
+    workflows: Workflow[];
 }
 
 const ProjectDeploymentDialogWorkflowsStepItem = ({
@@ -34,12 +39,23 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     showWorkflowToggle = false,
     workflow,
     workflowIndex,
+    workflows,
 }: ProjectDeploymentDialogWorkflowListItemProps) => {
     const [setWorkflowEnabled, workflowEnabledMap] = useWorkflowsEnabledStore(
         useShallow(({setWorkflowEnabled, workflowEnabledMap}) => [setWorkflowEnabled, workflowEnabledMap])
     );
 
-    const componentConnections = getWorkflowComponentConnections(workflow);
+    const componentConnections = getWorkflowComponentConnections(workflow, workflows);
+    const workflowInputs = getWorkflowInputs(workflow, workflows);
+    const duplicateSubflowConnectionStubs = getSubflowConnectionStubs(workflow, workflows);
+    const duplicateSubflowInputStubs = getSubflowInputStubs(workflow, workflows);
+    const subflowLabelMap = new Map<string, string>();
+
+    for (const subflowWorkflow of workflows) {
+        if (subflowWorkflow.workflowUuid && subflowWorkflow.label) {
+            subflowLabelMap.set(subflowWorkflow.workflowUuid, subflowWorkflow.label);
+        }
+    }
 
     const watchedConnections = useWatch({
         control,
@@ -109,16 +125,17 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
 
                             <span>Inputs</span>
 
-                            <span className="ml-1">({workflow.inputs?.length})</span>
+                            <span className="ml-1">({workflowInputs.length})</span>
                         </TabsTrigger>
                     </TabsList>
 
-                    <TabsContent className="mt-0" value="connections">
+                    <TabsContent className="mt-0" tabIndex={-1} value="connections">
                         <ConnectionConfigurationList
                             componentConnections={componentConnections}
                             connections={connections ?? []}
                             connectionsGrouped={connectionsGrouped}
                             control={control as unknown as Control<FieldValues>}
+                            duplicateSubflowStubs={duplicateSubflowConnectionStubs}
                             fieldNamePrefix={`projectDeploymentWorkflows.${workflowIndex}.connections`}
                             getCurrentConnectionId={(connectionIndex) =>
                                 watchedConnections?.[connectionIndex]?.connectionId
@@ -129,16 +146,19 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                                     connectionId
                                 )
                             }
+                            subflowLabelMap={subflowLabelMap}
                             workflow={workflow}
                         />
                     </TabsContent>
 
-                    <TabsContent className="mt-0" value="inputs">
+                    <TabsContent className="mt-0" tabIndex={-1} value="inputs">
                         <InputConfigurationList
                             control={control as unknown as Control<FieldValues>}
                             controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
+                            duplicateSubflowStubs={duplicateSubflowInputStubs}
                             formState={formState as unknown as FormState<FieldValues>}
-                            inputs={workflow.inputs}
+                            inputs={workflowInputs}
+                            subflowLabelMap={subflowLabelMap}
                         />
                     </TabsContent>
                 </Tabs>

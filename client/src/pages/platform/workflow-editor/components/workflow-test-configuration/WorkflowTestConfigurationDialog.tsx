@@ -211,7 +211,6 @@ const WorkflowTestConfigurationDialog = ({
                                     connections={connections}
                                     connectionsGrouped={connectionsGrouped}
                                     control={control as unknown as Control<FieldValues>}
-                                    enforceRequiredConnection={false}
                                     getCurrentConnectionId={(index) => watchedConnections?.[index]?.connectionId}
                                     handleConnectionDialogOpen={(componentConnection) => {
                                         setComponentConnection(componentConnection);
