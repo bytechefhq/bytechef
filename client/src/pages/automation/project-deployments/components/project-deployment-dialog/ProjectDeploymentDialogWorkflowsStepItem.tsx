@@ -10,7 +10,11 @@ import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-import getWorkflowComponentConnections, {getWorkflowInputs} from './projectDeploymentDialog-utils';
+import getWorkflowComponentConnections, {
+    getSubflowConnectionStubs,
+    getSubflowInputStubs,
+    getWorkflowInputs,
+} from './projectDeploymentDialog-utils';
 
 export interface ProjectDeploymentDialogWorkflowListItemProps {
     connections?: Connection[];
@@ -42,12 +46,9 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
     );
 
     const componentConnections = getWorkflowComponentConnections(workflow, workflows);
-
     const workflowInputs = getWorkflowInputs(workflow, workflows);
-
-    console.log('workflow: ', workflow);
-    console.log('workflows: ', workflows);
-
+    const duplicateSubflowConnectionStubs = getSubflowConnectionStubs(workflow, workflows);
+    const duplicateSubflowInputStubs = getSubflowInputStubs(workflow, workflows);
     const subflowLabelMap = new Map<string, string>();
 
     for (const subflowWorkflow of workflows) {
@@ -134,6 +135,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                             connections={connections ?? []}
                             connectionsGrouped={connectionsGrouped}
                             control={control as unknown as Control<FieldValues>}
+                            duplicateSubflowStubs={duplicateSubflowConnectionStubs}
                             fieldNamePrefix={`projectDeploymentWorkflows.${workflowIndex}.connections`}
                             getCurrentConnectionId={(connectionIndex) =>
                                 watchedConnections?.[connectionIndex]?.connectionId
@@ -153,6 +155,7 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
                         <InputConfigurationList
                             control={control as unknown as Control<FieldValues>}
                             controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
+                            duplicateSubflowStubs={duplicateSubflowInputStubs}
                             formState={formState as unknown as FormState<FieldValues>}
                             inputs={workflowInputs}
                             subflowLabelMap={subflowLabelMap}

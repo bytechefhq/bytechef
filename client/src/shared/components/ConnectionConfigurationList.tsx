@@ -5,7 +5,7 @@ import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/compon
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {CaretDownIcon} from '@radix-ui/react-icons';
-import {InfoIcon, PlusIcon} from 'lucide-react';
+import {CornerDownRightIcon, ExpandIcon, InfoIcon, PlusIcon} from 'lucide-react';
 import {useCallback, useMemo} from 'react';
 import {Control, FieldValues} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
@@ -19,9 +19,15 @@ interface ConnectionRenderItemI {
     index: number;
 }
 
+export interface SubflowDuplicateStubI {
+    subflowWorkflowUuid: string;
+    subflowWorkflowUuidPath: string[];
+}
+
 interface SubflowTreeNodeI {
     children: Map<string, SubflowTreeNodeI>;
     connections: ConnectionRenderItemI[];
+    duplicateStubs: SubflowDuplicateStubI[];
     subflowWorkflowUuid: string;
 }
 
@@ -221,6 +227,28 @@ interface SubflowConnectionGroupProps {
 
 import EnvironmentBadge from './EnvironmentBadge';
 
+import Badge from '@/components/Badge/Badge';
+
+interface SubflowDuplicateStubRowProps {
+    stub: SubflowDuplicateStubI;
+    subflowLabelMap?: Map<string, string>;
+}
+
+const InheritedSubflow = ({stub, subflowLabelMap}: SubflowDuplicateStubRowProps) => (
+    <div className="flex items-center gap-2 rounded-md border bg-surface-neutral-primary px-3 py-2.5">
+        <InlineSVG className="size-5" src={SubflowIcon} />
+
+        <span className="text-sm font-medium text-content-neutral-primary">
+            {subflowLabelMap?.get(stub.subflowWorkflowUuid) || 'Subflow connections'}
+        </span>
+
+        <Badge className="ml-auto flex gap-1 font-semibold uppercase" styleType="secondary-filled">
+            <CornerDownRightIcon className="size-3" />
+            Inherited
+        </Badge>
+    </div>
+);
+
 const SubflowConnectionGroup = ({
     connectionDialogAllowed,
     connections,
@@ -290,6 +318,14 @@ const SubflowConnectionGroup = ({
                         workflowNodeLabelMap={workflowNodeLabelMap}
                     />
                 ))}
+
+                {node.duplicateStubs.map((stub) => (
+                    <InheritedSubflow
+                        key={stub.subflowWorkflowUuidPath.join('/')}
+                        stub={stub}
+                        subflowLabelMap={subflowLabelMap}
+                    />
+                ))}
             </CollapsibleContent>
         </Collapsible>
     );
@@ -301,6 +337,7 @@ interface ConnectionConfigurationListProps {
     connections?: ConnectionI[];
     connectionsGrouped?: boolean;
     control: Control<FieldValues>;
+    duplicateSubflowStubs?: SubflowDuplicateStubI[];
     fieldNamePrefix?: string;
     getCurrentConnectionId?: (index: number) => number | undefined;
     handleConnectionIdChange: (index: number, connectionId: number) => void;
@@ -315,6 +352,7 @@ const ConnectionConfigurationList = ({
     connections,
     connectionsGrouped = false,
     control,
+    duplicateSubflowStubs,
     fieldNamePrefix = 'connections',
     getCurrentConnectionId,
     handleConnectionDialogOpen,
@@ -355,16 +393,24 @@ const ConnectionConfigurationList = ({
         return groupedConnections;
     }, [componentConnections, connectionsGrouped]);
 
-    const {regularConnections, subflowConnectionTree} = useMemo(() => {
+    const {regularConnections, subflowConnectionTree, topLevelStubs} = useMemo(() => {
         if (connectionsGrouped) {
             return {
                 regularConnections: connectionsToRender,
                 subflowConnectionTree: new Map<string, SubflowTreeNodeI>(),
+                topLevelStubs: [] as SubflowDuplicateStubI[],
             };
         }
 
         const regularConnections: typeof connectionsToRender = [];
         const subflowConnectionTree = new Map<string, SubflowTreeNodeI>();
+
+        const createSubflowNode = (uuid: string): SubflowTreeNodeI => ({
+            children: new Map<string, SubflowTreeNodeI>(),
+            connections: [],
+            duplicateStubs: [],
+            subflowWorkflowUuid: uuid,
+        });
 
         for (const item of connectionsToRender) {
             const uuidPath = item.connection.subflowWorkflowUuidPath ?? [];
@@ -382,7 +428,7 @@ const ConnectionConfigurationList = ({
                 let node = currentLevel.get(uuid);
 
                 if (!node) {
-                    node = {children: new Map<string, SubflowTreeNodeI>(), connections: [], subflowWorkflowUuid: uuid};
+                    node = createSubflowNode(uuid);
 
                     currentLevel.set(uuid, node);
                 }
@@ -394,8 +440,41 @@ const ConnectionConfigurationList = ({
             targetNode!.connections.push(item);
         }
 
-        return {regularConnections, subflowConnectionTree};
-    }, [connectionsToRender, connectionsGrouped]);
+        // Attach each duplicate subflow stub under its parent node, creating any intermediate nodes
+        // that hold no real connections of their own. A stub whose parent path is empty is a
+        // top-level duplicate and is rendered alongside the root groups.
+        const topLevelStubs: SubflowDuplicateStubI[] = [];
+
+        for (const stub of duplicateSubflowStubs ?? []) {
+            const parentPath = stub.subflowWorkflowUuidPath.slice(0, -1);
+
+            if (!parentPath.length) {
+                topLevelStubs.push(stub);
+
+                continue;
+            }
+
+            let currentLevel = subflowConnectionTree;
+            let parentNode: SubflowTreeNodeI | undefined;
+
+            for (const uuid of parentPath) {
+                let node = currentLevel.get(uuid);
+
+                if (!node) {
+                    node = createSubflowNode(uuid);
+
+                    currentLevel.set(uuid, node);
+                }
+
+                parentNode = node;
+                currentLevel = node.children;
+            }
+
+            parentNode!.duplicateStubs.push(stub);
+        }
+
+        return {regularConnections, subflowConnectionTree, topLevelStubs};
+    }, [connectionsToRender, connectionsGrouped, duplicateSubflowStubs]);
 
     const workflowNodeLabelMap = useMemo(() => {
         if (connectionsGrouped) {
@@ -419,7 +498,7 @@ const ConnectionConfigurationList = ({
         return workflowNodeLabelMap;
     }, [connectionsGrouped, workflow?.tasks, workflow?.triggers]);
 
-    if (!connectionsToRender.length) {
+    if (!connectionsToRender.length && !(duplicateSubflowStubs?.length && !connectionsGrouped)) {
         return <h3 className="p-4 text-center font-medium text-content-neutral-primary">No Connections yet</h3>;
     }
 
@@ -458,6 +537,14 @@ const ConnectionConfigurationList = ({
                     node={node}
                     subflowLabelMap={subflowLabelMap}
                     workflowNodeLabelMap={workflowNodeLabelMap}
+                />
+            ))}
+
+            {topLevelStubs.map((stub) => (
+                <InheritedSubflow
+                    key={stub.subflowWorkflowUuidPath.join('/')}
+                    stub={stub}
+                    subflowLabelMap={subflowLabelMap}
                 />
             ))}
         </div>

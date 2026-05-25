@@ -10,9 +10,12 @@ import {useMemo} from 'react';
 import {Control, FieldValues, FormState} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 
+import {SubflowDuplicateStubI} from './ConnectionConfigurationList';
+
 interface InputConfigurationListProps {
     control: Control<FieldValues>;
     controlPath: string;
+    duplicateSubflowStubs?: SubflowDuplicateStubI[];
     formState: FormState<FieldValues>;
     inputs?: WorkflowInput[];
     onOpenInputs?: () => void;
@@ -21,6 +24,7 @@ interface InputConfigurationListProps {
 
 interface SubflowInputTreeNodeI {
     children: Map<string, SubflowInputTreeNodeI>;
+    duplicateStubs: SubflowDuplicateStubI[];
     inputs: PropertyAllType[];
     subflowWorkflowUuid: string;
 }
@@ -54,16 +58,37 @@ const countSubflowNodeInputs = (node: SubflowInputTreeNodeI): number => {
     return count;
 };
 
+interface SubflowDuplicateInputStubProps {
+    stub: SubflowDuplicateStubI;
+    subflowLabelMap?: Map<string, string>;
+}
+
+const SubflowDuplicateInputStub = ({stub, subflowLabelMap}: SubflowDuplicateInputStubProps) => (
+    <div className="flex gap-2 rounded-md border bg-surface-neutral-primary px-3 py-2.5">
+        <InlineSVG className="size-5" src={SubflowIcon} />
+
+        <span className="text-sm font-medium text-content-neutral-primary">
+            {subflowLabelMap?.get(stub.subflowWorkflowUuid) || 'Subflow inputs'}
+        </span>
+    </div>
+);
+
 interface SubflowInputGroupProps {
     control: Control<FieldValues>;
     controlPath: string;
     formState: FormState<FieldValues>;
-    node: SubflowInputTreeNodeI;
+    inputTreeNode: SubflowInputTreeNodeI;
     subflowLabelMap?: Map<string, string>;
 }
 
-const SubflowInputGroup = ({control, controlPath, formState, node, subflowLabelMap}: SubflowInputGroupProps) => {
-    const inputCount = countSubflowNodeInputs(node);
+const SubflowInputGroup = ({
+    control,
+    controlPath,
+    formState,
+    inputTreeNode,
+    subflowLabelMap,
+}: SubflowInputGroupProps) => {
+    const inputCount = countSubflowNodeInputs(inputTreeNode);
 
     return (
         <Collapsible
@@ -75,7 +100,7 @@ const SubflowInputGroup = ({control, controlPath, formState, node, subflowLabelM
                     <InlineSVG className="size-5" src={SubflowIcon} />
 
                     <span className="text-sm font-medium text-content-neutral-primary underline-offset-2 group-hover/trigger:underline">
-                        {subflowLabelMap?.get(node.subflowWorkflowUuid) || 'Subflow inputs'}
+                        {subflowLabelMap?.get(inputTreeNode.subflowWorkflowUuid) || 'Subflow inputs'}
                     </span>
 
                     <span className="text-sm font-light text-content-neutral-primary">
@@ -87,22 +112,30 @@ const SubflowInputGroup = ({control, controlPath, formState, node, subflowLabelM
             </CollapsibleTrigger>
 
             <CollapsibleContent className="flex flex-col gap-4">
-                {!!node.inputs.length && (
+                {!!inputTreeNode.inputs.length && (
                     <Properties
                         control={control}
                         controlPath={controlPath}
                         formState={formState}
-                        properties={node.inputs}
+                        properties={inputTreeNode.inputs}
                     />
                 )}
 
-                {Array.from(node.children.values()).map((childNode) => (
+                {Array.from(inputTreeNode.children.values()).map((childInputNode) => (
                     <SubflowInputGroup
                         control={control}
                         controlPath={controlPath}
                         formState={formState}
-                        key={childNode.subflowWorkflowUuid}
-                        node={childNode}
+                        inputTreeNode={childInputNode}
+                        key={childInputNode.subflowWorkflowUuid}
+                        subflowLabelMap={subflowLabelMap}
+                    />
+                ))}
+
+                {inputTreeNode.duplicateStubs.map((inputStub) => (
+                    <SubflowDuplicateInputStub
+                        key={inputStub.subflowWorkflowUuidPath.join('/')}
+                        stub={inputStub}
                         subflowLabelMap={subflowLabelMap}
                     />
                 ))}
@@ -114,14 +147,22 @@ const SubflowInputGroup = ({control, controlPath, formState, node, subflowLabelM
 const InputConfigurationList = ({
     control,
     controlPath,
+    duplicateSubflowStubs,
     formState,
     inputs,
     onOpenInputs,
     subflowLabelMap,
 }: InputConfigurationListProps) => {
-    const {regularInputs, subflowInputTree} = useMemo(() => {
+    const {regularInputs, subflowInputTree, topLevelStubs} = useMemo(() => {
         const regularInputs: PropertyAllType[] = [];
         const subflowInputTree = new Map<string, SubflowInputTreeNodeI>();
+
+        const createNode = (uuid: string): SubflowInputTreeNodeI => ({
+            children: new Map<string, SubflowInputTreeNodeI>(),
+            duplicateStubs: [],
+            inputs: [],
+            subflowWorkflowUuid: uuid,
+        });
 
         for (const input of inputs ?? []) {
             const uuidPath = input.subflowWorkflowUuidPath ?? [];
@@ -140,7 +181,7 @@ const InputConfigurationList = ({
                 let node = currentLevel.get(uuid);
 
                 if (!node) {
-                    node = {children: new Map<string, SubflowInputTreeNodeI>(), inputs: [], subflowWorkflowUuid: uuid};
+                    node = createNode(uuid);
 
                     currentLevel.set(uuid, node);
                 }
@@ -152,10 +193,40 @@ const InputConfigurationList = ({
             targetNode!.inputs.push(property);
         }
 
-        return {regularInputs, subflowInputTree};
-    }, [inputs]);
+        const topLevelStubs: SubflowDuplicateStubI[] = [];
 
-    if (!regularInputs.length && !subflowInputTree.size) {
+        for (const stub of duplicateSubflowStubs ?? []) {
+            const parentPath = stub.subflowWorkflowUuidPath.slice(0, -1);
+
+            if (!parentPath.length) {
+                topLevelStubs.push(stub);
+
+                continue;
+            }
+
+            let currentLevel = subflowInputTree;
+            let parentNode: SubflowInputTreeNodeI | undefined;
+
+            for (const uuid of parentPath) {
+                let node = currentLevel.get(uuid);
+
+                if (!node) {
+                    node = createNode(uuid);
+
+                    currentLevel.set(uuid, node);
+                }
+
+                parentNode = node;
+                currentLevel = node.children;
+            }
+
+            parentNode!.duplicateStubs.push(stub);
+        }
+
+        return {regularInputs, subflowInputTree, topLevelStubs};
+    }, [inputs, duplicateSubflowStubs]);
+
+    if (!regularInputs.length && !subflowInputTree.size && !topLevelStubs.length) {
         return (
             <div className="flex flex-col items-center gap-4">
                 <h3 className="font-medium text-content-neutral-primary">No Inputs yet</h3>
@@ -187,13 +258,21 @@ const InputConfigurationList = ({
                 />
             )}
 
-            {Array.from(subflowInputTree.values()).map((node) => (
+            {Array.from(subflowInputTree.values()).map((inputNode) => (
                 <SubflowInputGroup
                     control={control}
                     controlPath={controlPath}
                     formState={formState}
-                    key={node.subflowWorkflowUuid}
-                    node={node}
+                    inputTreeNode={inputNode}
+                    key={inputNode.subflowWorkflowUuid}
+                    subflowLabelMap={subflowLabelMap}
+                />
+            ))}
+
+            {topLevelStubs.map((inputStub) => (
+                <SubflowDuplicateInputStub
+                    key={inputStub.subflowWorkflowUuidPath.join('/')}
+                    stub={inputStub}
                     subflowLabelMap={subflowLabelMap}
                 />
             ))}
