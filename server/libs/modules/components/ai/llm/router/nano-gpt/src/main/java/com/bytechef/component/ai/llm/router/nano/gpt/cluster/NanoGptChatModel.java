@@ -47,8 +47,8 @@ public class NanoGptChatModel {
 
     public static final ClusterElementDefinition<ModelFunction> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<ModelFunction>clusterElement("model")
-            .title("Open Router Model")
-            .description("Open Router model.")
+            .title("Nano GPT Model")
+            .description("Nano GPT model.")
             .type(ModelFunction.MODEL)
             .object(() -> NanoGptChatModel::apply)
             .properties(

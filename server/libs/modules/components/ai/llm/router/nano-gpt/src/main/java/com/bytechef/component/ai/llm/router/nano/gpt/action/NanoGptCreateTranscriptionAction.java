@@ -66,9 +66,7 @@ public class NanoGptCreateTranscriptionAction {
     }
 
     @SuppressWarnings("unchecked")
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         FileEntry fileEntry = inputParameters.getFileEntry(FILE);
         byte[] audioBytes = context.file(file -> file.readAllBytes(fileEntry));
         String filename = fileEntry.getName() != null ? fileEntry.getName() : "audio";

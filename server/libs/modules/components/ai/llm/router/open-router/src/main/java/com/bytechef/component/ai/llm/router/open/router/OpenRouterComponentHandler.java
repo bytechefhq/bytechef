@@ -43,11 +43,13 @@ public class OpenRouterComponentHandler implements ComponentHandler {
         .icon("path:assets/open-router.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(OpenRouterConnection.CONNECTION_DEFINITION)
-        .actions(OpenRouterChatAction.ACTION_DEFINITION,
+        .actions(
+            OpenRouterChatAction.ACTION_DEFINITION,
             OpenRouterCreateImageAction.ACTION_DEFINITION,
             OpenRouterCreateSpeechAction.ACTION_DEFINITION,
             OpenRouterCreateTranscriptionAction.ACTION_DEFINITION)
-        .clusterElements(OpenRouterChatModel.CLUSTER_ELEMENT_DEFINITION,
+        .clusterElements(
+            OpenRouterChatModel.CLUSTER_ELEMENT_DEFINITION,
             OpenRouterEmbedding.CLUSTER_ELEMENT_DEFINITION)
         .version(1);
 

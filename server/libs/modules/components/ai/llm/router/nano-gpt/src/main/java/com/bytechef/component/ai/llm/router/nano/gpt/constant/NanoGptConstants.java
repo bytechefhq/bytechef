@@ -40,8 +40,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 public class NanoGptConstants {
 
     public static final String BASE_URL = "https://nano-gpt.com/api/v1";
-    public static final String TRANSCRIBE_URL = "https://nano-gpt.com/api/transcribe";
-
     public static final String GUIDANCE_SCALE = "guidanceScale";
     public static final String MIN_P = "minP";
     public static final String MIN_TOKENS = "minTokens";
@@ -54,6 +52,7 @@ public class NanoGptConstants {
     public static final String STRENGTH = "strength";
     public static final String TFS = "tfs";
     public static final String TOP_A = "topA";
+    public static final String TRANSCRIBE_URL = "https://nano-gpt.com/api/transcribe";
     public static final String TYPICAL_P = "typicalP";
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)

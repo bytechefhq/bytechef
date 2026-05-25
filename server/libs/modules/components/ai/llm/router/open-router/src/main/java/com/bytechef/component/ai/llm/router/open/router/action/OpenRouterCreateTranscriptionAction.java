@@ -36,7 +36,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 import org.springframework.core.ParameterizedTypeReference;
@@ -74,15 +73,13 @@ public class OpenRouterCreateTranscriptionAction {
     }
 
     @SuppressWarnings("unchecked")
-    public static String perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static String perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         FileEntry fileEntry = inputParameters.getFileEntry(FILE);
 
         byte[] audioBytes = context.file(file -> file.readAllBytes(fileEntry));
-        String base64Data = Base64.getEncoder()
-            .encodeToString(audioBytes);
-        String format = fileEntry.getExtension() != null ? fileEntry.getExtension() : "wav";
+        String base64Data = context.encoder(encoder -> encoder.base64Encode(audioBytes));
+
+        String format = fileEntry.getExtension() == null ? "wav" : fileEntry.getExtension();
 
         Map<String, Object> inputAudio = new HashMap<>();
 

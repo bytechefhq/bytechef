@@ -39,7 +39,8 @@ public class NanoGptEmbedding {
             .description("NanoGPT embedding.")
             .type(EmbeddingFunction.EMBEDDING)
             .object(() -> NanoGptEmbedding::apply)
-            .properties(EMBEDDING_MODEL_PROPERTY,
+            .properties(
+                EMBEDDING_MODEL_PROPERTY,
                 integer(DIMENSION)
                     .label("Dimension")
                     .description("The number of dimensions for the output embeddings")
