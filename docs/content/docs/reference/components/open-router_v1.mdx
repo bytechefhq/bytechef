@@ -1,0 +1,297 @@
+---
+title: "Open Router"
+description: "OpenRouter provides a unified API that gives you access to hundreds of AI models through a single endpoint, while automatically handling fallbacks and selecting the most cost-effective options."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: openRouter/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Bearer Token
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| token | Token | STRING |  | true |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Ask
+Name: ask
+
+`Ask anything you want.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| supportedParameters | Supported parameters | ARRAY <details> <summary> Items </summary> [STRING] </details> | Filter models by supported parameter | true |
+| model | Model | STRING <details> <summary> Depends On </summary> supportedParameters </details> | ID of the model to use. | true |
+| userPrompt | Prompt | STRING | User prompt to the model. | true |
+| format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
+| systemPrompt | System Prompt | STRING | System prompt to the model. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
+| messages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(role), STRING\(content), [FILE_ENTRY]\(attachments)&#125;] </details> | A list of messages comprising the conversation so far. | true |
+| response | Response | OBJECT <details> <summary> Properties </summary> &#123;STRING\(responseFormat), STRING\(responseSchema)&#125; </details> | The response from the API. | true |
+| frequencyPenalty | Frequency Penalty | NUMBER | Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim. | false |
+| logitBias | Logit Bias | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Modify the likelihood of specified tokens appearing in the completion. | false |
+| logprobs | Logprobs | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Return log probabilities. | false |
+| maxCompletionTokens | Max Completion Tokens | INTEGER | Maximum tokens in completion. | false |
+| maxTokens | Max Tokens | INTEGER | The maximum number of tokens to generate in the chat completion. | false |
+| presencePenalty | Presence Penalty | NUMBER | Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear in the text so far, increasing the model's likelihood to talk about new topics. | false |
+| reasoning | Reasoning effort | STRING <details> <summary> Options </summary> <span>none</span>, <span>minimal</span>, <span>low</span>, <span>medium</span>, <span>high</span>, <span>xhigh</span> </details> | Constrains effort on reasoning. Reducing reasoning effort can result in faster responses and fewer tokens used on reasoning in a response. For reasoning models for gpt-5 and o-series models only. | false |
+| seed | Seed | INTEGER | Keeping the same seed would output the same response. | false |
+| stop | Stop | ARRAY <details> <summary> Items </summary> [STRING] </details> | Up to 4 sequences where the API will stop generating further tokens. | false |
+| temperature | Temperature | NUMBER | Controls randomness:  Higher values will make the output more random, while lower values like will make it more focused and deterministic. | false |
+| topLogprobs | Top Logprobs | INTEGER | Number of top log probabilities to return (0-20). | false |
+| topK | Top K | INTEGER | Specify the number of token choices the generative uses to generate the next token. | false |
+| topP | Top P | NUMBER | An alternative to sampling with temperature, called nucleus sampling,  where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. | false |
+| verbosity | Verbosity | STRING <details> <summary> Options </summary> <span>low</span>, <span>medium</span>, <span>high</span> </details> | Adjusts response verbosity. Lower levels yield shorter answers. | false |
+| user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Ask",
+  "name" : "ask",
+  "parameters" : {
+    "supportedParameters" : [ "" ],
+    "model" : "",
+    "userPrompt" : "",
+    "format" : "",
+    "systemPrompt" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "messages" : [ {
+      "role" : "",
+      "content" : "",
+      "attachments" : [ {
+        "extension" : "",
+        "mimeType" : "",
+        "name" : "",
+        "url" : ""
+      } ]
+    } ],
+    "response" : {
+      "responseFormat" : "",
+      "responseSchema" : ""
+    },
+    "frequencyPenalty" : 0.0,
+    "logitBias" : { },
+    "logprobs" : false,
+    "maxCompletionTokens" : 1,
+    "maxTokens" : 1,
+    "presencePenalty" : 0.0,
+    "reasoning" : "",
+    "seed" : 1,
+    "stop" : [ "" ],
+    "temperature" : 0.0,
+    "topLogprobs" : 1,
+    "topK" : 1,
+    "topP" : 0.0,
+    "verbosity" : "",
+    "user" : ""
+  },
+  "type" : "openRouter/v1/ask"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Create Image
+Name: createImage
+
+`Create an image using text-to-image models`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the model to use. | true |
+| imageMessages | Messages | ARRAY <details> <summary> Items </summary> [&#123;STRING\(content), NUMBER\(weight)&#125;] </details> | A list of messages comprising the conversation so far. | true |
+| aspectRatio | Aspect Ratio | STRING <details> <summary> Options </summary> <span title="1024×1024 (default)">1:1</span>, <span title="832×1248">2:3</span>, <span title="1248×832">3:2</span>, <span title="864×1184">3:4</span>, <span title="1184×864">4:3</span>, <span title="896×1152">4:5</span>, <span title="1152×896">5:4</span>, <span title="768×1344">9:16</span>, <span title="1344×768">16:9</span>, <span title="1536×672">21:9</span>, <span title="supported by google/gemini-3.1-flash-image-preview only">1:4</span>, <span title="supported by google/gemini-3.1-flash-image-preview only">4:1</span>, <span title="supported by google/gemini-3.1-flash-image-preview only">1:8</span>, <span title="supported by google/gemini-3.1-flash-image-preview only">8:1</span> </details> | Specific aspect ratios for generated images | false |
+| size | Size | STRING <details> <summary> Options </summary> <span title="Standard resolution (default)">1K</span>, <span title="Higher resolution">2K</span>, <span title="Highest resolution">4K</span>, <span title="Lower resolution, optimized for efficiency (supported by google/gemini-3.1-flash-image-preview only)">0.5K</span> </details> | The size of the generated images. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | Only text and image files are supported. Also, only certain models supports images. Please check the documentation. | false |
+| user | User | STRING | A unique identifier representing your end-user, which can help admins to monitor and detect abuse. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Image",
+  "name" : "createImage",
+  "parameters" : {
+    "model" : "",
+    "imageMessages" : [ {
+      "content" : "",
+      "weight" : 0.0
+    } ],
+    "aspectRatio" : "",
+    "size" : "",
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ],
+    "user" : ""
+  },
+  "type" : "openRouter/v1/createImage"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Create Speech
+Name: createSpeech
+
+`Generate an audio file from the input text`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the model to use. | true |
+| input | Input | STRING | The text to synthesize. | true |
+| voice | Voice | STRING | Voice identifier (provider-specific). | true |
+| responseFormat | Response Format | STRING <details> <summary> Options </summary> <span>mp3</span>, <span>pcm</span> </details> | Audio output file format. | false |
+| speed | Speed | NUMBER | Playback speed multiplier. Only used by models that support it. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Speech",
+  "name" : "createSpeech",
+  "parameters" : {
+    "model" : "",
+    "input" : "",
+    "voice" : "",
+    "responseFormat" : "",
+    "speed" : 0.0
+  },
+  "type" : "openRouter/v1/createSpeech"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+
+
+### Create Transcription
+Name: createTranscription
+
+`Transcribes audio into text.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | ID of the model to use. | true |
+| file | File | FILE_ENTRY | The audio file to transcribe. Supported formats: wav, mp3, flac, m4a, ogg, webm, aac. | true |
+| language | Language | STRING <details> <summary> Options </summary> <span>AF</span>, <span>AR</span>, <span>HY</span>, <span>AZ</span>, <span>BE</span>, <span>BS</span>, <span>BG</span>, <span>CA</span>, <span>ZH</span>, <span>HR</span>, <span>CS</span>, <span>DA</span>, <span>NL</span>, <span>EL</span>, <span>ET</span>, <span>EN</span>, <span>FI</span>, <span>FR</span>, <span>GL</span>, <span>DE</span>, <span>HE</span>, <span>HI</span>, <span>HU</span>, <span>IS</span>, <span>ID</span>, <span>IT</span>, <span>JA</span>, <span>KK</span>, <span>KN</span>, <span>KO</span>, <span>LT</span>, <span>LV</span>, <span>MA</span>, <span>MK</span>, <span>MR</span>, <span>MS</span>, <span>NE</span>, <span>NO</span>, <span>FA</span>, <span>PL</span>, <span>PT</span>, <span>RO</span>, <span>RU</span>, <span>SK</span>, <span>SL</span>, <span>SR</span>, <span>ES</span>, <span>SV</span>, <span>SW</span>, <span>TA</span>, <span>TL</span>, <span>TH</span>, <span>TR</span>, <span>UK</span>, <span>UR</span>, <span>VI</span>, <span>CY</span> </details> | The language of the input audio. | false |
+| temperature | Temperature | NUMBER | Sampling temperature for transcription. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create Transcription",
+  "name" : "createTranscription",
+  "parameters" : {
+    "model" : "",
+    "file" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "language" : "",
+    "temperature" : 0.0
+  },
+  "type" : "openRouter/v1/createTranscription"
+}
+```
+
+#### Output
+
+
+
+Type: STRING
+
+
+
+
+
+
+
+
+
+
+
+
