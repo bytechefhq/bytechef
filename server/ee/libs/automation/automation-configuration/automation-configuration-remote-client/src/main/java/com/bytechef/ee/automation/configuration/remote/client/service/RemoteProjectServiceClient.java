@@ -128,6 +128,11 @@ public class RemoteProjectServiceClient implements ProjectService {
     }
 
     @Override
+    public List<Long> getWorkspaceProjectIds(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public int publishProject(long id, String description, boolean syncWithGit) {
         throw new UnsupportedOperationException();
     }

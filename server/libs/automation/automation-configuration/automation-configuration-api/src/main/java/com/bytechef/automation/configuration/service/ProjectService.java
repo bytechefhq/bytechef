@@ -57,6 +57,8 @@ public interface ProjectService {
 
     Project getWorkflowProject(String workflowId);
 
+    List<Long> getWorkspaceProjectIds(long workspaceId);
+
     int publishProject(long id, @Nullable String description, boolean syncWithGit);
 
     Project update(long id, List<Long> tagIds);
