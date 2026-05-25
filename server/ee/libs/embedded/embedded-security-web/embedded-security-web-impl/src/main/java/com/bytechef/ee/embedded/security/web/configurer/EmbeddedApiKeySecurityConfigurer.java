@@ -32,7 +32,8 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
 
         super(
             request -> regexMatcher("^/api/embedded/v[0-9]+/.+").matches(request) ||
-                (regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) &&
+                ((regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) ||
+                    regexMatcher("^/graphql$").matches(request)) &&
                     request.getHeader("Authorization") != null),
             new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService),
             new EmbeddedApiKeyAuthenticationProvider(apiKeyService, connectedUserService));
@@ -43,7 +44,8 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
         csrf.ignoringRequestMatchers(regexMatcher("^/api/embedded/v[0-9]+/.+"));
         // For internal calls from the embedded workflow builder
         csrf.ignoringRequestMatchers(
-            request -> regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) &&
+            request -> (regexMatcher("^/api/(?:automation|embedded|platform)/internal/.+").matches(request) ||
+                regexMatcher("^/graphql$").matches(request)) &&
                 request.getHeader("Authorization") != null);
     }
 }

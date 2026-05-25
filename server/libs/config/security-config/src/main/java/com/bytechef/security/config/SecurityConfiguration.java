@@ -341,27 +341,22 @@ public class SecurityConfiguration {
     }
 
     /**
-     * Configures the security filter chain for GraphQL and GraphiQL endpoints in the development profile, defining
-     * authorization rules, authentication mechanisms, and exception handling.
+     * Configures the security filter chain for the GraphiQL dev UI and HTTP-Basic-authenticated GraphiQL POSTs to
+     * {@code /graphql}. The chain intentionally does not match {@code /graphql} requests carrying a Bearer token or
+     * relying on session-cookie auth — those fall through to {@link #apiFilterChain} where the JWT contributor and
+     * form-login session handlers live.
      *
-     * @param http the {@link HttpSecurity} object used to customize security settings for the GraphQL endpoints
-     * @param mvc  a {@link PathPatternRequestMatcher.Builder} used to create request matchers for specific URI patterns
-     * @return a configured {@link SecurityFilterChain} for securing GraphQL and GraphiQL endpoints
-     * @throws Exception if an error occurs while configuring the security filter chain
+     * @param http the {@link HttpSecurity} object used to customize security settings for the GraphiQL endpoints
+     * @return a configured {@link SecurityFilterChain} for serving GraphiQL and accepting its Basic-auth GraphQL calls
      */
     @Bean
     @Profile("dev")
     @Order(1)
-    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http, PathPatternRequestMatcher.Builder mvc)
-        throws Exception {
-
+    public SecurityFilterChain graphqlDevFilterChain(HttpSecurity http) {
         http
-            .securityMatcher("/graphql", "/graphiql")
+            .securityMatcher(SecurityConfiguration::isGraphiqlBasicAuthRequest)
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(mvc.matcher("/graphiql"))
-                .permitAll()
-                .requestMatchers(mvc.matcher("/graphql"))
+            .authorizeHttpRequests(auth -> auth.anyRequest()
                 .authenticated())
             .httpBasic(withDefaults())
             .exceptionHandling(exceptions -> exceptions
@@ -400,6 +395,22 @@ public class SecurityConfiguration {
         RememberMe rememberMe = security.getRememberMe();
 
         return rememberMe.getKey();
+    }
+
+    private static boolean isGraphiqlBasicAuthRequest(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+
+        if ("/graphiql".equals(uri)) {
+            return true;
+        }
+
+        if ("/graphql".equals(uri)) {
+            String authorization = request.getHeader("Authorization");
+
+            return authorization != null && authorization.regionMatches(true, 0, "Basic ", 0, 6);
+        }
+
+        return false;
     }
 
     /**
@@ -454,12 +465,11 @@ public class SecurityConfiguration {
      * authentication. Method: {@link #commence(HttpServletRequest, HttpServletResponse, AuthenticationException)}: -
      * Handles the response when an {@link AuthenticationException} occurs, customizing the headers and status code.
      */
-    private static class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
+    private static final class UnauthorizedBasicAuthenticationEntryPoint extends BasicAuthenticationEntryPoint {
 
         @Override
         public void commence(
-            HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException authException) {
+            HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) {
 
             response.setHeader("WWW-Authenticate", "Basic realm=\"Protected Endpoints\"");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
