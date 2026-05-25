@@ -63,7 +63,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             Number of tasks executed per workflow run.
                         </TooltipContent>
                     </Tooltip>
@@ -80,7 +83,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             Zoom in
                         </TooltipContent>
                     </Tooltip>
@@ -95,7 +101,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             Zoom out
                         </TooltipContent>
                     </Tooltip>
@@ -110,7 +119,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             Fit to screen
                         </TooltipContent>
                     </Tooltip>
@@ -128,7 +140,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             {layoutDirection === 'TB' ? 'Switch to horizontal layout' : 'Switch to vertical layout'}
                         </TooltipContent>
                     </Tooltip>
@@ -144,7 +159,10 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                             </button>
                         </TooltipTrigger>
 
-                        <TooltipContent className="rounded-lg bg-surface-tooltip text-content-onsurface-primary" side="top">
+                        <TooltipContent
+                            className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                            side="top"
+                        >
                             Reset layout
                         </TooltipContent>
                     </Tooltip>
