@@ -51,6 +51,7 @@ public class NanoGptCreateImageAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_IMAGE)
         .title("Create Image")
         .description("Create an image using text-to-image models.")
+        .help("", "https://docs.bytechef.io/reference/components/nano-gpt_v1#create-image")
         .properties(
             IMAGE_MODEL_PROPERTY,
             IMAGE_MESSAGE_PROPERTY,

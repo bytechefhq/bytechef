@@ -96,6 +96,7 @@ public class NanoGptChatAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(ASK)
         .title("Ask")
         .description("Ask anything you want.")
+        .help("", "https://docs.bytechef.io/reference/components/nano-gpt_v1#ask")
         .properties(
             CHAT_MODEL_PROPERTY,
             PROMPT_PROPERTY,

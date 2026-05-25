@@ -50,6 +50,7 @@ public class NanoGptCreateTranscriptionAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_TRANSCRIPTION)
         .title("Create Transcription")
         .description("Transcribes audio into text.")
+        .help("", "https://docs.bytechef.io/reference/components/nano-gpt_v1#create-transcription")
         .properties(
             TRANSCRIPTION_MODEL_PROPERTY,
             fileEntry(FILE)
