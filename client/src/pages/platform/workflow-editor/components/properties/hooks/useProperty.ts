@@ -319,10 +319,6 @@ export const useProperty = ({
 
     let {displayCondition} = property;
 
-    if (optionsLoadedDynamically) {
-        console.log(property);
-    }
-
     const {
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
