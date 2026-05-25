@@ -38,6 +38,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.ByteArrayInputStream;
@@ -93,17 +94,20 @@ public class NanoGptCreateSpeechAction {
                 .minValue(0.1)
                 .maxValue(5)
                 .required(false))
-        .output(outputSchema(object().properties(
-            fileEntry("file").description("The generated audio file."),
-            string("audioUrl").description("URL to the generated audio file"))))
+        .output(
+            outputSchema(
+                object()
+                    .properties(
+                        fileEntry("file")
+                            .description("The generated audio file."),
+                        string("audioUrl")
+                            .description("URL to the generated audio file"))))
         .perform(NanoGptCreateSpeechAction::perform);
 
     private NanoGptCreateSpeechAction() {
     }
 
-    public static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         Map<String, Object> requestBody = new HashMap<>();
 
         requestBody.put("text", inputParameters.getRequiredString(INPUT));
@@ -240,7 +244,7 @@ public class NanoGptCreateSpeechAction {
             }
 
             if ("failed".equals(status)) {
-                throw new RuntimeException("TTS generation failed: " + statusResponse.get("error"));
+                throw new ProviderException("TTS generation failed: " + statusResponse.get("error"));
             }
         }
 

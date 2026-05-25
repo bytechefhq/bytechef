@@ -18,8 +18,9 @@ package com.bytechef.component.ai.llm.router.nano.gpt.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.TypeReference;
 import java.math.BigDecimal;
 import java.util.Comparator;
@@ -35,10 +36,10 @@ public class NanoGptUtils {
     private NanoGptUtils() {
     }
 
-    public static ActionDefinition.OptionsFunction<String> getNanoGptChatModels() {
+    public static OptionsFunction<String> getNanoGptChatModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             ModelsResponse response = context.http(http -> http.get("/models"))
-                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .queryParameter("detailed", "true")
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -47,19 +48,16 @@ public class NanoGptUtils {
                 .stream()
                 .sorted(Comparator
                     .comparingDouble(NanoGptModel::totalCost)
-                    .thenComparing(model -> model.name() != null ? model.name() : model.id()))
-                .map(model -> option(
-                    formatModelLabel(model),
-                    model.id(),
-                    model.description()))
+                    .thenComparing(model -> model.name() == null ? model.id() : model.name()))
+                .map(model -> option(formatModelLabel(model), model.id(), model.description()))
                 .collect(Collectors.toList());
         };
     }
 
-    public static ActionDefinition.OptionsFunction<String> getNanoGptEmbeddingModels() {
+    public static OptionsFunction<String> getNanoGptEmbeddingModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             EmbeddingModelsResponse response = context.http(http -> http.get("/embedding-models"))
-                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .execute()
                 .getBody(new TypeReference<>() {});
 
@@ -67,7 +65,7 @@ public class NanoGptUtils {
                 .stream()
                 .sorted(Comparator
                     .comparingDouble(NanoGptEmbeddingModel::pricePerMillionOrZero)
-                    .thenComparing(model -> model.name() != null ? model.name() : model.id()))
+                    .thenComparing(model -> model.name() == null ? model.id() : model.name()))
                 .map(model -> option(
                     formatEmbeddingModelLabel(model),
                     model.id(),
@@ -76,10 +74,10 @@ public class NanoGptUtils {
         };
     }
 
-    public static ActionDefinition.OptionsFunction<String> getNanoGptImageModels() {
+    public static OptionsFunction<String> getNanoGptImageModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             ImageModelsResponse response = context.http(http -> http.get("/image-models"))
-                .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+                .configuration(Http.responseType(Http.ResponseType.JSON))
                 .queryParameter("detailed", "true")
                 .execute()
                 .getBody(new TypeReference<>() {});
@@ -88,7 +86,7 @@ public class NanoGptUtils {
                 .stream()
                 .sorted(Comparator
                     .comparingDouble(NanoGptImageModel::minPriceOrZero)
-                    .thenComparing(model -> model.name() != null ? model.name() : model.id()))
+                    .thenComparing(model -> model.name() == null ? model.id() : model.name()))
                 .map(model -> option(
                     formatImageModelLabel(model),
                     model.id(),
@@ -97,12 +95,12 @@ public class NanoGptUtils {
         };
     }
 
-    public static ActionDefinition.OptionsFunction<String> getNanoGptSpeechModels() {
+    public static OptionsFunction<String> getNanoGptSpeechModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> fetchAudioModels(
             "tts", context);
     }
 
-    public static ActionDefinition.OptionsFunction<String> getNanoGptTranscriptionModels() {
+    public static OptionsFunction<String> getNanoGptTranscriptionModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> fetchAudioModels(
             "stt", context);
     }
@@ -111,7 +109,7 @@ public class NanoGptUtils {
         String type, Context context) {
 
         AudioModelsResponse response = context.http(http -> http.get("/audio-models"))
-            .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .queryParameter("detailed", "true")
             .queryParameter("type", type)
             .execute()
@@ -121,7 +119,7 @@ public class NanoGptUtils {
             .stream()
             .sorted(Comparator
                 .comparingDouble((NanoGptAudioModel model) -> model.priceOrZero(type))
-                .thenComparing(model -> model.name() != null ? model.name() : model.id()))
+                .thenComparing(model -> model.name() == null ? model.id() : model.name()))
             .map(model -> option(
                 formatAudioModelLabel(model, type),
                 model.id(),
@@ -130,7 +128,7 @@ public class NanoGptUtils {
     }
 
     private static String formatEmbeddingModelLabel(NanoGptEmbeddingModel model) {
-        String displayName = model.name() != null ? model.name() : model.id();
+        String displayName = model.name() == null ? model.id() : model.name();
 
         if (model.pricing() == null) {
             return displayName;
@@ -141,12 +139,12 @@ public class NanoGptUtils {
     }
 
     private static String formatImageModelLabel(NanoGptImageModel model) {
-        String displayName = model.name() != null ? model.name() : model.id();
+        String displayName = model.name() == null ? model.id() : model.name();
 
-        if (model.pricing() == null || model.pricing()
-            .per_image() == null || model.pricing()
-                .per_image()
-                .isEmpty()) {
+        ImagePricing imagePricing = model.pricing();
+
+        if (imagePricing == null || imagePricing.per_image() == null || imagePricing.per_image()
+            .isEmpty()) {
             return displayName;
         }
 
@@ -154,29 +152,27 @@ public class NanoGptUtils {
     }
 
     private static String formatAudioModelLabel(NanoGptAudioModel model, String type) {
-        String displayName = model.name() != null ? model.name() : model.id();
+        String displayName = model.name() == null ? model.id() : model.name();
 
-        if (model.pricing() == null) {
+        AudioPricing audioPricing = model.pricing();
+
+        if (audioPricing == null) {
             return displayName;
         }
 
-        if ("tts".equals(type) && model.pricing()
-            .per_thousand_chars() != null) {
-            return displayName + " - $" + formatCost(model.pricing()
-                .per_thousand_chars()) + " per 1K chars";
+        if ("tts".equals(type) && audioPricing.per_thousand_chars() != null) {
+            return displayName + " - $" + formatCost(audioPricing.per_thousand_chars()) + " per 1K chars";
         }
 
-        if ("stt".equals(type) && model.pricing()
-            .per_minute() != null) {
-            return displayName + " - $" + formatCost(model.pricing()
-                .per_minute()) + " per min";
+        if ("stt".equals(type) && audioPricing.per_minute() != null) {
+            return displayName + " - $" + formatCost(audioPricing.per_minute()) + " per min";
         }
 
         return displayName;
     }
 
     private static String formatModelLabel(NanoGptModel model) {
-        String displayName = model.name() != null ? model.name() : model.id();
+        String displayName = model.name() == null ? model.id() : model.name();
 
         if (model.pricing() == null) {
             return displayName;
