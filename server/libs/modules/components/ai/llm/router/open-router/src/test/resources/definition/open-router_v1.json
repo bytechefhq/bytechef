@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-router_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
@@ -1083,7 +1086,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-router_v1#create-image"
+    },
     "metadata": null,
     "name": "createImage",
     "outputDefinition": {
@@ -1478,7 +1484,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generate an audio file from the input text",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-router_v1#create-speech"
+    },
     "metadata": null,
     "name": "createSpeech",
     "outputDefinition": {
@@ -1833,7 +1842,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Transcribes audio into text.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/open-router_v1#create-transcription"
+    },
     "metadata": null,
     "name": "createTranscription",
     "outputDefinition": {

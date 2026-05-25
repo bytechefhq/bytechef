@@ -26,6 +26,6 @@ class OpenRouterComponentHandlerTest {
 
     @Test
     void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals("definition/oper-router_v1.json", new OpenRouterComponentHandler().getDefinition());
+        JsonFileAssert.assertEquals("definition/open-router_v1.json", new OpenRouterComponentHandler().getDefinition());
     }
 }
