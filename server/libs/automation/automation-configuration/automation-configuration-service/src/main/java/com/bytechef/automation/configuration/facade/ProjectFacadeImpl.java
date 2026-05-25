@@ -376,12 +376,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
 
     @Override
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
-        List<Long> projectIds = projectService.getProjects(null, null, null, null, null, workspaceId)
-            .stream()
-            .map(Project::getId)
-            .toList();
-
-        return projectWorkflowService.getProjectWorkflows(projectIds)
+        return projectWorkflowService.getProjectWorkflows(projectService.getWorkspaceProjectIds(workspaceId))
             .stream()
             .map(projectWorkflow -> new ProjectWorkflowDTO(
                 workflowService.getWorkflow(projectWorkflow.getWorkflowId()), projectWorkflow, false))

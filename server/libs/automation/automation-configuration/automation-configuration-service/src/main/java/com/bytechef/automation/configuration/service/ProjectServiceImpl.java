@@ -139,6 +139,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
+    public List<Long> getWorkspaceProjectIds(long workspaceId) {
+        return projectRepository.findProjectIdsByWorkspaceId(workspaceId);
+    }
+
+    @Override
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = getProject(id);
 
