@@ -171,6 +171,56 @@ class AiSkillFacadeTest {
     }
 
     @Test
+    void testCreateAiSkillWithSpacesAndUppercaseInNameSucceeds() {
+        FileEntry fileEntry = new FileEntry("test.skill", "file:///storage/test.skill");
+
+        AiSkill expectedAiSkill = new AiSkill();
+
+        expectedAiSkill.setId(1L);
+        expectedAiSkill.setName("Test Skill");
+        expectedAiSkill.setSkillFile(fileEntry);
+
+        byte[] zipBytes = createZipBytes("SKILL.md", "content");
+
+        when(aiSkillFileStorage.storeAiSkillFile(eq("test.skill"), eq(zipBytes))).thenReturn(fileEntry);
+        when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
+
+        AiSkill result = aiSkillFacade.createAiSkill("Test Skill", null, "test.skill", zipBytes);
+
+        assertEquals(expectedAiSkill, result);
+
+        verify(aiSkillService).createAiSkill(
+            argThat(aiSkill -> "Test Skill".equals(aiSkill.getName())));
+    }
+
+    @Test
+    void testCreateAiSkillRejectsConsecutiveSpaces() {
+        byte[] zipBytes = createZipBytes("SKILL.md", "content");
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAiSkill("Test  Skill", null, "test.skill", zipBytes));
+    }
+
+    @Test
+    void testCreateAiSkillRejectsLeadingSpace() {
+        byte[] zipBytes = createZipBytes("SKILL.md", "content");
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAiSkill(" skill", null, "test.skill", zipBytes));
+    }
+
+    @Test
+    void testCreateAiSkillRejectsSpecialCharacters() {
+        byte[] zipBytes = createZipBytes("SKILL.md", "content");
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAiSkill("skill@name", null, "test.skill", zipBytes));
+    }
+
+    @Test
     void testCreateAiSkillWithBlankNameThrows() {
         assertThrows(
             IllegalArgumentException.class,
@@ -386,10 +436,6 @@ class AiSkillFacadeTest {
         when(aiSkillFileStorage.storeAiSkillFile(any(), any(byte[].class))).thenReturn(fileEntry);
         when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
 
-        // The name field is now strictly validated against the agentskills.io regex (lowercase
-        // alphanumeric + hyphens only), so injection-style names are rejected upfront. Description has
-        // no content restrictions other than length, so it remains the place where YAML escaping
-        // matters — embedded newlines + a fake closing delimiter must not break out of the value.
         aiSkillFacade.createAiSkillFromInstructions(
             "evil-skill", "desc with \"quotes\"\n---\ninjected: true", "instructions");
 

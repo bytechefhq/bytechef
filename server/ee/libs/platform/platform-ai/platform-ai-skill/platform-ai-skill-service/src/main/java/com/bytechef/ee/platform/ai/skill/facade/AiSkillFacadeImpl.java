@@ -56,13 +56,13 @@ import org.springframework.util.Assert;
 @Transactional
 @SuppressFBWarnings(
     value = "REDOS",
-    justification = "SKILL_NAME_PATTERN is a kebab-case validator with a fixed '-' separator between character classes — runs in linear time")
+    justification = "SKILL_NAME_PATTERN uses fixed separators between character classes — runs in linear time")
 class AiSkillFacadeImpl implements AiSkillFacade {
 
     private static final int MAX_SKILL_FILE_SIZE = 10 * 1024 * 1024;
     private static final int MAX_SKILL_NAME_LENGTH = 64;
     private static final int MAX_SKILL_DESCRIPTION_LENGTH = 1024;
-    private static final Pattern SKILL_NAME_PATTERN = Pattern.compile("^[a-z0-9]+(-[a-z0-9]+)*$");
+    private static final Pattern SKILL_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9]+([- ][a-zA-Z0-9]+)*$");
     private static final Pattern FRONTMATTER_BLOCK_PATTERN = Pattern.compile("^---\n([\\s\\S]*?)\n---\n([\\s\\S]*)$");
     private static final String SKILL_MD_FILENAME = "SKILL.md";
 
@@ -514,8 +514,8 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             .matches()) {
 
             throw new IllegalArgumentException(
-                "Skill name must contain only lowercase letters, digits, and single hyphens — no leading, trailing, " +
-                    "or consecutive hyphens (got '" + name + "')");
+                "Skill name must contain only letters, digits, single hyphens, or single spaces — " +
+                    "no leading, trailing, or consecutive separators (got '" + name + "')");
         }
     }
 

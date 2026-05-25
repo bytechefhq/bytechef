@@ -48,9 +48,9 @@ public class SkillsTools {
             "agentskills.io SKILL.md spec — see parameter descriptions for the format rules. Returns the created skill.")
     public AiSkill createAiSkill(
         @ToolParam(
-            description = "The skill name. 1-64 characters; lowercase letters (a-z), digits (0-9), and " +
-                "single hyphens (-) only. Must not start or end with a hyphen and must not contain " +
-                "consecutive hyphens. Example: 'pdf-processing'.") String name,
+            description = "The skill name. 1-64 characters; letters (a-z, A-Z), digits (0-9), with single " +
+                "hyphens (-) or single spaces as separators. Must not start or end with a separator and must " +
+                "not contain consecutive separators. Example: 'pdf-processing'.") String name,
         @ToolParam(
             description = "A description (max 1024 characters) of what the skill does and when to use it. " +
                 "Include keywords that help identify relevant tasks.") @Nullable String description,
@@ -200,9 +200,9 @@ public class SkillsTools {
     public AiSkill updateAiSkill(
         @ToolParam(description = "The ID of the skill to update") long id,
         @ToolParam(
-            description = "The new skill name. 1-64 characters; lowercase letters (a-z), digits (0-9), and " +
-                "single hyphens (-) only. Must not start or end with a hyphen and must not contain " +
-                "consecutive hyphens.") String name,
+            description = "The new skill name. 1-64 characters; letters (a-z, A-Z), digits (0-9), with single " +
+                "hyphens (-) or single spaces as separators. Must not start or end with a separator and must " +
+                "not contain consecutive separators.") String name,
         @ToolParam(description = "The new description (max 1024 characters).") @Nullable String description) {
 
         try {
