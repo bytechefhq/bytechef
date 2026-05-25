@@ -178,21 +178,21 @@ public class AiAgentUtilsSkillsTool {
 
         ToolCallbackProvider toolCallbackProvider = ToolCallbackProvider.from(skillsToolCallback);
 
-        List<ToolCallback> allCallbacks = new ArrayList<>(Arrays.asList(toolCallbackProvider.getToolCallbacks()));
+        List<ToolCallback> allToolCallbacks = new ArrayList<>(Arrays.asList(toolCallbackProvider.getToolCallbacks()));
 
         JobContextAware jobContextAware = (JobContextAware) context;
 
         for (SkillScripts skillScripts : skillScriptsList) {
             for (ScriptEntry scriptEntry : skillScripts.scripts()) {
-                ToolCallback scriptCallback = createScriptToolCallback(
+                ToolCallback scriptToolCallback = createScriptToolCallback(
                     skillScripts.name(), skillScripts.description(), scriptEntry, componentConnections,
                     jobContextAware);
 
-                allCallbacks.add(scriptCallback);
+                allToolCallbacks.add(scriptToolCallback);
             }
         }
 
-        return ToolCallbackProvider.from(allCallbacks.toArray(ToolCallback[]::new));
+        return ToolCallbackProvider.from(allToolCallbacks.toArray(ToolCallback[]::new));
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
@@ -223,9 +223,10 @@ public class AiAgentUtilsSkillsTool {
         return FunctionToolCallback.builder(
             toolName,
             (Map<String, Object> toolInput) -> {
-                Parameters scriptParams = ParametersFactory.create(Map.of(
-                    "script", scriptContent,
-                    ScriptConstants.INPUT, toolInput != null ? toolInput : Map.of()));
+                Parameters scriptParams = ParametersFactory.create(
+                    Map.of(
+                        "script", scriptContent,
+                        ScriptConstants.INPUT, toolInput != null ? toolInput : Map.of()));
 
                 return polyglotEngine.execute(languageId, scriptParams, componentConnections, jobContextAware);
             })
@@ -238,7 +239,7 @@ public class AiAgentUtilsSkillsTool {
     private static SkillExtraction extractSkillResources(byte[] zipBytes, long skillId, Context context) {
         String skillName = "";
         String skillDescription = "";
-        List<ScriptEntry> scripts = new ArrayList<>();
+        List<ScriptEntry> scriptEntries = new ArrayList<>();
 
         try {
             Path tempDirectory = Files.createTempDirectory("bytechef-skill-" + skillId + "-");
@@ -315,7 +316,7 @@ public class AiAgentUtilsSkillsTool {
                         String languageId = EXTENSION_TO_LANGUAGE_ID.get(extension.toLowerCase());
 
                         if (languageId != null) {
-                            scripts.add(new ScriptEntry(fileName, languageId, content));
+                            scriptEntries.add(new ScriptEntry(fileName, languageId, content));
                         } else {
                             context.log(log -> log.warn(
                                 "Unsupported script extension '{}' in '{}', skipping", extension, entryName));
@@ -324,7 +325,7 @@ public class AiAgentUtilsSkillsTool {
                 }
             }
 
-            return new SkillExtraction(tempDirectory, new SkillScripts(skillName, skillDescription, scripts));
+            return new SkillExtraction(tempDirectory, new SkillScripts(skillName, skillDescription, scriptEntries));
         } catch (IOException ioException) {
             throw new UncheckedIOException("Failed to extract skill resources from zip archive", ioException);
         }
