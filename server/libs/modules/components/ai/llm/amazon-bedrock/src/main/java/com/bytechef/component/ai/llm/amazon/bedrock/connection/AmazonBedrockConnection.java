@@ -35,6 +35,7 @@ import software.amazon.awssdk.regions.Region;
 public final class AmazonBedrockConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
                 .properties(

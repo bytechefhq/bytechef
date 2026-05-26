@@ -34,6 +34,7 @@ public class AmazonBedrockComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("amazonBedrock")
         .title("Amazon Bedrock")
+        .version(1)
         .description(
             "Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models " +
                 "(FMs) from leading AI companies.")
