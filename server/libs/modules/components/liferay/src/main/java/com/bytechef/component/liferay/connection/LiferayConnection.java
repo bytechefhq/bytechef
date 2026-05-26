@@ -75,6 +75,7 @@ public class LiferayConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("Password")
-                        .required(true)));
-
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/liferay_v1#connection-setup")
+        .version(1);
 }

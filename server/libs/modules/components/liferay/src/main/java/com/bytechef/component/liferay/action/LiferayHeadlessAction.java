@@ -57,14 +57,17 @@ public class LiferayHeadlessAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("headlessRequest")
         .title("Headless Request")
-        .description("The Headless endpoint to use.")
+        .description("Executes a Liferay Headless API action using the configured endpoint.")
+        .help("", "https://docs.bytechef.io/reference/components/liferay_v1#headless-request")
         .properties(
             string(APPLICATION)
                 .label("Application")
+                .description("Liferay REST Application you want to use.")
                 .options((ActionDefinition.OptionsFunction<String>) LiferayOptionUtils::getApplicationsOptions)
                 .required(true),
             string(ENDPOINT)
                 .label("Endpoint")
+                .description("API endpoint where requests are sent.")
                 .options((ActionDefinition.OptionsFunction<String>) LiferayOptionUtils::getEndpointsOptions)
                 .optionsLookupDependsOn(APPLICATION)
                 .required(true),
