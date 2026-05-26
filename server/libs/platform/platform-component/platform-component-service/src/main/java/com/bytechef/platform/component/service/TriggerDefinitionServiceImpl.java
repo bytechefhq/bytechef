@@ -92,7 +92,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private static final int MAX_POLLING_TRIGGER_ITERATIONS = 100;
     private static final int MAX_POLLING_TRIGGER_RECORDS = 10_000;
 
-    private static final Logger logger = LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(TriggerDefinitionServiceImpl.class);
 
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
@@ -471,14 +471,14 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         }
 
         if (pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS || records.size() >= MAX_POLLING_TRIGGER_RECORDS) {
-            logger.warn(
+            log.warn(
                 "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
                     "resume. Likely cause: component keeps requesting immediate re-poll without completing pagination.",
                 componentName, triggerName, pollFunctionApplyCount, records.size());
         }
 
         if (pollOutput.pollImmediately()) {
-            logger.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
+            log.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
         }
 
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
