@@ -152,10 +152,10 @@ public abstract class AbstractAiAgentChatAction {
             .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
             .advisors(getConversationAdvisor(conversationId))
             .messages(ModelUtils.getMessages(inputParameters, context))
-            .toolCallbacks(
+            .tools(spec -> spec.callbacks(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context));
+                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context)));
     }
 
     private ChatMemoryFunction.Result buildChatMemoryResult(
