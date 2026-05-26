@@ -28,12 +28,10 @@ import org.slf4j.LoggerFactory;
  */
 public class LogTaskApplicationEventListener implements ApplicationEventListener {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(LogTaskApplicationEventListener.class);
 
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
-        if (log.isDebugEnabled()) {
-            log.debug("{}", applicationEvent);
-        }
+        log.debug("{}", applicationEvent);
     }
 }
