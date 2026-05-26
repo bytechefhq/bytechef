@@ -30,8 +30,9 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -43,6 +44,7 @@ import org.testcontainers.containers.GenericContainer;
  *
  * @author Igor Beslic
  */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringJUnitConfig(BaseFtpActionIntTest.TestConfig.class)
 public class BaseFtpActionIntTest {
 
@@ -88,8 +90,8 @@ public class BaseFtpActionIntTest {
     protected FixedHostPortGenericContainer<?> ftpContainer;
     protected GenericContainer<?> sftpContainer;
 
-    @BeforeEach
-    void setUpContainer() throws Exception {
+    @BeforeAll
+    void setUpContainers() throws Exception {
         ftpContainer = new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
             .withEnv("USERS", ftpUsername + "|" + ftpPassword)
             .withEnv("ADDRESS", ftpHostIp)
@@ -118,10 +120,14 @@ public class BaseFtpActionIntTest {
         copyTestFileViaFtp("005");
     }
 
-    @AfterEach
-    void tearDownContainer() {
+    @AfterAll
+    void tearDownContainers() {
         if (ftpContainer != null) {
             ftpContainer.stop();
+        }
+
+        if (sftpContainer != null) {
+            sftpContainer.stop();
         }
     }
 
