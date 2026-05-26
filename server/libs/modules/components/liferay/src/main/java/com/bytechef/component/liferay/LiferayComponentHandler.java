@@ -38,11 +38,14 @@ public class LiferayComponentHandler implements ComponentHandler {
             "Liferay is an open-source digital experience platform for enterprise content management (ECM) and " +
                 "portal development.")
         .icon("path:assets/liferay.svg")
+        .customAction(true)
+        .customActionHelp("", "https://learn.liferay.com/w/dxp/integration/headless-apis")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(LiferayConnection.CONNECTION_DEFINITION)
         .actions(
             LiferayHeadlessAction.ACTION_DEFINITION,
-            LiferayJsonWsRequestAction.ACTION_DEFINITION);
+            LiferayJsonWsRequestAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

@@ -46,7 +46,8 @@ public class LiferayJsonWsRequestAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("jsonWsRequest")
         .title("JSON WS Services")
-        .description("The Headless endpoint to use.")
+        .description("Sends a JSON-based HTTP request to a configured external web service endpoint.")
+        .help("", "https://docs.bytechef.io/reference/components/liferay_v1#json-ws-request")
         .properties(
             string(CONTEXT_NAME)
                 .label("Context Name")

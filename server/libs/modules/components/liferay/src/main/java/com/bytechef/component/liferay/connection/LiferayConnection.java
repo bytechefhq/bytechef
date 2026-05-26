@@ -34,7 +34,6 @@ import com.bytechef.component.definition.Authorization;
 import com.bytechef.component.definition.Authorization.ApiTokenLocation;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -53,17 +52,17 @@ public class LiferayConnection {
         .authorizations(
             authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2")
-                    .properties(
-                        string(CLIENT_ID)
-                            .label("Client ID")
-                            .required(true),
-                        string(CLIENT_SECRET)
-                            .label("Client Secret")
-                            .required(true))
-                .authorizationUrl((connectionParameters, context) ->
-                    connectionParameters.getRequiredString(BASE_URI) + "o/oauth2/authorize")
-                .tokenUrl(((connectionParameters, context) ->
-                    connectionParameters.getRequiredString(BASE_URI) + "o/oauth2/token"))
+                .properties(
+                    string(CLIENT_ID)
+                        .label("Client ID")
+                        .required(true),
+                    string(CLIENT_SECRET)
+                        .label("Client Secret")
+                        .required(true))
+                .authorizationUrl((connectionParameters, context) -> connectionParameters.getRequiredString(BASE_URI)
+                    + "o/oauth2/authorize")
+                .tokenUrl((connectionParameters, context) -> connectionParameters.getRequiredString(BASE_URI)
+                    + "o/oauth2/token")
                 .scopes((connectionParameters, context) -> {
                     Map<String, Boolean> map = new LinkedHashMap<>();
 
@@ -228,6 +227,7 @@ public class LiferayConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("Password")
-                        .required(true)));
-
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/liferay_v1#connection-setup")
+        .version(1);
 }
