@@ -35,6 +35,7 @@ public class GroqComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("groq")
         .title("Groq")
+        .version(1)
         .description(
             "The LPU Inference Engine by Groq is a hardware and software platform that delivers exceptional compute " +
                 "speed, quality, and energy efficiency.")

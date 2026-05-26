@@ -88,6 +88,7 @@ public class GroqChatAction {
             STOP_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/groq_v1#ask")
         .perform(GroqChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
