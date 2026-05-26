@@ -31,7 +31,7 @@ type UseWorkflowExecutionsReturnType = {
 const useWorkflowExecutions = ({
     workflowTestExecution,
 }: {
-    workflowTestExecution: WorkflowTestExecution;
+    workflowTestExecution?: WorkflowTestExecution;
 }): UseWorkflowExecutionsReturnType => {
     const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [dialogOpen, setDialogOpen] = useState(false);
@@ -39,7 +39,7 @@ const useWorkflowExecutions = ({
         getInitialSelectedItem(workflowTestExecution)
     );
 
-    const {job, triggerExecution} = workflowTestExecution;
+    const {job, triggerExecution} = workflowTestExecution ?? {};
 
     const currentWorkflowId = job?.workflowId;
 

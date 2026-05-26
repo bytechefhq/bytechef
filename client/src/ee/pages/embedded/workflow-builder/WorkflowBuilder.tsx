@@ -117,7 +117,7 @@ const WorkflowBuilder = () => {
                     <ResizableHandle className="bg-muted" />
 
                     <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
-                        {workflowTestExecution && (
+                        {(workflowIsRunning || workflowTestExecution) && (
                             <WorkflowExecutionsTestOutput
                                 onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
                                 workflowIsRunning={workflowIsRunning}
