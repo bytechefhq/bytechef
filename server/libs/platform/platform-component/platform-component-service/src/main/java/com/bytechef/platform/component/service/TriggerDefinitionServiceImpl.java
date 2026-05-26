@@ -467,6 +467,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 pollFunction, inputParameters, connectionParameters,
                 ParametersFactory.create(pollOutput.closureParameters()), triggerContext);
 
+            polledRecords = pollOutput.records();
+
             pollFunctionApplyCount++;
         }
 
