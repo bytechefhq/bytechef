@@ -358,7 +358,7 @@ import org.slf4j.LoggerFactory;
  */
 class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
 
-    private static final Logger logger = LoggerFactory.getLogger(WebSocketEmitter.class);
+    private static final Logger log = LoggerFactory.getLogger(WebSocketEmitter.class);
 
     private final CopyOnWriteArrayList<Consumer<byte[]>> binaryMessageListeners = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<Runnable> closeListeners = new CopyOnWriteArrayList<>();
@@ -393,8 +393,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 closeListener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -407,8 +407,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 callback.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -421,8 +421,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 consumer.accept(java.util.Objects.requireNonNull(lastError));
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         } else {
@@ -472,8 +472,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -482,8 +482,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -497,8 +497,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.accept(data);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -512,8 +512,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.accept(message);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -532,8 +532,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.accept(throwable);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -551,8 +551,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.accept(data);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -564,8 +564,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.accept(data);
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -576,8 +576,8 @@ class WebSocketEmitter implements WebSocketHandler.WebSocketEmitter {
             try {
                 listener.run();
             } catch (Exception exception) {
-                if (logger.isTraceEnabled()) {
-                    logger.trace(exception.getMessage(), exception);
+                if (log.isTraceEnabled()) {
+                    log.trace(exception.getMessage(), exception);
                 }
             }
         }
@@ -650,7 +650,7 @@ import org.slf4j.LoggerFactory;
  */
 class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger logger =
+    private static final Logger log =
         LoggerFactory.getLogger(WebSocketStreamTaskExecutionPostOutputProcessor.class);
 
     private final Cache<String, CopyOnWriteArrayList<SseStreamBridge>> sseStreamBridges;
@@ -681,8 +681,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onEvent(payload);
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -699,8 +699,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onComplete();
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -717,8 +717,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onError(throwable);
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -733,8 +733,8 @@ class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPo
                     try {
                         bridge.onError(new TimeoutException("WebSocket stream timed out for job " + jobId));
                     } catch (Exception exception) {
-                        if (logger.isTraceEnabled()) {
-                            logger.trace(exception.getMessage(), exception);
+                        if (log.isTraceEnabled()) {
+                            log.trace(exception.getMessage(), exception);
                         }
                     }
                 }
@@ -848,7 +848,7 @@ import org.slf4j.LoggerFactory;
  */
 public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutputProcessor {
 
-    private static final Logger logger =
+    private static final Logger log =
         LoggerFactory.getLogger(WebSocketStreamTaskExecutionPostOutputProcessor.class);
 
     private final MessageBroker messageBroker;
@@ -921,8 +921,8 @@ public class WebSocketStreamTaskExecutionPostOutputProcessor implements TaskExec
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (logger.isTraceEnabled()) {
-                logger.trace(exception.getMessage(), exception);
+            if (log.isTraceEnabled()) {
+                log.trace(exception.getMessage(), exception);
             }
         }
     }
