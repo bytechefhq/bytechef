@@ -130,7 +130,7 @@ const WorkflowCodeEditorSheet = ({
                                     <TooltipTrigger asChild>
                                         <div>
                                             <Button
-                                                className="rounded-r-none opacity-50"
+                                                className="rounded-r-none"
                                                 disabled={!dirty || hasErrors}
                                                 icon={<SaveIcon />}
                                                 onClick={() => handleSaveClick(workflow, definition)}
