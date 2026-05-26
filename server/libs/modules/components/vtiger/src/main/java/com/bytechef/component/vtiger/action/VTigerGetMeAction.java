@@ -38,6 +38,7 @@ public class VTigerGetMeAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getMe")
         .title("Get Me")
         .description("Get more information about yourself.")
+        .help("", "https://docs.bytechef.io/reference/components/vtiger_v1#get-me")
         .output(
             outputSchema(
                 object()
