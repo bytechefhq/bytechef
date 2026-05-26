@@ -1,6 +1,7 @@
 dependencies {
     implementation("com.knuddels:jtokkit")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.ai:spring-ai-mistral-ai")
     implementation("org.springframework.ai:spring-ai-markdown-document-reader")
     implementation("org.springframework.ai:spring-ai-openai")
