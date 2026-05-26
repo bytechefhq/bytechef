@@ -61,7 +61,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
- * A fork of the MCP SDK's {@code McpAsyncServer} (2.0.0-M2) that adds per-session tool filtering.
+ * A fork of the MCP SDK's {@code McpAsyncServer} (2.0.0-M3) that adds per-session tool filtering.
  *
  * <p>
  * The standard {@code McpAsyncServer} returns all registered tools to every client session. This class introduces a
@@ -204,7 +204,7 @@ public class FilterableMcpAsyncServer {
 
         mcpTransportProvider.setSessionFactory(new DefaultMcpStreamableServerSessionFactory(requestTimeout,
             this::asyncInitializeRequestHandler, requestHandlers, notificationHandlers,
-            sessionId -> this.cleanupForSession(sessionId)));
+            sessionId -> this.cleanupForSession(sessionId), this.jsonSchemaValidator));
     }
 
     private Map<String, McpNotificationHandler> prepareNotificationHandlers(
@@ -394,6 +394,17 @@ public class FilterableMcpAsyncServer {
             return Mono.error(new IllegalStateException("Server must be configured with tool capabilities"));
         }
 
+        try {
+            var tool = toolSpecification.tool();
+
+            this.jsonSchemaValidator.assertConforms(
+                "Tool '" + tool.name() + "' inputSchema", tool.inputSchema());
+            this.jsonSchemaValidator.assertConforms(
+                "Tool '" + tool.name() + "' outputSchema", tool.outputSchema());
+        } catch (IllegalArgumentException exception) {
+            return Mono.error(exception);
+        }
+
         var wrappedToolSpecification = withStructuredOutputHandling(this.jsonSchemaValidator, toolSpecification);
 
         return Mono.defer(() -> {
@@ -475,7 +486,8 @@ public class FilterableMcpAsyncServer {
                         log.warn(content);
 
                         return CallToolResult.builder()
-                            .content(List.of(new McpSchema.TextContent(content)))
+                            .content(List.of(McpSchema.TextContent.builder(content)
+                                .build()))
                             .isError(true)
                             .build();
                     }
@@ -487,14 +499,16 @@ public class FilterableMcpAsyncServer {
                         log.warn("Tool call result validation failed: {}", validation.errorMessage());
 
                         return CallToolResult.builder()
-                            .content(List.of(new McpSchema.TextContent(validation.errorMessage())))
+                            .content(List.of(McpSchema.TextContent.builder(validation.errorMessage())
+                                .build()))
                             .isError(true)
                             .build();
                     }
 
                     if (Utils.isEmpty(result.content())) {
                         return CallToolResult.builder()
-                            .content(List.of(new McpSchema.TextContent(validation.jsonStructuredOutput())))
+                            .content(List.of(McpSchema.TextContent.builder(validation.jsonStructuredOutput())
+                                .build()))
                             .isError(result.isError())
                             .structuredContent(result.structuredContent())
                             .build();
@@ -605,7 +619,8 @@ public class FilterableMcpAsyncServer {
                 .map(McpServerFeatures.AsyncToolSpecification::tool)
                 .toList();
 
-            return Mono.just(new McpSchema.ListToolsResult(toolList, null));
+            return Mono.just(McpSchema.ListToolsResult.builder(toolList)
+                .build());
         };
     }
     // --- end ByteChef modification ---
@@ -858,7 +873,8 @@ public class FilterableMcpAsyncServer {
                 .map(McpServerFeatures.AsyncResourceSpecification::resource)
                 .toList();
 
-            return Mono.just(new McpSchema.ListResourcesResult(resourceList, null));
+            return Mono.just(McpSchema.ListResourcesResult.builder(resourceList)
+                .build());
         };
     }
 
@@ -869,7 +885,8 @@ public class FilterableMcpAsyncServer {
                 .map(McpServerFeatures.AsyncResourceTemplateSpecification::resourceTemplate)
                 .toList();
 
-            return Mono.just(new McpSchema.ListResourceTemplatesResult(resourceList, null));
+            return Mono.just(McpSchema.ListResourceTemplatesResult.builder(resourceList)
+                .build());
         };
     }
 
@@ -1061,7 +1078,8 @@ public class FilterableMcpAsyncServer {
                 .map(McpServerFeatures.AsyncPromptSpecification::prompt)
                 .toList();
 
-            return Mono.just(new McpSchema.ListPromptsResult(promptList, null));
+            return Mono.just(McpSchema.ListPromptsResult.builder(promptList)
+                .build());
         };
     }
 
