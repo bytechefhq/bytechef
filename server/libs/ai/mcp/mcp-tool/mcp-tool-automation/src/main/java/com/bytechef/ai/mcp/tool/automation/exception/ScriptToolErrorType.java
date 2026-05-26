@@ -24,6 +24,7 @@ import com.bytechef.exception.AbstractErrorType;
 public class ScriptToolErrorType extends AbstractErrorType {
 
     public static final ScriptToolErrorType UPDATE_SCRIPT = new ScriptToolErrorType(100);
+    public static final ScriptToolErrorType UPDATE_WORKFLOW_ROOT = new ScriptToolErrorType(101);
 
     private ScriptToolErrorType(int errorKey) {
         super(ScriptToolErrorType.class, errorKey);

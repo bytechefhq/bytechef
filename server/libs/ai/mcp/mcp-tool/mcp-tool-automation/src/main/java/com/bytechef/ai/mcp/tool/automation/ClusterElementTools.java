@@ -47,6 +47,49 @@ public class ClusterElementTools {
     }
 
     @Tool(
+        description = "Update root-level properties of a workflow definition (e.g. label, description, inputs, outputs). " +
+            "Accepts a JSON object whose keys are merged into the workflow root. Returns the updated workflow.")
+    public WorkflowInfo updateWorkflowRootProperties(
+        @ToolParam(description = "The ID of the workflow to update") String workflowId,
+        @ToolParam(
+            description = "A JSON object containing the root-level properties to set, e.g. " +
+                "{\"label\": \"My Workflow\", \"description\": \"Does X\"}") String rootPropertiesDefinition) {
+
+        try {
+            ProjectWorkflowDTO projectWorkflowDTO = projectWorkflowFacade.getProjectWorkflow(workflowId);
+
+            JsonNode rootPropertiesNode = JsonUtils.readTree(rootPropertiesDefinition);
+            JsonNode rootNode = JsonUtils.readTree(projectWorkflowDTO.getDefinition());
+
+            ((ObjectNode) rootNode).setAll((ObjectNode) rootPropertiesNode);
+
+            String updatedWorkflowDefinition = JsonUtils.writeWithDefaultPrettyPrinter(rootNode);
+
+            projectWorkflowFacade.updateWorkflow(
+                projectWorkflowDTO.getId(), updatedWorkflowDefinition, projectWorkflowDTO.getVersion());
+
+            if (log.isDebugEnabled()) {
+                log.debug("updateWorkflowRootProperties({}): Updated root properties", workflowId);
+            }
+
+            return new WorkflowInfo(
+                projectWorkflowDTO.getId(), projectWorkflowDTO.getProjectWorkflowId(),
+                projectWorkflowDTO.getWorkflowUuid(), projectWorkflowDTO.getLabel(),
+                projectWorkflowDTO.getDescription(), updatedWorkflowDefinition,
+                projectWorkflowDTO.getVersion(),
+                projectWorkflowDTO.getCreatedDate() != null ? projectWorkflowDTO.getCreatedDate() : null,
+                projectWorkflowDTO.getLastModifiedDate() != null ? projectWorkflowDTO.getLastModifiedDate() : null);
+        } catch (Exception e) {
+            log.error("updateWorkflowRootProperties({}): Failed to update root properties in workflow {}",
+                workflowId, workflowId, e);
+
+            throw new ExecutionException(
+                "Failed to update workflow root properties: " + e.getMessage(), e,
+                ScriptToolErrorType.UPDATE_WORKFLOW_ROOT);
+        }
+    }
+
+    @Tool(
         description = "Update the clusterElements field of a specific task in the workflow definition. Returns the updated workflow")
     public WorkflowInfo updateClusterElementTask(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,

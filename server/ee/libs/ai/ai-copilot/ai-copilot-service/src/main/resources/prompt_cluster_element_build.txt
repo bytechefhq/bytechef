@@ -34,6 +34,7 @@ Unless stated otherwise, assume all questions and suggestions are about the task
 
 7. **Deployment** - Deploy it on ByteChef:
    - `updateClusterElementTask(workflowId, taskName, clusterElementsDefinition)` - Update the cluster element task
+   - `updateWorkflowRootProperties(workflowId, rootPropertiesDefinition)` - Update root-level workflow properties (label, description, inputs, outputs, etc.) by passing a JSON object of keys to merge
 
 ## Validation Strategy
 
@@ -72,6 +73,7 @@ validateWorkflow()
 
 ### 6. Deployment
 updateClusterElementTask(workflowId, taskName, clusterElementsDefinition)
+updateWorkflowRootProperties(workflowId, rootPropertiesDefinition)  // only if root properties changed
 // If a component is still missing a connection, ask the user to create it
 
 ## Important Rules when getting Errors:
