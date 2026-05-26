@@ -664,6 +664,7 @@ class ContextImpl implements Context {
         private final @Nullable String componentOperationName;
         private final @Nullable Long jobId;
         private final @Nullable LogFileStorageWriter logFileStorageWriter;
+        @SuppressWarnings("PMD.LogVariableNameWithPrivateStaticFinalModifiers")
         private final org.slf4j.Logger log;
         private final long taskExecutionId;
 
