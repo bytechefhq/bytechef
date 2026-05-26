@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.skill.facade;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -29,7 +30,20 @@ public interface AiSkillFacade {
     AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes);
 
     AiSkill createAiSkillFromInstructions(
-        String name, @Nullable String description, String instructions);
+        String name, @Nullable String description, String instructions,
+        @Nullable Map<String, String> additionalFiles);
+
+    /**
+     * Adds or replaces multiple files inside an existing skill zip archive in one operation. Paths must not contain
+     * traversal sequences (..) or be absolute.
+     */
+    AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles);
+
+    default AiSkill createAiSkillFromInstructions(
+        String name, @Nullable String description, String instructions) {
+
+        return createAiSkillFromInstructions(name, description, instructions, null);
+    }
 
     void deleteAiSkill(long id);
 
