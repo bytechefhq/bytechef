@@ -187,12 +187,21 @@ export const useWorkflowBuilderHeader = ({bottomResizablePanelRef, chatTrigger, 
                 bottomResizablePanelRef.current.resize(0);
             }
         }
+
+        if (!useWorkflowEditorStore.getState().workflowTestExecution) {
+            setShowBottomPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        }
     }, [
         bottomResizablePanelRef,
         chatTrigger,
         closeWorkflowTestStream,
         jobId,
         persistJobId,
+        setShowBottomPanelOpen,
         setStreamRequest,
         setWorkflowIsRunning,
         setWorkflowTestChatPanelOpen,

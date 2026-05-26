@@ -154,7 +154,23 @@ export const useAutomationWorkflowEditorHeader = ({
                 setJobId(null);
             });
         }
-    }, [closeWorkflowTestStream, getPersistedJobId, jobId, persistJobId, setStreamRequest, setWorkflowIsRunning]);
+        if (!useWorkflowEditorStore.getState().workflowTestExecution) {
+            setShowBottomPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        }
+    }, [
+        bottomResizablePanelRef,
+        closeWorkflowTestStream,
+        getPersistedJobId,
+        jobId,
+        persistJobId,
+        setShowBottomPanelOpen,
+        setStreamRequest,
+        setWorkflowIsRunning,
+    ]);
 
     // On mount: try to restore an ongoing workflow execution using jobId persisted in localStorage by calling
     // attach endpoint.
