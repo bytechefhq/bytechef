@@ -35,6 +35,7 @@ Name | Type
 `type` | string
 `children` | [Array&lt;TaskExecution&gt;](TaskExecution.md)
 `iterations` | Array&lt;Array&lt;TaskExecution&gt;&gt;
+`childJob` | [Job](Job.md)
 
 ## Example
 
@@ -71,6 +72,7 @@ const example = {
   "type": null,
   "children": null,
   "iterations": null,
+  "childJob": null,
 } satisfies TaskExecution
 
 console.log(example)
