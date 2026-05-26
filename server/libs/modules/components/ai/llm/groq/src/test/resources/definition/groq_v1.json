@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/groq_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
@@ -1093,8 +1096,11 @@
       "tokenUrl": null,
       "type": "BEARER_TOKEN"
     } ],
-    "baseUri": { },
-    "help": null,
+    "baseUri": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/groq_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
