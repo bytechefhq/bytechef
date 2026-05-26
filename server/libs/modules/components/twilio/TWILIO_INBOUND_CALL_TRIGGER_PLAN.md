@@ -306,7 +306,7 @@ public void afterConnectionEstablished(WebSocketSession session) throws Exceptio
     String sessionKey = session.getId();
     String callSid = extractCallSid(uri);
 
-    logger.info("WebSocket connection established: webhookId={}, sessionId={}, callSid={}",
+    log.info("WebSocket connection established: webhookId={}, sessionId={}, callSid={}",
         webhookId, sessionKey, callSid);
 
     if (callSid != null) {
@@ -347,7 +347,7 @@ private void startSubWorkflowExecution(String callSid, String subWorkflowId, Web
     // Execute in virtual thread to not block WebSocket handler
     Thread.startVirtualThread(() -> {
         try {
-            logger.info("Starting sub-workflow execution: callSid={}, subWorkflowId={}", callSid, subWorkflowId);
+            log.info("Starting sub-workflow execution: callSid={}, subWorkflowId={}", callSid, subWorkflowId);
 
             // Create job parameters for sub-workflow
             JobParametersDTO jobParams = new JobParametersDTO(
@@ -371,7 +371,7 @@ private void startSubWorkflowExecution(String callSid, String subWorkflowId, Web
             AutoCloseable statusListener = jobSyncExecutor.addJobStatusListener(subJobId, event -> {
                 // Check if call is still active
                 if (!callSessionRegistry.isCallActive(callSid)) {
-                    logger.info("Call ended, stopping sub-workflow: callSid={}, subJobId={}",
+                    log.info("Call ended, stopping sub-workflow: callSid={}, subJobId={}",
                         callSid, subJobId);
                     jobSyncExecutor.stopJob(subJobId);
                 }
@@ -385,7 +385,7 @@ private void startSubWorkflowExecution(String callSid, String subWorkflowId, Web
             // Await sub-workflow completion (blocks until done)
             Job completedJob = jobSyncExecutor.awaitJob(subJobId, false);
 
-            logger.info("Sub-workflow completed: callSid={}, status={}",
+            log.info("Sub-workflow completed: callSid={}, status={}",
                 callSid, completedJob.getStatus());
 
             // Clean up
@@ -395,7 +395,7 @@ private void startSubWorkflowExecution(String callSid, String subWorkflowId, Web
             notifyMainWorkflowContinuation(callSid, completedJob);
 
         } catch (Exception e) {
-            logger.error("Sub-workflow execution failed: callSid={}", callSid, e);
+            log.error("Sub-workflow execution failed: callSid={}", callSid, e);
 
             // Send error to WebSocket
             Map<String, Object> error = new LinkedHashMap<>();
@@ -490,7 +490,7 @@ public ResponseEntity<String> handleStatusCallback(@RequestParam Map<String, Str
             Long subJobId = session.getSubJobId();
 
             if (subJobId != null) {
-                logger.info("Call ended, requesting sub-workflow stop: callSid={}, subJobId={}",
+                log.info("Call ended, requesting sub-workflow stop: callSid={}, subJobId={}",
                     callSid, subJobId);
 
                 // Stop the sub-workflow via JobSyncExecutor

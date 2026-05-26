@@ -323,7 +323,7 @@ public class ExampleComponentHandler implements ComponentHandler {
   - Reactive operators: Project Reactor `Mono`/`Flux` (e.g., `map`, `flatMap`, `filter`, `onErrorResume`)
   - HTTP client builder/request DSLs: Spring `WebClient`, OkHttp
   - Testing/assertion DSLs: AssertJ, Mockito BDD APIs
-  - Logging fluent APIs: SLF4J 2.x `logger.atXxx()` fluent logger
+  - Logging fluent APIs: SLF4J 2.x `log.atXxx()` fluent logger
   - JSON builders and similar fluent APIs: Jackson `ObjectNode`/`ArrayNode`, JSON‑P `JsonObjectBuilder`
 
 - Formatting rules:

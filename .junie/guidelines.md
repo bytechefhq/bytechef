@@ -294,12 +294,12 @@ Access the application at http://localhost:8080
       When building verbose messages at `DEBUG` or `TRACE` level, especially those involving method calls or complex string concatenations, wrap them in a level check or use suppliers:
 
     ```java
-    if (logger.isDebugEnabled()) {
-        logger.debug("Detailed state: {}", computeExpensiveDetails());
+    if (log.isDebugEnabled()) {
+        log.debug("Detailed state: {}", computeExpensiveDetails());
     }
 
     // using Supplier/Lambda expression
-    logger.atDebug()
+    log.atDebug()
         .setMessage("Detailed state: {}")
         .addArgument(() -> computeExpensiveDetails())
         .log();
@@ -361,7 +361,7 @@ Access the application at http://localhost:8080
     - Reactive operators: Project Reactor `Mono`/`Flux` (e.g., `map`, `flatMap`, `filter`, `onErrorResume`)
     - HTTP client builder/request DSLs: Spring `WebClient`, OkHttp
     - Testing/assertion DSLs: AssertJ, Mockito BDD APIs
-    - Logging fluent APIs: SLF4J 2.x `logger.atXxx()` fluent logger
+    - Logging fluent APIs: SLF4J 2.x `log.atXxx()` fluent logger
     - JSON builders and similar fluent APIs: Jackson `ObjectNode`/`ArrayNode`, JSON‑P `JsonObjectBuilder`
   - Formatting rules:
     - Break each chained step onto its own line when there are 3+ operations or line length would exceed limits
