@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vtiger_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -138,7 +141,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "ID of the user assigned as the owner of this record.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -314,7 +317,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "ID of the user assigned as the owner of this record.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -442,7 +445,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new product for your CRM.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vtiger_v1#create-product"
+    },
     "metadata": null,
     "name": "createProduct",
     "outputDefinition": {
@@ -530,7 +536,7 @@
               "advancedOption": null,
               "controlType": "TEXT",
               "defaultValue": null,
-              "description": null,
+              "description": "ID of the user assigned as the owner of this record.",
               "displayCondition": null,
               "exampleValue": null,
               "expressionEnabled": null,
@@ -662,7 +668,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "ID of the user assigned as the owner of this record.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -776,7 +782,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get more information about yourself.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vtiger_v1#get-me"
+    },
     "metadata": null,
     "name": "getMe",
     "outputDefinition": {
@@ -1728,14 +1737,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/vtiger_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://vtap.vtiger.com/platform/rest-apis.html"
+  },
   "description": "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business.",
   "icon": "path:assets/vtiger.svg",
   "metadata": null,
