@@ -43,10 +43,15 @@ vi.mock('@/shared/stores/useEnvironmentStore', () => {
 });
 
 vi.mock('@/pages/platform/workflow-editor/stores/useWorkflowEditorStore', () => {
+    const useWorkflowEditorStore = (selector: (s: typeof hoisted.editorSpies) => unknown) =>
+        selector(hoisted.editorSpies);
+
+    useWorkflowEditorStore.getState = () => hoisted.editorSpies;
+
     return {
         __esModule: true,
         __spies: hoisted.editorSpies,
-        default: (selector: (s: typeof hoisted.editorSpies) => unknown) => selector(hoisted.editorSpies),
+        default: useWorkflowEditorStore,
     };
 });
 
