@@ -23,6 +23,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.utils.util.AiAgentUtilsUtils;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.ComponentConnection;
 import com.bytechef.platform.configuration.workflow.connection.ClusterElementConnectionFactory;
@@ -117,9 +118,13 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
                 ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
                     componentName, null);
 
-                connections.add(ComponentConnection.of(
-                    workflowNodeName, componentName,
-                    componentDefinition.getVersion(), componentDefinition.isConnectionRequired()));
+                ConnectionDefinition connection = componentDefinition.getConnection();
+
+                if(connection != null) {
+                    connections.add(ComponentConnection.of(
+                        workflowNodeName, componentName,
+                        componentDefinition.getVersion(), componentDefinition.isConnectionRequired()));
+                }
             } catch (RuntimeException runtimeException) {
                 log.debug(
                     "Component '{}' referenced in skill scripts not found in registry, skipping", componentName);
