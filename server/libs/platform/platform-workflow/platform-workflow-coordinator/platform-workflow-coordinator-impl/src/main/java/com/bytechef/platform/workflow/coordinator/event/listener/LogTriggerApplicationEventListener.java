@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class LogTriggerApplicationEventListener implements ApplicationEventListener {
 
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private static final Logger log = LoggerFactory.getLogger(LogTriggerApplicationEventListener.class);
 
     @Override
     public void onApplicationEvent(ApplicationEvent applicationEvent) {
