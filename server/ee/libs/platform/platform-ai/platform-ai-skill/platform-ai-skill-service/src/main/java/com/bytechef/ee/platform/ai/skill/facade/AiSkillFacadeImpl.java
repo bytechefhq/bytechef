@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -158,14 +159,20 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
     @Override
     public AiSkill createAiSkillFromInstructions(
-        String name, @Nullable String description, String instructions) {
+        String name, @Nullable String description, String instructions,
+        @Nullable Map<String, String> additionalFiles) {
 
         Assert.hasText(name, "Skill name must not be blank");
         Assert.hasText(instructions, "Instructions must not be blank");
 
+        validateAdditionalFilePaths(additionalFiles);
+
         String body = stripLeadingFrontmatter(instructions);
 
-        byte[] zipBytes = createSkillZip(name, description, body);
+        Map<String, String> resolvedAdditionalFiles =
+            additionalFiles != null ? additionalFiles : Collections.emptyMap();
+
+        byte[] zipBytes = createSkillZip(name, description, body, resolvedAdditionalFiles);
 
         return createAiSkill(name, description, name + ".skill", zipBytes);
     }
@@ -339,6 +346,66 @@ class AiSkillFacadeImpl implements AiSkillFacade {
                 } catch (RuntimeException exception) {
                     log.error(
                         "Failed to delete old skill file after content update, fileEntry={}", oldFileEntry, exception);
+                }
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    try {
+                        aiSkillFileStorage.deleteAiSkillFile(newFileEntry);
+                    } catch (RuntimeException exception) {
+                        log.error(
+                            "Failed to clean up new skill file after rollback, fileEntry={}", newFileEntry, exception);
+                    }
+                }
+            }
+        });
+
+        return aiSkillService.updateAiSkillFile(id, newFileEntry);
+    }
+
+    @Override
+    public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
+        Assert.notEmpty(additionalFiles, "additionalFiles must not be null or empty");
+
+        validateAdditionalFilePaths(additionalFiles);
+
+        AiSkill aiSkill = aiSkillService.getAiSkill(id);
+
+        FileEntry oldFileEntry = aiSkill.getSkillFile();
+
+        byte[] zipBytes = aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry);
+
+        for (Map.Entry<String, String> entry : additionalFiles.entrySet()) {
+            byte[] contentBytes = entry.getValue().getBytes(StandardCharsets.UTF_8);
+
+            if (contentBytes.length > MAX_ZIP_ENTRY_SIZE) {
+                throw new IllegalArgumentException(
+                    "File content exceeds maximum allowed size: " + entry.getKey());
+            }
+
+            zipBytes = replaceZipEntry(zipBytes, entry.getKey(), contentBytes);
+        }
+
+        if (zipBytes.length > MAX_SKILL_FILE_SIZE) {
+            throw new IllegalArgumentException(
+                "Updated skill archive exceeds maximum allowed size of "
+                    + (MAX_SKILL_FILE_SIZE / 1024 / 1024) + " MB");
+        }
+
+        FileEntry newFileEntry = aiSkillFileStorage.storeAiSkillFile(
+            toSkillFilename(aiSkill.getName()), zipBytes);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                try {
+                    aiSkillFileStorage.deleteAiSkillFile(oldFileEntry);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Failed to delete old skill file after adding files, fileEntry={}", oldFileEntry, exception);
                 }
             }
 
@@ -649,7 +716,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         return null;
     }
 
-    private byte[] createSkillZip(String name, @Nullable String description, String instructions) {
+    private byte[] createSkillZip(
+        String name, @Nullable String description, String instructions,
+        Map<String, String> additionalFiles) {
+
         String skillMdContent = "---\n" +
             "name: \"" + escapeYamlValue(name) + "\"\n" +
             "description: \"" + escapeYamlValue(description != null ? description : "") + "\"\n" +
@@ -663,11 +733,34 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             zipOutputStream.write(skillMdContent.getBytes(StandardCharsets.UTF_8));
             zipOutputStream.closeEntry();
 
+            for (Map.Entry<String, String> entry : additionalFiles.entrySet()) {
+                zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
+                zipOutputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                zipOutputStream.closeEntry();
+            }
+
             zipOutputStream.finish();
 
             return byteArrayOutputStream.toByteArray();
         } catch (IOException ioException) {
             throw new UncheckedIOException("Failed to create skill zip", ioException);
+        }
+    }
+
+    private void validateAdditionalFilePaths(@Nullable Map<String, String> additionalFiles) {
+        if (additionalFiles == null) {
+            return;
+        }
+
+        for (String path : additionalFiles.keySet()) {
+            if (path == null || path.isBlank()) {
+                throw new IllegalArgumentException("Additional file path must not be blank");
+            }
+
+            if (path.contains("..") || path.startsWith("/")) {
+                throw new IllegalArgumentException(
+                    "Additional file path must not contain path traversal sequences or be absolute: " + path);
+            }
         }
     }
 

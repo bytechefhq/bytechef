@@ -22,6 +22,7 @@ import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.exception.ExecutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,10 +57,16 @@ public class SkillsTools {
                 "Include keywords that help identify relevant tasks.") @Nullable String description,
         @ToolParam(
             description = "The Markdown body of SKILL.md — the actual skill instructions. Do NOT include the " +
-                "YAML frontmatter (the --- block); it is generated automatically from the name and description.") String instructions) {
+                "YAML frontmatter (the --- block); it is generated automatically from the name and description.") String instructions,
+        @ToolParam(
+            required = false,
+            description = "Optional bundled files to include in the skill archive alongside SKILL.md. " +
+                "Keys are relative paths within the archive (e.g. 'scripts/extract.py', " +
+                "'references/REFERENCE.md', 'assets/template.txt'). Values are the file contents as text. " +
+                "Paths must not be absolute or contain traversal sequences (..).") @Nullable Map<String, String> additionalFiles) {
 
         try {
-            AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
+            AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(name, description, instructions, additionalFiles);
 
             if (log.isDebugEnabled()) {
                 log.debug("createAiSkill({}): Created skill with id={}", name, aiSkill.getId());
@@ -71,6 +78,34 @@ public class SkillsTools {
 
             throw new ExecutionException(
                 "Failed to create skill: " + e.getMessage(), e, SkillToolErrorType.CREATE_SKILL);
+        }
+    }
+
+    @Tool(
+        description = "Add or replace multiple files inside an existing AI skill archive in one operation. " +
+            "Use this to bundle scripts, references, or assets into a skill after it has been created. " +
+            "Returns the updated skill.")
+    public AiSkill createAdditionalFilesInSkill(
+        @ToolParam(description = "The ID of the skill to add files to") long id,
+        @ToolParam(
+            description = "Files to add or replace. Keys are relative paths within the archive " +
+                "(e.g. 'scripts/extract.py', 'references/REFERENCE.md', 'assets/template.txt'). " +
+                "Values are the file contents as text. Paths must not be absolute or contain " +
+                "traversal sequences (..).") Map<String, String> additionalFiles) {
+
+        try {
+            AiSkill aiSkill = aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
+
+            if (log.isDebugEnabled()) {
+                log.debug("createAdditionalFilesInSkill({}): Added {} file(s)", id, additionalFiles.size());
+            }
+
+            return aiSkill;
+        } catch (Exception e) {
+            log.error("createAdditionalFilesInSkill({}): Failed to add files to skill", id, e);
+
+            throw new ExecutionException(
+                "Failed to add files to skill: " + e.getMessage(), e, SkillToolErrorType.CREATE_SKILL);
         }
     }
 

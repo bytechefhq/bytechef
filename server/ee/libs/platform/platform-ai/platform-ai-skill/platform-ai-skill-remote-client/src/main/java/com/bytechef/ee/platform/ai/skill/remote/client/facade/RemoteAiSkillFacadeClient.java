@@ -10,6 +10,8 @@ package com.bytechef.ee.platform.ai.skill.remote.client.facade;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import java.util.List;
+import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -26,7 +28,15 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
     }
 
     @Override
-    public AiSkill createAiSkillFromInstructions(String name, String description, String instructions) {
+    public AiSkill createAiSkillFromInstructions(
+        String name, @Nullable String description, String instructions,
+        @Nullable Map<String, String> additionalFiles) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
         throw new UnsupportedOperationException();
     }
 

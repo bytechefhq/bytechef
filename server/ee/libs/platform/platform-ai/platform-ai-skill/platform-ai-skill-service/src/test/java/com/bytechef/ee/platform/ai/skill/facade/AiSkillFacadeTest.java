@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
@@ -239,6 +240,120 @@ class AiSkillFacadeTest {
         assertThrows(
             IllegalArgumentException.class,
             () -> aiSkillFacade.createAiSkillFromInstructions("name", "desc", ""));
+    }
+
+    @Test
+    void testCreateAiSkillFromInstructionsWithAdditionalFiles() throws IOException {
+        FileEntry fileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
+
+        AiSkill expectedAiSkill = new AiSkill();
+
+        expectedAiSkill.setId(1L);
+        expectedAiSkill.setName("my-skill");
+        expectedAiSkill.setSkillFile(fileEntry);
+
+        when(aiSkillFileStorage.storeAiSkillFile(eq("my-skill.skill"), any(byte[].class)))
+            .thenReturn(fileEntry);
+        when(aiSkillService.createAiSkill(any(AiSkill.class))).thenReturn(expectedAiSkill);
+
+        Map<String, String> additionalFiles = Map.of(
+            "scripts/extract.py", "print('hello')",
+            "references/REFERENCE.md", "# Reference");
+
+        AiSkill result = aiSkillFacade.createAiSkillFromInstructions(
+            "my-skill", "My description", "Do something useful", additionalFiles);
+
+        assertEquals(expectedAiSkill, result);
+
+        verify(aiSkillFileStorage).storeAiSkillFile(eq("my-skill.skill"), argThat(zipBytes -> {
+            Map<String, String> entries = readZipEntries(zipBytes);
+
+            return entries.containsKey("SKILL.md")
+                && "print('hello')".equals(entries.get("scripts/extract.py"))
+                && "# Reference".equals(entries.get("references/REFERENCE.md"));
+        }));
+    }
+
+    @Test
+    void testCreateAiSkillFromInstructionsRejectsPathTraversalInAdditionalFiles() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAiSkillFromInstructions(
+                "my-skill", null, "instructions",
+                Map.of("../etc/passwd", "bad content")));
+    }
+
+    @Test
+    void testCreateAiSkillFromInstructionsRejectsAbsolutePathInAdditionalFiles() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAiSkillFromInstructions(
+                "my-skill", null, "instructions",
+                Map.of("/absolute/path.txt", "bad content")));
+    }
+
+    @Test
+    void testCreateAdditionalFilesInSkill() {
+        long skillId = 1L;
+
+        byte[] existingZipBytes = createZipBytes("SKILL.md", "---\nname: \"my-skill\"\ndescription: \"\"\n---\n\nInstructions");
+
+        FileEntry oldFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
+        FileEntry newFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill-new.skill");
+
+        AiSkill aiSkill = new AiSkill();
+
+        aiSkill.setId(skillId);
+        aiSkill.setName("my-skill");
+        aiSkill.setSkillFile(oldFileEntry);
+
+        AiSkill updatedAiSkill = new AiSkill();
+
+        updatedAiSkill.setId(skillId);
+        updatedAiSkill.setName("my-skill");
+        updatedAiSkill.setSkillFile(newFileEntry);
+
+        when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
+        when(aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry)).thenReturn(existingZipBytes);
+        when(aiSkillFileStorage.storeAiSkillFile(eq("my-skill.skill"), any(byte[].class))).thenReturn(newFileEntry);
+        when(aiSkillService.updateAiSkillFile(skillId, newFileEntry)).thenReturn(updatedAiSkill);
+
+        Map<String, String> additionalFiles = Map.of(
+            "scripts/run.py", "print('running')",
+            "references/REFERENCE.md", "# Ref");
+
+        AiSkill result = aiSkillFacade.createAdditionalFilesInSkill(skillId, additionalFiles);
+
+        assertEquals(updatedAiSkill, result);
+
+        verify(aiSkillFileStorage).storeAiSkillFile(eq("my-skill.skill"), argThat(zipBytes -> {
+            Map<String, String> entries = readZipEntries(zipBytes);
+
+            return entries.containsKey("SKILL.md")
+                && "print('running')".equals(entries.get("scripts/run.py"))
+                && "# Ref".equals(entries.get("references/REFERENCE.md"));
+        }));
+    }
+
+    @Test
+    void testCreateAdditionalFilesInSkillRejectsPathTraversal() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAdditionalFilesInSkill(1L, Map.of("../etc/passwd", "bad")));
+    }
+
+    @Test
+    void testCreateAdditionalFilesInSkillRejectsAbsolutePath() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAdditionalFilesInSkill(1L, Map.of("/etc/passwd", "bad")));
+    }
+
+    @Test
+    void testCreateAdditionalFilesInSkillRejectsEmptyMap() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.createAdditionalFilesInSkill(1L, Map.of()));
     }
 
     @Test
@@ -665,6 +780,25 @@ class AiSkillFacadeTest {
         } catch (IOException ioException) {
             throw new RuntimeException("Failed to create test zip", ioException);
         }
+    }
+
+    private Map<String, String> readZipEntries(byte[] zipBytes) {
+        Map<String, String> entries = new java.util.HashMap<>();
+
+        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(zipBytes))) {
+            ZipEntry zipEntry;
+
+            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
+                if (!zipEntry.isDirectory()) {
+                    entries.put(zipEntry.getName(),
+                        new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8));
+                }
+            }
+        } catch (IOException ioException) {
+            throw new RuntimeException("Failed to read test zip", ioException);
+        }
+
+        return entries;
     }
 
     private byte[] createZipBytesWithEntries(String[] entryNames) {
