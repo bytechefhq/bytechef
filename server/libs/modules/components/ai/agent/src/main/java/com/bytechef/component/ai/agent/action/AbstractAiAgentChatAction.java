@@ -359,6 +359,11 @@ public abstract class AbstractAiAgentChatAction {
         if (chatMemoryAdvisor != null) {
             advisors.add(chatMemoryAdvisor);
 
+            // Spring AI auto-applies this when ToolCallAdvisor is auto-registered (see DefaultChatClient
+            // .autoRegisterToolCallAdvisor), but we register manually to supply our own ToolCallingManager,
+            // so the auto-disable path is skipped and we must call it ourselves. Removing this line makes
+            // ToolCallAdvisor carry full conversation history alongside the downstream ChatMemoryAdvisor —
+            // double bookkeeping that produces malformed tool-call sequences on OpenAI.
             toolCallAdvisorBuilder.disableInternalConversationHistory();
         }
 
