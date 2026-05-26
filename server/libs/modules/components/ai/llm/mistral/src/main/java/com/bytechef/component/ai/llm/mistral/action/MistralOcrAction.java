@@ -32,6 +32,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -143,6 +144,7 @@ public class MistralOcrAction {
                                     .description("Number of pages processed."),
                                 integer("doc_size_bytes")
                                     .description("Document size in bytes.")))))
+        .help("", "https://docs.bytechef.io/reference/components/mistral_v1#document-ocr")
         .perform(MistralOcrAction::perform);
 
     private MistralOcrAction() {
@@ -164,6 +166,6 @@ public class MistralOcrAction {
                             : inputParameters.getRequiredString(URL))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody();
+            .getBody(new TypeReference<>() {});
     }
 }
