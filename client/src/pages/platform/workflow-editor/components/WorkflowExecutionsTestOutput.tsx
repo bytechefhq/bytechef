@@ -16,7 +16,7 @@ interface WorkflowExecutionsTestOutputProps {
     onCloseClick?: () => void;
     resizablePanelSize?: number;
     workflowIsRunning: boolean;
-    workflowTestExecution: WorkflowTestExecution;
+    workflowTestExecution?: WorkflowTestExecution;
 }
 
 const WorkflowExecutionsTestOutput = ({
