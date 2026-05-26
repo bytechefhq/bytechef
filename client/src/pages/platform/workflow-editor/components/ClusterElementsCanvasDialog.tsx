@@ -15,11 +15,16 @@ import {useClusterElementsCanvasDialogStore} from '@/pages/platform/workflow-edi
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
+import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {XIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useState} from 'react';
+import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -81,6 +86,17 @@ const ClusterElementsCanvasDialog = ({
         onOpenChange,
         workflowReferenceId,
     });
+
+    const queryClient = useQueryClient();
+    const {projectId, projectWorkflowId} = useParams();
+
+    useEffect(() => {
+        return useCopilotPostTurnRegistry.getState().register(Source.CLUSTER_ELEMENT, () => {
+            queryClient.invalidateQueries({
+                queryKey: ProjectWorkflowKeys.projectWorkflow(+projectId!, +projectWorkflowId!),
+            });
+        });
+    }, [projectId, projectWorkflowId, queryClient]);
 
     useEffect(() => {
         let outerRafId: number | undefined;
