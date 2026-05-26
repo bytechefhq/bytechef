@@ -56,6 +56,7 @@ const WorkflowEditor = ({
     return (
         <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
             <ReactFlow
+                deleteKeyCode={null}
                 edgeTypes={edgeTypes}
                 edges={edges}
                 maxZoom={1.5}
