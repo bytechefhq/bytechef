@@ -67,6 +67,7 @@ public class AmazonBedrockChatAction {
             TEMPERATURE_PROPERTY,
             TOP_P_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/amazon-bedrock_v1#ask")
         .perform(AmazonBedrockChatAction::perform);
 
     public static final ChatModel CHAT_MODEL =
