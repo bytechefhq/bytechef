@@ -33,6 +33,7 @@ public final class GroqConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.groq.com/openai")
         .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/groq_v1#connection-setup")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
