@@ -3,6 +3,7 @@ package com.bytechef.platform.workflow.execution.web.rest.model;
 import java.net.URI;
 import java.util.Objects;
 import com.bytechef.platform.workflow.execution.web.rest.model.ExecutionErrorModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.JobModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -31,7 +32,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "TaskExecution", description = "Adds execution semantics to a task.")
 @JsonTypeName("TaskExecution")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T14:10:01.371326+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-26T12:16:43.643285952+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class TaskExecutionModel {
 
   private @Nullable String createdBy;
@@ -137,6 +138,8 @@ public class TaskExecutionModel {
 
   @Valid
   private List<List<@Valid TaskExecutionModel>> iterations = new ArrayList<>();
+
+  private @Nullable JobModel childJob;
 
   public TaskExecutionModel() {
     super();
@@ -764,6 +767,27 @@ public class TaskExecutionModel {
     this.iterations = iterations;
   }
 
+  public TaskExecutionModel childJob(@Nullable JobModel childJob) {
+    this.childJob = childJob;
+    return this;
+  }
+
+  /**
+   * Get childJob
+   * @return childJob
+   */
+  @Valid 
+  @Schema(name = "childJob", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("childJob")
+  public @Nullable JobModel getChildJob() {
+    return childJob;
+  }
+
+  @JsonProperty("childJob")
+  public void setChildJob(@Nullable JobModel childJob) {
+    this.childJob = childJob;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -800,12 +824,13 @@ public class TaskExecutionModel {
         Objects.equals(this.workflowTask, taskExecution.workflowTask) &&
         Objects.equals(this.type, taskExecution.type) &&
         Objects.equals(this.children, taskExecution.children) &&
-        Objects.equals(this.iterations, taskExecution.iterations);
+        Objects.equals(this.iterations, taskExecution.iterations) &&
+        Objects.equals(this.childJob, taskExecution.childJob);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations);
+    return Objects.hash(createdBy, createdDate, endDate, error, executionTime, icon, id, input, jobId, lastModifiedBy, lastModifiedDate, maxRetries, output, parentId, priority, progress, retryAttempts, retryDelay, retryDelayFactor, startDate, status, taskNumber, title, retryDelayMillis, workflowTask, type, children, iterations, childJob);
   }
 
   @Override
@@ -840,6 +865,7 @@ public class TaskExecutionModel {
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    children: ").append(toIndentedString(children)).append("\n");
     sb.append("    iterations: ").append(toIndentedString(iterations)).append("\n");
+    sb.append("    childJob: ").append(toIndentedString(childJob)).append("\n");
     sb.append("}");
     return sb.toString();
   }
