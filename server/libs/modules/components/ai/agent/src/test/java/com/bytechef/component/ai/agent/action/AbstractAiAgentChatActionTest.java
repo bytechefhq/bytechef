@@ -49,9 +49,13 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.DefaultChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.model.tool.ToolCallingManager;
 
@@ -365,6 +369,104 @@ class AbstractAiAgentChatActionTest {
         verify(clusterElementDefinitionService,
             never()).<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("sanitizeText"), anyInt(), anyString());
+    }
+
+    @Test
+    void testChatMemoryAdvisorOrderedDownstreamOfToolCallAdvisor() throws Exception {
+        // Regression for the M7 ordering bug: with disableInternalConversationHistory() active,
+        // ToolCallAdvisor passes only [systemMsg, lastMessage] between loop iterations and relies on a
+        // DOWNSTREAM ChatMemoryAdvisor to rehydrate the preceding assistant-with-tool-calls each turn.
+        // If a future change places ChatMemoryAdvisor at a lower order than ToolCallAdvisor, memory
+        // moves outside the tool-call loop and the second model call lands at OpenAI as
+        // [systemMsg, toolResultMsg], producing
+        // "messages with role 'tool' must be a response to a preceding message with 'tool_calls'".
+        Parameters inputParameters = MockParametersFactory.create(Map.of());
+
+        Map<String, Object> modelElement = buildModelElement();
+
+        Map<String, Object> chatMemoryParameters = new HashMap<>();
+        chatMemoryParameters.put("conversationId", "test-conversation");
+
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+        chatMemoryElement.put("name", "chatMemory_1");
+        chatMemoryElement.put("type", "testComponent/v1/testChatMemory");
+        chatMemoryElement.put("parameters", chatMemoryParameters);
+
+        Parameters extensions = MockParametersFactory.create(
+            Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
+
+        stubModelLookup();
+
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
+
+        // Build the chat-memory advisor exactly as the production chat-memory components do
+        // (default order via the builder), so the assertion catches regressions in any of them.
+        MessageChatMemoryAdvisor productionStyleChatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(mock(ChatMemory.class))
+            .build();
+
+        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(productionStyleChatMemoryAdvisor);
+
+        ComponentConnection componentConnection = new ComponentConnection(
+            "testComponent", 1, 1L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "model_1", componentConnection,
+            "chatMemory_1", componentConnection);
+
+        ActionContext actionContext = mock(ActionContext.class);
+
+        TestAiAgentChatAction action = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
+
+        try (MockedStatic<ModelUtils> modelUtilsMockedStatic = mockStatic(ModelUtils.class)) {
+            modelUtilsMockedStatic.when(() -> ModelUtils.getMessages(any(), any()))
+                .thenReturn(List.of());
+
+            ChatClient.ChatClientRequestSpec spec = action.getChatClientRequestSpec(
+                inputParameters, connectionParameters, extensions, null, actionContext);
+
+            List<Advisor> advisors = ((DefaultChatClient.DefaultChatClientRequestSpec) spec).getAdvisors();
+
+            Advisor toolCallAdvisor = advisors.stream()
+                .filter(ToolCallAdvisor.class::isInstance)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("ToolCallAdvisor missing from advisor chain"));
+
+            Advisor chatMemoryAdvisor = advisors.stream()
+                .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("ChatMemoryAdvisor missing from advisor chain"));
+
+            assertThat(chatMemoryAdvisor.getOrder())
+                .as(
+                    "ChatMemoryAdvisor MUST run downstream of ToolCallAdvisor so memory participates in " +
+                        "every tool-call iteration. With disableInternalConversationHistory() active, the " +
+                        "inverse ordering causes OpenAI to reject the second iteration's prompt because the " +
+                        "tool-result message has no preceding assistant-with-tool-calls.")
+                .isGreaterThan(toolCallAdvisor.getOrder());
+        }
+    }
+
+    @Test
+    void testSpringAiDefaultOrdersComposeCorrectly() {
+        // Safety net for Spring AI version bumps. Our chat-memory components and AbstractAiAgentChatAction
+        // both rely on Spring AI's builder defaults (no explicit .order(...) / .advisorOrder(...) calls)
+        // to produce ToolCallAdvisor < ChatMemoryAdvisor. If a future bump inverts these defaults, every
+        // chat-memory-backed agent breaks with the same OpenAI tool-message ordering error — this test
+        // surfaces the regression at the dependency-bump PR rather than in production.
+        ToolCallAdvisor toolCallAdvisor = ToolCallAdvisor.builder()
+            .build();
+
+        MessageChatMemoryAdvisor chatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(mock(ChatMemory.class))
+            .build();
+
+        assertThat(chatMemoryAdvisor.getOrder())
+            .as("Spring AI default ordering must keep ChatMemoryAdvisor downstream of ToolCallAdvisor")
+            .isGreaterThan(toolCallAdvisor.getOrder());
     }
 
     private static Map<String, Object> buildModelElement() {
