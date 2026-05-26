@@ -47,7 +47,8 @@ public class ClusterElementTools {
     }
 
     @Tool(
-        description = "Update root-level properties of a workflow definition (e.g. label, description, inputs, outputs). " +
+        description = "Update root-level properties of a workflow definition (e.g. label, description, inputs, outputs). "
+            +
             "Accepts a JSON object whose keys are merged into the workflow root. Returns the updated workflow.")
     public WorkflowInfo updateWorkflowRootProperties(
         @ToolParam(description = "The ID of the workflow to update") String workflowId,

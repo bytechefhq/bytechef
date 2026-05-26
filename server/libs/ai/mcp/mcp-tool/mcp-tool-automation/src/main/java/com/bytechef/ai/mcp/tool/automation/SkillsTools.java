@@ -66,7 +66,8 @@ public class SkillsTools {
                 "Paths must not be absolute or contain traversal sequences (..).") @Nullable Map<String, String> additionalFiles) {
 
         try {
-            AiSkill aiSkill = aiSkillFacade.createAiSkillFromInstructions(name, description, instructions, additionalFiles);
+            AiSkill aiSkill =
+                aiSkillFacade.createAiSkillFromInstructions(name, description, instructions, additionalFiles);
 
             if (log.isDebugEnabled()) {
                 log.debug("createAiSkill({}): Created skill with id={}", name, aiSkill.getId());
@@ -210,7 +211,8 @@ public class SkillsTools {
         description = "Update the instructions (e.g. `SKILL.md` content) of an existing AI skill. Returns the updated skill.")
     public AiSkill updateAiSkillContent(
         @ToolParam(description = "The ID of the skill to update") long id,
-        @ToolParam(description = "Path to the file you want to update (e.g., `scripts/extract.py`). Default is `SKILL.md`") String targetPath,
+        @ToolParam(
+            description = "Path to the file you want to update (e.g., `scripts/extract.py`). Default is `SKILL.md`") String targetPath,
         @ToolParam(description = "The modified content of the skill") String contents) {
 
         try {
