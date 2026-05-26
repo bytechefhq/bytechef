@@ -71,7 +71,9 @@ java {
 
 pmd {
     toolVersion = "${libs.findVersion("pmd").get()}"
-    ruleSetFiles = files("${rootDir}/config/pmd/pmd-ruleset.xml")
+    ruleSetFiles = files(
+        "${rootDir}/config/pmd/pmd-ruleset.xml",
+        "${rootDir}/config/pmd/pmd-ruleset-bytechef.xml")
     ruleSets()
 }
 
