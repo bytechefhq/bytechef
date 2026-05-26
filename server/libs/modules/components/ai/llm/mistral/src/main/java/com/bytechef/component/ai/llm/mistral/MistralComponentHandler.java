@@ -38,6 +38,7 @@ public class MistralComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mistral")
         .title("MistralAI")
+        .version(1)
         .description("Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.")
         .icon("path:assets/mistral.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)

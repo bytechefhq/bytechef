@@ -32,6 +32,7 @@ public final class MistralConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.mistral.ai/")
+        .version(1)
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

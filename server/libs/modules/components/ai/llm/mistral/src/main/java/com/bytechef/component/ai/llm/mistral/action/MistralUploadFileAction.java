@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -75,6 +76,7 @@ public class MistralUploadFileAction {
                             .description("MIME type of the uploaded file."),
                         string("source"),
                         string("signature"))))
+        .help("", "https://docs.bytechef.io/reference/components/mistral_v1#upload-file")
         .perform(MistralUploadFileAction::perform);
 
     private MistralUploadFileAction() {
@@ -90,6 +92,6 @@ public class MistralUploadFileAction {
                     Http.BodyContentType.FORM_DATA))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody();
+            .getBody(new TypeReference<>() {});
     }
 }

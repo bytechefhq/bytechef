@@ -78,6 +78,7 @@ public class MistralChatAction {
             SEED_PROPERTY,
             SAFE_PROMPT_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/mistral_v1#ask")
         .perform(MistralChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
