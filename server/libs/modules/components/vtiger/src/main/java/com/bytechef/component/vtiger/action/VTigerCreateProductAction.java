@@ -42,6 +42,7 @@ public class VTigerCreateProductAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createProduct")
         .title("Create Product")
         .description("Creates a new product for your CRM.")
+        .help("", "https://docs.bytechef.io/reference/components/vtiger_v1#create-product")
         .properties(
             string(PRODUCT_NAME)
                 .label("Product Name")
@@ -64,7 +65,8 @@ public class VTigerCreateProductAction {
                                     .description("Name of the product."),
                                 string(PRODUCT_TYPE)
                                     .description("Type of the product."),
-                                string("assigned_user_id"),
+                                string("assigned_user_id")
+                                    .description("ID of the user assigned as the owner of this record."),
                                 string("id")
                                     .description("ID of the product.")))))
         .perform(VTigerCreateProductAction::perform);

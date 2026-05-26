@@ -42,6 +42,7 @@ public class VTigerCreateContactAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Creates a new contact.")
+        .help("", "https://docs.bytechef.io/reference/components/vtiger_v1#create-contact")
         .properties(
             string(FIRSTNAME)
                 .label("First Name")
@@ -69,7 +70,8 @@ public class VTigerCreateContactAction {
                                     .description("Email address of the contact."),
                                 string("phone")
                                     .description("Phone number of the contact."),
-                                string("assigned_user_id"),
+                                string("assigned_user_id")
+                                    .description("ID of the user assigned as the owner of this record."),
                                 string("id")
                                     .description("ID of the contact.")))))
         .perform(VTigerCreateContactAction::perform);

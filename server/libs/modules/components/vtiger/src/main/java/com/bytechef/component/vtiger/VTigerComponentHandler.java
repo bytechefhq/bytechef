@@ -39,13 +39,16 @@ public class VTigerComponentHandler implements ComponentHandler {
         .description(
             "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, " +
                 "and support solutions to streamline business.")
+        .customAction(true)
+        .customActionHelp("", "https://vtap.vtiger.com/platform/rest-apis.html")
         .icon("path:assets/vtiger.svg")
         .categories(ComponentCategory.CRM)
         .connection(VTigerConnection.CONNECTION_DEFINITION)
         .actions(
             VTigerCreateContactAction.ACTION_DEFINITION,
             VTigerCreateProductAction.ACTION_DEFINITION,
-            VTigerGetMeAction.ACTION_DEFINITION);
+            VTigerGetMeAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

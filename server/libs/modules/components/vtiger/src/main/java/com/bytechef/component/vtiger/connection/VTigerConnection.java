@@ -51,7 +51,9 @@ public class VTigerConnection {
                         .label("VTiger Instance URL")
                         .description("For the instance URL, add the url without the endpoint.")
                         .exampleValue("https://<instance>.od2.vtiger.com")
-                        .required(true)));
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/vtiger_v1#connection-setup")
+        .version(1);
 
     private VTigerConnection() {
     }
