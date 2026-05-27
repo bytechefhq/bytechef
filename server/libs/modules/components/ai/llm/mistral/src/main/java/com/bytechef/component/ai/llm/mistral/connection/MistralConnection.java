@@ -31,7 +31,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class MistralConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
-        .baseUri((connectionParameters, context) -> "https://api.mistral.ai/")
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/mistral_v1#connection-setup")
         .authorizations(
