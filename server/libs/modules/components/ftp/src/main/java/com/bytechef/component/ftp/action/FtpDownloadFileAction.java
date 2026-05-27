@@ -31,7 +31,6 @@ import com.bytechef.component.ftp.util.RemoteFileClient;
 import java.io.IOException;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
-import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * @author Ivica Cardic
@@ -59,28 +58,21 @@ public class FtpDownloadFileAction {
         String remotePath = inputParameters.getRequiredString(PATH);
 
         try (RemoteFileClient remoteFileClient = RemoteFileClient.of(connectionParameters)) {
-            String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
+            PipedInputStream pipedInputStream = new PipedInputStream();
+            PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream);
 
-            try (PipedInputStream pipedInputStream = new PipedInputStream()) {
-                AtomicReference<ProviderException> retrieveThreadException = new AtomicReference<>();
+            try {
 
-                Thread.ofVirtual()
-                    .start(() -> {
-                        try (PipedOutputStream pipedOutputStream = new PipedOutputStream(pipedInputStream)) {
-                            remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
-                        } catch (IOException ioException) {
-                            retrieveThreadException.set(
-                                new ProviderException("Failed to download file " + remotePath, ioException));
-                        }
-                    });
+                String filename = remotePath.substring(remotePath.lastIndexOf('/') + 1);
 
-                FileEntry fileEntry = context.file(file -> file.storeContent(filename, pipedInputStream));
+                remoteFileClient.retrieveFile(remotePath, pipedOutputStream);
 
-                if (retrieveThreadException.get() != null) {
-                    throw retrieveThreadException.get();
-                }
-
-                return fileEntry;
+                pipedOutputStream.flush();
+                pipedOutputStream.close();
+                return context.file(file -> file.storeContent(filename, pipedInputStream));
+            } finally {
+                pipedInputStream.close();
+                pipedOutputStream.close();
             }
         } catch (IOException ioException) {
             throw new ProviderException("Failed to download file " + remotePath, ioException);
