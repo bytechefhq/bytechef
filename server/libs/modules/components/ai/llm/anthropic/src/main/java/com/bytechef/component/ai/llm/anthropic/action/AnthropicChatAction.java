@@ -51,41 +51,40 @@ public class AnthropicChatAction {
         .help("", "https://docs.bytechef.io/reference/components/anthropic_v1#ask")
         .perform(AnthropicChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL =
-        (inputParameters, connectionParameters, responseFormatRequired) -> {
-            String apiKey = connectionParameters.getString(TOKEN);
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
+            .model(inputParameters.getRequiredString(MODEL))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .topK(inputParameters.getInteger(TOP_K));
 
-            AnthropicChatOptions.Builder optionsBuilder = AnthropicChatOptions.builder()
-                .model(inputParameters.getRequiredString(MODEL))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .topK(inputParameters.getInteger(TOP_K));
+        // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
+        Double temperature = inputParameters.getDouble(TEMPERATURE);
 
-            // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
-            Double temperature = inputParameters.getDouble(TEMPERATURE);
+        if (temperature != null) {
+            optionsBuilder.temperature(temperature);
+        } else {
+            Double topP = inputParameters.getDouble(TOP_P);
 
-            if (temperature != null) {
-                optionsBuilder.temperature(temperature);
-            } else {
-                Double topP = inputParameters.getDouble(TOP_P);
-
-                if (topP != null) {
-                    optionsBuilder.topP(topP);
-                }
+            if (topP != null) {
+                optionsBuilder.topP(topP);
             }
+        }
 
-            return AnthropicChatModel.builder()
-                .anthropicClient(
-                    AnthropicOkHttpClient.builder()
-                        .apiKey(apiKey)
-                        .build())
-                .anthropicClientAsync(
-                    AnthropicOkHttpClientAsync.builder()
-                        .apiKey(apiKey)
-                        .build())
-                .options(optionsBuilder.build())
-                .build();
-        };
+        String apiKey = connectionParameters.getRequiredString(TOKEN);
+
+        return AnthropicChatModel.builder()
+            .anthropicClient(
+                AnthropicOkHttpClient.builder()
+                    .apiKey(apiKey)
+                    .build())
+            .anthropicClientAsync(
+                AnthropicOkHttpClientAsync.builder()
+                    .apiKey(apiKey)
+                    .build())
+            .options(optionsBuilder.build())
+            .build();
+    };
 
     private AnthropicChatAction() {
     }
