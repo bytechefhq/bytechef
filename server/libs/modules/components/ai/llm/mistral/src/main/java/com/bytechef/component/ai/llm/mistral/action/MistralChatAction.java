@@ -88,9 +88,8 @@ public class MistralChatAction {
             ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
                 RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
 
-            String type = chatModelResponseFormat.equals(ChatModel.ResponseFormat.TEXT) ? "text" : "json_object";
-
-            responseFormat = new ResponseFormat(type);
+            responseFormat = chatModelResponseFormat.equals(ChatModel.ResponseFormat.TEXT) ? ResponseFormat.text()
+                : ResponseFormat.jsonObject();
         }
 
         return MistralAiChatModel.builder()
