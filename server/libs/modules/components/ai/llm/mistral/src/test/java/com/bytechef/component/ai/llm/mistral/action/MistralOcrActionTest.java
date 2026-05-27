@@ -24,18 +24,18 @@ import static com.bytechef.component.definition.Context.ContextFunction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.ai.llm.mistral.action.MistralOcrAction.DocumentType;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -49,7 +49,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class MistralOcrActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -60,24 +60,20 @@ class MistralOcrActionTest {
 
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.of(
-                MODEL, "mistral-ocr-latest",
-                TYPE, MistralOcrAction.DocumentType.IMAGE_URL.getValue(),
+                MODEL, "mistral-ocr-latest", TYPE, DocumentType.IMAGE_URL.getValue(),
                 URL, "https://example.com/image.png"));
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(Map.of());
 
         Object result = MistralOcrAction.perform(mockedInputParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
@@ -85,11 +81,11 @@ class MistralOcrActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("https://api.mistral.ai/v1/ocr", stringArgumentCaptor.getValue());
         assertEquals(
-            Http.Body.of(
+            Body.of(
                 MODEL, "mistral-ocr-latest",
                 "document", Map.of(
-                    TYPE, MistralOcrAction.DocumentType.IMAGE_URL.getValue(),
-                    MistralOcrAction.DocumentType.IMAGE_URL.getValue(), "https://example.com/image.png")),
+                    TYPE, DocumentType.IMAGE_URL.getValue(),
+                    DocumentType.IMAGE_URL.getValue(), "https://example.com/image.png")),
             bodyArgumentCaptor.getValue());
     }
 
@@ -101,38 +97,33 @@ class MistralOcrActionTest {
 
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.of(
-                MODEL, "mistral-ocr-latest",
-                TYPE, MistralOcrAction.DocumentType.DOCUMENT_URL.getValue(),
+                MODEL, "mistral-ocr-latest", TYPE, DocumentType.DOCUMENT_URL.getValue(),
                 URL, "https://example.com/document.pdf"));
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(Map.of());
 
         Object result = MistralOcrAction.perform(mockedInputParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-
         assertNotNull(result);
         assertEquals("https://api.mistral.ai/v1/ocr", stringArgumentCaptor.getValue());
         assertEquals(
-            Http.Body.of(
+            Body.of(
                 MODEL, "mistral-ocr-latest",
                 "document", Map.of(
-                    TYPE, MistralOcrAction.DocumentType.DOCUMENT_URL.getValue(),
-                    MistralOcrAction.DocumentType.DOCUMENT_URL.getValue(), "https://example.com/document.pdf")),
+                    TYPE, DocumentType.DOCUMENT_URL.getValue(),
+                    DocumentType.DOCUMENT_URL.getValue(), "https://example.com/document.pdf")),
             bodyArgumentCaptor.getValue());
     }
 
@@ -143,39 +134,30 @@ class MistralOcrActionTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "mistral-ocr-latest",
-                TYPE, MistralOcrAction.DocumentType.FILE.getValue(),
-                FILE_ID, "file-abc123"));
+            Map.of(MODEL, "mistral-ocr-latest", TYPE, DocumentType.FILE.getValue(), FILE_ID, "file-abc123"));
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(Map.of());
 
         Object result = MistralOcrAction.perform(mockedInputParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
-
         assertNotNull(result);
         assertEquals("https://api.mistral.ai/v1/ocr", stringArgumentCaptor.getValue());
         assertEquals(
-            Http.Body.of(
+            Body.of(
                 MODEL, "mistral-ocr-latest",
-                "document", Map.of(
-                    TYPE, MistralOcrAction.DocumentType.FILE.getValue(),
-                    FILE_ID, "file-abc123")),
+                "document", Map.of(TYPE, DocumentType.FILE.getValue(), FILE_ID, "file-abc123")),
             bodyArgumentCaptor.getValue());
     }
 }
