@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -93,6 +92,6 @@ public class VTigerCreateContactAction {
                         EMAIL, inputParameters.getRequiredString(EMAIL))))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

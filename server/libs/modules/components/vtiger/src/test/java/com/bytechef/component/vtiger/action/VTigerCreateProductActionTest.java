@@ -21,17 +21,19 @@ import static com.bytechef.component.vtiger.constant.VTigerConstants.PRODUCT_TYP
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -54,15 +56,15 @@ class VTigerCreateProductActionTest {
 
     @Test
     void testPerform(
-        ActionContext mockedContext, Http.Response mockedResponse, Http.Executor mockedExecutor, Http mockedHttp,
-        ArgumentCaptor<Context.ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor,
-        ArgumentCaptor<Http.Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
         Object result = VTigerCreateProductAction.perform(mockedParameters, null, mockedContext);
@@ -71,14 +73,10 @@ class VTigerCreateProductActionTest {
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration configuration = configurationBuilder.build();
-
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/create", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Map.of("elementType", "Products", "element", elementMap), body.getContent());
+        assertEquals(Body.of(Map.of("elementType", "Products", "element", elementMap)), bodyArgumentCaptor.getValue());
     }
 }
