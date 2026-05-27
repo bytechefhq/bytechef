@@ -17,34 +17,45 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * CreateFrontendProjectWorkflowRequestModel
+ * GenerateFrontendProjectWorkflowRequestModel
  */
 
-@JsonTypeName("createFrontendProjectWorkflow_request")
+@JsonTypeName("generateFrontendProjectWorkflow_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-27T21:00:27.680399+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
-public class CreateFrontendProjectWorkflowRequestModel {
+public class GenerateFrontendProjectWorkflowRequestModel {
 
-  private @Nullable String definition;
+  private String prompt;
 
-  public CreateFrontendProjectWorkflowRequestModel definition(@Nullable String definition) {
-    this.definition = definition;
+  public GenerateFrontendProjectWorkflowRequestModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public GenerateFrontendProjectWorkflowRequestModel(String prompt) {
+    this.prompt = prompt;
+  }
+
+  public GenerateFrontendProjectWorkflowRequestModel prompt(String prompt) {
+    this.prompt = prompt;
     return this;
   }
 
   /**
-   * The workflow definition
-   * @return definition
+   * Natural language description of the workflow to build.
+   * @return prompt
    */
-  
-  @Schema(name = "definition", description = "The workflow definition", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("definition")
-  public @Nullable String getDefinition() {
-    return definition;
+  @NotNull 
+  @Schema(name = "prompt", description = "Natural language description of the workflow to build.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("prompt")
+  public String getPrompt() {
+    return prompt;
   }
 
-  @JsonProperty("definition")
-  public void setDefinition(@Nullable String definition) {
-    this.definition = definition;
+  @JsonProperty("prompt")
+  public void setPrompt(String prompt) {
+    this.prompt = prompt;
   }
 
   @Override
@@ -55,20 +66,20 @@ public class CreateFrontendProjectWorkflowRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequest = (CreateFrontendProjectWorkflowRequestModel) o;
-    return Objects.equals(this.definition, createFrontendProjectWorkflowRequest.definition);
+    GenerateFrontendProjectWorkflowRequestModel generateFrontendProjectWorkflowRequest = (GenerateFrontendProjectWorkflowRequestModel) o;
+    return Objects.equals(this.prompt, generateFrontendProjectWorkflowRequest.prompt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(definition);
+    return Objects.hash(prompt);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class CreateFrontendProjectWorkflowRequestModel {\n");
-    sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("class GenerateFrontendProjectWorkflowRequestModel {\n");
+    sb.append("    prompt: ").append(toIndentedString(prompt)).append("\n");
     sb.append("}");
     return sb.toString();
   }

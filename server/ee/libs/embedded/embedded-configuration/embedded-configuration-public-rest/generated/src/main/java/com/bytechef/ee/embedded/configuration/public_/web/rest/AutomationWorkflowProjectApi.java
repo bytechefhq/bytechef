@@ -7,6 +7,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.GenerateFrontendProjectWorkflowRequestModel;
 import org.springframework.lang.Nullable;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-23T14:31:02.200793+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-27T21:00:27.680399+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
 @Tag(name = "automation-workflow-project", description = "The Embedded Automation Workflow Project Public API")
 public interface AutomationWorkflowProjectApi {
@@ -113,6 +114,84 @@ public interface AutomationWorkflowProjectApi {
     default ResponseEntity<String> copyWorkflowTemplate(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowUuid", description = "The workflow template uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GENERATE_FRONTEND_PROJECT_WORKFLOW = "/automation/workflows/generate";
+    /**
+     * POST /automation/workflows/generate : Generate a new workflow from a natural language prompt
+     * Generate a new workflow for the connected user from a natural language prompt using AI Copilot.
+     *
+     * @param generateFrontendProjectWorkflowRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "generateFrontendProjectWorkflow",
+        summary = "Generate a new workflow from a natural language prompt",
+        description = "Generate a new workflow for the connected user from a natural language prompt using AI Copilot.",
+        tags = { "automation-workflow-project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = AutomationWorkflowProjectApi.PATH_GENERATE_FRONTEND_PROJECT_WORKFLOW,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> generateFrontendProjectWorkflow(
+        @Parameter(name = "GenerateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody GenerateFrontendProjectWorkflowRequestModel generateFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_GENERATE_PROJECT_WORKFLOW = "/{externalUserId}/automation/workflows/generate";
+    /**
+     * POST /{externalUserId}/automation/workflows/generate : Generate a new workflow from a natural language prompt
+     * Generate a new workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param generateFrontendProjectWorkflowRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "generateProjectWorkflow",
+        summary = "Generate a new workflow from a natural language prompt",
+        description = "Generate a new workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.",
+        tags = { "automation-workflow-project" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = AutomationWorkflowProjectApi.PATH_GENERATE_PROJECT_WORKFLOW,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> generateProjectWorkflow(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "GenerateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody GenerateFrontendProjectWorkflowRequestModel generateFrontendProjectWorkflowRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
