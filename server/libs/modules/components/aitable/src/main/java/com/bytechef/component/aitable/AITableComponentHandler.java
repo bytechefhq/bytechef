@@ -40,12 +40,14 @@ public class AITableComponentHandler implements ComponentHandler {
                 "visualization and analysis without requiring coding skills.")
         .icon("path:assets/aitable.svg")
         .customAction(true)
+        .customActionHelp("", "https://developers.aitable.ai/api/reference/")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(AITableConnection.CONNECTION_DEFINITION)
         .actions(
             AITableCreateRecordAction.ACTION_DEFINITION,
             AITableFindRecordsAction.ACTION_DEFINITION,
-            AITableUpdateRecordAction.ACTION_DEFINITION);
+            AITableUpdateRecordAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

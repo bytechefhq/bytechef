@@ -37,7 +37,9 @@ public class AITableConnection {
                 .properties(
                     string(TOKEN)
                         .label("Token")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/aitable_v1#connection-setup");
 
     private AITableConnection() {
     }
