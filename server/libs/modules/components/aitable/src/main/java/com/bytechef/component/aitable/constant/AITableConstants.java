@@ -34,7 +34,7 @@ public class AITableConstants {
     public static final String FIELDS = "fields";
     public static final String ID = "id";
     public static final String NAME = "name";
-    public static final String MAX_RECORDS = "maxRecords";
+    public static final String PAGE_SIZE = "pageSize";
     public static final String RECORD_ID = "recordId";
     public static final String RECORD_IDS = "recordIds";
     public static final String RECORDS = "records";
