@@ -22,12 +22,12 @@ import static com.bytechef.component.definition.Context.ContextFunction;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
 import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
@@ -35,7 +35,6 @@ import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -49,7 +48,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class MistralUploadFileActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.of(PURPOSE, "ocr", FILE, mockedFileEntry));
@@ -65,28 +64,21 @@ class MistralUploadFileActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(Map.of());
 
         Object result = MistralUploadFileAction.perform(mockedInputParameters, null, mockedContext);
 
         assertEquals(Map.of(), result);
         assertEquals("https://api.mistral.ai/v1/files", stringArgumentCaptor.getValue());
-
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
-            Http.Body.of(
-                Map.of(
-                    PURPOSE, "ocr",
-                    FILE, mockedFileEntry),
-                Http.BodyContentType.FORM_DATA),
+            Body.of(Map.of(PURPOSE, "ocr", FILE, mockedFileEntry), Http.BodyContentType.FORM_DATA),
             bodyArgumentCaptor.getValue());
     }
 }
