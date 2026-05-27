@@ -29,6 +29,25 @@ Version: 1
 
 
 
+## Connection Setup
+
+### Find API Key
+
+1. Navigate to your [Mistral Admin console](https://admin.mistral.ai/organization).
+2. Click on **API Keys**.
+3. Click on **Create new key**.
+4. Enter the name of your API key.
+5. Select the workspace the API key will be connected to.
+6. Select the expiration date for your API key.
+7. Select access scopes for your API key.
+8. Click on **Create new key**.
+9. Click on **Copy key**.
+10. Click on **Done**.
+11. Done 🚀.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/951c9102-14bb-46b1-979e-cbb945ef13e3?type=1&controls=on"  width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0, border: 'none'}} allowFullScreen></iframe>
+</div>
 
 
 
@@ -47,7 +66,7 @@ Name: ask
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| model | Model | STRING <details> <summary> Options </summary> <span>codestral-latest</span>, <span>devstral-medium-latest</span>, <span>devstral-small-latest</span>, <span>magistral-medium-latest</span>, <span>magistral-small-latest</span>, <span>ministral-14b-latest</span>, <span>ministral-3b-latest</span>, <span>ministral-8b-latest</span>, <span>mistral-large-latest</span>, <span>mistral-medium-latest</span>, <span>mistral-small-latest</span>, <span>open-mistral-nemo</span>, <span>pixtral-12b-latest</span>, <span>pixtral-large-latest</span> </details> | ID of the model to use. | true |
+| model | Model | STRING <details> <summary> Options </summary> <span>codestral-latest</span>, <span>devstral-medium-latest</span>, <span>devstral-small-latest</span>, <span>magistral-medium-latest</span>, <span>magistral-small-latest</span>, <span>ministral-14b-latest</span>, <span>ministral-3b-latest</span>, <span>ministral-8b-latest</span>, <span>mistral-large-latest</span>, <span>mistral-medium-latest</span>, <span>mistral-small-latest</span>, <span>open-mistral-nemo</span> </details> | ID of the model to use. | true |
 | format | Format | STRING <details> <summary> Options </summary> <span title="User prompt and optional system prompt.">SIMPLE</span>, <span title="Full control over the messages sent to the model.">ADVANCED</span> </details> | Format of providing the prompt to the model. | true |
 | userPrompt | Prompt | STRING | User prompt to the model. | true |
 | systemPrompt | System Prompt | STRING | System prompt to the model. | false |
