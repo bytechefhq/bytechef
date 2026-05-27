@@ -20,6 +20,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Crea
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/GenerateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputTypeModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationBasicModel.java
