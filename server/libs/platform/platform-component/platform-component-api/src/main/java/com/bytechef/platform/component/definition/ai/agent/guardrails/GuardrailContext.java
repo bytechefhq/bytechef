@@ -21,12 +21,14 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * Call-site context passed to every guardrail function. All {@link Parameters} accessors are non-null — null
@@ -46,11 +48,21 @@ public final class GuardrailContext {
     private final Map<String, ComponentConnection> componentConnections;
     private final @Nullable ChatClient chatClient;
     private final Context context;
+    private final List<Message> conversationHistory;
 
     public GuardrailContext(
         Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
         @Nullable ChatClient chatClient, Context context) {
+
+        this(inputParameters, connectionParameters, parentParameters, extensions, componentConnections, chatClient,
+            context, List.of());
+    }
+
+    private GuardrailContext(
+        Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
+        Parameters extensions, Map<String, ComponentConnection> componentConnections,
+        @Nullable ChatClient chatClient, Context context, List<Message> conversationHistory) {
 
         this.inputParameters = inputParameters == null ? ParametersFactory.create(Map.of()) : inputParameters;
         this.connectionParameters = connectionParameters == null
@@ -61,6 +73,7 @@ public final class GuardrailContext {
         this.componentConnections = componentConnections == null ? Map.of() : Map.copyOf(componentConnections);
         this.chatClient = chatClient;
         this.context = Objects.requireNonNull(context, "context");
+        this.conversationHistory = conversationHistory == null ? List.of() : List.copyOf(conversationHistory);
     }
 
     public Parameters inputParameters() {
@@ -115,6 +128,15 @@ public final class GuardrailContext {
         }
 
         return chatClient;
+    }
+
+    public List<Message> conversationHistory() {
+        return conversationHistory;
+    }
+
+    public GuardrailContext withConversationHistory(List<Message> history) {
+        return new GuardrailContext(inputParameters, connectionParameters, parentParameters, extensions,
+            componentConnections, chatClient, context, history);
     }
 
     public Context context() {

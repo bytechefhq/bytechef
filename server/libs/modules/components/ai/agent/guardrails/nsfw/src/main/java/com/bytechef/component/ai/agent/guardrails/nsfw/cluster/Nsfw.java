@@ -38,8 +38,10 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailC
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * `NSFW` is an LLM-based classifier for Not-Safe-For-Work content. It runs in the **LLM stage** of
@@ -108,13 +110,21 @@ public final class Nsfw {
 
         double threshold = inputParameters.getDouble(THRESHOLD, DEFAULT_THRESHOLD);
 
-        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text);
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, context.conversationHistory());
     }
 
     static Optional<Violation> classifyWith(
         ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text) {
 
-        Verdict verdict = LlmClassifierUtils.classify("nsfw", chatClient, systemMessage, userPrompt, text, threshold);
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, List.of());
+    }
+
+    static Optional<Violation> classifyWith(
+        ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text,
+        List<Message> conversationHistory) {
+
+        Verdict verdict = LlmClassifierUtils.classify(
+            "nsfw", chatClient, systemMessage, userPrompt, text, threshold, conversationHistory);
 
         if (!verdict.violated()) {
             return Optional.empty();

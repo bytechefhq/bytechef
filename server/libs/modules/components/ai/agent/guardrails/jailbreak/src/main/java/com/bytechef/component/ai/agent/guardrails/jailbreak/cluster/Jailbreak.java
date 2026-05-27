@@ -38,8 +38,10 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailC
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * LLM-based jailbreak / prompt-injection detection. Classifies whether the user input is attempting to subvert the
@@ -109,14 +111,21 @@ public final class Jailbreak {
 
         double threshold = inputParameters.getDouble(THRESHOLD, DEFAULT_THRESHOLD);
 
-        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text);
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, context.conversationHistory());
     }
 
     static Optional<Violation> classifyWith(
         ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text) {
 
-        Verdict verdict =
-            LlmClassifierUtils.classify("jailbreak", chatClient, systemMessage, userPrompt, text, threshold);
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, List.of());
+    }
+
+    static Optional<Violation> classifyWith(
+        ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text,
+        List<Message> conversationHistory) {
+
+        Verdict verdict = LlmClassifierUtils.classify(
+            "jailbreak", chatClient, systemMessage, userPrompt, text, threshold, conversationHistory);
 
         if (!verdict.violated()) {
             return Optional.empty();

@@ -20,8 +20,10 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import java.util.List;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * @author Ivica Cardic
@@ -41,5 +43,6 @@ public interface GuardrailsFunction {
      */
     Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, Context context) throws Exception;
+        Map<String, ComponentConnection> componentConnections, Context context,
+        List<Message> conversationHistory) throws Exception;
 }

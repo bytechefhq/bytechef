@@ -30,7 +30,6 @@ import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
 /**
@@ -54,18 +53,18 @@ public class CassandraChatMemory {
             .type(CHAT_MEMORY)
             .object(() -> CassandraChatMemory::apply);
 
-    protected static MessageChatMemoryAdvisor apply(
+    protected static ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
-        ChatMemoryRepository chatMemoryRepository = getChatMemoryRepository(connectionParameters);
-
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
-            .chatMemoryRepository(chatMemoryRepository)
+            .chatMemoryRepository(getChatMemoryRepository(connectionParameters))
             .build();
 
-        return MessageChatMemoryAdvisor.builder(chatMemory)
-            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
-            .build();
+        return new ChatMemoryFunction.Result(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
+                .build(),
+            chatMemory);
     }
 }

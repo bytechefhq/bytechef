@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 import tools.jackson.core.JacksonException;
 
 /**
@@ -44,6 +45,13 @@ public final class LlmPiiDetectorUtils {
     public static List<Span> detect(
         String guardrailName, ChatClient chatClient, String text, List<String> requestedTypes, Context context) {
 
+        return detect(guardrailName, chatClient, text, requestedTypes, context, List.of());
+    }
+
+    public static List<Span> detect(
+        String guardrailName, ChatClient chatClient, String text, List<String> requestedTypes, Context context,
+        List<Message> conversationHistory) {
+
         Objects.requireNonNull(context, "context");
 
         if (text == null || text.isEmpty()) {
@@ -62,6 +70,7 @@ public final class LlmPiiDetectorUtils {
         try {
             response = chatClient.prompt()
                 .system(SYSTEM_MESSAGE)
+                .messages(conversationHistory)
                 .user(userPrompt)
                 .call()
                 .entity(Response.class);

@@ -24,11 +24,13 @@ import java.util.Collections;
 import java.util.HexFormat;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.core.ParameterizedTypeReference;
 import tools.jackson.core.JacksonException;
 
@@ -49,6 +51,13 @@ public final class LlmClassifierUtils {
         String guardrailName, ChatClient chatClient, String systemMessage, String userPrompt,
         String textToClassify, double threshold) {
 
+        return classify(guardrailName, chatClient, systemMessage, userPrompt, textToClassify, threshold, List.of());
+    }
+
+    public static Verdict classify(
+        String guardrailName, ChatClient chatClient, String systemMessage, String userPrompt,
+        String textToClassify, double threshold, List<Message> conversationHistory) {
+
         String fullPrompt = fenceUserInput(userPrompt, textToClassify);
 
         Response response;
@@ -56,6 +65,7 @@ public final class LlmClassifierUtils {
         try {
             response = chatClient.prompt()
                 .system(systemMessage)
+                .messages(conversationHistory)
                 .user(fullPrompt)
                 .call()
                 .entity(Response.class);
@@ -159,6 +169,14 @@ public final class LlmClassifierUtils {
         String guardrailName, ChatClient chatClient, String systemMessage, String userPrompt,
         String textToClassify, double threshold, String responseSchema) {
 
+        return classifyWithSchema(guardrailName, chatClient, systemMessage, userPrompt, textToClassify, threshold,
+            responseSchema, List.of());
+    }
+
+    public static SchemaVerdict classifyWithSchema(
+        String guardrailName, ChatClient chatClient, String systemMessage, String userPrompt,
+        String textToClassify, double threshold, String responseSchema, List<Message> conversationHistory) {
+
         String schemaReminder = userPrompt
             + "\n\nResponse must conform to this JSON schema:\n" + responseSchema;
 
@@ -169,6 +187,7 @@ public final class LlmClassifierUtils {
         try {
             response = chatClient.prompt()
                 .system(systemMessage)
+                .messages(conversationHistory)
                 .user(fullPrompt)
                 .call()
                 .entity(new ParameterizedTypeReference<>() {});

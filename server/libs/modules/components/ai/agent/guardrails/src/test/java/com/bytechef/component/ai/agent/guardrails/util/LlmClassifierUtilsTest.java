@@ -19,6 +19,7 @@ package com.bytechef.component.ai.agent.guardrails.util;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -174,6 +175,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()
             .system(anyString())
+            .messages(anyList())
             .user(anyString())
             .call()
             .entity(any(ParameterizedTypeReference.class)))
@@ -205,6 +207,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()
             .system(anyString())
+            .messages(anyList())
             .user(anyString())
             .call()
             .entity(any(ParameterizedTypeReference.class)))
@@ -245,6 +248,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new Response(0.1, false));
@@ -269,6 +273,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new Response(0.1, false));
@@ -295,6 +300,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new Response(0.1, false));
@@ -338,6 +344,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new Response(0.1, false));
@@ -406,6 +413,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(response);
@@ -419,6 +427,7 @@ class LlmClassifierUtilsTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenThrow(exception);
 

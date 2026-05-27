@@ -80,11 +80,14 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     private final String blockedMessage;
     private final List<CheckEntry> checks;
     private final Context context;
+    private final List<Message> conversationHistory;
 
     private CheckForViolationsAdvisor(Builder builder) {
         this.blockedMessage = builder.blockedMessage;
         this.checks = List.copyOf(builder.checks);
         this.context = Objects.requireNonNull(builder.context, "context");
+        this.conversationHistory =
+            builder.conversationHistory == null ? List.of() : List.copyOf(builder.conversationHistory);
     }
 
     private void contextLog(Context.ContextConsumer<Context.Log> logConsumer) {
@@ -261,8 +264,12 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                 continue;
             }
 
+            GuardrailContext effectiveContext = (conversationHistory.isEmpty() || !VALIDATE_INPUT.equals(validateKey))
+                ? entry.context
+                : entry.context.withConversationHistory(conversationHistory);
+
             try {
-                List<Violation> results = entry.function.applyAll(text, entry.context);
+                List<Violation> results = entry.function.applyAll(text, effectiveContext);
 
                 aggregated.addAll(Objects.requireNonNull(results));
             } catch (OutOfMemoryError error) {
@@ -489,6 +496,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         private final List<PendingCheck> pendingChecks = new ArrayList<>();
         private final List<CheckEntry> checks = new ArrayList<>();
         private Context context;
+        private List<Message> conversationHistory;
 
         public Builder blockedMessage(String value) {
             this.blockedMessage = value;
@@ -498,6 +506,12 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
 
         public Builder context(Context value) {
             this.context = value;
+
+            return this;
+        }
+
+        public Builder conversationHistory(List<Message> value) {
+            this.conversationHistory = List.copyOf(value);
 
             return this;
         }
