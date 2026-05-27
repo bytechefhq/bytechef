@@ -19,21 +19,23 @@ package com.bytechef.component.aitable.action;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID;
 import static com.bytechef.component.aitable.constant.AITableConstants.DATASHEET_ID_PROPERTY;
 import static com.bytechef.component.aitable.constant.AITableConstants.FIELDS;
-import static com.bytechef.component.aitable.constant.AITableConstants.MAX_RECORDS;
+import static com.bytechef.component.aitable.constant.AITableConstants.PAGE_SIZE;
 import static com.bytechef.component.aitable.constant.AITableConstants.RECORD_IDS;
 import static com.bytechef.component.aitable.constant.AITableConstants.SPACE_ID_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
-import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.aitable.util.AITableUtils;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Monika Domiter
@@ -58,10 +60,6 @@ public class AITableFindRecordsAction {
                 .label("Record IDs")
                 .description("The IDs of the records to find.")
                 .items(string())
-                .required(false),
-            integer(MAX_RECORDS)
-                .label("Max Records")
-                .description("How many records are returned in total")
                 .required(false))
         .output()
         .perform(AITableFindRecordsAction::perform);
@@ -69,19 +67,41 @@ public class AITableFindRecordsAction {
     private AITableFindRecordsAction() {
     }
 
-    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        List<String> fields = inputParameters.getList(FIELDS, String.class, List.of());
-        List<String> recordIds = inputParameters.getList(RECORD_IDS, String.class, List.of());
-        int maxRecords = inputParameters.getInteger(MAX_RECORDS);
+    public static List<Map<?, ?>> perform(
+        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        return context
-            .http(http -> http.get("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
-            .queryParameters(
-                FIELDS, String.join(",", fields),
-                RECORD_IDS, String.join(",", recordIds),
-                MAX_RECORDS, maxRecords)
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody();
+        int pageNum = 1;
+        int totalReceived = 0;
+        int total = 0;
+
+        List<Map<?, ?>> records = new ArrayList<>();
+        do {
+            Map<String, ?> body = context
+                .http(http -> http.get("/datasheets/" + inputParameters.getRequiredString(DATASHEET_ID) + "/records"))
+                .queryParameters(
+                    FIELDS, String.join(",", inputParameters.getList(FIELDS, String.class, List.of())),
+                    RECORD_IDS, String.join(",", inputParameters.getList(RECORD_IDS, String.class, List.of())),
+                    PAGE_SIZE, 1000,
+                    "pageNum", pageNum)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("data") instanceof Map<?, ?> data) {
+                if (data.get("records") instanceof List<?> list) {
+                    for (Object record : list) {
+                        if (record instanceof Map<?, ?> map) {
+                            records.add(map);
+                        }
+                    }
+                }
+
+                totalReceived += (Integer) data.get(PAGE_SIZE);
+                pageNum++;
+                total = (Integer) data.get("total");
+            }
+        } while (totalReceived < total);
+
+        return records;
     }
 }
