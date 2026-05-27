@@ -41,6 +41,7 @@ public class AITableUpdateRecordAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("updateRecord")
         .title("Update Record")
         .description("Update record in datasheet")
+        .help("", "https://docs.bytechef.io/reference/components/aitable_v1#update-record")
         .properties(
             SPACE_ID_PROPERTY,
             DATASHEET_ID_PROPERTY,

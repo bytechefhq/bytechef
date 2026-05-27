@@ -43,6 +43,7 @@ public class AITableFindRecordsAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("findRecords")
         .title("Find Records")
         .description("Find records in datasheet")
+        .help("", "https://docs.bytechef.io/reference/components/aitable_v1#find-records")
         .properties(
             SPACE_ID_PROPERTY,
             DATASHEET_ID_PROPERTY,

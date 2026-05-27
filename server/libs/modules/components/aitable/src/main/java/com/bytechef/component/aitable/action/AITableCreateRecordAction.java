@@ -39,6 +39,7 @@ public class AITableCreateRecordAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRecord")
         .title("Create Record")
         .description("Creates a new record in datasheet.")
+        .help("", "https://docs.bytechef.io/reference/components/aitable_v1#create-record")
         .properties(
             SPACE_ID_PROPERTY,
             DATASHEET_ID_PROPERTY,
