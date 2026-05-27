@@ -2595,6 +2595,10 @@
       "name": "model",
       "options": [ {
         "description": null,
+        "label": "chatgpt-image-latest",
+        "value": "chatgpt-image-latest"
+      }, {
+        "description": null,
         "label": "dall-e-2",
         "value": "dall-e-2"
       }, {
@@ -2613,6 +2617,14 @@
         "description": null,
         "label": "gpt-image-1-mini",
         "value": "gpt-image-1-mini"
+      }, {
+        "description": null,
+        "label": "gpt-image-2",
+        "value": "gpt-image-2"
+      }, {
+        "description": null,
+        "label": "gpt-image-2-2026-04-21",
+        "value": "gpt-image-2-2026-04-21"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
