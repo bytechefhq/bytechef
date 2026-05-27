@@ -19,6 +19,7 @@ package com.bytechef.component.ai.agent.guardrails.llmpii.cluster;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -187,6 +188,7 @@ class LlmPiiTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(systemCaptor.capture())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new LlmPiiDetectorUtils.Response(List.of()));
@@ -221,6 +223,7 @@ class LlmPiiTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(systemCaptor.capture())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new LlmPiiDetectorUtils.Response(List.of()));
@@ -258,6 +261,7 @@ class LlmPiiTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(response);

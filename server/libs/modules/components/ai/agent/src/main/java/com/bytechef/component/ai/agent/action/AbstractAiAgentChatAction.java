@@ -59,6 +59,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -69,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
@@ -196,12 +198,19 @@ public abstract class AbstractAiAgentChatAction {
                     "Configure at most one.");
         }
 
+        Optional<ChatMemoryFunction.Result> chatMemoryResult =
+            clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+                .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
+
+        List<Message> conversationHistory = chatMemoryResult
+            .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
+            .orElse(List.of());
+
         for (ClusterElement clusterElement : guardrailClusterElements) {
-            advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement, context));
+            advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement, context, conversationHistory));
         }
 
-        clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> getChatMemoryAdvisor(connectionParameters, clusterElement, context))
+        chatMemoryResult.map(ChatMemoryFunction.Result::advisor)
             .ifPresent(advisors::add);
 
         clusterElementMap.fetchClusterElement(RAG)
@@ -213,7 +222,7 @@ public abstract class AbstractAiAgentChatAction {
         return advisors;
     }
 
-    private Advisor getChatMemoryAdvisor(
+    private ChatMemoryFunction.Result buildChatMemoryResult(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
         ActionContext context) {
 
@@ -231,6 +240,39 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
+    private List<Message> loadConversationHistory(
+        @Nullable ChatMemory chatMemory, ClusterElementMap clusterElementMap) {
+
+        if (chatMemory == null) {
+            return List.of();
+        }
+
+        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+            .map(clusterElement -> {
+                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
+                String conversationId = chatMemoryParameters.getString("conversationId");
+
+                if (conversationId == null) {
+                    return List.<Message>of();
+                }
+
+                try {
+                    List<Message> all = chatMemory.get(conversationId);
+
+                    if (all.isEmpty()) {
+                        return List.<Message>of();
+                    }
+
+                    int size = all.size();
+
+                    return size <= 3 ? List.copyOf(all) : List.copyOf(all.subList(size - 3, size));
+                } catch (Exception exception) {
+                    return List.<Message>of();
+                }
+            })
+            .orElse(List.of());
+    }
+
     private static Parameters getConnectionParameters(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
 
@@ -240,7 +282,8 @@ public abstract class AbstractAiAgentChatAction {
     }
 
     private Advisor getGuardrailsAdvisor(
-        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement, ActionContext context) {
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement, ActionContext context,
+        List<Message> conversationHistory) {
 
         GuardrailsFunction guardrailsFunction = clusterElementDefinitionService.getClusterElement(
             clusterElement.getComponentName(), clusterElement.getComponentVersion(),
@@ -250,7 +293,8 @@ public abstract class AbstractAiAgentChatAction {
             return guardrailsFunction.apply(
                 ParametersFactory.create(clusterElement.getParameters()),
                 getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context);
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections, context,
+                conversationHistory);
         } catch (Exception e) {
             throw clusterElementInitializationException(clusterElement, "guardrails", e, context);
         }

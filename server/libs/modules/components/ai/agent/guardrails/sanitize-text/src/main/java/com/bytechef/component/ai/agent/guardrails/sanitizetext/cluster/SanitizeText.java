@@ -40,6 +40,7 @@ import java.util.Map;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Component;
 
@@ -68,7 +69,8 @@ public final class SanitizeText {
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private Advisor apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
-        Map<String, ComponentConnection> componentConnections, Context context) throws Exception {
+        Map<String, ComponentConnection> componentConnections, Context context,
+        List<Message> conversationHistory) throws Exception {
 
         SanitizeTextAdvisor.Builder builder = SanitizeTextAdvisor.builder()
             .context(context);

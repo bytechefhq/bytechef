@@ -96,14 +96,15 @@ class AbstractAiAgentChatActionTest {
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
         ChatModel chatModel = mock(ChatModel.class);
-        BaseChatMemoryAdvisor chatMemory = mock(BaseChatMemoryAdvisor.class);
+        BaseChatMemoryAdvisor chatMemoryAdvisor = mock(BaseChatMemoryAdvisor.class);
+        ChatMemoryFunction.Result chatMemoryResult = new ChatMemoryFunction.Result(chatMemoryAdvisor, null);
 
         when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
         when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testChatMemory"))).thenReturn(chatMemoryFunction);
         when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
-        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenAnswer(invocation -> chatMemory);
+        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(chatMemoryResult);
 
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
@@ -234,7 +235,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("sanitizeText"), eq(1), eq("sanitizeText")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
             .thenReturn(advisor);
 
         ComponentConnection componentConnection = new ComponentConnection(
@@ -287,7 +288,7 @@ class AbstractAiAgentChatActionTest {
             clusterElementDefinitionService.<com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction>getClusterElement(
                 eq("checkForViolations"), eq(1), eq("checkForViolations")))
                     .thenReturn(guardrailsFunction);
-        when(guardrailsFunction.apply(any(), any(), any(), any(), any()))
+        when(guardrailsFunction.apply(any(), any(), any(), any(), any(), any()))
             .thenThrow(new RuntimeException("simulated guardrail init failure"));
 
         ComponentConnection componentConnection = new ComponentConnection(

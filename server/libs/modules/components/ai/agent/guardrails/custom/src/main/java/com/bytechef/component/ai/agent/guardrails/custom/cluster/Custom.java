@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * LLM-based custom classifier accepting multiple operator-defined entries (prompt + threshold + optional schema). Each
@@ -144,11 +145,12 @@ public final class Custom {
             throw new IllegalArgumentException("Custom guardrail requires at least one entry in 'Classifiers'");
         }
 
-        return applyMultiple(chatClient, systemMessage, text, entries);
+        return applyMultiple(chatClient, systemMessage, text, entries, context.conversationHistory());
     }
 
     private static List<Violation> applyMultiple(
-        ChatClient chatClient, String systemMessage, String text, List<Map<String, Object>> entries) {
+        ChatClient chatClient, String systemMessage, String text, List<Map<String, Object>> entries,
+        List<Message> conversationHistory) {
 
         List<ValidatedEntry> validated = new ArrayList<>(entries.size());
 
@@ -197,8 +199,11 @@ public final class Custom {
             try {
                 Optional<Violation> violation = entry.schema != null && !entry.schema.isBlank()
                     ? classifyWithSchema(
-                        chatClient, entry.name, entry.prompt, entry.threshold, systemMessage, text, entry.schema)
-                    : classifyWith(chatClient, entry.name, entry.prompt, entry.threshold, systemMessage, text);
+                        chatClient, entry.name, entry.prompt, entry.threshold, systemMessage, text, entry.schema,
+                        conversationHistory)
+                    : classifyWith(
+                        chatClient, entry.name, entry.prompt, entry.threshold, systemMessage, text,
+                        conversationHistory);
 
                 violation.ifPresent(violations::add);
             } catch (OutOfMemoryError error) {
@@ -238,8 +243,15 @@ public final class Custom {
         ChatClient chatClient, String guardrailName, String userPrompt, double threshold,
         String systemMessage, String text) {
 
+        return classifyWith(chatClient, guardrailName, userPrompt, threshold, systemMessage, text, List.of());
+    }
+
+    static Optional<Violation> classifyWith(
+        ChatClient chatClient, String guardrailName, String userPrompt, double threshold,
+        String systemMessage, String text, List<Message> conversationHistory) {
+
         Verdict verdict = LlmClassifierUtils.classify(
-            guardrailName, chatClient, systemMessage, userPrompt, text, threshold);
+            guardrailName, chatClient, systemMessage, userPrompt, text, threshold, conversationHistory);
 
         if (!verdict.violated()) {
             return Optional.empty();
@@ -252,8 +264,17 @@ public final class Custom {
         ChatClient chatClient, String guardrailName, String userPrompt, double threshold,
         String systemMessage, String text, String responseSchema) {
 
+        return classifyWithSchema(chatClient, guardrailName, userPrompt, threshold, systemMessage, text, responseSchema,
+            List.of());
+    }
+
+    static Optional<Violation> classifyWithSchema(
+        ChatClient chatClient, String guardrailName, String userPrompt, double threshold,
+        String systemMessage, String text, String responseSchema, List<Message> conversationHistory) {
+
         LlmClassifierUtils.SchemaVerdict verdict = LlmClassifierUtils.classifyWithSchema(
-            guardrailName, chatClient, systemMessage, userPrompt, text, threshold, responseSchema);
+            guardrailName, chatClient, systemMessage, userPrompt, text, threshold, responseSchema,
+            conversationHistory);
 
         if (!verdict.violated()) {
             return Optional.empty();

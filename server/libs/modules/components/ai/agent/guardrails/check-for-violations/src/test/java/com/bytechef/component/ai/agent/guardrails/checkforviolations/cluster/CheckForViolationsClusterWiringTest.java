@@ -233,7 +233,7 @@ class CheckForViolationsClusterWiringTest {
 
         try {
             return guardrailsFunction.apply(inputParameters, ParametersFactory.create(Map.of()), extensions, Map.of(),
-                mock(com.bytechef.component.definition.Context.class));
+                mock(com.bytechef.component.definition.Context.class), List.of());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

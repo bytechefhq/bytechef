@@ -38,8 +38,10 @@ import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailC
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailContext;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailStage;
 import com.bytechef.platform.component.definition.ai.agent.guardrails.Violation;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.messages.Message;
 
 /**
  * LLM-based topical-alignment check. Classifies whether the user input is on-topic for an operator-defined allowed
@@ -107,14 +109,21 @@ public final class TopicalAlignment {
 
         double threshold = inputParameters.getDouble(THRESHOLD, DEFAULT_THRESHOLD);
 
-        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text);
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, context.conversationHistory());
     }
 
     static Optional<Violation> classifyWith(
         ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text) {
 
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, List.of());
+    }
+
+    static Optional<Violation> classifyWith(
+        ChatClient chatClient, String userPrompt, double threshold, String systemMessage, String text,
+        List<Message> conversationHistory) {
+
         Verdict verdict = LlmClassifierUtils.classify(
-            "topicalAlignment", chatClient, systemMessage, userPrompt, text, threshold);
+            "topicalAlignment", chatClient, systemMessage, userPrompt, text, threshold, conversationHistory);
 
         if (!verdict.violated()) {
             return Optional.empty();

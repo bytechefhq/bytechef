@@ -55,12 +55,14 @@ public class InMemoryChatMemory {
             .type(CHAT_MEMORY)
             .object(() -> InMemoryChatMemory::apply);
 
-    protected static MessageChatMemoryAdvisor apply(
+    protected static ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) {
 
-        return MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
-            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
-            .build();
+        return new ChatMemoryFunction.Result(
+            MessageChatMemoryAdvisor.builder(inMemoryChatMemory)
+                .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
+                .build(),
+            inMemoryChatMemory);
     }
 }

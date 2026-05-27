@@ -75,7 +75,7 @@ public class VectorStoreChatMemory {
             .object(() -> this::apply);
     }
 
-    protected VectorStoreChatMemoryAdvisor apply(
+    protected ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) throws Exception {
 
@@ -99,6 +99,6 @@ public class VectorStoreChatMemory {
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 
-        return builder.build();
+        return new ChatMemoryFunction.Result(builder.build(), null);
     }
 }

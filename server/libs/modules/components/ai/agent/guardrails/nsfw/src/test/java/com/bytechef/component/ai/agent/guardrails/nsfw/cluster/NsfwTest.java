@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsCons
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -112,6 +113,7 @@ class NsfwTest {
 
         when(client.prompt()).thenReturn(spec);
         when(spec.system(systemCaptor.capture())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(userCaptor.capture())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(new LlmClassifierUtils.Response(0.1, false));
@@ -139,6 +141,7 @@ class NsfwTest {
 
         when(client.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(response);

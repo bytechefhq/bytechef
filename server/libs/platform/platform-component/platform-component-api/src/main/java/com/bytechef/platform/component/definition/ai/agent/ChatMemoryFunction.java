@@ -20,7 +20,9 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 
 /**
  * @author Ivica Cardic
@@ -34,6 +36,13 @@ public interface ChatMemoryFunction {
     ClusterElementType CHAT_MEMORY = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Memory");
 
     /**
+     * Holds the advisor and the backing {@link ChatMemory} together so callers can read conversation history without
+     * building a second memory instance. {@code chatMemory} is {@code null} for advisor types (e.g. VectorStore) that
+     * do not expose a standard {@link ChatMemory}.
+     */
+    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {}
+
+    /**
      * @param inputParameters
      * @param connectionParameters
      * @param extensions
@@ -41,7 +50,7 @@ public interface ChatMemoryFunction {
      * @return
      * @throws Exception
      */
-    BaseChatMemoryAdvisor apply(
+    Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) throws Exception;
 }

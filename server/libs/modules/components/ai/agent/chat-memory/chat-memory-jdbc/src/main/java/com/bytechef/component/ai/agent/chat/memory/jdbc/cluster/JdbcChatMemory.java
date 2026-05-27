@@ -30,7 +30,6 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
-import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 
 /**
@@ -64,19 +63,20 @@ public class JdbcChatMemory {
             .object(() -> this::apply);
     }
 
-    protected MessageChatMemoryAdvisor apply(
+    protected ChatMemoryFunction.Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) throws Exception {
 
-        ChatMemoryRepository chatMemoryRepository = JdbcChatMemoryUtils.getChatMemoryRepository(
-            extensions, componentConnections, clusterElementDefinitionService);
-
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
-            .chatMemoryRepository(chatMemoryRepository)
+            .chatMemoryRepository(
+                JdbcChatMemoryUtils.getChatMemoryRepository(extensions, componentConnections,
+                    clusterElementDefinitionService))
             .build();
 
-        return MessageChatMemoryAdvisor.builder(chatMemory)
-            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
-            .build();
+        return new ChatMemoryFunction.Result(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
+                .build(),
+            chatMemory);
     }
 }

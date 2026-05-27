@@ -24,6 +24,7 @@ import static com.bytechef.component.ai.agent.guardrails.constant.GuardrailsCons
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
@@ -98,6 +99,7 @@ class CustomTest {
 
         when(chatClient.prompt()
             .system(anyString())
+            .messages(anyList())
             .user(anyString())
             .call()
             .entity(any(ParameterizedTypeReference.class)))
@@ -269,6 +271,7 @@ class CustomTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class)))
@@ -317,6 +320,7 @@ class CustomTest {
 
         when(chatClient.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class)))
@@ -429,6 +433,7 @@ class CustomTest {
 
         when(client.prompt()).thenReturn(spec);
         when(spec.system(anyString())).thenReturn(spec);
+        when(spec.messages(anyList())).thenReturn(spec);
         when(spec.user(anyString())).thenReturn(spec);
         when(spec.call()).thenReturn(callSpec);
         when(callSpec.entity(any(Class.class))).thenReturn(response);

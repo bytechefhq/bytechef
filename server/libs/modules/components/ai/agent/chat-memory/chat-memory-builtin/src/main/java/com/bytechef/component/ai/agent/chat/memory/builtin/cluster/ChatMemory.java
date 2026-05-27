@@ -54,14 +54,17 @@ public class ChatMemory {
     private ChatMemory() {
     }
 
-    protected static MessageChatMemoryAdvisor
-        apply(Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
+    protected static ChatMemoryFunction.Result apply(
+        Parameters inputParameters, ChatMemoryRepository chatMemoryRepository) {
+
         MessageWindowChatMemory chatMemory = MessageWindowChatMemory.builder()
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
-        return MessageChatMemoryAdvisor.builder(chatMemory)
-            .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
-            .build();
+        return new ChatMemoryFunction.Result(
+            MessageChatMemoryAdvisor.builder(chatMemory)
+                .order(BaseAdvisor.HIGHEST_PRECEDENCE + 200)
+                .build(),
+            chatMemory);
     }
 }
