@@ -2697,6 +2697,7 @@
   "customActionHelp": null,
   "description": "Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.",
   "icon": "path:assets/mistral.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mistral",
   "resources": null,
