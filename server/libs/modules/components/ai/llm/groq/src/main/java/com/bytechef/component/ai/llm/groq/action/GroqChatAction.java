@@ -106,16 +106,18 @@ public class GroqChatAction {
                 .build();
         }
 
+        String token = connectionParameters.getRequiredString(TOKEN);
+
         return OpenAiChatModel.builder()
             .openAiClient(
                 OpenAIOkHttpClient.builder()
-                    .apiKey(connectionParameters.getString(TOKEN))
+                    .apiKey(token)
                     .baseUrl("https://api.groq.com/openai/v1")
                     .timeout(Duration.ofMinutes(5))
                     .build())
             .options(
                 OpenAiChatOptions.builder()
-                    .apiKey(connectionParameters.getRequiredString(TOKEN))
+                    .apiKey(token)
                     .model(inputParameters.getRequiredString(MODEL))
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
