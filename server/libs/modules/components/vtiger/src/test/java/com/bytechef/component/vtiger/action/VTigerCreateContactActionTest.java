@@ -22,7 +22,6 @@ import static com.bytechef.component.vtiger.constant.VTigerConstants.LASTNAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -30,11 +29,12 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
@@ -65,7 +65,7 @@ class VTigerCreateContactActionTest {
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedResponse.getBody(any(TypeReference.class)))
+        when(mockedResponse.getBody())
             .thenReturn(mockedObject);
 
         Object result = VTigerCreateContactAction.perform(mockedParameters, null, mockedContext);
@@ -74,16 +74,11 @@ class VTigerCreateContactActionTest {
         assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Configuration configuration = configurationBuilder.build();
-
-        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/create", stringArgumentCaptor.getValue());
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> bodyMap = Map.of("elementType", "Contacts", "element", elementMap);
-
-        assertEquals(bodyMap, body.getContent());
+        assertEquals(Http.Body.of(Map.of("elementType", "Contacts", "element", elementMap)),
+            bodyArgumentCaptor.getValue());
     }
 }

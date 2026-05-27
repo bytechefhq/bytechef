@@ -27,7 +27,6 @@ import static com.bytechef.component.definition.Context.Http.responseType;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Luka Ljubić
@@ -91,6 +90,6 @@ public class VTigerGetMeAction {
             .http(http -> http.get("/me"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
