@@ -19,6 +19,7 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
@@ -47,6 +48,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -76,6 +78,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
+    private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
@@ -87,7 +90,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
         CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        ConnectedUserProjectFacade connectedUserProjectFacade, ProjectService projectService,
+        ConnectedUserProjectFacade connectedUserProjectFacade,
+        @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, ProjectService projectService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
         WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
@@ -95,6 +99,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserProjectFacade = connectedUserProjectFacade;
+        this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
@@ -121,6 +126,26 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         Workflow workflow = workflowService.getWorkflow(publishedWorkflowId);
 
         return connectedUserProjectFacade.createProjectWorkflow(externalUserId, workflow.getDefinition(), environment);
+    }
+
+    @Override
+    public String generateProjectWorkflow(String externalUserId, String prompt, Environment environment) {
+        if (StringUtils.isBlank(prompt)) {
+            throw new IllegalArgumentException("Prompt must not be blank");
+        }
+
+        if (copilotWorkflowGenerator == null) {
+            throw new IllegalStateException(
+                "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
+        }
+
+        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
+            externalUserId, DEFAULT_DEFINITION, environment);
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt);
+
+        return workflowUuid;
     }
 
     @Override

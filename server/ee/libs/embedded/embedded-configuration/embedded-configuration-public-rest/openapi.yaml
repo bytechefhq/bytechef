@@ -42,6 +42,82 @@ paths:
                   $ref: "#/components/schemas/AutomationWorkflowProject"
       security:
         - jwtBearerAuth: [ ]
+  /automation/workflows/generate:
+    post:
+      description: "Generate a new workflow for the connected user from a natural language prompt using AI Copilot."
+      summary: "Generate a new workflow from a natural language prompt"
+      tags:
+        - "automation-workflow-project"
+      operationId: "generateFrontendProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "prompt"
+              properties:
+                prompt:
+                  description: "Natural language description of the workflow to build."
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The new workflow uuid."
+          content:
+            application/json:
+              schema:
+                type: "string"
+      security:
+        - jwtBearerAuth: [ ]
+  /{externalUserId}/automation/workflows/generate:
+    post:
+      description: "Generate a new workflow for a connected user identified by external user id from a natural language prompt using AI Copilot."
+      summary: "Generate a new workflow from a natural language prompt"
+      tags:
+        - "automation-workflow-project"
+      operationId: "generateProjectWorkflow"
+      parameters:
+        - name: "X-Environment"
+          description: "The environment."
+          in: "header"
+          required: false
+          schema:
+            $ref: '#/components/schemas/Environment'
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              required:
+                - "prompt"
+              properties:
+                prompt:
+                  description: "Natural language description of the workflow to build."
+                  type: "string"
+        required: true
+      responses:
+        "200":
+          description: "The new workflow uuid."
+          content:
+            application/json:
+              schema:
+                type: "string"
+      security:
+        - bearerAuth: [ ]
   /automation/workflow-templates/{workflowUuid}/copy:
     post:
       description: "Copy a catalog workflow template into a new user workflow."

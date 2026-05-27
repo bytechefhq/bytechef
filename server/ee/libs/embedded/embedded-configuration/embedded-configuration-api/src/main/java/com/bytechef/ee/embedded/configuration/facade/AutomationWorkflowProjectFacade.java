@@ -23,6 +23,8 @@ public interface AutomationWorkflowProjectFacade {
 
     String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment);
 
+    String generateProjectWorkflow(String externalUserId, String prompt, Environment environment);
+
     long createProject(String name, String description, String category, List<String> tags);
 
     String duplicateProjectWorkflow(String workflowId);
