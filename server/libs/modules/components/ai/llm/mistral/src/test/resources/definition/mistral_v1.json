@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mistral_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
@@ -740,7 +743,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text and structured content from documents.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mistral_v1#document-ocr"
+    },
     "metadata": null,
     "name": "ocr",
     "outputDefinition": {
@@ -1684,7 +1690,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts text and structured content from documents.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mistral_v1#upload-file"
+    },
     "metadata": null,
     "name": "uploadFile",
     "outputDefinition": {
@@ -2682,8 +2691,11 @@
       "tokenUrl": null,
       "type": "BEARER_TOKEN"
     } ],
-    "baseUri": { },
-    "help": null,
+    "baseUri": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/mistral_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
