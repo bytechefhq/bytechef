@@ -25,22 +25,13 @@ import static com.bytechef.component.ftp.constant.FtpConstants.SFTP;
 import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -75,16 +66,12 @@ public class FtpDownloadFileActionIntTest extends BaseFtpActionIntTest {
             SFTP, false));
         Parameters inputParameters = MockParametersFactory.create(Map.of(PATH, FTP_REMOTE_PATH));
 
-        AtomicReference<String> capturedFilename = new AtomicReference<>();
-        AtomicReference<byte[]> capturedContent = new AtomicReference<>();
-        FileEntry mockFileEntry = mock(FileEntry.class);
-        ActionContext context = buildCapturingContext(capturedFilename, capturedContent, mockFileEntry);
+        TestContextImpl context = new TestContextImpl();
 
         FileEntry result = FtpDownloadFileAction.perform(inputParameters, connectionParameters, context);
 
-        assertSame(mockFileEntry, result);
-        assertEquals(TEST_FILE_NAME, capturedFilename.get());
-        assertArrayEquals(TEST_CONTENT.getBytes(StandardCharsets.UTF_8), capturedContent.get());
+        assertEquals(TEST_FILE_NAME, result.getName());
+        assertArrayEquals(TEST_CONTENT.getBytes(StandardCharsets.UTF_8), context.getCapturedBytes(result));
     }
 
     @Test
@@ -97,52 +84,12 @@ public class FtpDownloadFileActionIntTest extends BaseFtpActionIntTest {
             SFTP, true));
         Parameters inputParameters = MockParametersFactory.create(Map.of(PATH, SFTP_REMOTE_PATH));
 
-        AtomicReference<String> capturedFilename = new AtomicReference<>();
-        AtomicReference<byte[]> capturedContent = new AtomicReference<>();
-        FileEntry mockFileEntry = mock(FileEntry.class);
-        ActionContext context = buildCapturingContext(capturedFilename, capturedContent, mockFileEntry);
+        TestContextImpl context = new TestContextImpl();
 
         FileEntry result = FtpDownloadFileAction.perform(inputParameters, connectionParameters, context);
 
-        assertSame(mockFileEntry, result);
-        assertEquals(TEST_FILE_NAME, capturedFilename.get());
-        assertArrayEquals(TEST_CONTENT.getBytes(StandardCharsets.UTF_8), capturedContent.get());
-    }
-
-    /**
-     * Creates a mock {@link ActionContext} whose {@code file()} method captures the filename and raw bytes passed to
-     * {@code storeContent} so that tests can assert on the downloaded file content without needing a real file-storage
-     * backend.
-     *
-     * <p>
-     * To add assertions on additional {@link Context.File} interactions, inject a pre-configured {@code Context.File}
-     * mock instead of the one built internally here.
-     */
-    private static ActionContext buildCapturingContext(
-        AtomicReference<String> capturedFilename,
-        AtomicReference<byte[]> capturedContent,
-        FileEntry mockFileEntry) throws Exception {
-
-        ActionContext context = mock(ActionContext.class);
-        Context.File mockFile = mock(Context.File.class);
-
-        when(mockFile.storeContent(anyString(), any(InputStream.class))).thenAnswer(invocation -> {
-            capturedFilename.set(invocation.getArgument(0));
-
-            InputStream inputStream = invocation.getArgument(1);
-
-            capturedContent.set(inputStream.readAllBytes());
-
-            return mockFileEntry;
-        });
-
-        when(context.file(any())).thenAnswer(invocation -> {
-            ContextFunction<Context.File, FileEntry> fileFunction = invocation.getArgument(0);
-
-            return fileFunction.apply(mockFile);
-        });
-
-        return context;
+        assertEquals(TEST_FILE_NAME, result.getName());
+        assertArrayEquals(TEST_CONTENT.getBytes(StandardCharsets.UTF_8), context.getCapturedBytes(result));
     }
 
 }

@@ -24,8 +24,13 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.function.Consumer;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
@@ -47,6 +52,183 @@ import org.testcontainers.containers.GenericContainer;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @SpringJUnitConfig(BaseFtpActionIntTest.TestConfig.class)
 public class BaseFtpActionIntTest {
+
+    protected static class TestContextImpl implements ActionContext {
+
+        private File file;
+
+        TestContextImpl() {
+            this.file = new TestFileImpl();
+        }
+
+        public byte[] getCapturedBytes(FileEntry fileEntry) throws IOException {
+            return file.readAllBytes(fileEntry);
+        }
+
+        @Override
+        public <R> R converter(ContextFunction<Converter, R> converterFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R encoder(ContextFunction<Encoder, R> encoderFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R escaper(ContextFunction<Escaper, R> escaperFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R file(ContextFunction<File, R> fileFunction) {
+            try {
+                return fileFunction.apply(file);
+            } catch (Exception e) {
+                throw new RuntimeException("Unable to apply function", e);
+            }
+        }
+
+        @Override
+        public <R> R http(ContextFunction<Http, R> httpFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public boolean isEditorEnvironment() {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R json(ContextFunction<Json, R> jsonFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public void log(ContextConsumer<Log> logConsumer) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R mimeType(ContextFunction<MimeType, R> mimeTypeFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R outputSchema(ContextFunction<OutputSchema, R> outputSchemaFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public Approval.Links approval(ContextFunction<Approval, Approval.Links> approvalFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public <R> R data(ContextFunction<Data, R> dataFunction) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public void event(Consumer<Event> eventConsumer) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public void suspend(Suspend suspend) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+    }
+
+    static class TestFileImpl implements Context.File {
+        private String extension = "txt";
+        private String mimeType = "txt/txt";
+        private String name;
+        private String url = "file://text-file.txt";
+        private String data;
+
+        @Override
+        public long getContentLength(FileEntry fileEntry) {
+            return data.length();
+        }
+
+        @Override
+        public InputStream getInputStream(FileEntry fileEntry) {
+            return new ByteArrayInputStream(data.getBytes());
+        }
+
+        @Override
+        public OutputStream getOutputStream(FileEntry fileEntry) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public String readToString(FileEntry fileEntry) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, String fileData) {
+            data = fileData;
+            name = fileName;
+
+            return new FileEntry() {
+
+                @Override
+                public String getExtension() {
+                    return extension;
+                }
+
+                @Override
+                public String getMimeType() {
+                    return mimeType;
+                }
+
+                @Override
+                public String getName() {
+                    return name;
+                }
+
+                @Override
+                public String getUrl() {
+                    return url;
+                }
+            };
+        }
+
+        @Override
+        public java.io.File toTempFile(FileEntry fileEntry) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public Path toTempFilePath(FileEntry fileEntry) {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
+        public byte[] readAllBytes(FileEntry fileEntry) throws IOException {
+            InputStream inputStream = getInputStream(fileEntry);
+
+            return inputStream.readAllBytes();
+        }
+
+        @Override
+        public FileEntry storeContent(String fileName, InputStream inputStream) {
+            this.name = fileName;
+
+            try {
+                return storeContent(fileName, new String(inputStream.readAllBytes()));
+            } catch (Exception exception) {
+                throw new RuntimeException("Unable to store file " + fileName, exception);
+            }
+        }
+    }
 
     @Configuration
     static class TestConfig {
