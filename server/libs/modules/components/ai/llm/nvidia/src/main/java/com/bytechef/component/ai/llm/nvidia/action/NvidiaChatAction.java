@@ -88,6 +88,7 @@ public class NvidiaChatAction {
             STOP_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/nvidia_v1#ask")
         .perform(NvidiaChatAction::perform);
 
     public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {

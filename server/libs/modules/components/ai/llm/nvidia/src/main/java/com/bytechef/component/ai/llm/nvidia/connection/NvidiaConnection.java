@@ -31,6 +31,7 @@ public final class NvidiaConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://integrate.api.nvidia.com/")
+        .version(1)
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")

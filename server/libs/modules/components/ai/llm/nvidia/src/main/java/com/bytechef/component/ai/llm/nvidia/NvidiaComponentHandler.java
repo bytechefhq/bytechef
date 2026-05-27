@@ -35,6 +35,7 @@ public class NvidiaComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("nvidia")
         .title("NVIDIA LLM")
+        .version(1)
         .description(
             "Generative AI and digitalization are reshaping the $3 trillion automotive industry, from design and " +
                 "engineering to manufacturing, autonomous driving, and customer experience. NVIDIA is at the " +
