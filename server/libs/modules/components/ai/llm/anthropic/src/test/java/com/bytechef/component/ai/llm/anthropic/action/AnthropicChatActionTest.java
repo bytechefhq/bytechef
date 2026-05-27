@@ -58,29 +58,29 @@ class AnthropicChatActionTest {
     void testCreateChatModelWithTemperature() {
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.of(
-                MODEL, "claude-3-5-sonnet-20241022",
-                MAX_TOKENS, 1000,
-                STOP, List.of("stop"),
-                TOP_K, 50,
+                MODEL, "claude-3-5-sonnet-20241022", MAX_TOKENS, 1000, STOP, List.of("stop"), TOP_K, 50,
                 TEMPERATURE, 0.7));
 
         try (MockedStatic<AnthropicOkHttpClient> syncMockedStatic = mockStatic(AnthropicOkHttpClient.class);
-            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic =
-                mockStatic(AnthropicOkHttpClientAsync.class)) {
+            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic = mockStatic(AnthropicOkHttpClientAsync.class)) {
 
             AnthropicOkHttpClient.Builder mockedSyncBuilder = mock(AnthropicOkHttpClient.Builder.class);
 
             syncMockedStatic.when(AnthropicOkHttpClient::builder)
                 .thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.build()).thenReturn(mock(AnthropicClient.class));
+            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSyncBuilder);
+            when(mockedSyncBuilder.build())
+                .thenReturn(mock(AnthropicClient.class));
 
             AnthropicOkHttpClientAsync.Builder mockedAsyncBuilder = mock(AnthropicOkHttpClientAsync.Builder.class);
 
             asyncMockedStatic.when(AnthropicOkHttpClientAsync::builder)
                 .thenReturn(mockedAsyncBuilder);
-            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedAsyncBuilder);
-            when(mockedAsyncBuilder.build()).thenReturn(mock(AnthropicClientAsync.class));
+            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedAsyncBuilder);
+            when(mockedAsyncBuilder.build())
+                .thenReturn(mock(AnthropicClientAsync.class));
 
             org.springframework.ai.chat.model.ChatModel chatModel = AnthropicChatAction.CHAT_MODEL.createChatModel(
                 mockedInputParameters, mockedConnectionParameters, false);
@@ -89,15 +89,14 @@ class AnthropicChatActionTest {
             assertInstanceOf(AnthropicChatModel.class, chatModel);
             assertEquals(List.of("TOKEN", "TOKEN"), stringArgumentCaptor.getAllValues());
 
-            AnthropicChatOptions options = ((AnthropicChatModel) chatModel).getOptions();
+            AnthropicChatOptions anthropicChatOptions = ((AnthropicChatModel) chatModel).getOptions();
 
-            assertEquals("claude-3-5-sonnet-20241022", options.getModel());
-            assertEquals(1000, options.getMaxTokens());
-            assertEquals(List.of("stop"), options.getStopSequences());
-            assertEquals(50, options.getTopK());
-            // temperature is set — topP must be null
-            assertEquals(0.7, options.getTemperature());
-            assertNull(options.getTopP());
+            assertEquals("claude-3-5-sonnet-20241022", anthropicChatOptions.getModel());
+            assertEquals(1000, anthropicChatOptions.getMaxTokens());
+            assertEquals(List.of("stop"), anthropicChatOptions.getStopSequences());
+            assertEquals(50, anthropicChatOptions.getTopK());
+            assertEquals(0.7, anthropicChatOptions.getTemperature());
+            assertNull(anthropicChatOptions.getTopP());
         }
     }
 
@@ -105,29 +104,29 @@ class AnthropicChatActionTest {
     void testCreateChatModelWithTopP() {
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.of(
-                MODEL, "claude-3-5-sonnet-20241022",
-                MAX_TOKENS, 1000,
-                STOP, List.of("stop"),
-                TOP_K, 50,
+                MODEL, "claude-3-5-sonnet-20241022", MAX_TOKENS, 1000, STOP, List.of("stop"), TOP_K, 50,
                 TOP_P, 0.9));
 
         try (MockedStatic<AnthropicOkHttpClient> syncMockedStatic = mockStatic(AnthropicOkHttpClient.class);
-            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic =
-                mockStatic(AnthropicOkHttpClientAsync.class)) {
+            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic = mockStatic(AnthropicOkHttpClientAsync.class)) {
 
             AnthropicOkHttpClient.Builder mockedSyncBuilder = mock(AnthropicOkHttpClient.Builder.class);
 
             syncMockedStatic.when(AnthropicOkHttpClient::builder)
                 .thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.build()).thenReturn(mock(AnthropicClient.class));
+            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSyncBuilder);
+            when(mockedSyncBuilder.build())
+                .thenReturn(mock(AnthropicClient.class));
 
             AnthropicOkHttpClientAsync.Builder mockedAsyncBuilder = mock(AnthropicOkHttpClientAsync.Builder.class);
 
             asyncMockedStatic.when(AnthropicOkHttpClientAsync::builder)
                 .thenReturn(mockedAsyncBuilder);
-            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedAsyncBuilder);
-            when(mockedAsyncBuilder.build()).thenReturn(mock(AnthropicClientAsync.class));
+            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedAsyncBuilder);
+            when(mockedAsyncBuilder.build())
+                .thenReturn(mock(AnthropicClientAsync.class));
 
             org.springframework.ai.chat.model.ChatModel chatModel = AnthropicChatAction.CHAT_MODEL.createChatModel(
                 mockedInputParameters, mockedConnectionParameters, false);
@@ -135,43 +134,40 @@ class AnthropicChatActionTest {
             assertNotNull(chatModel);
             assertInstanceOf(AnthropicChatModel.class, chatModel);
 
-            AnthropicChatOptions options = ((AnthropicChatModel) chatModel).getOptions();
+            AnthropicChatOptions anthropicChatOptions = ((AnthropicChatModel) chatModel).getOptions();
 
-            assertEquals("claude-3-5-sonnet-20241022", options.getModel());
-            assertEquals(1000, options.getMaxTokens());
-            assertEquals(List.of("stop"), options.getStopSequences());
-            assertEquals(50, options.getTopK());
-            // temperature is null — topP must be set
-            assertNull(options.getTemperature());
-            assertEquals(0.9, options.getTopP());
+            assertEquals("claude-3-5-sonnet-20241022", anthropicChatOptions.getModel());
+            assertEquals(1000, anthropicChatOptions.getMaxTokens());
+            assertEquals(List.of("stop"), anthropicChatOptions.getStopSequences());
+            assertEquals(50, anthropicChatOptions.getTopK());
+            assertNull(anthropicChatOptions.getTemperature());
+            assertEquals(0.9, anthropicChatOptions.getTopP());
         }
     }
 
     @Test
     void testCreateChatModelWithNeitherTemperatureNorTopP() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "claude-3-5-sonnet-20241022",
-                MAX_TOKENS, 1000,
-                STOP, List.of("stop"),
-                TOP_K, 50));
+            Map.of(MODEL, "claude-3-5-sonnet-20241022", MAX_TOKENS, 1000, STOP, List.of("stop"), TOP_K, 50));
 
         try (MockedStatic<AnthropicOkHttpClient> syncMockedStatic = mockStatic(AnthropicOkHttpClient.class);
-            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic =
-                mockStatic(AnthropicOkHttpClientAsync.class)) {
+            MockedStatic<AnthropicOkHttpClientAsync> asyncMockedStatic = mockStatic(AnthropicOkHttpClientAsync.class)) {
 
             AnthropicOkHttpClient.Builder mockedSyncBuilder = mock(AnthropicOkHttpClient.Builder.class);
 
             syncMockedStatic.when(AnthropicOkHttpClient::builder)
                 .thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedSyncBuilder);
-            when(mockedSyncBuilder.build()).thenReturn(mock(AnthropicClient.class));
+            when(mockedSyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedSyncBuilder);
+            when(mockedSyncBuilder.build())
+                .thenReturn(mock(AnthropicClient.class));
 
             AnthropicOkHttpClientAsync.Builder mockedAsyncBuilder = mock(AnthropicOkHttpClientAsync.Builder.class);
 
             asyncMockedStatic.when(AnthropicOkHttpClientAsync::builder)
                 .thenReturn(mockedAsyncBuilder);
-            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture())).thenReturn(mockedAsyncBuilder);
+            when(mockedAsyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedAsyncBuilder);
             when(mockedAsyncBuilder.build()).thenReturn(mock(AnthropicClientAsync.class));
 
             org.springframework.ai.chat.model.ChatModel chatModel = AnthropicChatAction.CHAT_MODEL.createChatModel(
@@ -180,12 +176,14 @@ class AnthropicChatActionTest {
             assertNotNull(chatModel);
             assertInstanceOf(AnthropicChatModel.class, chatModel);
 
-            AnthropicChatOptions options = ((AnthropicChatModel) chatModel).getOptions();
+            AnthropicChatOptions anthropicChatOptions = ((AnthropicChatModel) chatModel).getOptions();
 
-            assertEquals("claude-3-5-sonnet-20241022", options.getModel());
-            // neither set — both must be null
-            assertNull(options.getTemperature());
-            assertNull(options.getTopP());
+            assertEquals("claude-3-5-sonnet-20241022", anthropicChatOptions.getModel());
+            assertEquals(1000, anthropicChatOptions.getMaxTokens());
+            assertEquals(List.of("stop"), anthropicChatOptions.getStopSequences());
+            assertEquals(50, anthropicChatOptions.getTopK());
+            assertNull(anthropicChatOptions.getTemperature());
+            assertNull(anthropicChatOptions.getTopP());
         }
     }
 }
