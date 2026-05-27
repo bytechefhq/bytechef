@@ -53,10 +53,6 @@
         "value": "magistral-medium-latest"
       }, {
         "description": null,
-        "label": "magistral-small-latest",
-        "value": "magistral-small-latest"
-      }, {
-        "description": null,
         "label": "ministral-14b-latest",
         "value": "ministral-14b-latest"
       }, {
@@ -2442,10 +2438,6 @@
         "description": null,
         "label": "magistral-medium-latest",
         "value": "magistral-medium-latest"
-      }, {
-        "description": null,
-        "label": "magistral-small-latest",
-        "value": "magistral-small-latest"
       }, {
         "description": null,
         "label": "ministral-14b-latest",

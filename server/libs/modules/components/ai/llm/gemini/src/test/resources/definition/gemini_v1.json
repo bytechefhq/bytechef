@@ -54,16 +54,16 @@
         "value": "gemini-2.5-pro"
       }, {
         "description": null,
-        "label": "gemini-3-flash-preview",
-        "value": "gemini-3-flash-preview"
-      }, {
-        "description": null,
-        "label": "gemini-3.1-flash-lite-preview",
-        "value": "gemini-3.1-flash-lite-preview"
+        "label": "gemini-3.1-flash-lite",
+        "value": "gemini-3.1-flash-lite"
       }, {
         "description": null,
         "label": "gemini-3.1-pro-preview",
         "value": "gemini-3.1-pro-preview"
+      }, {
+        "description": null,
+        "label": "gemini-3.5-flash",
+        "value": "gemini-3.5-flash"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -757,16 +757,16 @@
         "value": "gemini-2.5-pro"
       }, {
         "description": null,
-        "label": "gemini-3-flash-preview",
-        "value": "gemini-3-flash-preview"
-      }, {
-        "description": null,
-        "label": "gemini-3.1-flash-lite-preview",
-        "value": "gemini-3.1-flash-lite-preview"
+        "label": "gemini-3.1-flash-lite",
+        "value": "gemini-3.1-flash-lite"
       }, {
         "description": null,
         "label": "gemini-3.1-pro-preview",
         "value": "gemini-3.1-pro-preview"
+      }, {
+        "description": null,
+        "label": "gemini-3.5-flash",
+        "value": "gemini-3.5-flash"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
