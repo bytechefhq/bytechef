@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.GenerateFrontendProjectWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -81,6 +82,29 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .build();
         }
+    }
+
+    @CrossOrigin
+    @Override
+    public ResponseEntity<String> generateFrontendProjectWorkflow(
+        GenerateFrontendProjectWorkflowRequestModel requestModel, EnvironmentModel xEnvironment) {
+
+        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
+            .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        return ResponseEntity.ok(
+            automationWorkflowProjectFacade.generateProjectWorkflow(
+                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment)));
+    }
+
+    @Override
+    public ResponseEntity<String> generateProjectWorkflow(
+        String externalUserId, GenerateFrontendProjectWorkflowRequestModel requestModel,
+        EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            automationWorkflowProjectFacade.generateProjectWorkflow(
+                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment)));
     }
 
     @CrossOrigin

@@ -1,0 +1,127 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.ai.copilot.service;
+
+import com.agui.core.agent.AgentSubscriber;
+import com.agui.core.agent.AgentSubscriberParams;
+import com.agui.core.agent.RunAgentParameters;
+import com.agui.core.message.BaseMessage;
+import com.agui.core.message.UserMessage;
+import com.agui.core.state.State;
+import com.agui.server.LocalAgent;
+import com.bytechef.ee.ai.copilot.util.Mode;
+import com.bytechef.ee.ai.copilot.util.Source;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
+
+/**
+ * Synchronously drives the {@code workflow_editor_build} agent end-to-end so the embedded public API can return a fresh
+ * workflow uuid after the agent has populated the workflow via its tools.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+@Service
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
+public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
+
+    private static final Logger log = LoggerFactory.getLogger(CopilotWorkflowGeneratorImpl.class);
+
+    private static final long DEFAULT_TIMEOUT_MINUTES = 10;
+
+    private final Map<String, LocalAgent> localAgentMap;
+
+    @SuppressFBWarnings("EI")
+    public CopilotWorkflowGeneratorImpl(List<LocalAgent> localAgents) {
+        this.localAgentMap = localAgents.stream()
+            .collect(Collectors.toMap(LocalAgent::getAgentId, localAgent -> localAgent));
+    }
+
+    @Override
+    public void generateWorkflow(String workflowId, String prompt) {
+        String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
+
+        LocalAgent localAgent = localAgentMap.get(agentId);
+
+        if (localAgent == null) {
+            throw new IllegalStateException("Workflow editor BUILD agent not available: " + agentId);
+        }
+
+        State state = new State(new HashMap<>(Map.of(
+            "workflowId", workflowId,
+            "mode", Mode.BUILD.name())));
+
+        UserMessage userMessage = new UserMessage();
+
+        userMessage.setId(UUID.randomUUID()
+            .toString());
+        userMessage.setContent(prompt);
+
+        RunAgentParameters parameters = RunAgentParameters.builder()
+            .threadId(UUID.randomUUID()
+                .toString())
+            .runId(UUID.randomUUID()
+                .toString())
+            .messages(List.<BaseMessage>of(userMessage))
+            .state(state)
+            .build();
+
+        CountDownLatch latch = new CountDownLatch(1);
+        AtomicReference<Throwable> errorRef = new AtomicReference<>();
+
+        localAgent.runAgent(parameters, new AgentSubscriber() {
+
+            @Override
+            public void onRunFinalized(AgentSubscriberParams params) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onRunFailed(AgentSubscriberParams params, Throwable throwable) {
+                errorRef.set(throwable);
+
+                latch.countDown();
+            }
+        });
+
+        try {
+            if (!latch.await(DEFAULT_TIMEOUT_MINUTES, TimeUnit.MINUTES)) {
+                throw new IllegalStateException(
+                    "Workflow generation timed out after " + DEFAULT_TIMEOUT_MINUTES + " minutes for workflowId="
+                        + workflowId);
+            }
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread()
+                .interrupt();
+
+            throw new IllegalStateException("Workflow generation was interrupted for workflowId=" + workflowId,
+                interruptedException);
+        }
+
+        Throwable error = errorRef.get();
+
+        if (error != null) {
+            log.error("Workflow generation failed for workflowId={}", workflowId, error);
+
+            throw new IllegalStateException(
+                "Workflow generation failed: " + error.getMessage(), error);
+        }
+    }
+}
