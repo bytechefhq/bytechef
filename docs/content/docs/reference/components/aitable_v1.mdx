@@ -1,5 +1,5 @@
 ---
-title: "AITable"
+title: "AITable.ai"
 description: "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills."
 ---
 
@@ -88,6 +88,11 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Space ID and Datasheet ID
+
+To find the Space ID, click [here](/reference/components/aitable_v1#how-to-find-the-space-id).
+
+To find the Datasheet ID, click [here](/reference/components/aitable_v1#how-to-find-the-datasheet-id).
 
 
 
@@ -104,7 +109,6 @@ Name: findRecords
 | datasheetId | Datasheet ID | STRING <details> <summary> Depends On </summary> spaceId </details> | AITable Datasheet ID | true |
 | fields | Field Names | ARRAY <details> <summary> Items </summary> [STRING] </details> | The returned record results are limited to the specified fields. | false |
 | recordIds | Record IDs | ARRAY <details> <summary> Items </summary> [STRING] </details> | The IDs of the records to find. | false |
-| maxRecords | Max Records | INTEGER | How many records are returned in total | false |
 
 #### Example JSON Structure
 ```json
@@ -115,8 +119,7 @@ Name: findRecords
     "spaceId" : "",
     "datasheetId" : "",
     "fields" : [ "" ],
-    "recordIds" : [ "" ],
-    "maxRecords" : 1
+    "recordIds" : [ "" ]
   },
   "type" : "aitable/v1/findRecords"
 }
@@ -128,6 +131,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Space ID, Datasheet ID and Record ID
+
+To find the Space ID, click [here](/reference/components/aitable_v1#how-to-find-the-space-id).
+
+To find the Datasheet ID, click [here](/reference/components/aitable_v1#how-to-find-the-datasheet-id).
+
+To find the Record ID, click [here](/reference/components/aitable_v1#how-to-find-the-record-id).
 
 
 
@@ -166,6 +176,13 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Space ID, Datasheet ID and Record ID
+
+To find the Space ID, click [here](/reference/components/aitable_v1#how-to-find-the-space-id).
+
+To find the Datasheet ID, click [here](/reference/components/aitable_v1#how-to-find-the-datasheet-id).
+
+To find the Record ID, click [here](/reference/components/aitable_v1#how-to-find-the-record-id).
 
 
 
@@ -177,3 +194,24 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find the Space ID
+
+1. Open the AITable management overview page: https://aitable.ai/management/overview.
+2. In the **Overview** section, locate the details of your space.
+3. Your **Space ID** (a string usually starting with `spc`) will be displayed there and can be copied directly.
+
+### How to find the Datasheet ID
+
+1. Open the datasheet in your browser.
+2. Look at the URL in the address bar.
+3. Find the part of the URL that starts with `dst` - this value is the `datasheetId` of the opened datasheet.
+
+### How to find the Record ID
+
+1. Open the datasheet that contains the record.
+2. Expand (open) the row for the record whose ID you need.
+3. Look at the URL in the address bar and find the part that starts with `rec` - this value is the `recordId` for that record.
