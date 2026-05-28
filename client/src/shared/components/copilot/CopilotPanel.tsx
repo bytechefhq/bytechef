@@ -87,14 +87,14 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                             variant="outline"
                         >
                             <ToggleGroupItem
-                                className="h-7 rounded-none rounded-l-md border-r-0 bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                                className="h-7 rounded-none rounded-l-md border-r-0 bg-white px-3 text-xs data-[state=on]:bg-zinc-200! data-[state=on]:text-zinc-900! dark:bg-zinc-900 dark:data-[state=on]:bg-zinc-700! dark:data-[state=on]:text-zinc-50!"
                                 value={MODE.ASK}
                             >
                                 {MODE.ASK.charAt(0) + MODE.ASK.slice(1).toLowerCase()}
                             </ToggleGroupItem>
 
                             <ToggleGroupItem
-                                className="h-7 rounded-none rounded-r-md bg-white px-3 text-xs data-[state=on]:!bg-zinc-200 data-[state=on]:!text-zinc-900 dark:bg-zinc-900 dark:data-[state=on]:!bg-zinc-700 dark:data-[state=on]:!text-zinc-50"
+                                className="h-7 rounded-none rounded-r-md bg-white px-3 text-xs data-[state=on]:bg-zinc-200! data-[state=on]:text-zinc-900! dark:bg-zinc-900 dark:data-[state=on]:bg-zinc-700! dark:data-[state=on]:text-zinc-50!"
                                 value={MODE.BUILD}
                             >
                                 {MODE.BUILD.charAt(0) + MODE.BUILD.slice(1).toLowerCase()}
@@ -119,7 +119,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 bottom-0 top-16 -mx-1">
+            <div className="absolute inset-x-0 top-16 bottom-0 -mx-1">
                 <CopilotRuntimeProvider source={source}>
                     <Thread />
                 </CopilotRuntimeProvider>

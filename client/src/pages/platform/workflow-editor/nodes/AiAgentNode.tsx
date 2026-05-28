@@ -316,7 +316,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             >
                 <div
                     className={twMerge(
-                        'invisible absolute left-workflow-node-popover-hover top-0 pr-4',
+                        'invisible absolute top-0 left-workflow-node-popover-hover pr-4',
                         !suppressHover && 'group-hover:visible'
                     )}
                 >
@@ -355,7 +355,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 >
                     <HoverCardTrigger>
                         <Button
-                            className="size-18 flex w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
+                            className="flex size-18 w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
                             onClick={handleNodeClick}
                         >
                             <span className="self-center text-content-neutral-primary [&_svg]:size-9">
@@ -392,7 +392,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                             </TooltipTrigger>
 
                                             <TooltipContent
-                                                className="text-pretty border border-stroke-neutral-tertiary bg-surface-neutral-primary text-content-neutral-primary"
+                                                className="border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
                                                 side="bottom"
                                             >
                                                 {iconUrlObject?.label}
@@ -411,7 +411,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                             </TooltipTrigger>
 
                                             <TooltipContent
-                                                className="max-w-36 text-pretty border border-stroke-neutral-tertiary bg-surface-neutral-primary text-content-neutral-primary"
+                                                className="max-w-36 border border-stroke-neutral-tertiary bg-surface-neutral-primary text-pretty text-content-neutral-primary"
                                                 side="bottom"
                                             >
                                                 <ul>
@@ -431,7 +431,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                     {!clusterElementsCanvasOpen && (
                         <HoverCardPortal>
-                            <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
+                            <HoverCardContent className="w-fit max-w-xl min-w-72 text-sm" side="right">
                                 {workflowNodeDescription?.description && (
                                     <div
                                         className="flex"
@@ -455,14 +455,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <div
                     className={twMerge(
                         'ml-2 flex w-full min-w-max flex-col items-start',
-                        isHorizontal && 'absolute top-full ml-0 w-auto min-w-0 max-w-[150px] items-center text-center'
+                        isHorizontal && 'absolute top-full ml-0 w-auto max-w-[150px] min-w-0 items-center text-center'
                     )}
                 >
                     {isRenaming ? (
                         <div className="z-10 flex max-h-7 items-center rounded-md border-2 bg-surface-neutral-primary p-1">
                             <input
                                 autoFocus
-                                className="nodrag max-h-5 w-40 cursor-text select-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-none hover:bg-surface-neutral-secondary-hover"
+                                className="nodrag max-h-5 w-40 cursor-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-hidden select-text hover:bg-surface-neutral-secondary-hover"
                                 onBlur={handleRenameInputBlur}
                                 onChange={handleRenameInputChange}
                                 onKeyDown={handleRenameKeyDown}
@@ -499,8 +499,8 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                     className={twMerge(
                         styles.handleVisible,
                         layoutDirection === 'LR'
-                            ? '-left-[1px] rounded-l-xs rounded-r-none'
-                            : '-top-[1px] rounded-b-none rounded-t-xs'
+                            ? '-left-px rounded-l-xs rounded-r-none'
+                            : '-top-px rounded-t-xs rounded-b-none'
                     )}
                     isConnectable={false}
                     position={mapHandlePosition(Position.Top, layoutDirection)}
@@ -517,7 +517,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 <Handle
                     className={twMerge(
                         styles.handleVisible,
-                        layoutDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-b-xs rounded-t-none'
+                        layoutDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-t-none rounded-b-xs'
                     )}
                     isConnectable={false}
                     position={mapHandlePosition(Position.Bottom, layoutDirection)}

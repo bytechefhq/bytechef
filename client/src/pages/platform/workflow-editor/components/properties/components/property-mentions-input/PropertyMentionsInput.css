@@ -1,3 +1,5 @@
+@reference '../../../../../../../styles/index.css';
+
 .property-mentions-editor {
     > div {
         @apply w-full;

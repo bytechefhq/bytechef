@@ -514,7 +514,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ...(labelId ? {'aria-labelledby': labelId} : {}),
                     'aria-multiline': 'true',
                     class: twMerge(
-                        'w-full min-w-0 max-w-full whitespace-pre-wrap break-words break-all border-none text-sm outline-none ring-0',
+                        'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
                         controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
                         className
                     ),
@@ -652,7 +652,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         return (
             <>
                 {isFromAi ? (
-                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm font-medium italic text-muted-foreground">
+                    <div className="flex w-full items-center px-2 py-[0.44rem] text-sm font-medium text-muted-foreground italic">
                         Automatically defined by the model
                     </div>
                 ) : (

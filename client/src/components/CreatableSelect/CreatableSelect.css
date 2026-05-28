@@ -1,14 +1,16 @@
+@reference '../../styles/index.css';
+
 .react-select__control {
     @apply border;
-    @apply border-input !important;
-    @apply rounded-md !important;
-    @apply shadow-sm !important;
+    @apply border-input!;
+    @apply rounded-md!;
+    @apply shadow-xs!;
     @apply sm:text-sm;
     min-height: 36px;
 }
 
 .react-select__control--is-focused {
-    @apply outline-none;
+    @apply outline-hidden;
     @apply ring-1;
     @apply ring-ring;
     outline-offset: 0;
@@ -23,13 +25,12 @@
 }
 
 .react-select__multi-value {
-    @apply rounded-md !important;
+    @apply rounded-md!;
 }
 
 .react-select__multi-value__remove {
-    @apply rounded-r-md !important;
+    @apply rounded-r-md!;
 }
-
 
 .react-select__option--is-focused {
     @apply dark:text-black;

@@ -63,7 +63,7 @@ const PropertyField = ({
                 ) : (
                     <ClipboardIcon
                         aria-hidden="true"
-                        className="invisible mx-2 size-4 cursor-pointer text-content-neutral-secondary hover:text-content-neutral-primary group-hover:visible"
+                        className="invisible mx-2 size-4 cursor-pointer text-content-neutral-secondary group-hover:visible hover:text-content-neutral-primary"
                         onClick={() => copyToClipboard(valueToCopy!)}
                     />
                 )}
@@ -86,7 +86,7 @@ const PropertyField = ({
                     </TooltipTrigger>
 
                     {property.description && (
-                        <TooltipContent className="mr-2 max-w-72 whitespace-normal break-normal">
+                        <TooltipContent className="mr-2 max-w-72 break-normal whitespace-normal">
                             <span className="block">{property.description}</span>
                         </TooltipContent>
                     )}

@@ -51,7 +51,7 @@ const AccountProfilePassword = () => {
 
     return (
         <div className="py-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Change password</h2>
+            <h2 className="text-base leading-7 font-semibold text-gray-900">Change password</h2>
 
             <Form {...form}>
                 <form className="mt-10 grid w-full gap-4" onSubmit={form.handleSubmit(handleSubmit)}>

@@ -45,7 +45,7 @@ const SchemaCreator = ({
     return (
         <div className="w-full min-w-0 overflow-hidden">
             <div className="flex items-end">
-                {isRequired && <AsteriskIcon className="mb-3 mr-1 h-4 text-xs" />}
+                {isRequired && <AsteriskIcon className="mr-1 mb-3 h-4 text-xs" />}
 
                 <SchemaControls
                     onAdd={isSchemaObject(schema) ? () => onChange(addSchemaProperty(schema)) : undefined}
@@ -163,7 +163,7 @@ const SchemaBox = ({children, itemCount}: {itemCount?: number} & PropsWithChildr
             )}
         >
             <Button
-                className="absolute -left-3 top-0 size-6"
+                className="absolute top-0 -left-3 size-6"
                 icon={
                     <ChevronDownIcon className={twMerge('transition-all duration-200', isCollapsed && 'rotate-180')} />
                 }

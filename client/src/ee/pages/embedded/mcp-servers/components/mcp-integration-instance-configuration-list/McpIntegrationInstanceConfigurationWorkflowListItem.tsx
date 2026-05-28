@@ -40,7 +40,7 @@ const McpIntegrationInstanceConfigurationWorkflowListItem = ({
         <>
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <PopoverAnchor asChild>
-                    <Badge className="max-w-96 gap-1 py-1 pl-2.5 pr-1" styleType="secondary-filled">
+                    <Badge className="max-w-96 gap-1 py-1 pr-1 pl-2.5" styleType="secondary-filled">
                         <span className="truncate text-sm">{workflowLabel}</span>
 
                         <span className="ml-auto flex shrink-0 items-center gap-0.5">

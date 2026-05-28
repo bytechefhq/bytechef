@@ -2,8 +2,6 @@ import {createRoot} from 'react-dom/client';
 
 import './styles/index.css';
 
-import './styles/components.css';
-
 import {TooltipProvider} from '@/components/ui/tooltip';
 import I18n from '@/i18n';
 import {ConditionalPostHogProvider} from '@/shared/providers/conditional-posthog-provider';

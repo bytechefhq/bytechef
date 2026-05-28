@@ -572,7 +572,9 @@ const WorkflowNodesPopoverMenuOperationList = ({
                                 <div className="min-w-0 flex-1 space-y-1">
                                     <h3 className="text-sm">{operation.title}</h3>
 
-                                    <p className="break-words text-xs text-muted-foreground">{operation.description}</p>
+                                    <p className="text-xs wrap-break-word text-muted-foreground">
+                                        {operation.description}
+                                    </p>
                                 </div>
 
                                 {isLoading && (

@@ -26,7 +26,7 @@ const AutomationWorkflowProjectVersionHistorySheet = ({
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
+                className="top-3 right-4 bottom-4 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-sidebar-project-version-history-sheet-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >

@@ -12,7 +12,7 @@ export const WorkflowRightSidebarSkeleton = ({itemCount = 4}: {itemCount?: numbe
 
 export const FieldsetSkeleton = ({bottomBorder = false, label}: {bottomBorder?: boolean; label: string}) => (
     <div className={twMerge('flex flex-col', bottomBorder && 'border-b border-muted p-4')}>
-        <span className="text-sm font-medium leading-6">{label}</span>
+        <span className="text-sm leading-6 font-medium">{label}</span>
 
         <Skeleton className="h-9 w-full" />
     </div>

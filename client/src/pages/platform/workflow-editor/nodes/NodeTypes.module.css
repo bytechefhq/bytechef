@@ -1,15 +1,19 @@
-.content {
-    @apply pointer-events-none;
-}
+@reference '../../../../styles/index.css';
 
-.handle {
-    @apply invisible;
-}
+@layer utilities {
+    .content {
+        @apply pointer-events-none;
+    }
 
-.handleVisible {
-    @apply -z-10;
-    @apply h-2;
-    @apply w-2;
-    @apply border-0;
-    @apply bg-stroke-neutral-tertiary !important;
+    .handle {
+        @apply invisible;
+    }
+
+    .handleVisible {
+        @apply -z-10;
+        @apply h-2;
+        @apply w-2;
+        @apply border-0;
+        @apply bg-stroke-neutral-tertiary!;
+    }
 }

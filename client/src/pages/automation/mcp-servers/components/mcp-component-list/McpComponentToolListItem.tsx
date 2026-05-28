@@ -35,7 +35,7 @@ const McpComponentToolListItem = ({
         <>
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <PopoverAnchor asChild>
-                    <Badge className="gap-1 py-1 pl-2.5 pr-1" styleType="secondary-filled">
+                    <Badge className="gap-1 py-1 pr-1 pl-2.5" styleType="secondary-filled">
                         <span className="text-sm">{mcpTool.title || mcpTool.name}</span>
 
                         <Button

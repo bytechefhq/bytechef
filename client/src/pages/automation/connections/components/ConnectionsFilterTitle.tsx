@@ -28,9 +28,9 @@ const ConnectionsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
 
-            <span className="text-sm uppercase text-muted-foreground">
+            <span className="text-sm text-muted-foreground uppercase">
                 {searchParams.get('tagId') ? 'tag' : 'component'}:
             </span>
 

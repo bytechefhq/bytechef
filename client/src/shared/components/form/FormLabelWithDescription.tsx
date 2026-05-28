@@ -23,7 +23,7 @@ export const FormLabelWithDescription = ({description, label}: FormLabelWithDesc
                     <TooltipTrigger asChild>
                         <button
                             aria-label="Field description"
-                            className="inline-flex items-center text-muted-foreground hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                            className="inline-flex items-center text-muted-foreground hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-hidden"
                             onClick={(event) => event.stopPropagation()}
                             type="button"
                         >

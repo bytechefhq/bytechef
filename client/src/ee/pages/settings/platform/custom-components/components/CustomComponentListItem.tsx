@@ -181,7 +181,7 @@ const CustomComponentListItem = ({customComponent}: CustomComponentItemProps) =>
                 </div>
 
                 <CollapsibleContent>
-                    <div className="ml-8 mt-4 border-t pt-4">
+                    <div className="mt-4 ml-8 border-t pt-4">
                         {isLoadingDefinition ? (
                             <div className="flex items-center gap-2 text-sm text-content-neutral-secondary">
                                 <LoadingIcon className="size-4" />

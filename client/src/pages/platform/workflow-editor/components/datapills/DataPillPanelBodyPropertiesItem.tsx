@@ -119,7 +119,7 @@ const DataPillPanelBodyPropertiesItem = ({
                 </div>
 
                 {currentWorkflowNode?.operationName && (
-                    <span className="ml-auto mr-4 max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
+                    <span className="mr-4 ml-auto max-w-36 truncate rounded bg-muted px-2 py-1 text-xs">
                         {currentWorkflowNode?.operationName}
                     </span>
                 )}
@@ -164,7 +164,7 @@ const DataPillPanelBodyPropertiesItem = ({
                                         />
 
                                         {value !== undefined && typeof value !== 'object' && (
-                                            <div className="flex-1 overflow-hidden truncate text-xs text-muted-foreground">
+                                            <div className="flex-1 truncate overflow-hidden text-xs text-muted-foreground">
                                                 {String(value)}
                                             </div>
                                         )}

@@ -62,7 +62,7 @@ const AccountProfileLinkedAccounts = () => {
 
     return (
         <div className="py-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Linked Accounts</h2>
+            <h2 className="text-base leading-7 font-semibold text-gray-900">Linked Accounts</h2>
 
             <p className="mt-1 text-sm leading-6 text-content-neutral-secondary">
                 Manage external identity providers linked to your account.

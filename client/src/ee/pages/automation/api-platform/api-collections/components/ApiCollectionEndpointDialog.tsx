@@ -269,7 +269,7 @@ const ApiCollectionEndpointDialog = ({
 
                                     <FormControl>
                                         <div className="flex">
-                                            <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-sm transition-colors">
+                                            <div className="flex h-9 items-center rounded-md rounded-r-none border border-r-0 border-input bg-muted px-3 py-1 text-sm shadow-xs transition-colors">
                                                 {`/v${collectionVersion}/${contextPath}/`}
                                             </div>
 

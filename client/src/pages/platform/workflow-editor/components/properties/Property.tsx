@@ -171,7 +171,7 @@ const Property = ({
 
     if (isLoadingDisplayCondition) {
         return (
-            <div className={twMerge('flex flex-col space-y-1', objectName && 'ml-2 mt-1')}>
+            <div className={twMerge('flex flex-col space-y-1', objectName && 'mt-1 ml-2')}>
                 <Skeleton className="h-5 w-1/4" />
 
                 <Skeleton className="h-9 w-full" />
@@ -354,7 +354,7 @@ const Property = ({
                                         }}
                                         inputOverlay={
                                             isFieldFromAi ? (
-                                                <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium italic text-muted-foreground">
+                                                <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
                                                     Automatically defined by the model
                                                 </span>
                                             ) : undefined
@@ -509,7 +509,7 @@ const Property = ({
                                                 }
                                                 inputOverlay={
                                                     isFieldFromAi ? (
-                                                        <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium italic text-muted-foreground">
+                                                        <span className="flex h-full flex-1 items-center pl-property-input-position text-sm font-medium text-muted-foreground italic">
                                                             Automatically defined by the model
                                                         </span>
                                                     ) : undefined

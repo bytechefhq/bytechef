@@ -77,7 +77,7 @@ const SchemaMenuPopover = ({children, onChange, onClose, open: controlledOpen, s
                     </fieldset>
 
                     <Button
-                        className="absolute right-1 top-1 size-8 p-0 hover:bg-transparent hover:text-content-destructive"
+                        className="absolute top-1 right-1 size-8 p-0 hover:bg-transparent hover:text-content-destructive"
                         icon={<CloseIcon className="size-4" />}
                         onClick={() => handleOpenChange(false)}
                         size="icon"

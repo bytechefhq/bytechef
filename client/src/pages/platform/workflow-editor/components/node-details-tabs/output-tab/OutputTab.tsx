@@ -192,7 +192,7 @@ const OutputTab = ({
 
                                                     <ClipboardIcon
                                                         aria-hidden="true"
-                                                        className="absolute right-0 top-2.5 mx-2 size-4 cursor-pointer text-gray-400 hover:text-gray-800 group-hover:visible"
+                                                        className="absolute top-2.5 right-0 mx-2 size-4 cursor-pointer text-gray-400 group-hover:visible hover:text-gray-800"
                                                         onClick={() => copyToClipboard(webhookTestUrl!)}
                                                     />
                                                 </div>

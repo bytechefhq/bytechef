@@ -27,17 +27,17 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
 const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:size-4 [&>span]:data-[state=checked]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-4',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:size-3 [&>span]:data-[state=checked]:translate-x-3',
-        track: 'h-[14px] w-[26px] px-[1px] rounded-[7px] border-0',
+        thumbOverrides: '[&>span]:size-3 data-[state=checked]:[&>span]:translate-x-3',
+        track: 'h-[14px] w-[26px] px-px rounded-[7px] border-0',
     },
 };
 
@@ -69,7 +69,7 @@ function TextBlock({description, label, variant}: TextBlockProps) {
             </span>
 
             {!isSmall && description && (
-                <span className="text-sm font-normal leading-5 text-content-neutral-secondary">{description}</span>
+                <span className="text-sm leading-5 font-normal text-content-neutral-secondary">{description}</span>
             )}
         </div>
     );

@@ -16,7 +16,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
 
     return (
         <div className="flex h-full flex-col">
-            <div className="space-y-2 px-4 pb-3 pt-0.5">
+            <div className="space-y-2 px-4 pt-0.5 pb-3">
                 <Input
                     onChange={(event) => handleSearchChange(event.target.value)}
                     placeholder="Search tables..."
@@ -39,7 +39,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
                                                 toLink={`/automation/datatables/${table.id}`}
                                             />
 
-                                            <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
+                                            <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2">
                                                 <DataTableLeftSidebarDropdownMenu
                                                     tableId={table.id}
                                                     tableName={table.baseName}

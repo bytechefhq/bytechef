@@ -178,7 +178,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         ref={ref}
                         {...props}
                         className={twMerge(
-                            'flex h-auto w-full items-center justify-between rounded-md border border-input bg-surface-neutral-primary px-4 py-2 text-sm font-normal text-primary shadow-sm hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
+                            'flex h-auto w-full items-center justify-between rounded-md border border-input bg-surface-neutral-primary px-4 py-2 text-sm font-normal text-primary shadow-xs hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
                             leadingIcon && 'relative',
                             optionsLoading && 'min-h-10 cursor-not-allowed',
                             className
@@ -291,7 +291,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                 <PopoverContent
                     align="start"
-                    className="w-[--radix-popover-trigger-width] p-0"
+                    className="w-(--radix-popover-trigger-width) p-0"
                     onEscapeKeyDown={() => setIsPopoverOpen(false)}
                 >
                     <Command>

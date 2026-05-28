@@ -29,38 +29,38 @@ const IdentityProvidersTable = () => {
         <Table>
             <TableHeader>
                 <TableRow className="border-b-border/50">
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Name
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Type
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Issuer / Metadata URI
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Domains
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Status
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Enforced
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary" />
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase" />
                 </TableRow>
             </TableHeader>
 
             <TableBody>
                 {identityProviders.map((identityProvider: IdentityProviderType) => (
                     <TableRow className="cursor-pointer border-b-border/50" key={identityProvider.id}>
-                        <TableCell className="whitespace-nowrap font-medium">{identityProvider.name}</TableCell>
+                        <TableCell className="font-medium whitespace-nowrap">{identityProvider.name}</TableCell>
 
                         <TableCell className="whitespace-nowrap">
                             <Badge variant="outline">{identityProvider.type}</Badge>

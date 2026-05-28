@@ -36,7 +36,7 @@ const ProjectDeploymentDialogBasicStepProjectVersionsSelect = ({
                         (projectVersion) =>
                             projectVersion.status == ProjectStatus.Published && (
                                 <Item
-                                    className="radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
+                                    className="radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden"
                                     key={projectVersion.version}
                                     value={projectVersion.version!.toString()}
                                 >

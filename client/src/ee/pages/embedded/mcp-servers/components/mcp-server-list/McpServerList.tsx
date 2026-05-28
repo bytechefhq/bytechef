@@ -72,7 +72,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                                         <McpServerToolsContent mcpServer={mcpServer} />
                                     </TabsContent>
 
-                                    <TabsContent className="max-w-screen-lg py-3" value="connect">
+                                    <TabsContent className="max-w-(--breakpoint-lg) py-3" value="connect">
                                         <div className="flex-1 space-y-4">
                                             <h2 className="font-semibold text-foreground">Server URL</h2>
 

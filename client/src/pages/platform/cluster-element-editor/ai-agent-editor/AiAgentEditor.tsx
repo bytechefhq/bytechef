@@ -89,7 +89,7 @@ export default function AiAgentEditor({
                     {showNodeDetailsPanel && previousComponentDefinitions && workflowNodeOutputs && (
                         <>
                             {dataPillPanelOpen && (
-                                <div className="absolute inset-y-0 -left-[405px] z-10 w-[400px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
+                                <div className="absolute inset-y-0 left-[-405px] z-10 w-[400px] overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background shadow-lg">
                                     <Suspense
                                         fallback={
                                             <DataPillPanelSkeleton className="relative inset-auto z-0 size-full max-w-none rounded-none border-0" />

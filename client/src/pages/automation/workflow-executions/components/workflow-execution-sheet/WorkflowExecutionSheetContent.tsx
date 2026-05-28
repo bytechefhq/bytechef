@@ -51,7 +51,7 @@ const WorkflowExecutionSheetContent = ({
         ) : (
             <ResizablePanelGroup orientation="horizontal">
                 <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
-                    <ScrollArea className="mb-4 h-full pl-1 pr-4">
+                    <ScrollArea className="mb-4 h-full pr-4 pl-1">
                         <Accordion
                             className="ml-2 space-y-2"
                             defaultValue={

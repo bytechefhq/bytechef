@@ -82,7 +82,7 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
 
             {expanded && (
                 <>
-                    <div className="ml-8 mt-1 rounded-md border border-border/30 bg-gray-50/50 p-2">
+                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-gray-50/50 p-2">
                         {scenario.judges.length > 0 ? (
                             <div className="flex flex-col gap-1">
                                 {scenario.judges.map((judge) => (
@@ -133,7 +133,7 @@ const AiAgentEvalScenarioRow = ({onDelete, onEdit, scenario}: AiAgentEvalScenari
                         />
                     </div>
 
-                    <div className="ml-8 mt-1 rounded-md border border-border/30 bg-gray-50/50 p-2">
+                    <div className="mt-1 ml-8 rounded-md border border-border/30 bg-gray-50/50 p-2">
                         {scenario.toolSimulations.length > 0 ? (
                             <div className="flex flex-col gap-1">
                                 {scenario.toolSimulations.map((simulation) => (

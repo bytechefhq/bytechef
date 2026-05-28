@@ -121,11 +121,11 @@ const ComponentsFilter = ({
                 <DropdownMenuContent align="start" className="mr-2 overflow-hidden p-1">
                     <div className="mb-1 flex items-center">
                         <div className="relative w-full rounded-md bg-background">
-                            <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                            <SearchIcon className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
 
                             <Input
                                 aria-label="Find category"
-                                className="pl-9 pr-7 text-sm"
+                                className="pr-7 pl-9 text-sm"
                                 onChange={(event) => setSearchValue(event.target.value)}
                                 onKeyDown={(event) => event.stopPropagation()}
                                 placeholder="Find category"
@@ -135,7 +135,7 @@ const ComponentsFilter = ({
                             {filterState.searchValue !== '' && (
                                 <Button
                                     aria-label="Clear search input"
-                                    className="absolute right-1 top-2.5 mx-1 h-auto p-0 text-muted-foreground hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
+                                    className="absolute top-2.5 right-1 mx-1 h-auto p-0 text-muted-foreground hover:bg-transparent hover:text-muted-foreground active:bg-transparent active:text-muted-foreground"
                                     icon={<XIcon />}
                                     onClick={() => setSearchValue('')}
                                     variant="ghost"

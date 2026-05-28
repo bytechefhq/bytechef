@@ -95,7 +95,7 @@ const AutomationWorkflowExecutionsTable = ({data}: {data: WorkflowExecution[]}) 
                             onClick={() => handleRowClick(row.index)}
                         >
                             {row.getVisibleCells().map((cell, index) => (
-                                <TableCell className="whitespace-nowrap py-4" key={`${row.id}_${cell.id}_${index}`}>
+                                <TableCell className="py-4 whitespace-nowrap" key={`${row.id}_${cell.id}_${index}`}>
                                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
                                 </TableCell>
                             ))}

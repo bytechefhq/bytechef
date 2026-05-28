@@ -68,7 +68,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                             />
                         ) : (
                             <h3
-                                className="px-2 pb-1 pt-4 text-sm font-semibold text-muted-foreground"
+                                className="px-2 pt-4 pb-1 text-sm font-semibold text-muted-foreground"
                                 key={navItem.title}
                             >
                                 {navItem.title}

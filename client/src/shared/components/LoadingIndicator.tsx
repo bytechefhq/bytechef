@@ -7,7 +7,7 @@ const LoadingIndicator = ({isFetching, isOnline}: {isFetching: number; isOnline:
         <Tooltip>
             <TooltipTrigger
                 aria-label="Loading indicator"
-                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline focus:outline-ring"
+                className="inline-flex size-9 cursor-pointer items-center justify-center rounded-md hover:bg-surface-neutral-primary-hover focus:outline-ring focus:outline-solid"
             >
                 {isOnline && isFetching ? (
                     <LoaderCircleIcon className="size-3 animate-spin text-content-warning" />

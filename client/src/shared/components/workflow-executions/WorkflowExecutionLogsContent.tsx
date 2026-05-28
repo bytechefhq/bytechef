@@ -136,7 +136,7 @@ const LogEntryRow = ({entry, showComponentName}: {entry: LogEntry; showComponent
                         <div>
                             <span className="text-xs font-semibold text-muted-foreground">Stack Trace:</span>
 
-                            <pre className="mt-1 overflow-x-auto whitespace-pre-wrap text-xs text-muted-foreground">
+                            <pre className="mt-1 overflow-x-auto text-xs whitespace-pre-wrap text-muted-foreground">
                                 {entry.stackTrace}
                             </pre>
                         </div>

@@ -22,7 +22,7 @@ describe('SchemaInput', () => {
         expect(screen.getByText('Pill Key')).toBeInTheDocument();
     });
 
-    it('calls onChange on blur when value has changed', () => {
+    it('calls onChange on blur-sm when value has changed', () => {
         const onChangeMock = vi.fn();
 
         render(<SchemaInput onChange={onChangeMock} value="original" />);
@@ -35,7 +35,7 @@ describe('SchemaInput', () => {
         expect(onChangeMock).toHaveBeenCalledWith('updated');
     });
 
-    it('does not call onChange on blur when value is unchanged', () => {
+    it('does not call onChange on blur-sm when value is unchanged', () => {
         const onChangeMock = vi.fn();
 
         render(<SchemaInput onChange={onChangeMock} value="original" />);

@@ -130,7 +130,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             key={id}
         >
             {!isMainRootClusterElement && !isClusterElement && (
-                <div className="invisible absolute left-workflow-node-popover-hover top-0 pr-4 group-hover:visible">
+                <div className="invisible absolute top-0 left-workflow-node-popover-hover pr-4 group-hover:visible">
                     {data.trigger ? (
                         <WorkflowNodesPopoverMenu
                             hideActionComponents
@@ -302,7 +302,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
 
                 {!isMainRootClusterElement && (
                     <HoverCardPortal>
-                        <HoverCardContent className="w-fit min-w-72 max-w-xl text-sm" side="right">
+                        <HoverCardContent className="w-fit max-w-xl min-w-72 text-sm" side="right">
                             {nodeDescription && (
                                 <div
                                     className="flex"
@@ -329,8 +329,8 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         'ml-2 flex w-full min-w-max flex-col items-start',
                         ((isClusterElement && !isNestedClusterRoot) || (isHorizontal && isRegularNode)) &&
                             'absolute top-full ml-0 items-center text-center',
-                        isClusterElement && !isNestedClusterRoot && 'w-auto min-w-0 max-w-[130px]',
-                        isHorizontal && isRegularNode && 'w-auto min-w-0 max-w-[150px]'
+                        isClusterElement && !isNestedClusterRoot && 'w-auto max-w-[130px] min-w-0',
+                        isHorizontal && isRegularNode && 'w-auto max-w-[150px] min-w-0'
                     )}
                 >
                     {isRenaming ? (
@@ -338,7 +338,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             <div className="flex items-center">
                                 <input
                                     autoFocus
-                                    className="nodrag max-h-5 w-40 cursor-text select-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-none hover:bg-surface-neutral-secondary-hover"
+                                    className="nodrag max-h-5 w-40 cursor-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-hidden select-text hover:bg-surface-neutral-secondary-hover"
                                     onBlur={(event) => handleRenameSubmit(event.target.value)}
                                     onChange={(event) => setRenameValue(event.target.value)}
                                     onKeyDown={handleRenameKeyDown}
@@ -426,8 +426,8 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         className={twMerge(
                             styles.handleVisible,
                             effectiveDirection === 'LR'
-                                ? '-left-[1px] rounded-l-xs rounded-r-none'
-                                : '-top-[1px] rounded-b-none rounded-t-xs',
+                                ? '-left-px rounded-l-xs rounded-r-none'
+                                : '-top-px rounded-t-xs rounded-b-none',
                             data.trigger && 'hidden'
                         )}
                         isConnectable={false}
@@ -439,7 +439,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     <Handle
                         className={twMerge(
                             styles.handleVisible,
-                            effectiveDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-b-xs rounded-t-none'
+                            effectiveDirection === 'LR' ? 'rounded-l-none rounded-r-xs' : 'rounded-t-none rounded-b-xs'
                         )}
                         isConnectable={false}
                         position={mapHandlePosition(Position.Bottom, effectiveDirection)}
@@ -458,10 +458,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             )}
 
             {data.name.includes('condition') && effectiveDirection === 'LR' && (
-                <div className="absolute right-0 top-0 font-bold text-muted-foreground">
-                    <span className="absolute -right-16 -top-8">TRUE</span>
+                <div className="absolute top-0 right-0 font-bold text-muted-foreground">
+                    <span className="absolute -top-8 -right-16">TRUE</span>
 
-                    <span className="absolute -right-16 top-20">FALSE</span>
+                    <span className="absolute top-20 -right-16">FALSE</span>
                 </div>
             )}
 
@@ -474,10 +474,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             )}
 
             {data.componentName === 'on-error' && effectiveDirection === 'LR' && (
-                <div className="absolute right-0 top-0 font-bold text-muted-foreground">
-                    <span className="absolute -right-16 -top-8">TRY</span>
+                <div className="absolute top-0 right-0 font-bold text-muted-foreground">
+                    <span className="absolute -top-8 -right-16">TRY</span>
 
-                    <span className="absolute -right-16 top-20">CATCH</span>
+                    <span className="absolute top-20 -right-16">CATCH</span>
                 </div>
             )}
         </div>

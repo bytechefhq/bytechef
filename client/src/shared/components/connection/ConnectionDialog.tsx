@@ -433,7 +433,7 @@ const ConnectionDialog = ({
                 onInteractOutside={(event) => event.preventDefault()}
             >
                 <Form {...form}>
-                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pb-4 pt-6">
+                    <DialogHeader className="flex flex-row items-center justify-between space-y-0 px-6 pt-6 pb-4">
                         <div className="flex flex-col space-y-1">
                             <DialogTitle>{`${connection?.id ? 'Edit' : 'Create'} Connection`}</DialogTitle>
 
@@ -467,7 +467,7 @@ const ConnectionDialog = ({
                                             </div>
 
                                             <Button
-                                                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                                                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-xs hover:bg-gray-100"
                                                 icon={
                                                     <ClipboardIcon
                                                         aria-hidden="true"
@@ -742,7 +742,7 @@ const ConnectionDialog = ({
 
                     <DialogFooter
                         className={twMerge(
-                            'flex-row flex-wrap items-center gap-2 px-6 pb-6 pt-4',
+                            'flex-row flex-wrap items-center gap-2 px-6 pt-4 pb-6',
                             connectionDefinition?.help?.learnMoreUrl ? 'sm:justify-between' : 'sm:justify-end'
                         )}
                     >
@@ -864,7 +864,7 @@ const RedirectUriInput = ({redirectUri}: {redirectUri?: string}) => {
             </div>
 
             <Button
-                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-sm hover:bg-gray-100"
+                className="-ml-px rounded-l-none rounded-r-md border border-gray-200 bg-gray-50 shadow-xs hover:bg-gray-100"
                 icon={<ClipboardIcon aria-hidden="true" className="size-4 text-gray-400" />}
                 onClick={() => copyToClipboard(redirectUri ?? '')}
                 size="icon"

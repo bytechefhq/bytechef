@@ -82,14 +82,14 @@ const ProjectHeader = ({
         <header
             className={twMerge(
                 'flex items-center justify-between bg-surface-main px-3 py-2.5',
-                projectLeftSidebarOpen && 'pl-0 pr-3',
+                projectLeftSidebarOpen && 'pr-3 pl-0',
                 copilotLayoutShifted && 'pr-0'
             )}
         >
             <div className="flex items-center">
                 <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
 
-                <Separator className="ml-2 mr-4 h-4" orientation="vertical" />
+                <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
 
                 {projectWorkflows && (
                     <ProjectBreadcrumb

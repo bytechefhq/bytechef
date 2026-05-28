@@ -69,7 +69,7 @@ const variants: Record<VariantType, string> = {
     destructiveGhost:
         'bg-transparent hover:bg-surface-destructive-secondary-hover opacity-50 text-content-destructive-primary active:bg-surface-destructive-secondary-active hover:opacity-100',
     destructiveOutline:
-        'bg-transparent border border-stroke-onsurface-primary/70 text-content-onsurface-primary hover:border-stroke-onsurface-primary/100 hover:bg-transparent',
+        'bg-transparent border border-stroke-onsurface-primary/70 text-content-onsurface-primary hover:border-stroke-onsurface-primary hover:bg-transparent',
     outline:
         'bg-surface-neutral-primary border border-stroke-neutral-secondary text-content-neutral-primary hover:bg-surface-neutral-primary-hover hover:border-stroke-neutral-secondary hover:text-content-neutral-primary active:bg-surface-brand-secondary active:border-stroke-brand-secondary active:text-content-brand-primary',
     // eslint-disable-next-line sort-keys

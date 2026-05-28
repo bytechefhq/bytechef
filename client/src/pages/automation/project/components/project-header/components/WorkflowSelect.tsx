@@ -36,7 +36,7 @@ const WorkflowSelect = ({
             <TooltipTrigger asChild>
                 <SelectTrigger
                     aria-label="Workflow select"
-                    className="[&>span]:line-clamp-0 w-64 gap-2 border shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
+                    className="w-64 gap-2 border shadow-none hover:bg-surface-neutral-primary-hover [&>span]:line-clamp-0 [&>span]:truncate [&>svg]:min-w-4"
                 >
                     <SelectValue className="font-semibold" placeholder="Select a workflow">
                         {!currentWorkflowLabel ? <Skeleton className="h-3 w-44" /> : currentWorkflowLabel}

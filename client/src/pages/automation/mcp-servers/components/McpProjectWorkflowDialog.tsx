@@ -324,7 +324,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                                         }}
                                                     />
 
-                                                    <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                                                    <label className="text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                                                         {projectWorkflow.workflow.label || projectWorkflow.workflow.id}
                                                     </label>
                                                 </div>

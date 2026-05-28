@@ -30,7 +30,7 @@ const OperationSelect = ({
 }: CurrentOperationSelectProps) => (
     <div className="flex w-full flex-col">
         <Label className="flex items-center space-x-1">
-            <span className="text-sm font-medium leading-6">
+            <span className="text-sm leading-6 font-medium">
                 {clusterElementLabel ?? (triggerSelect ? 'Triggers' : 'Actions')}
             </span>
 
@@ -56,7 +56,7 @@ const OperationSelect = ({
                 {operations?.map((operation) => (
                     <Item
                         className={twMerge(
-                            'radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none'
+                            'radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden'
                         )}
                         key={operation.name}
                         value={operation.name}
@@ -98,7 +98,7 @@ const CurrentOperationSelect = ({
         {operations?.length === 1 && !!operations[0] ? (
             <div className="flex w-full flex-col">
                 <div className="flex items-center space-x-1">
-                    <span className="text-sm font-medium leading-6">
+                    <span className="text-sm leading-6 font-medium">
                         {clusterElementLabel ?? (triggerSelect ? 'Triggers' : 'Actions')}
                     </span>
 

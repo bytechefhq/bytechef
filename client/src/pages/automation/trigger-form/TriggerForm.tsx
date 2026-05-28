@@ -82,7 +82,7 @@ export default function TriggerForm() {
                     <h1 className="text-2xl font-semibold tracking-tight">{uiDefinition.title}</h1>
 
                     {uiDefinition.subtitle && (
-                        <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
+                        <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">
                             {uiDefinition.subtitle}
                         </p>
                     )}

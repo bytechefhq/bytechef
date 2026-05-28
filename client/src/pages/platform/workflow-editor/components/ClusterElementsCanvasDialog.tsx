@@ -125,7 +125,7 @@ const ClusterElementsCanvasDialog = ({
             </DialogHeader>
 
             <DialogContent
-                className="absolute bottom-4 left-16 top-12 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0 duration-300 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0"
+                className="absolute top-12 bottom-4 left-16 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0 duration-300 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=closed]:zoom-out-95 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 data-[state=open]:zoom-in-95"
                 onPointerDownOutside={handlePointerDownOutside}
             >
                 {isDataStreamClusterRoot && showDataStreamEditor ? (
@@ -245,7 +245,7 @@ const ClusterElementsCanvasDialog = ({
                         {testingPanelOpen && (
                             <div
                                 className={twMerge(
-                                    'absolute inset-y-0 right-0 z-10 w-[800px] overflow-hidden border-l border-r bg-background transition-[right] duration-300 ease-in-out',
+                                    'absolute inset-y-0 right-0 z-10 w-[800px] overflow-hidden border-r border-l bg-background transition-[right] duration-300 ease-in-out',
                                     workflowNodeDetailsPanelOpen && !copilotPanelOpen && 'right-[465px]',
                                     copilotPanelOpen && !workflowNodeDetailsPanelOpen && 'right-[450px]',
                                     copilotPanelOpen && workflowNodeDetailsPanelOpen && 'right-[915px]'

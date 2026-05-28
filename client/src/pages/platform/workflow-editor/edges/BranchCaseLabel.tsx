@@ -55,7 +55,7 @@ export default function BranchCaseLabel({
     return (
         <EdgeLabelRenderer key={`${edgeId}-case-label`}>
             <div
-                className="top-6 z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium shadow-sm hover:border-stroke-brand-secondary-hover"
+                className="top-6 z-10 flex items-center rounded-md border-2 border-stroke-neutral-tertiary bg-white p-1 text-xs font-medium shadow-xs hover:border-stroke-brand-secondary-hover"
                 style={{
                     pointerEvents: 'all',
                     position: 'absolute',
@@ -67,7 +67,7 @@ export default function BranchCaseLabel({
                 {!isDefaultCase && (
                     <div className="group relative flex items-center">
                         <Input
-                            className="h-auto max-w-24 border-none pr-7 text-xs shadow-none disabled:cursor-auto disabled:text-xs disabled:opacity-100 group-hover:bg-surface-brand-secondary md:text-xs"
+                            className="h-auto max-w-24 border-none pr-7 text-xs shadow-none group-hover:bg-surface-brand-secondary disabled:cursor-auto disabled:text-xs disabled:opacity-100 md:text-xs"
                             disabled={!isCaseKeyEditable}
                             onChange={(event) => setCaseKeyValue(event.target.value)}
                             onKeyDown={(event) => {
@@ -80,7 +80,7 @@ export default function BranchCaseLabel({
                         />
 
                         <Button
-                            className="absolute right-2 top-1/2 size-4 -translate-y-1/2 cursor-pointer text-content-neutral-primary/50 hover:bg-transparent hover:text-content-neutral-primary [&_svg]:size-3"
+                            className="absolute top-1/2 right-2 size-4 -translate-y-1/2 cursor-pointer text-content-neutral-primary/50 hover:bg-transparent hover:text-content-neutral-primary [&_svg]:size-3"
                             icon={
                                 isCaseKeyEditable ? <CheckIcon className="text-content-brand-primary" /> : <PenIcon />
                             }

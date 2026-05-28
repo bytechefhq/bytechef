@@ -311,7 +311,7 @@ const Login = () => {
                                                             aria-label={
                                                                 showPassword ? 'Hide Password' : 'Show Password'
                                                             }
-                                                            className="absolute right-2 top-1 z-10"
+                                                            className="absolute top-1 right-2 z-10"
                                                             icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
                                                             onClick={() => setShowPassword((show) => !show)}
                                                             size="iconSm"
@@ -339,7 +339,7 @@ const Login = () => {
                                 control={form.control}
                                 name="rememberMe"
                                 render={({field}) => (
-                                    <FormItem className="flex items-center space-x-2 space-y-0 py-4">
+                                    <FormItem className="flex items-center space-y-0 space-x-2 py-4">
                                         <FormControl>
                                             <Checkbox
                                                 checked={field.value}

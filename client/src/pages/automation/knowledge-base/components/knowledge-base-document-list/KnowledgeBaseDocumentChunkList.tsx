@@ -50,7 +50,7 @@ const KnowledgeBaseDocumentChunkList = ({
                     <p className="ml-7 text-sm text-content-neutral-primary">{chunk.content}</p>
 
                     {chunk.metadata && (
-                        <p className="ml-7 mt-2 text-xs text-content-neutral-tertiary">
+                        <p className="mt-2 ml-7 text-xs text-content-neutral-tertiary">
                             <span className="font-medium">Metadata: </span>
 
                             {JSON.stringify(chunk.metadata)}

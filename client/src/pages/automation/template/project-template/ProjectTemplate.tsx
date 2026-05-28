@@ -55,7 +55,7 @@ const ProjectTemplate = ({
                     <span>This template contains the following components:</span>
 
                     {projectTemplate && (
-                        <div className="absolute bottom-0 top-5 w-full space-y-3 overflow-y-auto">
+                        <div className="absolute top-5 bottom-0 w-full space-y-3 overflow-y-auto">
                             {projectTemplate.workflows.map((workflow) => {
                                 const componentDefinitions = projectTemplate?.components?.find(
                                     (component) => component!.key === workflow!.id

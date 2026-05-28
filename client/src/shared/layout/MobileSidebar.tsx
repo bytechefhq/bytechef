@@ -76,8 +76,8 @@ export function MobileSidebar({mobileMenuOpen, navigation, setMobileMenuOpen}: M
 
     return (
         <Dialog onOpenChange={setMobileMenuOpen} open={mobileMenuOpen}>
-            <DialogContent className="flex h-full flex-col bg-white p-0 focus:outline-none">
-                <div className="pb-4 pt-5">
+            <DialogContent className="flex h-full flex-col bg-white p-0 focus:outline-hidden">
+                <div className="pt-5 pb-4">
                     <div className="flex shrink-0 items-center px-4">
                         <img alt="ByteChef" className="h-8 w-auto" src={reactLogo} />
                     </div>

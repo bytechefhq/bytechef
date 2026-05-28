@@ -76,7 +76,7 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
         PROPERTY_MENTION_CHIP_CLASS,
         'relative inline-flex items-center gap-0.5 rounded-full bg-muted px-2',
         controlType !== 'RICH_TEXT' && controlType !== 'TEXT_AREA' && controlType !== 'FORMULA_MODE' && 'text-sm',
-        isUnavailable && 'rounded-l-full rounded-r-none bg-transparent pl-2 pr-1'
+        isUnavailable && 'rounded-l-full rounded-r-none bg-transparent pr-1 pl-2'
     );
 
     const dataPillChip = (
@@ -102,7 +102,7 @@ function PropertyMentionNodeView({HTMLAttributes, deleteNode, editor, node}: Nod
                 <Tooltip>
                     <TooltipTrigger asChild>{dataPillChip}</TooltipTrigger>
 
-                    <TooltipContent className="max-w-sm whitespace-pre-wrap text-left">
+                    <TooltipContent className="max-w-sm text-left whitespace-pre-wrap">
                         {unavailableTooltipText}
                     </TooltipContent>
                 </Tooltip>

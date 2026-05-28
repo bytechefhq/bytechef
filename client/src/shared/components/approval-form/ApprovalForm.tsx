@@ -113,7 +113,7 @@ export default function ApprovalForm({
                     <h2 className="text-lg font-semibold tracking-tight">{uiDefinition.title}</h2>
 
                     {uiDefinition.description && (
-                        <p className="mt-2 whitespace-pre-line text-sm text-muted-foreground">
+                        <p className="mt-2 text-sm whitespace-pre-line text-muted-foreground">
                             {uiDefinition.description}
                         </p>
                     )}

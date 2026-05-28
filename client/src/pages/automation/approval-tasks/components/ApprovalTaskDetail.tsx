@@ -46,7 +46,7 @@ export default function ApprovalTaskDetail() {
             </div>
 
             <div className="flex gap-6">
-                <div className="min-w-0 max-w-lg flex-1">
+                <div className="max-w-lg min-w-0 flex-1">
                     <fieldset className="mb-6 border-0">
                         <span className="mb-2 block text-sm font-medium text-foreground">Description</span>
 

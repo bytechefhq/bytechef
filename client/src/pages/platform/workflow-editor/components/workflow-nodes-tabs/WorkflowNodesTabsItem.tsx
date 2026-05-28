@@ -45,7 +45,7 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
             const nodeContainer = document.createElement('div');
 
             nodeContainer.className =
-                'flex size-14 items-center justify-center rounded-lg border-2 border-slate-200 bg-white absolute -left-[1000px] -top-[1000px]';
+                'flex size-14 items-center justify-center rounded-lg border-2 border-slate-200 bg-white absolute left-[-1000px] top-[-1000px]';
 
             const iconClone = iconRef.current.cloneNode(true) as HTMLElement;
 

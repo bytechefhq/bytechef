@@ -27,7 +27,7 @@ const McpServer = () => {
 
     return (
         <LayoutContainer header={<Header centerTitle position="main" title="MCP Server" />} leftSidebarOpen={false}>
-            <div className="max-w-screen-lg p-4 3xl:mx-auto 3xl:w-4/5">
+            <div className="max-w-(--breakpoint-lg) p-4 3xl:mx-auto 3xl:w-4/5">
                 {mcpServerUrl && <McpServerConfiguration mcpServerUrl={mcpServerUrl} onRefresh={handleRefresh} />}
             </div>
         </LayoutContainer>

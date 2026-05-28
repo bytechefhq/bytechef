@@ -52,13 +52,13 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
         <Panel className="m-2 mb-3" position="bottom-left">
             <div className="flex items-start gap-2" style={{minWidth: 'max-content', overflowX: 'auto'}}>
                 <div className="flex items-center gap-1 rounded-md bg-surface-neutral-secondary px-3 py-[10px]">
-                    <span className="whitespace-nowrap text-xs font-medium text-content-neutral-primary">
+                    <span className="text-xs font-medium whitespace-nowrap text-content-neutral-primary">
                         {taskCount} tasks
                     </span>
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button className="flex cursor-default items-center rounded outline-none">
+                            <button className="flex cursor-default items-center rounded outline-hidden">
                                 <InfoIcon className="size-4 text-content-neutral-primary" />
                             </button>
                         </TooltipTrigger>

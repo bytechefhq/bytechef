@@ -60,7 +60,7 @@ const DataPillSampleValue = ({sampleOutput}: {sampleOutput: string | number | bo
                     <span className="flex-1 truncate text-xs text-muted-foreground">{sampleOutputString}</span>
                 </TooltipTrigger>
 
-                <TooltipContent className="max-h-96 max-w-96 overflow-y-scroll whitespace-pre-wrap break-all">
+                <TooltipContent className="max-h-96 max-w-96 overflow-y-scroll break-all whitespace-pre-wrap">
                     {sampleOutputString}
                 </TooltipContent>
             </Tooltip>
@@ -282,7 +282,7 @@ const DataPill = ({
                 </TooltipTrigger>
 
                 {property?.description && (
-                    <TooltipContent className="mr-2 max-w-72 whitespace-normal break-normal">
+                    <TooltipContent className="mr-2 max-w-72 break-normal whitespace-normal">
                         <span className="block">{property.description}</span>
                     </TooltipContent>
                 )}

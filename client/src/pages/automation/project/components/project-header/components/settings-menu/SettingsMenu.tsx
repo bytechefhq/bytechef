@@ -61,7 +61,7 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
                 <Tooltip>
                     <DropdownMenuTrigger
                         asChild
-                        className="cursor-pointer [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
+                        className="cursor-pointer data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                     >
                         <TooltipTrigger asChild>
                             <Button aria-label="Settings" icon={<SettingsIcon />} size="icon" variant="ghost" />
