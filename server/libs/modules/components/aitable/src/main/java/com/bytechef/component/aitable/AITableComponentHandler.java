@@ -34,7 +34,7 @@ import com.google.auto.service.AutoService;
 public class AITableComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("aitable")
-        .title("AITable")
+        .title("AITable.ai")
         .description(
             "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data " +
                 "visualization and analysis without requiring coding skills.")
