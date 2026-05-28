@@ -50,45 +50,46 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AITableUtilsTest {
 
-    private final ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor =
-        forClass(ConfigurationBuilder.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        forClass(ContextFunction.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
-    void testCreatePropertiesForRecord() {
+    void testCreatePropertiesForRecord(
+        ActionContext mockedContext, Executor mockedExecutor, Response mockedResponse, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Parameters mockedParameters = MockParametersFactory.create(Map.of(DATASHEET_ID, "abc"));
 
         List<Map<String, Object>> fields = new ArrayList<>();
@@ -99,7 +100,7 @@ class AITableUtilsTest {
         fields.add(
             createFieldMap("singleSelect", SINGLE_SELECT.getName(),
                 Map.of("options", List.of(Map.of("name", "option1")))));
-        fields.add(createFieldMap("number", NUMBER.getName(), Map.of()));
+        fields.add(createFieldMap("number", NUMBER.getName(), Map.of("precision", 2)));
         fields.add(createFieldMap("singleText", SINGLE_TEXT.getName(), Map.of()));
         fields.add(createFieldMap("url", URL.getName(), Map.of()));
         fields.add(createFieldMap("phone", PHONE.getName(), Map.of()));
@@ -108,25 +109,15 @@ class AITableUtilsTest {
         fields.add(
             createFieldMap("multiSelect", MULTI_SELECT.getName(),
                 Map.of("options", List.of(Map.of("name", "option1")))));
-        fields.add(createFieldMap("currency", CURRENCY.getName(), Map.of("symbol", "$")));
-        fields.add(createFieldMap("percent", PERCENT.getName(), Map.of()));
+        fields.add(createFieldMap("currency", CURRENCY.getName(), Map.of("symbol", "$", "precision", 2)));
+        fields.add(createFieldMap("percent", PERCENT.getName(), Map.of("precision", 2)));
         fields.add(createFieldMap("email", EMAIL.getName(), Map.of()));
         fields.add(createFieldMap("member", MEMBER.getName(),
             Map.of("options", List.of(Map.of("name", "Alice", "id", "u1")))));
         fields.add(createFieldMap("twoWayLink", TWO_WAY_LINK.getName(), Map.of()));
 
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of("fields", fields)));
 
@@ -134,16 +125,12 @@ class AITableUtilsTest {
             mockedParameters, null, null, mockedContext);
 
         assertEquals(getExpectedProperties(), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/datasheets/abc/fields", stringArgumentCaptor.getValue());
     }
 
@@ -166,6 +153,7 @@ class AITableUtilsTest {
                 .required(false),
             number("number")
                 .label("number")
+                .maxNumberPrecision(2)
                 .required(false),
             string("singleText")
                 .label("singleText")
@@ -191,8 +179,11 @@ class AITableUtilsTest {
             number("currency")
                 .label("currency")
                 .description("Currency symbol: $")
+                .maxNumberPrecision(2)
                 .required(false),
-            number("percent").label("percent")
+            number("percent")
+                .label("percent")
+                .maxNumberPrecision(2)
                 .required(false),
             string("email")
                 .label("email")
@@ -218,23 +209,17 @@ class AITableUtilsTest {
     }
 
     @Test
-    void testGetDatasheetIdOptions() {
+    void testGetDatasheetIdOptions(
+        ActionContext mockedContext, Executor mockedExecutor, Response mockedResponse, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Parameters mockedParameters = MockParametersFactory.create(Map.of(SPACE_ID, "abc"));
 
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of("nodes", List.of(Map.of("name", "name", "id", "id")))));
 
@@ -242,16 +227,12 @@ class AITableUtilsTest {
             mockedParameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("name", "id")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/spaces/abc/nodes", stringArgumentCaptor.getValue());
 
         Object[] queryParameters = {
@@ -262,21 +243,15 @@ class AITableUtilsTest {
     }
 
     @Test
-    void testGetFieldNamesOptions() {
+    void testGetFieldNamesOptions(
+        ActionContext mockedContext, Executor mockedExecutor, Response mockedResponse, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Parameters mockedParameters = MockParametersFactory.create(Map.of(DATASHEET_ID, "abc"));
 
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
-
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of(FIELDS, List.of(Map.of("name", "name")))));
 
@@ -284,49 +259,35 @@ class AITableUtilsTest {
             mockedParameters, null, null, null, mockedContext);
 
         assertEquals(List.of(option("name", "name")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/datasheets/abc/fields", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testGetSpaceIdOptions() {
-        when(mockedContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> {
-                ContextFunction<Http, Http.Executor> value = httpFunctionArgumentCaptor.getValue();
+    void testGetSpaceIdOptions(
+        ActionContext mockedContext, Executor mockedExecutor, Response mockedResponse, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-                return value.apply(mockedHttp);
-            });
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(configurationBuilderArgumentCaptor.capture()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of("spaces", List.of(Map.of("name", "name", "id", "id")))));
 
         List<Option<String>> result = AITableUtils.getSpaceIdOptions(null, null, null, null, mockedContext);
 
         assertEquals(List.of(option("name", "id")), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/spaces", stringArgumentCaptor.getValue());
     }
 }
