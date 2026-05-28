@@ -50,6 +50,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -149,50 +152,15 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
             return text;
         }
 
-        int jsonBlockStart = text.indexOf("```json");
+        Pattern pattern = Pattern.compile(
+            "\\{\\s*\"label\"[\\s\\S]*\\}",
+            Pattern.DOTALL
+        );
 
-        if (jsonBlockStart >= 0) {
-            int contentStart = text.indexOf('\n', jsonBlockStart) + 1;
-            int blockEnd = text.indexOf("```", contentStart);
+        Matcher matcher = pattern.matcher(text);
 
-            if (blockEnd > contentStart) {
-                return StringUtils.strip(text.substring(contentStart, blockEnd));
-            }
-        }
-
-        int blockStart = text.indexOf("```");
-
-        if (blockStart >= 0) {
-            int contentStart = text.indexOf('\n', blockStart) + 1;
-            int blockEnd = text.indexOf("```", contentStart);
-
-            if (blockEnd > contentStart) {
-                return StringUtils.strip(text.substring(contentStart, blockEnd));
-            }
-        }
-
-        int objectStart = text.indexOf('{');
-        int arrayStart = text.indexOf('[');
-
-        if (objectStart < 0 && arrayStart < 0) {
-            return text;
-        }
-
-        char closeChar;
-        int start;
-
-        if (objectStart >= 0 && (arrayStart < 0 || objectStart <= arrayStart)) {
-            closeChar = '}';
-            start = objectStart;
-        } else {
-            closeChar = ']';
-            start = arrayStart;
-        }
-
-        int lastClose = text.lastIndexOf(closeChar);
-
-        if (lastClose > start) {
-            return text.substring(start, lastClose + 1);
+        if (matcher.find()) {
+            return matcher.group().trim();
         }
 
         return text;
