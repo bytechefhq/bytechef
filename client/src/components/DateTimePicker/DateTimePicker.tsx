@@ -61,7 +61,7 @@ export default function DateTimePicker({onChange, value}: {onChange: (date: Date
 
                 <div className="border-t p-3">
                     <input
-                        className="w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                        className="w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-xs transition-colors focus-visible:ring-1 focus-visible:ring-ring focus-visible:outline-hidden"
                         onChange={handleTimeChange}
                         type="time"
                         value={date ? format(date, 'HH:mm') : ''}

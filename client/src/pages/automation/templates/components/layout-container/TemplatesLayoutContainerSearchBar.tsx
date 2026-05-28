@@ -13,7 +13,7 @@ export function TemplatesLayoutContainerSearchBar({placeholder}: {placeholder: s
 
     return (
         <div className="relative mx-auto max-w-2xl">
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
 
             <Input
                 className="h-12 border-border bg-background pl-10"

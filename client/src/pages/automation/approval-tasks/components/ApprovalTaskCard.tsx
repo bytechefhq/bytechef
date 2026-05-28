@@ -75,7 +75,7 @@ export default function ApprovalTaskCard({approvalTask, isSelected, onSelect, on
                         </div>
                     </div>
 
-                    <p className="mb-2 line-clamp-2 break-words text-xs text-muted-foreground">
+                    <p className="mb-2 line-clamp-2 text-xs wrap-break-word text-muted-foreground">
                         {highlightedDescription}
                     </p>
 

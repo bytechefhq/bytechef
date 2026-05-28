@@ -35,7 +35,7 @@ const ReadOnlyWorkflowSheet = () => {
                 <SheetTitle>{workflow?.label}</SheetTitle>
             </VisuallyHidden.Root>
 
-            <SheetContent className="bottom-4 right-4 top-3 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
+            <SheetContent className="top-3 right-4 bottom-4 flex h-auto flex-col gap-0 rounded-md bg-surface-neutral-secondary p-0 sm:max-w-workflow-read-only-project-deployment-workflow-sheet-width">
                 <header className="flex shrink-0 items-center justify-between rounded-t-md border-b border-b-border/50 bg-surface-neutral-primary p-3">
                     <span className="text-lg font-semibold">{workflow?.label}</span>
 

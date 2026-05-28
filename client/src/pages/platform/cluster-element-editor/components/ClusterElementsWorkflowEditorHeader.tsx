@@ -27,7 +27,7 @@ const ClusterElementsWorkflowEditorHeader = ({
 }: ClusterElementsWorkflowEditorHeaderProps) => {
     return (
         <div className="relative z-10 flex items-center justify-end px-4 py-6">
-            <div className="flex items-center gap-1 rounded-lg bg-white/70 backdrop-blur-sm">
+            <div className="flex items-center gap-1 rounded-lg bg-white/70 backdrop-blur-xs">
                 {showToggleEditor && (
                     <Tooltip>
                         <TooltipTrigger asChild>
@@ -56,7 +56,7 @@ const ClusterElementsWorkflowEditorHeader = ({
 
                                 <ExternalLinkIcon
                                     aria-hidden
-                                    className="absolute right-0.5 top-0.5 size-2.5 text-content-neutral-secondary/70"
+                                    className="absolute top-0.5 right-0.5 size-2.5 text-content-neutral-secondary/70"
                                 />
                             </a>
                         </TooltipTrigger>

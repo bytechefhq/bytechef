@@ -18,7 +18,7 @@ const WorkflowsListFilter = forwardRef<HTMLInputElement, WorkflowsListFilterProp
         return (
             <div className="flex items-center gap-2">
                 <div className="relative flex w-full rounded-md bg-background align-middle">
-                    <SearchIcon className="absolute left-3 top-2.5 size-4 text-muted-foreground" />
+                    <SearchIcon className="absolute top-2.5 left-3 size-4 text-muted-foreground" />
 
                     <Input
                         className="border-stroke-neutral-secondary py-1.5 pl-8 shadow-none"

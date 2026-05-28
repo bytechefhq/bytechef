@@ -53,7 +53,7 @@ export default function LabeledClusterElementsEdge({
 
             <EdgeLabelRenderer key={id}>
                 <div
-                    className="z-10 max-w-20 text-wrap p-0.5 text-center text-xs font-medium"
+                    className="z-10 max-w-20 p-0.5 text-center text-xs font-medium text-wrap"
                     style={{
                         position: 'absolute',
                         transform: getEdgeLabelPosition(),

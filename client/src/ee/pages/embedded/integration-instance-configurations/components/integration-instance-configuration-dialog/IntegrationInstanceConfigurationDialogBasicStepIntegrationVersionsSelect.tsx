@@ -34,7 +34,7 @@ const IntegrationInstanceConfigurationDialogBasicStepIntegrationVersionsSelect =
                 {filteredIntegrationVersions &&
                     filteredIntegrationVersions.map((integrationVersion) => (
                         <Item
-                            className="radix-disabled:opacity-50 flex cursor-pointer select-none items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 focus:bg-gray-100 focus:outline-none"
+                            className="radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md p-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden"
                             key={integrationVersion.version}
                             value={integrationVersion.version!.toString()}
                         >

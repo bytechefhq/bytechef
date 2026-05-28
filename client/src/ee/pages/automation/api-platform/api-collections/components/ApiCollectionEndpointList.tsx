@@ -34,7 +34,7 @@ const ApiCollectionEndpointList = ({
             {apiCollectionEndpoints && apiCollectionEndpoints.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-2 text-sm font-semibold uppercase text-gray-400">
+                        <h3 className="flex justify-start pl-2 text-sm font-semibold text-gray-400 uppercase">
                             Endpoints
                         </h3>
                     </div>

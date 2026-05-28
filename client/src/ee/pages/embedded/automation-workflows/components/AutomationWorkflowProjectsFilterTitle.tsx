@@ -33,7 +33,7 @@ const AutomationWorkflowProjectsFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm uppercase text-muted-foreground">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
+            <span className="text-sm text-muted-foreground uppercase">{`Filter by ${searchParams.get('tagId') ? 'tag' : 'category'}:`}</span>
 
             <Badge label={`${pageTitle ?? 'All Categories'}`} styleType="secondary-filled" weight="semibold" />
         </div>

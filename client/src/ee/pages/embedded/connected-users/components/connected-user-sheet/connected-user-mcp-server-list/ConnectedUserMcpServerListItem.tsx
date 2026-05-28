@@ -70,7 +70,7 @@ const ConnectedUserMcpServerListItem = ({
                         <div className="flex min-w-52 flex-col items-end gap-y-2">
                             <div className="relative flex items-center">
                                 {enableConnectedUserMcpServerMutation.isPending && (
-                                    <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                                    <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                 )}
 
                                 <Switch
@@ -120,7 +120,7 @@ const ConnectedUserMcpServerListItem = ({
                 <CollapsibleContent>
                     {toolCount > 0 ? (
                         <div className="flex w-full flex-col gap-y-3 py-3 pl-4">
-                            <h3 className="flex justify-start px-2 text-sm font-semibold uppercase text-muted-foreground">
+                            <h3 className="flex justify-start px-2 text-sm font-semibold text-muted-foreground uppercase">
                                 Tools
                             </h3>
 

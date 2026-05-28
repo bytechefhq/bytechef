@@ -56,11 +56,11 @@ const McpServersFilterTitle = ({
 
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
 
             {filterLabel ? (
                 <>
-                    <span className="text-sm uppercase text-muted-foreground">{filterLabel}:</span>
+                    <span className="text-sm text-muted-foreground uppercase">{filterLabel}:</span>
 
                     <Badge
                         label={typeof pageTitle === 'string' ? pageTitle : 'Unknown'}
@@ -69,7 +69,7 @@ const McpServersFilterTitle = ({
                     />
                 </>
             ) : (
-                <span className="text-sm uppercase text-muted-foreground">none</span>
+                <span className="text-sm text-muted-foreground uppercase">none</span>
             )}
         </div>
     );

@@ -10,17 +10,17 @@ const WorkflowExecutionsFilterTitle = ({
 }) => {
     return (
         <div className="space-x-1">
-            <span className="text-sm font-semibold uppercase text-muted-foreground">Filter by </span>
+            <span className="text-sm font-semibold text-muted-foreground uppercase">Filter by </span>
 
             {filterData.status && (
                 <>
-                    <span className="text-sm uppercase text-muted-foreground">status:</span>
+                    <span className="text-sm text-muted-foreground uppercase">status:</span>
 
                     <Badge label={filterData.status} styleType="secondary-filled" weight="semibold" />
                 </>
             )}
 
-            {!filterData.status && <span className="text-sm uppercase text-muted-foreground">none</span>}
+            {!filterData.status && <span className="text-sm text-muted-foreground uppercase">none</span>}
         </div>
     );
 };

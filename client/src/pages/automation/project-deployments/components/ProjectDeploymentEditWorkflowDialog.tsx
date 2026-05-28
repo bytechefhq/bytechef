@@ -176,7 +176,7 @@ const ProjectDeploymentEditWorkflowDialog = ({
                         />
                     </div>
 
-                    <DialogFooter className="flex items-center px-6 pb-6 pt-4">
+                    <DialogFooter className="flex items-center px-6 pt-4 pb-6">
                         {componentConnections.length > 1 && (
                             <div className="mr-auto flex items-center gap-2">
                                 <Switch

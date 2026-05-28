@@ -42,7 +42,7 @@ const ProjectWorkflowsList = ({
                 <div className="flex w-80 items-center justify-between">
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <span className="inline-block w-56 overflow-hidden truncate rounded-md px-1 py-2 text-lg font-medium">
+                            <span className="inline-block w-56 truncate overflow-hidden rounded-md px-1 py-2 text-lg font-medium">
                                 {project.name}
                             </span>
                         </TooltipTrigger>

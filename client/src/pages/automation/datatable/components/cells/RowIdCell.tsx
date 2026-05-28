@@ -64,7 +64,7 @@ const RowIdCell = ({
 
     return (
         <div
-            className="flex w-full items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-1"
+            className="flex w-full items-center justify-center gap-2 focus:ring-2 focus:ring-ring focus:ring-offset-1 focus:outline-hidden"
             onClick={handleToggleRow}
             onKeyDown={handleKeyDown}
             onMouseEnter={handleMouseEnter}
@@ -82,7 +82,7 @@ const RowIdCell = ({
                     onClick={handleCheckboxClick}
                 />
             ) : (
-                <span aria-hidden="true" className="select-none text-xs text-muted-foreground">
+                <span aria-hidden="true" className="text-xs text-muted-foreground select-none">
                     {rowNumber}
                 </span>
             )}

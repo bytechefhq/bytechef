@@ -45,7 +45,7 @@ const IntegrationSelect = ({
                 <TooltipTrigger asChild>
                     <SelectTrigger
                         aria-label="Select integration"
-                        className="[&>span]:line-clamp-0 w-full border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
+                        className="w-full border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:line-clamp-0 [&>span]:truncate [&>svg]:min-w-4"
                     >
                         <SelectValue placeholder="Select an integration">
                             {selectedIntegrationId === integrationId

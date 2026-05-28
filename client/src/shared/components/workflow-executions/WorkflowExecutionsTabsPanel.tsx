@@ -163,7 +163,7 @@ const WorkflowExecutionsTabsPanel = ({
                                     </div>
                                 </DialogHeader>
 
-                                <ScrollArea className="max-h-workflow-execution-content-height overflow-auto pb-4 pr-4">
+                                <ScrollArea className="max-h-workflow-execution-content-height overflow-auto pr-4 pb-4">
                                     <WorkflowExecutionContent
                                         error={activeTab === 'error' ? selectedItem?.error : undefined}
                                         input={activeTab === 'input' ? selectedItem?.input : undefined}
@@ -192,7 +192,7 @@ const WorkflowExecutionsTabsPanel = ({
                 )}
             </div>
 
-            <ScrollArea className="min-h-0 flex-1 pb-4 pr-4">
+            <ScrollArea className="min-h-0 flex-1 pr-4 pb-4">
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
                         {selectedItem?.input ? (

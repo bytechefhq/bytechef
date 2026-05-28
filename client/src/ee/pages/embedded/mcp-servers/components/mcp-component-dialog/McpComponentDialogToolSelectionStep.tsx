@@ -49,7 +49,7 @@ const McpComponentDialogToolSelectionStep = ({
                             ref={selectAllCheckboxRef}
                         />
 
-                        <label className="cursor-pointer text-sm font-medium leading-none" htmlFor="select-all-tools">
+                        <label className="cursor-pointer text-sm leading-none font-medium" htmlFor="select-all-tools">
                             Select All Tools ({toolElements.length})
                         </label>
                     </div>

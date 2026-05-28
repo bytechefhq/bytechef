@@ -66,7 +66,7 @@ describe('NumberEditCell', () => {
     });
 
     describe('interactions', () => {
-        it('should call onRowChange on blur with commit', async () => {
+        it('should call onRowChange on blur-sm with commit', async () => {
             const user = userEvent.setup();
 
             render(

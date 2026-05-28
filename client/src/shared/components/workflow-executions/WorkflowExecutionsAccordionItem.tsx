@@ -63,7 +63,7 @@ const WorkflowExecutionsAccordionItem = ({
                 className={twMerge(
                     'group flex w-full items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&_svg]:size-5',
                     isSelected &&
-                        'border-stroke-brand-primary bg-surface-neutral-secondary hover:bg-surface-neutral-secondary [&[data-state=open]]:border-stroke-brand-primary'
+                        'border-stroke-brand-primary bg-surface-neutral-secondary hover:bg-surface-neutral-secondary data-[state=open]:border-stroke-brand-primary'
                 )}
                 onClick={() => {
                     if (!isSelected) {
@@ -91,7 +91,7 @@ const WorkflowExecutionsAccordionItem = ({
                                 <AccordionItem className="border-b-0" key={iterationValue} value={iterationValue}>
                                     <HoverCard openDelay={200}>
                                         <HoverCardTrigger className="[&[data-state=open]_button]:bg-surface-neutral-secondary [&[data-state=open]_span]:text-content-brand-primary [&[data-state=open]_svg]:text-content-brand-primary">
-                                            <AccordionTrigger className="flex w-full min-w-0 items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors [&[data-state=closed]:hover>svg]:!rotate-0 [&[data-state=open]>svg]:!rotate-180 [&[data-state=open]]:hover:border-stroke-brand-secondary [&_svg]:size-5">
+                                            <AccordionTrigger className="flex w-full min-w-0 items-center justify-between rounded-md border border-stroke-neutral-primary p-2 hover:border-stroke-brand-primary hover:no-underline focus-visible:outline-stroke-brand-focus focus-visible:transition-colors data-[state=open]:hover:border-stroke-brand-secondary [&_svg]:size-5 [&[data-state=closed]:hover>svg]:rotate-0! [&[data-state=open]>svg]:rotate-180!">
                                                 <div className="flex w-full items-center justify-between">
                                                     <span className="text-sm font-medium text-content-neutral-primary">
                                                         {taskExecution.title || ''} iteration {index + 1}
@@ -111,7 +111,7 @@ const WorkflowExecutionsAccordionItem = ({
                                         {currentIterationItem != null && (
                                             <HoverCardContent
                                                 align="start"
-                                                className="flex max-h-56 w-fit min-w-40 max-w-sm flex-col rounded-md border border-stroke-neutral-primary bg-surface-neutral-secondary p-3 text-sm"
+                                                className="flex max-h-56 w-fit max-w-sm min-w-40 flex-col rounded-md border border-stroke-neutral-primary bg-surface-neutral-secondary p-3 text-sm"
                                                 side="right"
                                             >
                                                 <span className="mb-1.5 shrink-0 text-sm font-semibold text-content-brand-primary">

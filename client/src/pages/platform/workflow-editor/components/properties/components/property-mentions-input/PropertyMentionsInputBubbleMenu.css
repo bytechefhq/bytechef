@@ -1,3 +1,5 @@
+@reference '../../../../../../../styles/index.css';
+
 .property-bubble-menu {
     @apply bg-background;
     @apply border;

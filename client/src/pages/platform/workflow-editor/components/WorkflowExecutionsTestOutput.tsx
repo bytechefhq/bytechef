@@ -80,7 +80,7 @@ const WorkflowExecutionsTestOutput = ({
                             {workflowTestExecution?.job && !jobFailedWithNoExecutions && (
                                 <ResizablePanelGroup orientation="horizontal">
                                     <ResizablePanel className="overflow-y-auto py-4" defaultSize={resizablePanelSize}>
-                                        <ScrollArea className="h-full pl-1 pr-4">
+                                        <ScrollArea className="h-full pr-4 pl-1">
                                             <Accordion
                                                 className="ml-2 space-y-2"
                                                 defaultValue={

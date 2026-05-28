@@ -28,7 +28,7 @@ export default function AiAgentTestingPanel({contentClassName, headerClassName, 
                         <div className="relative text-muted-foreground/40">
                             <WorkflowIcon className="size-12" strokeWidth={1.5} />
 
-                            <SparklesIcon className="absolute -right-1 -top-1 size-5" strokeWidth={1.5} />
+                            <SparklesIcon className="absolute -top-1 -right-1 size-5" strokeWidth={1.5} />
                         </div>
 
                         <div className="flex flex-col items-center gap-1.5">

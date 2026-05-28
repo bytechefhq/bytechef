@@ -517,7 +517,7 @@ const ProjectDeploymentDialog = ({
                 onClick={(event) => event.stopPropagation()}
                 onInteractOutside={(event) => event.preventDefault()}
             >
-                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 pb-3 pt-6">
+                <DialogHeader className="flex flex-row items-center justify-between gap-1 space-y-0 px-6 pt-6 pb-3">
                     <div className="flex w-full flex-col space-y-2">
                         <DialogTitle>{dialogTitle}</DialogTitle>
 
@@ -547,7 +547,7 @@ const ProjectDeploymentDialog = ({
                     </div>
                 </WorkflowMockProvider>
 
-                <DialogFooter className="px-6 pb-6 pt-3">
+                <DialogFooter className="px-6 pt-3 pb-6">
                     {activeStepIndex === 0 && (
                         <>
                             <DialogClose asChild>

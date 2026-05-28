@@ -144,7 +144,7 @@ const ConnectedUserSheetPanelIntegrationListItem = ({
                             <div className="flex min-w-52 flex-col items-end gap-y-2">
                                 <div className="relative flex items-center">
                                     {enableIntegrationInstanceMutation.isPending && (
-                                        <LoadingIcon className="absolute left-[-15px] top-[3px]" />
+                                        <LoadingIcon className="absolute top-[3px] left-[-15px]" />
                                     )}
 
                                     <Switch

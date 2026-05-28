@@ -71,7 +71,7 @@ describe('Switch - Variants', () => {
         const switchElement = screen.getByRole('switch');
         expect(switchElement).toHaveClass('h-[14px]');
         expect(switchElement).toHaveClass('w-[26px]');
-        expect(switchElement).toHaveClass('px-[1px]');
+        expect(switchElement).toHaveClass('px-px');
         expect(switchElement).toHaveClass('rounded-[7px]');
         expect(switchElement).toHaveClass('border-0');
     });
@@ -196,7 +196,7 @@ describe('Switch - States', () => {
         expect(switchElement.className).toMatch(/\[&>span\]:bg-surface-neutral-primary/);
     });
 
-    it('should override shadcn thumb shadow with shadow-none', () => {
+    it('should override shadcn thumb shadow-sm with shadow-none', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');

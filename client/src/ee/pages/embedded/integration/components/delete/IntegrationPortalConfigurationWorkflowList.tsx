@@ -42,7 +42,7 @@ const IntegrationPortalConfigurationWorkflowList = () => {
                     {workflows.map((workflow) => (
                         <li className="relative flex justify-between py-4" key={workflow.name}>
                             <div className="min-w-0 flex-auto cursor-pointer">
-                                <span className="text-sm font-semibold leading-6 text-gray-900">
+                                <span className="text-sm leading-6 font-semibold text-gray-900">
                                     {workflow.sheet || workflow.name}
                                 </span>
                             </div>

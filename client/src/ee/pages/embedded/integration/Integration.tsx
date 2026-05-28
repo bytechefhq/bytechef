@@ -56,7 +56,7 @@ const Integration = () => {
                 <div
                     className={twMerge(
                         'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
-                        leftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                        leftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >
                     {sidebarLoaded && (

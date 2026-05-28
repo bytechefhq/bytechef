@@ -86,7 +86,7 @@ const WorkflowCodeEditorSheet = ({
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="bottom-4 right-4 top-3 flex h-auto w-[60%] flex-row gap-0 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
+                className="top-3 right-4 bottom-4 flex h-auto w-[60%] flex-row gap-0 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
@@ -238,7 +238,7 @@ const WorkflowCodeEditorSheet = ({
                                     onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
                                     panelRef={setErrorPanelRef}
                                 >
-                                    <div className="sticky left-0 right-0 flex w-auto items-center gap-2 px-3 py-2">
+                                    <div className="sticky right-0 left-0 flex w-auto items-center gap-2 px-3 py-2">
                                         <InfoIcon className="text-content-destructive-primary" />
 
                                         <span className="text-sm font-semibold">Errors ({errors.length})</span>

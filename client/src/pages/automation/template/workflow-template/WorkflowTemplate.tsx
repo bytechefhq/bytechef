@@ -81,7 +81,7 @@ const WorkflowTemplate = ({
                 <div className="relative flex-1 space-y-4">
                     <span>This template contains the following components:</span>
 
-                    <div className="absolute bottom-0 top-5 w-full space-y-3 overflow-y-auto">
+                    <div className="absolute top-5 bottom-0 w-full space-y-3 overflow-y-auto">
                         {workflowTemplate?.components?.map((componentDefinition) => (
                             <ComponentRow
                                 componentDefinition={componentDefinition!}

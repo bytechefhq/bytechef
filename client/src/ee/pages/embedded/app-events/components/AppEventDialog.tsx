@@ -138,7 +138,7 @@ const AppEventDialog = ({appEvent, onClose, triggerNode}: AppEventDialogProps) =
                                     <FormLabel>Schema</FormLabel>
 
                                     <FormControl>
-                                        <div className="h-48 overflow-hidden rounded-md border border-input shadow-sm focus-within:outline-none focus-within:ring-1 focus-within:ring-ring">
+                                        <div className="h-48 overflow-hidden rounded-md border border-input shadow-xs focus-within:ring-1 focus-within:ring-ring focus-within:outline-hidden">
                                             <Suspense fallback={<MonacoEditorLoader />}>
                                                 <MonacoEditor
                                                     defaultLanguage="json"

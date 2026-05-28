@@ -64,7 +64,7 @@ export default function AiAgentHeader({
 
                                 <ExternalLinkIcon
                                     aria-hidden
-                                    className="absolute right-0.5 top-0.5 size-2.5 text-content-neutral-secondary/70"
+                                    className="absolute top-0.5 right-0.5 size-2.5 text-content-neutral-secondary/70"
                                 />
                             </a>
                         </TooltipTrigger>

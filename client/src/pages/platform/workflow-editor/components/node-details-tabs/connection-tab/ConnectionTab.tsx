@@ -136,7 +136,7 @@ const ConnectionTab = ({
     }, 600);
 
     return (
-        <div className={twMerge('flex h-full flex-col gap-6 overflow-y-auto overflow-x-hidden p-4', className)}>
+        <div className={twMerge('flex h-full flex-col gap-6 overflow-x-hidden overflow-y-auto p-4', className)}>
             {componentConnections.map((componentConnection) => {
                 const workflowTestConfigurationConnection = workflowTestConfigurationConnections?.find(
                     (testConfigConnection) => testConfigConnection.workflowConnectionKey === componentConnection.key

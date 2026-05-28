@@ -18,7 +18,7 @@ const AutomationWorkflowEditorWorkflowSelect = ({
     <Select onValueChange={onValueChange} value={currentWorkflowId}>
         <SelectTrigger
             aria-label="Select workflow"
-            className="[&>span]:line-clamp-0 border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:truncate [&>svg]:min-w-4"
+            className="border-stroke-neutral-secondary bg-background px-3 py-2 shadow-none hover:bg-surface-neutral-primary-hover [&>span]:line-clamp-0 [&>span]:truncate [&>svg]:min-w-4"
         >
             <SelectValue placeholder="Select a workflow" />
         </SelectTrigger>

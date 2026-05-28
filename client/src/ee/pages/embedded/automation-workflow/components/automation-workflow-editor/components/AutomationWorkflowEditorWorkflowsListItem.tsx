@@ -45,7 +45,7 @@ const AutomationWorkflowEditorWorkflowsListItem = ({
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <div className="flex flex-col gap-1 text-start">
-                            <span className="overflow-hidden truncate text-sm font-medium">{workflow.label}</span>
+                            <span className="truncate overflow-hidden text-sm font-medium">{workflow.label}</span>
 
                             {editedDate && (
                                 <div className="flex gap-1 text-xs text-content-neutral-secondary">

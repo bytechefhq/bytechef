@@ -47,7 +47,7 @@ const ApiConnectorWizardLayout = ({
     return (
         <div className="flex min-h-full items-center justify-center p-6">
             <div className="w-full max-w-2xl">
-                <div className="rounded-lg border bg-white shadow-sm">
+                <div className="rounded-lg border bg-white shadow-xs">
                     <div className="flex flex-col gap-1 border-b p-6">
                         <div className="flex items-center justify-between">
                             <h1 className="text-lg font-semibold">{pageTitleWithStep}</h1>
@@ -66,7 +66,7 @@ const ApiConnectorWizardLayout = ({
                                 {steps.map((step, index) => (
                                     <li
                                         className={twMerge(
-                                            'group flex flex-col border-l-4 py-2 pl-4 md:flex-1 md:border-l-0 md:border-t-4 md:pb-0 md:pl-0 md:pt-2',
+                                            'group flex flex-col border-l-4 py-2 pl-4 md:flex-1 md:border-t-4 md:border-l-0 md:pt-2 md:pb-0 md:pl-0',
                                             index <= currentStep
                                                 ? 'border-gray-900 hover:border-gray-800'
                                                 : 'border-gray-200 hover:border-gray-300'

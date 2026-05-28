@@ -63,7 +63,7 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
             </div>
 
             <pre className="overflow-x-auto p-4">
-                <div className="relative max-w-screen-lg">
+                <div className="relative max-w-(--breakpoint-lg)">
                     <code className="font-mono text-sm leading-relaxed text-foreground">{codeSnippet}</code>
                 </div>
             </pre>

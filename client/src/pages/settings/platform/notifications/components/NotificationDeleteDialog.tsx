@@ -34,7 +34,7 @@ const NotificationDeleteDialog = ({
 
                 <Button
                     aria-label="Close"
-                    className="absolute right-2 top-0"
+                    className="absolute top-0 right-2"
                     icon={<XIcon />}
                     onClick={closeDeleteDialog}
                     size="icon"

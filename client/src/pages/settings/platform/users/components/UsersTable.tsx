@@ -24,23 +24,23 @@ const UsersTable = ({pageNumber}: UsersTableProps) => {
         <Table>
             <TableHeader>
                 <TableRow className="border-b-border/50">
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Email
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Name
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Role
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary">
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
                         Status
                     </TableHead>
 
-                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium uppercase tracking-wide text-content-neutral-secondary"></TableHead>
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase"></TableHead>
                 </TableRow>
             </TableHeader>
 

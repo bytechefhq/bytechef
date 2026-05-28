@@ -114,7 +114,7 @@ const ProjectDeploymentWorkflowList = ({
 
     return (
         <div className="border-b border-b-gray-100 py-3 pl-4">
-            <h3 className="heading-tertiary flex justify-start pl-2 text-sm">Workflows</h3>
+            <h3 className="flex justify-start pl-2 text-sm heading-tertiary">Workflows</h3>
 
             {enabledWorkflows.length === 0 ? (
                 <p className="py-4 pl-2 text-sm text-muted-foreground">

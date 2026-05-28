@@ -228,7 +228,7 @@ const Register = () => {
                                                                 aria-label={
                                                                     showPassword ? 'Hide Password' : 'Show Password'
                                                                 }
-                                                                className="absolute right-2 top-1 z-10"
+                                                                className="absolute top-1 right-2 z-10"
                                                                 icon={showPassword ? <EyeOffIcon /> : <EyeIcon />}
                                                                 onClick={() => setShowPassword((show) => !show)}
                                                                 size="iconSm"

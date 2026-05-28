@@ -69,7 +69,7 @@ const AccountProfileDetails = () => {
 
     return (
         <div className="pb-12">
-            <h2 className="text-base font-semibold leading-7 text-gray-900">Profile</h2>
+            <h2 className="text-base leading-7 font-semibold text-gray-900">Profile</h2>
 
             {account && (
                 <Form {...form}>

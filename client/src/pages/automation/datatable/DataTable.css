@@ -1,3 +1,5 @@
+@reference '../../../styles/index.css';
+
 .datatable-cell {
     @apply border-t;
     @apply border-r;

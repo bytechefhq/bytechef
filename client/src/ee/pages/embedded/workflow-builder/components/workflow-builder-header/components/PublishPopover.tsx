@@ -45,7 +45,7 @@ const PublishPopover = ({
                 <PopoverTrigger asChild>
                     <TooltipTrigger asChild>
                         <Button
-                            className="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover [&[data-state=open]]:border-stroke-brand-secondary [&[data-state=open]]:bg-surface-brand-secondary [&[data-state=open]]:text-content-brand-primary"
+                            className="shadow-none hover:border-stroke-neutral-secondary hover:bg-surface-neutral-primary-hover data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
                             variant="outline"
                         >
                             <SendIcon /> Publish

@@ -27,7 +27,7 @@ const WorkflowTestChatPanel = () => {
     }
 
     return (
-        <div className="absolute inset-y-4 bottom-6 right-[69px] top-2 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background">
+        <div className="absolute inset-y-4 top-2 right-[69px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background">
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-surface-main">
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>
@@ -41,7 +41,7 @@ const WorkflowTestChatPanel = () => {
                     </button>
                 </header>
 
-                <div className="absolute inset-x-0 bottom-0 top-16">
+                <div className="absolute inset-x-0 top-16 bottom-0">
                     <WorkflowTestChatRuntimeProvider>
                         <Thread />
                     </WorkflowTestChatRuntimeProvider>

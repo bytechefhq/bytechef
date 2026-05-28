@@ -57,7 +57,7 @@ const Project = () => {
                 <div
                     className={twMerge(
                         'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
-                        projectLeftSidebarOpen ? 'ml-0 opacity-100' : '-ml-[355px] opacity-0'
+                        projectLeftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >
                     {sidebarLoaded && (

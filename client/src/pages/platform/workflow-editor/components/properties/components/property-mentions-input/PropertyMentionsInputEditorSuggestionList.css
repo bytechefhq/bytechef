@@ -1,3 +1,5 @@
+@reference '../../../../../../../styles/index.css';
+
 .property-mentions-suggestion-menu {
     @apply bg-background;
     @apply border;

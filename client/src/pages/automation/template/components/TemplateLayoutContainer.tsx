@@ -14,7 +14,7 @@ const TemplateLayoutContainer = ({
     return (
         <div className={twMerge('flex size-full flex-col', !fromInternalFlow && 'bg-surface-main')}>
             {!fromInternalFlow && (
-                <div className="absolute left-9 top-6 flex items-center justify-center py-4">
+                <div className="absolute top-6 left-9 flex items-center justify-center py-4">
                     <Link to="/">
                         <img alt="ByteChef" className="h-8 w-auto cursor-pointer" src={reactLogo} />
                     </Link>

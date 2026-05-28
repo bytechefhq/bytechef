@@ -43,7 +43,7 @@ export function TemplateCard({authorName, categories, description, icons, templa
 
                     <CardTitle>
                         <Tooltip>
-                            <TooltipTrigger asChild className="line-clamp-1 text-base font-semibold leading-tight">
+                            <TooltipTrigger asChild className="line-clamp-1 text-base leading-tight font-semibold">
                                 <span>{title}</span>
                             </TooltipTrigger>
 

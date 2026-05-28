@@ -20,7 +20,7 @@ export default function ApprovalTaskSearch() {
     return (
         <div className="relative">
             <div className="relative w-full">
-                <SearchIcon className="absolute left-3 top-1/2 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
+                <SearchIcon className="absolute top-1/2 left-3 z-10 size-4 -translate-y-1/2 text-muted-foreground" />
 
                 <Input
                     className="px-10"

@@ -123,12 +123,12 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                 >
                     <div
                         className={twMerge(
-                            'focus:ring-2 focus:ring-blue-500 focus-visible:outline-none',
+                            'focus:ring-2 focus:ring-blue-500 focus-visible:outline-hidden',
                             leadingIcon && 'relative rounded-md',
                             type === 'hidden' && 'border-0',
                             error && 'ring-rose-300',
                             trailingAction &&
-                                'flex h-9 items-center rounded-md border border-input shadow-sm focus-within:ring-2 focus-within:ring-blue-500'
+                                'flex h-9 items-center rounded-md border border-input shadow-xs focus-within:ring-2 focus-within:ring-blue-500'
                         )}
                     >
                         {type !== 'hidden' && leadingIcon && (
@@ -146,7 +146,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         {inputOverlay || (
                             <Input
                                 className={twMerge(
-                                    'bg-background outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500',
+                                    'bg-background outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-hidden',
                                     error &&
                                         'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                                     disabled && 'bg-gray-100 text-content-neutral-secondary',

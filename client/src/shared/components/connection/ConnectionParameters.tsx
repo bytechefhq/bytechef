@@ -52,7 +52,7 @@ const ConnectionParameters = ({
                 </div>
             )}
 
-            <h2 className="heading-tertiary text-sm">
+            <h2 className="text-sm heading-tertiary">
                 {hasConnectionParameters ? 'Connection' : 'Authorization'} Parameters
             </h2>
 

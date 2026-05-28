@@ -133,9 +133,7 @@ describe('Button variants', () => {
         expect(screen.getByText('Button')).toHaveClass(
             'bg-transparent border border-stroke-onsurface-primary/70 text-content-onsurface-primary'
         );
-        expect(screen.getByText('Button')).toHaveClass(
-            'hover:border-stroke-onsurface-primary/100 hover:bg-transparent'
-        );
+        expect(screen.getByText('Button')).toHaveClass('hover:border-stroke-onsurface-primary hover:bg-transparent');
     });
 
     it('should render an outline variant button with label if the variant prop is set to outline', () => {

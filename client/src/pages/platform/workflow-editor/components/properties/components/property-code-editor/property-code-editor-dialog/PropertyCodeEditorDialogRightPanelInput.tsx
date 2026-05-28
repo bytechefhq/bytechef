@@ -35,7 +35,7 @@ const PropertyCodeEditorDialogRightPanelInput = ({input}: PropertyCodeEditorDial
                 </div>
             </CardHeader>
 
-            <CardContent className="-ml-2 flex min-h-0 flex-1 flex-col pb-4 pl-0 pr-4">
+            <CardContent className="-ml-2 flex min-h-0 flex-1 flex-col pr-4 pb-4 pl-0">
                 {Object.keys(input).length > 0 ? (
                     <div className="flex min-h-0 flex-1 flex-col">
                         <div className="min-h-0 flex-1 overflow-hidden" data-testid="input-editor-container">
