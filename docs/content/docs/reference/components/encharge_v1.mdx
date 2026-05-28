@@ -84,31 +84,33 @@ This action does not produce any output.
 
 
 ### Create Email Template
-Name: createEmail
+Name: createEmailTemplate
 
-`Create email template`
+`Creates email template.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| name | Name | STRING | Name of the email template | true |
-| subject | Subject | STRING | Subject of the email | true |
-| fromEmail | From Email | STRING | From address to send the email from | true |
+| name | Name | STRING | Name of the email template. | true |
+| subject | Subject | STRING | Subject of the email. | true |
+| fromEmail | From Email | STRING | From address to send the email from. | true |
 | replyEmail | Reply Email | STRING | Address that recipients will reply to by default. | false |
+| html | HTML Content | STRING | HTML content of the email template. | false |
 
 #### Example JSON Structure
 ```json
 {
   "label" : "Create Email Template",
-  "name" : "createEmail",
+  "name" : "createEmailTemplate",
   "parameters" : {
     "name" : "",
     "subject" : "",
     "fromEmail" : "",
-    "replyEmail" : ""
+    "replyEmail" : "",
+    "html" : ""
   },
-  "type" : "encharge/v1/createEmail"
+  "type" : "encharge/v1/createEmailTemplate"
 }
 ```
 
@@ -123,7 +125,7 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| email | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail)&#125; </details> |  |
+| email | OBJECT <details> <summary> Properties </summary> &#123;INTEGER\(id), BOOLEAN\(isStandalone), INTEGER\(accountId), STRING\(name), STRING\(subject), STRING\(fromEmail), STRING\(replyEmail), STRING\(type), BOOLEAN\(archived), BOOLEAN\(canSpamCompliance), INTEGER\(communicationCategoryId), BOOLEAN\(isDefaultTemplate)&#125; </details> |  |
 
 
 
@@ -133,10 +135,17 @@ Type: OBJECT
 {
   "email" : {
     "id" : 1,
+    "isStandalone" : false,
+    "accountId" : 1,
     "name" : "",
     "subject" : "",
     "fromEmail" : "",
-    "replyEmail" : ""
+    "replyEmail" : "",
+    "type" : "",
+    "archived" : false,
+    "canSpamCompliance" : false,
+    "communicationCategoryId" : 1,
+    "isDefaultTemplate" : false
   }
 }
 ```
@@ -144,10 +153,10 @@ Type: OBJECT
 
 
 
-### Create People
-Name: createPeople
+### Create Person
+Name: createPerson
 
-`Creates new People`
+`Creates a new person in Encharge.`
 
 #### Properties
 
@@ -158,8 +167,8 @@ Name: createPeople
 #### Example JSON Structure
 ```json
 {
-  "label" : "Create People",
-  "name" : "createPeople",
+  "label" : "Create Person",
+  "name" : "createPerson",
   "parameters" : {
     "__items" : [ {
       "email" : "",
@@ -170,7 +179,7 @@ Name: createPeople
       "phone" : ""
     } ]
   },
-  "type" : "encharge/v1/createPeople"
+  "type" : "encharge/v1/createPerson"
 }
 ```
 
