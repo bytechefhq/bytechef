@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Ask anything you want.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/amazon-bedrock_v1#ask"
+    },
     "metadata": null,
     "name": "ask",
     "outputDefinition": {
