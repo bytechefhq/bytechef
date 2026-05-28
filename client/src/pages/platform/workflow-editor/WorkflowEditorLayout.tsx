@@ -22,6 +22,7 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
+import SubflowBanner from './components/SubflowBanner';
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
     DataPillPanelSkeleton,
@@ -43,6 +44,7 @@ const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSideba
 interface WorkflowEditorLayoutProps {
     includeComponents?: string[];
     leftSidebarOpen?: boolean;
+    onEditSubflowClick?: (workflowUuid: string) => void;
     runDisabled: boolean;
     showCopilot?: boolean;
     showWorkflowInputs: boolean;
@@ -52,6 +54,7 @@ interface WorkflowEditorLayoutProps {
 const WorkflowEditorLayout = ({
     includeComponents,
     leftSidebarOpen,
+    onEditSubflowClick,
     runDisabled,
     showCopilot = true,
     showWorkflowInputs,
@@ -192,6 +195,8 @@ const WorkflowEditorLayout = ({
                     copilotLayoutShifted && 'mr-0'
                 )}
             >
+                <SubflowBanner />
+
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense>
                         <WorkflowEditor
@@ -286,6 +291,7 @@ const WorkflowEditorLayout = ({
             {showWorkflowCodeEditorSheet && (
                 <WorkflowCodeEditorSheet
                     invalidateWorkflowQueries={invalidateWorkflowQueries!}
+                    onEditSubflowClick={onEditSubflowClick}
                     onSheetOpenClose={setShowWorkflowCodeEditorSheet}
                     runDisabled={runDisabled}
                     sheetOpen={showWorkflowCodeEditorSheet}
