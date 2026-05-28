@@ -15,6 +15,7 @@ import {PanelImperativeHandle, usePanelCallbackRef} from 'react-resizable-panels
 import {useShallow} from 'zustand/shallow';
 
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 
 import type {editor} from 'monaco-editor';
 
@@ -75,6 +76,7 @@ const useWorkflowCodeEditorSheet = ({
     const ai = useApplicationInfoStore((state) => state.ai);
     const setContext = useCopilotStore((state) => state.setContext);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const setShowBottomPanelOpen = useWorkflowEditorStore((state) => state.setShowBottomPanelOpen);
 
     const {projectName} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -97,6 +99,7 @@ const useWorkflowCodeEditorSheet = ({
             setWorkflowTestExecution(execution);
             setWorkflowIsRunning(false);
             setJobId(null);
+            setShowBottomPanelOpen(true);
         },
         onStart: (jobId) => setJobId(jobId),
         workflowId: workflow.id!,
@@ -244,7 +247,9 @@ const useWorkflowCodeEditorSheet = ({
     }, [workflow.definition]);
 
     useEffect(() => {
-        if (!workflow.id || currentEnvironmentId === undefined) return;
+        if (!workflow.id || currentEnvironmentId === undefined) {
+            return;
+        }
 
         const jobId = getPersistedJobId();
 
