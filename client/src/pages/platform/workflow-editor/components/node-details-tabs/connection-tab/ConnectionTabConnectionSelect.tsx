@@ -327,7 +327,7 @@ const ConnectionTabConnectionSelect = ({
                     <div className="flex w-full min-w-0 space-x-2">
                         {componentConnections && componentConnections.length > 0 && (
                             <div className="min-w-0 flex-1 bg-content-onsurface-primary">
-                                <SelectTrigger>
+                                <SelectTrigger className="min-w-0 overflow-hidden text-left [&>span]:block [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden">
                                     <SelectValue placeholder="Choose Connection..." />
                                 </SelectTrigger>
                             </div>
@@ -367,18 +367,24 @@ const ConnectionTabConnectionSelect = ({
                         {!connectionDialogAllowed && !componentConnections?.length && <p>No connections available.</p>}
                     </div>
 
-                    <SelectContent>
+                    <SelectContent className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0">
                         {componentConnections &&
                             componentConnections.map((connection) => (
-                                <SelectItem key={connection.id} value={connection.id!.toString()}>
-                                    <div className="flex items-center space-x-1">
-                                        <span>{connection.name}</span>
+                                <SelectItem
+                                    className="[&>span:last-child]:block [&>span:last-child]:min-w-0 [&>span:last-child]:flex-1"
+                                    key={connection.id}
+                                    value={connection.id!.toString()}
+                                >
+                                    <div className="flex w-full min-w-0 items-center space-x-1">
+                                        <span className="min-w-0 truncate">{connection.name}</span>
 
-                                        <span className="text-xs text-content-neutral-secondary">
+                                        <span className="min-w-0 truncate text-xs text-content-neutral-secondary">
                                             {connection?.tags?.map((tag) => tag.name).join(', ')}
                                         </span>
 
-                                        <EnvironmentBadge environmentId={+connection.environmentId!} />
+                                        <span className="shrink-0">
+                                            <EnvironmentBadge environmentId={+connection.environmentId!} />
+                                        </span>
                                     </div>
                                 </SelectItem>
                             ))}

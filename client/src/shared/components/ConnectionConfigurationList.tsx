@@ -86,6 +86,8 @@ const ConnectionConfigurationListFormField = ({
         (connection) => connection.componentName === componentConnection.componentName
     );
 
+    const currentConnection = connectionList.find((connection) => connection.id === currentConnectionId);
+
     const openConnectionDialog = () => {
         if (!handleConnectionDialogOpen) {
             return;
@@ -135,9 +137,21 @@ const ConnectionConfigurationListFormField = ({
                     >
                         <FormControl>
                             <div className="flex min-w-0 space-x-2 bg-surface-neutral-primary">
-                                <SelectTrigger className="min-w-0 shadow-none">
+                                <SelectTrigger className="min-w-0 overflow-hidden text-left shadow-none [&>span]:block [&>span]:min-w-0 [&>span]:flex-1 [&>span]:overflow-hidden">
                                     {currentConnectionId ? (
-                                        <SelectValue placeholder="Select a connection..." />
+                                        <SelectValue placeholder="Select a connection...">
+                                            {currentConnection && (
+                                                <div className="flex w-full min-w-0 items-center space-x-1">
+                                                    <span className="min-w-0 truncate">{currentConnection.name}</span>
+
+                                                    <span className="shrink-0">
+                                                        <EnvironmentBadge
+                                                            environmentId={currentConnection.environmentId!}
+                                                        />
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </SelectValue>
                                     ) : (
                                         <SelectValue placeholder="Select a connection...">
                                             <span className="text-content-neutral-secondary/80">
