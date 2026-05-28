@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new record in datasheet.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aitable_v1#create-record"
+    },
     "metadata": null,
     "name": "createRecord",
     "outputDefinition": {
@@ -93,7 +96,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Find records in datasheet",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aitable_v1#find-records"
+    },
     "metadata": null,
     "name": "findRecords",
     "outputDefinition": {
@@ -243,25 +249,6 @@
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
-    }, {
-      "advancedOption": null,
-      "controlType": "INTEGER",
-      "defaultValue": null,
-      "description": "How many records are returned in total",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "label": "Max Records",
-      "maxValue": null,
-      "metadata": { },
-      "minValue": null,
-      "name": "maxRecords",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": null,
-      "required": false,
-      "type": "INTEGER"
     } ],
     "resumePerform": null,
     "title": "Find Records",
@@ -273,7 +260,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update record in datasheet",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aitable_v1#update-record"
+    },
     "metadata": null,
     "name": "updateRecord",
     "outputDefinition": {
@@ -428,21 +418,27 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/aitable_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.aitable.ai/api/reference/"
+  },
   "description": "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills.",
   "icon": "path:assets/aitable.svg",
   "metadata": null,
   "name": "aitable",
   "resources": null,
   "tags": null,
-  "title": "AITable",
+  "title": "AITable.ai",
   "triggers": null,
   "unifiedApi": null,
   "version": 1
