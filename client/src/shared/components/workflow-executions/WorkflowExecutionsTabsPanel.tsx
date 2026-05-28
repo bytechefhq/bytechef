@@ -17,17 +17,18 @@ import {getDisplayValue, hasDialogContentValue} from '@/shared/components/workfl
 import {Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {TabValueType} from '@/shared/types';
-import {AlertCircleIcon, ExpandIcon, ScrollTextIcon} from 'lucide-react';
-import {useMemo} from 'react';
+import {AlertCircleIcon, ExpandIcon, ScrollTextIcon, SquarePenIcon} from 'lucide-react';
+import {useCallback, useMemo} from 'react';
 
 interface WorkflowExecutionsTabsPanelProps {
     activeTab: TabValueType;
-    setActiveTab: (value: TabValueType) => void;
     dialogOpen: boolean;
-    setDialogOpen: (open: boolean) => void;
-    selectedItem: TriggerExecution | TaskExecution | undefined;
-    job: Job;
     isEditorEnvironment?: boolean;
+    job: Job;
+    onEditSubflowClick?: (workflowUuid: string) => void;
+    selectedItem: TriggerExecution | TaskExecution | undefined;
+    setActiveTab: (value: TabValueType) => void;
+    setDialogOpen: (open: boolean) => void;
     triggerExecution?: TriggerExecution;
 }
 
@@ -36,12 +37,15 @@ const WorkflowExecutionsTabsPanel = ({
     dialogOpen,
     isEditorEnvironment = false,
     job,
+    onEditSubflowClick,
     selectedItem,
     setActiveTab,
     setDialogOpen,
     triggerExecution,
 }: WorkflowExecutionsTabsPanelProps) => {
     const ff_2896 = useFeatureFlagsStore()('ff-2896');
+
+    const handleValueChange = useCallback((value: string) => setActiveTab(value as TabValueType), [setActiveTab]);
 
     const displayValue = useMemo(
         () =>
@@ -79,11 +83,16 @@ const WorkflowExecutionsTabsPanel = ({
           ? (selectedItem as TaskExecution).workflowTask?.name
           : undefined;
 
+    const subflowWorkflowUuid =
+        !isTriggerExecution && selectedItem && 'workflowTask' in selectedItem
+            ? ((selectedItem as TaskExecution).workflowTask?.parameters?.workflowUuid as string | undefined)
+            : undefined;
+
     return (
         <Tabs
             className="flex h-full flex-col"
             defaultValue={activeTab}
-            onValueChange={(value) => setActiveTab(value as TabValueType)}
+            onValueChange={handleValueChange}
             value={activeTab}
         >
             <div className="flex items-center justify-between p-3">
@@ -93,6 +102,17 @@ const WorkflowExecutionsTabsPanel = ({
                     <span className="text-sm font-semibold">{itemLabel || selectedItem?.title}</span>
 
                     <span className="text-xs text-muted-foreground">{`(${workflowNodeName})`}</span>
+
+                    {subflowWorkflowUuid && onEditSubflowClick && (
+                        <button
+                            className="flex items-center justify-center gap-1 rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-1.5 py-0.5"
+                            onClick={() => onEditSubflowClick(subflowWorkflowUuid)}
+                        >
+                            <SquarePenIcon className="size-3 text-content-neutral-primary" />
+
+                            <span className="text-[12px] font-medium leading-4 text-content-neutral-primary">Edit</span>
+                        </button>
+                    )}
                 </div>
 
                 <div className="flex items-center gap-2 text-xs text-muted-foreground">
