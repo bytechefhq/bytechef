@@ -159,9 +159,9 @@ Type: OBJECT
 
 To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
 
-#### Find Parent Folder ID
+#### Find Folder ID
 
-To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -322,6 +322,77 @@ This action does not produce any output.
 
 
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
+
+
+
+### Download File
+Name: downloadFile
+
+`Download file from Microsoft SharePoint site.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| siteId | Site ID | STRING | The ID of the SharePoint site. | true |
+| fileId | File ID | STRING <details> <summary> Depends On </summary> siteId </details> | ID of the file that will be downloaded. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "siteId" : "",
+    "fileId" : ""
+  },
+  "type" : "microsoftSharePoint/v1/downloadFile"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -415,6 +486,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find Folder ID
+
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -593,6 +671,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Site ID
+
+To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
+
+#### Find File ID
+
+To find the File ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -690,9 +775,9 @@ Type: OBJECT
 
 To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
 
-#### Find Parent Folder ID
+#### Find Folder ID
 
-To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -737,9 +822,9 @@ The output for this action is dynamic and may vary depending on the input parame
 
 To find the Site ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-site-id).
 
-#### Find Parent Folder ID
+#### Find Folder ID
 
-To find the Parent Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-parent-folder-id).
+To find the Folder ID, click [here](/reference/components/microsoft-share-point_v1#how-to-find-your-folder-or-file-id).
 
 
 
@@ -764,9 +849,9 @@ Only way of finding Site ID in Microsoft SharePoint is using Microsoft Graph API
 3. Then use this Microsoft Graph API endpoint; `GET https://graph.microsoft.com/v1.0/sites/company.sharepoint.com:/sites/Finance`
 4. You will get your folder ID.
 
-### How to find your Parent Folder ID
+### How to find your Folder of File ID
 
-Only way of finding Folder ID in Microsoft SharePoint is using Microsoft Graph API endpoint: `GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives`.
+Only way of finding Folder or File ID in Microsoft SharePoint is using Microsoft Graph API endpoint: `GET https://graph.microsoft.com/v1.0/sites/{site-id}/drives`.
 
 ### How to find your List ID
 
