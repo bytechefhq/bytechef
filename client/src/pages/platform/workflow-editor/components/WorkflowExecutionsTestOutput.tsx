@@ -14,6 +14,7 @@ import useWorkflowExecutions from './properties/hooks/useWorkflowExecutions';
 
 interface WorkflowExecutionsTestOutputProps {
     onCloseClick?: () => void;
+    onEditSubflowClick?: (workflowUuid: string) => void;
     resizablePanelSize?: number;
     workflowIsRunning: boolean;
     workflowTestExecution?: WorkflowTestExecution;
@@ -21,6 +22,7 @@ interface WorkflowExecutionsTestOutputProps {
 
 const WorkflowExecutionsTestOutput = ({
     onCloseClick,
+    onEditSubflowClick,
     resizablePanelSize = 300,
     workflowIsRunning,
     workflowTestExecution,
@@ -51,7 +53,7 @@ const WorkflowExecutionsTestOutput = ({
                 )}
 
                 {onCloseClick && (
-                    <button className="p-2" onClick={() => onCloseClick()}>
+                    <button className="p-2" onClick={onCloseClick}>
                         <ChevronDownIcon className="h-5" />
                     </button>
                 )}
@@ -126,8 +128,9 @@ const WorkflowExecutionsTestOutput = ({
                                             <WorkflowExecutionsTabsPanel
                                                 activeTab={activeTab}
                                                 dialogOpen={dialogOpen}
-                                                isEditorEnvironment={true}
+                                                isEditorEnvironment
                                                 job={job}
+                                                onEditSubflowClick={onEditSubflowClick}
                                                 selectedItem={selectedExecution}
                                                 setActiveTab={setActiveTab}
                                                 setDialogOpen={setDialogOpen}
