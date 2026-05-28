@@ -128,17 +128,17 @@ public class AITableUtils {
 
         List<FieldTypeInfo> datasheetFields = createDatasheetFields(inputParameters, context);
 
-        List<ValueProperty<?>> list = new ArrayList<>();
+        List<ValueProperty<?>> properties = new ArrayList<>();
 
         for (FieldTypeInfo fieldTypeInfo : datasheetFields) {
             ModifiableValueProperty<?, ?> propertyType = getPropertyType(fieldTypeInfo);
 
             if (propertyType != null) {
-                list.add(propertyType);
+                properties.add(propertyType);
             }
         }
 
-        return list;
+        return properties;
     }
 
     @SuppressWarnings("unchecked")
@@ -160,7 +160,6 @@ public class AITableUtils {
 
                     fields.add(new FieldTypeInfo((String) field.get(NAME), (String) field.get(TYPE), property));
                 }
-
             }
         }
 
@@ -191,11 +190,17 @@ public class AITableUtils {
                     yield number(name)
                         .label(name)
                         .description("Currency symbol: " + property.get("symbol"))
+                        .maxNumberPrecision((Integer) property.get("precision"))
                         .required(false);
                 }
-                case NUMBER, PERCENT -> number(name)
-                    .label(name)
-                    .required(false);
+                case NUMBER, PERCENT -> {
+                    Map<String, Object> property = fieldTypeInfo.property();
+
+                    yield number(name)
+                        .label(name)
+                        .maxNumberPrecision((Integer) property.get("precision"))
+                        .required(false);
+                }
                 case RATING -> {
                     Map<String, Object> property = fieldTypeInfo.property();
 
