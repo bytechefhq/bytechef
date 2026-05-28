@@ -159,7 +159,7 @@ public class BaseFtpActionIntTest {
 
         @Override
         public InputStream getInputStream(FileEntry fileEntry) {
-            return new ByteArrayInputStream(data.getBytes());
+            return new ByteArrayInputStream(data.getBytes(StandardCharsets.UTF_8));
         }
 
         @Override
@@ -202,7 +202,7 @@ public class BaseFtpActionIntTest {
         }
 
         @Override
-        public java.io.File toTempFile(FileEntry fileEntry) {
+        public File toTempFile(FileEntry fileEntry) {
             throw new UnsupportedOperationException("Disabled in test mode");
         }
 
@@ -223,7 +223,8 @@ public class BaseFtpActionIntTest {
             this.name = fileName;
 
             try {
-                return storeContent(fileName, new String(inputStream.readAllBytes()));
+                return storeContent(
+                    fileName, new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
             } catch (Exception exception) {
                 throw new RuntimeException("Unable to store file " + fileName, exception);
             }
