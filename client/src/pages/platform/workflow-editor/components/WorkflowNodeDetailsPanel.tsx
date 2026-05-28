@@ -113,10 +113,9 @@ const WorkflowNodeDetailsPanel = ({
 
                                 <div className="flex flex-col items-start flex-1 min-w-0">
                                     <div className="flex items-center gap-2 min-w-0 max-w-full">
-                                        {/* <span className="text-lg font-semibold flex-1 min-w-0 truncate">{currentNode?.label}</span> */}
 
                                         {(currentNode?.label?.length ?? 0) > 32 ? (
-                                            <Tooltip delayDuration={300}>
+                                            <Tooltip>
                                                 <TooltipTrigger asChild>
                                                     <span className="text-lg font-semibold flex-1 min-w-0 truncate">{currentNode?.label}</span>
                                                 </TooltipTrigger>
@@ -134,7 +133,7 @@ const WorkflowNodeDetailsPanel = ({
                                         )}
 
                                         {currentWorkflowNode.description && (
-                                            <Tooltip delayDuration={500}>
+                                            <Tooltip>
                                                 <TooltipTrigger>
                                                     <InfoIcon className="size-4" />
                                                 </TooltipTrigger>
