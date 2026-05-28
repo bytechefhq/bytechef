@@ -231,7 +231,7 @@ const WorkflowNodeDetailsPanel = ({
                                 </div>
                             )}
 
-                            <ScrollArea className="h-full max-w-workflow-node-details-panel-width bg-surface-main [&>div]:relative">
+                            <ScrollArea className="h-full max-w-workflow-node-details-panel-width bg-surface-main [&_[data-radix-scroll-area-viewport]>div]:block! [&>div]:relative">
                                 <div className="size-full max-w-workflow-node-details-panel-width">
                                     {activeTab === 'description' &&
                                         (nodeDefinition ? (
