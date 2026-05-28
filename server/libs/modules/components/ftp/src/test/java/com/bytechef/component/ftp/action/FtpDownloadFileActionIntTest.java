@@ -26,7 +26,6 @@ import static com.bytechef.component.ftp.constant.FtpConstants.USERNAME;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -42,8 +41,6 @@ import org.junit.jupiter.api.Test;
  * 1. Add a new {@code @Test} method. <br>
  * 2. Build {@link Parameters} with {@link MockParametersFactory#create(Map)} using the constants from
  * {@link com.bytechef.component.ftp.constant.FtpConstants}. <br>
- * 3. Use {@link #buildCapturingContext} to obtain a mock {@link ActionContext} that captures the downloaded bytes and
- * filename. <br>
  * 4. Call {@link FtpDownloadFileAction#perform} and assert on the captured values. <br>
  * <br>
  * FTP container configuration: change {@link #PASSIVE_DATA_PORT}, {@link #FTP_USERNAME}, or {@link #FTP_PASSWORD} and
