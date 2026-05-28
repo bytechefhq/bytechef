@@ -55,6 +55,9 @@ export interface WorkflowEditorI {
     showWorkflowOutputsSheet: boolean;
     setShowWorkflowOutputsSheet: (showWorkflowOutputsSheet: boolean) => void;
 
+    parentWorkflowTestExecution?: WorkflowTestExecution;
+    setParentWorkflowTestExecution: (parentWorkflowTestExecution?: WorkflowTestExecution) => void;
+
     workflowTestExecution?: WorkflowTestExecution;
     setWorkflowTestExecution: (workflowTestExecution?: WorkflowTestExecution) => void;
 }
@@ -150,6 +153,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setWorkflowIsRunning: (workflowIsRunning) =>
                 set(() => ({
                     workflowIsRunning: workflowIsRunning,
+                })),
+
+            parentWorkflowTestExecution: undefined,
+            setParentWorkflowTestExecution: (parentWorkflowTestExecution?: WorkflowTestExecution) =>
+                set(() => ({
+                    parentWorkflowTestExecution,
                 })),
 
             workflowTestExecution: undefined,

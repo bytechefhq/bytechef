@@ -33,6 +33,7 @@ const Project = () => {
         cancelWorkflowQueries,
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
+        handleEditSubflowClick,
         handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
         invalidateWorkflowQueries,
@@ -109,6 +110,7 @@ const Project = () => {
                                 {projectId && (
                                     <WorkflowEditorLayout
                                         leftSidebarOpen={projectLeftSidebarOpen}
+                                        onEditSubflowClick={handleEditSubflowClick}
                                         runDisabled={runDisabled}
                                         showWorkflowInputs={true}
                                         workflowReferenceId={projectWorkflowId}
@@ -123,6 +125,7 @@ const Project = () => {
                             {(workflowIsRunning || workflowTestExecution) && (
                                 <WorkflowExecutionsTestOutput
                                     onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                    onEditSubflowClick={handleEditSubflowClick}
                                     workflowIsRunning={workflowIsRunning}
                                     workflowTestExecution={workflowTestExecution}
                                 />

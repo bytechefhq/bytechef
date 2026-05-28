@@ -16,10 +16,15 @@ import {
     useUpdateWorkflowNodeParameterMutation,
 } from '@/shared/mutations/platform/workflowNodeParameters.mutations';
 import useUpdatePlatformWorkflowMutation from '@/shared/mutations/platform/workflows.mutations';
+import {useGetComponentDefinitionsQuery as useGetComponentDefinitionsBaseQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetProjectCategoriesQuery} from '@/shared/queries/automation/projectCategories.queries';
 import {useGetProjectTagsQuery} from '@/shared/queries/automation/projectTags.queries';
-import {ProjectWorkflowKeys, useGetProjectWorkflowQuery} from '@/shared/queries/automation/projectWorkflows.queries';
+import {
+    ProjectWorkflowKeys,
+    useGetProjectWorkflowQuery,
+    useGetProjectWorkflowsQuery,
+} from '@/shared/queries/automation/projectWorkflows.queries';
 import {WorkflowKeys} from '@/shared/queries/automation/workflows.queries';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {WorkflowNodeDescriptionKeys} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
@@ -27,7 +32,7 @@ import {WorkflowNodeOutputKeys} from '@/shared/queries/platform/workflowNodeOutp
 import {WorkflowNodeParameterKeys} from '@/shared/queries/platform/workflowNodeParameters.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {useQueryClient} from '@tanstack/react-query';
-import {useEffect, useRef, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
@@ -44,12 +49,15 @@ export const useProject = () => {
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const projectLeftSidebarOpen = useProjectsLeftSidebarStore((state) => state.projectLeftSidebarOpen);
-    const {setShowBottomPanelOpen, setShowEditWorkflowDialog} = useWorkflowEditorStore(
-        useShallow((state) => ({
-            setShowBottomPanelOpen: state.setShowBottomPanelOpen,
-            setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
-        }))
-    );
+    const {setShowBottomPanelOpen, setShowEditWorkflowDialog, setShowWorkflowCodeEditorSheet, showBottomPanel} =
+        useWorkflowEditorStore(
+            useShallow((state) => ({
+                setShowBottomPanelOpen: state.setShowBottomPanelOpen,
+                setShowEditWorkflowDialog: state.setShowEditWorkflowDialog,
+                setShowWorkflowCodeEditorSheet: state.setShowWorkflowCodeEditorSheet,
+                showBottomPanel: state.showBottomPanel,
+            }))
+        );
     const setWorkflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.setWorkflowNodeDetailsPanelOpen
     );
@@ -80,8 +88,10 @@ export const useProject = () => {
         !!projectId && !!projectWorkflowId
     );
 
+    const {data: projectWorkflows} = useGetProjectWorkflowsQuery(+projectId!, !!projectId);
+
     const useGetComponentDefinitionsQuery = (request: GetComponentDefinitionsRequestI, enabled?: boolean) => {
-        return useGetComponentDefinitionsQuery(request, enabled);
+        return useGetComponentDefinitionsBaseQuery(request, enabled);
     };
 
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) => {
@@ -168,25 +178,84 @@ export const useProject = () => {
         });
     };
 
-    const handleProjectClick = (projectId: number, projectWorkflowId: number) => {
-        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
-    };
+    const handleEditSubflowClick = useCallback(
+        (workflowUuid: string) => {
+            const matchingWorkflow = projectWorkflows?.find((workflow) => workflow.workflowUuid === workflowUuid);
 
-    const handleWorkflowExecutionsTestOutputCloseClick = () => {
+            if (matchingWorkflow?.projectWorkflowId) {
+                const newSearchParams = new URLSearchParams(searchParams.toString());
+
+                const existingParentId = newSearchParams.get('parentProjectWorkflowId');
+
+                if (existingParentId) {
+                    const existingChain = newSearchParams.get('parentChain');
+                    const newChain = existingChain ? `${existingChain},${existingParentId}` : existingParentId;
+
+                    newSearchParams.set('parentChain', newChain);
+                }
+
+                newSearchParams.set('fromSubflow', 'true');
+                newSearchParams.set('parentProjectWorkflowId', projectWorkflowId!);
+
+                if (showBottomPanel) {
+                    newSearchParams.set('restoreExecutionPanel', 'true');
+                }
+
+                const {parentWorkflowTestExecution, setParentWorkflowTestExecution, workflowTestExecution} =
+                    useWorkflowEditorStore.getState();
+
+                if (!parentWorkflowTestExecution) {
+                    setParentWorkflowTestExecution(workflowTestExecution);
+                }
+
+                setShowBottomPanelOpen(false);
+                setShowWorkflowCodeEditorSheet(false);
+
+                if (bottomResizablePanelRef.current) {
+                    bottomResizablePanelRef.current.resize(0);
+                }
+
+                navigate(
+                    `/automation/projects/${projectId}/project-workflows/${matchingWorkflow.projectWorkflowId}?${newSearchParams}`
+                );
+            }
+        },
+        [
+            bottomResizablePanelRef,
+            navigate,
+            projectId,
+            projectWorkflowId,
+            projectWorkflows,
+            searchParams,
+            setShowBottomPanelOpen,
+            setShowWorkflowCodeEditorSheet,
+            showBottomPanel,
+        ]
+    );
+
+    const handleProjectClick = useCallback(
+        (projectId: number, projectWorkflowId: number) => {
+            const newSearchParams = new URLSearchParams(searchParams.toString());
+
+            newSearchParams.delete('fromSubflow');
+            newSearchParams.delete('parentChain');
+            newSearchParams.delete('parentProjectWorkflowId');
+            newSearchParams.delete('restoreExecutionPanel');
+
+            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+        },
+        [navigate, searchParams]
+    );
+
+    const handleWorkflowExecutionsTestOutputCloseClick = useCallback(() => {
         setShowBottomPanelOpen(false);
 
         if (bottomResizablePanelRef.current) {
             bottomResizablePanelRef.current.resize(0);
         }
-    };
+    }, [bottomResizablePanelRef, setShowBottomPanelOpen]);
 
     useEffect(() => {
-        setShowBottomPanelOpen(false);
-
-        if (bottomResizablePanelRef.current) {
-            bottomResizablePanelRef.current.resize(0);
-        }
-
         // Reset state when the component unmounts
         return () => {
             setCopilotPanelOpen(false);
@@ -202,6 +271,36 @@ export const useProject = () => {
         setWorkflowTestChatPanelOpen(false);
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
+
+        const restoreParam = searchParams.get('restoreExecutionPanel');
+        const fromSubflow = searchParams.get('fromSubflow');
+        const isReturningFromSubflow = restoreParam === 'true' && fromSubflow !== 'true';
+
+        if (isReturningFromSubflow) {
+            const {parentWorkflowTestExecution, setParentWorkflowTestExecution, setWorkflowTestExecution} =
+                useWorkflowEditorStore.getState();
+
+            setWorkflowTestExecution(parentWorkflowTestExecution);
+            setParentWorkflowTestExecution(undefined);
+        }
+
+        const storedExecution = useWorkflowEditorStore.getState().workflowTestExecution;
+        const shouldRestorePanel = isReturningFromSubflow && !!storedExecution;
+
+        if (shouldRestorePanel) {
+            setShowBottomPanelOpen(true);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(350);
+            }
+        } else {
+            setShowBottomPanelOpen(false);
+
+            if (bottomResizablePanelRef.current) {
+                bottomResizablePanelRef.current.resize(0);
+            }
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [projectWorkflowId]);
 
@@ -236,6 +335,7 @@ export const useProject = () => {
         deleteClusterElementParameterMutation,
         deleteWorkflowNodeParameterMutation,
         filterData,
+        handleEditSubflowClick,
         handleProjectClick,
         handleWorkflowExecutionsTestOutputCloseClick,
         invalidateWorkflowQueries,
