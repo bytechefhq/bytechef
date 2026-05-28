@@ -1,4 +1,5 @@
 import babelPlugin from '@rolldown/plugin-babel';
+import tailwindcss from '@tailwindcss/vite';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 import react from '@vitejs/plugin-react';
 import * as path from 'node:path';
@@ -45,6 +46,7 @@ export default ({mode}) => {
         },
         plugins: [
             react(),
+            tailwindcss(),
             babelPlugin({
                 plugins: ['@lingui/babel-plugin-lingui-macro'],
             }),

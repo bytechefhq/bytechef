@@ -54,6 +54,9 @@ export default [
             },
         },
         settings: {
+            'better-tailwindcss': {
+                entryPoint: 'src/styles/index.css',
+            },
             react: {version: 'detect'},
         },
         plugins: {
