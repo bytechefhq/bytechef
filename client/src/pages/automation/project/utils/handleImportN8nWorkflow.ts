@@ -4,6 +4,7 @@ import {
 } from '@/shared/middleware/automation/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
+import {toast} from "sonner";
 
 const handleImportN8nWorkflow = async (
     event: ChangeEvent<HTMLInputElement>,
@@ -24,12 +25,18 @@ const handleImportN8nWorkflow = async (
             ? (file as Blob).text()
             : new Response(file).text());
 
-        const convertedWorkflow = await convertN8nWorkflow(json);
+        try {
+            const convertedWorkflow = await convertN8nWorkflow(json);
 
-        importProjectWorkflowMutation.mutate({
-            id: projectId,
-            workflow: {definition: convertedWorkflow},
-        });
+            importProjectWorkflowMutation.mutate({
+                id: projectId,
+                workflow: {definition: convertedWorkflow},
+            });
+        } catch (e) {
+            console.error(e);
+
+            toast('The uploaded n8n workflow is not supported or could not be converted.');
+        }
     }
 };
 
