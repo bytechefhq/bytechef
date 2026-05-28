@@ -78,7 +78,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Create email template",
+    "description": "Creates email template.",
     "help": null,
     "metadata": {
       "path": "/emails",
@@ -86,7 +86,7 @@
       "method": "POST",
       "bodyContentType": "JSON"
     },
-    "name": "createEmail",
+    "name": "createEmailTemplate",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -143,6 +143,49 @@
               "metadata": { },
               "minValue": null,
               "name": "id",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "required": false,
+              "type": "INTEGER"
+            }, {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Whether this email template is standalone or part of a broadcast.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": { },
+              "name": "isStandalone",
+              "options": [ {
+                "description": null,
+                "label": "True",
+                "value": true
+              }, {
+                "description": null,
+                "label": "False",
+                "value": false
+              } ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
+            }, {
+              "advancedOption": null,
+              "controlType": "INTEGER",
+              "defaultValue": null,
+              "description": "ID of the account associated with the email template.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "maxValue": null,
+              "metadata": { },
+              "minValue": null,
+              "name": "accountId",
               "options": null,
               "optionsDataSource": null,
               "placeholder": null,
@@ -236,6 +279,119 @@
               "regex": null,
               "required": false,
               "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "TEXT",
+              "defaultValue": null,
+              "description": "Type of the email. HTML or plain-text. Currently only HTML is supported.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "languageId": null,
+              "maxLength": null,
+              "metadata": { },
+              "minLength": null,
+              "name": "type",
+              "options": null,
+              "optionsDataSource": null,
+              "optionsLoadedDynamically": null,
+              "placeholder": null,
+              "regex": null,
+              "required": false,
+              "type": "STRING"
+            }, {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Indicates if the email template is archived.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": { },
+              "name": "archived",
+              "options": [ {
+                "description": null,
+                "label": "True",
+                "value": true
+              }, {
+                "description": null,
+                "label": "False",
+                "value": false
+              } ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
+            }, {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Indicates if the email template complies with CAN-SPAM regulations.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": { },
+              "name": "canSpamCompliance",
+              "options": [ {
+                "description": null,
+                "label": "True",
+                "value": true
+              }, {
+                "description": null,
+                "label": "False",
+                "value": false
+              } ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
+            }, {
+              "advancedOption": null,
+              "controlType": "INTEGER",
+              "defaultValue": null,
+              "description": "ID of the communication category of this email template.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "maxValue": null,
+              "metadata": { },
+              "minValue": null,
+              "name": "communicationCategoryId",
+              "options": null,
+              "optionsDataSource": null,
+              "placeholder": null,
+              "required": false,
+              "type": "INTEGER"
+            }, {
+              "advancedOption": null,
+              "controlType": "SELECT",
+              "defaultValue": null,
+              "description": "Indicates if the email template is the default template for the account.",
+              "displayCondition": null,
+              "exampleValue": null,
+              "expressionEnabled": null,
+              "hidden": null,
+              "label": null,
+              "metadata": { },
+              "name": "isDefaultTemplate",
+              "options": [ {
+                "description": null,
+                "label": "True",
+                "value": true
+              }, {
+                "description": null,
+                "label": "False",
+                "value": false
+              } ],
+              "placeholder": null,
+              "required": false,
+              "type": "BOOLEAN"
             } ],
             "required": false,
             "type": "OBJECT"
@@ -299,6 +455,49 @@
             "metadata": { },
             "minValue": null,
             "name": "id",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "Whether this email template is standalone or part of a broadcast.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "name": "isStandalone",
+            "options": [ {
+              "description": null,
+              "label": "True",
+              "value": true
+            }, {
+              "description": null,
+              "label": "False",
+              "value": false
+            } ],
+            "placeholder": null,
+            "required": false,
+            "type": "BOOLEAN"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "ID of the account associated with the email template.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "accountId",
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
@@ -392,6 +591,119 @@
             "regex": null,
             "required": false,
             "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "TEXT",
+            "defaultValue": null,
+            "description": "Type of the email. HTML or plain-text. Currently only HTML is supported.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "languageId": null,
+            "maxLength": null,
+            "metadata": { },
+            "minLength": null,
+            "name": "type",
+            "options": null,
+            "optionsDataSource": null,
+            "optionsLoadedDynamically": null,
+            "placeholder": null,
+            "regex": null,
+            "required": false,
+            "type": "STRING"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "Indicates if the email template is archived.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "name": "archived",
+            "options": [ {
+              "description": null,
+              "label": "True",
+              "value": true
+            }, {
+              "description": null,
+              "label": "False",
+              "value": false
+            } ],
+            "placeholder": null,
+            "required": false,
+            "type": "BOOLEAN"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "Indicates if the email template complies with CAN-SPAM regulations.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "name": "canSpamCompliance",
+            "options": [ {
+              "description": null,
+              "label": "True",
+              "value": true
+            }, {
+              "description": null,
+              "label": "False",
+              "value": false
+            } ],
+            "placeholder": null,
+            "required": false,
+            "type": "BOOLEAN"
+          }, {
+            "advancedOption": null,
+            "controlType": "INTEGER",
+            "defaultValue": null,
+            "description": "ID of the communication category of this email template.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "maxValue": null,
+            "metadata": { },
+            "minValue": null,
+            "name": "communicationCategoryId",
+            "options": null,
+            "optionsDataSource": null,
+            "placeholder": null,
+            "required": false,
+            "type": "INTEGER"
+          }, {
+            "advancedOption": null,
+            "controlType": "SELECT",
+            "defaultValue": null,
+            "description": "Indicates if the email template is the default template for the account.",
+            "displayCondition": null,
+            "exampleValue": null,
+            "expressionEnabled": null,
+            "hidden": null,
+            "label": null,
+            "metadata": { },
+            "name": "isDefaultTemplate",
+            "options": [ {
+              "description": null,
+              "label": "True",
+              "value": true
+            }, {
+              "description": null,
+              "label": "False",
+              "value": false
+            } ],
+            "placeholder": null,
+            "required": false,
+            "type": "BOOLEAN"
           } ],
           "required": false,
           "type": "OBJECT"
@@ -407,7 +719,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Name of the email template",
+      "description": "Name of the email template.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -431,7 +743,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Subject of the email",
+      "description": "Subject of the email.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -455,7 +767,7 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "From address to send the email from",
+      "description": "From address to send the email from.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -499,6 +811,30 @@
       "regex": null,
       "required": false,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "TEXT",
+      "defaultValue": null,
+      "description": "HTML content of the email template.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "HTML Content",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": {
+        "type": "BODY"
+      },
+      "minLength": null,
+      "name": "html",
+      "options": null,
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
     } ],
     "resumePerform": null,
     "title": "Create Email Template",
@@ -509,7 +845,7 @@
     "beforeSuspend": null,
     "beforeTimeoutResume": null,
     "deprecated": null,
-    "description": "Creates new People",
+    "description": "Creates a new person in Encharge.",
     "help": null,
     "metadata": {
       "path": "/people",
@@ -517,7 +853,7 @@
       "method": "POST",
       "bodyContentType": "JSON"
     },
-    "name": "createPeople",
+    "name": "createPerson",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -1147,7 +1483,7 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "title": "Create People",
+    "title": "Create Person",
     "workflowNodeDescription": null
   } ],
   "clusterElements": null,
