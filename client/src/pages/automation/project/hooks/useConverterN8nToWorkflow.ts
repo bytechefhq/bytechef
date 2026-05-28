@@ -11,16 +11,6 @@ export const useConvertN8nToWorkflow = () => {
     const setWorkflow = useWorkflowDataStore((state) => state.setWorkflow);
     const [isRunning, setIsRunning] = useState(false);
 
-    const extractJson = (text: string) => {
-        const firstBrace = text.indexOf('{');
-        const lastBrace = text.lastIndexOf('}');
-
-        if (firstBrace === -1 || lastBrace === -1) {
-            throw new Error('No JSON found in response');
-        }
-
-        return text.slice(firstBrace, lastBrace + 1);
-    };
 
     const convertN8nWorkflow = useCallback(
         async (workflowJson: string) => {
@@ -55,13 +45,15 @@ export const useConvertN8nToWorkflow = () => {
                 },
                 onTextMessageEndEvent: () => {
                     try {
-                        const cleaned = extractJson(convertedWorkflowBuffer);
-
-                        const parsedWorkflow = JSON.parse(cleaned);
+                        const parsedWorkflow = JSON.parse(convertedWorkflowBuffer);
 
                         setWorkflow(parsedWorkflow);
                     } catch (e) {
                         console.error('Failed to parse workflow', e);
+
+                        throw new Error(
+                            'The n8n workflow could not be converted into a valid ByteChef workflow.'
+                        );
                     } finally {
                         setIsRunning(false);
                     }
