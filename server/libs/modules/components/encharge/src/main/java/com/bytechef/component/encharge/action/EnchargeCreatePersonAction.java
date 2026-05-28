@@ -33,10 +33,10 @@ import java.util.Map;
  *
  * @generated
  */
-public class EnchargeCreatePeopleAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createPeople")
-        .title("Create People")
-        .description("Creates new People")
+public class EnchargeCreatePersonAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createPerson")
+        .title("Create Person")
+        .description("Creates a new person in Encharge.")
         .metadata(
             Map.of(
                 "method", "POST",
@@ -88,6 +88,6 @@ public class EnchargeCreatePeopleAction {
                 Map.of(
                     "responseType", ResponseType.JSON))));
 
-    private EnchargeCreatePeopleAction() {
+    private EnchargeCreatePersonAction() {
     }
 }
