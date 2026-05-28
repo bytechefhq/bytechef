@@ -33,9 +33,11 @@ public class MicrosoftSharePointConstants {
     public static final String FIELDS = "fields";
     public static final String FILE_ID = "fileId";
     public static final String FOLDER = "folder";
+    public static final String LOCATION = "location";
     public static final String LIST_ID = "listId";
     public static final String PARENT_FOLDER = "parentFolder";
     public static final String READ_ONLY = "readOnly";
+    public static final int REDIRECT_STATUS_CODE = 302;
     public static final String REQUIRED = "required";
     public static final String SITE_ID = "siteId";
 

@@ -26,6 +26,7 @@ import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCr
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointCreateListItemAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointDeleteFileOrFolderAction;
+import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointDownloadFileAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointGetFileOrFolderByIdAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointGetFolderContentsAction;
 import com.bytechef.component.microsoft.share.point.action.MicrosoftSharePointReplaceFileAction;
@@ -58,6 +59,7 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             MicrosoftSharePointCreateListAction.ACTION_DEFINITION,
             MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION,
             MicrosoftSharePointDeleteFileOrFolderAction.ACTION_DEFINITION,
+            MicrosoftSharePointDownloadFileAction.ACTION_DEFINITION,
             MicrosoftSharePointGetFileOrFolderByIdAction.ACTION_DEFINITION,
             MicrosoftSharePointGetFolderContentsAction.ACTION_DEFINITION,
             MicrosoftSharePointReplaceFileAction.ACTION_DEFINITION,
@@ -67,6 +69,7 @@ public class MicrosoftSharePointComponentHandler implements ComponentHandler {
             tool(MicrosoftSharePointCreateListAction.ACTION_DEFINITION),
             tool(MicrosoftSharePointCreateListItemAction.ACTION_DEFINITION),
             tool(MicrosoftSharePointDeleteFileOrFolderAction.ACTION_DEFINITION),
+            tool(MicrosoftSharePointDownloadFileAction.ACTION_DEFINITION),
             tool(MicrosoftSharePointGetFileOrFolderByIdAction.ACTION_DEFINITION),
             tool(MicrosoftSharePointGetFolderContentsAction.ACTION_DEFINITION),
             tool(MicrosoftSharePointReplaceFileAction.ACTION_DEFINITION),
