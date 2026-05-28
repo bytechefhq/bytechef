@@ -102,7 +102,7 @@ const WorkflowNodeDetailsPanel = ({
                 {currentNode?.workflowNodeName && currentWorkflowNode && (
                     <div className="flex h-full flex-col divide-y divide-muted bg-background">
                         <header className="flex items-center justify-between p-4 text-lg font-medium">
-                            <div className="flex items-center gap-2 flex-1 min-w-0">
+                            <div className="flex min-w-0 flex-1 items-center gap-2">
                                 {currentWorkflowNode.icon && (
                                     <InlineSVG
                                         className="size-8 shrink-0"
@@ -111,13 +111,14 @@ const WorkflowNodeDetailsPanel = ({
                                     />
                                 )}
 
-                                <div className="flex flex-col items-start flex-1 min-w-0">
-                                    <div className="flex items-center gap-2 min-w-0 max-w-full">
-
+                                <div className="flex min-w-0 flex-1 flex-col items-start">
+                                    <div className="flex min-w-0 max-w-full items-center gap-2">
                                         {(currentNode?.label?.length ?? 0) > 32 ? (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <span className="text-lg font-semibold flex-1 min-w-0 truncate">{currentNode?.label}</span>
+                                                    <span className="min-w-0 flex-1 truncate text-lg font-semibold">
+                                                        {currentNode?.label}
+                                                    </span>
                                                 </TooltipTrigger>
 
                                                 <TooltipPortal>
@@ -127,7 +128,7 @@ const WorkflowNodeDetailsPanel = ({
                                                 </TooltipPortal>
                                             </Tooltip>
                                         ) : (
-                                            <span className="text-lg font-semibold flex-1 min-w-0 truncate">
+                                            <span className="min-w-0 flex-1 truncate text-lg font-semibold">
                                                 {currentNode?.label}
                                             </span>
                                         )}
@@ -149,7 +150,7 @@ const WorkflowNodeDetailsPanel = ({
                                         )}
                                     </div>
 
-                                    <span className="text-sm text-muted-foreground truncate w-full">
+                                    <span className="w-full truncate text-sm text-muted-foreground">
                                         ({currentNode?.workflowNodeName})
                                     </span>
                                 </div>
