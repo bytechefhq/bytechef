@@ -12,8 +12,8 @@ paths:
       tags:
         - "Emails"
       summary: "Create Email Template"
-      description: "Create email template"
-      operationId: "createEmail"
+      description: "Creates email template."
+      operationId: "createEmailTemplate"
       requestBody:
         description: "data of new email template"
         required: true
@@ -28,16 +28,20 @@ paths:
                 - "fromEmail"
               properties:
                 name:
-                  description: "Name of the email template"
+                  description: "Name of the email template."
                   type: "string"
                 subject:
-                  description: "Subject of the email"
+                  description: "Subject of the email."
                   type: "string"
                 fromEmail:
-                  description: "From address to send the email from"
+                  description: "From address to send the email from."
                   type: "string"
                 replyEmail:
                   description: "Address that recipients will reply to by default."
+                  type: "string"
+                html:
+                  title: "HTML Content"
+                  description: "HTML content of the email template."
                   type: "string"
       responses:
         200:
@@ -53,6 +57,12 @@ paths:
                       id:
                         type: "integer"
                         description: "ID of the email template."
+                      isStandalone:
+                        type: "boolean"
+                        description: "Whether this email template is standalone or part of a broadcast."
+                      accountId:
+                        type: "integer"
+                        description: "ID of the account associated with the email template."
                       name:
                         type: "string"
                         description: "Name of the email template."
@@ -65,15 +75,29 @@ paths:
                       replyEmail:
                         type: "string"
                         description: "Address that recipients will reply to by default."
+                      type:
+                        type: "string"
+                        description: "Type of the email. HTML or plain-text. Currently only HTML is supported."
+                      archived:
+                        type: "boolean"
+                        description: "Indicates if the email template is archived."
+                      canSpamCompliance:
+                        type: "boolean"
+                        description: "Indicates if the email template complies with CAN-SPAM regulations."
+                      communicationCategoryId:
+                        type: "integer"
+                        description: "ID of the communication category of this email template."
+                      isDefaultTemplate:
+                        type: boolean
+                        description: "Indicates if the email template is the default template for the account."
   /people:
     post:
       tags:
         - "People"
-      summary: "Create People"
-      description: "Creates new People"
-      operationId: "createPeople"
+      summary: "Create Person"
+      description: "Creates a new person in Encharge."
+      operationId: "createPerson"
       requestBody:
-        description: "data of new People"
         required: true
         content:
           application/json:
