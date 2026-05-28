@@ -32,6 +32,7 @@ public final class NvidiaConnection {
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://integrate.api.nvidia.com/")
         .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/nvidia_v1#connection-setup")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
