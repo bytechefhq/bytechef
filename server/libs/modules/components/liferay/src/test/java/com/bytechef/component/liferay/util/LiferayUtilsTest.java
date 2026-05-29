@@ -17,17 +17,47 @@
 package com.bytechef.component.liferay.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.liferay.constant.LiferayConstants.CONTEXT_NAME;
+import static com.bytechef.component.liferay.constant.LiferayConstants.DISCOVER;
+import static com.bytechef.component.liferay.constant.LiferayConstants.NAME;
+import static com.bytechef.component.liferay.constant.LiferayConstants.PARAMETERS;
+import static com.bytechef.component.liferay.constant.LiferayConstants.SERVICE;
+import static com.bytechef.component.liferay.constant.LiferayConstants.SERVICES;
+import static com.bytechef.component.liferay.constant.LiferayConstants.TYPE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class LiferayUtilsTest {
+
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
 
     @Test
     void testGetContextNameOptions() {
@@ -84,5 +114,116 @@ class LiferayUtilsTest {
         expectedContextNameOptions.add(option("WIKI", "wiki"));
 
         return expectedContextNameOptions;
+    }
+
+    @Test
+    void testCreateParameters(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(CONTEXT_NAME, "portal", SERVICE, 1L));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of(SERVICES, List.of(
+                    Map.of(
+                        PARAMETERS, List.of(
+                            Map.of(NAME, "id", TYPE, "long"),
+                            Map.of(NAME, "title", TYPE, "string"))))));
+
+        List<Property.ValueProperty<?>> result =
+            LiferayUtils.createParameters(mockedParameters, null, null, mockedContext);
+
+        assertEquals(2, result.size());
+
+        assertEquals("id", result.get(0)
+            .getName());
+        assertEquals("title", result.get(1)
+            .getName());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/jsonws", stringArgumentCaptor.getValue());
+
+        Object[] expectedQueryParameters = {
+            CONTEXT_NAME, "", DISCOVER, ""
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetServiceHttpData(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of(SERVICES, List.of(Map.of("path", "/test", "method", "GET"))));
+
+        Map<String, String> result = LiferayUtils.getServiceHttpData(mockedContext, "portal", 1L);
+
+        assertEquals("GET", result.get("method"));
+        assertEquals("/test", result.get("endpoint"));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/jsonws", stringArgumentCaptor.getValue());
+
+        Object[] expectedQueryParameters = {
+            CONTEXT_NAME, "", DISCOVER, ""
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testGetServiceOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(Map.of(CONTEXT_NAME, "non-portal"));
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(
+                Map.of("services", List.of(Map.of("name", "Service A"), Map.of("name", "Service B"))));
+
+        Object result = LiferayUtils.getServiceOptions(mockedParameters, null, null,
+            null, mockedContext);
+
+        assertEquals(List.of(option("Service A", 1L), option("Service B", 2L)), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Http.Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/api/jsonws", stringArgumentCaptor.getValue());
+
+        Object[] expectedQueryParameters = {
+            CONTEXT_NAME, "non-portal", DISCOVER, ""
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
     }
 }
