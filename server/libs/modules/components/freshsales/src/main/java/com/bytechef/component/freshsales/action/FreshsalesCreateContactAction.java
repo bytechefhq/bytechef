@@ -53,6 +53,7 @@ public class FreshsalesCreateContactAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Add new contact in Freshsales CRM.")
+        .help("", "https://docs.bytechef.io/reference/components/freshsales_v1#create-contact")
         .properties(
             string(FIRST_NAME)
                 .label("First Name")
@@ -184,5 +185,4 @@ public class FreshsalesCreateContactAction {
             .execute()
             .getBody(new TypeReference<>() {});
     }
-
 }

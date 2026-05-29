@@ -41,6 +41,7 @@ public class FreshsalesCreateAccountAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createAccount")
         .title("Create Account")
         .description("Creates a new account.")
+        .help("", "https://docs.bytechef.io/reference/components/freshsales_v1#create-account")
         .properties(
             string(NAME)
                 .label("Name")

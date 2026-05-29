@@ -50,7 +50,9 @@ public class FreshsalesConnection {
                         .description("The API Key supplied by Freshsales")
                         .required(true))
                 .apply((connectionParameters, context) -> ofHeaders(
-                    Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))));
+                    Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))))
+        .help("", "https://docs.bytechef.io/reference/components/freshsales_v1#connection-setup")
+        .version(1);
 
     private FreshsalesConnection() {
     }
