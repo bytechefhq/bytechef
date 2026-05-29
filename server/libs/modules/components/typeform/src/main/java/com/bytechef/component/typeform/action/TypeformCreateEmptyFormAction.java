@@ -44,6 +44,7 @@ public class TypeformCreateEmptyFormAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createEmptyForm")
         .title("Create Empty Form")
         .description("Creates a new empty form.")
+        .help("", "https://docs.bytechef.io/reference/components/typeform_v1#create-empty-form")
         .properties(
             string(TITLE)
                 .label("Title")

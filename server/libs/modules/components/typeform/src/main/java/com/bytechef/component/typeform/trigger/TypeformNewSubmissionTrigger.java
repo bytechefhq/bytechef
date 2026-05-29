@@ -44,6 +44,7 @@ public class TypeformNewSubmissionTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newSubmission")
         .title("New Submission")
         .description("Triggers when form is submitted.")
+        .help("", "https://docs.bytechef.io/reference/components/typeform_v1#new-submission")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(FORM_ID)

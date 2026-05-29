@@ -39,9 +39,12 @@ public class TypeformComponentHandler implements ComponentHandler {
                 "engaging forms for collecting data and feedback.")
         .icon("path:assets/typeform.svg")
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
+        .customAction(true)
+        .customActionHelp("", "https://www.typeform.com/developers/get-started/")
         .connection(TypeformConnection.CONNECTION_DEFINITION)
         .actions(TypeformCreateEmptyFormAction.ACTION_DEFINITION)
-        .triggers(TypeformNewSubmissionTrigger.TRIGGER_DEFINITION);
+        .triggers(TypeformNewSubmissionTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
