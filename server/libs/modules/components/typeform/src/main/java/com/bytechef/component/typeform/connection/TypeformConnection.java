@@ -37,7 +37,9 @@ public class TypeformConnection {
                 .properties(
                     string(TOKEN)
                         .label("Personal Access Token")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/typeform_v1#connection-setup");
 
     private TypeformConnection() {
     }
