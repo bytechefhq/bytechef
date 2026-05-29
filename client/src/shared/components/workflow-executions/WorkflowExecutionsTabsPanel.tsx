@@ -83,10 +83,12 @@ const WorkflowExecutionsTabsPanel = ({
           ? (selectedItem as TaskExecution).workflowTask?.name
           : undefined;
 
-    const subflowWorkflowUuid =
+    const subflowTaskExecution =
         !isTriggerExecution && selectedItem && 'workflowTask' in selectedItem
-            ? ((selectedItem as TaskExecution).workflowTask?.parameters?.workflowUuid as string | undefined)
+            ? (selectedItem as TaskExecution)
             : undefined;
+
+    const subflowWorkflowUuid = subflowTaskExecution?.workflowTask?.parameters?.workflowUuid as string | undefined;
 
     return (
         <Tabs
@@ -104,14 +106,13 @@ const WorkflowExecutionsTabsPanel = ({
                     <span className="text-xs text-muted-foreground">{`(${workflowNodeName})`}</span>
 
                     {subflowWorkflowUuid && onEditSubflowClick && (
-                        <button
-                            className="flex items-center justify-center gap-1 rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-1.5 py-0.5"
+                        <Button
+                            icon={<SquarePenIcon />}
+                            label="Edit"
                             onClick={() => onEditSubflowClick(subflowWorkflowUuid)}
-                        >
-                            <SquarePenIcon className="size-3 text-content-neutral-primary" />
-
-                            <span className="text-[12px] font-medium leading-4 text-content-neutral-primary">Edit</span>
-                        </button>
+                            size="xxs"
+                            variant="outline"
+                        />
                     )}
                 </div>
 

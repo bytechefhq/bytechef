@@ -1,3 +1,4 @@
+import Button from '@/components/Button/Button';
 import {InfoIcon, Undo2Icon, XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
@@ -10,24 +11,26 @@ const SubflowBanner = ({className}: {className?: string}) => {
     const navigate = useNavigate();
     const {projectId, projectWorkflowId} = useParams();
 
-    const fromSubflow = searchParams.get('fromSubflow');
-    const parentProjectWorkflowId = searchParams.get('parentProjectWorkflowId');
+    const fromSubflowParam = searchParams.get('fromSubflow');
+    const parentProjectWorkflowIdParam = searchParams.get('parentProjectWorkflowId');
 
     useEffect(() => {
         setDismissed(false);
     }, [projectWorkflowId]);
 
-    if (fromSubflow !== 'true' || dismissed) {
+    if (fromSubflowParam !== 'true' || dismissed) {
         return null;
     }
 
     const handleReturnClick = () => {
-        if (projectId && parentProjectWorkflowId) {
+        if (projectId && parentProjectWorkflowIdParam) {
             const newSearchParams = new URLSearchParams(searchParams.toString());
+
             const parentChain = newSearchParams.get('parentChain');
 
             if (parentChain) {
                 const chainItems = parentChain.split(',');
+
                 const grandparentId = chainItems.pop() ?? '';
 
                 if (chainItems.length > 0) {
@@ -43,7 +46,7 @@ const SubflowBanner = ({className}: {className?: string}) => {
             }
 
             navigate(
-                `/automation/projects/${projectId}/project-workflows/${parentProjectWorkflowId}?${newSearchParams}`
+                `/automation/projects/${projectId}/project-workflows/${parentProjectWorkflowIdParam}?${newSearchParams}`
             );
         } else {
             navigate(-1);
@@ -59,22 +62,28 @@ const SubflowBanner = ({className}: {className?: string}) => {
         >
             <InfoIcon className="size-6 shrink-0 text-content-onwarning" />
 
-            <span className="flex-1 text-sm font-medium text-content-neutral-primary">
+            <span className="flex-1 whitespace-nowrap text-sm font-medium text-content-neutral-primary">
                 Currently inside of a subflow.
             </span>
 
-            <button
-                className="flex items-center gap-1 text-sm font-medium text-content-neutral-primary hover:underline"
-                onClick={handleReturnClick}
-            >
-                <Undo2Icon className="size-4" />
+            <div className="flex shrink-0 items-center gap-1">
+                <Button
+                    className="active:text-content-primary text-sm font-medium hover:bg-transparent hover:underline active:bg-transparent"
+                    icon={<Undo2Icon className="size-4" />}
+                    label="Return to parent flow"
+                    onClick={handleReturnClick}
+                    size="xs"
+                    variant="ghost"
+                />
 
-                <span>Return to parent flow</span>
-            </button>
-
-            <button className="opacity-50 hover:opacity-100" onClick={() => setDismissed(true)}>
-                <XIcon className="size-4 text-content-neutral-primary" />
-            </button>
+                <Button
+                    className="active:text-content-primary opacity-50 hover:bg-transparent hover:opacity-100 active:bg-transparent"
+                    icon={<XIcon />}
+                    onClick={() => setDismissed(true)}
+                    size="iconXs"
+                    variant="ghost"
+                />
+            </div>
         </div>
     );
 };

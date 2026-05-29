@@ -272,9 +272,10 @@ export const useProject = () => {
 
         useWorkflowNodeDetailsPanelStore.getState().reset();
 
-        const restoreParam = searchParams.get('restoreExecutionPanel');
-        const fromSubflow = searchParams.get('fromSubflow');
-        const isReturningFromSubflow = restoreParam === 'true' && fromSubflow !== 'true';
+        const restorePanelParam = searchParams.get('restoreExecutionPanel');
+        const fromSubflowParam = searchParams.get('fromSubflow');
+
+        const isReturningFromSubflow = restorePanelParam === 'true' && fromSubflowParam !== 'true';
 
         if (isReturningFromSubflow) {
             const {parentWorkflowTestExecution, setParentWorkflowTestExecution, setWorkflowTestExecution} =
@@ -285,6 +286,7 @@ export const useProject = () => {
         }
 
         const storedExecution = useWorkflowEditorStore.getState().workflowTestExecution;
+
         const shouldRestorePanel = isReturningFromSubflow && !!storedExecution;
 
         if (shouldRestorePanel) {
