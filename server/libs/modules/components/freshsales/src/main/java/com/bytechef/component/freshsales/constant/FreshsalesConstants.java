@@ -43,5 +43,4 @@ public class FreshsalesConstants {
     public static final String WEBSITE = "website";
     public static final String WORK_NUMBER = "work_number";
     public static final String ZIPCODE = "zipcode";
-
 }
