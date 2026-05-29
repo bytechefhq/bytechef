@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -45,6 +46,23 @@ public final class CollectionUtils {
 
         return list.stream()
             .anyMatch(predicate);
+    }
+
+    /**
+     * Returns map representation of the source object. Caller must provide the transformation function. Method performs
+     * the null check against the source object.
+     *
+     * @param source      the source object to be transformed into Map
+     * @param mapFunction the function that transforms the source into Map
+     * @return empty map if the source is null, otherwise returns the source transformed into Map
+     * @param <T>
+     */
+    public static <T> Map<String, ?> asMap(T source, Function<T, Map<String, ?>> mapFunction) {
+        if (source == null) {
+            return Map.of();
+        }
+
+        return mapFunction.apply(source);
     }
 
     @SafeVarargs

@@ -247,15 +247,8 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         }
 
         return new JobDTO(
-            job, asMap(job.getOutputs(), taskFileStorage::readJobOutputs), getJobTaskExecutions(job.getId()));
-    }
-
-    private <T> Map<String, ?> asMap(T source, Function<T, Map<String, ?>> consumer) {
-        if (source == null) {
-            return Map.of();
-        }
-
-        return consumer.apply(source);
+            job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
+            getJobTaskExecutions(job.getId()));
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
