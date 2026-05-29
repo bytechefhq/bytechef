@@ -80,7 +80,7 @@ const GlobalSearchDialog = ({onOpenChange, open}: GlobalSearchDialogProps) => {
     const hasResults = (data?.automationSearch?.length ?? 0) > 0;
 
     return (
-        <CommandDialog onOpenChange={onOpenChange} open={open} shouldFilter={false}>
+        <CommandDialog onOpenChange={onOpenChange} open={open}>
             <CommandInput
                 className="my-2"
                 onValueChange={(value) => {
