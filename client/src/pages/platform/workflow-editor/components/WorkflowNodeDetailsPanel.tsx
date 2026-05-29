@@ -106,13 +106,13 @@ const WorkflowNodeDetailsPanel = ({
                                 {currentWorkflowNode.icon && (
                                     <InlineSVG
                                         className="size-8 shrink-0"
-                                        loader={<LoadingIcon className="ml-0 mr-2 size-6" />}
+                                        loader={<LoadingIcon className="mr-2 ml-0 size-6" />}
                                         src={currentWorkflowNode.icon}
                                     />
                                 )}
 
                                 <div className="flex min-w-0 flex-1 flex-col items-start">
-                                    <div className="flex min-w-0 max-w-full items-center gap-2">
+                                    <div className="flex max-w-full min-w-0 items-center gap-2">
                                         {(currentNode?.label?.length ?? 0) > 32 ? (
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
