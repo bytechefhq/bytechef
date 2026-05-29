@@ -32,81 +32,81 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.TWI
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WORK_NUMBER;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.ZIPCODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import java.util.HashMap;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
-class FreshsalesCreateContactActionTest extends AbstractFreshsalesActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class FreshsalesCreateContactActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.ofEntries(
+            Map.entry(FIRST_NAME, "firstName"),
+            Map.entry(LAST_NAME, "lastName"),
+            Map.entry(JOB_TITLE, "jobTitle"),
+            Map.entry(EMAIL, "email"),
+            Map.entry(WORK_NUMBER, "workNumber"),
+            Map.entry(MOBILE_NUMBER, "mobileNumber"),
+            Map.entry(ADDRESS, "address"),
+            Map.entry(CITY, "city"),
+            Map.entry(STATE, "state"),
+            Map.entry(ZIPCODE, "zipcode"),
+            Map.entry(COUNTRY, "country"),
+            Map.entry(MEDIUM, "medium"),
+            Map.entry(FACEBOOK, "facebook"),
+            Map.entry(TWITTER, "twitter"),
+            Map.entry(LINKEDIN, "linkedin")));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Map<String, String> propertyStubsMap = createPropertyStubsMap();
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Http.Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getString(FIRST_NAME))
-            .thenReturn(propertyStubsMap.get(FIRST_NAME));
-        when(mockedParameters.getString(LAST_NAME))
-            .thenReturn(propertyStubsMap.get(LAST_NAME));
-        when(mockedParameters.getString(JOB_TITLE))
-            .thenReturn(propertyStubsMap.get(JOB_TITLE));
-        when(mockedParameters.getRequiredString(EMAIL))
-            .thenReturn(propertyStubsMap.get(EMAIL));
-        when(mockedParameters.getString(WORK_NUMBER))
-            .thenReturn(propertyStubsMap.get(WORK_NUMBER));
-        when(mockedParameters.getString(MOBILE_NUMBER))
-            .thenReturn(propertyStubsMap.get(MOBILE_NUMBER));
-        when(mockedParameters.getString(ADDRESS))
-            .thenReturn(propertyStubsMap.get(ADDRESS));
-        when(mockedParameters.getString(CITY))
-            .thenReturn(propertyStubsMap.get(CITY));
-        when(mockedParameters.getString(STATE))
-            .thenReturn(propertyStubsMap.get(STATE));
-        when(mockedParameters.getString(ZIPCODE))
-            .thenReturn(propertyStubsMap.get(ZIPCODE));
-        when(mockedParameters.getString(COUNTRY))
-            .thenReturn(propertyStubsMap.get(COUNTRY));
-        when(mockedParameters.getString(MEDIUM))
-            .thenReturn(propertyStubsMap.get(MEDIUM));
-        when(mockedParameters.getString(FACEBOOK))
-            .thenReturn(propertyStubsMap.get(FACEBOOK));
-        when(mockedParameters.getString(TWITTER))
-            .thenReturn(propertyStubsMap.get(TWITTER));
-        when(mockedParameters.getString(LINKEDIN))
-            .thenReturn(propertyStubsMap.get(LINKEDIN));
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(Map.of());
 
         Object result = FreshsalesCreateContactAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, String> createPropertyStubsMap() {
-        Map<String, String> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(FIRST_NAME, "firstName");
-        propertyStubsMap.put(LAST_NAME, "lastName");
-        propertyStubsMap.put(JOB_TITLE, "jobTitle");
-        propertyStubsMap.put(EMAIL, "email");
-        propertyStubsMap.put(WORK_NUMBER, "workNumber");
-        propertyStubsMap.put(MOBILE_NUMBER, "mobileNumber");
-        propertyStubsMap.put(ADDRESS, "address");
-        propertyStubsMap.put(CITY, "city");
-        propertyStubsMap.put(STATE, "state");
-        propertyStubsMap.put(ZIPCODE, "zipcode");
-        propertyStubsMap.put(COUNTRY, "country");
-        propertyStubsMap.put(MEDIUM, "medium");
-        propertyStubsMap.put(FACEBOOK, "facebook");
-        propertyStubsMap.put(TWITTER, "twitter");
-        propertyStubsMap.put(LINKEDIN, "linkedin");
-
-        return propertyStubsMap;
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/contacts", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(
+                FIRST_NAME, "firstName", LAST_NAME, "lastName", JOB_TITLE, "jobTitle",
+                EMAIL, "email", WORK_NUMBER, "workNumber", MOBILE_NUMBER, "mobileNumber", ADDRESS, "address",
+                CITY, "city", STATE, "state", ZIPCODE, "zipcode", COUNTRY, "country", MEDIUM, "medium",
+                FACEBOOK, "facebook", TWITTER, "twitter", LINKEDIN, "linkedin"),
+            bodyArgumentCaptor.getValue());
     }
 }

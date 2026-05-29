@@ -20,45 +20,61 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.NAM
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.PHONE;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.WEBSITE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import java.util.HashMap;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
-class FreshsalesCreateAccountActionTest extends AbstractFreshsalesActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class FreshsalesCreateAccountActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(NAME, "name", WEBSITE, "website", PHONE, "phone"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Map<String, String> propertyStubsMap = createPropertyStubsMap();
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getRequiredString(NAME))
-            .thenReturn(propertyStubsMap.get(NAME));
-        when(mockedParameters.getString(WEBSITE))
-            .thenReturn(propertyStubsMap.get(WEBSITE));
-        when(mockedParameters.getString(PHONE))
-            .thenReturn(propertyStubsMap.get(PHONE));
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(Map.of());
 
         Object result = FreshsalesCreateAccountAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, String> createPropertyStubsMap() {
-        Map<String, String> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(NAME, "name");
-        propertyStubsMap.put(WEBSITE, "website");
-        propertyStubsMap.put(PHONE, "phone");
-
-        return propertyStubsMap;
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/sales_accounts", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(NAME, "name", WEBSITE, "website", PHONE, "phone"), bodyArgumentCaptor.getValue());
     }
 }
