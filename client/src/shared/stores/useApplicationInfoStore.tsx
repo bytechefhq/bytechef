@@ -43,8 +43,8 @@ export interface ApplicationInfoI {
         enabled: boolean;
     };
     templatesSubmissionForm: {
-        projects: string;
-        workflows: string;
+        projects: string | undefined;
+        workflows: string | undefined;
     };
     userGuiding: {
         containerId: string | undefined;
