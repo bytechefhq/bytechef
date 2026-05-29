@@ -360,15 +360,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
             .stream()
-            .filter(job -> job.getParentTaskExecutionId() != null)
             .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
 
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
                 DefinitionResult definitionResult = getDefinition(taskExecution.getType());
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
@@ -376,19 +374,23 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
 
-                Job childJob = childJobMap.get(taskExecution.getId());
-
                 return new TaskExecutionDTO(
-                    taskExecution,
-                    definitionResult.title(), definitionResult.icon(),
+                    taskExecution, definitionResult.title(), definitionResult.icon(),
                     workflowTask.evaluateParameters(context, evaluator), output,
-                    childJob == null ? null : new JobDTO(
-                        childJob,
-                        childJob.getOutputs() == null ? null : taskFileStorage.readJobOutputs(childJob.getOutputs()),
-                        getJobTaskExecutions(childJob.getId())));
+                    asJobDTO(childJobMap.get(taskExecution.getId())));
             });
 
         return buildHierarchy(taskExecutionDTOs);
+    }
+
+    private JobDTO asJobDTO(Job job) {
+        if (job == null) {
+            return null;
+        }
+
+        return new JobDTO(
+            job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
+            getJobTaskExecutions(job.getId()));
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(

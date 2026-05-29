@@ -144,8 +144,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
-        JobDTO jobDTO = new JobDTO(
-            job, taskFileStorage.readJobOutputs(job.getOutputs()), getJobTaskExecutions(id));
+        JobDTO jobDTO = asJobDTO(job);
         long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.EMBEDDED);
 
@@ -393,32 +392,39 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
             .stream()
-            .filter(job -> job.getParentTaskExecutionId() != null)
             .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
 
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
                 DefinitionResult definitionResult = getDefinition(taskExecution.getType());
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
                 Object output = taskExecution.getOutput() == null
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
-
-                Job childJob = childJobMap.get(taskExecution.getId());
 
                 return new TaskExecutionDTO(
                     taskExecution,
                     definitionResult.title(), definitionResult.icon(),
                     workflowTask.evaluateParameters(context, evaluator), output,
-                    childJob == null ? null : new JobDTO(childJob));
+                    asJobDTO(childJobMap.get(taskExecution.getId())));
             });
 
         return buildHierarchy(taskExecutionDTOs);
+    }
+
+    private JobDTO asJobDTO(Job job) {
+        if (job == null) {
+            return null;
+        }
+
+        return new JobDTO(
+            job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
+            getJobTaskExecutions(job.getId()));
     }
 
     private List<String> getWorkflowIds(Integration integration) {
