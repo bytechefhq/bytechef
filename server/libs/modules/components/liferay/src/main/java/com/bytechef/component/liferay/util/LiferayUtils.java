@@ -127,7 +127,7 @@ public class LiferayUtils {
         return serviceOptions;
     }
 
-    public static List<Object> getServices(Context context, String contextName) {
+    private static List<Object> getServices(Context context, String contextName) {
         contextName = contextName.equals("portal") ? "" : contextName;
 
         Map<String, Object> response = context.http(http -> http.get("/api/jsonws"))

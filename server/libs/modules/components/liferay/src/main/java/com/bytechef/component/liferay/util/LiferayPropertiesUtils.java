@@ -134,14 +134,9 @@ public class LiferayPropertiesUtils {
         List<String> pathParameters, List<String> queryParameters) {
 
         String in = (String) parameterMap.get("in");
-
-        if (in == null) {
-            return null;
-        }
-
         String name = (String) parameterMap.get("name");
 
-        if (name == null) {
+        if (in == null || name == null) {
             return null;
         }
 
