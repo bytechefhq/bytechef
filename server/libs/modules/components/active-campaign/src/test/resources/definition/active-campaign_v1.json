@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new account.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/active-campaign_v1#create-account"
+    },
     "metadata": {
       "path": "/accounts",
       "mimeType": "application/json",
@@ -325,7 +328,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/active-campaign_v1#create-contact"
+    },
     "metadata": {
       "path": "/contacts",
       "mimeType": "application/json",
@@ -776,7 +782,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/active-campaign_v1#create-task"
+    },
     "metadata": {
       "path": "/dealTasks",
       "mimeType": "application/json",
@@ -2460,14 +2469,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/active-campaign_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.activecampaign.com/reference/overview"
+  },
   "description": "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools.",
   "icon": "path:assets/active-campaign.svg",
   "metadata": null,
