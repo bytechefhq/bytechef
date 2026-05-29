@@ -85,7 +85,7 @@ public class LiferayHeadlessAction {
                         if (endpoint.contains("batch")) {
                             return List.of(array(BODY)
                                 .label("Body")
-                                .description("JSON structure of body")
+                                .description("JSON structure of body.")
                                 .required(false));
                         }
 
@@ -102,17 +102,9 @@ public class LiferayHeadlessAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
-        Map<String, ?> properties = inputParameters.getMap(PROPERTIES);
+        Map<String, ?> properties = inputParameters.getMap(PROPERTIES, Map.of());
 
-        if (properties == null) {
-            properties = Map.of();
-        }
-
-        Map<String, ?> hiddenProperties = (Map<String, ?>) properties.get(HIDDEN_PROPERTIES);
-
-        if (hiddenProperties == null) {
-            hiddenProperties = Map.of();
-        }
+        Map<?, ?> hiddenProperties = properties.get(HIDDEN_PROPERTIES) instanceof Map<?, ?> map ? map : Map.of();
 
         String endpoint = inputParameters.getRequiredString(ENDPOINT);
 
@@ -122,18 +114,18 @@ public class LiferayHeadlessAction {
             context, endpointParts[0],
             getEndpointUri(
                 inputParameters, connectionParameters, endpointParts[1],
-                getParameterValueMap((List<String>) hiddenProperties.get(PATH), properties)));
+                getParameterValueMap((List<?>) hiddenProperties.get(PATH), properties)));
 
         Response response = executor.headers(
-            getParameterValueMap((List<String>) hiddenProperties.get(HEADER), properties))
+            getParameterValueMap((List<?>) hiddenProperties.get(HEADER), properties))
             .queryParameters(
-                getParameterValueMap((List<String>) hiddenProperties.get(QUERY), properties))
+                getParameterValueMap((List<?>) hiddenProperties.get(QUERY), properties))
             .configuration(
                 Http.timeout(Duration.ofMillis(inputParameters.getInteger("timeout", 10000))))
             .configuration(
                 responseType(ResponseType.JSON))
             .body(
-                getBody((List<String>) hiddenProperties.get(BODY), properties))
+                getBody((List<?>) hiddenProperties.get(BODY), properties))
             .execute();
 
         return response.getBody();
@@ -173,7 +165,7 @@ public class LiferayHeadlessAction {
     }
 
     private static Map<String, List<String>> getParameterValueMap(
-        List<String> parameterNames, Map<String, ?> properties) {
+        List<?> parameterNames, Map<String, ?> properties) {
 
         if (parameterNames == null) {
             return Map.of();
@@ -181,6 +173,7 @@ public class LiferayHeadlessAction {
 
         return parameterNames
             .stream()
+            .map(String::valueOf)
             .filter(
                 properties::containsKey)
             .collect(
@@ -189,7 +182,7 @@ public class LiferayHeadlessAction {
                     parameterName -> List.of(String.valueOf(properties.get(parameterName)))));
     }
 
-    private static Body getBody(List<String> parameterNames, Map<String, ?> properties) {
+    private static Body getBody(List<?> parameterNames, Map<String, ?> properties) {
         if (properties.containsKey(BODY)) {
             return Body.of((List<?>) properties.get(BODY));
         }
@@ -200,13 +193,13 @@ public class LiferayHeadlessAction {
 
         return Body.of(parameterNames
             .stream()
+            .map(String::valueOf)
             .filter(
                 properties::containsKey)
             .collect(
                 Collectors.toMap(
                     parameterName -> parameterName,
                     properties::get)));
-
     }
 
     private static Executor getExecutor(Context context, String method, String finalEndpointUri) {
