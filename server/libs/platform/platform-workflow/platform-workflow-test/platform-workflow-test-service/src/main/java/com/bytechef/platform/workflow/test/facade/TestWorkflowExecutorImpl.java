@@ -218,15 +218,13 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
             .stream()
-            .filter(job -> job.getParentTaskExecutionId() != null)
             .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
 
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> {
                 Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(
-                        Validate.notNull(taskExecution.getId(), "id"), Context.Classname.TASK_EXECUTION));
+                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
 
                 DefinitionResult definitionResult = getDefinition(taskExecution.getType());
                 WorkflowTask workflowTask = taskExecution.getWorkflowTask();
