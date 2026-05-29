@@ -236,15 +236,28 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 Job childJob = childJobMap.get(taskExecution.getId());
 
                 return new TaskExecutionDTO(
-                    taskExecutionService.getTaskExecution(Validate.notNull(taskExecution.getId(), "id")),
+                    taskExecution,
                     definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output, childJob == null ? null : new JobDTO(
-                        childJob,
-                        childJob.getOutputs() == null ? null : taskFileStorage.readJobOutputs(childJob.getOutputs()),
-                        getJobTaskExecutions(childJob.getId())));
+                    workflowTask.evaluateParameters(context, evaluator), output, asJobDTO(childJob));
             });
 
         return buildHierarchy(taskExecutionDTOs);
+    }
+
+    private JobDTO asJobDTO(Job job) {
+        if (job == null) {
+            return null;
+        }
+
+        return new JobDTO(job, asMap(job.getOutputs()), getJobTaskExecutions(job.getId()));
+    }
+
+    private Map<String, ?> asMap(FileEntry fileEntry) {
+        if (fileEntry == null) {
+            return Map.of();
+        }
+
+        return taskFileStorage.readJobOutputs(fileEntry);
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
