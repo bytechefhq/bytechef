@@ -43,11 +43,11 @@ public class FreshsalesConnection {
                 .properties(
                     string(USERNAME)
                         .label("Bundle alias")
-                        .description("Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com)")
+                        .description("Your Freshsales bundle alias (e.g. https://<alias>.myfreshworks.com).")
                         .required(true),
                     string(KEY)
                         .label("API Key")
-                        .description("The API Key supplied by Freshsales")
+                        .description("The API Key supplied by Freshsales.")
                         .required(true))
                 .apply((connectionParameters, context) -> ofHeaders(
                     Map.of(AUTHORIZATION, List.of("Token token=" + connectionParameters.getRequiredString(KEY))))))
