@@ -20,45 +20,63 @@ import static com.bytechef.component.freshsales.constant.FreshsalesConstants.EMA
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.FIRST_NAME;
 import static com.bytechef.component.freshsales.constant.FreshsalesConstants.LAST_NAME;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import java.util.HashMap;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Domiter
  */
-class FreshsalesCreateLeadActionTest extends AbstractFreshsalesActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class FreshsalesCreateLeadActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FIRST_NAME, "firstName", LAST_NAME, "lastName", EMAIL, "mail@mail.com"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Map<String, String> propertyStubsMap = createPropertyStubsMap();
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedParameters.getString(FIRST_NAME))
-            .thenReturn(propertyStubsMap.get(FIRST_NAME));
-        when(mockedParameters.getString(LAST_NAME))
-            .thenReturn(propertyStubsMap.get(LAST_NAME));
-        when(mockedParameters.getRequiredString(EMAIL))
-            .thenReturn(propertyStubsMap.get(EMAIL));
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(Map.of());
 
         Object result = FreshsalesCreateLeadAction.perform(mockedParameters, mockedParameters, mockedContext);
 
-        assertEquals(responeseMap, result);
+        assertEquals(Map.of(), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(propertyStubsMap, body.getContent());
-    }
-
-    private static Map<String, String> createPropertyStubsMap() {
-        Map<String, String> propertyStubsMap = new HashMap<>();
-
-        propertyStubsMap.put(FIRST_NAME, "firstName");
-        propertyStubsMap.put(LAST_NAME, "lastName");
-        propertyStubsMap.put(EMAIL, "mail@mail.com");
-
-        return propertyStubsMap;
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/leads", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(FIRST_NAME, "firstName", LAST_NAME, "lastName", EMAIL, "mail@mail.com"),
+            bodyArgumentCaptor.getValue());
     }
 }
