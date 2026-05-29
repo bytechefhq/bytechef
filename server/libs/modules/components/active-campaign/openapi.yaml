@@ -15,6 +15,7 @@ paths:
       description: "Creates a new account."
       operationId: "createAccount"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/active-campaign_v1#create-account"
       requestBody:
         content:
           application/json:
@@ -62,6 +63,7 @@ paths:
       description: "Creates a new contact."
       operationId: "createContact"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/active-campaign_v1#create-contact"
       requestBody:
         content:
           application/json:
@@ -123,6 +125,7 @@ paths:
       description: "Creates a new task."
       operationId: "createTask"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/active-campaign_v1#create-task"
       requestBody:
         content:
           application/json:

@@ -50,6 +50,7 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://developers.activecampaign.com/reference/overview")
             .icon("path:assets/active-campaign.svg")
             .categories(ComponentCategory.CRM, ComponentCategory.MARKETING_AUTOMATION);
     }
@@ -79,7 +80,9 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://" + connectionParameters.getRequiredString(USERNAME) +
-                ".api-us1.com/api/3");
+                ".api-us1.com/api/3")
+            .help("", "https://docs.bytechef.io/reference/components/active-campaign_v1#connection-setup")
+            .version(1);
     }
 
     @Override
@@ -106,6 +109,7 @@ public class ActiveCampaignComponentHandler extends AbstractActiveCampaignCompon
                 }
             }
         }
+
         return modifiableProperty;
     }
 }
