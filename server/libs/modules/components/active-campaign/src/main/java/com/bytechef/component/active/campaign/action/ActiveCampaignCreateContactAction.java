@@ -77,7 +77,8 @@ public class ActiveCampaignCreateContactAction {
                         .required(false))
                     .metadata(
                         Map.of(
-                            "responseType", ResponseType.JSON))));
+                            "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/active-campaign_v1#create-contact");
 
     private ActiveCampaignCreateContactAction() {
     }
