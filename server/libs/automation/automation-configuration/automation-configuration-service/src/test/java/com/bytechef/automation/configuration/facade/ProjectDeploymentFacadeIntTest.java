@@ -328,7 +328,7 @@ public class ProjectDeploymentFacadeIntTest {
         when(
             principalJobService.getJobIds(
                 eq(Job.Status.STARTED), eq(null), eq(null), eq(List.of(deploymentId)), eq(PlatformType.AUTOMATION),
-                eq(List.of(workflowId)), false, eq(0)))
+                eq(List.of(workflowId)), eq(false), eq(0)))
                     .thenReturn(new PageImpl<>(runningJobIds, PageRequest.of(0, 20), runningJobIds.size()));
 
         // When - Disable the workflow
