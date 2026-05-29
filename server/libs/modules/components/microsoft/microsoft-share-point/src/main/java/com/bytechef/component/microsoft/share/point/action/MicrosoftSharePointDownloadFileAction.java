@@ -57,8 +57,7 @@ public class MicrosoftSharePointDownloadFileAction {
                 .required(true))
         .output(outputSchema(fileEntry()))
         .perform(MicrosoftSharePointDownloadFileAction::perform)
-        .help(
-            "", "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#download-file")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-share-point_v1#download-file")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
     private MicrosoftSharePointDownloadFileAction() {
