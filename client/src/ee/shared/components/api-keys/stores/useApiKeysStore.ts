@@ -23,7 +23,7 @@ export const useApiKeysStore = create<ApiKeysStateI>()(
     devtools(
         (set) => ({
             currentApiKey: undefined,
-            setCurrentApiKey: (currentApiKey: ApiKey) =>
+            setCurrentApiKey: (currentApiKey: ApiKey | undefined) =>
                 set(() => ({
                     currentApiKey,
                 })),
@@ -41,7 +41,7 @@ export const useApiKeysStore = create<ApiKeysStateI>()(
                 })),
 
             secretKey: undefined,
-            setSecretKey: (secretKey: string) =>
+            setSecretKey: (secretKey: string | undefined) =>
                 set(() => ({
                     secretKey,
                 })),
