@@ -42,21 +42,29 @@ public class TypeformUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/forms"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        int page = 1;
+        int pageCount;
 
         List<Option<String>> options = new ArrayList<>();
 
-        if (body.get("items") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map) {
-                    options.add(option((String) map.get(TITLE), (String) map.get(ID)));
+        do {
+            Map<String, Object> body = context
+                .http(http -> http.get("/forms"))
+                .queryParameters("page", page, "page_size", 200)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("items") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map) {
+                        options.add(option((String) map.get(TITLE), (String) map.get(ID)));
+                    }
                 }
             }
-        }
+
+            pageCount = (int) body.get("page_count");
+        } while (page++ < pageCount);
 
         return options;
     }
@@ -65,21 +73,29 @@ public class TypeformUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> dependencyPaths,
         String searchText, Context context) {
 
+        int page = 1;
+        int pageCount;
+
         List<Option<String>> options = new ArrayList<>();
 
-        Map<String, Object> body = context
-            .http(http -> http.get("/workspaces"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        do {
+            Map<String, Object> body = context
+                .http(http -> http.get("/workspaces"))
+                .queryParameters("page", page, "page_size", 200)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
 
-        if (body.get("items") instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.get("self") instanceof Map<?, ?> selfMap) {
-                    options.add(option((String) map.get("name"), (String) selfMap.get(HREF)));
+            if (body.get("items") instanceof List<?> list) {
+                for (Object item : list) {
+                    if (item instanceof Map<?, ?> map && map.get("self") instanceof Map<?, ?> selfMap) {
+                        options.add(option((String) map.get("name"), (String) selfMap.get(HREF)));
+                    }
                 }
             }
-        }
+
+            pageCount = (int) body.get("page_count");
+        } while (page++ < pageCount);
 
         return options;
     }
