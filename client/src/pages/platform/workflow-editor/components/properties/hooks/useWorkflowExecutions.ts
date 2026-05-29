@@ -10,7 +10,7 @@ import {
 } from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 type UseWorkflowExecutionsReturnType = {
     activeTab: TabValueType;
@@ -80,11 +80,11 @@ const useWorkflowExecutions = ({
         stackTrace: [],
     };
 
-    const handleExecutionClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
+    const handleExecutionClick = (taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'output');
 
         setSelectedExecution(taskExecution);
-    }, []);
+    };
 
     useEffect(() => {
         setSelectedExecution(getInitialSelectedItem(workflowTestExecution));
