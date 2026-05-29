@@ -18,7 +18,6 @@ package com.bytechef.component.microsoft.share.point.action;
 
 import static com.bytechef.component.definition.Context.ContextFunction;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.FILE_ID;
-import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.LOCATION;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.REDIRECT_STATUS_CODE;
 import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSharePointConstants.SITE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -56,7 +56,7 @@ class MicrosoftSharePointDownloadFileActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(SITE_ID, "testSiteId", FILE_ID, "testFileId"));
-    private final FileEntry mockedFileEntry = org.mockito.Mockito.mock(FileEntry.class);
+    private final FileEntry mockedFileEntry = mock(FileEntry.class);
 
     @Test
     void testPerformReturnsFileEntryOnRedirect(
@@ -68,26 +68,37 @@ class MicrosoftSharePointDownloadFileActionTest {
             .thenReturn(mockedExecutor);
         when(mockedResponse.getStatusCode())
             .thenReturn(REDIRECT_STATUS_CODE);
-        when(mockedResponse.getFirstHeader(LOCATION))
+        when(mockedResponse.getFirstHeader(stringArgumentCaptor.capture()))
             .thenReturn("https://redirect.example.com/file");
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedFileEntry);
 
-        FileEntry result = MicrosoftSharePointDownloadFileAction.perform(
-            mockedParameters, null, mockedContext);
+        FileEntry result = MicrosoftSharePointDownloadFileAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(mockedFileEntry, result);
 
-        ContextFunction<Http, Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-        assertNotNull(capturedFunction);
+        List<ContextFunction<Http, Executor>> values = httpFunctionArgumentCaptor.getAllValues();
 
-        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Configuration configuration = configurationBuilder.build();
+        for (ContextFunction<Http, Executor> function : values) {
+            assertNotNull(function);
+        }
 
-        assertEquals(ResponseType.BINARY, configuration.getResponseType());
+        List<ConfigurationBuilder> configurationBuilder = configurationBuilderArgumentCaptor.getAllValues();
 
+        assertEquals(2, configurationBuilder.size());
+
+        Configuration configuration = configurationBuilder.getFirst()
+            .build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Configuration configuration2 = configurationBuilder.getLast()
+            .build();
+
+        assertEquals(ResponseType.BINARY, configuration2.getResponseType());
         assertEquals(
-            List.of("/sites/testSiteId/drive/items/testFileId/content", "https://redirect.example.com/file"),
+            List.of("/sites/testSiteId/drive/items/testFileId/content", "location",
+                "https://redirect.example.com/file"),
             stringArgumentCaptor.getAllValues());
     }
 
@@ -97,19 +108,21 @@ class MicrosoftSharePointDownloadFileActionTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Response mockedNonRedirectResponse = org.mockito.Mockito.mock(Response.class);
-
-        when(mockedHttp.get(any(String.class)))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedNonRedirectResponse.getStatusCode())
+        when(mockedResponse.getStatusCode())
             .thenReturn(200);
-        when(mockedExecutor.configuration(any(ConfigurationBuilder.class)))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedNonRedirectResponse);
 
         assertThrows(
             ProviderException.class,
             () -> MicrosoftSharePointDownloadFileAction.perform(mockedParameters, null, mockedContext));
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/sites/testSiteId/drive/items/testFileId/content", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
