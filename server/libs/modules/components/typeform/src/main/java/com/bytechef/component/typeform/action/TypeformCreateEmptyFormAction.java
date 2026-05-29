@@ -71,9 +71,12 @@ public class TypeformCreateEmptyFormAction {
             outputSchema(
                 object()
                     .properties(
-                        string(ID),
-                        string(TYPE),
-                        string(TITLE),
+                        string(ID)
+                            .description("ID of the form."),
+                        string(TYPE)
+                            .description("Type of the form."),
+                        string(TITLE)
+                            .description("Title of the form."),
                         object(WORKSPACE)
                             .properties(string(HREF)),
                         object("theme")
