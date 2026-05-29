@@ -59,6 +59,7 @@ import org.springframework.ai.openai.OpenAiChatOptions;
  * @author Nikolina Spehar
  */
 class NvidiaChatActionTest {
+
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(Map.of(TOKEN, "TOKEN"));
     private final Parameters mockedInputParameters = MockParametersFactory.create(
         Map.ofEntries(
@@ -74,7 +75,6 @@ class NvidiaChatActionTest {
     @Test
     void testCreateChatModelWithResponseFormat() {
         try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class)) {
-
             OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
 
             openAIOkHttpClientMockedStatic.when(OpenAIOkHttpClient::builder)
@@ -94,7 +94,6 @@ class NvidiaChatActionTest {
 
             assertNotNull(chatModel);
             assertInstanceOf(OpenAiChatModel.class, chatModel);
-
             assertEquals(List.of("TOKEN", "https://integrate.api.nvidia.com/v1"), stringArgumentCaptor.getAllValues());
             assertEquals(Duration.ofMinutes(5), durationArgumentCaptor.getValue());
 
