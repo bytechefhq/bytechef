@@ -233,12 +233,11 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
                 Object output = taskExecution.getOutput() == null
                     ? null
                     : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
-                Job childJob = childJobMap.get(taskExecution.getId());
 
                 return new TaskExecutionDTO(
-                    taskExecution,
-                    definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output, asJobDTO(childJob));
+                    taskExecution, definitionResult.title(), definitionResult.icon(),
+                    workflowTask.evaluateParameters(context, evaluator), output,
+                    asJobDTO(childJobMap.get(taskExecution.getId())));
             });
 
         return buildHierarchy(taskExecutionDTOs);
@@ -249,15 +248,16 @@ public class TestWorkflowExecutorImpl implements TestWorkflowExecutor {
             return null;
         }
 
-        return new JobDTO(job, asMap(job.getOutputs()), getJobTaskExecutions(job.getId()));
+        return new JobDTO(
+            job, asMap(job.getOutputs(), taskFileStorage::readJobOutputs), getJobTaskExecutions(job.getId()));
     }
 
-    private Map<String, ?> asMap(FileEntry fileEntry) {
-        if (fileEntry == null) {
+    private <T> Map<String, ?> asMap(T source, Function<T, Map<String, ?>> consumer) {
+        if (source == null) {
             return Map.of();
         }
 
-        return taskFileStorage.readJobOutputs(fileEntry);
+        return consumer.apply(source);
     }
 
     private JobDTO execute(JobParametersDTO jobParametersDTO) {
