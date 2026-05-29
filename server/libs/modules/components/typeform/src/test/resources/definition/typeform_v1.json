@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new empty form.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/typeform_v1#create-empty-form"
+    },
     "metadata": null,
     "name": "createEmptyForm",
     "outputDefinition": {
@@ -33,7 +36,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "ID of the form.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -55,7 +58,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "Type of the form.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -77,7 +80,7 @@
             "advancedOption": null,
             "controlType": "TEXT",
             "defaultValue": null,
-            "description": null,
+            "description": "Title of the form.",
             "displayCondition": null,
             "exampleValue": null,
             "expressionEnabled": null,
@@ -787,7 +790,7 @@
           "advancedOption": null,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": null,
+          "description": "ID of the form.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
@@ -809,7 +812,7 @@
           "advancedOption": null,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": null,
+          "description": "Type of the form.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
@@ -831,7 +834,7 @@
           "advancedOption": null,
           "controlType": "TEXT",
           "defaultValue": null,
-          "description": null,
+          "description": "Title of the form.",
           "displayCondition": null,
           "exampleValue": null,
           "expressionEnabled": null,
@@ -1671,14 +1674,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/typeform_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://www.typeform.com/developers/get-started/"
+  },
   "description": "Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback.",
   "icon": "path:assets/typeform.svg",
   "metadata": null,
@@ -1692,7 +1701,10 @@
     "deprecated": null,
     "description": "Triggers when form is submitted.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/typeform_v1#new-submission"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newSubmission",
