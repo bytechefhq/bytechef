@@ -40,11 +40,14 @@ public class FreshsalesComponentHandler implements ComponentHandler {
                 "sales processes and manage customer interactions effectively.")
         .icon("path:assets/freshsales.svg")
         .categories(ComponentCategory.CRM)
+        .customAction(true)
+        .customActionHelp("", "https://developer.freshsales.io/api/")
         .connection(CONNECTION_DEFINITION)
         .actions(
             FreshsalesCreateAccountAction.ACTION_DEFINITION,
             FreshsalesCreateContactAction.ACTION_DEFINITION,
-            FreshsalesCreateLeadAction.ACTION_DEFINITION);
+            FreshsalesCreateLeadAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

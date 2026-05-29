@@ -41,6 +41,7 @@ public class FreshsalesCreateLeadAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLead")
         .title("Create Lead")
         .description("Creates a new lead.")
+        .help("", "https://docs.bytechef.io/reference/components/freshsales_v1#create-lead")
         .properties(
             string(FIRST_NAME)
                 .label("First Name")
@@ -85,7 +86,7 @@ public class FreshsalesCreateLeadAction {
                     EMAIL, inputParameters.getRequiredString(EMAIL)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
 
     }
 }
