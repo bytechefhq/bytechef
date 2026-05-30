@@ -51,14 +51,17 @@ public class JsonDocumentReader extends AbstractDocumentReader {
                     .required(false))
             .object(() -> JsonDocumentReader::apply);
 
-    protected static JsonReader apply(
+    protected static org.springframework.ai.document.DocumentReader apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         FileResult result = getFile(inputParameters, context);
 
         List<String> keys = inputParameters.getList(JSON_KEYS_TO_USE, String.class);
 
-        return (keys == null) ? new JsonReader(result.fileSystemResource())
+        JsonReader jsonReader = (keys == null) ? new JsonReader(result.fileSystemResource())
             : new JsonReader(result.fileSystemResource(), keys.toArray(new String[0]));
+
+        return withFilename(jsonReader, result.fileEntry()
+            .getName());
     }
 }

@@ -51,6 +51,9 @@ public class TikaDocumentReader extends AbstractDocumentReader {
 
         FileResult result = getFile(inputParameters, context);
 
-        return new org.springframework.ai.reader.tika.TikaDocumentReader(result.fileSystemResource());
+        return withFilename(
+            new org.springframework.ai.reader.tika.TikaDocumentReader(result.fileSystemResource()),
+            result.fileEntry()
+                .getName());
     }
 }

@@ -41,7 +41,7 @@ public class PagePdfDocumentReader extends AbstractDocumentReader {
                 DOCUMENT_PROPERTY)
             .object(() -> PagePdfDocumentReader::apply);
 
-    protected static org.springframework.ai.reader.pdf.PagePdfDocumentReader apply(
+    protected static org.springframework.ai.document.DocumentReader apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         FileResult result = getFile(inputParameters, context);
@@ -55,6 +55,9 @@ public class PagePdfDocumentReader extends AbstractDocumentReader {
             .withPagesPerDocument(1)
             .build();
 
-        return new org.springframework.ai.reader.pdf.PagePdfDocumentReader(result.fileSystemResource(), config);
+        return withFilename(
+            new org.springframework.ai.reader.pdf.PagePdfDocumentReader(result.fileSystemResource(), config),
+            result.fileEntry()
+                .getName());
     }
 }
