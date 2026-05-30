@@ -117,10 +117,10 @@ public final class KnowledgeBaseVectorStore {
 
             Map<String, Object> metadata = document.getMetadata();
 
-            Object source = metadata.get("source");
+            Object filename = metadata.get("filename");
 
-            if (source != null) {
-                return source.toString();
+            if (filename != null) {
+                return filename.toString();
             }
         }
 

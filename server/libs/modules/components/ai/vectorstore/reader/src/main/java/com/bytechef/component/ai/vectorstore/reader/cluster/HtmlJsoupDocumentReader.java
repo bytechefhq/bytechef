@@ -49,6 +49,9 @@ public class HtmlJsoupDocumentReader extends AbstractDocumentReader {
 
         FileResult result = getFile(inputParameters, context);
 
-        return new org.springframework.ai.reader.jsoup.JsoupDocumentReader(result.fileSystemResource());
+        return withFilename(
+            new org.springframework.ai.reader.jsoup.JsoupDocumentReader(result.fileSystemResource()),
+            result.fileEntry()
+                .getName());
     }
 }

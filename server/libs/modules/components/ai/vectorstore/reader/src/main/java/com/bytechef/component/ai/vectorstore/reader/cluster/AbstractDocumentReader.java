@@ -21,6 +21,10 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
+import org.springframework.ai.document.Document;
+import org.springframework.ai.document.DocumentReader;
 import org.springframework.core.io.FileSystemResource;
 
 /**
@@ -36,6 +40,19 @@ public abstract class AbstractDocumentReader {
         FileSystemResource fileSystemResource = new FileSystemResource(file);
 
         return new FileResult(fileEntry, fileSystemResource);
+    }
+
+    protected static DocumentReader withFilename(DocumentReader reader, String filename) {
+        return () -> reader.read()
+            .stream()
+            .map(document -> {
+                Map<String, Object> metadata = new HashMap<>(document.getMetadata());
+
+                metadata.put("filename", filename);
+
+                return new Document(document.getId(), document.getText(), metadata);
+            })
+            .toList();
     }
 
     protected record FileResult(FileEntry fileEntry, FileSystemResource fileSystemResource) {
