@@ -64,7 +64,7 @@ class KnowledgeBaseDocumentChunkFacadeImpl implements KnowledgeBaseDocumentChunk
         for (KnowledgeBaseDocumentChunk chunk : chunks) {
             FileEntry contentFileEntry = chunk.getContent();
 
-            if (contentFileEntry != null) {
+            if (contentFileEntry != null && knowledgeBaseFileStorage.chunkContentExists(contentFileEntry)) {
                 String textContent = knowledgeBaseFileStorage.readChunkContent(contentFileEntry);
 
                 chunk.setTextContent(textContent);

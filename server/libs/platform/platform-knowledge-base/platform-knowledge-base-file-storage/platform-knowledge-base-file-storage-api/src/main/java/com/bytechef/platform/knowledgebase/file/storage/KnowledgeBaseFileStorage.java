@@ -40,6 +40,14 @@ public interface KnowledgeBaseFileStorage {
     void deleteDocument(FileEntry fileEntry);
 
     /**
+     * Checks whether the chunk content file associated with the given file entry exists in storage.
+     *
+     * @param fileEntry the file entry representing the chunk to check
+     * @return true if the file exists, false otherwise
+     */
+    boolean chunkContentExists(FileEntry fileEntry);
+
+    /**
      * Reads the chunk content associated with the given file entry.
      *
      * @param fileEntry the file entry representing the chunk whose content is to be read

@@ -39,6 +39,11 @@ public class KnowledgeBaseFileStorageImpl implements KnowledgeBaseFileStorage {
     }
 
     @Override
+    public boolean chunkContentExists(FileEntry fileEntry) {
+        return fileStorageService.fileExists(KNOWLEDGE_BASE_CHUNKS_DIR, fileEntry);
+    }
+
+    @Override
     public void deleteChunkContent(FileEntry fileEntry) {
         fileStorageService.deleteFile(KNOWLEDGE_BASE_CHUNKS_DIR, fileEntry);
     }
