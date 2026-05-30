@@ -86,11 +86,11 @@ const WorkflowCodeEditorSheet = ({
             </VisuallyHidden.Root>
 
             <SheetContent
-                className="top-3 right-4 bottom-4 flex h-auto w-[60%] flex-row gap-0 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 sm:max-w-[90%]"
+                className="top-3 right-4 bottom-4 flex h-auto w-fit max-w-[95vw] flex-row gap-0 rounded-lg border border-stroke-neutral-secondary bg-surface-neutral-secondary p-0 transition-[width] duration-300 ease-in-out sm:max-w-[90vw]"
                 onFocusOutside={(event) => event.preventDefault()}
                 onPointerDownOutside={(event) => event.preventDefault()}
             >
-                <div className="flex min-w-0 flex-1 flex-col">
+                <div className="flex w-[60vw] min-w-0 flex-col">
                     <header className="flex w-full shrink-0 items-center justify-between gap-x-3 rounded-t-md border-b border-stroke-neutral-primary bg-surface-neutral-primary p-3">
                         <div className="flex items-center gap-2">
                             <CodeXmlIcon />
