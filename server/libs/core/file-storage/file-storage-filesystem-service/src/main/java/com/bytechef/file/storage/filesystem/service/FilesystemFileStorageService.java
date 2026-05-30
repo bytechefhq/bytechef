@@ -63,15 +63,21 @@ public class FilesystemFileStorageService implements FileStorageService {
 
     @Override
     public void deleteFile(String directory, FileEntry fileEntry) {
-        Path directoryPath = resolveDirectoryPath(directory);
-        Path filePath = resolveFilePath(directoryPath, directory, fileEntry.getUrl());
+        if (fileEntry != null) {
+            Path directoryPath = resolveDirectoryPath(directory);
+            Path filePath = resolveFilePath(directoryPath, directory, fileEntry.getUrl());
 
-        File file = filePath.toFile();
+            File file = filePath.toFile();
 
-        boolean deleted = file.delete();
+            if (!file.exists()) {
+                return;
+            }
 
-        if (!deleted) {
-            throw new FileStorageException("File %s cannot be deleted".formatted(directoryPath));
+            boolean deleted = file.delete();
+
+            if (!deleted) {
+                throw new FileStorageException("File %s cannot be deleted".formatted(filePath));
+            }
         }
     }
 
