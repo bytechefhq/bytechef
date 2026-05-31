@@ -21,8 +21,10 @@ import com.bytechef.ai.mcp.tool.automation.ClusterElementTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectTools;
 import com.bytechef.ai.mcp.tool.automation.ProjectWorkflowTools;
 import com.bytechef.ai.mcp.tool.automation.ScriptTools;
+import com.bytechef.ai.mcp.tool.automation.SkillsTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
+import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -67,21 +69,25 @@ public class ManagementMcpServerConfiguration {
     private final ProjectTools projectTools;
     private final ProjectWorkflowTools projectWorkflowTools;
     private final TaskTools taskTools;
+    private final TaskDispatcherTools taskDispatcherTools;
     private final ScriptTools scriptTools;
+    private final SkillsTools skillsTools;
     private final ClusterElementTools clusterElementTools;
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        ClusterElementTools clusterElementTools) {
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, TaskDispatcherTools taskDispatcherTools,
+        ScriptTools scriptTools, SkillsTools skillsTools, ClusterElementTools clusterElementTools) {
 
         this.componentTools = componentTools;
         this.firecrawlTools = firecrawlTools;
         this.projectTools = projectTools;
         this.projectWorkflowTools = projectWorkflowTools;
         this.taskTools = taskTools;
+        this.taskDispatcherTools = taskDispatcherTools;
         this.scriptTools = scriptTools;
+        this.skillsTools = skillsTools;
         this.clusterElementTools = clusterElementTools;
     }
 
@@ -120,7 +126,9 @@ public class ManagementMcpServerConfiguration {
     @Primary
     ToolCallbackProvider toolCallbackProvider() {
         List<Object> tools = new ArrayList<>(
-            List.of(projectTools, projectWorkflowTools, componentTools, taskTools, scriptTools, clusterElementTools));
+            List.of(
+                projectTools, projectWorkflowTools, componentTools, taskTools, taskDispatcherTools, scriptTools,
+                skillsTools, clusterElementTools));
 
         if (firecrawlTools != null) {
             tools.add(firecrawlTools);
