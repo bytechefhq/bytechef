@@ -17,9 +17,12 @@
 package com.bytechef.component.slack;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.tool;
+import static com.bytechef.component.slack.constant.SlackConstants.CHANNEL;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.slack.action.SlackAddReactionAction;
@@ -29,6 +32,7 @@ import com.bytechef.component.slack.action.SlackSendDirectMessageAction;
 import com.bytechef.component.slack.cluster.SlackApprovalChannel;
 import com.bytechef.component.slack.connection.SlackConnection;
 import com.bytechef.component.slack.trigger.SlackAnyEventTrigger;
+import com.bytechef.component.slack.util.SlackUtils;
 import com.google.auto.service.AutoService;
 
 /**
@@ -45,6 +49,12 @@ public final class SlackComponentHandler implements ComponentHandler {
         .icon("path:assets/slack.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.DEVELOPER_TOOLS)
         .connection(SlackConnection.CONNECTION_DEFINITION)
+        .inputs(
+            string(CHANNEL)
+                .label("Channel")
+                .description("Channel, private group, or IM channel to use.")
+                .options((OptionsFunction<String>) SlackUtils::getChannelIdOptions)
+                .required(true))
         .actions(
             SlackAddReactionAction.ACTION_DEFINITION,
             SlackSendApprovalMessageAction.ACTION_DEFINITION,
