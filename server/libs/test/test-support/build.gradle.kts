@@ -1,6 +1,7 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation("org.junit.jupiter:junit-jupiter")
+    implementation(libs.org.json)
     implementation("org.skyscreamer:jsonassert")
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-jackson")
