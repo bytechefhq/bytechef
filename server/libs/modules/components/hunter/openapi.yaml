@@ -12,6 +12,7 @@ paths:
       summary: "Email Enrichment"
       description: "Returns all the information associated with an email address, such as a person's name, location and social handles."
       operationId: "emailEnrichment"
+      x-help: "https://docs.bytechef.io/reference/components/hunter_v1#email-enrichment"
       parameters:
         - name: "email"
           description: "The email address name for which you to find associated information."
@@ -88,6 +89,7 @@ paths:
       summary: "Company Enrichment"
       description: "Returns all the information associated with a domain name, such as the industry, the description, or headquarters' location."
       operationId: "companyEnrichment"
+      x-help: "https://docs.bytechef.io/reference/components/hunter_v1#company-enrichment"
       parameters:
         - name: "domain"
           description: "The domain name for which you to find associated information."
@@ -150,6 +152,7 @@ paths:
       summary: "Combined Enrichment"
       description: "Returns all the information associated with an email address and its domain name."
       operationId: "combinedEnrichment"
+      x-help: "https://docs.bytechef.io/reference/components/hunter_v1#combined-enrichment"
       parameters:
         - name: "email"
           description: "The email address name for which you to find associated information."
@@ -259,6 +262,7 @@ paths:
       summary: "Create Lead"
       description: "Creates a new lead."
       operationId: "createLead"
+      x-help: "https://docs.bytechef.io/reference/components/hunter_v1#create-lead"
       requestBody:
         content:
           application/json:
