@@ -38,10 +38,8 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Date;
 
 /**
@@ -87,9 +85,8 @@ public class CopperCreateTaskAction {
                 .required(true),
             array(TAGS)
                 .label("Tags")
-                .items(
-                    string()
-                        .options((OptionsFunction<String>) CopperOptionUtils::getTagsOptions))
+                .items(string())
+                .options((OptionsFunction<String>) CopperOptionUtils::getTagsOptions)
                 .required(false),
             string(STATUS)
                 .label("Status")
@@ -132,9 +129,6 @@ public class CopperCreateTaskAction {
                             .items(string()))))
         .perform(CopperCreateTaskAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_CREATE_TASK_FUNCTION =
-        http -> http.post("/tasks");
-
     private CopperCreateTaskAction() {
     }
 
@@ -144,7 +138,7 @@ public class CopperCreateTaskAction {
         Date dueDate = inputParameters.getDate(DUE_DATE);
         Date reminderDate = inputParameters.getDate(REMINDER_DATE);
 
-        return actionContext.http(POST_CREATE_TASK_FUNCTION)
+        return actionContext.http(http -> http.post("/tasks"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getRequiredString(NAME),
@@ -159,6 +153,6 @@ public class CopperCreateTaskAction {
                     TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }
