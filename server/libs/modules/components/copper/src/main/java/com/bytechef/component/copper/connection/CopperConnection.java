@@ -49,7 +49,9 @@ public class CopperConnection {
                     Map.of(
                         "X-PW-AccessToken", List.of(connectionParameters.getRequiredString(KEY)),
                         "X-PW-Application", List.of("developer_api"),
-                        "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))))));
+                        "X-PW-UserEmail", List.of(connectionParameters.getRequiredString(USERNAME))))))
+        .help("", "https://docs.bytechef.io/reference/components/copper_v1#connection-setup")
+        .version(1);
 
     private CopperConnection() {
     }

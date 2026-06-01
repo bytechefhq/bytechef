@@ -51,6 +51,7 @@ public class CopperCreateTaskAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTask")
         .title("Create Task")
         .description("Creates a new task in Copper.")
+        .help("", "https://docs.bytechef.io/reference/components/copper_v1#create-activity")
         .properties(
             string(NAME)
                 .label("Name")
