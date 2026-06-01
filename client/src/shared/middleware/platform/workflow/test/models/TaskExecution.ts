@@ -27,6 +27,13 @@ import {
     WorkflowTaskToJSON,
     WorkflowTaskToJSONTyped,
 } from './WorkflowTask';
+import type { Job } from './Job';
+import {
+    JobFromJSON,
+    JobFromJSONTyped,
+    JobToJSON,
+    JobToJSONTyped,
+} from './Job';
 
 /**
  * Adds execution semantics to a task.
@@ -202,6 +209,12 @@ export interface TaskExecution {
      * @memberof TaskExecution
      */
     iterations?: Array<Array<TaskExecution>>;
+    /**
+     * 
+     * @type {Job}
+     * @memberof TaskExecution
+     */
+    childJob?: Job;
 }
 
 
@@ -267,6 +280,7 @@ export function TaskExecutionFromJSONTyped(json: any, ignoreDiscriminator: boole
         'type': json['type'] == null ? undefined : json['type'],
         'children': json['children'] == null ? undefined : ((json['children'] as Array<any>).map(TaskExecutionFromJSON)),
         'iterations': json['iterations'] == null ? undefined : json['iterations'],
+        'childJob': json['childJob'] == null ? undefined : JobFromJSON(json['childJob']),
     };
 }
 
@@ -285,6 +299,7 @@ export function TaskExecutionToJSONTyped(value?: Omit<TaskExecution, 'createdBy'
         'workflowTask': WorkflowTaskToJSON(value['workflowTask']),
         'children': value['children'] == null ? undefined : ((value['children'] as Array<any>).map(TaskExecutionToJSON)),
         'iterations': value['iterations'],
+        'childJob': JobToJSON(value['childJob']),
     };
 }
 
