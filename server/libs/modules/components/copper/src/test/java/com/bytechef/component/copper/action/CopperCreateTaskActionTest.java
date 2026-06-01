@@ -16,7 +16,6 @@
 
 package com.bytechef.component.copper.action;
 
-import static com.bytechef.component.copper.action.CopperCreateTaskAction.POST_CREATE_TASK_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.DUE_DATE;
@@ -25,50 +24,75 @@ import static com.bytechef.component.copper.constant.CopperConstants.PRIORITY;
 import static com.bytechef.component.copper.constant.CopperConstants.REMINDER_DATE;
 import static com.bytechef.component.copper.constant.CopperConstants.STATUS;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Date;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Vihar Shah
  * @author Monika Kušter
  */
-class CopperCreateTaskActionTest extends AbstractCopperActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class CopperCreateTaskActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Date date = new Date();
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(
+            NAME, "name", ASSIGNEE_ID, "assigneeId", DUE_DATE, date, REMINDER_DATE, date,
+            PRIORITY, "priority", STATUS, "status", DETAILS, "details"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Date date = new Date();
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         long epochSecond = date.toInstant()
             .getEpochSecond();
 
-        mockedParameters = MockParametersFactory.create(
-            Map.of(
-                NAME, "name", ASSIGNEE_ID, "assigneeId", DUE_DATE, date, REMINDER_DATE, date,
-                PRIORITY, "priority", STATUS, "status", DETAILS, "details"));
-
         Object result = CopperCreateTaskAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+        assertEquals("/tasks", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        verify(mockedContext, times(1)).http(POST_CREATE_TASK_FUNCTION);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
 
-        Map<String, Object> expectedBody = Map.of(
-            NAME, "name",
-            ASSIGNEE_ID, "assigneeId",
-            DUE_DATE, epochSecond,
-            REMINDER_DATE, epochSecond,
-            PRIORITY, "priority",
-            STATUS, "status",
-            DETAILS, "details");
-
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(
+            NAME, "name", ASSIGNEE_ID, "assigneeId", DUE_DATE, epochSecond, REMINDER_DATE, epochSecond,
+            PRIORITY, "priority", STATUS, "status", DETAILS, "details"),
+            bodyArgumentCaptor.getValue());
     }
 }

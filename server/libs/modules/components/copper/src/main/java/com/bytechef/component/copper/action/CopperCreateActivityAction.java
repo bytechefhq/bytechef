@@ -35,10 +35,8 @@ import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 import java.util.Map;
 
 /**
@@ -98,16 +96,13 @@ public class CopperCreateActivityAction {
                                 .description("ID of the parent this activity is associated with.")))))
         .perform(CopperCreateActivityAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_ACTIVITIES_CONTEXT_FUNCTION =
-        http -> http.post("/activities");
-
     private CopperCreateActivityAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(POST_ACTIVITIES_CONTEXT_FUNCTION)
+        return actionContext.http(http -> http.post("/activities"))
             .body(
                 Http.Body.of(
                     TYPE, Map.of("category", "user", ID, inputParameters.getRequiredString(ACTIVITY_TYPE)),
@@ -116,6 +111,6 @@ public class CopperCreateActivityAction {
                     Map.of(TYPE, inputParameters.getRequiredString(TYPE), ID, inputParameters.getRequiredString(ID))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
 }

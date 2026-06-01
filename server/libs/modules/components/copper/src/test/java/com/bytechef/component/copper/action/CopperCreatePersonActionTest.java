@@ -16,7 +16,6 @@
 
 package com.bytechef.component.copper.action;
 
-import static com.bytechef.component.copper.action.CopperCreatePersonAction.POST_PEOPLE_CONTEXT_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ADDRESS;
 import static com.bytechef.component.copper.constant.CopperConstants.ASSIGNEE_ID;
 import static com.bytechef.component.copper.constant.CopperConstants.CATEGORY;
@@ -33,41 +32,76 @@ import static com.bytechef.component.copper.constant.CopperConstants.TITLE;
 import static com.bytechef.component.copper.constant.CopperConstants.URL;
 import static com.bytechef.component.copper.constant.CopperConstants.WEBSITES;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class CopperCreatePersonActionTest extends AbstractCopperActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class CopperCreatePersonActionTest {
 
-    private static final List<Map<String, String>> phoneNumbers = List.of(Map.of(NUMBER, "1234", CATEGORY, "work"));
-    private static final List<Map<String, String>> socials = List.of(Map.of(URL, "url", CATEGORY, "youtube"));
-    private static final List<Map<String, String>> websites = List.of(Map.of(URL, "url", CATEGORY, "personal"));
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Object mockedObject = mock(Object.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(
+            NAME, "name", ASSIGNEE_ID, "assigneeId", TITLE, "title", DETAILS, "details", CONTACT_TYPE_ID, "contactType",
+            PHONE_NUMBERS, List.of(Map.of(NUMBER, "1234", CATEGORY, "work")), SOCIALS,
+            List.of(Map.of(URL, "url", CATEGORY, "youtube")), WEBSITES,
+            List.of(Map.of(URL, "url", CATEGORY, "personal")),
+            ADDRESS, Map.of(STREET, "street", CITY, "city"), TAGS, List.of("tag1", "tag2")));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
-        Map<String, Object> bodyMap = Map.of(
-            NAME, "name", ASSIGNEE_ID, "assigneeId", TITLE, "title", DETAILS, "details", CONTACT_TYPE_ID, "contactType",
-            PHONE_NUMBERS, phoneNumbers, SOCIALS, socials, WEBSITES, websites,
-            ADDRESS, Map.of(STREET, "street", CITY, "city"), TAGS, List.of("tag1", "tag2"));
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        mockedParameters = MockParametersFactory.create(bodyMap);
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         Object result = CopperCreatePersonAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+        assertEquals("/people", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        verify(mockedContext, times(1)).http(POST_PEOPLE_CONTEXT_FUNCTION);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(bodyMap, body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(NAME, "name", ASSIGNEE_ID, "assigneeId", TITLE, "title", DETAILS, "details", CONTACT_TYPE_ID,
+                "contactType",
+                PHONE_NUMBERS, List.of(Map.of(NUMBER, "1234", CATEGORY, "work")), SOCIALS,
+                List.of(Map.of(URL, "url", CATEGORY, "youtube")), WEBSITES,
+                List.of(Map.of(URL, "url", CATEGORY, "personal")),
+                ADDRESS, Map.of(STREET, "street", CITY, "city"), TAGS, List.of("tag1", "tag2")),
+            bodyArgumentCaptor.getValue());
     }
 }
