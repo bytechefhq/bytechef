@@ -56,6 +56,7 @@ subprojects {
         testCompileOnly(rootProject.libs.com.github.spotbugs.spotbugs.annotations)
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
+        testImplementation(rootProject.libs.org.json)
     }
 }
 
