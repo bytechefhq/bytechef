@@ -15,8 +15,6 @@ import {CheckIcon, ChevronDown, CircleXIcon, XIcon} from 'lucide-react';
 import {ButtonHTMLAttributes, ComponentType, ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-import {ScrollArea} from '../ui/scroll-area';
-
 export type MultiSelectOptionType = {
     label: string;
     value: string;
@@ -318,7 +316,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
 
                                 <CommandSeparator className="my-1.5" />
 
-                                <ScrollArea className="h-48 pr-3">
+                                <div className="max-h-48 overflow-y-auto">
                                     {options.map((option) => {
                                         const isSelected = selectedValues?.includes(option.value);
 
@@ -349,7 +347,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                             </CommandItem>
                                         );
                                     })}
-                                </ScrollArea>
+                                </div>
                             </CommandGroup>
 
                             {showFooter && (
