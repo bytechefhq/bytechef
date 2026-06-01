@@ -35,7 +35,6 @@ import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.sftp.SFTPClient;
 import net.schmizz.sshj.transport.verification.PromiscuousVerifier;
 import net.schmizz.sshj.xfer.InMemorySourceFile;
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Value;
@@ -252,6 +251,8 @@ public class BaseFtpActionIntTest {
      * exactly.
      */
     protected static final int PASSIVE_DATA_PORT = 30121;
+    private static final int FTP_CONTAINER_START_MAX_ATTEMPTS = 6;
+    private static final long FTP_CONTAINER_START_RETRY_DELAY_MILLIS = 2000;
     protected static final String TEST_CONTENT = "Hello from FTP Integration Test!";
     protected static final String TEST_FILE_BASE_NAME = "test-document";
     protected static final String TEST_FILE_BASE_EXTENSION = ".txt";
@@ -269,27 +270,14 @@ public class BaseFtpActionIntTest {
      * host port and container port to be identical: the server embeds the port number in the PASV response, so the FTP
      * client connects directly to that port on the host — dynamic port mapping would break this contract.
      */
-    @SuppressWarnings("deprecation")
-    protected FixedHostPortGenericContainer<?> ftpContainer;
-    protected GenericContainer<?> sftpContainer;
+    static FixedHostPortGenericContainer<?> ftpContainer;
+    static GenericContainer<?> sftpContainer;
 
     @BeforeAll
     void setUpContainers() throws Exception {
-        ftpContainer = new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
-            .withEnv("USERS", ftpUsername + "|" + ftpPassword)
-            .withEnv("ADDRESS", ftpHostIp)
-            .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
-            .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
-            .withExposedPorts(21)
-            .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
+        startContainersOnce();
 
-        ftpContainer.start();
-
-        sftpContainer = new GenericContainer<>("atmoz/sftp:latest")
-            .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
-            .withExposedPorts(22);
-
-        sftpContainer.start();
+        resetFtpFiles();
 
         uploadTestFileViaFtp();
         uploadTestFileViaSftp();
@@ -303,14 +291,58 @@ public class BaseFtpActionIntTest {
         copyTestFileViaFtp("005");
     }
 
-    @AfterAll
-    void tearDownContainers() {
-        if (ftpContainer != null) {
-            ftpContainer.stop();
+    private void startContainersOnce() throws InterruptedException {
+        if (ftpContainer == null) {
+            ftpContainer = startFtpContainer();
         }
 
-        if (sftpContainer != null) {
-            sftpContainer.stop();
+        if (sftpContainer == null) {
+            GenericContainer<?> container = new GenericContainer<>("atmoz/sftp:latest")
+                .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
+                .withExposedPorts(22);
+
+            container.start();
+
+            sftpContainer = container;
+        }
+    }
+
+    @SuppressWarnings("deprecation")
+    private FixedHostPortGenericContainer<?> startFtpContainer() throws InterruptedException {
+        RuntimeException startException = null;
+
+        for (int attempt = 1; attempt <= FTP_CONTAINER_START_MAX_ATTEMPTS; attempt++) {
+            FixedHostPortGenericContainer<?> container =
+                new FixedHostPortGenericContainer<>("delfer/alpine-ftp-server:latest")
+                    .withEnv("USERS", ftpUsername + "|" + ftpPassword)
+                    .withEnv("ADDRESS", ftpHostIp)
+                    .withEnv("MIN_PORT", String.valueOf(PASSIVE_DATA_PORT))
+                    .withEnv("MAX_PORT", String.valueOf(PASSIVE_DATA_PORT))
+                    .withExposedPorts(21)
+                    .withFixedExposedPort(PASSIVE_DATA_PORT, PASSIVE_DATA_PORT);
+
+            try {
+                container.start();
+
+                return container;
+            } catch (RuntimeException exception) {
+                startException = exception;
+
+                container.stop();
+
+                Thread.sleep(FTP_CONTAINER_START_RETRY_DELAY_MILLIS);
+            }
+        }
+
+        throw new IllegalStateException(
+            "FTP container failed to start after " + FTP_CONTAINER_START_MAX_ATTEMPTS + " attempts", startException);
+    }
+
+    protected void resetFtpFiles() throws Exception {
+        var result = ftpContainer.execInContainer("sh", "-c", "rm -rf /ftp/" + ftpUsername + "/*");
+
+        if (result.getExitCode() != 0) {
+            throw new IllegalStateException("Failed to clean FTP test files inside container: " + result.getStderr());
         }
     }
 
