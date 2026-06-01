@@ -4,7 +4,7 @@ import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
-import {NODE_WIDTH, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {NODE_WIDTH} from '@/shared/constants';
 import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clusterElementDefinitions.queries';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -239,14 +239,15 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     <Button
                         aria-label={`${data.workflowNodeName} node`}
                         className={twMerge(
-                            'size-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
+                            'h-auto min-h-18 rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 text-primary hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary [&_svg]:size-9',
+                            // Roots size via the inline width style; w-18 (!important) would otherwise clobber it.
+                            !isMainRootClusterElement && !isNestedClusterRoot && 'w-18',
                             isSelected &&
                                 workflowNodeDetailsPanelOpen &&
                                 'border-stroke-brand-primary shadow-none hover:border-stroke-brand-primary',
                             isMainRootClusterElement && 'nodrag',
-                            (isMainRootClusterElement || isNestedClusterRoot) && `min-w-[${ROOT_CLUSTER_WIDTH}px] `,
-                            isNestedClusterRoot && 'overflow-hidden px-6',
-                            isClusterElement && !isMainRootClusterElement && 'rounded-full',
+                            isNestedClusterRoot && 'overflow-hidden rounded-2xl px-6',
+                            isClusterElement && !isMainRootClusterElement && !isNestedClusterRoot && 'rounded-full',
                             isClusterElement &&
                                 !isNestedClusterRoot &&
                                 !hasSavedClusterElementPosition &&

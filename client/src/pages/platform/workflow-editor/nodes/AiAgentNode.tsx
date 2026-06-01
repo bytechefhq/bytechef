@@ -355,7 +355,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 >
                     <HoverCardTrigger>
                         <Button
-                            className="flex size-18 w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
+                            className="flex h-auto min-h-18 w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
                             onClick={handleNodeClick}
                         >
                             <span className="self-center text-content-neutral-primary [&_svg]:size-9">
