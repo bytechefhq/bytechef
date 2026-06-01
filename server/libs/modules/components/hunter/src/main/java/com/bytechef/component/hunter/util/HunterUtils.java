@@ -39,25 +39,35 @@ public class HunterUtils extends AbstractHunterUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Map<String, Object>> body = context
-            .http(http -> http.get("/leads_lists"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
-        Map<String, Object> data = body.get("data");
+        int offset = 0;
+        int total;
         List<Option<Long>> options = new ArrayList<>();
 
-        if (data.get("leads_lists") instanceof List<?> leadLists) {
-            for (Object leadList : leadLists) {
-                if (leadList instanceof Map<?, ?> leadsListMap) {
-                    options.add(
-                        option((String) leadsListMap.get("name"), ((Integer) leadsListMap.get("id")).intValue()));
+        do {
+            Map<String, Map<String, Object>> body = context
+                .http(http -> http.get("/leads_lists"))
+                .queryParameters("limit", 100, "offset", offset)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            Map<String, Object> data = body.get("data");
+
+            if (data.get("leads_lists") instanceof List<?> leadLists) {
+                offset += leadLists.size();
+                for (Object leadList : leadLists) {
+                    if (leadList instanceof Map<?, ?> leadsListMap) {
+                        options.add(
+                            option((String) leadsListMap.get("name"), ((Integer) leadsListMap.get("id")).intValue()));
+                    }
                 }
             }
-        }
+
+            Map<String, Object> meta = body.get("meta");
+
+            total = (Integer) meta.get("total");
+        } while (offset < total);
 
         return options;
     }
-
 }
