@@ -16,44 +16,73 @@
 
 package com.bytechef.component.copper.action;
 
-import static com.bytechef.component.copper.action.CopperCreateActivityAction.POST_ACTIVITIES_CONTEXT_FUNCTION;
 import static com.bytechef.component.copper.constant.CopperConstants.ACTIVITY_TYPE;
 import static com.bytechef.component.copper.constant.CopperConstants.DETAILS;
 import static com.bytechef.component.copper.constant.CopperConstants.ID;
 import static com.bytechef.component.copper.constant.CopperConstants.PARENT;
 import static com.bytechef.component.copper.constant.CopperConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
-class CopperCreateActivityActionTest extends AbstractCopperActionTest {
+@ExtendWith(MockContextSetupExtension.class)
+class CopperCreateActivityActionTest {
+
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(ACTIVITY_TYPE, "activityType", DETAILS, "details", TYPE, "lead", ID, "id"));
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final Object mockedObject = mock(Object.class);
 
     @Test
-    void testPerform() {
-        mockedParameters = MockParametersFactory.create(
-            Map.of(ACTIVITY_TYPE, "activityType", DETAILS, "details", TYPE, "lead", ID, "id"));
+    void testPerform(
+        ActionContext mockedContext, Executor mockedExecutor, Http mockedHttp, Response mockedResponse,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(mockedObject);
 
         Object result = CopperCreateActivityAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedObject, result);
+        assertEquals("/activities", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        verify(mockedContext, times(1)).http(POST_ACTIVITIES_CONTEXT_FUNCTION);
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> expectedBody = Map.of(
-            TYPE, Map.of("category", "user", ID, "activityType"),
-            DETAILS, "details",
-            PARENT, Map.of(ID, "id", TYPE, "lead"));
-
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+        assertEquals(
+            Body.of(
+                TYPE, Map.of("category", "user", ID, "activityType"), DETAILS, "details",
+                PARENT, Map.of(ID, "id", TYPE, "lead")),
+            bodyArgumentCaptor.getValue());
     }
 }

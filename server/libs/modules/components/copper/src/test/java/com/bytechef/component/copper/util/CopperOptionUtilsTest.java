@@ -40,7 +40,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -62,14 +61,10 @@ class CopperOptionUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        List<Map<String, Object>> userList = new ArrayList<>();
-
-        userList.add(Map.of(NAME, "ActivityName", ID, "ActivityId"));
-
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("user", userList));
+            .thenReturn(Map.of("user", List.of(Map.of(NAME, "ActivityName", ID, "ActivityId"))));
 
         assertEquals(
             List.of(option("ActivityName", "ActivityId")),
@@ -130,7 +125,6 @@ class CopperOptionUtilsTest {
 
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/contact_types", stringArgumentCaptor.getValue());
-
     }
 
     @Test
