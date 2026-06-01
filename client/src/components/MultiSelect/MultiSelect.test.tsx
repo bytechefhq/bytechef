@@ -235,6 +235,23 @@ describe('MultiSelect component', () => {
         expect(screen.queryByTestId('mock-leading-icon')).not.toBeInTheDocument();
     });
 
+    it('should render options in a natively scrollable container, not a Radix ScrollArea (regression #5025)', async () => {
+        renderMultiSelect({});
+
+        fireEvent.click(screen.getByText('Select...'));
+
+        const optionLabel = await screen.findByLabelText('Option One');
+
+        // A Radix ScrollArea reimplements scrolling and breaks mouse-wheel scrolling
+        // (only thumb-dragging works). Options must live in a native overflow-y-auto
+        // container so the mouse wheel scrolls the list.
+        expect(document.querySelector('[data-radix-scroll-area-viewport]')).not.toBeInTheDocument();
+
+        const scrollContainer = optionLabel.closest('.overflow-y-auto');
+
+        expect(scrollContainer).toBeInTheDocument();
+    });
+
     it('should render search input when searchable prop is true', async () => {
         const {rerender} = renderMultiSelect({
             searchable: true,
