@@ -31,7 +31,6 @@ public class CopperConstants {
     public static final String COMPANY_ID = "company_id";
     public static final String CONTACT_TYPE_ID = "contact_type_id";
     public static final String COUNTRY = "country";
-    public static final String CUSTOM_FIELDS = "custom_fields";
     public static final String DETAILS = "details";
     public static final String DUE_DATE = "due_date";
     public static final String EMAIL = "email";

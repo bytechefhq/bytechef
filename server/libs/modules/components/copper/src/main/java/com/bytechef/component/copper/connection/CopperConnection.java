@@ -40,7 +40,7 @@ public class CopperConnection {
                 .title("API Key")
                 .properties(
                     string(USERNAME)
-                        .label("Email address")
+                        .label("Email Address")
                         .required(true),
                     string(KEY)
                         .label("Key")

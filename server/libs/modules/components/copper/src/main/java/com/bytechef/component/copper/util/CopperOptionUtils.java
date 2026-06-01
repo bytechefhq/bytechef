@@ -46,7 +46,7 @@ public class CopperOptionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : value) {
-            options.add(option(String.valueOf(map.get(NAME)), String.valueOf(map.get(ID))));
+            options.add(option((String) map.get(NAME), String.valueOf(map.get(ID))));
         }
 
         return options;
@@ -57,7 +57,7 @@ public class CopperOptionUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, ActionContext context) {
 
-        Map<String, ArrayList<Map<String, Object>>> body;
+        Map<String, List<Map<String, Object>>> body;
 
         Http.Response response = context.http(http -> http.get("/activity_types"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
@@ -78,7 +78,7 @@ public class CopperOptionUtils {
 
         body
             .getOrDefault("user", new ArrayList<>())
-            .forEach(map -> options.add(option(String.valueOf(map.get("name")), String.valueOf(map.get("id")))));
+            .forEach(map -> options.add(option((String) map.get(NAME), String.valueOf(map.get(ID)))));
 
         return options;
     }
@@ -118,15 +118,16 @@ public class CopperOptionUtils {
 
         String parentType = inputParameters.getRequiredString(TYPE);
 
-        Http.Executor executor = switch (parentType) {
-            case LEAD -> context.http(http -> http.post("/leads/search"));
-            case PERSON -> context.http(http -> http.post("/people/search"));
-            case COMPANY -> context.http(http -> http.post("/companies/search"));
-            default -> context.http(http -> http.post("/opportunities/search"));
+        String url = switch (parentType) {
+            case LEAD -> "/leads/search";
+            case PERSON -> "/people/search";
+            case COMPANY -> "/companies/search";
+            default -> "/opportunities/search";
         };
 
         List<Map<String, Object>> body;
-        Http.Response response = executor.configuration(Http.responseType(Http.ResponseType.JSON))
+        Http.Response response = context.http(http -> http.post(url))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
 
         try {
@@ -155,7 +156,7 @@ public class CopperOptionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> linkedHashMap : body) {
-            String name = String.valueOf(linkedHashMap.get(NAME));
+            String name = (String) linkedHashMap.get(NAME);
 
             options.add(option(name, name));
         }

@@ -51,11 +51,9 @@ import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ControlType;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Monika Domiter
@@ -87,7 +85,7 @@ public class CopperCreatePersonAction {
                                 .options(
                                     option("Work", "work"),
                                     option("Personal", "personal"),
-                                    option(OTHER, OTHER))
+                                    option("Other", OTHER))
                                 .required(false)))
                 .required(false),
             string(ASSIGNEE_ID)
@@ -274,16 +272,13 @@ public class CopperCreatePersonAction {
                                         .description("Category of the website."))))))
         .perform(CopperCreatePersonAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_PEOPLE_CONTEXT_FUNCTION =
-        http -> http.post("/people");
-
     private CopperCreatePersonAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(POST_PEOPLE_CONTEXT_FUNCTION)
+        return actionContext.http(http -> http.post("/people"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
@@ -300,7 +295,6 @@ public class CopperCreatePersonAction {
                     TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
+            .getBody();
     }
-
 }

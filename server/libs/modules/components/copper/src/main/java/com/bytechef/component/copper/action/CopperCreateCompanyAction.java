@@ -48,10 +48,8 @@ import com.bytechef.component.copper.util.CopperOptionUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
 
 /**
  * @author Monika Domiter
@@ -233,16 +231,13 @@ public class CopperCreateCompanyAction {
                                         .description("Category of the website."))))))
         .perform(CopperCreateCompanyAction::perform);
 
-    protected static final ContextFunction<Http, Http.Executor> POST_COMPANIES_CONTEXT_FUNCTION =
-        http -> http.post("/companies");
-
     private CopperCreateCompanyAction() {
     }
 
     public static Object perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
-        return actionContext.http(POST_COMPANIES_CONTEXT_FUNCTION)
+        return actionContext.http(http -> http.post("/companies"))
             .body(
                 Http.Body.of(
                     NAME, inputParameters.getString(NAME),
@@ -257,7 +252,6 @@ public class CopperCreateCompanyAction {
                     TAGS, inputParameters.getList(TAGS, String.class)))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
-            .getBody(new TypeReference<>() {});
-
+            .getBody();
     }
 }
