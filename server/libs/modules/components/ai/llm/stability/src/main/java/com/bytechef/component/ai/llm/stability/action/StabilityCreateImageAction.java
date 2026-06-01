@@ -71,13 +71,15 @@ public class StabilityCreateImageAction {
             integer(HEIGHT)
                 .label("Height")
                 .description(
-                    "Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                    "Height of the image to generate, in pixels, in an increment divisible by 64. Engine-specific " +
+                        "dimension validation applies.")
                 .defaultValue(512)
                 .required(true),
             integer(WIDTH)
                 .label("Width")
                 .description(
-                    "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific dimension validation applies.")
+                    "Width of the image to generate, in pixels, in an increment divisible by 64. Engine-specific " +
+                        "dimension validation applies.")
                 .defaultValue(512)
                 .required(true),
             IMAGE_N_PROPERTY,
@@ -85,11 +87,13 @@ public class StabilityCreateImageAction {
             string(STYLE)
                 .label("Style")
                 .description(
-                    "Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
+                    "Pass in a style preset to guide the image model towards a particular style. This list of style " +
+                        "presets is subject to change.")
                 .options(
                     ModelUtils.getEnumOptions(
                         Arrays.stream(StyleEnum.values())
-                            .collect(Collectors.toMap(StyleEnum::toString, StyleEnum::name)))),
+                            .collect(Collectors.toMap(StyleEnum::toString, StyleEnum::name))))
+                .required(true),
             integer(STEPS)
                 .label("Steps")
                 .description("Number of diffusion steps to run. Valid range: 10 to 50.")
@@ -106,12 +110,14 @@ public class StabilityCreateImageAction {
             string(CLIP_GUIDANCE_PRESET)
                 .label("Clip guidance preset")
                 .description(
-                    "Pass in a style preset to guide the image model towards a particular style. This list of style presets is subject to change.")
+                    "Pass in a style preset to guide the image model towards a particular style. This list of style " +
+                        "presets is subject to change.")
                 .advancedOption(true),
             string(SAMPLER)
                 .label("Sampler")
                 .description(
-                    "Which sampler to use for the diffusion process. If this value is omitted, an appropriate sampler will be automatically selected.")
+                    "Which sampler to use for the diffusion process. If this value is omitted, an appropriate " +
+                        "sampler will be automatically selected.")
                 .advancedOption(true),
             number(SEED)
                 .label("Seed")
@@ -139,19 +145,19 @@ public class StabilityCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
-        new StabilityAiApi(connectionParameters.getString(TOKEN)),
-        StabilityAiImageOptions.builder()
-            .cfgScale(inputParameters.getFloat(CFG_SCALE))
-            .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
-            .height(inputParameters.getInteger(HEIGHT))
-            .model(inputParameters.getRequiredString(MODEL))
-            .N(inputParameters.getInteger(N))
-            .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
-            .sampler(inputParameters.getString(SAMPLER))
-            .seed(inputParameters.getLong(SEED))
-            .steps(inputParameters.getInteger(STEPS))
-            .stylePreset(StyleEnum.valueOf(inputParameters.getString(STYLE)))
-            .width(inputParameters.getInteger(WIDTH))
-            .build());
+    public static final ImageModel IMAGE_MODEL =
+        (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+            new StabilityAiApi(connectionParameters.getString(TOKEN), inputParameters.getRequiredString(MODEL)),
+            StabilityAiImageOptions.builder()
+                .cfgScale(inputParameters.getFloat(CFG_SCALE))
+                .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+                .height(inputParameters.getInteger(HEIGHT))
+                .N(inputParameters.getInteger(N))
+                .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
+                .sampler(inputParameters.getString(SAMPLER))
+                .seed(inputParameters.getLong(SEED))
+                .steps(inputParameters.getInteger(STEPS))
+                .stylePreset(StyleEnum.valueOf(inputParameters.getString(STYLE)))
+                .width(inputParameters.getInteger(WIDTH))
+                .build());
 }
