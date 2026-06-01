@@ -16,7 +16,7 @@ const DataTableLeftSidebar = ({currentId}: Props) => {
 
     return (
         <div className="flex h-full flex-col">
-            <div className="space-y-2 px-4 pt-0.5 pb-3">
+            <div className="space-y-2 px-3 pt-0.5 pb-3">
                 <Input
                     onChange={(event) => handleSearchChange(event.target.value)}
                     placeholder="Search tables..."
