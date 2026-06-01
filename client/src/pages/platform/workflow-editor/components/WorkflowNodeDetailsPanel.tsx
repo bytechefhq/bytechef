@@ -23,6 +23,7 @@ import {Link} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
 import {getClusterElementsLabel} from '../../cluster-element-editor/utils/clusterElementsUtils';
+import getNodeOperationDescription from '../utils/getNodeOperationDescription';
 import {DescriptionTabSkeleton, FieldsetSkeleton, PropertiesTabSkeleton} from './WorkflowEditorSkeletons';
 import useWorkflowNodeDetailsPanel from './hooks/useWorkflowNodeDetailsPanel';
 
@@ -180,15 +181,15 @@ const WorkflowNodeDetailsPanel = ({
                                         currentNode.clusterElementType &&
                                         getClusterElementsLabel(currentNode.clusterElementType)
                                     }
-                                    description={
-                                        currentNode?.trigger
-                                            ? currentTriggerDefinition?.description
-                                            : !!currentNode?.clusterElementType &&
-                                                currentNode?.workflowNodeName !==
-                                                    rootClusterElementNodeData?.workflowNodeName
-                                              ? currentComponentDefinition?.description
-                                              : currentActionDefinition?.description
-                                    }
+                                    description={getNodeOperationDescription({
+                                        actionDescription: currentActionDefinition?.description,
+                                        clusterElementOperations: filteredClusterElementOperations,
+                                        currentNode,
+                                        currentOperationName,
+                                        rootClusterElementWorkflowNodeName:
+                                            rootClusterElementNodeData?.workflowNodeName,
+                                        triggerDescription: currentTriggerDefinition?.description,
+                                    })}
                                     handleValueChange={handleOperationSelectChange}
                                     operations={
                                         (currentNode?.trigger
