@@ -33,6 +33,7 @@ public final class StabilityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/stability_v1#connection-setup")
         .baseUri((connectionParameters, context) -> StabilityAiApi.DEFAULT_BASE_URL)
         .authorizations(
             authorization(BEARER_TOKEN)
