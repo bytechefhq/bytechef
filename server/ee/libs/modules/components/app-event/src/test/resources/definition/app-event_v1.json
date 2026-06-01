@@ -10,6 +10,7 @@
   "customActionHelp": null,
   "description": "Use one event from your app tot trigger workflows across any integrations.",
   "icon": "path:assets/app-event.svg",
+  "inputs": null,
   "metadata": null,
   "name": "appEvent",
   "resources": null,

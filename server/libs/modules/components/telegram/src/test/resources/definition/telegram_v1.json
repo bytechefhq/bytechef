@@ -12658,6 +12658,7 @@
   },
   "description": "Telegram is a cloud-based messaging platform that enables users to send messages, media, and files, and supports automation and integrations through its API.",
   "icon": "path:assets/telegram.svg",
+  "inputs": null,
   "metadata": null,
   "name": "telegram",
   "resources": null,

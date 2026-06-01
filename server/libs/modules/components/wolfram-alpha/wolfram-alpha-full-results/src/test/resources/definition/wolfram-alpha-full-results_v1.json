@@ -5284,6 +5284,7 @@
   },
   "description": "Wolfram Alpha Full Results returns the computed results of your query in a variety of formats.",
   "icon": "path:assets/wolfram-alpha.svg",
+  "inputs": null,
   "metadata": null,
   "name": "wolframAlphaFullResults",
   "resources": null,

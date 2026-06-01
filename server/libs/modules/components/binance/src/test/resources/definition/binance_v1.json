@@ -195,6 +195,7 @@
   },
   "description": "Binance is an online exchange where users can trade cryptocurrencies.",
   "icon": "path:assets/binance.svg",
+  "inputs": null,
   "metadata": null,
   "name": "binance",
   "resources": null,

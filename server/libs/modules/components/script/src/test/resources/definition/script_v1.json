@@ -1789,6 +1789,7 @@
   "customActionHelp": null,
   "description": "Executes user-defined code. User can write custom workflow logic in Java, JavaScript, Python, R or Ruby programming languages.",
   "icon": "path:assets/script.svg",
+  "inputs": null,
   "metadata": null,
   "name": "script",
   "resources": null,

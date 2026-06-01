@@ -6218,6 +6218,7 @@
   "customActionHelp": null,
   "description": "The Data Mapper enables you to configure data mappings.",
   "icon": "path:assets/data-mapper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "dataMapper",
   "resources": null,

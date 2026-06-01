@@ -1046,6 +1046,7 @@
   "customActionHelp": null,
   "description": "Cassandra Chat Memory stores conversation history in Apache Cassandra for distributed, scalable persistent storage.",
   "icon": "path:assets/cassandra-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "cassandraChatMemory",
   "resources": null,

@@ -5374,6 +5374,7 @@
   "customActionHelp": null,
   "description": "Productboard is a product management platform that helps teams prioritize features, gather customer feedback, and align their product strategy to deliver better products.",
   "icon": "path:assets/productboard.svg",
+  "inputs": null,
   "metadata": null,
   "name": "productboard",
   "resources": null,

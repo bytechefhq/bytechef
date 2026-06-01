@@ -577,6 +577,7 @@
   "customActionHelp": null,
   "description": "Detects — and optionally masks — personally identifiable information.",
   "icon": "path:assets/pii.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pii",
   "resources": null,

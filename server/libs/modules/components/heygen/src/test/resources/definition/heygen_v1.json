@@ -1916,6 +1916,7 @@
   "customActionHelp": null,
   "description": "HeyGen is an AI Video Generator that lets you create explainer videos, marketing and sales promos, product demos, training and onboarding content.",
   "icon": "path:assets/heygen.svg",
+  "inputs": null,
   "metadata": null,
   "name": "heyGen",
   "resources": null,

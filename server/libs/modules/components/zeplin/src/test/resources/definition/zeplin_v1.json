@@ -190,6 +190,7 @@
   },
   "description": "Zeplin is a collaboration tool that bridges the gap between designers and developers by providing a platform to share, organize, and translate design files into development.",
   "icon": "path:assets/zeplin.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zeplin",
   "resources": null,

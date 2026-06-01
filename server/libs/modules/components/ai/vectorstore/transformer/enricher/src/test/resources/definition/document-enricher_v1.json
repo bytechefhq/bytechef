@@ -167,6 +167,7 @@
   "customActionHelp": null,
   "description": "Document Enricher.",
   "icon": "path:assets/document-enricher.svg",
+  "inputs": null,
   "metadata": null,
   "name": "documentEnricher",
   "resources": null,

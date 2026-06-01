@@ -2440,6 +2440,7 @@
   },
   "description": "Spotify is a popular music streaming service that offers a vast library of songs, podcasts, and playlists for users to enjoy.",
   "icon": "path:assets/spotify.svg",
+  "inputs": null,
   "metadata": null,
   "name": "spotify",
   "resources": null,

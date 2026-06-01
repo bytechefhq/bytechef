@@ -293,6 +293,7 @@
   "customActionHelp": null,
   "description": "Execute GraphQL queries against a GraphQL API, allowing you to fetch exactly the data you need using queries and variables.",
   "icon": "path:assets/graphql-client.svg",
+  "inputs": null,
   "metadata": null,
   "name": "graphQl",
   "resources": null,

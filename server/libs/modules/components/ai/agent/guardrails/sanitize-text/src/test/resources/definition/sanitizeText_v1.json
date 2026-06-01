@@ -42,6 +42,7 @@
   "customActionHelp": null,
   "description": "Runs configured sanitizers on the model response.",
   "icon": "path:assets/sanitize-text.svg",
+  "inputs": null,
   "metadata": null,
   "name": "sanitizeText",
   "resources": null,

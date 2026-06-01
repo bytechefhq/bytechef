@@ -2152,6 +2152,7 @@
   },
   "description": "DocuSign is a cloud-based e-signature platform that enables secure digital document signing and workflow automation.",
   "icon": "path:assets/docusign.svg",
+  "inputs": null,
   "metadata": null,
   "name": "docusign",
   "resources": null,

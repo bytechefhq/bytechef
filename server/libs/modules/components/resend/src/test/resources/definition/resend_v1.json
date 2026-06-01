@@ -723,6 +723,7 @@
   },
   "description": "Resend is the email API for developers.",
   "icon": "path:assets/resend.svg",
+  "inputs": null,
   "metadata": null,
   "name": "resend",
   "resources": null,

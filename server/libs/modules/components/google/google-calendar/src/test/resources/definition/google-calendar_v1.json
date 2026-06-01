@@ -19297,6 +19297,7 @@
   },
   "description": "Google Calendar is a web-based application that allows users to schedule and organize events, appointments, and reminders, synchronizing across multiple devices.",
   "icon": "path:assets/google-calendar.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleCalendar",
   "resources": null,

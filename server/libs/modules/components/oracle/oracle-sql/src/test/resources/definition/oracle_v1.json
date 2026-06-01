@@ -1390,6 +1390,7 @@
   "customActionHelp": null,
   "description": "Select, insert, update and delete data from Oracle Databases.",
   "icon": "path:assets/oracle.svg",
+  "inputs": null,
   "metadata": null,
   "name": "oracleSql",
   "resources": null,

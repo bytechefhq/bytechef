@@ -207,6 +207,7 @@
   "customActionHelp": null,
   "description": "User-defined LLM-based guardrail.",
   "icon": "path:assets/custom.svg",
+  "inputs": null,
   "metadata": null,
   "name": "custom",
   "resources": null,

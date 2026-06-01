@@ -841,6 +841,7 @@
   },
   "description": "Microsoft Dynamics CRM is a customer relationship management software that helps businesses manage customer interactions, sales, marketing, and customer service processes efficiently.",
   "icon": "path:assets/microsoft-dynamics-crm.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftDynamicsCrm",
   "resources": null,

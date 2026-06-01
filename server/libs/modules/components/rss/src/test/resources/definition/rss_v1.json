@@ -1593,6 +1593,7 @@
   "customActionHelp": null,
   "description": "RSS.app is a web-based tool that helps you create, customize, and manage RSS feeds—even from websites that don’t provide them natively.",
   "icon": "path:assets/rss.svg",
+  "inputs": null,
   "metadata": null,
   "name": "rss",
   "resources": null,

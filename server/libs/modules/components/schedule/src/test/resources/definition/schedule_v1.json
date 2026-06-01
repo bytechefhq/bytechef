@@ -10,6 +10,7 @@
   "customActionHelp": null,
   "description": "With the Scheduled trigger, you can initiate customized workflows at specific time intervals.",
   "icon": "path:assets/schedule.svg",
+  "inputs": null,
   "metadata": null,
   "name": "schedule",
   "resources": null,

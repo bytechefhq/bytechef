@@ -89,6 +89,7 @@
   "customActionHelp": null,
   "description": "Component description.",
   "icon": "path:assets/example.svg",
+  "inputs": null,
   "metadata": null,
   "name": "example",
   "resources": null,

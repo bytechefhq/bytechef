@@ -996,6 +996,7 @@
   "customActionHelp": null,
   "description": "Built-in chat memory.",
   "icon": "path:assets/chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "chatMemory",
   "resources": null,

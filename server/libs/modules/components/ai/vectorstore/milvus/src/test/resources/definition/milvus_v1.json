@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
     "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1196,6 +1196,7 @@
   "customActionHelp": null,
   "description": "Milvus is an open-source vector database that has garnered significant attention in the fields of data science and machine learning.",
   "icon": "path:assets/milvus.svg",
+  "inputs": null,
   "metadata": null,
   "name": "milvus",
   "resources": null,

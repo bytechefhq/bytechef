@@ -60,6 +60,7 @@
   "customActionHelp": null,
   "description": "A modular RAG (Retrieval-Augmented Generation) component that provides a flexible and customizable approach to building RAG systems. It allows you to combine different retrieval, augmentation, and generation strategies into a cohesive pipeline for enhanced AI-driven information processing and response generation.",
   "icon": "path:assets/modular-rag.svg",
+  "inputs": null,
   "metadata": null,
   "name": "modularRag",
   "resources": null,

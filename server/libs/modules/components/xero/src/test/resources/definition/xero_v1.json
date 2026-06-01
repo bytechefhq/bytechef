@@ -5057,6 +5057,7 @@
   "customActionHelp": null,
   "description": "Xero is an online accounting software platform designed for small businesses and accountants to manage finances efficiently.",
   "icon": "path:assets/xero.svg",
+  "inputs": null,
   "metadata": null,
   "name": "xero",
   "resources": null,

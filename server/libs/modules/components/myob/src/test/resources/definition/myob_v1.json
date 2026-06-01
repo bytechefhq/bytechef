@@ -1090,6 +1090,7 @@
   "customActionHelp": null,
   "description": "MYOB is an accounting software that helps businesses manage their finances, invoicing, and payroll.",
   "icon": "path:assets/myob.svg",
+  "inputs": null,
   "metadata": null,
   "name": "myob",
   "resources": null,

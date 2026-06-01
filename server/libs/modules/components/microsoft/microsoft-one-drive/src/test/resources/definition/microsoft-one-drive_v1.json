@@ -12449,6 +12449,7 @@
   },
   "description": "Microsoft OneDrive is a cloud storage service provided by Microsoft for storing, accessing, and sharing files online.",
   "icon": "path:assets/microsoft-one-drive.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftOneDrive",
   "resources": null,

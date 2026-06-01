@@ -2485,6 +2485,7 @@
   },
   "description": "ActiveCampaign is a customer experience automation platform that offers email marketing, marketing automation, sales automation, and CRM tools.",
   "icon": "path:assets/active-campaign.svg",
+  "inputs": null,
   "metadata": null,
   "name": "activeCampaign",
   "resources": null,

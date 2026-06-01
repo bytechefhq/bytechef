@@ -4834,6 +4834,7 @@
   "customActionHelp": null,
   "description": "The Crypto Helper allows you to use cryptographic functions.",
   "icon": "path:assets/crypto-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "cryptoHelper",
   "resources": null,

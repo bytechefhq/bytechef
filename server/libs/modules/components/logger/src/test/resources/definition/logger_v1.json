@@ -166,6 +166,7 @@
   "customActionHelp": null,
   "description": "Logs a value to the system log.",
   "icon": "path:assets/logger.svg",
+  "inputs": null,
   "metadata": null,
   "name": "logger",
   "resources": null,

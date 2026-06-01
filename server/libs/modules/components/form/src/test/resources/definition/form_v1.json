@@ -10,6 +10,7 @@
   "customActionHelp": null,
   "description": "Component for handling form submissions and requests.",
   "icon": "path:assets/form.svg",
+  "inputs": null,
   "metadata": null,
   "name": "form",
   "resources": null,

@@ -434,6 +434,7 @@
   },
   "description": "AITable is an AI-powered platform that enables users to create interactive and dynamic tables for data visualization and analysis without requiring coding skills.",
   "icon": "path:assets/aitable.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aitable",
   "resources": null,

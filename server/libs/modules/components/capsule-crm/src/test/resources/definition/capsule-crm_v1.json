@@ -1131,6 +1131,7 @@
   },
   "description": "Capsule CRM is a cloud-based customer relationship management platform designed to help businesses manage contacts, track sales opportunities, and collaborate with their teams efficiently.",
   "icon": "path:assets/capsule-crm.svg",
+  "inputs": null,
   "metadata": null,
   "name": "capsuleCRM",
   "resources": null,

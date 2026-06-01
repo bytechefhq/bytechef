@@ -3052,6 +3052,7 @@
   "customActionHelp": null,
   "description": "Retable is a online database and spreadsheet platform designed for teams and individuals who want to organize, manage, and collaborate on structured data.",
   "icon": "path:assets/retable.svg",
+  "inputs": null,
   "metadata": null,
   "name": "retable",
   "resources": null,

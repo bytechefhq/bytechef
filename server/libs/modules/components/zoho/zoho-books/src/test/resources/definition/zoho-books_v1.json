@@ -3507,6 +3507,7 @@
   },
   "description": "Zoho Books is cloud-based accounting software for managing your accounting tasks and organizing your transactions.",
   "icon": "path:assets/zoho-books.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zohoBooks",
   "resources": null,

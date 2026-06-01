@@ -1062,6 +1062,7 @@
   "customActionHelp": null,
   "description": "Weaviate is an open-source vector search engine and database that enables efficient storage, retrieval, and management of high-dimensional data, often used in machine learning and AI applications.",
   "icon": "path:assets/weaviate.svg",
+  "inputs": null,
   "metadata": null,
   "name": "weaviate",
   "resources": null,

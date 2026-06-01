@@ -2599,6 +2599,7 @@
   },
   "description": "Microsoft Excel is a spreadsheet program used for organizing, analyzing, and visualizing data in tabular form.",
   "icon": "path:assets/microsoft-excel.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftExcel",
   "resources": null,

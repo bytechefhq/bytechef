@@ -265,6 +265,7 @@
   },
   "description": "Google Forms is a web-based application that allows users to create surveys, quizzes, and forms for data collection and analysis, with real-time collaboration and response tracking.",
   "icon": "path:assets/google-forms.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleForms",
   "resources": null,

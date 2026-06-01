@@ -6987,6 +6987,7 @@
   "customActionHelp": null,
   "description": "Helper component for date and time manipulation.",
   "icon": "path:assets/date-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "dateHelper",
   "resources": null,

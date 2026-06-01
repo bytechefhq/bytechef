@@ -1015,6 +1015,7 @@
   "customActionHelp": null,
   "description": "Zendesk Sell is a sales CRM software that helps businesses manage leads, contacts, and deals efficiently.",
   "icon": "path:assets/zendesk-sell.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zendeskSell",
   "resources": null,

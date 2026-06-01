@@ -1220,6 +1220,7 @@
   "customActionHelp": null,
   "description": "Salesforce is a cloud-based customer relationship management (CRM) platform that provides tools for sales, service, marketing, and analytics to help businesses manage customer interactions and data.",
   "icon": "path:assets/salesforce.svg",
+  "inputs": null,
   "metadata": null,
   "name": "salesforce",
   "resources": null,

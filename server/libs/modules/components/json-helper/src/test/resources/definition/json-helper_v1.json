@@ -284,6 +284,7 @@
   "customActionHelp": null,
   "description": "JSON helper component provides actions for parsing and stringifying JSON.",
   "icon": "path:assets/json-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jsonHelper",
   "resources": null,

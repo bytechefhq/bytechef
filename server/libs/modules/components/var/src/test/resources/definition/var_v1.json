@@ -269,6 +269,7 @@
   "customActionHelp": null,
   "description": "Sets a value which can then be referenced in other tasks.",
   "icon": "path:assets/var.svg",
+  "inputs": null,
   "metadata": null,
   "name": "var",
   "resources": null,

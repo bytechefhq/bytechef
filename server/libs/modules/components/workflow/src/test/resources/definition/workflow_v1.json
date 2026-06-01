@@ -175,6 +175,7 @@
   "customActionHelp": null,
   "description": "Triggers and actions for workflow-to-workflow communication.",
   "icon": "path:assets/workflow.svg",
+  "inputs": null,
   "metadata": null,
   "name": "workflow",
   "resources": null,

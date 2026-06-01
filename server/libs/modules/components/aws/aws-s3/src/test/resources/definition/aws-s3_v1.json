@@ -1186,6 +1186,7 @@
   "customActionHelp": null,
   "description": "AWS S3 is a simple object storage service provided by Amazon Web Services.",
   "icon": "path:assets/aws-s3.svg",
+  "inputs": null,
   "metadata": null,
   "name": "awsS3",
   "resources": null,

@@ -428,6 +428,7 @@
   "customActionHelp": null,
   "description": "Pauses the workflow execution for a specified amount of time or until a webhook call is received.",
   "icon": "path:assets/wait.svg",
+  "inputs": null,
   "metadata": null,
   "name": "wait",
   "resources": null,

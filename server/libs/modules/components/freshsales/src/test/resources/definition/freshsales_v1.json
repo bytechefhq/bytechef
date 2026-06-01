@@ -1935,6 +1935,7 @@
   },
   "description": "Freshsales is a customer relationship management (CRM) software designed to help businesses streamline sales processes and manage customer interactions effectively.",
   "icon": "path:assets/freshsales.svg",
+  "inputs": null,
   "metadata": null,
   "name": "freshsales",
   "resources": null,

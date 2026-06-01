@@ -740,6 +740,7 @@
   "customActionHelp": null,
   "description": "Reads and writes data from a ODS file.",
   "icon": "path:assets/ods-file.svg",
+  "inputs": null,
   "metadata": null,
   "name": "odsFile",
   "resources": null,

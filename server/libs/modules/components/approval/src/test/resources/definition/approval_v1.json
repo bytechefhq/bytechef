@@ -976,6 +976,7 @@
   "customActionHelp": null,
   "description": "Approval component for manual intervention in workflows.",
   "icon": "path:assets/approval.svg",
+  "inputs": null,
   "metadata": null,
   "name": "approval",
   "resources": null,

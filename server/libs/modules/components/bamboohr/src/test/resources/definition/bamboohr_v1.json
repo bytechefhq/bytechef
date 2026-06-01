@@ -1538,6 +1538,7 @@
   },
   "description": "BambooHR is a human resources software that helps HR teams manage employee data, hiring, onboarding, time tracking, payroll, performance management, and more in one platform.",
   "icon": "path:assets/bamboohr.svg",
+  "inputs": null,
   "metadata": null,
   "name": "bambooHr",
   "resources": null,

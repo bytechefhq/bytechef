@@ -444,8 +444,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -559,8 +559,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -744,8 +744,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -859,8 +859,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -2497,8 +2497,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -2612,8 +2612,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "perform": { },
@@ -3186,8 +3186,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -3301,8 +3301,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -3483,8 +3483,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -3598,8 +3598,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -5212,8 +5212,8 @@
         "placeholder": null,
         "sampleOutput": {
           "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-          "mimeType": "plain/text",
-          "name": "new-file.txt"
+          "name": "new-file.txt",
+          "mimeType": "plain/text"
         }
       },
       "outputSchema": {
@@ -5327,8 +5327,8 @@
       },
       "sampleOutput": {
         "id": "1hPJ7kjhStTX90amAWSJ-V0K1-nhDlsIr",
-        "mimeType": "plain/text",
-        "name": "new-file.txt"
+        "name": "new-file.txt",
+        "mimeType": "plain/text"
       }
     },
     "processErrorResponse": null,
@@ -5561,6 +5561,7 @@
   },
   "description": "Google Drive is a cloud storage service by Google that enables users to store, sync, share files, and collaborate online.",
   "icon": "path:assets/google-drive.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleDrive",
   "resources": null,

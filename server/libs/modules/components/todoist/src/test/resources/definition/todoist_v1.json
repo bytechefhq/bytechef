@@ -3066,6 +3066,7 @@
   },
   "description": "Todoist is a task management application that helps users organize and prioritize their to-do lists.",
   "icon": "path:assets/todoist.svg",
+  "inputs": null,
   "metadata": null,
   "name": "todoist",
   "resources": null,

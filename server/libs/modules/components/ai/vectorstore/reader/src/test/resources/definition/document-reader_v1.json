@@ -779,6 +779,7 @@
   "customActionHelp": null,
   "description": "Document Reader.",
   "icon": "path:assets/document-reader.svg",
+  "inputs": null,
   "metadata": null,
   "name": "documentReader",
   "resources": null,

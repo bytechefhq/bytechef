@@ -5420,6 +5420,7 @@
   "customActionHelp": null,
   "description": "Simplifying campaign design and optimization with a user-friendly click-and-drag interface allowing you to build complex campaigns.",
   "icon": "path:assets/mautic.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mautic",
   "resources": null,

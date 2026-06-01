@@ -99,6 +99,7 @@
   "customActionHelp": null,
   "description": "A component that enables Question-Answer Retrieval Augmented Generation (RAG) capabilities. It combines natural language processing with document retrieval to provide accurate answers based on the given context.",
   "icon": "path:assets/questionanswer-rag.svg",
+  "inputs": null,
   "metadata": null,
   "name": "questionAnswerRag",
   "resources": null,

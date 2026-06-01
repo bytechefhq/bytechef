@@ -1712,6 +1712,7 @@
   "customActionHelp": null,
   "description": "MailerLite is an intuitive email marketing platform that offers automation, landing pages, and subscriber management for businesses and creators.",
   "icon": "path:assets/mailerlite.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mailerLite",
   "resources": null,

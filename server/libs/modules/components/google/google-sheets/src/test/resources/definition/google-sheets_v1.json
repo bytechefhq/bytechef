@@ -4101,6 +4101,7 @@
   },
   "description": "Google Sheets is a cloud-based spreadsheet software that allows users to create, edit, and collaborate on spreadsheets in real-time.",
   "icon": "path:assets/google-sheets.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleSheets",
   "resources": null,

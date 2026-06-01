@@ -2869,6 +2869,7 @@
   "customActionHelp": null,
   "description": "Ahrefs is a comprehensive suite of SEO (Search Engine Optimization) tools used by digital marketers and businesses to improve their website's visibility in search engine results.",
   "icon": "path:assets/ahrefs.svg",
+  "inputs": null,
   "metadata": null,
   "name": "ahrefs",
   "resources": null,

@@ -13349,6 +13349,7 @@
   },
   "description": "Klaviyo is a marketing automation platform primarily used for email and SMS marketing, especially by e-commerce businesses.",
   "icon": "path:assets/klaviyo.svg",
+  "inputs": null,
   "metadata": null,
   "name": "klaviyo",
   "resources": null,

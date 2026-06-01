@@ -110,6 +110,7 @@
   "customActionHelp": null,
   "description": "Runs configured guardrail checks on the user prompt.",
   "icon": "path:assets/check-for-violations.svg",
+  "inputs": null,
   "metadata": null,
   "name": "checkForViolations",
   "resources": null,

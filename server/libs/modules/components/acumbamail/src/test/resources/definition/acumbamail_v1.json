@@ -469,6 +469,7 @@
   "customActionHelp": null,
   "description": "Acumbamail is an email marketing and automation platform that allows users to create, manage, and analyze email campaigns, newsletters, and SMS marketing with an intuitive interface and API integration.",
   "icon": "path:assets/acumbamail.svg",
+  "inputs": null,
   "metadata": null,
   "name": "acumbamail",
   "resources": null,

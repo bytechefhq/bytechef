@@ -2417,6 +2417,7 @@
   },
   "description": "NocoDB is an open-source platform that transforms databases into smart spreadsheets, enabling users to manage and collaborate on data with a no-code interface.",
   "icon": "path:assets/nocodb.svg",
+  "inputs": null,
   "metadata": null,
   "name": "nocoDb",
   "resources": null,

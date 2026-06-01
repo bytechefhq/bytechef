@@ -155,6 +155,7 @@
   "customActionHelp": null,
   "description": "Processes and transforms data in data streams.",
   "icon": "path:assets/data-stream-processor.svg",
+  "inputs": null,
   "metadata": null,
   "name": "dataStreamProcessor",
   "resources": null,

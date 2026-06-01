@@ -1753,6 +1753,7 @@
   },
   "description": "VTiger is a comprehensive customer relationship management (CRM) platform that offers sales, marketing, and support solutions to streamline business.",
   "icon": "path:assets/vtiger.svg",
+  "inputs": null,
   "metadata": null,
   "name": "vtiger",
   "resources": null,

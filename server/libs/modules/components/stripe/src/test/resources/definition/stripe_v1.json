@@ -9112,6 +9112,7 @@
   },
   "description": "Stripe is a payment processing platform that allows businesses to accept online payments and manage transactions securely.",
   "icon": "path:assets/stripe.svg",
+  "inputs": null,
   "metadata": null,
   "name": "stripe",
   "resources": null,

@@ -1390,6 +1390,7 @@
   "customActionHelp": null,
   "description": "Query, insert and update data from MySQL.",
   "icon": "path:assets/mysql.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mysql",
   "resources": null,

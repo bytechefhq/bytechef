@@ -81,8 +81,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "success": true,
-          "remotePath": "/uploads/document.pdf"
+          "remotePath": "/uploads/document.pdf",
+          "success": true
         }
       },
       "outputSchema": {
@@ -153,8 +153,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "success": true,
-        "remotePath": "/uploads/document.pdf"
+        "remotePath": "/uploads/document.pdf",
+        "success": true
       }
     },
     "perform": { },
@@ -1019,8 +1019,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "deletedPath": "/uploads/old-file.pdf",
-          "success": true
+          "success": true,
+          "deletedPath": "/uploads/old-file.pdf"
         }
       },
       "outputSchema": {
@@ -1091,8 +1091,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "deletedPath": "/uploads/old-file.pdf",
-        "success": true
+        "success": true,
+        "deletedPath": "/uploads/old-file.pdf"
       }
     },
     "perform": { },
@@ -1251,9 +1251,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "newPath": "/archive/new-name.pdf",
           "oldPath": "/uploads/old-name.pdf",
-          "success": true,
-          "newPath": "/archive/new-name.pdf"
+          "success": true
         }
       },
       "outputSchema": {
@@ -1346,9 +1346,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "newPath": "/archive/new-name.pdf",
         "oldPath": "/uploads/old-name.pdf",
-        "success": true,
-        "newPath": "/archive/new-name.pdf"
+        "success": true
       }
     },
     "perform": { },
@@ -1503,8 +1503,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "success": true,
-          "remotePath": "/uploads/document.pdf"
+          "remotePath": "/uploads/document.pdf",
+          "success": true
         }
       },
       "outputSchema": {
@@ -1575,8 +1575,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "success": true,
-        "remotePath": "/uploads/document.pdf"
+        "remotePath": "/uploads/document.pdf",
+        "success": true
       }
     },
     "processErrorResponse": null,
@@ -2441,8 +2441,8 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "deletedPath": "/uploads/old-file.pdf",
-          "success": true
+          "success": true,
+          "deletedPath": "/uploads/old-file.pdf"
         }
       },
       "outputSchema": {
@@ -2513,8 +2513,8 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "deletedPath": "/uploads/old-file.pdf",
-        "success": true
+        "success": true,
+        "deletedPath": "/uploads/old-file.pdf"
       }
     },
     "processErrorResponse": null,
@@ -2673,9 +2673,9 @@
         },
         "placeholder": null,
         "sampleOutput": {
+          "newPath": "/archive/new-name.pdf",
           "oldPath": "/uploads/old-name.pdf",
-          "success": true,
-          "newPath": "/archive/new-name.pdf"
+          "success": true
         }
       },
       "outputSchema": {
@@ -2768,9 +2768,9 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
+        "newPath": "/archive/new-name.pdf",
         "oldPath": "/uploads/old-name.pdf",
-        "success": true,
-        "newPath": "/archive/new-name.pdf"
+        "success": true
       }
     },
     "processErrorResponse": null,
@@ -3028,6 +3028,7 @@
   "customActionHelp": null,
   "description": "FTP (File Transfer Protocol) is a standard network protocol for transferring files between a client and a server. It allows uploading, downloading, and managing files on remote servers.",
   "icon": "path:assets/ftp.svg",
+  "inputs": null,
   "metadata": null,
   "name": "ftp",
   "resources": null,

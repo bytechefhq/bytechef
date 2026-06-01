@@ -976,6 +976,7 @@
   "customActionHelp": null,
   "description": "ZenRows is a web scraping service with an advanced toolkit and APIs that simplify data extraction from bot-protected websites.",
   "icon": "path:assets/zenrows.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zenrows",
   "resources": null,

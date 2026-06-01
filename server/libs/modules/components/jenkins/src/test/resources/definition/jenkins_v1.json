@@ -237,6 +237,7 @@
   },
   "description": "Jenkins is leading open source automation server, Jenkins provides hundreds of plugins to support building, deploying and automating any project.",
   "icon": "path:assets/jenkins.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jenkins",
   "resources": null,

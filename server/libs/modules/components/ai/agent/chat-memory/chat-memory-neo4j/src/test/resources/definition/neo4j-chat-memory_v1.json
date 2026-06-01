@@ -961,6 +961,7 @@
   "customActionHelp": null,
   "description": "Neo4j Chat Memory stores conversation history in Neo4j graph database for persistent storage with graph-based relationships.",
   "icon": "path:assets/neo4j-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "neo4jChatMemory",
   "resources": null,

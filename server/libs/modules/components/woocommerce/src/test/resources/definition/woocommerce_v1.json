@@ -32684,6 +32684,7 @@
   "customActionHelp": null,
   "description": "WooCommerce is a e-commerce plugin for WordPress that allows you to turn a standard WordPress website into a fully functional online store.",
   "icon": "path:assets/woocommerce.svg",
+  "inputs": null,
   "metadata": null,
   "name": "woocommerce",
   "resources": null,

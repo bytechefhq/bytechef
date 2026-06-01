@@ -1667,6 +1667,7 @@
   "customActionHelp": null,
   "description": "Anthropic is an AI safety and research company that's working to build reliable, interpretable, and steerable AI systems.",
   "icon": "path:assets/anthropic.svg",
+  "inputs": null,
   "metadata": null,
   "name": "anthropic",
   "resources": null,

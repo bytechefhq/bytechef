@@ -9477,6 +9477,7 @@
   "customActionHelp": null,
   "description": "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration.",
   "icon": "path:assets/bitbucket.svg",
+  "inputs": null,
   "metadata": null,
   "name": "bitbucket",
   "resources": null,

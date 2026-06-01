@@ -1001,6 +1001,7 @@
   "customActionHelp": null,
   "description": "The Random Helper allows you to generate random values.",
   "icon": "path:assets/random-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "randomHelper",
   "resources": null,

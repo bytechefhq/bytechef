@@ -2808,6 +2808,7 @@
   "customActionHelp": null,
   "description": "X (formerly known as Twitter) is a social media platform that enables users to share short messages, known as posts or tweets, and interact with others in real time.",
   "icon": "path:assets/x.svg",
+  "inputs": null,
   "metadata": null,
   "name": "x",
   "resources": null,

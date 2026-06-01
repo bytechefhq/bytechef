@@ -7873,6 +7873,7 @@
   },
   "description": "Coda is a collaborative all-in-one productivity tool that combines documents, spreadsheets, apps and databases into a single platform.",
   "icon": "path:assets/coda.svg",
+  "inputs": null,
   "metadata": null,
   "name": "coda",
   "resources": null,

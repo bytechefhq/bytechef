@@ -468,6 +468,7 @@
   },
   "description": "Google Slides is a cloud-based presentation software that allows users to create, edit, and collaborate on presentations online in real-time.",
   "icon": "path:assets/google-slides.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleSlides",
   "resources": null,

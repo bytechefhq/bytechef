@@ -8044,6 +8044,7 @@
   "customActionHelp": null,
   "description": "Keap is a customer comprehensive customer relationship management platform designed to help small businesses streamline sales, marketing, and customer management processes in one integrated system.",
   "icon": "path:assets/keap.svg",
+  "inputs": null,
   "metadata": null,
   "name": "keap",
   "resources": null,

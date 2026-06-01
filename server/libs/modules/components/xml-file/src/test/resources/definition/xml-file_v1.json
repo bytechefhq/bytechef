@@ -547,6 +547,7 @@
   "customActionHelp": null,
   "description": "Reads and writes data from a XML file.",
   "icon": "path:assets/xml-file.svg",
+  "inputs": null,
   "metadata": null,
   "name": "xmlFile",
   "resources": null,

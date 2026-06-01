@@ -85,6 +85,7 @@
   "customActionHelp": null,
   "description": "Actions and triggers for using with API platform.",
   "icon": "path:assets/api-platform.svg",
+  "inputs": null,
   "metadata": null,
   "name": "apiPlatform",
   "resources": null,

@@ -4156,6 +4156,7 @@
   "customActionHelp": null,
   "description": "ElevenLabs is an AI-powered voice synthesis company specializing in ultra-realistic text-to-speech and voice cloning technology.",
   "icon": "path:assets/elevenlabs.svg",
+  "inputs": null,
   "metadata": null,
   "name": "elevenLabs",
   "resources": null,

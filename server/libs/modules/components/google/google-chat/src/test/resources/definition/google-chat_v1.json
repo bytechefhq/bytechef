@@ -2658,6 +2658,7 @@
   },
   "description": "Google Chat is an intelligent and secure communication and collaboration tool, built for teams.",
   "icon": "path:assets/google-chat.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleChat",
   "resources": null,

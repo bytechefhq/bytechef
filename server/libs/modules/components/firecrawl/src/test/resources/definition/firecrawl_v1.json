@@ -14202,6 +14202,7 @@
   },
   "description": "Firecrawl allows you to turn entire websites into LLM-ready markdown",
   "icon": "path:assets/firecrawl.svg",
+  "inputs": null,
   "metadata": null,
   "name": "firecrawl",
   "resources": null,

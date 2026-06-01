@@ -502,6 +502,7 @@
   "customActionHelp": null,
   "description": "JWT helper component provides actions for signing and verifying JWT tokens.",
   "icon": "path:assets/jwt-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jwtHelper",
   "resources": null,

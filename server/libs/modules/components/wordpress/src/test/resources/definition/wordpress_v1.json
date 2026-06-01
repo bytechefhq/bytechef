@@ -32392,6 +32392,7 @@
   "customActionHelp": null,
   "description": "WordPress is a web content management system.",
   "icon": "path:assets/wordpress.svg",
+  "inputs": null,
   "metadata": null,
   "name": "wordpress",
   "resources": null,

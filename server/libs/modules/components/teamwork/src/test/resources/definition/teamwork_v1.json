@@ -786,6 +786,7 @@
   },
   "description": "Teamwork is a project management software that helps teams collaborate, organize tasks, and track progress efficiently.",
   "icon": "path:assets/teamwork.svg",
+  "inputs": null,
   "metadata": null,
   "name": "teamwork",
   "resources": null,

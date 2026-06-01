@@ -1570,6 +1570,7 @@
   "customActionHelp": null,
   "description": "Encharge is a marketing automation platform that helps businesses automate their customer communication and marketing campaigns.",
   "icon": "path:assets/encharge.svg",
+  "inputs": null,
   "metadata": null,
   "name": "encharge",
   "resources": null,

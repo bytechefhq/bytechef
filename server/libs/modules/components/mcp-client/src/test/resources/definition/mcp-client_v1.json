@@ -606,6 +606,7 @@
   "customActionHelp": null,
   "description": "Connects to external MCP servers to discover and call their tools.",
   "icon": "path:assets/mcp-client.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mcpClient",
   "resources": null,

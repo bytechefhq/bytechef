@@ -29122,6 +29122,7 @@
   },
   "description": "Google Maps is a widely used mapping service by Google, offering free and feature-rich navigation, location discovery, and real-time traffic updates accessible through web browsers and mobile apps.",
   "icon": "path:assets/google-maps.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleMaps",
   "resources": null,

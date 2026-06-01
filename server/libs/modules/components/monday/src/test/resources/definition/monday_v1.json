@@ -3745,6 +3745,7 @@
   },
   "description": "Monday.com is a work operating system that powers teams to run projects and workflows with confidence.",
   "icon": "path:assets/monday.svg",
+  "inputs": null,
   "metadata": null,
   "name": "monday",
   "resources": null,

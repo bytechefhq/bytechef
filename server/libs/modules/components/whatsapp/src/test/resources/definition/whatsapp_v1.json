@@ -450,6 +450,7 @@
   "customActionHelp": null,
   "description": "WhatsApp is a free-to-use messaging app offering end-to-end encrypted chat, voice, and video communication, along with document and media sharing, available on multiple platforms.",
   "icon": "path:assets/whatsapp.svg",
+  "inputs": null,
   "metadata": null,
   "name": "whatsApp",
   "resources": null,

@@ -467,6 +467,7 @@
   "customActionHelp": null,
   "description": "Detects — and optionally masks — URLs outside a configured allowlist.",
   "icon": "path:assets/urls.svg",
+  "inputs": null,
   "metadata": null,
   "name": "urls",
   "resources": null,

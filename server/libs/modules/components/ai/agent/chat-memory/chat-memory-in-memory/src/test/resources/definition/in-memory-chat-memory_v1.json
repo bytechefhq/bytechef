@@ -865,6 +865,7 @@
   "customActionHelp": null,
   "description": "In Memory Chat Memory.",
   "icon": "path:assets/in-memory-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "inMemoryChatMemory",
   "resources": null,

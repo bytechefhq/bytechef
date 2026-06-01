@@ -5771,6 +5771,7 @@
   "customActionHelp": null,
   "description": "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers.",
   "icon": "path:assets/sendfox.svg",
+  "inputs": null,
   "metadata": null,
   "name": "sendfox",
   "resources": null,

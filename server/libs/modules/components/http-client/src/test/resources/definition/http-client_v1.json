@@ -9916,6 +9916,7 @@
   "customActionHelp": null,
   "description": "Makes an HTTP request and returns the response data.",
   "icon": "path:assets/http-client.svg",
+  "inputs": null,
   "metadata": null,
   "name": "httpClient",
   "resources": null,

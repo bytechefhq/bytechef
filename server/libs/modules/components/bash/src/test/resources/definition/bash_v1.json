@@ -99,6 +99,7 @@
   "customActionHelp": null,
   "description": "Allows you to run arbitrary Bash scripts.",
   "icon": "path:assets/bash.svg",
+  "inputs": null,
   "metadata": null,
   "name": "bash",
   "resources": null,

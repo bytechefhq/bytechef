@@ -6224,6 +6224,7 @@
   "customActionHelp": null,
   "description": "ZoomInfo is a platform that provides companies with accurate contact data and sales insights to help them find and engage potential customers.",
   "icon": "path:assets/zoominfo.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zoominfo",
   "resources": null,

@@ -1462,6 +1462,7 @@
   },
   "description": "Build better products by turning your user data into meaningful insights, using Amplitude's digital analytics platform and experimentation tools.",
   "icon": "path:assets/amplitude.svg",
+  "inputs": null,
   "metadata": null,
   "name": "amplitude",
   "resources": null,

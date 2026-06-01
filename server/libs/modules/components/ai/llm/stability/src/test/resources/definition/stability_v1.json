@@ -613,6 +613,7 @@
   "customActionHelp": null,
   "description": "Activating humanity's potential through generative AI. Open models in every modality, for everyone, everywhere.",
   "icon": "path:assets/stability.svg",
+  "inputs": null,
   "metadata": null,
   "name": "stability",
   "resources": null,

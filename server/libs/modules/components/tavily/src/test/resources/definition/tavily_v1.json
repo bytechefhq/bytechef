@@ -2884,6 +2884,7 @@
   },
   "description": "Tavily is an AI-powered search tool designed to help users quickly find accurate, relevant and up-to-date information from the web.",
   "icon": "path:assets/tavily.svg",
+  "inputs": null,
   "metadata": null,
   "name": "tavily",
   "resources": null,

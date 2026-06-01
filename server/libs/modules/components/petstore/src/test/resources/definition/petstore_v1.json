@@ -7815,6 +7815,7 @@
   "customActionHelp": null,
   "description": "This is a sample Pet Store Server based on the OpenAPI 3.0 specification.",
   "icon": "path:assets/petstore.svg",
+  "inputs": null,
   "metadata": null,
   "name": "petstore",
   "resources": null,

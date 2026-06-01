@@ -3886,6 +3886,7 @@
   "customActionHelp": null,
   "description": "Helper component which contains various actions for image manipulation.",
   "icon": "path:assets/image-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "imageHelper",
   "resources": null,

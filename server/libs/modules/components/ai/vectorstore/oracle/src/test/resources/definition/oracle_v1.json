@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
     "delete": [ "EMBEDDING" ],
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -1225,6 +1225,7 @@
   "customActionHelp": null,
   "description": "Oracle Vector Store uses Oracle Database 23ai's native vector storage and similarity search capabilities to store and query document embeddings.",
   "icon": "path:assets/oracle.svg",
+  "inputs": null,
   "metadata": null,
   "name": "oracleVectorStore",
   "resources": null,

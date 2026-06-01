@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "deleteConversation": [ "DATA_SOURCE" ],
     "addMessages": [ "DATA_SOURCE" ],
     "listConversations": [ "DATA_SOURCE" ],
-    "getMessages": [ "DATA_SOURCE" ]
+    "getMessages": [ "DATA_SOURCE" ],
+    "deleteConversation": [ "DATA_SOURCE" ]
   },
   "actions": [ {
     "batch": null,
@@ -1010,6 +1010,7 @@
   "customActionHelp": null,
   "description": "JDBC Chat Memory stores conversation history in a relational database.",
   "icon": "path:assets/jdbc-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jdbcChatMemory",
   "resources": null,

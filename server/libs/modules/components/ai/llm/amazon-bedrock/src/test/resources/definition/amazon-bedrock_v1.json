@@ -973,6 +973,7 @@
   "customActionHelp": null,
   "description": "Amazon Bedrock is a fully managed service that offers a choice of high-performing foundation models (FMs) from leading AI companies.",
   "icon": "path:assets/amazon-bedrock.svg",
+  "inputs": null,
   "metadata": null,
   "name": "amazonBedrock",
   "resources": null,

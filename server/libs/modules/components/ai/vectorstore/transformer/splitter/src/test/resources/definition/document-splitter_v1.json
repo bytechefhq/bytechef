@@ -147,6 +147,7 @@
   "customActionHelp": null,
   "description": "Document Splitter.",
   "icon": "path:assets/document-splitter.svg",
+  "inputs": null,
   "metadata": null,
   "name": "documentSplitter",
   "resources": null,
