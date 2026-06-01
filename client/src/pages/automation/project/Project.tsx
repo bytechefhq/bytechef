@@ -53,10 +53,10 @@ const Project = () => {
         <div className="flex w-full">
             <WorkflowTestRunLeaveDialog onCancel={cancelLeave} onConfirm={confirmLeave} open={showLeaveDialog} />
 
-            <div className="shrink-0 overflow-hidden">
+            <div className="h-full shrink-0 overflow-hidden">
                 <div
                     className={twMerge(
-                        'w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
+                        'h-full w-[355px] transition-[margin-left,opacity] duration-300 ease-out',
                         projectLeftSidebarOpen ? 'ml-0 opacity-100' : 'ml-[-355px] opacity-0'
                     )}
                 >

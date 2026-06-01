@@ -300,7 +300,7 @@ const ProjectsLeftSidebar = ({
                 </ButtonGroup>
             </div>
 
-            <ScrollArea className="mb-3 h-screen w-full overflow-y-auto">
+            <ScrollArea className="mb-3 min-h-0 w-full flex-1">
                 {isLoading && <WorkflowsListSkeleton />}
 
                 {!isLoading && (
