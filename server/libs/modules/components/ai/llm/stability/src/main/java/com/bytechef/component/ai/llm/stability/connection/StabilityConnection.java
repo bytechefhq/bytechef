@@ -32,6 +32,7 @@ import org.springframework.ai.stabilityai.api.StabilityAiApi;
 public final class StabilityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
         .baseUri((connectionParameters, context) -> StabilityAiApi.DEFAULT_BASE_URL)
         .authorizations(
             authorization(BEARER_TOKEN)
