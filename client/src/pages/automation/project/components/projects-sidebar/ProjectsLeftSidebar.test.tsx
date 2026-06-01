@@ -390,6 +390,22 @@ describe('ProjectsLeftSidebar', () => {
         expect(items).toHaveLength(workflows.length);
     });
 
+    it('uses a flex-bounded scroll container so the last workflow stays reachable (regression for #5111)', async () => {
+        setupQueries({selectedProjectId: 7, workflows: [{id: 'wa'}, {id: 'wb'}, {id: 'wc'}]});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={7} />);
+
+        const items = await screen.findAllByTestId('workflow-item');
+        const scrollContainer = items[0].closest('ul')?.parentElement as HTMLElement;
+
+        // The scroll container must fill the remaining flex space and be allowed to shrink
+        // (flex-1 + min-h-0) rather than be pinned to the viewport height (h-screen), which
+        // pushed its bottom below the fold and clipped the last workflow.
+        expect(scrollContainer.className).toContain('flex-1');
+        expect(scrollContainer.className).toContain('min-h-0');
+        expect(scrollContainer.className).not.toContain('h-screen');
+    });
+
     it('handles zero projectId correctly (should show all projects)', async () => {
         const projects = [{id: 11}, {id: 22}];
         setupQueries({projects, selectedProjectId: 0, workflows: [{id: 'wa'}]});
