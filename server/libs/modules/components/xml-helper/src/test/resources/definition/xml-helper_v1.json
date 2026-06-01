@@ -195,6 +195,7 @@
   "customActionHelp": null,
   "description": "Converts between XML string and object/array.",
   "icon": "path:assets/xml-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "xmlHelper",
   "resources": null,

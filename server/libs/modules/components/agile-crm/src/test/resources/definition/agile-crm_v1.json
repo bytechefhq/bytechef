@@ -12753,6 +12753,7 @@
   },
   "description": "All-in-One CRM. Automate your sales, marketing, and service in one platform. Avoid data leaks and enable consistent messaging.",
   "icon": "path:assets/agile-crm.svg",
+  "inputs": null,
   "metadata": null,
   "name": "agileCrm",
   "resources": null,

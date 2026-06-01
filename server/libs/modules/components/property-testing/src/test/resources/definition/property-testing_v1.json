@@ -1057,6 +1057,7 @@
   "customActionHelp": null,
   "description": "Component fo testing.",
   "icon": "path:assets/example.svg",
+  "inputs": null,
   "metadata": null,
   "name": "propertyTesting",
   "resources": null,

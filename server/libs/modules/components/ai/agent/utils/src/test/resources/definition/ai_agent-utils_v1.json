@@ -206,6 +206,7 @@
   "customActionHelp": null,
   "description": "AI Agent Utils brings Claude Code-inspired tools and agent skills.",
   "icon": "path:assets/agent-utils.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aiAgentUtils",
   "resources": null,

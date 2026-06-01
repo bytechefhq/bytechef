@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
     "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1171,6 +1171,7 @@
   "customActionHelp": null,
   "description": "Typesense is an open-source, in-memory search engine designed for fast, typo-tolerant, and relevance-focused full-text search across large datasets.",
   "icon": "path:assets/typesense.svg",
+  "inputs": null,
   "metadata": null,
   "name": "typesense",
   "resources": null,

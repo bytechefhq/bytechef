@@ -28113,6 +28113,7 @@
   "customActionHelp": null,
   "description": "Google Workspace Admin is responsible for managing users, groups, devices, and security settings across the organization.",
   "icon": "path:assets/google-workspace-admin.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleWorkspaceAdmin",
   "resources": null,

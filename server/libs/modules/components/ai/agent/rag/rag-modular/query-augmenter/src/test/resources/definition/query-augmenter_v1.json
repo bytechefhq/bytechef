@@ -27,6 +27,7 @@
   "customActionHelp": null,
   "description": "Query Augmenter.",
   "icon": "path:assets/query-augmenter.svg",
+  "inputs": null,
   "metadata": null,
   "name": "queryAugmenter",
   "resources": null,

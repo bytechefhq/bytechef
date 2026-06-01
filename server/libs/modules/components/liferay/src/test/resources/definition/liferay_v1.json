@@ -584,6 +584,7 @@
   "customActionHelp": null,
   "description": "Liferay is an open-source digital experience platform for enterprise content management (ECM) and portal development.",
   "icon": "path:assets/liferay.svg",
+  "inputs": null,
   "metadata": null,
   "name": "liferay",
   "resources": null,

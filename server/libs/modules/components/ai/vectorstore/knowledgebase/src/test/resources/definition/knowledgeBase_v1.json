@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "delete": [ ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
     "search": [ ],
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ]
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
+    "delete": [ ]
   },
   "actions": [ {
     "batch": null,
@@ -993,8 +993,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ ],
-    "search": [ ]
+    "search": [ ],
+    "vectorStore": [ ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1252,6 +1252,7 @@
   "customActionHelp": null,
   "description": "Search ByteChef's internal knowledge base to retrieve relevant document chunks using semantic similarity search powered by vector embeddings.",
   "icon": "path:assets/knowledge-base.svg",
+  "inputs": null,
   "metadata": null,
   "name": "knowledgeBase",
   "resources": null,

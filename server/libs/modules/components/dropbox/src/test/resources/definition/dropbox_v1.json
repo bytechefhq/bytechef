@@ -9629,6 +9629,7 @@
   },
   "description": "Dropbox is a file hosting service that offers cloud storage, file synchronization, personal cloud, and client software.",
   "icon": "path:assets/dropbox.svg",
+  "inputs": null,
   "metadata": null,
   "name": "dropbox",
   "resources": null,

@@ -5260,6 +5260,7 @@
   },
   "description": "Mattermost is an open-source, self-hosted messaging platform designed for secure team collaboration and communication.",
   "icon": "path:assets/mattermost.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mattermost",
   "resources": null,

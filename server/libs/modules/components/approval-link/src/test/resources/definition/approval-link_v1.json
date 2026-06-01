@@ -35,6 +35,7 @@
   "customActionHelp": null,
   "description": "The Approval Link component that create approval/disapproval links.",
   "icon": "path:assets/approval-link.svg",
+  "inputs": null,
   "metadata": null,
   "name": "approvalLink",
   "resources": null,

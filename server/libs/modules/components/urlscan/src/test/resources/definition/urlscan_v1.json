@@ -37496,6 +37496,7 @@
   },
   "description": "Urlscan.io is an online service that allows you to safely analyze websites and URLs to determine potential security threats and risks.",
   "icon": "path:assets/urlscan.svg",
+  "inputs": null,
   "metadata": null,
   "name": "urlscan",
   "resources": null,

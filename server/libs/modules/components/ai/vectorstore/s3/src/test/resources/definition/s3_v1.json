@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
     "search": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ]
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -1244,6 +1244,7 @@
   "customActionHelp": null,
   "description": "Amazon S3 Vector Store uses AWS S3 as a persistent storage backend for vector embeddings, enabling scalable and durable similarity search.",
   "icon": "path:assets/s3.svg",
+  "inputs": null,
   "metadata": null,
   "name": "s3VectorStore",
   "resources": null,

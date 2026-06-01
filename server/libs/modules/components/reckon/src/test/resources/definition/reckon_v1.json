@@ -778,6 +778,7 @@
   "customActionHelp": null,
   "description": "Reckon is an accounting software used for financial management and bookkeeping tasks.",
   "icon": "path:assets/reckon.svg",
+  "inputs": null,
   "metadata": null,
   "name": "reckon",
   "resources": null,

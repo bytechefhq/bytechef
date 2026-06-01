@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "delete": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
     "search": [ "EMBEDDING" ],
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1258,6 +1258,7 @@
   "customActionHelp": null,
   "description": "PGVector is an open-source PostgreSQL extension for vector similarity search.",
   "icon": "path:assets/pgvector.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pgVector",
   "resources": null,

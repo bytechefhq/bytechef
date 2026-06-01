@@ -2286,6 +2286,7 @@
   "customActionHelp": null,
   "description": "Get up and running with large language models.",
   "icon": "path:assets/ollama.svg",
+  "inputs": null,
   "metadata": null,
   "name": "ollama",
   "resources": null,

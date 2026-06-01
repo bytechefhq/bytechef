@@ -4422,6 +4422,7 @@
   },
   "description": "Linear is a project management and issue tracking tool designed primarily for software teams.",
   "icon": "path:assets/linear.svg",
+  "inputs": null,
   "metadata": null,
   "name": "linear",
   "resources": null,

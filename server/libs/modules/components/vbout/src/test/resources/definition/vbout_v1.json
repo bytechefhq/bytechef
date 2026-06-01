@@ -1940,6 +1940,7 @@
   "customActionHelp": null,
   "description": "VBOUT is an AI-enabled marketing platform that helps businesses manage and streamline their digital marketing efforts.",
   "icon": "path:assets/vbout.svg",
+  "inputs": null,
   "metadata": null,
   "name": "vbout",
   "resources": null,

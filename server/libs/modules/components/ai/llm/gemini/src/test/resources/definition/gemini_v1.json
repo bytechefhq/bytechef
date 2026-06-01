@@ -1128,6 +1128,7 @@
   "customActionHelp": null,
   "description": "Google Gemini is a multimodal generative AI model. This component supports both Vertex AI and the Gemini Developer API.",
   "icon": "path:assets/google-vertex.svg",
+  "inputs": null,
   "metadata": null,
   "name": "gemini",
   "resources": null,

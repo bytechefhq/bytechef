@@ -12180,6 +12180,7 @@
   "customActionHelp": null,
   "description": "Zendesk is a customer service and sales platform that helps businesses manage customer interactions across various channels.",
   "icon": "path:assets/zendesk.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zendesk",
   "resources": null,

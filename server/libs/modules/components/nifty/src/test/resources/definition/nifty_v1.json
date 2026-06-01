@@ -2527,6 +2527,7 @@
   },
   "description": "Nifty Project Management is a software tool that streamlines team collaboration and project tracking with features like task management, timelines, and communication tools to enhance productivity.",
   "icon": "path:assets/nifty.svg",
+  "inputs": null,
   "metadata": null,
   "name": "nifty",
   "resources": null,

@@ -277,6 +277,7 @@
   "customActionHelp": null,
   "description": "Flags or masks the input if any listed keyword appears in it.",
   "icon": "path:assets/keywords.svg",
+  "inputs": null,
   "metadata": null,
   "name": "keywords",
   "resources": null,

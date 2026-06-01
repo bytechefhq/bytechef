@@ -10598,6 +10598,7 @@
   "customActionHelp": null,
   "description": "Wrike's Powerful Project Management Software Provides Users with Enterprise-Level Security.",
   "icon": "path:assets/wrike.svg",
+  "inputs": null,
   "metadata": null,
   "name": "wrike",
   "resources": null,

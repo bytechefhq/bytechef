@@ -9948,6 +9948,7 @@
   "customActionHelp": null,
   "description": "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data insights—all within a secure and scalable AI Data Cloud.",
   "icon": "path:assets/snowflake.svg",
+  "inputs": null,
   "metadata": null,
   "name": "snowflake",
   "resources": null,

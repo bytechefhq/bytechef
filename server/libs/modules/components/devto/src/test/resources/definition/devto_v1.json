@@ -3900,6 +3900,7 @@
   },
   "description": "Dev.to is an online community and platform where software developers share articles, tutorials, and discussions about programming and technology.",
   "icon": "path:assets/devto.svg",
+  "inputs": null,
   "metadata": null,
   "name": "devto",
   "resources": null,

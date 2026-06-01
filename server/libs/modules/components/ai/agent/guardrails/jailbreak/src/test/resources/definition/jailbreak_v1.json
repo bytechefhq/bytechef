@@ -146,6 +146,7 @@
   "customActionHelp": null,
   "description": "LLM-based detection of jailbreak / prompt-injection attempts.",
   "icon": "path:assets/jailbreak.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jailbreak",
   "resources": null,

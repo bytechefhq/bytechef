@@ -1032,12 +1032,14 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
+    "smartWebFetchTool": [ "model" ],
     "nsfw": [ "model" ],
-    "custom": [ "model" ],
-    "topicalAlignment": [ "model" ],
-    "checkForViolations": [ "checkForViolations" ],
     "sanitizeText": [ "sanitizeText" ],
-    "jailbreak": [ "model" ]
+    "jailbreak": [ "model" ],
+    "custom": [ "model" ],
+    "checkForViolations": [ "checkForViolations" ],
+    "taskTool": [ "model" ],
+    "topicalAlignment": [ "model" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",
@@ -1634,6 +1636,7 @@
   "customActionHelp": null,
   "description": "With the AI Agent, you can chat with the AI agent.",
   "icon": "path:assets/ai-agent.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aiAgent",
   "resources": null,

@@ -62,6 +62,7 @@
   "customActionHelp": null,
   "description": "A fully customizable scheduling software for individuals, businesses taking calls and developers building scheduling platforms where users meet users.",
   "icon": "path:assets/calcom.svg",
+  "inputs": null,
   "metadata": null,
   "name": "calcom",
   "resources": null,

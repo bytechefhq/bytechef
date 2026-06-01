@@ -1532,6 +1532,7 @@
   "customActionHelp": null,
   "description": "Reads and writes data from a csv file.",
   "icon": "path:assets/csv-file.svg",
+  "inputs": null,
   "metadata": null,
   "name": "csvFile",
   "resources": null,

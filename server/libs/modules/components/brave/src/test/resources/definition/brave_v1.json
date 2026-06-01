@@ -5387,6 +5387,7 @@
   },
   "description": "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions",
   "icon": "path:assets/brave.svg",
+  "inputs": null,
   "metadata": null,
   "name": "brave",
   "resources": null,

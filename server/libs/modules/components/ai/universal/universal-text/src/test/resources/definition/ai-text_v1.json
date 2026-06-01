@@ -636,8 +636,8 @@
         "sampleOutput": {
           "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
           "maskMap": {
-            "[REDACTED_1]": "John Doe",
-            "[EMAIL_1]": "john@example.com"
+            "[EMAIL_1]": "john@example.com",
+            "[REDACTED_1]": "John Doe"
           }
         }
       },
@@ -729,8 +729,8 @@
       "sampleOutput": {
         "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
         "maskMap": {
-          "[REDACTED_1]": "John Doe",
-          "[EMAIL_1]": "john@example.com"
+          "[EMAIL_1]": "john@example.com",
+          "[REDACTED_1]": "John Doe"
         }
       }
     },
@@ -2620,6 +2620,7 @@
   "customActionHelp": null,
   "description": "AI Helper component for text analysis and generation.",
   "icon": "path:assets/ai-text.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aiText",
   "resources": null,

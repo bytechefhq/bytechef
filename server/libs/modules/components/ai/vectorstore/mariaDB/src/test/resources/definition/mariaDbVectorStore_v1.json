@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -1121,6 +1121,7 @@
   "customActionHelp": null,
   "description": "MariaDB Vector Store uses MariaDB 11.7+ native vector storage and similarity search capabilities to store and query document embeddings.",
   "icon": "path:assets/mariadb-vector-store.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mariaDbVectorStore",
   "resources": null,

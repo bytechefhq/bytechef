@@ -2492,6 +2492,7 @@
   "customActionHelp": null,
   "description": null,
   "icon": "path:assets/pdf-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pdfHelper",
   "resources": null,

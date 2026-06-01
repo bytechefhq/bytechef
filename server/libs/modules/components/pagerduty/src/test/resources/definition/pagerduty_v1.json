@@ -17820,6 +17820,7 @@
   "customActionHelp": null,
   "description": "With PagerDuty, you can get real-time alerts, manage on-call schedules, and automate parts of your incident response process.",
   "icon": "path:assets/pagerduty.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pagerDuty",
   "resources": null,

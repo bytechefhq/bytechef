@@ -1372,6 +1372,7 @@
   },
   "description": "Airtable is a user-friendly and flexible cloud-based database management tool.",
   "icon": "path:assets/airtable.svg",
+  "inputs": null,
   "metadata": null,
   "name": "airtable",
   "resources": null,

@@ -2096,6 +2096,7 @@
   },
   "description": "Contiguity is an SMS service for your needs - quick and simple.",
   "icon": "path:assets/contiguity.svg",
+  "inputs": null,
   "metadata": null,
   "name": "contiguity",
   "resources": null,

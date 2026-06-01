@@ -1429,6 +1429,7 @@
   },
   "description": "A simple server for sending and receiving messages.",
   "icon": "path:assets/gotify.svg",
+  "inputs": null,
   "metadata": null,
   "name": "gotify",
   "resources": null,

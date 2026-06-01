@@ -27,6 +27,7 @@
   "customActionHelp": null,
   "description": "Document Joiner.",
   "icon": "path:assets/document-joiner.svg",
+  "inputs": null,
   "metadata": null,
   "name": "documentJoiner",
   "resources": null,

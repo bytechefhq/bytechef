@@ -16053,6 +16053,7 @@
   },
   "description": "Apify is the largest ecosystem where developers build, deploy, and publish data extraction and web automation tools.",
   "icon": "path:assets/apify.svg",
+  "inputs": null,
   "metadata": null,
   "name": "apify",
   "resources": null,

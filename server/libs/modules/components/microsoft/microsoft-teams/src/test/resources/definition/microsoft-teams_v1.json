@@ -7937,6 +7937,7 @@
   },
   "description": "Microsoft Teams is a collaboration platform that combines workplace chat, video meetings, file storage, and application integration.",
   "icon": "path:assets/microsoft-teams.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftTeams",
   "resources": null,

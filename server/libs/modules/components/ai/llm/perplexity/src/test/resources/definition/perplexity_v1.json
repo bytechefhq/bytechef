@@ -1182,6 +1182,7 @@
   "customActionHelp": null,
   "description": "Perplexity AI provides a unique AI service that integrates its language models with real-time search capabilities.",
   "icon": "path:assets/perplexity.svg",
+  "inputs": null,
   "metadata": null,
   "name": "perplexity",
   "resources": null,

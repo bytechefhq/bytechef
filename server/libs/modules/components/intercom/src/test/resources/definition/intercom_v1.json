@@ -2608,6 +2608,7 @@
   "customActionHelp": null,
   "description": "Intercom is the complete AI-first customer service solution, giving exceptional experiences for support teams with AI agent, AI copilot, tickets, ...",
   "icon": "path:assets/intercom.svg",
+  "inputs": null,
   "metadata": null,
   "name": "intercom",
   "resources": null,

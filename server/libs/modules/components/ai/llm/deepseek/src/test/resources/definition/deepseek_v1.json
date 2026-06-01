@@ -1027,6 +1027,7 @@
   "customActionHelp": null,
   "description": "DeepSeek AI provides the open-source DeepSeek V3 model, renowned for its cutting-edge reasoning and problem-solving capabilities.",
   "icon": "path:assets/deepseek.svg",
+  "inputs": null,
   "metadata": null,
   "name": "deepseek",
   "resources": null,

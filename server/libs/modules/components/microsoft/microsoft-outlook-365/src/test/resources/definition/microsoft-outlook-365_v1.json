@@ -5953,6 +5953,7 @@
   },
   "description": "Microsoft Outlook 365 is a comprehensive email and productivity platform that integrates email, calendar, contacts, and tasks to streamline communication and organization.",
   "icon": "path:assets/microsoft-outlook-365.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftOutlook365",
   "resources": null,

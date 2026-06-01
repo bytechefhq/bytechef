@@ -309,6 +309,7 @@
   "customActionHelp": null,
   "description": "Combine multiple inputs into one output.",
   "icon": "path:assets/merge-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mergeHelper",
   "resources": null,

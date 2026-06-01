@@ -4898,6 +4898,7 @@
   },
   "description": "Canva is a web and mobile application designed to help users create, design, and collaborate on visual content.",
   "icon": "path:assets/canva.svg",
+  "inputs": null,
   "metadata": null,
   "name": "canva",
   "resources": null,

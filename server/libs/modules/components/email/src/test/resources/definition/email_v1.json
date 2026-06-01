@@ -1007,6 +1007,7 @@
   "customActionHelp": null,
   "description": "The Email connector sends emails using an SMTP email server.",
   "icon": "path:assets/email.svg",
+  "inputs": null,
   "metadata": null,
   "name": "email",
   "resources": null,

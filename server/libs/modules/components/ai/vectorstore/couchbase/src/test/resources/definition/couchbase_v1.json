@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1275,6 +1275,7 @@
   "customActionHelp": null,
   "description": "Couchbase is a distributed, JSON document database, with all the desired capabilities of a relational DBMS.",
   "icon": "path:assets/couchbase.svg",
+  "inputs": null,
   "metadata": null,
   "name": "couchbase",
   "resources": null,

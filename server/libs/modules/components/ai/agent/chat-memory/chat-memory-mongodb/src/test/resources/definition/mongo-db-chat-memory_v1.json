@@ -983,6 +983,7 @@
   "customActionHelp": null,
   "description": "MongoDB Chat Memory stores conversation history in MongoDB for flexible, document-based persistent storage.",
   "icon": "path:assets/mongodb-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mongoDbChatMemory",
   "resources": null,

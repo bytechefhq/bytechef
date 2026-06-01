@@ -99,6 +99,7 @@
   "customActionHelp": null,
   "description": "Vector Store Document Retriever.",
   "icon": "path:assets/document-retriever.svg",
+  "inputs": null,
   "metadata": null,
   "name": "vectorStoreDocumentRetriever",
   "resources": null,

@@ -558,6 +558,7 @@
   "customActionHelp": null,
   "description": "Bolna AI is an open-source platform that enables businesses to create and deploy voice-driven conversational agents",
   "icon": "path:assets/bolna.svg",
+  "inputs": null,
   "metadata": null,
   "name": "bolna",
   "resources": null,

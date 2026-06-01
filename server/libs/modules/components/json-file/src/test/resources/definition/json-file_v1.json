@@ -1550,6 +1550,7 @@
   "customActionHelp": null,
   "description": "Reads and writes data from a JSON file.",
   "icon": "path:assets/jsonfile.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jsonFile",
   "resources": null,

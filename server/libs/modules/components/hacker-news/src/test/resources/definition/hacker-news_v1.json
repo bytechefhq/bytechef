@@ -1086,6 +1086,7 @@
   },
   "description": "Hacker News is a social news website focused on computer science, startups and technology-related topics.",
   "icon": "path:assets/hacker-news.svg",
+  "inputs": null,
   "metadata": null,
   "name": "hackerNews",
   "resources": null,

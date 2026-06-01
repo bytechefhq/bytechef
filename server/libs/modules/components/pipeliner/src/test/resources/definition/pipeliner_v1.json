@@ -1410,6 +1410,7 @@
   "customActionHelp": null,
   "description": "Pipeliner CRM is a comprehensive sales management tool that helps streamline sales processes through visual pipline management, contact organization, sales forecasting, and reporting.",
   "icon": "path:assets/pipeliner.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pipeliner",
   "resources": null,

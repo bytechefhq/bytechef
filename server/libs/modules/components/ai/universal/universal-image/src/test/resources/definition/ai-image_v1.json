@@ -387,6 +387,7 @@
   "customActionHelp": null,
   "description": "AI Helper component for image analysis and generation.",
   "icon": "path:assets/ai-image.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aiImage",
   "resources": null,

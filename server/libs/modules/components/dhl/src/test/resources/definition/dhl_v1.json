@@ -1072,6 +1072,7 @@
   },
   "description": "DHL is the global leader in the logistics industry. Specializing in international shipping, courier services and transportation.",
   "icon": "path:assets/dhl.svg",
+  "inputs": null,
   "metadata": null,
   "name": "dhl",
   "resources": null,

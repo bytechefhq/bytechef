@@ -532,6 +532,7 @@
   "customActionHelp": null,
   "description": "JotForm is an online form builder that enables users to create customized forms for various purposes without needing coding skills.",
   "icon": "path:assets/jotform.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jotform",
   "resources": null,

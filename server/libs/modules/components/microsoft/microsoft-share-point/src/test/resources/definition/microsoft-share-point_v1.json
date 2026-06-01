@@ -13728,6 +13728,7 @@
   },
   "description": "Microsoft SharePoint is a web-based collaborative platform that integrates with Microsoft Office, providing document management, intranet, and content management features for organizations.",
   "icon": "path:assets/microsoft-share-point.svg",
+  "inputs": null,
   "metadata": null,
   "name": "microsoftSharePoint",
   "resources": null,

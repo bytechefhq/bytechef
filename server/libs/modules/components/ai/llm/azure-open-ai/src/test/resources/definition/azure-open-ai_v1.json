@@ -2031,6 +2031,7 @@
   "customActionHelp": null,
   "description": "Azure OpenAI is a research organization that aims to develop and direct artificial intelligence (AI) in ways that benefit humanity as a whole.",
   "icon": "path:assets/azure-openai.svg",
+  "inputs": null,
   "metadata": null,
   "name": "azureOpenAi",
   "resources": null,

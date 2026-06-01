@@ -179,6 +179,7 @@
   "customActionHelp": null,
   "description": "Actions and triggers for using with the chat widget.",
   "icon": "path:assets/chat.svg",
+  "inputs": null,
   "metadata": null,
   "name": "chat",
   "resources": null,

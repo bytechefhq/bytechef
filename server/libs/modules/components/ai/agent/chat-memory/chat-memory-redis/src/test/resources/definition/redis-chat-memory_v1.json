@@ -1155,6 +1155,7 @@
   "customActionHelp": null,
   "description": "Redis Chat Memory stores conversation history in Redis for fast, persistent storage.",
   "icon": "path:assets/redis-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "redisChatMemory",
   "resources": null,

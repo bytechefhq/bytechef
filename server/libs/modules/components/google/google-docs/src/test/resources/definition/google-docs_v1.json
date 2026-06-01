@@ -5901,6 +5901,7 @@
   },
   "description": "Google Docs is a cloud-based collaborative word processing platform that allows multiple users to create, edit, and share documents in real-time.",
   "icon": "path:assets/google-docs.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googleDocs",
   "resources": null,

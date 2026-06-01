@@ -7052,6 +7052,7 @@
   "customActionHelp": null,
   "description": "Attio is the AI-native CRM that builds, scales and grows your company to the next level.",
   "icon": "path:assets/attio.svg",
+  "inputs": null,
   "metadata": null,
   "name": "attio",
   "resources": null,

@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ],
     "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -1245,6 +1245,7 @@
   "customActionHelp": null,
   "description": "Neo4j is an open-source NoSQL graph database. It is a fully transactional database (ACID) that stores data structured as graphs consisting of nodes, connected by relationships.",
   "icon": "path:assets/neo4j.svg",
+  "inputs": null,
   "metadata": null,
   "name": "neo4j",
   "resources": null,

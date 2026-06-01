@@ -1044,6 +1044,7 @@
   },
   "description": "Reddit is a social news aggregation, discussion, and content-sharing platform where users post and vote on content organized into communities called subreddits.",
   "icon": "path:assets/reddit.svg",
+  "inputs": null,
   "metadata": null,
   "name": "reddit",
   "resources": null,

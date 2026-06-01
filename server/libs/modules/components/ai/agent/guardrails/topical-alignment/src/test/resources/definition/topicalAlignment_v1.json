@@ -146,6 +146,7 @@
   "customActionHelp": null,
   "description": "LLM-based check that input stays within an allowed topic.",
   "icon": "path:assets/topical-alignment.svg",
+  "inputs": null,
   "metadata": null,
   "name": "topicalAlignment",
   "resources": null,

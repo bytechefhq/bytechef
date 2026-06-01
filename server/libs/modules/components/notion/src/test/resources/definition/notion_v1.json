@@ -11220,6 +11220,7 @@
   "customActionHelp": null,
   "description": "Notion is an all-in-one workspace for notes, tasks, wikis, and databases.",
   "icon": "path:assets/notion.svg",
+  "inputs": null,
   "metadata": null,
   "name": "notion",
   "resources": null,

@@ -933,6 +933,7 @@
   },
   "description": "Pushover is a notification service that sends real-time alerts to mobile and desktop devices, integrating with apps, scripts, and services.",
   "icon": "path:assets/pushover.svg",
+  "inputs": null,
   "metadata": null,
   "name": "pushover",
   "resources": null,

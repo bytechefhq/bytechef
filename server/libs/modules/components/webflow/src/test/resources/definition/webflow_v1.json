@@ -1192,6 +1192,7 @@
   },
   "description": "Webflow is a web design and development platform that allows users to build responsive websites visually without writing code.",
   "icon": "path:assets/webflow.svg",
+  "inputs": null,
   "metadata": null,
   "name": "webflow",
   "resources": null,

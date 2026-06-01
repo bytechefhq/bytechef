@@ -853,6 +853,7 @@
   "customActionHelp": null,
   "description": "Vector Store Chat Memory.",
   "icon": "path:assets/vector-store-chat-memory.svg",
+  "inputs": null,
   "metadata": null,
   "name": "vectorStoreChatMemory",
   "resources": null,

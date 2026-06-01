@@ -3535,6 +3535,7 @@
   },
   "description": "Aha! is a comprehensive product management software platform that helps teams set strategy, capture ideas, and plan, prioritize, and track work to build products customers love.",
   "icon": "path:assets/aha.svg",
+  "inputs": null,
   "metadata": null,
   "name": "aha",
   "resources": null,

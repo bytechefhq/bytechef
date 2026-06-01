@@ -385,6 +385,7 @@
   },
   "description": "Loops is an email marketing and transactional email platform built for modern SaaS companies, helping businesses automate onboarding, product updates, and lifecycle messaging with simple workflows, API integrations, and scalable contact management.",
   "icon": "path:assets/loops.svg",
+  "inputs": null,
   "metadata": null,
   "name": "loops",
   "resources": null,

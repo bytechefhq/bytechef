@@ -1690,6 +1690,7 @@
   },
   "description": "Typeform is an online survey and form-building tool that enables users to create interactive and engaging forms for collecting data and feedback.",
   "icon": "path:assets/typeform.svg",
+  "inputs": null,
   "metadata": null,
   "name": "typeform",
   "resources": null,

@@ -79,6 +79,7 @@
   "customActionHelp": null,
   "description": "Query Expander.",
   "icon": "path:assets/query-expander.svg",
+  "inputs": null,
   "metadata": null,
   "name": "queryExpander",
   "resources": null,

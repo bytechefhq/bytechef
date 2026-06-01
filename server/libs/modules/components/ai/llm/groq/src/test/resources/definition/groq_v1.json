@@ -1110,6 +1110,7 @@
   "customActionHelp": null,
   "description": "The LPU Inference Engine by Groq is a hardware and software platform that delivers exceptional compute speed, quality, and energy efficiency.",
   "icon": "path:assets/groq.svg",
+  "inputs": null,
   "metadata": null,
   "name": "groq",
   "resources": null,

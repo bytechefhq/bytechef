@@ -146,6 +146,7 @@
   "customActionHelp": null,
   "description": "LLM-based detection of NSFW content.",
   "icon": "path:assets/nsfw.svg",
+  "inputs": null,
   "metadata": null,
   "name": "nsfw",
   "resources": null,

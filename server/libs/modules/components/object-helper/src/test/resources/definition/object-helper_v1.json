@@ -1259,6 +1259,7 @@
   "customActionHelp": null,
   "description": "Object Helper allows you to do various operations on objects.",
   "icon": "path:assets/object-helper.svg",
+  "inputs": null,
   "metadata": null,
   "name": "objectHelper",
   "resources": null,

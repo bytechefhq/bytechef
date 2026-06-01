@@ -313,6 +313,7 @@
   "customActionHelp": null,
   "description": "User-defined regex guardrail — flags or masks matches of a custom pattern.",
   "icon": "path:assets/custom-regex.svg",
+  "inputs": null,
   "metadata": null,
   "name": "customRegex",
   "resources": null,

@@ -1378,76 +1378,76 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "web_id": 0,
-          "member_rating": 0,
-          "vip": true,
-          "last_changed": "2019-08-24T14:15:22",
-          "source": "string",
-          "consents_to_one_to_one_messaging": true,
-          "email_client": "string",
-          "unique_email_id": "string",
-          "tags_count": 0,
-          "list_id": "string",
-          "full_name": "string",
-          "merge_fields": {
-            "property2": "",
-            "property1": ""
-          },
-          "stats": {
-            "ecommerce_data": {
-              "total_revenue": 0,
-              "number_of_orders": 0,
-              "currency_code": "USD"
-            },
-            "avg_click_rate": 0,
-            "avg_open_rate": 0
-          },
-          "contact_id": "string",
-          "last_note": {
-            "created_at": "2019-08-24T14:15:22",
-            "note": "string",
-            "created_by": "string",
-            "note_id": 0
-          },
-          "email_address": "string",
-          "status": "subscribed",
-          "unsubscribe_reason": "string",
-          "timestamp_opt": "2019-08-24T14:15:22",
-          "ip_opt": "string",
-          "location": {
-            "timezone": "string",
-            "country_code": "string",
-            "gmtoff": 0,
-            "longitude": 0,
-            "region": "string",
-            "latitude": 0,
-            "dstoff": 0
-          },
-          "ip_signup": "string",
-          "tags": [ {
-            "id": 0,
-            "name": "string"
+          "_links": [ {
+            "schema": "string",
+            "targetSchema": "string",
+            "method": "GET",
+            "rel": "string",
+            "href": "string"
           } ],
-          "marketing_permissions": [ {
-            "text": "string",
-            "marketing_permission_id": "string",
-            "enabled": true
-          } ],
-          "email_type": "string",
-          "language": "string",
+          "id": "string",
+          "timestamp_signup": "2019-08-24T14:15:22",
           "interests": {
             "property2": true,
             "property1": true
           },
-          "timestamp_signup": "2019-08-24T14:15:22",
-          "id": "string",
-          "_links": [ {
-            "href": "string",
-            "rel": "string",
-            "method": "GET",
-            "targetSchema": "string",
-            "schema": "string"
-          } ]
+          "language": "string",
+          "email_type": "string",
+          "marketing_permissions": [ {
+            "enabled": true,
+            "marketing_permission_id": "string",
+            "text": "string"
+          } ],
+          "tags": [ {
+            "id": 0,
+            "name": "string"
+          } ],
+          "ip_signup": "string",
+          "location": {
+            "latitude": 0,
+            "region": "string",
+            "longitude": 0,
+            "gmtoff": 0,
+            "country_code": "string",
+            "timezone": "string",
+            "dstoff": 0
+          },
+          "ip_opt": "string",
+          "timestamp_opt": "2019-08-24T14:15:22",
+          "unsubscribe_reason": "string",
+          "status": "subscribed",
+          "email_address": "string",
+          "last_note": {
+            "created_by": "string",
+            "note": "string",
+            "created_at": "2019-08-24T14:15:22",
+            "note_id": 0
+          },
+          "contact_id": "string",
+          "stats": {
+            "avg_click_rate": 0,
+            "ecommerce_data": {
+              "number_of_orders": 0,
+              "total_revenue": 0,
+              "currency_code": "USD"
+            },
+            "avg_open_rate": 0
+          },
+          "merge_fields": {
+            "property2": "",
+            "property1": ""
+          },
+          "full_name": "string",
+          "list_id": "string",
+          "tags_count": 0,
+          "unique_email_id": "string",
+          "email_client": "string",
+          "consents_to_one_to_one_messaging": true,
+          "source": "string",
+          "last_changed": "2019-08-24T14:15:22",
+          "vip": true,
+          "member_rating": 0,
+          "web_id": 0
         }
       },
       "outputSchema": {
@@ -2807,76 +2807,76 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "web_id": 0,
-        "member_rating": 0,
-        "vip": true,
-        "last_changed": "2019-08-24T14:15:22",
-        "source": "string",
-        "consents_to_one_to_one_messaging": true,
-        "email_client": "string",
-        "unique_email_id": "string",
-        "tags_count": 0,
-        "list_id": "string",
-        "full_name": "string",
-        "merge_fields": {
-          "property2": "",
-          "property1": ""
-        },
-        "stats": {
-          "ecommerce_data": {
-            "total_revenue": 0,
-            "number_of_orders": 0,
-            "currency_code": "USD"
-          },
-          "avg_click_rate": 0,
-          "avg_open_rate": 0
-        },
-        "contact_id": "string",
-        "last_note": {
-          "created_at": "2019-08-24T14:15:22",
-          "note": "string",
-          "created_by": "string",
-          "note_id": 0
-        },
-        "email_address": "string",
-        "status": "subscribed",
-        "unsubscribe_reason": "string",
-        "timestamp_opt": "2019-08-24T14:15:22",
-        "ip_opt": "string",
-        "location": {
-          "timezone": "string",
-          "country_code": "string",
-          "gmtoff": 0,
-          "longitude": 0,
-          "region": "string",
-          "latitude": 0,
-          "dstoff": 0
-        },
-        "ip_signup": "string",
-        "tags": [ {
-          "id": 0,
-          "name": "string"
+        "_links": [ {
+          "schema": "string",
+          "targetSchema": "string",
+          "method": "GET",
+          "rel": "string",
+          "href": "string"
         } ],
-        "marketing_permissions": [ {
-          "text": "string",
-          "marketing_permission_id": "string",
-          "enabled": true
-        } ],
-        "email_type": "string",
-        "language": "string",
+        "id": "string",
+        "timestamp_signup": "2019-08-24T14:15:22",
         "interests": {
           "property2": true,
           "property1": true
         },
-        "timestamp_signup": "2019-08-24T14:15:22",
-        "id": "string",
-        "_links": [ {
-          "href": "string",
-          "rel": "string",
-          "method": "GET",
-          "targetSchema": "string",
-          "schema": "string"
-        } ]
+        "language": "string",
+        "email_type": "string",
+        "marketing_permissions": [ {
+          "enabled": true,
+          "marketing_permission_id": "string",
+          "text": "string"
+        } ],
+        "tags": [ {
+          "id": 0,
+          "name": "string"
+        } ],
+        "ip_signup": "string",
+        "location": {
+          "latitude": 0,
+          "region": "string",
+          "longitude": 0,
+          "gmtoff": 0,
+          "country_code": "string",
+          "timezone": "string",
+          "dstoff": 0
+        },
+        "ip_opt": "string",
+        "timestamp_opt": "2019-08-24T14:15:22",
+        "unsubscribe_reason": "string",
+        "status": "subscribed",
+        "email_address": "string",
+        "last_note": {
+          "created_by": "string",
+          "note": "string",
+          "created_at": "2019-08-24T14:15:22",
+          "note_id": 0
+        },
+        "contact_id": "string",
+        "stats": {
+          "avg_click_rate": 0,
+          "ecommerce_data": {
+            "number_of_orders": 0,
+            "total_revenue": 0,
+            "currency_code": "USD"
+          },
+          "avg_open_rate": 0
+        },
+        "merge_fields": {
+          "property2": "",
+          "property1": ""
+        },
+        "full_name": "string",
+        "list_id": "string",
+        "tags_count": 0,
+        "unique_email_id": "string",
+        "email_client": "string",
+        "consents_to_one_to_one_messaging": true,
+        "source": "string",
+        "last_changed": "2019-08-24T14:15:22",
+        "vip": true,
+        "member_rating": 0,
+        "web_id": 0
       }
     },
     "perform": null,
@@ -4841,76 +4841,76 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "web_id": 0,
-          "member_rating": 0,
-          "vip": true,
-          "last_changed": "2019-08-24T14:15:22",
-          "source": "string",
-          "consents_to_one_to_one_messaging": true,
-          "email_client": "string",
-          "unique_email_id": "string",
-          "tags_count": 0,
-          "list_id": "string",
-          "full_name": "string",
-          "merge_fields": {
-            "property2": "",
-            "property1": ""
-          },
-          "stats": {
-            "ecommerce_data": {
-              "total_revenue": 0,
-              "number_of_orders": 0,
-              "currency_code": "USD"
-            },
-            "avg_click_rate": 0,
-            "avg_open_rate": 0
-          },
-          "contact_id": "string",
-          "last_note": {
-            "created_at": "2019-08-24T14:15:22",
-            "note": "string",
-            "created_by": "string",
-            "note_id": 0
-          },
-          "email_address": "string",
-          "status": "subscribed",
-          "unsubscribe_reason": "string",
-          "timestamp_opt": "2019-08-24T14:15:22",
-          "ip_opt": "string",
-          "location": {
-            "timezone": "string",
-            "country_code": "string",
-            "gmtoff": 0,
-            "longitude": 0,
-            "region": "string",
-            "latitude": 0,
-            "dstoff": 0
-          },
-          "ip_signup": "string",
-          "tags": [ {
-            "id": 0,
-            "name": "string"
+          "_links": [ {
+            "schema": "string",
+            "targetSchema": "string",
+            "method": "GET",
+            "rel": "string",
+            "href": "string"
           } ],
-          "marketing_permissions": [ {
-            "text": "string",
-            "marketing_permission_id": "string",
-            "enabled": true
-          } ],
-          "email_type": "string",
-          "language": "string",
+          "id": "string",
+          "timestamp_signup": "2019-08-24T14:15:22",
           "interests": {
             "property2": true,
             "property1": true
           },
-          "timestamp_signup": "2019-08-24T14:15:22",
-          "id": "string",
-          "_links": [ {
-            "href": "string",
-            "rel": "string",
-            "method": "GET",
-            "targetSchema": "string",
-            "schema": "string"
-          } ]
+          "language": "string",
+          "email_type": "string",
+          "marketing_permissions": [ {
+            "enabled": true,
+            "marketing_permission_id": "string",
+            "text": "string"
+          } ],
+          "tags": [ {
+            "id": 0,
+            "name": "string"
+          } ],
+          "ip_signup": "string",
+          "location": {
+            "latitude": 0,
+            "region": "string",
+            "longitude": 0,
+            "gmtoff": 0,
+            "country_code": "string",
+            "timezone": "string",
+            "dstoff": 0
+          },
+          "ip_opt": "string",
+          "timestamp_opt": "2019-08-24T14:15:22",
+          "unsubscribe_reason": "string",
+          "status": "subscribed",
+          "email_address": "string",
+          "last_note": {
+            "created_by": "string",
+            "note": "string",
+            "created_at": "2019-08-24T14:15:22",
+            "note_id": 0
+          },
+          "contact_id": "string",
+          "stats": {
+            "avg_click_rate": 0,
+            "ecommerce_data": {
+              "number_of_orders": 0,
+              "total_revenue": 0,
+              "currency_code": "USD"
+            },
+            "avg_open_rate": 0
+          },
+          "merge_fields": {
+            "property2": "",
+            "property1": ""
+          },
+          "full_name": "string",
+          "list_id": "string",
+          "tags_count": 0,
+          "unique_email_id": "string",
+          "email_client": "string",
+          "consents_to_one_to_one_messaging": true,
+          "source": "string",
+          "last_changed": "2019-08-24T14:15:22",
+          "vip": true,
+          "member_rating": 0,
+          "web_id": 0
         }
       },
       "outputSchema": {
@@ -6270,76 +6270,76 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "web_id": 0,
-        "member_rating": 0,
-        "vip": true,
-        "last_changed": "2019-08-24T14:15:22",
-        "source": "string",
-        "consents_to_one_to_one_messaging": true,
-        "email_client": "string",
-        "unique_email_id": "string",
-        "tags_count": 0,
-        "list_id": "string",
-        "full_name": "string",
-        "merge_fields": {
-          "property2": "",
-          "property1": ""
-        },
-        "stats": {
-          "ecommerce_data": {
-            "total_revenue": 0,
-            "number_of_orders": 0,
-            "currency_code": "USD"
-          },
-          "avg_click_rate": 0,
-          "avg_open_rate": 0
-        },
-        "contact_id": "string",
-        "last_note": {
-          "created_at": "2019-08-24T14:15:22",
-          "note": "string",
-          "created_by": "string",
-          "note_id": 0
-        },
-        "email_address": "string",
-        "status": "subscribed",
-        "unsubscribe_reason": "string",
-        "timestamp_opt": "2019-08-24T14:15:22",
-        "ip_opt": "string",
-        "location": {
-          "timezone": "string",
-          "country_code": "string",
-          "gmtoff": 0,
-          "longitude": 0,
-          "region": "string",
-          "latitude": 0,
-          "dstoff": 0
-        },
-        "ip_signup": "string",
-        "tags": [ {
-          "id": 0,
-          "name": "string"
+        "_links": [ {
+          "schema": "string",
+          "targetSchema": "string",
+          "method": "GET",
+          "rel": "string",
+          "href": "string"
         } ],
-        "marketing_permissions": [ {
-          "text": "string",
-          "marketing_permission_id": "string",
-          "enabled": true
-        } ],
-        "email_type": "string",
-        "language": "string",
+        "id": "string",
+        "timestamp_signup": "2019-08-24T14:15:22",
         "interests": {
           "property2": true,
           "property1": true
         },
-        "timestamp_signup": "2019-08-24T14:15:22",
-        "id": "string",
-        "_links": [ {
-          "href": "string",
-          "rel": "string",
-          "method": "GET",
-          "targetSchema": "string",
-          "schema": "string"
-        } ]
+        "language": "string",
+        "email_type": "string",
+        "marketing_permissions": [ {
+          "enabled": true,
+          "marketing_permission_id": "string",
+          "text": "string"
+        } ],
+        "tags": [ {
+          "id": 0,
+          "name": "string"
+        } ],
+        "ip_signup": "string",
+        "location": {
+          "latitude": 0,
+          "region": "string",
+          "longitude": 0,
+          "gmtoff": 0,
+          "country_code": "string",
+          "timezone": "string",
+          "dstoff": 0
+        },
+        "ip_opt": "string",
+        "timestamp_opt": "2019-08-24T14:15:22",
+        "unsubscribe_reason": "string",
+        "status": "subscribed",
+        "email_address": "string",
+        "last_note": {
+          "created_by": "string",
+          "note": "string",
+          "created_at": "2019-08-24T14:15:22",
+          "note_id": 0
+        },
+        "contact_id": "string",
+        "stats": {
+          "avg_click_rate": 0,
+          "ecommerce_data": {
+            "number_of_orders": 0,
+            "total_revenue": 0,
+            "currency_code": "USD"
+          },
+          "avg_open_rate": 0
+        },
+        "merge_fields": {
+          "property2": "",
+          "property1": ""
+        },
+        "full_name": "string",
+        "list_id": "string",
+        "tags_count": 0,
+        "unique_email_id": "string",
+        "email_client": "string",
+        "consents_to_one_to_one_messaging": true,
+        "source": "string",
+        "last_changed": "2019-08-24T14:15:22",
+        "vip": true,
+        "member_rating": 0,
+        "web_id": 0
       }
     },
     "processErrorResponse": null,
@@ -7032,6 +7032,7 @@
   },
   "description": "Mailchimp is a marketing automation and email marketing platform.",
   "icon": "path:assets/mailchimp.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mailchimp",
   "resources": null,

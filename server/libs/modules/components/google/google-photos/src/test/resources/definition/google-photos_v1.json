@@ -6749,6 +6749,7 @@
   },
   "description": "Google Photos is a photo sharing and storage service.",
   "icon": "path:assets/google-photos.svg",
+  "inputs": null,
   "metadata": null,
   "name": "googlePhotos",
   "resources": null,

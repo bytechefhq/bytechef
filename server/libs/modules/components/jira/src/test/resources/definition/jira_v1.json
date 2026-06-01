@@ -9856,6 +9856,7 @@
   },
   "description": "Jira is a proprietary issue tracking product developed by Atlassian that allows bug tracking and agile project management.",
   "icon": "path:assets/jira.svg",
+  "inputs": null,
   "metadata": null,
   "name": "jira",
   "resources": null,

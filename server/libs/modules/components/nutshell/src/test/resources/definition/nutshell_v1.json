@@ -2682,6 +2682,7 @@
   },
   "description": "Nutshell CRM is a user-friendly customer relationship management software designed to help small businesses manage sales, track leads, and streamline communication.",
   "icon": "path:assets/nutshell.svg",
+  "inputs": null,
   "metadata": null,
   "name": "nutshell",
   "resources": null,

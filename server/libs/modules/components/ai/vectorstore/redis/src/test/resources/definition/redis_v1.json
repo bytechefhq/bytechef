@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
     "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ],
+    "delete": [ "EMBEDDING" ],
     "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "delete": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "search": [ "EMBEDDING" ],
-    "vectorStore": [ "EMBEDDING" ]
+    "vectorStore": [ "EMBEDDING" ],
+    "search": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
@@ -1108,6 +1108,7 @@
   "customActionHelp": null,
   "description": "Redis is an open-source, in-memory data structure store used as a database, cache, and message broker, known for its high performance and support for various data structures like strings, hashes, lists, sets, and more.",
   "icon": "path:assets/redis.svg",
+  "inputs": null,
   "metadata": null,
   "name": "redis",
   "resources": null,

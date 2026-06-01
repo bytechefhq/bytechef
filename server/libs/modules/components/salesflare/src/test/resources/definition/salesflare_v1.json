@@ -895,6 +895,7 @@
   "customActionHelp": null,
   "description": "Salesflare is a CRM software designed to help small businesses and startups manage their customer relationships efficiently.",
   "icon": "path:assets/salesflare.svg",
+  "inputs": null,
   "metadata": null,
   "name": "salesflare",
   "resources": null,

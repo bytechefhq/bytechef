@@ -1372,6 +1372,7 @@
   },
   "description": "Box is a cloud content management and file sharing service that enables businesses to securely store, manage, and collaborate on documents.",
   "icon": "path:assets/box.svg",
+  "inputs": null,
   "metadata": null,
   "name": "box",
   "resources": null,

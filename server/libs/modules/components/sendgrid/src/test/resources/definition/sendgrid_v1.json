@@ -713,6 +713,7 @@
   "customActionHelp": null,
   "description": "Trusted for reliable email delivery at scale.",
   "icon": "path:assets/sendgrid.svg",
+  "inputs": null,
   "metadata": null,
   "name": "sendgrid",
   "resources": null,

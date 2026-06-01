@@ -2450,6 +2450,7 @@
   "customActionHelp": null,
   "description": "Redis is an open-source, in-memory data structure store used as a database, cache, message broker, and streaming engine.",
   "icon": "path:assets/redis.svg",
+  "inputs": null,
   "metadata": null,
   "name": "redis",
   "resources": null,

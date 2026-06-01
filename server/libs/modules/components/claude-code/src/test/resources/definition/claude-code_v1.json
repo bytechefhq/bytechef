@@ -443,6 +443,7 @@
   "customActionHelp": null,
   "description": "Allows you to chat with Claude Code and added MCP tools",
   "icon": "path:assets/anthropic.svg",
+  "inputs": null,
   "metadata": null,
   "name": "claudeCode",
   "resources": null,

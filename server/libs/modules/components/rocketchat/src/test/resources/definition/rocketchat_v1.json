@@ -6153,6 +6153,7 @@
   },
   "description": "Rocket.Chat is a communication platform that enables team collaboration through messaging, audio/video calls, and integrations, all customizable and self-hostable.",
   "icon": "path:assets/rocketchat.svg",
+  "inputs": null,
   "metadata": null,
   "name": "rocketchat",
   "resources": null,

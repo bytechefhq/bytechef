@@ -8000,6 +8000,7 @@
   "customActionHelp": null,
   "description": "Discord is a communication platform designed for creating communities, chatting with friends, and connecting with others through text, voice, and video channels.",
   "icon": "path:assets/discord.svg",
+  "inputs": null,
   "metadata": null,
   "name": "discord",
   "resources": null,

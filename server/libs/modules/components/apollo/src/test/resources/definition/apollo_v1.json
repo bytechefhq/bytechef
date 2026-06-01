@@ -6403,6 +6403,7 @@
   },
   "description": "Apollo.io is a sales intelligence and engagement platform that provides tools for prospecting, lead generation, and sales automation to help businesses improve their sales processes and outreach efforts.",
   "icon": "path:assets/apollo.svg",
+  "inputs": null,
   "metadata": null,
   "name": "apollo",
   "resources": null,

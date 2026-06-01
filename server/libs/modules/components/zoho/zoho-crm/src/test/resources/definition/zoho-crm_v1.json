@@ -4525,6 +4525,7 @@
   },
   "description": "Zoho CRM is a cloud-based customer relationship management platform that integrates sales, marketing, and customer support activities to streamline business processes and enhance team.",
   "icon": "path:assets/zoho-crm.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zohoCrm",
   "resources": null,

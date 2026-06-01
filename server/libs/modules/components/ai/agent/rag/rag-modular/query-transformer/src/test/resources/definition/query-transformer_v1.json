@@ -92,6 +92,7 @@
   "customActionHelp": null,
   "description": "Query Transformer.",
   "icon": "path:assets/query-transformer.svg",
+  "inputs": null,
   "metadata": null,
   "name": "queryTransformer",
   "resources": null,

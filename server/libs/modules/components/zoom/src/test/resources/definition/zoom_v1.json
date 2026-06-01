@@ -7392,6 +7392,7 @@
   "customActionHelp": null,
   "description": "Zoom is a cloud-based video conferencing platform that enables virtual meetings, webinars, and collaboration through video, audio, and chat.",
   "icon": "path:assets/zoom.svg",
+  "inputs": null,
   "metadata": null,
   "name": "zoom",
   "resources": null,

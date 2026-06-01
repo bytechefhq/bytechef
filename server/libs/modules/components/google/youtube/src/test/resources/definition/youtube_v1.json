@@ -2897,6 +2897,7 @@
   },
   "description": "Enjoy the videos and music you love, upload original content, and share it all with friends, family, and the world on YouTube.",
   "icon": "path:assets/youtube.svg",
+  "inputs": null,
   "metadata": null,
   "name": "youTube",
   "resources": null,

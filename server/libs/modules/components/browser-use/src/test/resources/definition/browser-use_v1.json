@@ -5436,6 +5436,7 @@
   },
   "description": "AI-powered browser automation that enables agents to perform web tasks such as navigating websites and extracting data.",
   "icon": "path:assets/browser-use.svg",
+  "inputs": null,
   "metadata": null,
   "name": "browserUse",
   "resources": null,

@@ -2250,6 +2250,7 @@
   "customActionHelp": null,
   "description": "Allows multiple operations over files on the filesystem.",
   "icon": "path:assets/filesystem.svg",
+  "inputs": null,
   "metadata": null,
   "name": "filesystem",
   "resources": null,

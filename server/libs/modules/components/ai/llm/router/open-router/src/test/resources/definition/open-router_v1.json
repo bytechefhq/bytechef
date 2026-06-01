@@ -3015,6 +3015,7 @@
   "customActionHelp": null,
   "description": "OpenRouter provides a unified API that gives you access to hundreds of AI models through a single endpoint, while automatically handling fallbacks and selecting the most cost-effective options.",
   "icon": "path:assets/open-router.svg",
+  "inputs": null,
   "metadata": null,
   "name": "openRouter",
   "resources": null,
