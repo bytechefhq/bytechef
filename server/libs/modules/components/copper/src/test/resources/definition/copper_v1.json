@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new activity.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/copper_v1#create-activity"
+    },
     "metadata": null,
     "name": "createActivity",
     "outputDefinition": {
@@ -526,7 +529,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new company.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/copper_v1#create-company"
+    },
     "metadata": null,
     "name": "createCompany",
     "outputDefinition": {
@@ -2319,7 +2325,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new person.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/copper_v1#create-person"
+    },
     "metadata": null,
     "name": "createPerson",
     "outputDefinition": {
@@ -3847,7 +3856,7 @@
             "value": "personal"
           }, {
             "description": null,
-            "label": "other",
+            "label": "Other",
             "value": "other"
           } ],
           "optionsDataSource": null,
@@ -4492,7 +4501,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task in Copper.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/copper_v1#create-activity"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {
@@ -5300,7 +5312,7 @@
       "type": "STRING"
     }, {
       "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
+      "controlType": "MULTI_SELECT",
       "defaultValue": null,
       "description": null,
       "displayCondition": null,
@@ -5309,7 +5321,7 @@
       "hidden": null,
       "items": [ {
         "advancedOption": null,
-        "controlType": "SELECT",
+        "controlType": "TEXT",
         "defaultValue": null,
         "description": null,
         "displayCondition": null,
@@ -5323,10 +5335,7 @@
         "minLength": null,
         "name": null,
         "options": null,
-        "optionsDataSource": {
-          "options": { },
-          "optionsLookupDependsOn": null
-        },
+        "optionsDataSource": null,
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
@@ -5340,7 +5349,10 @@
       "multipleValues": null,
       "name": "tags",
       "options": null,
-      "optionsDataSource": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
       "placeholder": null,
       "required": false,
       "type": "ARRAY"
@@ -5407,7 +5419,7 @@
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "Email address",
+        "label": "Email Address",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
@@ -5453,14 +5465,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/copper_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Copper Developer API",
+    "learnMoreUrl": "https://developer.copper.com/"
+  },
   "description": "Copper is a customer relationship management (CRM) software designed to streamline and optimize sales processes, providing tools for managing contact, leads, opportunities, and communications in one centralized platform.",
   "icon": "path:assets/copper.svg",
   "metadata": null,
