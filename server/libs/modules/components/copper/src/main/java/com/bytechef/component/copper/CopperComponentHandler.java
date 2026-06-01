@@ -42,13 +42,15 @@ public class CopperComponentHandler implements ComponentHandler {
                 "centralized platform.")
         .icon("path:assets/copper.svg")
         .customAction(true)
+        .customActionHelp("Copper Developer API", "https://developer.copper.com/")
         .categories(ComponentCategory.CRM)
         .connection(CopperConnection.CONNECTION_DEFINITION)
         .actions(
             CopperCreateActivityAction.ACTION_DEFINITION,
             CopperCreateCompanyAction.ACTION_DEFINITION,
             CopperCreatePersonAction.ACTION_DEFINITION,
-            CopperCreateTaskAction.ACTION_DEFINITION);
+            CopperCreateTaskAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

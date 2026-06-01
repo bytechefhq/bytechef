@@ -59,6 +59,7 @@ public class CopperCreateCompanyAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create Company")
         .description("Creates a new company.")
+        .help("", "https://docs.bytechef.io/reference/components/copper_v1#create-company")
         .properties(
             string(NAME)
                 .label("Name")

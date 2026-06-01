@@ -47,6 +47,7 @@ public class CopperCreateActivityAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createActivity")
         .title("Create Activity")
         .description("Creates a new activity.")
+        .help("", "https://docs.bytechef.io/reference/components/copper_v1#create-activity")
         .properties(
             string(ACTIVITY_TYPE)
                 .label("Activity Type ID")

@@ -63,6 +63,7 @@ public class CopperCreatePersonAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPerson")
         .title("Create Person")
         .description("Creates a new person.")
+        .help("", "https://docs.bytechef.io/reference/components/copper_v1#create-person")
         .properties(
             string(NAME)
                 .label("Name")
