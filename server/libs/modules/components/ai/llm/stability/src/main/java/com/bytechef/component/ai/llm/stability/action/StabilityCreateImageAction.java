@@ -121,6 +121,7 @@ public class StabilityCreateImageAction {
                 .minValue(0)
                 .maxValue(429496)
                 .advancedOption(true))
+        .help("", "https://docs.bytechef.io/reference/components/stability_v1#create-image")
         .output(
             outputSchema(
                 object()

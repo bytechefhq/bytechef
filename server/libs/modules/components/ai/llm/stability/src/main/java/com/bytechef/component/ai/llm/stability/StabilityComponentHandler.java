@@ -34,6 +34,7 @@ public class StabilityComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("stability")
         .title("Stability AI")
+        .version(1)
         .description(
             "Activating humanity's potential through generative AI. Open models in every modality, for everyone, " +
                 "everywhere.")
