@@ -46,4 +46,6 @@ public interface IntegrationService {
     Integration update(long id, List<Long> tagIds);
 
     Integration update(Integration integration);
+
+    Integration updatePermissionExpression(long id, String permissionExpression);
 }

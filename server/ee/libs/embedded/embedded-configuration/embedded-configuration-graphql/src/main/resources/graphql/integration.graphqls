@@ -2,8 +2,13 @@ extend type Query {
     integration(id: ID): Integration
 }
 
+extend type Mutation {
+    updateIntegrationPermissionExpression(id: ID!, permissionExpression: String): Integration
+}
+
 type Integration {
     id: ID!
     componentName: String!
     name: String!
+    permissionExpression: String
 }

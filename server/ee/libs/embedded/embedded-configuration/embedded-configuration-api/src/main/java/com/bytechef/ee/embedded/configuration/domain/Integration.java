@@ -84,6 +84,9 @@ public final class Integration {
     @Column
     private String name;
 
+    @Column("permission_expression")
+    private String permissionExpression;
+
     @Version
     private int version;
 
@@ -95,7 +98,8 @@ public final class Integration {
     public Integration(
         AggregateReference<Category, Long> categoryId, String componentName, int componentVersion, String description,
         Long id,
-        Set<IntegrationTag> integrationTags, Set<IntegrationVersion> integrationVersions, int version) {
+        Set<IntegrationTag> integrationTags, Set<IntegrationVersion> integrationVersions, String permissionExpression,
+        int version) {
 
         this.categoryId = categoryId;
         this.componentName = componentName;
@@ -104,6 +108,7 @@ public final class Integration {
         this.id = id;
         this.integrationTags.addAll(integrationTags);
         this.integrationVersions.addAll(integrationVersions);
+        this.permissionExpression = permissionExpression;
         this.version = version;
     }
 
@@ -193,6 +198,10 @@ public final class Integration {
         return name;
     }
 
+    public String getPermissionExpression() {
+        return permissionExpression;
+    }
+
     public List<Long> getTagIds() {
         return integrationTags.stream()
             .map(IntegrationTag::getTagId)
@@ -266,6 +275,10 @@ public final class Integration {
         this.name = name;
     }
 
+    public void setPermissionExpression(String permissionExpression) {
+        this.permissionExpression = permissionExpression;
+    }
+
     public void setTagIds(List<Long> tagIds) {
         this.integrationTags = new HashSet<>();
 
@@ -295,6 +308,7 @@ public final class Integration {
             ", componentName='" + componentName + '\'' +
             ", componentVersion=" + componentVersion +
             ", name='" + name + '\'' +
+            ", permissionExpression='" + permissionExpression + '\'' +
             ", description='" + description + '\'' +
             ", categoryId=" + getCategoryId() +
             ", integrationTags=" + integrationTags +

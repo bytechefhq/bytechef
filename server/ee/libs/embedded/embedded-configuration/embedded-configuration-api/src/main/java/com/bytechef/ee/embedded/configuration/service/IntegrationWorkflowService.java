@@ -50,4 +50,6 @@ public interface IntegrationWorkflowService {
         long integrationId, int oldIntegrationVersion, String oldWorkflowId, IntegrationWorkflow integrationWorkflow);
 
     IntegrationWorkflow update(IntegrationWorkflow integrationWorkflow);
+
+    IntegrationWorkflow updatePermissionExpression(long id, String permissionExpression);
 }

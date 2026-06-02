@@ -155,6 +155,23 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
         curIntegrationWorkflow.setWorkflowId(integrationWorkflow.getWorkflowId());
         curIntegrationWorkflow.setUuid(integrationWorkflow.getUuidAsString());
 
+        // The permission expression is written exclusively via updatePermissionExpression(...). A model-derived update
+        // carries no expression, so only overwrite here when a non-null value is supplied to avoid nulling out a
+        // previously stored expression (mirrors IntegrationServiceImpl.update).
+        if (integrationWorkflow.getPermissionExpression() != null) {
+            curIntegrationWorkflow.setPermissionExpression(integrationWorkflow.getPermissionExpression());
+        }
+
         return integrationWorkflowRepository.save(curIntegrationWorkflow);
+    }
+
+    @Override
+    public IntegrationWorkflow updatePermissionExpression(long id, String permissionExpression) {
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("IntegrationWorkflow not found for id: " + id));
+
+        integrationWorkflow.setPermissionExpression(permissionExpression);
+
+        return integrationWorkflowRepository.save(integrationWorkflow);
     }
 }

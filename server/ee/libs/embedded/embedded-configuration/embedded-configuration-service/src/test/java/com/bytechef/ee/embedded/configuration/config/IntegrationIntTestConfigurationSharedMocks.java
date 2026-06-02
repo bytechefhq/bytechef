@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.embedded.configuration.config;
 
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
@@ -25,7 +26,14 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -40,6 +48,9 @@ import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
+import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -59,15 +70,21 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    ApiKeyFacade.class, ApiKeyService.class, ComponentDefinitionService.class, ConnectionDefinitionService.class,
-    ConnectionFacade.class, ConnectionService.class, ConnectedUserService.class, EnvironmentService.class,
-    PrincipalJobFacade.class, PrincipalJobService.class, JobFacade.class, JobService.class, OAuth2Service.class,
+    ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, ClusterElementDefinitionService.class,
+    ComponentDefinitionService.class,
+    ConnectionDefinitionService.class, TriggerDefinitionFacade.class,
+    ConnectionFacade.class, ConnectionService.class, ConnectedUserService.class, EmbeddedPermissionEvaluator.class,
+    EnvironmentService.class,
+    PrincipalJobFacade.class, PrincipalJobService.class, JobFacade.class, JobService.class,
+    McpComponentService.class, McpIntegrationInstanceConfigurationService.class,
+    McpIntegrationInstanceConfigurationWorkflowService.class, McpIntegrationInstanceToolService.class,
+    McpServerService.class, McpToolService.class, OAuth2Service.class,
     TriggerDefinitionService.class, TriggerExecutionService.class, TriggerLifecycleFacade.class,
     ComponentConnectionFacade.class, WorkflowFacade.class, WorkflowNodeParameterFacade.class,
     WorkflowNodeTestOutputService.class, WorkflowTestConfigurationService.class, OAuth2ParametersFacade.class,
     ProjectDeploymentFacade.class, ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class,
     ProjectFacade.class, ProjectService.class, ProjectWorkflowFacade.class, ProjectWorkflowService.class,
-    WorkflowCacheManager.class, WorkflowTestConfigurationFacade.class
+    WorkflowCacheManager.class, WorkflowService.class, WorkflowTestConfigurationFacade.class
 })
 public @interface IntegrationIntTestConfigurationSharedMocks {
 }

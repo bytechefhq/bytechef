@@ -68,6 +68,32 @@ public record IntegrationInstanceConfigurationDTO(
         return new Builder();
     }
 
+    // NOTE: the Builder does not carry connectionAuthorizationParameters/connectionConnectionParameters; build() resets
+    // them to Map.of(). A DTO produced via toBuilder().build() therefore loses those two maps. This is safe only for
+    // the embedded connected-user render path (the mapper never reads them, and OAuth2 params are computed separately
+    // from the unfiltered DTO). Do not route a config DTO through toBuilder() where those two maps are subsequently
+    // read.
+    public Builder toBuilder() {
+        return builder()
+            .connectionParameters(connectionParameters)
+            .createdBy(createdBy)
+            .createdDate(createdDate)
+            .description(description)
+            .enabled(enabled)
+            .environment(environment)
+            .id(id)
+            .lastModifiedBy(lastModifiedBy)
+            .lastModifiedDate(lastModifiedDate)
+            .integration(integration)
+            .integrationId(integrationId)
+            .integrationVersion(integrationVersion == null ? 0 : integrationVersion)
+            .integrationInstanceConfigurationWorkflows(integrationInstanceConfigurationWorkflows)
+            .name(name)
+            .tags(tags)
+            .authorizationType(authorizationType)
+            .version(version);
+    }
+
     public IntegrationInstanceConfiguration toIntegrationInstanceConfiguration() {
         IntegrationInstanceConfiguration integrationInstance = new IntegrationInstanceConfiguration();
 

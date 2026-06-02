@@ -21,6 +21,8 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Integration
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationInstanceWorkflowModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
@@ -52,12 +54,15 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
-        @Mapping(target = "mcpTools", ignore = true)
-        @Mapping(target = "mcpWorkflows", ignore = true)
+        @Mapping(target = "mcpTools", source = "mcpTools")
+        @Mapping(target = "mcpWorkflows", source = "mcpWorkflows")
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);
+
+        McpIntegrationInstanceToolModel map(ConnectedUserIntegrationDTO.McpInstanceToolInfo mcpInstanceToolInfo);
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")
         @Mapping(target = "inputs", source = "integrationInstanceWorkflow.inputs")
+        @Mapping(target = "workflowUuid", source = "integrationInstanceWorkflow.workflowUuid")
         IntegrationInstanceWorkflowModel map(
             ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
     }
@@ -73,8 +78,8 @@ public interface ConnectedUserIntegrationMapper {
         @Mapping(target = "icon", source = "integrationInstanceConfiguration.integration.icon")
         @Mapping(target = "id", source = "integrationInstanceConfiguration.integrationId")
         @Mapping(target = "integrationVersion", source = "integrationInstanceConfiguration.integrationVersion")
-        @Mapping(target = "mcpTools", ignore = true)
-        @Mapping(target = "mcpWorkflows", ignore = true)
+        @Mapping(target = "mcpTools", source = "mcpTools")
+        @Mapping(target = "mcpWorkflows", source = "mcpWorkflows")
         @Mapping(
             target = "multipleInstances", source = "integrationInstanceConfiguration.integration.multipleInstances")
         @Mapping(target = "name", source = "integrationInstanceConfiguration.integration.title")
@@ -94,19 +99,38 @@ public interface ConnectedUserIntegrationMapper {
         IntegrationWorkflowModel map(
             IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO);
 
+        McpToolModel map(ConnectedUserIntegrationDTO.McpToolInfo mcpToolInfo);
+
+        @Mapping(target = "description", source = "description")
+        @Mapping(target = "inputs", source = "inputs")
+        @Mapping(target = "label", source = "label")
+        @Mapping(target = "workflowUuid", source = "workflowUuid")
+        IntegrationWorkflowModel map(ConnectedUserIntegrationDTO.McpWorkflowInfo mcpWorkflowInfo);
+
+        McpIntegrationInstanceToolModel map(ConnectedUserIntegrationDTO.McpInstanceToolInfo mcpInstanceToolInfo);
+
         @Mapping(target = "enabled", source = "integrationInstance.enabled")
         @Mapping(target = "credentialStatus", source = "connection.credentialStatus")
         @Mapping(target = "id", source = "integrationInstance.id")
-        @Mapping(target = "mcpTools", ignore = true)
-        @Mapping(target = "mcpWorkflows", ignore = true)
+        @Mapping(target = "mcpTools", source = "mcpTools")
+        @Mapping(target = "mcpWorkflows", source = "mcpWorkflows")
         IntegrationInstanceModel map(ConnectedUserIntegrationInstance integrationInstance);
 
         @Mapping(target = "enabled", source = "integrationInstanceWorkflow.enabled")
         @Mapping(target = "inputs", source = "integrationInstanceWorkflow.inputs")
+        @Mapping(target = "workflowUuid", source = "integrationInstanceWorkflow.workflowUuid")
         IntegrationInstanceWorkflowModel map(
             ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
 
         default InputModel map(Workflow.Input input) {
+            return new InputModel()
+                .label(input.label())
+                .name(input.name())
+                .required(input.required())
+                .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
+        }
+
+        default InputModel mapWorkflowInput(ConnectedUserIntegrationDTO.WorkflowInputInfo input) {
             return new InputModel()
                 .label(input.label())
                 .name(input.name())
