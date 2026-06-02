@@ -21,108 +21,99 @@ import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIP
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.ID;
-import static com.bytechef.component.nutshell.constant.NutshellConstants.LINKS;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.NAME;
-import static com.bytechef.component.nutshell.constant.NutshellConstants.OWNER;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.VALUE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class NutshellUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final ActionContext mockedContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Object mockedObject = mock(Object.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
+    @Test
+    void testCreateEntityBasedOnType(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(NAME, "full name", DESCRIPTION, "some description", EMAIL, "test@mail.com"));
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
-
-    @Test
-    void testCreateEntityBasedOnType() {
-
-        Parameters mockedEntityParameters = MockParametersFactory.create(
-            Map.of(NAME, "full name", DESCRIPTION, "some description", EMAIL, "test@mail.com"));
-
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedObject);
 
-        Object result = NutshellUtils.createEntityBasedOnType(mockedEntityParameters, mockedContext, false);
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> contactMap = new HashMap<>();
-
-        contactMap.put(NAME, "full name");
-        contactMap.put(DESCRIPTION, "some description");
-        contactMap.put(EMAILS, List.of(Map.of(VALUE, "test@mail.com")));
-
-        assertEquals(Map.of("contacts", List.of(contactMap)), body.getContent());
+        Object result = NutshellUtils.createEntityBasedOnType(mockedParameters, mockedContext, false);
 
         assertEquals(mockedObject, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/contacts", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of(Map.of("contacts",
+                List.of(Map.of(NAME, "full name", DESCRIPTION, "some description", EMAILS,
+                    List.of(Map.of(VALUE, "test@mail.com")))))),
+            bodyArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testAddIfPresent() {
+    void testGetUserIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Map<String, Object> inputParams = Map.of(OWNER, "1-testuser");
-        Parameters mockedParams = MockParametersFactory.create(inputParams);
-
-        Map<String, Object> requestMap = new HashMap<>();
-        NutshellUtils.addIfPresent(mockedParams, OWNER, LINKS, requestMap);
-
-        assertEquals(Map.of(LINKS, inputParams), requestMap);
-    }
-
-    @Test
-    void testGetUserOptions() {
-
-        // User Response
-        Map<String, Object> users = new LinkedHashMap<>();
-        users.put(NAME, "Test User");
-        users.put(ID, "12345");
-        List<Map<String, Object>> usersList = List.of(users);
-        Map<String, Object> responseBody = Map.of("users", usersList);
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
 
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseBody);
+            .thenReturn(Map.of("users", List.of(Map.of(NAME, "Test User", ID, "12345"))));
 
-        List<Option<String>> expectedOptions = new ArrayList<>();
-        expectedOptions.add(option("Test User", "12345"));
+        assertEquals(
+            List.of(option("Test User", "12345")),
+            NutshellUtils.getUserIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/users", stringArgumentCaptor.getValue());
 
-        assertEquals(expectedOptions,
-            NutshellUtils.getUserOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
