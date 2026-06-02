@@ -17,7 +17,6 @@
 package com.bytechef.ai.mcp.tool.automation;
 
 import com.bytechef.ai.mcp.tool.automation.model.WorkflowInfo;
-import com.bytechef.ai.mcp.tool.automation.model.WorkflowValidationResult;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.ai.tool.annotation.Tool;
@@ -41,25 +40,10 @@ public class ReadProjectWorkflowTools {
     }
 
     @Tool(
-        description = "Instructions for writing custom code in Script component")
-    public String getScriptCodeInstructions() {
-        return delegate.getScriptCodeInstructions();
-    }
-
-    public String getClusterElementsInstructions() {
-        return this.delegate.getClusterElementsInstructions();
-    }
-
-    @Tool(
         description = "Get comprehensive information about a specific workflow. Returns detailed project information including id, name, description, version, definition, project workflow id, created date, last modified date.")
     public WorkflowInfo getWorkflow(
         @ToolParam(description = "The ID of the workflow to retrieve") String workflowId) {
         return delegate.getWorkflow(workflowId);
-    }
-
-    @Tool(description = "Instructions for building workflows")
-    public String getWorkflowBuildInstructions() {
-        return delegate.getWorkflowBuildInstructions();
     }
 
     @Tool(
@@ -75,12 +59,5 @@ public class ReadProjectWorkflowTools {
         @ToolParam(description = "The search query to match against workflow names and descriptions") String query,
         @ToolParam(required = false, description = "The ID of the project") Long projectId) {
         return delegate.searchWorkflows(query, projectId);
-    }
-
-    @Tool(
-        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
-    public WorkflowValidationResult validateWorkflow(
-        @ToolParam(description = "The JSON string of the workflow to validate") String workflowId) {
-        return delegate.validateWorkflow(workflowId);
     }
 }

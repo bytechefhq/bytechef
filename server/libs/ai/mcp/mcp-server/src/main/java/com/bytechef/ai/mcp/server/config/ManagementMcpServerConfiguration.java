@@ -77,8 +77,9 @@ public class ManagementMcpServerConfiguration {
     @SuppressFBWarnings("EI")
     public ManagementMcpServerConfiguration(
         ComponentTools componentTools, @Nullable FirecrawlTools firecrawlTools, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, TaskDispatcherTools taskDispatcherTools,
-        ScriptTools scriptTools, SkillsTools skillsTools, ClusterElementTools clusterElementTools) {
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        TaskDispatcherTools taskDispatcherTools, SkillsTools skillsTools,
+        ClusterElementTools clusterElementTools) {
 
         this.componentTools = componentTools;
         this.firecrawlTools = firecrawlTools;

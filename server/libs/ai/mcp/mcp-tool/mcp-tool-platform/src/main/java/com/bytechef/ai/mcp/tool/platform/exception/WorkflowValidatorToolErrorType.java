@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.mcp.tool.automation;
+package com.bytechef.ai.mcp.tool.platform.exception;
 
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Marko Kriskovic
  */
-@ExtendWith(MockitoExtension.class)
-class ProjectWorkflowToolsTest {
+public class WorkflowValidatorToolErrorType extends AbstractErrorType {
 
-    @Test
-    void instantiatesSuccessfully() {
-        new ProjectWorkflowTools(null);
+    public static final WorkflowValidatorToolErrorType VALIDATE_WORKFLOW = new WorkflowValidatorToolErrorType(100);
+
+    private WorkflowValidatorToolErrorType(int errorKey) {
+        super(WorkflowValidatorToolErrorType.class, errorKey);
     }
 }
