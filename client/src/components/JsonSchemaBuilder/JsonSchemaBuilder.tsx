@@ -9,27 +9,27 @@ interface JsonSchemaBuilderProps {
     schema?: SchemaRecordType;
 }
 
+const buildSchema = (schema?: SchemaRecordType): SchemaRecordType =>
+    isEmpty(schema)
+        ? {
+              $schema: 'https://json-schema.org/draft/2020-12/schema',
+              properties: {},
+              required: [],
+              type: 'object',
+          }
+        : {...schema};
+
 const JsonSchemaBuilder = ({onChange, schema}: JsonSchemaBuilderProps) => {
-    const [curSchema, setCurSchema] = useState<SchemaRecordType>();
+    const [curSchema, setCurSchema] = useState<SchemaRecordType>(() => buildSchema(schema));
 
     useEffect(() => {
-        setCurSchema(
-            isEmpty(schema)
-                ? {
-                      $schema: 'https://json-schema.org/draft/2020-12/schema',
-                      properties: {},
-                      required: [],
-                      type: 'object',
-                  }
-                : {...schema}
-        );
+        const nextSchema = buildSchema(schema);
 
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
-
-    if (!curSchema) {
-        return null;
-    }
+        // Re-sync only on genuine external changes (e.g. an AI copilot apply). The echo of the
+        // builder's own edit is structurally identical, so this is a no-op and never clobbers
+        // in-progress editing.
+        setCurSchema((current) => (JSON.stringify(current) === JSON.stringify(nextSchema) ? current : nextSchema));
+    }, [schema]);
 
     return (
         <SchemaCreator

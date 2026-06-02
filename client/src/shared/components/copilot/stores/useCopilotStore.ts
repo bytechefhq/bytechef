@@ -18,6 +18,7 @@ export enum Source {
     CLUSTER_ELEMENT = 'CLUSTER_ELEMENT',
     SKILLS = 'SKILLS',
     WORKFLOW_CODE_EDITOR = 'WORKFLOW_CODE_EDITOR',
+    JSON_SCHEMA_BUILDER = 'JSON_SCHEMA_BUILDER',
 }
 
 export type ContextType = {
