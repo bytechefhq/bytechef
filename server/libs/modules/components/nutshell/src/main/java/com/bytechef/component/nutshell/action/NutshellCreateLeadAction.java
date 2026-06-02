@@ -72,7 +72,7 @@ public class NutshellCreateLeadAction {
                                         string(DESCRIPTION)
                                             .description(
                                                 "Description of the lead, which appears under their name."))))))
-        .perform(NutshellCreateCompanyAction::perform);
+        .perform(NutshellCreateLeadAction::perform);
 
     private NutshellCreateLeadAction() {
     }
