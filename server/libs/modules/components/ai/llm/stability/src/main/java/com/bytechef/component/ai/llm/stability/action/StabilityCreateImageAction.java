@@ -145,19 +145,18 @@ public class StabilityCreateImageAction {
         return IMAGE_MODEL.getResponse(inputParameters, connectionParameters);
     }
 
-    public static final ImageModel IMAGE_MODEL =
-        (inputParameters, connectionParameters) -> new StabilityAiImageModel(
-            new StabilityAiApi(connectionParameters.getString(TOKEN), inputParameters.getRequiredString(MODEL)),
-            StabilityAiImageOptions.builder()
-                .cfgScale(inputParameters.getFloat(CFG_SCALE))
-                .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
-                .height(inputParameters.getInteger(HEIGHT))
-                .N(inputParameters.getInteger(N))
-                .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
-                .sampler(inputParameters.getString(SAMPLER))
-                .seed(inputParameters.getLong(SEED))
-                .steps(inputParameters.getInteger(STEPS))
-                .stylePreset(StyleEnum.valueOf(inputParameters.getString(STYLE)))
-                .width(inputParameters.getInteger(WIDTH))
-                .build());
+    public static final ImageModel IMAGE_MODEL = (inputParameters, connectionParameters) -> new StabilityAiImageModel(
+        new StabilityAiApi(connectionParameters.getString(TOKEN), inputParameters.getRequiredString(MODEL)),
+        StabilityAiImageOptions.builder()
+            .cfgScale(inputParameters.getFloat(CFG_SCALE))
+            .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
+            .height(inputParameters.getInteger(HEIGHT))
+            .N(inputParameters.getInteger(N))
+            .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
+            .sampler(inputParameters.getString(SAMPLER))
+            .seed(inputParameters.getLong(SEED))
+            .steps(inputParameters.getInteger(STEPS))
+            .stylePreset(StyleEnum.valueOf(inputParameters.getString(STYLE)))
+            .width(inputParameters.getInteger(WIDTH))
+            .build());
 }
