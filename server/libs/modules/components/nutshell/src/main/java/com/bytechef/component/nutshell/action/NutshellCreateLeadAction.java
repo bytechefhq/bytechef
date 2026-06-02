@@ -45,6 +45,7 @@ public class NutshellCreateLeadAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createLead")
         .title("Create Lead")
         .description("Creates a new lead.")
+        .help("", "https://docs.bytechef.io/reference/components/nutshell_v1#create-lead")
         .properties(
             string(DESCRIPTION)
                 .label("Name|Description")
