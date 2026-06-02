@@ -128,6 +128,9 @@ public class AutomationWorkflowProjectFacadeIntTest {
     private AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
 
     @Autowired
+    private ConnectedUserProjectFacade connectedUserProjectFacade;
+
+    @Autowired
     private TagService tagService;
 
     @BeforeEach
@@ -154,7 +157,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
             .map(ConnectedUserWorkflowTemplateDTO::workflowUuid)
             .orElseThrow();
 
-        String newWorkflowUuid = automationWorkflowProjectFacade.copyWorkflowTemplate(
+        String newWorkflowUuid = connectedUserProjectFacade.copyWorkflowTemplate(
             TEST_EXTERNAL_USER_ID, publishedWorkflowUuid, Environment.PRODUCTION);
 
         assertThat(newWorkflowUuid).isNotBlank()
@@ -163,7 +166,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
 
     @Test
     void testCopyWorkflowTemplateUnknownIdThrows() {
-        assertThatThrownBy(() -> automationWorkflowProjectFacade
+        assertThatThrownBy(() -> connectedUserProjectFacade
             .copyWorkflowTemplate(TEST_EXTERNAL_USER_ID, "nope", Environment.PRODUCTION))
                 .isInstanceOf(IllegalArgumentException.class);
     }
@@ -179,7 +182,7 @@ public class AutomationWorkflowProjectFacadeIntTest {
             .workflowUuid();
 
         assertThatThrownBy(
-            () -> automationWorkflowProjectFacade
+            () -> connectedUserProjectFacade
                 .copyWorkflowTemplate(TEST_EXTERNAL_USER_ID, draftWorkflowUuid, Environment.PRODUCTION))
                     .isInstanceOf(IllegalArgumentException.class);
     }

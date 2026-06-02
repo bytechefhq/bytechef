@@ -12,15 +12,11 @@ import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFa
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.GenerateFrontendProjectWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -55,60 +51,6 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
 
     @CrossOrigin
     @Override
-    public ResponseEntity<String> copyFrontendWorkflowTemplate(String workflowUuid, EnvironmentModel xEnvironment) {
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(
-                () -> new IllegalArgumentException("User not found"));
-
-        try {
-            return ResponseEntity.ok(
-                automationWorkflowProjectFacade.copyWorkflowTemplate(externalUserId, workflowUuid,
-                    getEnvironment(xEnvironment)));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .build();
-        }
-    }
-
-    @Override
-    public ResponseEntity<String> copyWorkflowTemplate(
-        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
-
-        try {
-            return ResponseEntity.ok(
-                automationWorkflowProjectFacade.copyWorkflowTemplate(
-                    externalUserId, workflowUuid, getEnvironment(xEnvironment)));
-        } catch (IllegalArgumentException illegalArgumentException) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                .build();
-        }
-    }
-
-    @CrossOrigin
-    @Override
-    public ResponseEntity<String> generateFrontendProjectWorkflow(
-        GenerateFrontendProjectWorkflowRequestModel requestModel, EnvironmentModel xEnvironment) {
-
-        String externalUserId = SecurityUtils.fetchCurrentUserLogin()
-            .orElseThrow(() -> new IllegalArgumentException("User not found"));
-
-        return ResponseEntity.ok(
-            automationWorkflowProjectFacade.generateProjectWorkflow(
-                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment)));
-    }
-
-    @Override
-    public ResponseEntity<String> generateProjectWorkflow(
-        String externalUserId, GenerateFrontendProjectWorkflowRequestModel requestModel,
-        EnvironmentModel xEnvironment) {
-
-        return ResponseEntity.ok(
-            automationWorkflowProjectFacade.generateProjectWorkflow(
-                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment)));
-    }
-
-    @CrossOrigin
-    @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getFrontendProjects(EnvironmentModel xEnvironment) {
         return ResponseEntity.ok(toAutomationWorkflowProjectModels());
     }
@@ -123,10 +65,6 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
-    }
-
-    private Environment getEnvironment(EnvironmentModel xEnvironment) {
-        return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
     }
 
     private List<AutomationWorkflowProjectModel> toAutomationWorkflowProjectModels() {

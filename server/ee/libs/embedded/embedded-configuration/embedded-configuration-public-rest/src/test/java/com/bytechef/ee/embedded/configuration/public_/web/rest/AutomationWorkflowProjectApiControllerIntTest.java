@@ -8,7 +8,6 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
@@ -166,50 +165,6 @@ public class AutomationWorkflowProjectApiControllerIntTest {
                 .isArray()
                 .jsonPath("$[0].workflowTemplates.length()")
                 .isEqualTo(0);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    @WithMockUser(username = "user@example.com")
-    public void testCopyFrontendWorkflowTemplateReturnsWorkflowUuid() {
-        String newWorkflowUuid = "new-workflow-uuid-999";
-
-        when(automationWorkflowProjectFacade.copyWorkflowTemplate(
-            eq("user@example.com"), eq(WORKFLOW_UUID), any(Environment.class)))
-                .thenReturn(newWorkflowUuid);
-
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", WORKFLOW_UUID)
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isOk()
-                .expectBody(String.class)
-                .isEqualTo(newWorkflowUuid);
-        } catch (Exception exception) {
-            Assertions.fail(exception);
-        }
-    }
-
-    @Test
-    @WithMockUser(username = "user@example.com")
-    public void testCopyFrontendWorkflowTemplateUnknownIdReturns404() {
-        when(automationWorkflowProjectFacade.copyWorkflowTemplate(
-            eq("user@example.com"), eq("unknown-id"), any(Environment.class)))
-                .thenThrow(new IllegalArgumentException("Workflow template not found: unknown-id"));
-
-        try {
-            webTestClient
-                .post()
-                .uri("/v1/automation/workflow-templates/{workflowUuid}/copy", "unknown-id")
-                .accept(MediaType.APPLICATION_JSON)
-                .exchange()
-                .expectStatus()
-                .isNotFound();
         } catch (Exception exception) {
             Assertions.fail(exception);
         }

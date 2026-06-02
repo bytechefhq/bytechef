@@ -11,7 +11,6 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
-import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
 /**
@@ -20,10 +19,6 @@ import java.util.List;
  * @author Ivica Cardic
  */
 public interface AutomationWorkflowProjectFacade {
-
-    String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment);
-
-    String generateProjectWorkflow(String externalUserId, String prompt, Environment environment);
 
     long createProject(String name, String description, String category, List<String> tags);
 
