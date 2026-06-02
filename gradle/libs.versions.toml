@@ -1,5 +1,6 @@
 [versions]
 anthropic-java = "2.35.0"
+bootui = "0.3.0"
 checkstyle = "13.4.0"
 com-google-auto-service = "1.1.1"
 findsecbugs = "1.14.0"
@@ -30,6 +31,7 @@ com-github-mizosoft-methanol = "com.github.mizosoft.methanol:methanol:1.9.0"
 com-github-spotbugs-spotbugs-annotations = { module = "com.github.spotbugs:spotbugs-annotations", version.ref = "spotbugs" }
 com-google-auto-service-auto-service = { module = "com.google.auto.service:auto-service", version.ref = "com-google-auto-service" }
 com-google-auto-service-auto-service-annotations = { module = "com.google.auto.service:auto-service-annotations", version.ref = "com-google-auto-service" }
+com-julien-dubois-bootui-bootui-spring-boot-starter = { module = "com.julien-dubois.bootui:bootui-spring-boot-starter", version.ref = "bootui" }
 com-googlecode-owasp-java-html-sanitizer = "com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1"
 com-oracle-database-jdbc-ojdbc11 = "com.oracle.database.jdbc:ojdbc11:23.26.1.0.0"
 com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
