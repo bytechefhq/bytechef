@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.platform.component.domain.Option;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +21,10 @@ public interface ConnectedUserIntegrationInstanceFacade {
     void disableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
 
     void enableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
+
+    List<Option> getIntegrationInstanceWorkflowInputOptions(
+        String externalUserId, long id, String workflowUuid, String inputName, String propertyName,
+        Map<String, Object> lookupDependsOnValues, String searchText);
 
     void updateIntegrationInstanceWorkflow(
         String externalUserId, long id, String workflowUuid, Map<String, Object> inputs);

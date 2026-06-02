@@ -9,22 +9,18 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
-import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationWorkflowModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
@@ -64,22 +60,7 @@ public class IntegrationApiController implements IntegrationApi {
         String externalId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-        ConnectedUserIntegrationDTO connectedUserIntegrationDTO;
-
-        try {
-            connectedUserIntegrationDTO = connectedUserIntegrationFacade.getConnectedUserIntegration(
-                externalId, id, true, getEnvironment(xEnvironment));
-        } catch (EmbeddedIntegrationNotVisibleException exception) {
-            return ResponseEntity.notFound()
-                .build();
-        }
-
-        IntegrationModel integrationModel = conversionService.convert(
-            connectedUserIntegrationDTO, IntegrationModel.class);
-
-        filterDisabledWorkflows(connectedUserIntegrationDTO, integrationModel);
-
-        return ResponseEntity.ok(integrationModel);
+        return getIntegration(externalId, id, xEnvironment);
     }
 
     @CrossOrigin
@@ -88,12 +69,7 @@ public class IntegrationApiController implements IntegrationApi {
         String externalId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
-        return ResponseEntity.ok(
-            connectedUserIntegrationFacade
-                .getConnectedUserIntegrations(externalId, true, getEnvironment(xEnvironment))
-                .stream()
-                .map(integrationDTO -> conversionService.convert(integrationDTO, IntegrationBasicModel.class))
-                .toList());
+        return getIntegrations(externalId, xEnvironment);
     }
 
     @Override
@@ -110,12 +86,7 @@ public class IntegrationApiController implements IntegrationApi {
                 .build();
         }
 
-        IntegrationModel integrationModel = conversionService.convert(
-            connectedUserIntegrationDTO, IntegrationModel.class);
-
-        filterDisabledWorkflows(connectedUserIntegrationDTO, integrationModel);
-
-        return ResponseEntity.ok(integrationModel);
+        return ResponseEntity.ok(conversionService.convert(connectedUserIntegrationDTO, IntegrationModel.class));
     }
 
     @Override
@@ -126,50 +97,14 @@ public class IntegrationApiController implements IntegrationApi {
             connectedUserIntegrationFacade
                 .getConnectedUserIntegrations(externalUserId, true, getEnvironment(xEnvironment))
                 .stream()
-                .map(integrationInstanceConfigurationDTO -> conversionService.convert(
-                    integrationInstanceConfigurationDTO, IntegrationBasicModel.class))
+                .map(connectedUserIntegrationDTO -> conversionService.convert(
+                    connectedUserIntegrationDTO, IntegrationBasicModel.class))
                 .toList());
     }
 
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
-    }
-
-    private void filterDisabledWorkflows(
-        ConnectedUserIntegrationDTO connectedUserIntegrationDTO, IntegrationModel integrationModel) {
-
-        if (integrationModel == null || integrationModel.getWorkflows() == null) {
-            return;
-        }
-
-        if (connectedUserIntegrationDTO.integrationInstanceConfiguration() == null ||
-            connectedUserIntegrationDTO.integrationInstanceConfiguration()
-                .integrationInstanceConfigurationWorkflows() == null) {
-
-            return;
-        }
-
-        Set<String> mcpWorkflowUuids = integrationModel.getMcpWorkflows() == null
-            ? Set.of()
-            : integrationModel.getMcpWorkflows()
-                .stream()
-                .map(IntegrationWorkflowModel::getWorkflowUuid)
-                .collect(Collectors.toSet());
-
-        Set<String> enabledWorkflowUuids = connectedUserIntegrationDTO.integrationInstanceConfiguration()
-            .integrationInstanceConfigurationWorkflows()
-            .stream()
-            .filter(IntegrationInstanceConfigurationWorkflowDTO::enabled)
-            .map(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
-            .filter(workflowUuid -> !mcpWorkflowUuids.contains(workflowUuid))
-            .collect(Collectors.toSet());
-
-        integrationModel.setWorkflows(
-            integrationModel.getWorkflows()
-                .stream()
-                .filter(workflowModel -> enabledWorkflowUuids.contains(workflowModel.getWorkflowUuid()))
-                .toList());
     }
 
     private Environment getEnvironment(EnvironmentModel xEnvironment) {

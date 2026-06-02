@@ -106,4 +106,9 @@ public class RemoteIntegrationWorkflowServiceClient implements IntegrationWorkfl
     public IntegrationWorkflow update(IntegrationWorkflow projectWorkflow) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public IntegrationWorkflow updatePermissionExpression(long id, String permissionExpression) {
+        throw new UnsupportedOperationException();
+    }
 }
