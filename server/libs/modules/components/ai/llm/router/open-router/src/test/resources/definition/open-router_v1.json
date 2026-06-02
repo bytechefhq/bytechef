@@ -3002,7 +3002,10 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/oper-router_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
