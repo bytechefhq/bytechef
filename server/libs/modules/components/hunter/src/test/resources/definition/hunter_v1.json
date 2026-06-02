@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all the information associated with an email address and its domain name.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hunter_v1#combined-enrichment"
+    },
     "metadata": {
       "method": "GET",
       "path": "/combined/find"
@@ -1353,7 +1356,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all the information associated with a domain name, such as the industry, the description, or headquarters' location.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hunter_v1#company-enrichment"
+    },
     "metadata": {
       "method": "GET",
       "path": "/companies/find"
@@ -2058,7 +2064,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new lead.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hunter_v1#create-lead"
+    },
     "metadata": {
       "path": "/leads",
       "mimeType": "application/json",
@@ -2733,7 +2742,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns all the information associated with an email address, such as a person's name, location and social handles.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hunter_v1#email-enrichment"
+    },
     "metadata": {
       "method": "GET",
       "path": "/people/find"
@@ -3671,14 +3683,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/hunter_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "Hunter API Documentation v2",
+    "learnMoreUrl": "https://hunter.io/api-documentation/v2"
+  },
   "description": "Hunter is a tool that helps users find and verify professional email addresses, enabling effective outreach and communication.",
   "icon": "path:assets/hunter.svg",
   "metadata": null,
