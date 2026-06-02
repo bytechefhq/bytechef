@@ -203,3 +203,55 @@ This project is licenced under **Apache 2.0** for the core (everything outside `
 ## Credits
 
 ByteChef started as a fork of [Piper](https://github.com/runabol/piper).
+
+## FAQ
+
+### What is ByteChef?
+
+ByteChef is an open-source platform that unifies AI agent orchestration and automation workflows. It provides a unified interface for integrating multiple AI services and automating complex business processes.
+
+### Key Features
+
+| Feature | Description |
+|---------|-------------|
+| **AI Agent Orchestration** | Coordinate multiple AI agents for complex tasks |
+| **Workflow Automation** | Automate repetitive tasks with AI-powered decision making |
+| **Multi-Platform Integration** | Connect with popular AI services and platforms |
+| **Extensible Architecture** | Add custom tools and integrations easily |
+| **Low-Code Interface** | Build workflows visually without extensive coding |
+
+### How to get started?
+
+1. Check the [Installation Guide](#installation) in the README
+2. Follow the [Quick Start](#quick-start) instructions
+3. Explore the [Examples](#examples) section for common use cases
+4. Join the [Community](#community) for support and discussions
+
+### What integrations are available?
+
+ByteChef integrates with:
+- **AI Services** - OpenAI, Anthropic, AWS Bedrock, and more
+- **Data Sources** - PostgreSQL, MySQL, MongoDB, REST APIs
+- **Business Tools** - Slack, Email, CRM systems
+- **Cloud Platforms** - AWS, GCP, Azure
+
+### Is this project free and open source?
+
+Yes! ByteChef is licensed under an open-source license. You can use it freely for personal and commercial projects. Check the [License](#license) section for details.
+
+### How can I contribute?
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes with clear commit messages
+4. Submit a pull request following the project's contribution guidelines
+
+### Where can I get help?
+
+- **Documentation** - Check the README and docs folder
+- **GitHub Issues** - Report bugs or request features
+- **Community Chat** - Join discussions with other users and developers
+
+---
+
+**Made with ❤️ by the ByteChef community**
