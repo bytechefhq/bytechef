@@ -36,8 +36,8 @@ public class NutshellComponentHandler implements ComponentHandler {
     private static final ComponentDefinition COMPONENT_DEFINITION = component("nutshell")
         .title("Nutshell")
         .description(
-            "Nutshell CRM is a user-friendly customer relationship management software designed to help " +
-                "small businesses manage sales, track leads, and streamline communication.")
+            "Nutshell CRM is a user-friendly customer relationship management software designed to help small " +
+                "businesses manage sales, track leads, and streamline communication.")
         .customAction(true)
         .icon("path:assets/nutshell.svg")
         .categories(ComponentCategory.CRM)

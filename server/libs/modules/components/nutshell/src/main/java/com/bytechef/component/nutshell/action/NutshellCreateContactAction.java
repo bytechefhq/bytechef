@@ -45,7 +45,7 @@ public class NutshellCreateContactAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
-        .description("Creates new contact")
+        .description("Creates a new contact, also known as a person, in Nutshell.")
         .properties(
             string(NAME)
                 .label("Name")
@@ -61,21 +61,20 @@ public class NutshellCreateContactAction {
                 .required(false),
             string(PHONE)
                 .label("Phone")
-                .description("Primary phone number of the contact")
+                .description("Primary phone number of the contact.")
                 .controlType(ControlType.PHONE)
                 .required(false))
         .output(
             outputSchema(
                 object()
                     .properties(
+                        object("links"),
                         array("contacts")
                             .items(
                                 object()
                                     .properties(
                                         string(ID)
                                             .description("ID of the contact."),
-                                        string("type")
-                                            .description("The type of this entity, e.g. 'contacts', 'leads'."),
                                         string(NAME)
                                             .description("Full name of the contact."),
                                         string(DESCRIPTION)

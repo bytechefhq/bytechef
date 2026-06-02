@@ -17,7 +17,6 @@
 package com.bytechef.component.nutshell.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.DESCRIPTION;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAIL;
 import static com.bytechef.component.nutshell.constant.NutshellConstants.EMAILS;
@@ -62,33 +61,23 @@ public class NutshellUtils {
         map.put(NAME, inputParameters.getRequiredString(NAME));
         map.put(DESCRIPTION, inputParameters.getString(DESCRIPTION, ""));
 
-        addToListIfPresent(inputParameters, EMAIL, EMAILS, map);
-        addToListIfPresent(inputParameters, PHONE, PHONES, map);
+        addToListIfPresent(inputParameters.getString(EMAIL), EMAILS, map);
+        addToListIfPresent(inputParameters.getString(PHONE), PHONES, map);
 
         return map;
     }
 
     private static void addToListIfPresent(
-        Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
-
-        String value = inputParameters.getString(key);
+        String value, String mapKey, Map<String, Object> map) {
 
         if (value != null) {
             map.put(mapKey, List.of(Map.of(VALUE, value)));
         }
     }
 
-    public static void addIfPresent(Parameters inputParameters, String key, String mapKey, Map<String, Object> map) {
-        String value = inputParameters.getString(key);
-
-        if (value != null) {
-            map.put(mapKey, Map.of(key, value));
-        }
-    }
-
-    public static List<Option<String>> getUserOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringMap, String s,
-        Context context) {
+    public static List<Option<String>> getUserIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, ?> body = context.http(http -> http.get("/users"))
             .configuration(Http.responseType(Http.ResponseType.JSON))
