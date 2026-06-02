@@ -30,7 +30,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
  * @version ee
  */
 @ExtendWith(MockitoExtension.class)
-class AutomationWorkflowProjectFacadeTest {
+class ConnectedUserProjectFacadeTest {
 
     @Mock
     private ComponentDefinitionService componentDefinitionService;
@@ -41,13 +41,14 @@ class AutomationWorkflowProjectFacadeTest {
     @Mock
     private IntegrationService integrationService;
 
-    private AutomationWorkflowProjectFacadeImpl facade;
+    private ConnectedUserProjectFacadeImpl facade;
 
     @BeforeEach
     void setUp() {
-        facade = new AutomationWorkflowProjectFacadeImpl(
-            null, componentDefinitionService, null, null, null, null, null, null, null, null, null,
-            integrationInstanceConfigurationService, integrationService);
+        facade = new ConnectedUserProjectFacadeImpl(
+            null, componentDefinitionService, null, null, null, null, null, null,
+            integrationInstanceConfigurationService, integrationService, null, null, null, null, null, null, null,
+            null, null, null, null, null, null);
     }
 
     @Test

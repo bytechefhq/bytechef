@@ -17,24 +17,17 @@ import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
-import com.bytechef.ee.embedded.configuration.domain.Integration;
-import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
-import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
-import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
-import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.WorkflowNodeTestOutputService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
@@ -43,7 +36,6 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,7 +45,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
-import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -82,8 +73,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
     private final CategoryService categoryService;
     private final ComponentDefinitionService componentDefinitionService;
-    private final ConnectedUserProjectFacade connectedUserProjectFacade;
-    private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
     private final ProjectService projectService;
     private final ProjectWorkflowFacade projectWorkflowFacade;
     private final ProjectWorkflowService projectWorkflowService;
@@ -91,24 +80,17 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
-    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
-    private final IntegrationService integrationService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
         CategoryService categoryService, ComponentDefinitionService componentDefinitionService,
-        ConnectedUserProjectFacade connectedUserProjectFacade,
-        @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, ProjectService projectService,
-        ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
-        TagService tagService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
-        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
-        IntegrationService integrationService) {
+        ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
+        ProjectWorkflowService projectWorkflowService, TagService tagService,
+        WorkflowNodeTestOutputService workflowNodeTestOutputService, WorkflowService workflowService,
+        WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
-        this.connectedUserProjectFacade = connectedUserProjectFacade;
-        this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.projectService = projectService;
         this.projectWorkflowFacade = projectWorkflowFacade;
         this.projectWorkflowService = projectWorkflowService;
@@ -116,49 +98,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
-        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
-        this.integrationService = integrationService;
-    }
-
-    @Override
-    public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
-        boolean isPublishedCatalogWorkflowTemplate = getPublishedProjects()
-            .stream()
-            .flatMap(project -> CollectionUtils.stream(project.workflowTemplates()))
-            .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid));
-
-        if (!isPublishedCatalogWorkflowTemplate) {
-            throw new IllegalArgumentException(
-                "Not a published catalog workflow template: " + workflowUuid);
-        }
-
-        String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
-
-        Workflow workflow = workflowService.getWorkflow(publishedWorkflowId);
-
-        return connectedUserProjectFacade.createProjectWorkflow(externalUserId, workflow.getDefinition(), environment);
-    }
-
-    @Override
-    public String generateProjectWorkflow(String externalUserId, String prompt, Environment environment) {
-        if (StringUtils.isBlank(prompt)) {
-            throw new IllegalArgumentException("Prompt must not be blank");
-        }
-
-        if (copilotWorkflowGenerator == null) {
-            throw new IllegalStateException(
-                "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
-        }
-
-        String workflowUuid = connectedUserProjectFacade.createProjectWorkflow(
-            externalUserId, DEFAULT_DEFINITION, environment);
-        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
-
-        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
-
-        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, allowedComponentNames);
-
-        return workflowUuid;
     }
 
     @Override
@@ -444,31 +383,6 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
 
         return project;
-    }
-
-    Set<String> resolveAllowedComponentNames(Environment environment) {
-        List<IntegrationInstanceConfiguration> enabledConfigurations =
-            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
-
-        List<Long> integrationIds = enabledConfigurations.stream()
-            .map(IntegrationInstanceConfiguration::getIntegrationId)
-            .filter(Objects::nonNull)
-            .distinct()
-            .toList();
-
-        Set<String> allowedComponentNames = integrationService.getIntegrations(integrationIds)
-            .stream()
-            .map(Integration::getComponentName)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toCollection(HashSet::new));
-
-        componentDefinitionService.getComponentDefinitions()
-            .stream()
-            .filter(componentDefinition -> !componentDefinition.isConnectionRequired())
-            .map(ComponentDefinition::getName)
-            .forEach(allowedComponentNames::add);
-
-        return allowedComponentNames;
     }
 
     private Long resolveCategory(String categoryName) {

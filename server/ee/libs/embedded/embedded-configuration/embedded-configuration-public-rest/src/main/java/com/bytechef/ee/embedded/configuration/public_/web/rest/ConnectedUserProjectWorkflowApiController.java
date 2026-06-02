@@ -12,6 +12,7 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.PublishFrontendProjectWorkflowRequestModel;
@@ -24,6 +25,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
 import org.springframework.core.convert.ConversionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -296,6 +298,77 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.noContent()
             .build();
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<String> copyFrontendWorkflowTemplate(String workflowUuid, EnvironmentModel xEnvironment) {
+        try {
+            return ResponseEntity.ok(
+                connectedUserProjectFacade.copyWorkflowTemplate(
+                    OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
+                    getEnvironment(xEnvironment)));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<String> copyWorkflowTemplate(
+        String externalUserId, String workflowUuid, EnvironmentModel xEnvironment) {
+
+        try {
+            return ResponseEntity.ok(
+                connectedUserProjectFacade.copyWorkflowTemplate(
+                    externalUserId, workflowUuid, getEnvironment(xEnvironment)));
+        } catch (IllegalArgumentException illegalArgumentException) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .build();
+        }
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<String> createFrontendProjectWorkflowFromPrompt(
+        CreateFrontendProjectWorkflowFromPromptRequestModel requestModel, EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.createProjectWorkflow(
+                OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), requestModel.getPrompt(),
+                getEnvironment(xEnvironment), true));
+    }
+
+    @Override
+    public ResponseEntity<String> createProjectWorkflowFromPrompt(
+        String externalUserId, CreateFrontendProjectWorkflowFromPromptRequestModel requestModel,
+        EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.createProjectWorkflow(
+                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+    }
+
+    @Override
+    @CrossOrigin
+    public ResponseEntity<String> updateFrontendProjectWorkflowFromPrompt(
+        String workflowUuid, CreateFrontendProjectWorkflowFromPromptRequestModel requestModel,
+        EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.updateProjectWorkflow(
+                OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), workflowUuid,
+                requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+    }
+
+    @Override
+    public ResponseEntity<String> updateProjectWorkflowFromPrompt(
+        String externalUserId, String workflowUuid, CreateFrontendProjectWorkflowFromPromptRequestModel requestModel,
+        EnvironmentModel xEnvironment) {
+
+        return ResponseEntity.ok(
+            connectedUserProjectFacade.updateProjectWorkflow(
+                externalUserId, workflowUuid, requestModel.getPrompt(), getEnvironment(xEnvironment), true));
     }
 
     @InitBinder

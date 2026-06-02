@@ -19,8 +19,13 @@ import java.util.List;
  */
 public interface ConnectedUserProjectFacade {
 
+    String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment);
+
     String createProjectWorkflow(
         String externalUserId, String definition, Environment environment);
+
+    String createProjectWorkflow(
+        String externalUserId, String prompt, Environment environment, boolean generate);
 
     void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment);
 
@@ -46,6 +51,9 @@ public interface ConnectedUserProjectFacade {
 
     void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment);
+
+    String updateProjectWorkflow(
+        String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate);
 
     void updateWorkflowConfigurationConnection(
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,

@@ -24,20 +24,28 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTestConfiguration;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
@@ -57,7 +65,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -82,11 +93,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         }
         """;
 
+    private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectService connectUserProjectService;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
+    private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
     private final EnvironmentService environmentService;
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationService integrationService;
     private final JobService jobService;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -103,10 +119,14 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectFacadeImpl(
+        AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
+        ComponentDefinitionService componentDefinitionService,
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
-        EnvironmentService environmentService, JobService jobService, PrincipalJobService principalJobService,
+        @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationService integrationService, JobService jobService, PrincipalJobService principalJobService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectDeploymentService projectDeploymentService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectFacade projectFacade,
         ProjectService projectService, ProjectWorkflowFacade projectWorkflowFacade,
@@ -114,11 +134,16 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         WorkflowTestConfigurationFacade workflowTestConfigurationFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
+        this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
+        this.componentDefinitionService = componentDefinitionService;
         this.connectUserProjectService = connectUserProjectService;
         this.connectedUserService = connectedUserService;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.connectionService = connectionService;
+        this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.environmentService = environmentService;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationService = integrationService;
         this.jobService = jobService;
         this.principalJobService = principalJobService;
         this.projectDeploymentFacade = projectDeploymentFacade;
@@ -154,6 +179,52 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
 
         return projectWorkflow.getUuidAsString();
+    }
+
+    @Override
+    public String copyWorkflowTemplate(String externalUserId, String workflowUuid, Environment environment) {
+        boolean isPublishedCatalogWorkflowTemplate = automationWorkflowProjectFacade.getPublishedProjects()
+            .stream()
+            .flatMap(project -> CollectionUtils.stream(project.workflowTemplates()))
+            .anyMatch(workflowTemplate -> Objects.equals(workflowTemplate.workflowUuid(), workflowUuid));
+
+        if (!isPublishedCatalogWorkflowTemplate) {
+            throw new IllegalArgumentException(
+                "Not a published catalog workflow template: " + workflowUuid);
+        }
+
+        String publishedWorkflowId = projectWorkflowService.getLastPublishedWorkflowId(workflowUuid);
+
+        Workflow workflow = workflowService.getWorkflow(publishedWorkflowId);
+
+        return createProjectWorkflow(externalUserId, workflow.getDefinition(), environment);
+    }
+
+    @Override
+    public String createProjectWorkflow(
+        String externalUserId, String prompt, Environment environment, boolean generate) {
+
+        if (!generate) {
+            return createProjectWorkflow(externalUserId, prompt, environment);
+        }
+
+        if (StringUtils.isBlank(prompt)) {
+            throw new IllegalArgumentException("Prompt must not be blank");
+        }
+
+        if (copilotWorkflowGenerator == null) {
+            throw new IllegalStateException(
+                "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
+        }
+
+        String workflowUuid = createProjectWorkflow(externalUserId, DEFAULT_DEFINITION, environment);
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
+
+        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, allowedComponentNames);
+
+        return workflowUuid;
     }
 
     @Override
@@ -408,6 +479,37 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    public String updateProjectWorkflow(
+        String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate) {
+
+        if (!generate) {
+            updateProjectWorkflow(externalUserId, workflowUuid, prompt, environment);
+
+            return workflowUuid;
+        }
+
+        if (StringUtils.isBlank(prompt)) {
+            throw new IllegalArgumentException("Prompt must not be blank");
+        }
+
+        if (copilotWorkflowGenerator == null) {
+            throw new IllegalStateException(
+                "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
+        }
+
+        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
+            connectedUserProject.getProjectId(), workflowUuid);
+
+        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
+
+        copilotWorkflowGenerator.generateWorkflow(projectWorkflow.getWorkflowId(), prompt, allowedComponentNames);
+
+        return workflowUuid;
+    }
+
+    @Override
     public void updateWorkflowConfigurationConnection(
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
@@ -544,5 +646,30 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         return projectDeploymentWorkflowService.isProjectDeploymentWorkflowEnabled(
             projectDeploymentId, projectWorkflow.getWorkflowId());
+    }
+
+    Set<String> resolveAllowedComponentNames(Environment environment) {
+        List<IntegrationInstanceConfiguration> enabledConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
+
+        List<Long> integrationIds = enabledConfigurations.stream()
+            .map(IntegrationInstanceConfiguration::getIntegrationId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
+
+        Set<String> allowedComponentNames = integrationService.getIntegrations(integrationIds)
+            .stream()
+            .map(Integration::getComponentName)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toCollection(HashSet::new));
+
+        componentDefinitionService.getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> !componentDefinition.isConnectionRequired())
+            .map(ComponentDefinition::getName)
+            .forEach(allowedComponentNames::add);
+
+        return allowedComponentNames;
     }
 }
