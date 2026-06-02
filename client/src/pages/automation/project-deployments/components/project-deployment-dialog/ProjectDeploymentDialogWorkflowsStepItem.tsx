@@ -62,6 +62,10 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
         name: `projectDeploymentWorkflows.${workflowIndex}.connections`,
     });
 
+    const configuredConnectionIds = componentConnections.map(
+        (_componentConnection, connectionIndex) => watchedConnections?.[connectionIndex]?.connectionId
+    );
+
     const workflowEnabled = workflowEnabledMap.get(workflow.id!);
 
     return (
@@ -153,12 +157,15 @@ const ProjectDeploymentDialogWorkflowsStepItem = ({
 
                     <TabsContent className="mt-0" tabIndex={-1} value="inputs">
                         <InputConfigurationList
+                            componentConnections={componentConnections}
+                            configuredConnectionIds={configuredConnectionIds}
                             control={control as unknown as Control<FieldValues>}
                             controlPath={`projectDeploymentWorkflows.${workflowIndex}.inputs`}
                             duplicateSubflowStubs={duplicateSubflowInputStubs}
                             formState={formState as unknown as FormState<FieldValues>}
                             inputs={workflowInputs}
                             subflowLabelMap={subflowLabelMap}
+                            workflowId={workflow.id}
                         />
                     </TabsContent>
                 </Tabs>

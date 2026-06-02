@@ -9,11 +9,13 @@ import WorkflowInputsTable from './WorkflowInputsTable';
 import useWorkflowInputs from './hooks/useWorkflowInputs';
 
 interface WorkflowInputsSheetContentProps {
+    internalOnlyVisible: boolean;
     invalidateWorkflowQueries: () => void;
     workflowTestConfiguration?: WorkflowTestConfiguration;
 }
 
 const WorkflowInputsSheetContent = ({
+    internalOnlyVisible,
     invalidateWorkflowQueries,
     workflowTestConfiguration,
 }: WorkflowInputsSheetContentProps) => {
@@ -52,10 +54,12 @@ const WorkflowInputsSheetContent = ({
                         closeDialog={() => closeEditDialog()}
                         currentInputIndex={currentInputIndex}
                         form={form}
+                        internalOnlyVisible={internalOnlyVisible}
                         isEditDialogOpen={isEditDialogOpen}
                         nameInputRef={nameInputRef}
                         openEditDialog={openEditDialog}
                         saveWorkflowInput={saveWorkflowInput}
+                        workflow={workflow}
                     />
                 )}
 
@@ -87,6 +91,7 @@ const WorkflowInputsSheetContent = ({
 
                 {!!workflow.inputs?.length && (
                     <WorkflowInputsTable
+                        internalOnlyVisible={internalOnlyVisible}
                         openDeleteDialog={openDeleteDialog}
                         openEditDialog={openEditDialog}
                         workflowInputs={workflow.inputs}

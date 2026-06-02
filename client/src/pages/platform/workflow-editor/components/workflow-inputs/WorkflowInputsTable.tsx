@@ -4,13 +4,32 @@ import {WorkflowInput, WorkflowTestConfiguration} from '@/shared/middleware/plat
 import {EditIcon, Trash2Icon} from 'lucide-react';
 
 interface WorkflowInputsTableProps {
+    internalOnlyVisible: boolean;
     openDeleteDialog: (index: number) => void;
     openEditDialog: (index?: number) => void;
     workflowInputs: WorkflowInput[];
     workflowTestConfigurationInputs?: WorkflowTestConfiguration['inputs'];
 }
 
+// A component-property input's test value is a nested object ({member: value}); render its member
+// values rather than the default "[object Object]".
+const formatTestValue = (value: unknown): string => {
+    if (value == null) {
+        return '';
+    }
+
+    if (typeof value === 'object') {
+        return Object.values(value as Record<string, unknown>)
+            .filter((memberValue) => memberValue != null && memberValue !== '')
+            .map((memberValue) => String(memberValue))
+            .join(', ');
+    }
+
+    return String(value);
+};
+
 const WorkflowInputsTable = ({
+    internalOnlyVisible,
     openDeleteDialog,
     openEditDialog,
     workflowInputs,
@@ -27,6 +46,8 @@ const WorkflowInputsTable = ({
 
                 <TableHead>Required</TableHead>
 
+                {internalOnlyVisible && <TableHead>Internal only</TableHead>}
+
                 <TableHead>Test Value</TableHead>
 
                 <TableHead>Actions</TableHead>
@@ -40,15 +61,13 @@ const WorkflowInputsTable = ({
 
                     <TableCell>{input.label}</TableCell>
 
-                    <TableCell>{input.type}</TableCell>
+                    <TableCell>{input.componentReference ? 'component' : input.type}</TableCell>
 
                     <TableCell>{input.required === true ? 'true' : 'false'}</TableCell>
 
-                    <TableCell>
-                        {workflowTestConfigurationInputs
-                            ? workflowTestConfigurationInputs[workflowInputs![index]?.name]?.toString()
-                            : undefined}
-                    </TableCell>
+                    {internalOnlyVisible && <TableCell>{input.internalOnly === true ? 'true' : 'false'}</TableCell>}
+
+                    <TableCell>{formatTestValue(workflowTestConfigurationInputs?.[input.name])}</TableCell>
 
                     <TableCell className="flex justify-end">
                         <Button icon={<EditIcon />} onClick={() => openEditDialog(index)} size="icon" variant="ghost" />

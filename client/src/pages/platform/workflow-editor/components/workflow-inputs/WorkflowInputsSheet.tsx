@@ -8,6 +8,7 @@ import {WorkflowSheetSkeleton} from '../WorkflowEditorSkeletons';
 const WorkflowInputsSheetContent = lazy(() => import('./WorkflowInputsSheetContent'));
 
 interface WorkflowInputsSheetProps {
+    internalOnlyVisible: boolean;
     invalidateWorkflowQueries: () => void;
     onSheetOpenChange: (open: boolean) => void;
     sheetOpen: boolean;
@@ -15,6 +16,7 @@ interface WorkflowInputsSheetProps {
 }
 
 const WorkflowInputsSheet = ({
+    internalOnlyVisible,
     invalidateWorkflowQueries,
     onSheetOpenChange,
     sheetOpen,
@@ -32,6 +34,7 @@ const WorkflowInputsSheet = ({
         >
             <Suspense fallback={<WorkflowSheetSkeleton title="Workflow Inputs" />}>
                 <WorkflowInputsSheetContent
+                    internalOnlyVisible={internalOnlyVisible}
                     invalidateWorkflowQueries={invalidateWorkflowQueries}
                     workflowTestConfiguration={workflowTestConfiguration}
                 />

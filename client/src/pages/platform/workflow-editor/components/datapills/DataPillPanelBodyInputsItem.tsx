@@ -6,6 +6,7 @@ import {AccordionContent, AccordionTrigger} from '@radix-ui/react-accordion';
 import {ChevronDownIcon, FormInputIcon} from 'lucide-react';
 
 import useWorkflowDataStore from '../../stores/useWorkflowDataStore';
+import getFieldMappingPillProperties from '../../utils/getFieldMappingPillProperties';
 
 const DataPillPanelBodyInputsItem = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
@@ -40,13 +41,49 @@ const DataPillPanelBodyInputsItem = () => {
                     {workflow.inputs.map((input, index) => {
                         const sampleOutput = workflowTestConfiguration?.inputs?.[input.name];
 
+                        const rootProperty = {
+                            name: input.name,
+                            type: input.type?.toUpperCase() as PropertyType,
+                        };
+
+                        if (input.type === 'field_mapping') {
+                            const childProperties = getFieldMappingPillProperties(sampleOutput as string | undefined);
+
+                            return (
+                                <li className="flex w-full flex-col space-y-2" key={`${input.name}-${index}`}>
+                                    <DataPill
+                                        property={rootProperty}
+                                        root
+                                        sampleOutput={sampleOutput}
+                                        workflowNodeName={input.name}
+                                    />
+
+                                    {childProperties.length > 0 && (
+                                        <ul className="flex w-full flex-col space-y-2 border-l border-l-border/50 pl-4">
+                                            {childProperties.map((childProperty, childIndex) => (
+                                                <div
+                                                    className="flex items-center space-x-3"
+                                                    key={`${input.name}-${childProperty.name}-${childIndex}`}
+                                                >
+                                                    <DataPill
+                                                        parentProperty={rootProperty}
+                                                        path={childProperty.name}
+                                                        property={childProperty}
+                                                        sampleOutput={sampleOutput}
+                                                        workflowNodeName={input.name}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </ul>
+                                    )}
+                                </li>
+                            );
+                        }
+
                         return (
                             <li className="flex w-full items-center space-x-3" key={`${input.name}-${index}`}>
                                 <DataPill
-                                    property={{
-                                        name: input.name,
-                                        type: input.type?.toUpperCase() as PropertyType,
-                                    }}
+                                    property={rootProperty}
                                     root
                                     sampleOutput={sampleOutput}
                                     workflowNodeName={input.name}

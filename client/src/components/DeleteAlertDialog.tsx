@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -12,12 +13,14 @@ import {Trash2Icon} from 'lucide-react';
 
 interface DeleteAlertDialogProps {
     open: boolean;
+    description?: string;
+    isPending?: boolean;
     nodeName?: string;
     onCancel: () => void;
     onDelete: () => void;
 }
 
-const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDialogProps) => {
+const DeleteAlertDialog = ({description, isPending, nodeName, onCancel, onDelete, open}: DeleteAlertDialogProps) => {
     const isNodeDeleteDialog = !!nodeName;
 
     return (
@@ -29,22 +32,24 @@ const DeleteAlertDialog = ({nodeName, onCancel, onDelete, open}: DeleteAlertDial
                     </AlertDialogTitle>
 
                     <AlertDialogDescription>
-                        {isNodeDeleteDialog
-                            ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
-                            : 'This action cannot be undone. This will permanently delete data.'}
+                        {description ??
+                            (isNodeDeleteDialog
+                                ? 'This action cannot be undone. This will permanently delete the node and properties it contains.'
+                                : 'This action cannot be undone. This will permanently delete data.')}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
 
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={onCancel}>
+                    <AlertDialogCancel disabled={isPending} onClick={onCancel}>
                         {isNodeDeleteDialog ? 'Keep node' : 'Cancel'}
                     </AlertDialogCancel>
 
                     <AlertDialogAction
                         className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                        disabled={isPending}
                         onClick={onDelete}
                     >
-                        {isNodeDeleteDialog && <Trash2Icon />}
+                        {isPending ? <LoadingIcon /> : isNodeDeleteDialog && <Trash2Icon />}
 
                         {isNodeDeleteDialog ? 'Delete node' : 'Delete'}
                     </AlertDialogAction>
