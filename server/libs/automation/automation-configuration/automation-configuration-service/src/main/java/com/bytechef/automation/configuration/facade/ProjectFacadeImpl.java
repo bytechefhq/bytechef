@@ -61,7 +61,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -658,36 +657,33 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private TemplateFiles readTemplate(byte[] data, boolean sharedTemplate) {
-        try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(data))) {
-            String projectJson = null;
-            String templateJson = null;
-            ZipEntry zipEntry;
-            List<String> workflowJsons = new ArrayList<>();
+        String[] projectJson = {
+            null
+        };
+        String[] templateJson = {
+            null
+        };
+        List<String> workflowJsons = new ArrayList<>();
 
-            while ((zipEntry = zipInputStream.getNextEntry()) != null) {
-                byte[] entryData = zipInputStream.readAllBytes();
-
-                String name = zipEntry.getName();
-
+        try {
+            BoundedZipReader.read(data, (name, entryData) -> {
                 if ("project.json".equals(name)) {
-                    projectJson = new String(entryData, StandardCharsets.UTF_8);
+                    projectJson[0] = new String(entryData, StandardCharsets.UTF_8);
                 } else if ("template.json".equals(name)) {
-                    templateJson = new String(entryData, StandardCharsets.UTF_8);
+                    templateJson[0] = new String(entryData, StandardCharsets.UTF_8);
                 } else if (name.startsWith("workflow-") && name.endsWith(".json")) {
                     workflowJsons.add(new String(entryData, StandardCharsets.UTF_8));
                 }
-
-                zipInputStream.closeEntry();
-            }
-
-            if (projectJson == null || sharedTemplate && (templateJson == null) || workflowJsons.isEmpty()) {
-                throw new RuntimeException("Missing files in a shared project file");
-            }
-
-            return new TemplateFiles(templateJson, projectJson, workflowJsons);
+            });
         } catch (IOException e) {
             throw new RuntimeException("Failed to read shared project", e);
         }
+
+        if (projectJson[0] == null || sharedTemplate && (templateJson[0] == null) || workflowJsons.isEmpty()) {
+            throw new RuntimeException("Missing files in a shared project file");
+        }
+
+        return new TemplateFiles(templateJson[0], projectJson[0], workflowJsons);
     }
 
     private ProjectDTO toProjectDTO(Project project) {
