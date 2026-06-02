@@ -1,1 +1,2 @@
 com.bytechef.ee.embedded.configuration.config.EmbeddedConfigurationJdbcRepositoryConfiguration
+com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluatorConfiguration

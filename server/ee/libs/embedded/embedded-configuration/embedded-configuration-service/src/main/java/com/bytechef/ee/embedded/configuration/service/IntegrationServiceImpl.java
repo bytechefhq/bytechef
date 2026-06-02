@@ -134,9 +134,26 @@ public class IntegrationServiceImpl implements IntegrationService {
         curIntegration.setCategoryId(integration.getCategoryId());
         curIntegration.setDescription(integration.getDescription());
         curIntegration.setName(integration.getName());
+
+        // The admin IntegrationModel carries no permissionExpression, so a model-derived update would otherwise null it
+        // out. The expression is written exclusively via updatePermissionExpression(...); only overwrite here when a
+        // non-null value is supplied so normal admin edits preserve it.
+        if (integration.getPermissionExpression() != null) {
+            curIntegration.setPermissionExpression(integration.getPermissionExpression());
+        }
+
         curIntegration.setTagIds(integration.getTagIds());
         curIntegration.setVersion(integration.getVersion());
 
         return integrationRepository.save(curIntegration);
+    }
+
+    @Override
+    public Integration updatePermissionExpression(long id, String permissionExpression) {
+        Integration integration = getIntegration(id);
+
+        integration.setPermissionExpression(permissionExpression);
+
+        return integrationRepository.save(integration);
     }
 }

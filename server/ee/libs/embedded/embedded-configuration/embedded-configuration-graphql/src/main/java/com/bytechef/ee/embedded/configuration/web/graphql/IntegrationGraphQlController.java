@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
@@ -36,5 +37,12 @@ public class IntegrationGraphQlController {
     @QueryMapping
     public Integration integration(@Argument long id) {
         return integrationService.getIntegration(id);
+    }
+
+    @MutationMapping
+    public Integration updateIntegrationPermissionExpression(
+        @Argument long id, @Argument String permissionExpression) {
+
+        return integrationService.updatePermissionExpression(id, permissionExpression);
     }
 }

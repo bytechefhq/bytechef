@@ -30,7 +30,8 @@ import org.jspecify.annotations.Nullable;
 public record ConnectedUserIntegrationDTO(
     ConnectionConfig connectionConfig, IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
     List<ConnectedUserIntegrationInstance> integrationInstances,
-    OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
+    OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri,
+    List<McpToolInfo> mcpTools, List<McpWorkflowInfo> mcpWorkflows) {
 
     public ConnectedUserIntegrationDTO(
         List<Connection> connections, IntegrationInstanceConfigurationDTO integrationInstanceConfiguration,
@@ -42,7 +43,7 @@ public record ConnectedUserIntegrationDTO(
             toIntegrationInstances(
                 connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
                 integrationInstances, integrationInstanceWorkflows),
-            null, null);
+            null, null, List.of(), List.of());
     }
 
     public ConnectedUserIntegrationDTO(
@@ -60,7 +61,16 @@ public record ConnectedUserIntegrationDTO(
             toIntegrationInstances(
                 connections, integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows(),
                 integrationInstances, integrationInstanceWorkflows),
-            oAuth2AuthorizationParameters, redirectUri);
+            oAuth2AuthorizationParameters, redirectUri, List.of(), List.of());
+    }
+
+    public ConnectedUserIntegrationDTO withMcp(
+        List<McpToolInfo> mcpTools, List<McpWorkflowInfo> mcpWorkflows,
+        List<ConnectedUserIntegrationInstance> integrationInstances) {
+
+        return new ConnectedUserIntegrationDTO(
+            connectionConfig, integrationInstanceConfiguration, integrationInstances, oAuth2AuthorizationParameters,
+            redirectUri, mcpTools, mcpWorkflows);
     }
 
     private static List<ConnectedUserIntegrationInstance> toIntegrationInstances(
@@ -80,7 +90,15 @@ public record ConnectedUserIntegrationDTO(
 
     public record ConnectedUserIntegrationInstance(
         Connection connection, IntegrationInstance integrationInstance,
-        List<ConnectedUserIntegrationInstanceWorkflow> workflows) {
+        List<ConnectedUserIntegrationInstanceWorkflow> workflows, List<McpInstanceToolInfo> mcpTools,
+        List<ConnectedUserIntegrationInstanceWorkflow> mcpWorkflows) {
+
+        public ConnectedUserIntegrationInstance(
+            Connection connection, IntegrationInstance integrationInstance,
+            List<ConnectedUserIntegrationInstanceWorkflow> workflows) {
+
+            this(connection, integrationInstance, workflows, List.of(), List.of());
+        }
     }
 
     public record ConnectedUserIntegrationInstanceWorkflow(
@@ -110,6 +128,19 @@ public record ConnectedUserIntegrationDTO(
     }
 
     public record OAuth2(OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
+    }
+
+    public record McpToolInfo(String name, String description) {
+    }
+
+    public record McpWorkflowInfo(
+        String label, String description, List<WorkflowInputInfo> inputs, String workflowUuid) {
+    }
+
+    public record WorkflowInputInfo(String name, String label, boolean required, String type) {
+    }
+
+    public record McpInstanceToolInfo(Long mcpToolId, boolean enabled) {
     }
 
     private static List<Input> getInputs(AuthorizationType authorizationType, List<? extends Property> properties) {

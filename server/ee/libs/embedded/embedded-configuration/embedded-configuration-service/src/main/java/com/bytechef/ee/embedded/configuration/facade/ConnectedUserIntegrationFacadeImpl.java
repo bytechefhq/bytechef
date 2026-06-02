@@ -7,25 +7,41 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceWorkflow;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
+import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfiguration;
+import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Authorization;
+import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
@@ -34,8 +50,15 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
+import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,39 +77,69 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrationFacade {
 
+    private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionFacade connectionFacade;
     private final ConnectionService connectionService;
+    private final EmbeddedPermissionEvaluator embeddedPermissionEvaluator;
     private final IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
+    private final McpComponentService mcpComponentService;
+    private final McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService;
+    private final McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService;
+    private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
+    private final McpServerService mcpServerService;
+    private final McpToolService mcpToolService;
     private final OAuth2ParametersFacade oAuth2ParametersFacade;
     private final OAuth2Service oAuth2Service;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
+    private final IntegrationWorkflowService integrationWorkflowService;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationFacadeImpl(
+        ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ConnectionFacade connectionFacade, ConnectionService connectionService,
+        EmbeddedPermissionEvaluator embeddedPermissionEvaluator,
         IntegrationInstanceConfigurationFacade integrationInstanceConfigurationFacade,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService, IntegrationService integrationService,
-        OAuth2ParametersFacade oAuth2ParametersFacade, OAuth2Service oAuth2Service,
-        IntegrationInstanceWorkflowService integrationInstanceWorkflowService) {
+        McpComponentService mcpComponentService,
+        McpIntegrationInstanceConfigurationService mcpIntegrationInstanceConfigurationService,
+        McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
+        McpIntegrationInstanceToolService mcpIntegrationInstanceToolService, McpServerService mcpServerService,
+        McpToolService mcpToolService, OAuth2ParametersFacade oAuth2ParametersFacade, OAuth2Service oAuth2Service,
+        IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
+        IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
 
+        this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
         this.connectionFacade = connectionFacade;
         this.connectionService = connectionService;
+        this.embeddedPermissionEvaluator = embeddedPermissionEvaluator;
         this.integrationInstanceConfigurationFacade = integrationInstanceConfigurationFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
+        this.mcpComponentService = mcpComponentService;
+        this.mcpIntegrationInstanceConfigurationService = mcpIntegrationInstanceConfigurationService;
+        this.mcpIntegrationInstanceConfigurationWorkflowService = mcpIntegrationInstanceConfigurationWorkflowService;
+        this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
+        this.mcpServerService = mcpServerService;
+        this.mcpToolService = mcpToolService;
         this.oAuth2ParametersFacade = oAuth2ParametersFacade;
         this.oAuth2Service = oAuth2Service;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
+        this.integrationWorkflowService = integrationWorkflowService;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -157,6 +210,13 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
 
+        if (!isIntegrationVisible(integrationDTO, connectedUser)) {
+            throw new EmbeddedIntegrationNotVisibleException(integrationId);
+        }
+
+        IntegrationInstanceConfigurationDTO filteredConfiguration =
+            filterWorkflows(integrationInstanceConfigurationDTO, connectedUser);
+
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
             connectedUser.getId(), integrationDTO.componentName(), environment);
 
@@ -195,9 +255,13 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     integrationInstanceConfigurationDTO.authorizationType());
         }
 
-        return new ConnectedUserIntegrationDTO(
-            authorization, connections, integrationInstanceConfigurationDTO, integrationInstances,
+        ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
+            authorization, connections, filteredConfiguration, integrationInstances,
             integrationInstanceWorkflows, oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
+
+        return connectedUserIntegrationDTO.withMcp(
+            getMcpTools(integrationDTO.componentName()), getMcpWorkflows(integrationId, connectedUser),
+            attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
     @Override
@@ -210,9 +274,47 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         return integrationInstanceConfigurationFacade
             .getIntegrationInstanceConfigurationIntegrations(enabled, environment)
             .stream()
+            .filter(integrationInstanceConfigurationDTO -> isIntegrationVisible(
+                integrationInstanceConfigurationDTO.integration(), connectedUser))
             .map(integrationInstanceConfigurationDTO -> toConnectedUserIntegrationDTO(
-                connectedUser, integrationInstanceConfigurationDTO, environment))
+                connectedUser, filterWorkflows(integrationInstanceConfigurationDTO, connectedUser), environment))
             .toList();
+    }
+
+    boolean isIntegrationVisible(IntegrationDTO integrationDTO, ConnectedUser connectedUser) {
+        return embeddedPermissionEvaluator.evaluate(integrationDTO.permissionExpression(), connectedUser);
+    }
+
+    IntegrationInstanceConfigurationDTO filterWorkflows(
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, ConnectedUser connectedUser) {
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> workflows =
+            integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows();
+
+        if (workflows == null || workflows.isEmpty()) {
+            return integrationInstanceConfigurationDTO;
+        }
+
+        Map<String, String> permissionExpressionsByUuid = new HashMap<>();
+
+        for (IntegrationWorkflow integrationWorkflow : integrationWorkflowService.getIntegrationWorkflows(
+            integrationInstanceConfigurationDTO.integrationId())) {
+
+            String uuid = integrationWorkflow.getUuidAsString();
+
+            if (uuid != null) {
+                permissionExpressionsByUuid.put(uuid, integrationWorkflow.getPermissionExpression());
+            }
+        }
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> visibleWorkflows = workflows.stream()
+            .filter(workflowDTO -> embeddedPermissionEvaluator.evaluate(
+                permissionExpressionsByUuid.get(workflowDTO.workflowUuid()), connectedUser))
+            .toList();
+
+        return integrationInstanceConfigurationDTO.toBuilder()
+            .integrationInstanceConfigurationWorkflows(visibleWorkflows)
+            .build();
     }
 
     private ConnectedUserIntegrationDTO toConnectedUserIntegrationDTO(
@@ -235,7 +337,167 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     .map(IntegrationInstance::getId)
                     .toList());
 
-        return new ConnectedUserIntegrationDTO(connections, integrationInstanceConfigurationDTO, integrationInstances,
-            integrationInstanceWorkflows);
+        ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
+            connections, integrationInstanceConfigurationDTO, integrationInstances, integrationInstanceWorkflows);
+
+        return connectedUserIntegrationDTO.withMcp(
+            getMcpTools(integrationDTO.componentName()), getMcpWorkflows(integrationDTO.id(), connectedUser),
+            attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
+    }
+
+    private boolean isEmbeddedMcpServerEnabled(long mcpServerId) {
+        McpServer mcpServer = mcpServerService.getMcpServer(mcpServerId);
+
+        return mcpServer.getType() == PlatformType.EMBEDDED && mcpServer.isEnabled();
+    }
+
+    private List<ConnectedUserIntegrationDTO.McpToolInfo> getMcpTools(String componentName) {
+        return mcpComponentService.getMcpComponentsByComponentName(componentName)
+            .stream()
+            .filter(mcpComponent -> isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId()))
+            .flatMap(mcpComponent -> mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
+                .stream()
+                .map(mcpTool -> {
+                    ClusterElementDefinition clusterElementDefinition =
+                        clusterElementDefinitionService.getClusterElementDefinition(
+                            mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
+
+                    return new ConnectedUserIntegrationDTO.McpToolInfo(
+                        mcpTool.getName(), clusterElementDefinition.getDescription());
+                }))
+            .toList();
+    }
+
+    private List<ConnectedUserIntegrationDTO.McpWorkflowInfo> getMcpWorkflows(
+        long integrationId, ConnectedUser connectedUser) {
+
+        return mcpIntegrationInstanceConfigurationService
+            .getMcpIntegrationInstanceConfigurationsByIntegrationId(integrationId)
+            .stream()
+            .filter(mcpIntegrationInstanceConfiguration -> isEmbeddedMcpServerEnabled(
+                mcpIntegrationInstanceConfiguration.getMcpServerId()))
+            .map(McpIntegrationInstanceConfiguration::getId)
+            .flatMap(mcpIntegrationInstanceConfigurationId -> mcpIntegrationInstanceConfigurationWorkflowService
+                .getMcpIntegrationInstanceConfigurationMcpIntegrationInstanceConfigurationWorkflows(
+                    mcpIntegrationInstanceConfigurationId)
+                .stream())
+            .map(mcpIntegrationInstanceConfigurationWorkflow -> {
+                IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                    integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
+                        mcpIntegrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+                String workflowId = integrationInstanceConfigurationWorkflow.getWorkflowId();
+
+                Workflow workflow = workflowService.getWorkflow(workflowId);
+
+                IntegrationWorkflow integrationWorkflow =
+                    integrationWorkflowService.getWorkflowIntegrationWorkflow(workflowId);
+
+                return new AbstractMap.SimpleEntry<>(integrationWorkflow, workflow);
+            })
+            .filter(entry -> entry.getKey()
+                .getUuidAsString() != null)
+            .filter(entry -> embeddedPermissionEvaluator.evaluate(
+                entry.getKey()
+                    .getPermissionExpression(),
+                connectedUser))
+            .map(entry -> {
+                IntegrationWorkflow integrationWorkflow = entry.getKey();
+                Workflow workflow = entry.getValue();
+
+                List<ConnectedUserIntegrationDTO.WorkflowInputInfo> inputs = workflow.getInputs()
+                    .stream()
+                    .map(input -> new ConnectedUserIntegrationDTO.WorkflowInputInfo(
+                        input.name(), input.label(), input.required(), input.type()))
+                    .toList();
+
+                return new ConnectedUserIntegrationDTO.McpWorkflowInfo(
+                    workflow.getLabel(), workflow.getDescription(), inputs, integrationWorkflow.getUuidAsString());
+            })
+            .toList();
+    }
+
+    private List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance> attachInstanceMcpData(
+        List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance> integrationInstances,
+        ConnectedUser connectedUser) {
+
+        return integrationInstances.stream()
+            .map(integrationInstance -> {
+                long integrationInstanceId = integrationInstance.integrationInstance()
+                    .getId();
+
+                List<ConnectedUserIntegrationDTO.McpInstanceToolInfo> mcpInstanceTools =
+                    mcpIntegrationInstanceToolService.getMcpIntegrationInstanceTools(integrationInstanceId)
+                        .stream()
+                        .filter(mcpIntegrationInstanceTool -> {
+                            McpTool mcpTool = mcpToolService.fetchMcpTool(mcpIntegrationInstanceTool.getMcpToolId())
+                                .orElse(null);
+
+                            if (mcpTool == null) {
+                                return false;
+                            }
+
+                            McpComponent mcpComponent =
+                                mcpComponentService.getMcpComponent(mcpTool.getMcpComponentId());
+
+                            return isEmbeddedMcpServerEnabled(mcpComponent.getMcpServerId());
+                        })
+                        .map(mcpIntegrationInstanceTool -> new ConnectedUserIntegrationDTO.McpInstanceToolInfo(
+                            mcpIntegrationInstanceTool.getMcpToolId(), mcpIntegrationInstanceTool.isEnabled()))
+                        .toList();
+
+                List<ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow> mcpInstanceWorkflows =
+                    integrationInstanceWorkflowService.getIntegrationInstanceWorkflows(integrationInstanceId)
+                        .stream()
+                        .map(integrationInstanceWorkflow -> {
+                            McpIntegrationInstanceConfigurationWorkflow mcpIntegrationInstanceConfigurationWorkflow =
+                                mcpIntegrationInstanceConfigurationWorkflowService
+                                    .fetchMcpIntegrationInstanceConfigurationWorkflowByIntegrationInstanceConfigurationWorkflowId(
+                                        integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId())
+                                    .orElse(null);
+
+                            if (mcpIntegrationInstanceConfigurationWorkflow == null) {
+                                return null;
+                            }
+
+                            McpIntegrationInstanceConfiguration mcpIntegrationInstanceConfiguration =
+                                mcpIntegrationInstanceConfigurationService
+                                    .fetchMcpIntegrationInstanceConfiguration(
+                                        mcpIntegrationInstanceConfigurationWorkflow
+                                            .getMcpIntegrationInstanceConfigurationId())
+                                    .orElse(null);
+
+                            if (mcpIntegrationInstanceConfiguration == null
+                                || !isEmbeddedMcpServerEnabled(mcpIntegrationInstanceConfiguration.getMcpServerId())) {
+
+                                return null;
+                            }
+
+                            IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
+                                integrationInstanceConfigurationWorkflowService
+                                    .getIntegrationInstanceConfigurationWorkflow(
+                                        integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId());
+
+                            IntegrationWorkflow integrationWorkflow =
+                                integrationWorkflowService.getWorkflowIntegrationWorkflow(
+                                    integrationInstanceConfigurationWorkflow.getWorkflowId());
+
+                            if (!embeddedPermissionEvaluator.evaluate(
+                                integrationWorkflow.getPermissionExpression(), connectedUser)) {
+
+                                return null;
+                            }
+
+                            return new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow(
+                                integrationInstanceWorkflow, integrationWorkflow.getUuidAsString());
+                        })
+                        .filter(Objects::nonNull)
+                        .toList();
+
+                return new ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance(
+                    integrationInstance.connection(), integrationInstance.integrationInstance(),
+                    integrationInstance.workflows(), mcpInstanceTools, mcpInstanceWorkflows);
+            })
+            .toList();
     }
 }

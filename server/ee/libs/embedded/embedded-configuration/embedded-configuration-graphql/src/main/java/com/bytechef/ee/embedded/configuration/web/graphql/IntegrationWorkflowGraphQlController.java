@@ -8,14 +8,17 @@
 package com.bytechef.ee.embedded.configuration.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.facade.IntegrationWorkflowFacade;
+import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
+import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.stereotype.Controller;
@@ -31,10 +34,15 @@ import org.springframework.stereotype.Controller;
 public class IntegrationWorkflowGraphQlController {
 
     private final IntegrationWorkflowFacade integrationWorkflowFacade;
+    private final IntegrationWorkflowService integrationWorkflowService;
 
     @SuppressFBWarnings("EI")
-    public IntegrationWorkflowGraphQlController(IntegrationWorkflowFacade integrationWorkflowFacade) {
+    public IntegrationWorkflowGraphQlController(
+        IntegrationWorkflowFacade integrationWorkflowFacade,
+        IntegrationWorkflowService integrationWorkflowService) {
+
         this.integrationWorkflowFacade = integrationWorkflowFacade;
+        this.integrationWorkflowService = integrationWorkflowService;
     }
 
     @QueryMapping
@@ -66,5 +74,20 @@ public class IntegrationWorkflowGraphQlController {
             .toList();
 
         return componentNames.isEmpty() ? List.of("manual") : componentNames;
+    }
+
+    @MutationMapping
+    public IntegrationWorkflow updateIntegrationWorkflowPermissionExpression(
+        @Argument long integrationWorkflowId, @Argument String permissionExpression) {
+
+        return integrationWorkflowService.updatePermissionExpression(integrationWorkflowId, permissionExpression);
+    }
+
+    @SchemaMapping(typeName = "IntegrationWorkflow")
+    String permissionExpression(IntegrationWorkflowDTO integrationWorkflowDTO) {
+        IntegrationWorkflow integrationWorkflow = integrationWorkflowService.getIntegrationWorkflow(
+            integrationWorkflowDTO.getIntegrationWorkflowId());
+
+        return integrationWorkflow.getPermissionExpression();
     }
 }

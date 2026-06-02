@@ -43,6 +43,9 @@ public final class IntegrationWorkflow {
     @Column("uuid")
     private UUID uuid;
 
+    @Column("permission_expression")
+    private String permissionExpression;
+
     @CreatedBy
     @Column("created_by")
     private String createdBy;
@@ -126,6 +129,10 @@ public final class IntegrationWorkflow {
         return uuid == null ? null : uuid.toString();
     }
 
+    public String getPermissionExpression() {
+        return permissionExpression;
+    }
+
     public String getCreatedBy() {
         return createdBy;
     }
@@ -162,6 +169,10 @@ public final class IntegrationWorkflow {
         this.uuid = uuid;
     }
 
+    public void setPermissionExpression(String permissionExpression) {
+        this.permissionExpression = permissionExpression;
+    }
+
     public void setVersion(int version) {
         this.version = version;
     }
@@ -174,6 +185,7 @@ public final class IntegrationWorkflow {
             ", integrationVersion=" + integrationVersion +
             ", workflowId='" + workflowId + '\'' +
             ", uuid='" + uuid + '\'' +
+            ", permissionExpression='" + permissionExpression + '\'' +
             ", createdBy='" + createdBy + '\'' +
             ", createdDate=" + createdDate +
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
