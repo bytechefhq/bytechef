@@ -46,6 +46,7 @@ public class NutshellCreateContactAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createContact")
         .title("Create Contact")
         .description("Creates a new contact, also known as a person, in Nutshell.")
+        .help("", "https://docs.bytechef.io/reference/components/nutshell_v1#create-contact")
         .properties(
             string(NAME)
                 .label("Name")

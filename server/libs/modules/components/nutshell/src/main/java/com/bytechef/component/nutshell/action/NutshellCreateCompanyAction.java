@@ -48,6 +48,7 @@ public class NutshellCreateCompanyAction {
         .description(
             "Creates a new account. Accounts are companies or organizations that you do business with, and are " +
                 "referred to as 'Companies' in the Nutshell UI.")
+        .help("", "https://docs.bytechef.io/reference/components/nutshell_v1#create-company")
         .properties(
             string(NAME)
                 .label("Name")

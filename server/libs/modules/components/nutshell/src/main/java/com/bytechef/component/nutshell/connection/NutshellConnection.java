@@ -40,7 +40,9 @@ public class NutshellConnection {
                         .required(true),
                     string(PASSWORD)
                         .label("API Key")
-                        .required(true)));
+                        .required(true)))
+        .help("", "https://docs.bytechef.io/reference/components/nutshell_v1#connection-setup")
+        .version(1);
 
     private NutshellConnection() {
     }

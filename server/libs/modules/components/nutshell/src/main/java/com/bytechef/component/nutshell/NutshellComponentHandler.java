@@ -39,13 +39,15 @@ public class NutshellComponentHandler implements ComponentHandler {
             "Nutshell CRM is a user-friendly customer relationship management software designed to help small " +
                 "businesses manage sales, track leads, and streamline communication.")
         .customAction(true)
+        .customActionHelp("", "https://developers.nutshell.com/docs/getting-started")
         .icon("path:assets/nutshell.svg")
         .categories(ComponentCategory.CRM)
         .connection(NutshellConnection.CONNECTION_DEFINITION)
         .actions(
             NutshellCreateContactAction.ACTION_DEFINITION,
             NutshellCreateCompanyAction.ACTION_DEFINITION,
-            NutshellCreateLeadAction.ACTION_DEFINITION);
+            NutshellCreateLeadAction.ACTION_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
