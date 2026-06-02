@@ -296,6 +296,74 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
         return new ChatResponse(List.of(new Generation(new AssistantMessage(content))));
     }
 
+    public String getVerbosity() {
+        return verbosity;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public Double getTopP() {
+        return topP;
+    }
+
+    public Integer getTopLogprobs() {
+        return topLogprobs;
+    }
+
+    public Double getTopK() {
+        return topK;
+    }
+
+    public Double getTemperature() {
+        return temperature;
+    }
+
+    public List<String> getStop() {
+        return stop;
+    }
+
+    public Integer getSeed() {
+        return seed;
+    }
+
+    public boolean isJsonResponseFormat() {
+        return jsonResponseFormat;
+    }
+
+    public String getReasoning() {
+        return reasoning;
+    }
+
+    public Double getPresencePenalty() {
+        return presencePenalty;
+    }
+
+    public Integer getMaxTokens() {
+        return maxTokens;
+    }
+
+    public Integer getMaxCompletionTokens() {
+        return maxCompletionTokens;
+    }
+
+    public Boolean getLogprobs() {
+        return logprobs;
+    }
+
+    public Map<String, Double> getLogitBias() {
+        return logitBias;
+    }
+
+    public Double getFrequencyPenalty() {
+        return frequencyPenalty;
+    }
+
+    public String getModel() {
+        return model;
+    }
+
     public abstract static class Builder<B extends Builder<B>> {
 
         protected String apiKey;
