@@ -21,24 +21,17 @@ import static com.bytechef.ai.mcp.tool.automation.exception.ProjectWorkflowToolE
 import com.bytechef.ai.mcp.tool.automation.exception.ProjectWorkflowToolErrorType;
 import com.bytechef.ai.mcp.tool.automation.model.ProjectWorkflowInfo;
 import com.bytechef.ai.mcp.tool.automation.model.WorkflowInfo;
-import com.bytechef.ai.mcp.tool.automation.model.WorkflowValidationResult;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.exception.ExecutionException;
-import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 /**
@@ -70,35 +63,10 @@ public class ProjectWorkflowTools {
         """;
 
     private final ProjectWorkflowFacade projectWorkflowFacade;
-    private final String scriptCodeInstructions;
-    private final String workflowBuildInstructions;
-    private final String clusterElementsInstructions;
-    private final WorkflowValidatorFacade workflowValidatorFacade;
 
-    @SuppressFBWarnings({
-        "CT_CONSTRUCTOR_THROW", "EI"
-    })
-    public ProjectWorkflowTools(
-        ProjectWorkflowFacade projectWorkflowFacade, WorkflowValidatorFacade workflowValidatorFacade,
-        @Value("classpath:instruction_script_code.txt") Resource scriptCodeInstructionsResource,
-        @Value("classpath:instruction_cluster_elements.txt") Resource clusterElementsInstructionsResource,
-        @Value("classpath:instruction_workflow_build.txt") Resource workflowBuildInstructionsResource) {
-
+    @SuppressFBWarnings("EI")
+    public ProjectWorkflowTools(ProjectWorkflowFacade projectWorkflowFacade) {
         this.projectWorkflowFacade = projectWorkflowFacade;
-        this.scriptCodeInstructions = readResource(scriptCodeInstructionsResource);
-        this.workflowValidatorFacade = workflowValidatorFacade;
-        this.workflowBuildInstructions = readResource(workflowBuildInstructionsResource);
-        this.clusterElementsInstructions = readResource(clusterElementsInstructionsResource);
-    }
-
-    @Tool(description = "Instructions for writing custom code in Script component")
-    public String getScriptCodeInstructions() {
-        return scriptCodeInstructions;
-    }
-
-    @Tool(description = "Instructions for working with cluster elements")
-    public String getClusterElementsInstructions() {
-        return clusterElementsInstructions;
     }
 
     @Tool(
@@ -125,12 +93,6 @@ public class ProjectWorkflowTools {
 
             throw new ExecutionException("Failed to get workflow: " + e.getMessage(), e, GET_WORKFLOW);
         }
-    }
-
-    @SuppressFBWarnings("VA")
-    @Tool(description = "Instructions for building workflows")
-    public String getWorkflowBuildInstructions() {
-        return workflowBuildInstructions.formatted(DEFAULT_DEFINITION);
     }
 
     @Tool(
@@ -207,40 +169,6 @@ public class ProjectWorkflowTools {
                 e);
             throw new ExecutionException(
                 "Failed to search workflows: " + e.getMessage(), e, ProjectWorkflowToolErrorType.SEARCH_WORKFLOWS);
-        }
-    }
-
-    @Tool(
-        description = "Validate a workflow configuration by checking its structure, properties and outputs against the task definitions. Returns validation results with any errors found")
-    public WorkflowValidationResult validateWorkflow(
-        @ToolParam(description = "The JSON string of the workflow to validate") String workflow) {
-
-        try {
-            WorkflowValidatorFacade.WorkflowValidationResult workflowValidationResult =
-                workflowValidatorFacade.validateWorkflow(workflow);
-
-            List<String> errors = workflowValidationResult.errors();
-
-            String errorMessages = errors.toString();
-
-            List<String> warnings = workflowValidationResult.warnings();
-
-            String warningMessages = warnings.toString();
-
-            boolean isValid = errorMessages.equals("[]");
-
-            if (log.isDebugEnabled()) {
-                log.debug(
-                    "validateWorkflow(): Validated workflow. Valid: {}, Errors: {}, Warnings: {}", isValid,
-                    errorMessages, warningMessages);
-            }
-
-            return new WorkflowValidationResult(isValid, errorMessages, warningMessages);
-        } catch (Exception e) {
-            log.error("validateWorkflow(): Failed to validate workflow", e);
-
-            throw new ExecutionException(
-                "Failed to validate workflow", e, ProjectWorkflowToolErrorType.VALIDATE_WORKFLOW);
         }
     }
 
@@ -329,14 +257,6 @@ public class ProjectWorkflowTools {
 
             throw new ExecutionException(
                 "Failed to update workflow: " + e.getMessage(), e, ProjectWorkflowToolErrorType.UPDATE_WORKFLOW);
-        }
-    }
-
-    private static String readResource(Resource resource) {
-        try (InputStream inputStream = resource.getInputStream()) {
-            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
-        } catch (IOException ioException) {
-            throw new IllegalStateException("Failed to read resource: " + resource.getDescription(), ioException);
         }
     }
 }

@@ -20,6 +20,8 @@ import com.bytechef.ai.mcp.tool.automation.SkillsTools;
 import com.bytechef.ai.mcp.tool.platform.ComponentTools;
 import com.bytechef.ai.mcp.tool.platform.FirecrawlTools;
 import com.bytechef.ai.mcp.tool.platform.TaskTools;
+import com.bytechef.ai.mcp.tool.platform.WorkflowInstructionTools;
+import com.bytechef.ai.mcp.tool.platform.WorkflowValidatorTools;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
@@ -64,6 +66,8 @@ public class CopilotConfiguration {
     private final Resource promptClusterElementBuildResource;
     private final Resource promptSkillsAskResource;
     private final Resource promptSkillsBuildResource;
+    private final WorkflowValidatorTools workflowValidatorTools;
+    private final WorkflowInstructionTools workflowInstructionTools;
     private final State state = new State();
 
     @SuppressFBWarnings("EI")
@@ -76,8 +80,11 @@ public class CopilotConfiguration {
         @Value("classpath:prompt_cluster_element_ask.txt") Resource promptClusterElementAskResource,
         @Value("classpath:prompt_cluster_element_build.txt") Resource promptClusterElementBuildResource,
         @Value("classpath:prompt_skills_ask.txt") Resource promptSkillsAskResource,
-        @Value("classpath:prompt_skills_build.txt") Resource promptSkillsBuildResource) {
+        @Value("classpath:prompt_skills_build.txt") Resource promptSkillsBuildResource,
+        WorkflowValidatorTools workflowValidatorTools, WorkflowInstructionTools workflowInstructionTools) {
 
+        this.workflowValidatorTools = workflowValidatorTools;
+        this.workflowInstructionTools = workflowInstructionTools;
         this.promptWorkflowEditorAskResource = promptWorkflowEditorAskResource;
         this.promptWorkflowEditorBuildResource = promptWorkflowEditorBuildResource;
         this.promptCodeEditorAskResource = promptCodeEditorAskResource;
@@ -95,7 +102,8 @@ public class CopilotConfiguration {
         ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
 
-        List<Object> tools = new ArrayList<>(List.of(readProjectWorkflowTools, componentTools));
+        List<Object> tools = new ArrayList<>(
+            List.of(readProjectWorkflowTools, componentTools, workflowValidatorTools, workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
 
@@ -123,7 +131,10 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
-            .tools(List.of(readProjectWorkflowTools, scriptTools, componentTools))
+            .tools(
+                List.of(
+                    readProjectWorkflowTools, scriptTools, componentTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .state(state)
             .build();
     }
@@ -140,7 +151,10 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
-            .tools(List.of(readProjectWorkflowTools, componentTools, taskTools))
+            .tools(
+                List.of(
+                    readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .state(state)
             .build();
     }
@@ -158,7 +172,10 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
-            .tools(List.of(readProjectWorkflowTools, clusterElementTools, componentTools, taskTools))
+            .tools(
+                List.of(
+                    readProjectWorkflowTools, clusterElementTools, componentTools, taskTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .state(state)
             .build();
     }
@@ -180,7 +197,9 @@ public class CopilotConfiguration {
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.ASK.name();
 
         List<Object> tools = new ArrayList<>(
-            List.of(readProjectTools, readProjectWorkflowTools, componentTools, taskTools));
+            List.of(
+                readProjectTools, readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
 
         firecrawlTools.ifPresent(tools::add);
 
@@ -212,7 +231,10 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
-            .tools(List.of(projectTools, projectWorkflowTools, taskTools, scriptTools))
+            .tools(
+                List.of(
+                    projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .build();
@@ -232,7 +254,10 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptConverterBuildResource))
             .state(state)
-            .tools(List.of(projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools))
+            .tools(
+                List.of(
+                    projectToolsImpl, projectWorkflowToolsImpl, taskTools, scriptTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .build();
     }
 
@@ -250,7 +275,10 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsAskResource))
             .state(state)
-            .tools(List.of(readSkillsTools, readProjectTools, readProjectWorkflowTools))
+            .tools(
+                List.of(
+                    readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .build();
     }
 
@@ -268,7 +296,10 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsBuildResource))
             .state(state)
-            .tools(List.of(skillsTools, readProjectTools, readProjectWorkflowTools))
+            .tools(
+                List.of(
+                    skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                    workflowInstructionTools))
             .build();
     }
 
