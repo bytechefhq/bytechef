@@ -76,6 +76,8 @@ fun shouldIncludeComponent(componentPath: String): Boolean {
 }
 
 dependencies {
+    developmentOnly(libs.com.julien.dubois.bootui.bootui.spring.boot.starter)
+
     implementation("io.awspring.cloud:spring-cloud-aws-starter-s3")
     implementation("io.awspring.cloud:spring-cloud-aws-starter-sqs")
     implementation(libs.org.springdoc.springdoc.openapi.starter.common)
