@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create an image using text-to-image models",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/stability_v1#create-image"
+    },
     "metadata": null,
     "name": "createImage",
     "outputDefinition": {
@@ -431,7 +434,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": true,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -597,7 +600,10 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/stability_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
