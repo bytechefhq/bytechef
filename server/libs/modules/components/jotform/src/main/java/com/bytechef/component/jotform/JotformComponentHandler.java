@@ -66,7 +66,8 @@ public class JotformComponentHandler extends AbstractJotformComponentHandler {
                     .label("Region")
                     .options(
                         option("US (jotform.com)", "us"),
-                        option("EU (eu.jotform.com)", "eu"))
+                        option("EU (eu.jotform.com)", "eu"),
+                        option("HIPAA (hipaa-api.jotform.com)", "hipaa"))
                     .required(true));
 
             modifiableAuthorization.properties(properties);
@@ -76,7 +77,12 @@ public class JotformComponentHandler extends AbstractJotformComponentHandler {
             .baseUri((connectionParameters, context) -> {
                 String region = connectionParameters.getRequiredString(REGION);
 
-                return region.equals("us") ? "https://api.jotform.com" : "https://eu-api.jotform.com";
+                return switch (region) {
+                    case "us" -> "https://api.jotform.com";
+                    case "eu" -> "https://eu-api.jotform.com";
+                    case "hipaa" -> "https://hipaa-api.jotform.com";
+                    default -> throw new IllegalArgumentException("Invalid region: " + region);
+                };
             });
     }
 }
