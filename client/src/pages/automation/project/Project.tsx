@@ -117,7 +117,7 @@ const Project = () => {
                             </WorkflowEditorProvider>
                         </ResizablePanel>
 
-                        <ResizableHandle className="bg-muted" />
+                        <ResizableHandle className="bg-muted" withHandle />
 
                         <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
                             {(workflowIsRunning || workflowTestExecution) && (
