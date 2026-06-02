@@ -45,7 +45,9 @@ public class NutshellCreateCompanyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create Company")
-        .description("Creates new company")
+        .description(
+            "Creates a new account. Accounts are companies or organizations that you do business with, and are " +
+                "referred to as 'Companies' in the Nutshell UI.")
         .properties(
             string(NAME)
                 .label("Name")
@@ -61,7 +63,7 @@ public class NutshellCreateCompanyAction {
                 .required(false),
             string(PHONE)
                 .label("Phone")
-                .description("Primary phone number of the company")
+                .description("Primary phone number of the company.")
                 .controlType(ControlType.PHONE)
                 .required(false))
         .output(
