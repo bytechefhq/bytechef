@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact, also known as a person, in Nutshell.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nutshell_v1#create-contact"
+    },
     "metadata": null,
     "name": "createContact",
     "outputDefinition": {
@@ -1110,7 +1113,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new account. Accounts are companies or organizations that you do business with, and are referred to as 'Companies' in the Nutshell UI.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nutshell_v1#create-company"
+    },
     "metadata": null,
     "name": "createCompany",
     "outputDefinition": {
@@ -2218,7 +2224,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new lead.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nutshell_v1#create-lead"
+    },
     "metadata": null,
     "name": "createLead",
     "outputDefinition": {
@@ -2657,14 +2666,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/nutshell_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.nutshell.com/docs/getting-started"
+  },
   "description": "Nutshell CRM is a user-friendly customer relationship management software designed to help small businesses manage sales, track leads, and streamline communication.",
   "icon": "path:assets/nutshell.svg",
   "metadata": null,
