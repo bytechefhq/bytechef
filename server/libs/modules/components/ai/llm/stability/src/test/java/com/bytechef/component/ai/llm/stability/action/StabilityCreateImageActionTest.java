@@ -54,9 +54,8 @@ class StabilityCreateImageActionTest {
 
     @Test
     void testCreateImageModel() {
-        org.springframework.ai.image.ImageModel imageModel =
-            StabilityCreateImageAction.IMAGE_MODEL.createImageModel(
-                mockedInputParameters, mockedConnectionParameters);
+        org.springframework.ai.image.ImageModel imageModel = StabilityCreateImageAction.IMAGE_MODEL.createImageModel(
+            mockedInputParameters, mockedConnectionParameters);
 
         assertNotNull(imageModel);
         assertInstanceOf(StabilityAiImageModel.class, imageModel);
