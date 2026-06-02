@@ -1,0 +1,14 @@
+#### How to find Owner ID
+
+If you are an administrator, you can view all user and team details and derive the correct Owner ID for use with the API.
+
+1. Log in to your Nutshell account.
+2. Navigate to **Settings** (bottom-left corner of the screen).
+3. Select **Users & teams**.
+4. Click the name of the specific user.
+5. In your browser’s address bar, look at the URL. For example: `https://app.nutshell.com/setup/user/settings/1`. The number at the end of the URL (`1` in this example) is the user’s simple integer entity ID.
+6. Convert the integer entity ID into the API Owner ID by appending `-users` to it. For example:
+    - Entity ID: `1`
+    - API Owner ID: `1-users`
+
+Use this `1-users` value as the Owner ID.
