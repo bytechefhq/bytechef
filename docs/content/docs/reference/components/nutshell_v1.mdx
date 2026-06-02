@@ -60,7 +60,7 @@ Version: 1
 ### Create Contact
 Name: createContact
 
-`Creates new contact`
+`Creates a new contact, also known as a person, in Nutshell.`
 
 #### Properties
 
@@ -69,7 +69,7 @@ Name: createContact
 | name | Name | STRING | Full name of the contact. | true |
 | description | Description | STRING | Description of the contact, which appears under their name. | false |
 | email | Email | STRING | Primary email address of the contact. | false |
-| phone | Phone | STRING | Primary phone number of the contact | false |
+| phone | Phone | STRING | Primary phone number of the contact. | false |
 
 #### Example JSON Structure
 ```json
@@ -97,7 +97,8 @@ Type: OBJECT
 
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
-| contacts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(type), STRING\(name), STRING\(description), [&#123;BOOLEAN\(isPrimary), STRING\(name), STRING\(value)&#125;]\(emails), [&#123;BOOLEAN\(isPrimary), STRING\(name), &#123;STRING\(countryCode), STRING\(number), STRING\(extension), STRING\(numberFormatted), STRING\(E164), STRING\(countryCodeAndNumber)&#125;\(value)&#125;]\(phones)&#125;] </details> |  |
+| links | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> |  |
+| contacts | ARRAY <details> <summary> Items </summary> [&#123;STRING\(id), STRING\(name), STRING\(description), [&#123;BOOLEAN\(isPrimary), STRING\(name), STRING\(value)&#125;]\(emails), [&#123;BOOLEAN\(isPrimary), STRING\(name), &#123;STRING\(countryCode), STRING\(number), STRING\(extension), STRING\(numberFormatted), STRING\(E164), STRING\(countryCodeAndNumber)&#125;\(value)&#125;]\(phones)&#125;] </details> |  |
 
 
 
@@ -105,9 +106,9 @@ Type: OBJECT
 #### Output Example
 ```json
 {
+  "links" : { },
   "contacts" : [ {
     "id" : "",
-    "type" : "",
     "name" : "",
     "description" : "",
     "emails" : [ {
@@ -137,7 +138,7 @@ Type: OBJECT
 ### Create Company
 Name: createCompany
 
-`Creates new company`
+`Creates a new account. Accounts are companies or organizations that you do business with, and are referred to as 'Companies' in the Nutshell UI.`
 
 #### Properties
 
@@ -146,7 +147,7 @@ Name: createCompany
 | name | Name | STRING | Full name of the company. | true |
 | description | Description | STRING | Detailed Description of the company. | false |
 | email | Email | STRING | Primary email address of the company. | false |
-| phone | Phone | STRING | Primary phone number of the company | false |
+| phone | Phone | STRING | Primary phone number of the company. | false |
 
 #### Example JSON Structure
 ```json
@@ -214,14 +215,14 @@ Type: OBJECT
 ### Create Lead
 Name: createLead
 
-`Creates new Lead`
+`Creates a new lead.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| description | Name|Description | STRING | Description of the lead, which is also set as the name of the lead | true |
-| owner | Assignee | STRING | The user to whom the lead is assigned | false |
+| description | Name|Description | STRING | Description of the lead, which is also set as the name of the lead. | true |
+| owner | Owner ID | STRING | The ID of the user the lead is assigned to. | false |
 
 #### Example JSON Structure
 ```json
@@ -264,6 +265,20 @@ Type: OBJECT
 }
 ```
 
+#### How to find Owner ID
+
+If you are an administrator, you can view all user and team details and derive the correct Owner ID for use with the API.
+
+1. Log in to your Nutshell account.
+2. Navigate to **Settings** (bottom-left corner of the screen).
+3. Select **Users & teams**.
+4. Click the name of the specific user.
+5. In your browser’s address bar, look at the URL. For example: `https://app.nutshell.com/setup/user/settings/1`. The number at the end of the URL (`1` in this example) is the user’s simple integer entity ID.
+6. Convert the integer entity ID into the API Owner ID by appending `-users` to it. For example:
+    - Entity ID: `1`
+    - API Owner ID: `1-users`
+
+Use this `1-users` value as the Owner ID.
 
 
 
