@@ -19,7 +19,11 @@ spring-cloud-aws = "4.0.2"
 spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.1"
 springaicommunity-agent-judge = "0.9.1"
-springaicommunity-agent-utils = "0.7.0"
+springaicommunity-agent-utils = "0.8.0"
+# Note: tool-search-tool and tool-searcher-vectorstore are temporarily vendored
+# under //spring-ai-tool-search-tool/ because upstream 2.1.0 builds against
+# spring-ai 2.0.0-M4 and is binary-incompatible with M7+. See
+# spring-ai-tool-search-tool/README.md for the removal plan.
 testcontainers = "1.21.3"
 
 [libraries]
