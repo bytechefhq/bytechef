@@ -4,10 +4,7 @@ import PropertyMentionsInputBubbleMenu from '@/pages/platform/workflow-editor/co
 import {getSuggestionOptions} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionsInputEditorSuggestionOptions';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {
-    escapeHtmlForParagraph,
-    transformValueForObjectAccess,
-} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {transformValueForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {
     ComponentDefinitionBasic,
@@ -33,6 +30,8 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {FormulaMode} from './FormulaMode.extension';
+import {FunctionSignature} from './FunctionSignature.extension';
+import {FunctionSuggestion, FunctionSuggestionPluginKey} from './FunctionSuggestion.extension';
 import {MentionStorage} from './MentionStorage.extension';
 import PropertyMentionNodeView from './PropertyMentionNodeView';
 import {getDataPillIconSource} from './getDataPillIconSource';
@@ -40,8 +39,10 @@ import {
     PROPERTY_MENTION_CHIP_CLASS,
     PROPERTY_MENTION_LABEL_CLASS,
     PROPERTY_MENTION_ROOT_CLASS,
+    buildPropertyMentionsContent,
     replaceMentionNodesInHtmlWithVariables,
 } from './propertyMentionDom';
+import {useEvaluatorFunctionDefinitions} from './useEvaluatorFunctionDefinitions';
 
 interface PropertyMentionsInputEditorProps {
     className?: string;
@@ -129,6 +130,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             [componentDefinitions, taskDispatcherDefinitions, workflow]
         );
 
+        const evaluatorFunctionDefinitions = useEvaluatorFunctionDefinitions();
+
         const extensions = useMemo(() => {
             const extensions = [
                 ...(controlType === 'RICH_TEXT' ? [StarterKit] : [Document, Paragraph, Text]),
@@ -159,6 +162,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     setIsFormulaMode: setIsFormulaMode || (() => {}),
                 }),
                 MentionStorage,
+                ...(expressionEnabled !== false ? [FunctionSuggestion, FunctionSignature] : []),
                 Mention.extend({
                     addNodeView() {
                         return ReactNodeViewRenderer(PropertyMentionNodeView);
@@ -222,9 +226,24 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             if (controlType !== 'TEXT_AREA' && controlType !== 'RICH_TEXT' && controlType !== 'FORMULA_MODE') {
                 extensions.push(
                     Extension.create({
-                        addKeyboardShortcuts(this) {
+                        addKeyboardShortcuts() {
                             return {
-                                Enter: () => true,
+                                // Single-line inputs swallow Enter to prevent newlines. But when the
+                                // function suggestion popup is open, defer to its keydown handler so Enter
+                                // accepts the highlighted function instead of being eaten here. Tiptap
+                                // reverses extensions when building plugins, so this keymap sits ahead of
+                                // the Suggestion plugin and would otherwise consume Enter first.
+                                Enter: ({editor}) => {
+                                    const functionSuggestionActive = FunctionSuggestionPluginKey.getState(
+                                        editor.state
+                                    )?.active;
+
+                                    if (functionSuggestionActive) {
+                                        return false;
+                                    }
+
+                                    return true;
+                                },
                             };
                         },
                     })
@@ -382,55 +401,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         );
 
         const getContent = useCallback(
-            (value?: string) => {
-                if (typeof value !== 'string') {
-                    return;
-                }
-
-                if (!value) {
-                    return '';
-                }
-
-                let content = value;
-                let contentIsDecodedHtml = false;
-
-                if (
-                    controlType === 'RICH_TEXT' &&
-                    (content.includes('&lt;') || content.includes('&gt;') || content.includes('&amp;'))
-                ) {
-                    content = decode(content);
-
-                    content = sanitizeHtml(content);
-
-                    contentIsDecodedHtml = true;
-                }
-
-                if (!contentIsDecodedHtml && content.includes('\n')) {
-                    const valueLines = content.split('\n');
-
-                    const paragraphedLines =
-                        controlType === 'TEXT_AREA' || controlType === 'TEXT' || controlType === 'FORMULA_MODE'
-                            ? valueLines.map((valueLine) => `<p>${escapeHtmlForParagraph(valueLine)}</p>`)
-                            : valueLines.map((valueLine) => `<p>${valueLine}</p>`);
-
-                    content = paragraphedLines.join('');
-                }
-
-                const dataPillRegex = /\${([^}]+)}/g;
-
-                const matches = value.match(dataPillRegex)?.map((match) => match.slice(2, -1));
-
-                if (matches) {
-                    for (const match of matches) {
-                        content = content.replace(
-                            `\${${match}}`,
-                            `<span data-type="mention" class="${PROPERTY_MENTION_ROOT_CLASS}" data-id="${match}"></span>`
-                        );
-                    }
-                }
-
-                return content;
-            },
+            (value?: string) => buildPropertyMentionsContent(value, controlType),
             [controlType]
         );
 
@@ -514,7 +485,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     'aria-multiline': 'true',
                     class: twMerge(
                         'w-full max-w-full min-w-0 border-none text-sm wrap-break-word break-all whitespace-pre-wrap ring-0 outline-hidden',
-                        controlType === 'RICH_TEXT' && 'prose prose-sm sm:prose-base lg:prose-lg xl:prose-2xl',
+                        controlType === 'RICH_TEXT' && 'prose prose-sm',
                         className
                     ),
                     id: elementId ?? '',
@@ -608,6 +579,16 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             editor.storage.MentionStorage.dataPills = dataPills;
             editor.storage.MentionStorage.controlType = controlType;
         }, [controlType, dataPills, editor]);
+
+        // Keep the function suggestion catalog in editor storage so the suggestion items callback can read it
+        // without recreating the editor.
+        useEffect(() => {
+            if (!editor || editor.storage.FunctionSuggestion === undefined) {
+                return;
+            }
+
+            editor.storage.FunctionSuggestion.functionDefinitions = evaluatorFunctionDefinitions;
+        }, [editor, evaluatorFunctionDefinitions]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {

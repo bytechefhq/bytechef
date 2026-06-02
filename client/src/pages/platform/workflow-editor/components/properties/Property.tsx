@@ -17,22 +17,27 @@ import PropertyMultiSelect from '@/pages/platform/workflow-editor/components/pro
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyTextArea from '@/pages/platform/workflow-editor/components/properties/components/PropertyTextArea';
 import PropertyCodeEditor from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/PropertyCodeEditor';
+import PropertyCopilotButton from '@/pages/platform/workflow-editor/components/properties/components/property-copilot/PropertyCopilotButton';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
+import {buildPropertyMentionsContent} from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/propertyMentionDom';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
 import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
+import {CLUSTER_ELEMENT_TYPE_TOOLS} from '@/shared/constants';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
+import {PropertyCopilotMode} from '@/shared/middleware/graphql-types';
 import {
     GetClusterElementParameterDisplayConditions200Response,
     Option,
 } from '@/shared/middleware/platform/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, SquareFunctionIcon, XIcon} from 'lucide-react';
-import {ReactNode} from 'react';
+import {ReactNode, useCallback, useRef} from 'react';
 import {Control, Controller, FieldValues, FormState} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';
 
@@ -162,7 +167,36 @@ const Property = ({
         toolsMode,
     });
 
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const propertyCopilotAnchorRef = useRef<HTMLDivElement>(null);
+
     const clusterElementContext = useClusterElementContext();
+
+    const handleCopilotApply = useCallback(
+        (value: string) => {
+            const isFormula = value.startsWith('=');
+            const rawValue = isFormula ? value.substring(1) : value;
+
+            // Convert ${...} pills to mention-span HTML so TipTap renders them as chips immediately;
+            // calling setContent with the raw value would leave them as plain text until a refresh.
+            const content = buildPropertyMentionsContent(rawValue, controlType);
+
+            if (isFormula) {
+                setIsFormulaMode(true);
+            }
+
+            editorRef.current?.commands.setContent(content ?? rawValue, {
+                parseOptions: {preserveWhitespace: 'full'},
+            });
+        },
+        [controlType, editorRef, setIsFormulaMode]
+    );
+
+    const getCopilotHasValue = useCallback(
+        () => (editorRef.current?.state.doc.textContent.trim().length ?? 0) > 0,
+        [editorRef]
+    );
 
     if (hidden && !control) {
         return <></>;
@@ -211,8 +245,31 @@ const Property = ({
             {mentionInput && currentNode && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
                     controlType={controlType || 'TEXT'}
+                    copilotAnchorRef={propertyCopilotAnchorRef}
                     defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
-                    deletePropertyButton={deletePropertyButton}
+                    deletePropertyButton={
+                        <>
+                            {workflow.id &&
+                                currentNode?.name &&
+                                currentNode.clusterElementType !== CLUSTER_ELEMENT_TYPE_TOOLS && (
+                                    <PropertyCopilotButton
+                                        anchorRef={propertyCopilotAnchorRef}
+                                        disabled={!!options?.length && !isFormulaMode && !mentionInput}
+                                        dynamic={mentionInput}
+                                        environmentId={currentEnvironmentId}
+                                        getHasValue={getCopilotHasValue}
+                                        mode={isFormulaMode ? PropertyCopilotMode.Formula : PropertyCopilotMode.Text}
+                                        onApply={handleCopilotApply}
+                                        propertyPath={calculatedPath ?? name ?? ''}
+                                        propertyType={type}
+                                        workflowId={workflow.id as string}
+                                        workflowNodeName={currentNode.name}
+                                    />
+                                )}
+
+                            {deletePropertyButton}
+                        </>
+                    }
                     description={description}
                     error={hasError}
                     errorMessage={errorMessage}
