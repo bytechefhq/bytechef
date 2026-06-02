@@ -44,7 +44,11 @@ public enum CopilotAgentType implements AgentType {
     JSON_SCHEMA_BUILDER_ASK("json_schema_builder_ask", false),
     JSON_SCHEMA_BUILDER_BUILD("json_schema_builder_build", false),
     JSON_SCHEMA_BUILDER("json_schema_builder", true),
-    JSON_SCHEMA_BUILDER_AGENT("json_schema_builder_agent", false);
+    JSON_SCHEMA_BUILDER_AGENT("json_schema_builder_agent", false),
+    SAMPLE_OUTPUT_ASK("sample_output_ask", false),
+    SAMPLE_OUTPUT_BUILD("sample_output_build", false),
+    SAMPLE_OUTPUT("sample_output", true),
+    SAMPLE_OUTPUT_AGENT("sample_output_agent", false);
 
     private final String key;
     private final boolean fallback;
