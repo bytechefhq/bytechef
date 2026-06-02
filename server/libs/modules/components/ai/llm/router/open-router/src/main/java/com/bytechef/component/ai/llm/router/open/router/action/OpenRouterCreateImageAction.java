@@ -77,7 +77,8 @@ public class OpenRouterCreateImageAction {
                     option("2K", "2K", "Higher resolution"),
                     option("4K", "4K", "Highest resolution"),
                     option("0.5K", "0.5K",
-                        "Lower resolution, optimized for efficiency (supported by google/gemini-3.1-flash-image-preview only)"))
+                        "Lower resolution, optimized for efficiency (supported by google/gemini-3.1-flash-" +
+                            "image-preview only)"))
                 .defaultValue("1K")
                 .required(false),
             ATTACHMENTS_PROPERTY,

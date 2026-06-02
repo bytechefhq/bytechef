@@ -88,15 +88,15 @@ public class OpenRouterCreateSpeechAction {
 
         Map<String, Object> body = new HashMap<>();
 
-        body.put("input", inputParameters.getRequiredString(INPUT));
-        body.put("model", inputParameters.getRequiredString(MODEL));
+        body.put(INPUT, inputParameters.getRequiredString(INPUT));
+        body.put(MODEL, inputParameters.getRequiredString(MODEL));
         body.put("response_format", responseFormat);
-        body.put("voice", inputParameters.getRequiredString(VOICE));
+        body.put(VOICE, inputParameters.getRequiredString(VOICE));
 
         Double speed = inputParameters.getDouble(SPEED);
 
         if (speed != null) {
-            body.put("speed", speed);
+            body.put(SPEED, speed);
         }
 
         RestClient restClient = ModelUtils.getRestClientBuilder()

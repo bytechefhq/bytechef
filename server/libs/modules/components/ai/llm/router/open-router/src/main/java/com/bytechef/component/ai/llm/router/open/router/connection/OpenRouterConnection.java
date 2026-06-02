@@ -26,8 +26,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
  */
 public final class OpenRouterConnection {
 
-    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION =
-        RouterConnection.connectionDefinition(BASE_URL);
+    public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = RouterConnection
+        .connectionDefinition(BASE_URL)
+        .help("", "https://docs.bytechef.io/reference/components/oper-router_v1#connection-setup");
 
     private OpenRouterConnection() {
     }
