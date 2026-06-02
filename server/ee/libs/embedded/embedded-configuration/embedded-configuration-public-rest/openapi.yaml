@@ -542,6 +542,46 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
+  /integration-instances/{id}/workflows/{workflowUuid}/options:
+    post:
+      description: "Resolve dynamic option values for a component-defined workflow input property."
+      summary: "Get integration instance workflow input options"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "getFrontendIntegrationInstanceWorkflowInputOptions"
+      parameters:
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowUuid"
+          description: "The workflow reference of the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowInputOptionsRequest"
+        required: true
+      responses:
+        "200":
+          description: "The list of resolved options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - jwtBearerAuth: [ ]
   /integration-instances/{id}/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
@@ -1243,6 +1283,52 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
+  /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/options:
+    post:
+      description: "Resolve dynamic option values for a component-defined workflow input property."
+      summary: "Get integration instance workflow input options"
+      tags:
+        - "integration-instance-workflow"
+      operationId: "getIntegrationInstanceWorkflowInputOptions"
+      parameters:
+        - name: "externalUserId"
+          description: "The external user id."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+        - name: "id"
+          description: "The id of an integration instance."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "workflowUuid"
+          description: "The workflow reference of the workflow."
+          in: "path"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WorkflowInputOptionsRequest"
+        required: true
+      responses:
+        "200":
+          description: "The list of resolved options."
+          content:
+            application/json:
+              schema:
+                type: "array"
+                items:
+                  $ref: "#/components/schemas/Option"
+        "401":
+          $ref: "#/components/responses/UnauthorizedError"
+      security:
+        - bearerAuth: [ ]
   /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable:
     post:
       description: "Enable a workflow."
@@ -1674,6 +1760,29 @@ components:
           default: false
         type:
           $ref: "#/components/schemas/InputType"
+        componentReference:
+          $ref: "#/components/schemas/ComponentInputReference"
+    ComponentInputReference:
+      description: "An all-or-nothing reference from a workflow input to a component-defined input\
+        \ group, with the resolved group the SDK renders."
+      type: "object"
+      required:
+        - "componentName"
+        - "componentVersion"
+        - "groupName"
+      properties:
+        componentName:
+          description: "The name of the referenced component."
+          type: "string"
+        componentVersion:
+          description: "The version of the referenced component."
+          type: "integer"
+          format: "int32"
+        groupName:
+          description: "The name of the referenced component input group."
+          type: "string"
+        group:
+          $ref: "#/components/schemas/ComponentPropertyGroup"
     InputType:
       description: "The type of an input, for example \\\"STRING\\\""
       type: "string"
@@ -1686,6 +1795,76 @@ components:
         - "NUMBER"
         - "STRING"
         - "TIME"
+    Option:
+      type: "object"
+      required:
+        - "label"
+        - "value"
+      properties:
+        label:
+          type: "string"
+        value:
+          type: "string"
+    ComponentProperty:
+      description: "A resolved component input property the SDK renders."
+      type: "object"
+      required:
+        - "name"
+        - "type"
+      properties:
+        name:
+          type: "string"
+        label:
+          type: "string"
+        type:
+          $ref: "#/components/schemas/InputType"
+        controlType:
+          type: "string"
+        required:
+          type: "boolean"
+        options:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Option"
+        dynamicOptions:
+          description: "True when options must be fetched from the options endpoint."
+          type: "boolean"
+        optionsLookupDependsOn:
+          type: "array"
+          items:
+            type: "string"
+    ComponentPropertyGroup:
+      description: "A resolved component property group rendered as one compound input."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        name:
+          type: "string"
+        label:
+          type: "string"
+        properties:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ComponentProperty"
+    WorkflowInputOptionsRequest:
+      type: "object"
+      required:
+        - "inputName"
+        - "propertyName"
+      properties:
+        inputName:
+          description: "The workflow input whose referenced component the options resolve against."
+          type: "string"
+        propertyName:
+          description: "The component property whose options to resolve."
+          type: "string"
+        lookupDependsOnValues:
+          description: "Current values of the properties this lookup depends on."
+          type: "object"
+          additionalProperties: true
+        searchText:
+          type: "string"
     OAuth2:
       type: "object"
       properties:

@@ -8,8 +8,10 @@
 package com.bytechef.ee.embedded.configuration.exception;
 
 /**
- * Thrown when a single embedded integration is not visible to the requesting connected user because its permission
- * expression evaluated to {@code false}. The embedded public REST controller maps this to HTTP 404.
+ * Thrown when an embedded integration or integration instance is not visible to the requesting connected user, either
+ * because its permission expression evaluated to {@code false} or because the connected user does not own the targeted
+ * integration instance. The embedded public REST controllers map this to HTTP 404 (rather than 403) to avoid leaking
+ * the existence of resources the connected user is not permitted to see.
  *
  * @version ee
  *

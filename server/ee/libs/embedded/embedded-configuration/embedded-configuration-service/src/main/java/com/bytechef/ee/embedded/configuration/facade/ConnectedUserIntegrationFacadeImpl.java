@@ -63,6 +63,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -214,8 +216,11 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             throw new EmbeddedIntegrationNotVisibleException(integrationId);
         }
 
+        List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows = getMcpWorkflows(
+            integrationId, connectedUser);
+
         IntegrationInstanceConfigurationDTO filteredConfiguration =
-            filterWorkflows(integrationInstanceConfigurationDTO, connectedUser);
+            filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(
             connectedUser.getId(), integrationDTO.componentName(), environment);
@@ -260,7 +265,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             integrationInstanceWorkflows, oAuth2AuthorizationParameters, oAuth2Service.getRedirectUri());
 
         return connectedUserIntegrationDTO.withMcp(
-            getMcpTools(integrationDTO.componentName()), getMcpWorkflows(integrationId, connectedUser),
+            getMcpTools(integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 
@@ -277,7 +282,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .filter(integrationInstanceConfigurationDTO -> isIntegrationVisible(
                 integrationInstanceConfigurationDTO.integration(), connectedUser))
             .map(integrationInstanceConfigurationDTO -> toConnectedUserIntegrationDTO(
-                connectedUser, filterWorkflows(integrationInstanceConfigurationDTO, connectedUser), environment))
+                connectedUser, integrationInstanceConfigurationDTO, environment))
             .toList();
     }
 
@@ -286,7 +291,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
     }
 
     IntegrationInstanceConfigurationDTO filterWorkflows(
-        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, ConnectedUser connectedUser) {
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO, ConnectedUser connectedUser,
+        List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows) {
 
         List<IntegrationInstanceConfigurationWorkflowDTO> workflows =
             integrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows();
@@ -294,6 +300,10 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         if (workflows == null || workflows.isEmpty()) {
             return integrationInstanceConfigurationDTO;
         }
+
+        Set<String> mcpWorkflowUuids = mcpWorkflows.stream()
+            .map(ConnectedUserIntegrationDTO.McpWorkflowInfo::workflowUuid)
+            .collect(Collectors.toSet());
 
         Map<String, String> permissionExpressionsByUuid = new HashMap<>();
 
@@ -308,6 +318,8 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         }
 
         List<IntegrationInstanceConfigurationWorkflowDTO> visibleWorkflows = workflows.stream()
+            .filter(IntegrationInstanceConfigurationWorkflowDTO::enabled)
+            .filter(workflowDTO -> !mcpWorkflowUuids.contains(workflowDTO.workflowUuid()))
             .filter(workflowDTO -> embeddedPermissionEvaluator.evaluate(
                 permissionExpressionsByUuid.get(workflowDTO.workflowUuid()), connectedUser))
             .toList();
@@ -322,6 +334,12 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
         Environment environment) {
 
         IntegrationDTO integrationDTO = integrationInstanceConfigurationDTO.integration();
+
+        List<ConnectedUserIntegrationDTO.McpWorkflowInfo> mcpWorkflows = getMcpWorkflows(
+            integrationDTO.id(), connectedUser);
+
+        IntegrationInstanceConfigurationDTO filteredConfiguration =
+            filterWorkflows(integrationInstanceConfigurationDTO, connectedUser, mcpWorkflows);
 
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getIntegrationInstances(connectedUser.getId(), integrationDTO.componentName(), environment);
@@ -338,10 +356,10 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                     .toList());
 
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO = new ConnectedUserIntegrationDTO(
-            connections, integrationInstanceConfigurationDTO, integrationInstances, integrationInstanceWorkflows);
+            connections, filteredConfiguration, integrationInstances, integrationInstanceWorkflows);
 
         return connectedUserIntegrationDTO.withMcp(
-            getMcpTools(integrationDTO.componentName()), getMcpWorkflows(integrationDTO.id(), connectedUser),
+            getMcpTools(integrationDTO.componentName()), mcpWorkflows,
             attachInstanceMcpData(connectedUserIntegrationDTO.integrationInstances(), connectedUser));
     }
 

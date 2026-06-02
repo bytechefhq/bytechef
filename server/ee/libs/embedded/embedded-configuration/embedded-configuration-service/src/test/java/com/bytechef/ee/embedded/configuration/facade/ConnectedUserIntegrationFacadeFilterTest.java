@@ -15,6 +15,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationWorkflow;
+import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationDTO;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
@@ -127,7 +128,8 @@ class ConnectedUserIntegrationFacadeFilterTest {
                 .build();
 
         IntegrationInstanceConfigurationDTO filteredIntegrationInstanceConfigurationDTO =
-            connectedUserIntegrationFacade.filterWorkflows(integrationInstanceConfigurationDTO, connectedUser);
+            connectedUserIntegrationFacade.filterWorkflows(
+                integrationInstanceConfigurationDTO, connectedUser, List.of());
 
         List<IntegrationInstanceConfigurationWorkflowDTO> visibleWorkflows =
             filteredIntegrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows();
@@ -137,9 +139,59 @@ class ConnectedUserIntegrationFacadeFilterTest {
             .workflowUuid());
     }
 
+    @Test
+    void testFilterWorkflowsDropsDisabledAndMcpWorkflows() {
+        ConnectedUser connectedUser = mock(ConnectedUser.class);
+
+        IntegrationWorkflow enabledWorkflow = mock(IntegrationWorkflow.class);
+
+        when(enabledWorkflow.getUuidAsString()).thenReturn("uuid-enabled");
+        when(enabledWorkflow.getPermissionExpression()).thenReturn(null);
+
+        IntegrationWorkflow disabledWorkflow = mock(IntegrationWorkflow.class);
+
+        when(disabledWorkflow.getUuidAsString()).thenReturn("uuid-disabled");
+        when(disabledWorkflow.getPermissionExpression()).thenReturn(null);
+
+        IntegrationWorkflow mcpWorkflow = mock(IntegrationWorkflow.class);
+
+        when(mcpWorkflow.getUuidAsString()).thenReturn("uuid-mcp");
+        when(mcpWorkflow.getPermissionExpression()).thenReturn(null);
+
+        when(integrationWorkflowService.getIntegrationWorkflows(10L))
+            .thenReturn(List.of(enabledWorkflow, disabledWorkflow, mcpWorkflow));
+
+        IntegrationInstanceConfigurationDTO integrationInstanceConfigurationDTO =
+            IntegrationInstanceConfigurationDTO.builder()
+                .integrationId(10L)
+                .integrationInstanceConfigurationWorkflows(
+                    List.of(
+                        workflowDTO(1L, "uuid-enabled", true), workflowDTO(2L, "uuid-disabled", false),
+                        workflowDTO(3L, "uuid-mcp", true)))
+                .build();
+
+        IntegrationInstanceConfigurationDTO filteredIntegrationInstanceConfigurationDTO =
+            connectedUserIntegrationFacade.filterWorkflows(
+                integrationInstanceConfigurationDTO, connectedUser,
+                List.of(new ConnectedUserIntegrationDTO.McpWorkflowInfo(null, null, List.of(), "uuid-mcp")));
+
+        List<IntegrationInstanceConfigurationWorkflowDTO> visibleWorkflows =
+            filteredIntegrationInstanceConfigurationDTO.integrationInstanceConfigurationWorkflows();
+
+        assertEquals(1, visibleWorkflows.size());
+        assertEquals("uuid-enabled", visibleWorkflows.getFirst()
+            .workflowUuid());
+    }
+
     private static IntegrationInstanceConfigurationWorkflowDTO workflowDTO(long id, String workflowUuid) {
+        return workflowDTO(id, workflowUuid, true);
+    }
+
+    private static IntegrationInstanceConfigurationWorkflowDTO workflowDTO(
+        long id, String workflowUuid, boolean enabled) {
+
         return new IntegrationInstanceConfigurationWorkflowDTO(
-            List.of(), null, null, Map.of(), true, id, null, null, null, null, 0, null, "workflowId-" + id,
+            List.of(), null, null, Map.of(), enabled, id, null, null, null, null, 0, null, "workflowId-" + id,
             workflowUuid);
     }
 

@@ -121,4 +121,9 @@ public class RemoteIntegrationServiceClient implements IntegrationService {
     public Integration update(Integration integration) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Integration updatePermissionExpression(long id, String permissionExpression) {
+        throw new UnsupportedOperationException();
+    }
 }
