@@ -124,6 +124,22 @@ public class OpenRouterImageModel implements ImageModel {
         return new ImageResponse(List.of(new ImageGeneration(new Image(url, null))));
     }
 
+    public String getModel() {
+        return model;
+    }
+
+    public String getAspectRatio() {
+        return aspectRatio;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
     public static class Builder {
 
         private String apiKey;
