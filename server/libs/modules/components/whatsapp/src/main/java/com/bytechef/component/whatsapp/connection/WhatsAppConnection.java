@@ -48,7 +48,8 @@ public class WhatsAppConnection {
                         .label("Phone number ID")
                         .required(true))
                 .apply((connectionParameters, context) -> ofHeaders(
-                    Map.of(AUTHORIZATION,
+                    Map.of(
+                        AUTHORIZATION,
                         List.of(BEARER + " " + connectionParameters.getString(SYSTEM_USER_ACCESS_TOKEN))))));
 
     private WhatsAppConnection() {
