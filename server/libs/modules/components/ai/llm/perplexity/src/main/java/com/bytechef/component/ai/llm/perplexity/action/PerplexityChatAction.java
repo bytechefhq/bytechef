@@ -90,47 +90,45 @@ public class PerplexityChatAction {
         .help("", "https://docs.bytechef.io/reference/components/perplexity_v1#ask")
         .perform(PerplexityChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL =
-        (inputParameters, connectionParameters, responseFormatRequired) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        ResponseFormat responseFormat = null;
 
-            ResponseFormat responseFormat = null;
+        if (responseFormatRequired) {
+            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
 
-            if (responseFormatRequired) {
-                ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
-                    RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+            ResponseFormat.Type type =
+                chatModelResponseFormat.equals(TEXT) ? ResponseFormat.Type.TEXT : ResponseFormat.Type.JSON_OBJECT;
 
-                ResponseFormat.Type type =
-                    chatModelResponseFormat.equals(TEXT) ? ResponseFormat.Type.TEXT : ResponseFormat.Type.JSON_OBJECT;
-
-                responseFormat = ResponseFormat.builder()
-                    .type(type)
-                    .build();
-            }
-
-            return OpenAiChatModel.builder()
-                .openAiClient(
-                    OpenAIOkHttpClient.builder()
-                        .apiKey(connectionParameters.getString(TOKEN))
-                        .baseUrl("https://api.perplexity.ai")
-                        .timeout(Duration.ofMinutes(5))
-                        .build())
-                .options(
-                    OpenAiChatOptions.builder()
-                        .apiKey(connectionParameters.getString(TOKEN))
-                        .model(inputParameters.getRequiredString(MODEL))
-                        .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                        .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                        .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                        .N(inputParameters.getInteger(N))
-                        .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                        .responseFormat(responseFormat)
-                        .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                        .temperature(inputParameters.getDouble(TEMPERATURE))
-                        .topP(inputParameters.getDouble(TOP_P))
-                        .user(inputParameters.getString(USER))
-                        .build())
+            responseFormat = ResponseFormat.builder()
+                .type(type)
                 .build();
-        };
+        }
+
+        return OpenAiChatModel.builder()
+            .openAiClient(
+                OpenAIOkHttpClient.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .baseUrl("https://api.perplexity.ai")
+                    .timeout(Duration.ofMinutes(5))
+                    .build())
+            .options(
+                OpenAiChatOptions.builder()
+                    .apiKey(connectionParameters.getString(TOKEN))
+                    .model(inputParameters.getRequiredString(MODEL))
+                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                    .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .N(inputParameters.getInteger(N))
+                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                    .responseFormat(responseFormat)
+                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                    .temperature(inputParameters.getDouble(TEMPERATURE))
+                    .topP(inputParameters.getDouble(TOP_P))
+                    .user(inputParameters.getString(USER))
+                    .build())
+            .build();
+    };
 
     private PerplexityChatAction() {
     }

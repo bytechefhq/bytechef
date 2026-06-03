@@ -98,15 +98,9 @@ class PerplexityChatActionTest {
         Parameters mockedInputParameters = MockParametersFactory.create(
             Map.ofEntries(
                 Map.entry(RESPONSE, Map.of(RESPONSE_FORMAT, ChatModel.ResponseFormat.TEXT.name())),
-                Map.entry(MODEL, "sonar"),
-                Map.entry(TEMPERATURE, 0.7),
-                Map.entry(MAX_TOKENS, 1000),
-                Map.entry(TOP_P, 0.9),
-                Map.entry(FREQUENCY_PENALTY, 0.5),
-                Map.entry(PRESENCE_PENALTY, 0.3),
-                Map.entry(N, 1),
-                Map.entry(STOP, List.of("stop")),
-                Map.entry(USER, "user123"),
+                Map.entry(MODEL, "sonar"), Map.entry(TEMPERATURE, 0.7), Map.entry(MAX_TOKENS, 1000),
+                Map.entry(TOP_P, 0.9), Map.entry(FREQUENCY_PENALTY, 0.5), Map.entry(PRESENCE_PENALTY, 0.3),
+                Map.entry(N, 1), Map.entry(STOP, List.of("stop")), Map.entry(USER, "user123"),
                 Map.entry(LOGIT_BIAS, Map.of("50256", -100))));
 
         org.springframework.ai.chat.model.ChatModel chatModel = PerplexityChatAction.CHAT_MODEL.createChatModel(
@@ -137,16 +131,8 @@ class PerplexityChatActionTest {
     @Test
     void testCreateChatModelWithoutResponseFormat() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "sonar",
-                TEMPERATURE, 0.7,
-                MAX_TOKENS, 1000,
-                TOP_P, 0.9,
-                FREQUENCY_PENALTY, 0.5,
-                PRESENCE_PENALTY, 0.3,
-                N, 1,
-                STOP, List.of("stop"),
-                USER, "user123",
+            Map.of(MODEL, "sonar", TEMPERATURE, 0.7, MAX_TOKENS, 1000, TOP_P, 0.9, FREQUENCY_PENALTY, 0.5,
+                PRESENCE_PENALTY, 0.3, N, 1, STOP, List.of("stop"), USER, "user123",
                 LOGIT_BIAS, Map.of("50256", -100)));
 
         org.springframework.ai.chat.model.ChatModel chatModel = PerplexityChatAction.CHAT_MODEL.createChatModel(
