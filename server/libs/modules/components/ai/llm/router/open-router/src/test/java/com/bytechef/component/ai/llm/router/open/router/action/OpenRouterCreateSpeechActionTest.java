@@ -22,17 +22,24 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMA
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SPEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.VOICE;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.File;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -66,9 +73,15 @@ class OpenRouterCreateSpeechActionTest {
     private final RestClient mockedRestClient = mock(RestClient.class);
     private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = forClass(InputStream.class);
+
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<File, Executor>> fileFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final File mockedFile = mock(File.class);
 
     @Test
-    void testPerform() {
+    void testPerform() throws IOException {
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = Mockito.mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(ModelUtils::getRestClientBuilder)
                 .thenReturn(mockedBuilder);
@@ -93,7 +106,13 @@ class OpenRouterCreateSpeechActionTest {
             when(mockedResponseSpec.body(byte[].class))
                 .thenReturn(mockedByteArray);
 
-            when(mockedContext.file(any()))
+            when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+                .thenAnswer(inv -> {
+                    ContextFunction<File, Executor> value = fileFunctionArgumentCaptor.getValue();
+
+                    return value.apply(mockedFile);
+                });
+            when(mockedFile.storeContent(stringArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
             FileEntry result = OpenRouterCreateSpeechAction.perform(mockedParameters, mockedParameters, mockedContext);
@@ -101,12 +120,20 @@ class OpenRouterCreateSpeechActionTest {
             assertEquals(mockedFileEntry, result);
 
             assertEquals(
-                List.of("https://openrouter.ai/api/v1", "Authorization", "Bearer token", "/audio/speech"),
+                List.of("https://openrouter.ai/api/v1", "Authorization", "Bearer token", "/audio/speech", "speech.pcm"),
                 stringArgumentCaptor.getAllValues());
 
             assertEquals(MediaType.APPLICATION_JSON, mediaTypeArgumentCaptor.getValue());
+            InputStream inputStreamArgumentCaptorValue = inputStreamArgumentCaptor.getValue();
 
-            Map<String, Object> body = (Map<String, Object>) objectArgumentCaptor.getValue();
+            assertInstanceOf(ByteArrayInputStream.class, inputStreamArgumentCaptorValue);
+            assertArrayEquals(mockedByteArray, inputStreamArgumentCaptorValue.readAllBytes());
+
+            Object value = objectArgumentCaptor.getValue();
+            assertInstanceOf(Map.class, value);
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> body = (Map<String, Object>) value;
 
             assertEquals("input", body.get("input"));
             assertEquals("model", body.get("model"));
