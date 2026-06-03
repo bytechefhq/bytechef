@@ -1,8 +1,10 @@
 import {Thread} from '@/components/assistant-ui/thread';
 import {WorkflowTestChatRuntimeProvider} from '@/pages/platform/workflow-editor/components/workflow-test-chat/runtime-providers/WorkflowTestChatRuntimeProvider';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {XIcon} from 'lucide-react';
 import {useEffect} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const WorkflowTestChatPanel = () => {
@@ -13,6 +15,8 @@ const WorkflowTestChatPanel = () => {
             workflowTestChatPanelOpen: state.workflowTestChatPanelOpen,
         }))
     );
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const handlePanelClose = () => {
         setWorkflowTestChatPanelOpen(false);
@@ -27,7 +31,12 @@ const WorkflowTestChatPanel = () => {
     }
 
     return (
-        <div className="absolute inset-y-4 top-2 right-[69px] bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background">
+        <div
+            className={twMerge(
+                'absolute inset-y-4 top-2 bottom-6 z-10 w-screen max-w-workflow-node-details-panel-width overflow-hidden rounded-lg border border-stroke-neutral-secondary bg-background',
+                copilotLayoutShifted ? 'right-[57px]' : 'right-[69px]'
+            )}
+        >
             <div className="flex h-full flex-col divide-y divide-gray-100 bg-surface-main">
                 <header className="flex items-center p-4 text-lg font-medium">
                     <span>Playground</span>

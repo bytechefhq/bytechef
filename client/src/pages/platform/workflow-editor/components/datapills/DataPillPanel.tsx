@@ -5,6 +5,7 @@ import DataPillPanelBody, {
     OperationType,
 } from '@/pages/platform/workflow-editor/components/datapills/DataPillPanelBody';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {InfoIcon, XIcon} from 'lucide-react';
 import {useEffect, useState} from 'react';
@@ -31,6 +32,8 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
     );
 
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const {aiAgentNodeDetailsPanelOpen, currentNode, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
@@ -87,8 +90,10 @@ const DataPillPanel = ({className, loading, previousComponentDefinitions, workfl
 
     const sharedClasses =
         'z-10 w-screen max-w-data-pill-panel-width overflow-hidden border border-stroke-neutral-secondary bg-background';
-    const defaultPositionClasses =
-        'absolute bottom-6 right-[536px] top-2 rounded-md animate-[slideInFromRight_300ms_ease-out]';
+    const defaultPositionClasses = twMerge(
+        'absolute top-2 bottom-6 animate-[slideInFromRight_300ms_ease-out] rounded-md',
+        copilotLayoutShifted ? 'right-[524px]' : 'right-[536px]'
+    );
 
     return (
         <div className={twMerge(sharedClasses, className || defaultPositionClasses)}>
