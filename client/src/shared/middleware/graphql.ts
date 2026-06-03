@@ -1,5 +1,14 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+import type * as Types from './graphql-types';
+
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { fetcher } from './graphqlFetcher';
+export * from './graphql-types';
+import type {KnowledgeBaseDocument as KnowledgeBaseDocumentSchemaType} from './graphql-types';
+export type KnowledgeBaseDocument = KnowledgeBaseDocumentSchemaType;
 export class TypedDocumentString<TResult, TVariables> extends String {
   __apiType?: { result: TResult; variables: TVariables };
   __meta__?: Record<string, unknown>;
@@ -13,5374 +22,1726 @@ export class TypedDocumentString<TResult, TVariables> extends String {
     return this.value;
   }
 }
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
-export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
-export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-/** All built-in and custom scalars, mapped to their actual values */
-export type Scalars = {
-  ID: { input: string; output: string; }
-  String: { input: string; output: string; }
-  Boolean: { input: boolean; output: boolean; }
-  Int: { input: number; output: number; }
-  Float: { input: number; output: number; }
-  Any: { input: any; output: any; }
-  Long: { input: any; output: any; }
-  Map: { input: any; output: any; }
-};
-
-export type ActionDefinition = {
-  __typename?: 'ActionDefinition';
-  componentName: Scalars['String']['output'];
-  componentVersion: Scalars['Int']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  help?: Maybe<Help>;
-  name: Scalars['String']['output'];
-  outputDefined: Scalars['Boolean']['output'];
-  outputFunctionDefined: Scalars['Boolean']['output'];
-  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
-  properties: Array<Property>;
-  resumePerformFunctionDefined?: Maybe<Scalars['Boolean']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
-};
-
-export type AddColumnInput = {
-  column: ColumnInput;
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type AdminUser = {
-  __typename?: 'AdminUser';
-  activated?: Maybe<Scalars['Boolean']['output']>;
-  authorities?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  email?: Maybe<Scalars['String']['output']>;
-  firstName?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  imageUrl?: Maybe<Scalars['String']['output']>;
-  langKey?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  lastName?: Maybe<Scalars['String']['output']>;
-  login?: Maybe<Scalars['String']['output']>;
-  uuid?: Maybe<Scalars['String']['output']>;
-};
-
-export type AdminUserPage = {
-  __typename?: 'AdminUserPage';
-  content: Array<Maybe<AdminUser>>;
-  number: Scalars['Int']['output'];
-  size: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
-};
-
-export type AiAgentEvalResult = {
-  __typename?: 'AiAgentEvalResult';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  inputTokens?: Maybe<Scalars['Int']['output']>;
-  outputTokens?: Maybe<Scalars['Int']['output']>;
-  runIndex?: Maybe<Scalars['Int']['output']>;
-  scenario: AiAgentEvalScenario;
-  score?: Maybe<Scalars['Float']['output']>;
-  status: AiAgentEvalResultStatus;
-  transcriptFile?: Maybe<Scalars['String']['output']>;
-  verdicts: Array<AiAgentJudgeVerdict>;
-};
-
-export enum AiAgentEvalResultStatus {
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  Pending = 'PENDING',
-  Running = 'RUNNING'
-}
-
-export type AiAgentEvalRun = {
-  __typename?: 'AiAgentEvalRun';
-  agentVersion?: Maybe<Scalars['String']['output']>;
-  averageScore?: Maybe<Scalars['Float']['output']>;
-  completedDate?: Maybe<Scalars['Long']['output']>;
-  completedScenarios: Scalars['Int']['output'];
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  results: Array<AiAgentEvalResult>;
-  startedDate?: Maybe<Scalars['Long']['output']>;
-  status: AiAgentEvalRunStatus;
-  totalInputTokens?: Maybe<Scalars['Int']['output']>;
-  totalOutputTokens?: Maybe<Scalars['Int']['output']>;
-  totalScenarios: Scalars['Int']['output'];
-};
-
-export enum AiAgentEvalRunStatus {
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  Pending = 'PENDING',
-  Running = 'RUNNING'
-}
-
-export type AiAgentEvalScenario = {
-  __typename?: 'AiAgentEvalScenario';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  expectedOutput?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  judges: Array<AiAgentScenarioJudge>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  maxTurns?: Maybe<Scalars['Int']['output']>;
-  name: Scalars['String']['output'];
-  numberOfRuns?: Maybe<Scalars['Int']['output']>;
-  personaPrompt?: Maybe<Scalars['String']['output']>;
-  toolSimulations: Array<AiAgentScenarioToolSimulation>;
-  type: AiAgentScenarioType;
-  userMessage?: Maybe<Scalars['String']['output']>;
-};
-
-export type AiAgentEvalTest = {
-  __typename?: 'AiAgentEvalTest';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  scenarios: Array<AiAgentEvalScenario>;
-};
-
-export type AiAgentJudge = {
-  __typename?: 'AiAgentJudge';
-  configuration: Scalars['Map']['output'];
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  type: AiAgentJudgeType;
-};
-
-export enum AiAgentJudgeScope {
-  Agent = 'AGENT',
-  Scenario = 'SCENARIO'
-}
-
-export enum AiAgentJudgeType {
-  ContainsText = 'CONTAINS_TEXT',
-  JsonSchema = 'JSON_SCHEMA',
-  LlmRule = 'LLM_RULE',
-  RegexMatch = 'REGEX_MATCH',
-  ResponseLength = 'RESPONSE_LENGTH',
-  Similarity = 'SIMILARITY',
-  StringEquals = 'STRING_EQUALS',
-  ToolUsage = 'TOOL_USAGE'
-}
-
-export type AiAgentJudgeVerdict = {
-  __typename?: 'AiAgentJudgeVerdict';
-  explanation: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  judgeName: Scalars['String']['output'];
-  judgeScope: AiAgentJudgeScope;
-  judgeType: AiAgentJudgeType;
-  passed: Scalars['Boolean']['output'];
-  score: Scalars['Float']['output'];
-};
-
-export type AiAgentScenarioJudge = {
-  __typename?: 'AiAgentScenarioJudge';
-  configuration: Scalars['Map']['output'];
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  type: AiAgentJudgeType;
-};
-
-export type AiAgentScenarioToolSimulation = {
-  __typename?: 'AiAgentScenarioToolSimulation';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  responsePrompt: Scalars['String']['output'];
-  simulationModel?: Maybe<Scalars['String']['output']>;
-  toolName: Scalars['String']['output'];
-};
-
-export enum AiAgentScenarioType {
-  MultiTurn = 'MULTI_TURN',
-  SingleTurn = 'SINGLE_TURN'
-}
-
-export type AiSkill = {
-  __typename?: 'AiSkill';
-  /** Epoch milliseconds (UTC) */
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  /** Epoch milliseconds (UTC) */
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-};
-
-export type ApiCollectionSearchResult = SearchResult & {
-  __typename?: 'ApiCollectionSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type ApiConnector = {
-  __typename?: 'ApiConnector';
-  connectorVersion: Scalars['Int']['output'];
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  definition?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  enabled?: Maybe<Scalars['Boolean']['output']>;
-  endpoints?: Maybe<Array<ApiConnectorEndpoint>>;
-  icon?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  specification?: Maybe<Scalars['String']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ApiConnectorEndpoint = {
-  __typename?: 'ApiConnectorEndpoint';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  httpMethod?: Maybe<HttpMethod>;
-  id: Scalars['ID']['output'];
-  lastExecutionDate?: Maybe<Scalars['Long']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  path?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ApiEndpointSearchResult = SearchResult & {
-  __typename?: 'ApiEndpointSearchResult';
-  collectionId: Scalars['ID']['output'];
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  path?: Maybe<Scalars['String']['output']>;
-  type: SearchAssetType;
-};
-
-export type ApiKey = {
-  __typename?: 'ApiKey';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  lastUsedDate?: Maybe<Scalars['Long']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  secretKey?: Maybe<Scalars['String']['output']>;
-};
-
-export type ApprovalTask = {
-  __typename?: 'ApprovalTask';
-  assigneeId?: Maybe<Scalars['ID']['output']>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  dueDate?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  jobResumeId?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  priority: ApprovalTaskPriority;
-  status: ApprovalTaskStatus;
-  version: Scalars['Int']['output'];
-};
-
-export type ApprovalTaskInput = {
-  assigneeId?: InputMaybe<Scalars['ID']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  dueDate?: InputMaybe<Scalars['String']['input']>;
-  id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
-  priority?: InputMaybe<ApprovalTaskPriority>;
-  status?: InputMaybe<ApprovalTaskStatus>;
-  version?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export enum ApprovalTaskPriority {
-  High = 'HIGH',
-  Low = 'LOW',
-  Medium = 'MEDIUM'
-}
-
-export enum ApprovalTaskStatus {
-  Completed = 'COMPLETED',
-  InProgress = 'IN_PROGRESS',
-  Open = 'OPEN'
-}
-
-export type ArrayProperty = Property & {
-  __typename?: 'ArrayProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Array<Maybe<Scalars['Map']['output']>>>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Array<Maybe<Scalars['Map']['output']>>>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  items?: Maybe<Array<Property>>;
-  label?: Maybe<Scalars['String']['output']>;
-  maxItems?: Maybe<Scalars['Long']['output']>;
-  minItems?: Maybe<Scalars['Long']['output']>;
-  multipleValues?: Maybe<Scalars['Boolean']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  options?: Maybe<Array<Option>>;
-  optionsDataSource?: Maybe<OptionsDataSource>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type Authorization = {
-  __typename?: 'Authorization';
-  description?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  properties?: Maybe<Array<Property>>;
-  title?: Maybe<Scalars['String']['output']>;
-  type?: Maybe<AuthorizationType>;
-};
-
-export enum AuthorizationType {
-  ApiKey = 'API_KEY',
-  BasicAuth = 'BASIC_AUTH',
-  BearerToken = 'BEARER_TOKEN',
-  Custom = 'CUSTOM',
-  DigestAuth = 'DIGEST_AUTH',
-  Oauth2AuthorizationCode = 'OAUTH2_AUTHORIZATION_CODE',
-  Oauth2AuthorizationCodePkce = 'OAUTH2_AUTHORIZATION_CODE_PKCE',
-  Oauth2ClientCredentials = 'OAUTH2_CLIENT_CREDENTIALS',
-  Oauth2ImplicitCode = 'OAUTH2_IMPLICIT_CODE',
-  Oauth2ResourceOwnerPassword = 'OAUTH2_RESOURCE_OWNER_PASSWORD'
-}
-
-export type AutomationWorkflowProject = {
-  __typename?: 'AutomationWorkflowProject';
-  categoryId?: Maybe<Scalars['ID']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastPublishedVersion?: Maybe<Scalars['Int']['output']>;
-  name: Scalars['String']['output'];
-  published: Scalars['Boolean']['output'];
-  tagIds: Array<Scalars['ID']['output']>;
-  version: Scalars['Int']['output'];
-  workflowTemplates: Array<AutomationWorkflowProjectWorkflowTemplate>;
-};
-
-export type AutomationWorkflowProjectCategory = {
-  __typename?: 'AutomationWorkflowProjectCategory';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export type AutomationWorkflowProjectComponent = {
-  __typename?: 'AutomationWorkflowProjectComponent';
-  icon?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-};
-
-export type AutomationWorkflowProjectTag = {
-  __typename?: 'AutomationWorkflowProjectTag';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export type AutomationWorkflowProjectVersion = {
-  __typename?: 'AutomationWorkflowProjectVersion';
-  publishedDate?: Maybe<Scalars['String']['output']>;
-  status: Scalars['String']['output'];
-  version: Scalars['Int']['output'];
-};
-
-export type AutomationWorkflowProjectWorkflowTemplate = {
-  __typename?: 'AutomationWorkflowProjectWorkflowTemplate';
-  components: Array<AutomationWorkflowProjectComponent>;
-  description?: Maybe<Scalars['String']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  triggers: Array<AutomationWorkflowProjectComponent>;
-  workflowUuid: Scalars['ID']['output'];
-};
-
-export type BooleanProperty = Property & {
-  __typename?: 'BooleanProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['Boolean']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['Boolean']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type Category = {
-  __typename?: 'Category';
-  id?: Maybe<Scalars['ID']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-};
-
-export type ChatWorkflow = {
-  __typename?: 'ChatWorkflow';
-  projectDeploymentId: Scalars['ID']['output'];
-  projectId: Scalars['ID']['output'];
-  projectName: Scalars['String']['output'];
-  workflowExecutionId: Scalars['String']['output'];
-  workflowLabel: Scalars['String']['output'];
-};
-
-export type ClusterElementDefinition = {
-  __typename?: 'ClusterElementDefinition';
-  componentName?: Maybe<Scalars['String']['output']>;
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  help?: Maybe<Help>;
-  icon?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  outputDefined: Scalars['Boolean']['output'];
-  outputFunctionDefined: Scalars['Boolean']['output'];
-  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
-  properties: Array<Property>;
-  title?: Maybe<Scalars['String']['output']>;
-  type?: Maybe<ClusterElementType>;
-};
-
-export type ClusterElementType = {
-  __typename?: 'ClusterElementType';
-  key?: Maybe<Scalars['String']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  multipleElements?: Maybe<Scalars['Boolean']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-};
-
-export type ColumnInput = {
-  name: Scalars['String']['input'];
-  type: ColumnType;
-};
-
-export enum ColumnType {
-  Boolean = 'BOOLEAN',
-  Date = 'DATE',
-  DateTime = 'DATE_TIME',
-  Integer = 'INTEGER',
-  Number = 'NUMBER',
-  String = 'STRING'
-}
-
-export type ComponentCategory = {
-  __typename?: 'ComponentCategory';
-  label?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-};
-
-export type ComponentConnection = {
-  __typename?: 'ComponentConnection';
-  componentName: Scalars['String']['output'];
-  componentVersion: Scalars['Int']['output'];
-  key: Scalars['String']['output'];
-  required: Scalars['Boolean']['output'];
-  workflowNodeName: Scalars['String']['output'];
-};
-
-export type ComponentDefinition = {
-  __typename?: 'ComponentDefinition';
-  actionClusterElementTypes?: Maybe<Scalars['Map']['output']>;
-  actions?: Maybe<Array<ActionDefinition>>;
-  actionsCount?: Maybe<Scalars['Int']['output']>;
-  clusterElement?: Maybe<Scalars['Boolean']['output']>;
-  clusterElementClusterElementTypes?: Maybe<Scalars['Map']['output']>;
-  clusterElementTypes?: Maybe<Array<ClusterElementType>>;
-  clusterElements?: Maybe<Array<ClusterElementDefinition>>;
-  clusterElementsCount?: Maybe<Scalars['Map']['output']>;
-  clusterRoot?: Maybe<Scalars['Boolean']['output']>;
-  componentCategories?: Maybe<Array<ComponentCategory>>;
-  connection?: Maybe<ConnectionDefinition>;
-  connectionRequired?: Maybe<Scalars['Boolean']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  icon?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  resources?: Maybe<Resources>;
-  tags?: Maybe<Array<Scalars['String']['output']>>;
-  title?: Maybe<Scalars['String']['output']>;
-  triggers?: Maybe<Array<TriggerDefinition>>;
-  triggersCount?: Maybe<Scalars['Int']['output']>;
-  unifiedApiCategory?: Maybe<UnifiedApiCategory>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ComponentDefinitionTuple = {
-  __typename?: 'ComponentDefinitionTuple';
-  key?: Maybe<Scalars['String']['output']>;
-  value: Array<Maybe<ComponentDefinition>>;
-};
-
-export type ConnectedUser = {
-  __typename?: 'ConnectedUser';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  environmentId: Scalars['ID']['output'];
-  externalId: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ConnectedUserMcpServer = {
-  __typename?: 'ConnectedUserMcpServer';
-  enabled: Scalars['Boolean']['output'];
-  environmentId: Scalars['ID']['output'];
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  tools: Array<ConnectedUserMcpServerTool>;
-};
-
-export type ConnectedUserMcpServerTool = {
-  __typename?: 'ConnectedUserMcpServerTool';
-  componentName: Scalars['String']['output'];
-  componentVersion: Scalars['Int']['output'];
-  enabled: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  integrationInstanceId: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export type ConnectedUserPage = {
-  __typename?: 'ConnectedUserPage';
-  content: Array<Maybe<ConnectedUser>>;
-  number: Scalars['Int']['output'];
-  size: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
-};
-
-export type ConnectedUserProject = {
-  __typename?: 'ConnectedUserProject';
-  connectedUser: ConnectedUser;
-  connectedUserProjectWorkflows: Array<ConnectedUserProjectWorkflow>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  environmentId: Scalars['ID']['output'];
-  id: Scalars['ID']['output'];
-  lastExecutionDate?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectId: Scalars['ID']['output'];
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ConnectedUserProjectWorkflow = {
-  __typename?: 'ConnectedUserProjectWorkflow';
-  connectedUserId: Scalars['ID']['output'];
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  enabled: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  lastExecutionDate?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectId: Scalars['ID']['output'];
-  version?: Maybe<Scalars['Int']['output']>;
-  workflow: Workflow;
-  workflowUuid: Scalars['ID']['output'];
-  workflowVersion?: Maybe<Scalars['Int']['output']>;
-};
-
-export type ConnectionDefinition = {
-  __typename?: 'ConnectionDefinition';
-  authorizationRequired: Scalars['Boolean']['output'];
-  authorizations?: Maybe<Array<Authorization>>;
-  baseUri?: Maybe<Scalars['String']['output']>;
-  componentDescription?: Maybe<Scalars['String']['output']>;
-  componentName: Scalars['String']['output'];
-  componentTitle?: Maybe<Scalars['String']['output']>;
-  properties?: Maybe<Array<Property>>;
-  version: Scalars['Int']['output'];
-};
-
-export type ConnectionSearchResult = SearchResult & {
-  __typename?: 'ConnectionSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export enum ControlType {
-  ArrayBuilder = 'ARRAY_BUILDER',
-  CodeEditor = 'CODE_EDITOR',
-  Date = 'DATE',
-  DateTime = 'DATE_TIME',
-  Email = 'EMAIL',
-  FileEntry = 'FILE_ENTRY',
-  Integer = 'INTEGER',
-  JsonSchemaBuilder = 'JSON_SCHEMA_BUILDER',
-  MultiSelect = 'MULTI_SELECT',
-  Null = 'NULL',
-  Number = 'NUMBER',
-  ObjectBuilder = 'OBJECT_BUILDER',
-  Password = 'PASSWORD',
-  Phone = 'PHONE',
-  RichText = 'RICH_TEXT',
-  Select = 'SELECT',
-  Text = 'TEXT',
-  TextArea = 'TEXT_AREA',
-  Time = 'TIME',
-  Url = 'URL'
-}
-
-export type CreateApiConnectorInput = {
-  connectorVersion: Scalars['Int']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type CreateDataTableInput = {
-  baseName: Scalars['String']['input'];
-  columns: Array<ColumnInput>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-export type CreateEmbeddedMcpServerInput = {
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-};
-
-export type CreateMcpIntegrationInstanceConfigurationInput = {
-  integrationInstanceConfigurationId: Scalars['ID']['input'];
-  mcpServerId: Scalars['ID']['input'];
-  selectedWorkflowIds: Array<Scalars['String']['input']>;
-};
-
-export type CreateMcpProjectInput = {
-  mcpServerId: Scalars['ID']['input'];
-  projectId: Scalars['ID']['input'];
-  projectVersion: Scalars['Int']['input'];
-  selectedWorkflowIds: Array<Scalars['String']['input']>;
-};
-
-export type CreateWorkspaceMcpServerInput = {
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type: PlatformType;
-  workspaceId: Scalars['ID']['input'];
-};
-
-export type CustomComponent = {
-  __typename?: 'CustomComponent';
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  enabled?: Maybe<Scalars['Boolean']['output']>;
-  icon?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  language?: Maybe<CustomComponentLanguage>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type CustomComponentActionDefinition = {
-  __typename?: 'CustomComponentActionDefinition';
-  description?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-};
-
-export type CustomComponentDefinition = {
-  __typename?: 'CustomComponentDefinition';
-  actions: Array<CustomComponentActionDefinition>;
-  triggers: Array<CustomComponentTriggerDefinition>;
-};
-
-export enum CustomComponentLanguage {
-  Java = 'JAVA',
-  Javascript = 'JAVASCRIPT',
-  Python = 'PYTHON',
-  Ruby = 'RUBY'
-}
-
-export type CustomComponentTriggerDefinition = {
-  __typename?: 'CustomComponentTriggerDefinition';
-  description?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  title?: Maybe<Scalars['String']['output']>;
-};
-
-export type DataTable = {
-  __typename?: 'DataTable';
-  baseName: Scalars['String']['output'];
-  columns: Array<DataTableColumn>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-};
-
-export type DataTableColumn = {
-  __typename?: 'DataTableColumn';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: ColumnType;
-};
-
-export type DataTableRow = {
-  __typename?: 'DataTableRow';
-  id: Scalars['ID']['output'];
-  values: Scalars['Map']['output'];
-};
-
-export type DataTableRowPage = {
-  __typename?: 'DataTableRowPage';
-  hasMore: Scalars['Boolean']['output'];
-  items: Array<DataTableRow>;
-  nextOffset?: Maybe<Scalars['Int']['output']>;
-};
-
-export type DataTableSearchResult = SearchResult & {
-  __typename?: 'DataTableSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type DataTableTagsEntry = {
-  __typename?: 'DataTableTagsEntry';
-  tableId: Scalars['ID']['output'];
-  tags: Array<Tag>;
-};
-
-export type DataTableWebhook = {
-  __typename?: 'DataTableWebhook';
-  environmentId: Scalars['Long']['output'];
-  id: Scalars['ID']['output'];
-  type: DataTableWebhookType;
-  url: Scalars['String']['output'];
-};
-
-export enum DataTableWebhookType {
-  RecordCreated = 'RECORD_CREATED',
-  RecordDeleted = 'RECORD_DELETED',
-  RecordUpdated = 'RECORD_UPDATED'
-}
-
-export type DateProperty = Property & {
-  __typename?: 'DateProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type DateTimeProperty = Property & {
-  __typename?: 'DateTimeProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type DeleteRowInput = {
-  environmentId: Scalars['ID']['input'];
-  id: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type DiscoverEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  userPrompt?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type DiscoveredEndpoint = {
-  __typename?: 'DiscoveredEndpoint';
-  id: Scalars['ID']['output'];
-  method: Scalars['String']['output'];
-  path: Scalars['String']['output'];
-  resource?: Maybe<Scalars['String']['output']>;
-  summary?: Maybe<Scalars['String']['output']>;
-};
-
-export type DocumentStatusUpdate = {
-  __typename?: 'DocumentStatusUpdate';
-  documentId: Scalars['ID']['output'];
-  message?: Maybe<Scalars['String']['output']>;
-  status: Scalars['Int']['output'];
-  timestamp: Scalars['Long']['output'];
-};
-
-export type DuplicateDataTableInput = {
-  environmentId: Scalars['ID']['input'];
-  newBaseName: Scalars['String']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type DynamicPropertiesProperty = Property & {
-  __typename?: 'DynamicPropertiesProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  header?: Maybe<Scalars['String']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  propertiesDataSource?: Maybe<PropertiesDataSource>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type EndpointDefinitionInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  httpMethod: HttpMethod;
-  operationId: Scalars['String']['input'];
-  parameters?: InputMaybe<Array<ParameterDefinitionInput>>;
-  path: Scalars['String']['input'];
-  requestBody?: InputMaybe<RequestBodyDefinitionInput>;
-  responses?: InputMaybe<Array<ResponseDefinitionInput>>;
-  summary?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type EndpointDiscoveryResult = {
-  __typename?: 'EndpointDiscoveryResult';
-  endpoints?: Maybe<Array<DiscoveredEndpoint>>;
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  jobId: Scalars['String']['output'];
-  status: GenerationJobStatusEnum;
-};
-
-export type Environment = {
-  __typename?: 'Environment';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export enum EnvironmentEnum {
-  Development = 'DEVELOPMENT',
-  Production = 'PRODUCTION',
-  Staging = 'STAGING'
-}
-
-export enum EvaluatorFunctionCategory {
-  Collection = 'COLLECTION',
-  DateTime = 'DATE_TIME',
-  Map = 'MAP',
-  String = 'STRING',
-  Type = 'TYPE',
-  Utility = 'UTILITY'
-}
-
-export type EvaluatorFunctionDefinition = {
-  __typename?: 'EvaluatorFunctionDefinition';
-  category: EvaluatorFunctionCategory;
-  description: Scalars['String']['output'];
-  example: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  parameters: Array<EvaluatorFunctionParameter>;
-  returnType: EvaluatorFunctionType;
-  title: Scalars['String']['output'];
-};
-
-export type EvaluatorFunctionParameter = {
-  __typename?: 'EvaluatorFunctionParameter';
-  description: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  required: Scalars['Boolean']['output'];
-  type: EvaluatorFunctionType;
-};
-
-export enum EvaluatorFunctionType {
-  Boolean = 'BOOLEAN',
-  Byte = 'BYTE',
-  Character = 'CHARACTER',
-  Datetime = 'DATETIME',
-  Double = 'DOUBLE',
-  Float = 'FLOAT',
-  Integer = 'INTEGER',
-  List = 'LIST',
-  Long = 'LONG',
-  Map = 'MAP',
-  Number = 'NUMBER',
-  Short = 'SHORT',
-  String = 'STRING'
-}
-
-export type ExecutionError = {
-  __typename?: 'ExecutionError';
-  message?: Maybe<Scalars['String']['output']>;
-  stackTrace?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
-};
-
-export type FileEntry = {
-  __typename?: 'FileEntry';
-  extension?: Maybe<Scalars['String']['output']>;
-  mimeType?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  url: Scalars['String']['output'];
-};
-
-export type FileEntryProperty = Property & {
-  __typename?: 'FileEntryProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['Map']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['Map']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type GenerateForEndpointsInput = {
-  documentationUrl: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  selectedEndpoints: Array<SelectedEndpointInput>;
-};
-
-export type GenerateFromDocumentationInput = {
-  documentationUrl: Scalars['String']['input'];
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  userPrompt?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type GenerateSpecificationInput = {
-  baseUrl?: InputMaybe<Scalars['String']['input']>;
-  endpoints: Array<EndpointDefinitionInput>;
-  name: Scalars['String']['input'];
-};
-
-export type GenerateSpecificationResponse = {
-  __typename?: 'GenerateSpecificationResponse';
-  specification?: Maybe<Scalars['String']['output']>;
-};
-
-export type GenerationJobStatus = {
-  __typename?: 'GenerationJobStatus';
-  errorMessage?: Maybe<Scalars['String']['output']>;
-  jobId: Scalars['String']['output'];
-  specification?: Maybe<Scalars['String']['output']>;
-  status: GenerationJobStatusEnum;
-};
-
-export enum GenerationJobStatusEnum {
-  Cancelled = 'CANCELLED',
-  Completed = 'COMPLETED',
-  Failed = 'FAILED',
-  Pending = 'PENDING',
-  Processing = 'PROCESSING'
-}
-
-export type Help = {
-  __typename?: 'Help';
-  description?: Maybe<Scalars['String']['output']>;
-  documentationUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export enum HttpMethod {
-  Delete = 'DELETE',
-  Get = 'GET',
-  Patch = 'PATCH',
-  Post = 'POST',
-  Put = 'PUT'
-}
-
-export type IdentityProviderInput = {
-  autoProvision?: InputMaybe<Scalars['Boolean']['input']>;
-  clientId?: InputMaybe<Scalars['String']['input']>;
-  clientSecret?: InputMaybe<Scalars['String']['input']>;
-  defaultAuthority?: InputMaybe<Scalars['String']['input']>;
-  domains: Array<Scalars['String']['input']>;
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  enforced?: InputMaybe<Scalars['Boolean']['input']>;
-  issuerUri?: InputMaybe<Scalars['String']['input']>;
-  metadataUri?: InputMaybe<Scalars['String']['input']>;
-  mfaMethod?: InputMaybe<Scalars['String']['input']>;
-  mfaRequired?: InputMaybe<Scalars['Boolean']['input']>;
-  name: Scalars['String']['input'];
-  nameIdFormat?: InputMaybe<Scalars['String']['input']>;
-  scopes?: InputMaybe<Scalars['String']['input']>;
-  signingCertificate?: InputMaybe<Scalars['String']['input']>;
-  type?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type IdentityProviderType = {
-  __typename?: 'IdentityProviderType';
-  autoProvision: Scalars['Boolean']['output'];
-  clientId?: Maybe<Scalars['String']['output']>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  defaultAuthority: Scalars['String']['output'];
-  domains: Array<Scalars['String']['output']>;
-  enabled: Scalars['Boolean']['output'];
-  enforced: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  issuerUri?: Maybe<Scalars['String']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  metadataUri?: Maybe<Scalars['String']['output']>;
-  mfaMethod?: Maybe<Scalars['String']['output']>;
-  mfaRequired: Scalars['Boolean']['output'];
-  name: Scalars['String']['output'];
-  nameIdFormat?: Maybe<Scalars['String']['output']>;
-  scopes?: Maybe<Scalars['String']['output']>;
-  signingCertificate?: Maybe<Scalars['String']['output']>;
-  type: Scalars['String']['output'];
-};
-
-export type ImportCsvInput = {
-  csv: Scalars['String']['input'];
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type ImportOpenApiSpecificationInput = {
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  specification: Scalars['String']['input'];
-};
-
-export type InsertRowInput = {
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-  values: Scalars['Map']['input'];
-};
-
-export type IntegerProperty = Property & {
-  __typename?: 'IntegerProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['Long']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  maxValue?: Maybe<Scalars['Long']['output']>;
-  minValue?: Maybe<Scalars['Long']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  options?: Maybe<Array<Option>>;
-  optionsDataSource?: Maybe<OptionsDataSource>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type Integration = {
-  __typename?: 'Integration';
-  componentName: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export type IntegrationInstanceConfigurationWorkflow = {
-  __typename?: 'IntegrationInstanceConfigurationWorkflow';
-  connections: Array<IntegrationInstanceConfigurationWorkflowConnection>;
-  enabled: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  inputs?: Maybe<Scalars['Map']['output']>;
-  integrationInstanceConfigurationId: Scalars['ID']['output'];
-  version: Scalars['Int']['output'];
-  workflowId: Scalars['String']['output'];
-};
-
-export type IntegrationInstanceConfigurationWorkflowConnection = {
-  __typename?: 'IntegrationInstanceConfigurationWorkflowConnection';
-  connectionId?: Maybe<Scalars['ID']['output']>;
-  workflowConnectionKey: Scalars['String']['output'];
-  workflowNodeName: Scalars['String']['output'];
-};
-
-export type IntegrationWorkflow = {
-  __typename?: 'IntegrationWorkflow';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  integrationWorkflowId: Scalars['ID']['output'];
-  label: Scalars['String']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  workflowTaskComponentNames: Array<Scalars['String']['output']>;
-  workflowTriggerComponentNames: Array<Scalars['String']['output']>;
-  workflowUuid?: Maybe<Scalars['String']['output']>;
-};
-
-export type KnowledgeBase = {
-  __typename?: 'KnowledgeBase';
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  documents?: Maybe<Array<Maybe<KnowledgeBaseDocument>>>;
-  id: Scalars['ID']['output'];
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  maxChunkSize?: Maybe<Scalars['Int']['output']>;
-  minChunkSizeChars?: Maybe<Scalars['Int']['output']>;
-  name: Scalars['String']['output'];
-  overlap?: Maybe<Scalars['Int']['output']>;
-};
-
-export type KnowledgeBaseDocument = {
-  __typename?: 'KnowledgeBaseDocument';
-  chunks?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  document?: Maybe<FileEntry>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  status: Scalars['Int']['output'];
-  tags?: Maybe<Array<Scalars['String']['output']>>;
-};
-
-export type KnowledgeBaseDocumentChunk = {
-  __typename?: 'KnowledgeBaseDocumentChunk';
-  content?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  knowledgeBaseDocumentId: Scalars['ID']['output'];
-  metadata?: Maybe<Scalars['Map']['output']>;
-  score?: Maybe<Scalars['Float']['output']>;
-};
-
-export type KnowledgeBaseDocumentChunkInput = {
-  content: Scalars['String']['input'];
-};
-
-export type KnowledgeBaseDocumentSearchResult = SearchResult & {
-  __typename?: 'KnowledgeBaseDocumentSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  knowledgeBaseId: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type KnowledgeBaseDocumentTagsEntry = {
-  __typename?: 'KnowledgeBaseDocumentTagsEntry';
-  knowledgeBaseDocumentId: Scalars['ID']['output'];
-  tags: Array<Scalars['String']['output']>;
-};
-
-export type KnowledgeBaseInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  maxChunkSize?: InputMaybe<Scalars['Int']['input']>;
-  minChunkSizeChars?: InputMaybe<Scalars['Int']['input']>;
-  name: Scalars['String']['input'];
-  overlap?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type KnowledgeBaseSearchResult = SearchResult & {
-  __typename?: 'KnowledgeBaseSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type KnowledgeBaseTagsEntry = {
-  __typename?: 'KnowledgeBaseTagsEntry';
-  knowledgeBaseId: Scalars['ID']['output'];
-  tags: Array<Tag>;
-};
-
-export type LogEntry = {
-  __typename?: 'LogEntry';
-  componentName: Scalars['String']['output'];
-  componentOperationName?: Maybe<Scalars['String']['output']>;
-  exceptionMessage?: Maybe<Scalars['String']['output']>;
-  exceptionType?: Maybe<Scalars['String']['output']>;
-  level: LogLevel;
-  message: Scalars['String']['output'];
-  stackTrace?: Maybe<Scalars['String']['output']>;
-  taskExecutionId: Scalars['ID']['output'];
-  timestamp: Scalars['String']['output'];
-};
-
-export type LogFilterInput = {
-  componentName?: InputMaybe<Scalars['String']['input']>;
-  fromTimestamp?: InputMaybe<Scalars['String']['input']>;
-  minLevel?: InputMaybe<LogLevel>;
-  searchText?: InputMaybe<Scalars['String']['input']>;
-  taskExecutionId?: InputMaybe<Scalars['ID']['input']>;
-  toTimestamp?: InputMaybe<Scalars['String']['input']>;
-};
-
-export enum LogLevel {
-  Debug = 'DEBUG',
-  Error = 'ERROR',
-  Info = 'INFO',
-  Trace = 'TRACE',
-  Warn = 'WARN'
-}
-
-export type LogPage = {
-  __typename?: 'LogPage';
-  content: Array<LogEntry>;
-  hasNext: Scalars['Boolean']['output'];
-  hasPrevious: Scalars['Boolean']['output'];
-  pageNumber: Scalars['Int']['output'];
-  pageSize: Scalars['Int']['output'];
-  totalElements: Scalars['Int']['output'];
-  totalPages: Scalars['Int']['output'];
-};
-
-export type McpComponent = {
-  __typename?: 'McpComponent';
-  componentName: Scalars['String']['output'];
-  componentVersion: Scalars['Int']['output'];
-  connectionId?: Maybe<Scalars['ID']['output']>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpServerId: Scalars['ID']['output'];
-  mcpTools?: Maybe<Array<Maybe<McpTool>>>;
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type McpComponentInput = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  connectionId?: InputMaybe<Scalars['ID']['input']>;
-  mcpServerId: Scalars['ID']['input'];
-};
-
-export type McpComponentWithToolsInput = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  connectionId?: InputMaybe<Scalars['ID']['input']>;
-  mcpServerId: Scalars['ID']['input'];
-  tools: Array<McpToolInputForComponent>;
-  version?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type McpIntegrationInstanceConfiguration = {
-  __typename?: 'McpIntegrationInstanceConfiguration';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  integration?: Maybe<Integration>;
-  integrationInstanceConfigurationId: Scalars['ID']['output'];
-  integrationInstanceConfigurationName?: Maybe<Scalars['String']['output']>;
-  integrationVersion?: Maybe<Scalars['Int']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpIntegrationInstanceConfigurationWorkflows?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
-  mcpServerId: Scalars['ID']['output'];
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type McpIntegrationInstanceConfigurationWorkflow = {
-  __typename?: 'McpIntegrationInstanceConfigurationWorkflow';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  integrationInstanceConfigurationWorkflow?: Maybe<IntegrationInstanceConfigurationWorkflow>;
-  integrationInstanceConfigurationWorkflowId: Scalars['Long']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpIntegrationInstanceConfigurationId: Scalars['Long']['output'];
-  parameters?: Maybe<Scalars['Map']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-  workflow?: Maybe<Workflow>;
-};
-
-export type McpIntegrationInstanceConfigurationWorkflowInput = {
-  integrationInstanceConfigurationWorkflowId: Scalars['Long']['input'];
-  mcpIntegrationInstanceConfigurationId: Scalars['Long']['input'];
-};
-
-export type McpIntegrationInstanceConfigurationWorkflowUpdateInput = {
-  integrationInstanceConfigurationWorkflowId?: InputMaybe<Scalars['Long']['input']>;
-  mcpIntegrationInstanceConfigurationId?: InputMaybe<Scalars['Long']['input']>;
-  parameters?: InputMaybe<Scalars['Map']['input']>;
-};
-
-export type McpProject = {
-  __typename?: 'McpProject';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
-  mcpServerId: Scalars['ID']['output'];
-  project?: Maybe<Project>;
-  projectDeploymentId: Scalars['ID']['output'];
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type McpProjectWorkflow = {
-  __typename?: 'McpProjectWorkflow';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpProjectId: Scalars['Long']['output'];
-  parameters?: Maybe<Scalars['Map']['output']>;
-  projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
-  projectDeploymentWorkflowId: Scalars['Long']['output'];
-  version?: Maybe<Scalars['Int']['output']>;
-  workflow?: Maybe<Workflow>;
-};
-
-export type McpProjectWorkflowInput = {
-  mcpProjectId: Scalars['Long']['input'];
-  projectDeploymentWorkflowId: Scalars['Long']['input'];
-};
-
-export type McpProjectWorkflowUpdateInput = {
-  mcpProjectId?: InputMaybe<Scalars['Long']['input']>;
-  parameters?: InputMaybe<Scalars['Map']['input']>;
-  projectDeploymentWorkflowId?: InputMaybe<Scalars['Long']['input']>;
-};
-
-export type McpServer = {
-  __typename?: 'McpServer';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  enabled: Scalars['Boolean']['output'];
-  environmentId: Scalars['ID']['output'];
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
-  name: Scalars['String']['output'];
-  secretKey: Scalars['String']['output'];
-  tags?: Maybe<Array<Maybe<Tag>>>;
-  type: PlatformType;
-  url: Scalars['String']['output'];
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type McpServerInput = {
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type: PlatformType;
-};
-
-export enum McpServerOrderBy {
-  CreatedDateAsc = 'CREATED_DATE_ASC',
-  CreatedDateDesc = 'CREATED_DATE_DESC',
-  LastModifiedDateAsc = 'LAST_MODIFIED_DATE_ASC',
-  LastModifiedDateDesc = 'LAST_MODIFIED_DATE_DESC',
-  NameAsc = 'NAME_ASC',
-  NameDesc = 'NAME_DESC'
-}
-
-export type McpServerUpdateInput = {
-  enabled?: InputMaybe<Scalars['Boolean']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type McpTool = {
-  __typename?: 'McpTool';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  mcpComponentId: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  parameters?: Maybe<Scalars['Map']['output']>;
-  title?: Maybe<Scalars['String']['output']>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type McpToolInput = {
-  mcpComponentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  parameters?: InputMaybe<Scalars['Map']['input']>;
-  version?: InputMaybe<Scalars['Int']['input']>;
-};
-
-export type McpToolInputForComponent = {
-  name: Scalars['String']['input'];
-  parameters?: InputMaybe<Scalars['Map']['input']>;
-};
-
-export type Mutation = {
-  __typename?: 'Mutation';
-  _placeholder?: Maybe<Scalars['Boolean']['output']>;
-  addDataTableColumn: Scalars['Boolean']['output'];
-  cancelAiAgentEvalRun: AiAgentEvalRun;
-  cancelGenerationJob: Scalars['Boolean']['output'];
-  createAiAgentEvalScenario: AiAgentEvalScenario;
-  createAiAgentEvalTest: AiAgentEvalTest;
-  createAiAgentJudge: AiAgentJudge;
-  createAiAgentScenarioJudge: AiAgentScenarioJudge;
-  createAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
-  createAiSkill: AiSkill;
-  createAiSkillFromInstructions: AiSkill;
-  createApiConnector: ApiConnector;
-  createApiKey: Scalars['String']['output'];
-  createApprovalTask?: Maybe<ApprovalTask>;
-  createAutomationWorkflowProject: Scalars['ID']['output'];
-  createAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
-  createDataTable: Scalars['Boolean']['output'];
-  createEmbeddedMcpServer?: Maybe<McpServer>;
-  createIdentityProvider: IdentityProviderType;
-  createKnowledgeBase?: Maybe<KnowledgeBase>;
-  createMcpComponent?: Maybe<McpComponent>;
-  createMcpComponentWithTools?: Maybe<McpComponent>;
-  createMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
-  createMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
-  createMcpProject?: Maybe<McpProject>;
-  createMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
-  createMcpServer?: Maybe<McpServer>;
-  createMcpTool?: Maybe<McpTool>;
-  createWorkspaceApiKey: Scalars['String']['output'];
-  createWorkspaceMcpServer?: Maybe<McpServer>;
-  deleteAiAgentEvalScenario: Scalars['Boolean']['output'];
-  deleteAiAgentEvalTest: Scalars['Boolean']['output'];
-  deleteAiAgentJudge: Scalars['Boolean']['output'];
-  deleteAiAgentScenarioJudge: Scalars['Boolean']['output'];
-  deleteAiAgentScenarioToolSimulation: Scalars['Boolean']['output'];
-  deleteAiSkill: Scalars['Boolean']['output'];
-  deleteApiConnector: Scalars['Boolean']['output'];
-  deleteApiKey: Scalars['Boolean']['output'];
-  deleteApprovalTask?: Maybe<Scalars['Boolean']['output']>;
-  deleteAutomationWorkflowProject: Scalars['Boolean']['output'];
-  deleteAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
-  deleteConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  deleteConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
-  deleteCustomComponent: Scalars['Boolean']['output'];
-  deleteDataTableRow: Scalars['Boolean']['output'];
-  deleteEmbeddedMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  deleteIdentityProvider: Scalars['Boolean']['output'];
-  deleteJobFileLogs: Scalars['Boolean']['output'];
-  deleteKnowledgeBase?: Maybe<Scalars['Boolean']['output']>;
-  deleteKnowledgeBaseDocument?: Maybe<Scalars['Boolean']['output']>;
-  deleteKnowledgeBaseDocumentChunk?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpComponent?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpIntegrationInstanceConfiguration?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpIntegrationInstanceConfigurationWorkflow?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpProject?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
-  deleteSharedProject: Scalars['Boolean']['output'];
-  deleteSharedWorkflow: Scalars['Boolean']['output'];
-  deleteUser: Scalars['Boolean']['output'];
-  deleteWorkspaceApiKey: Scalars['Boolean']['output'];
-  deleteWorkspaceMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  disconnectConnection: Scalars['Boolean']['output'];
-  dropDataTable: Scalars['Boolean']['output'];
-  duplicateAutomationWorkflowProject: Scalars['ID']['output'];
-  duplicateAutomationWorkflowProjectWorkflow: Scalars['ID']['output'];
-  duplicateDataTable: Scalars['Boolean']['output'];
-  enableApiConnector: Scalars['Boolean']['output'];
-  enableConnectedUserMcpServer?: Maybe<Scalars['Boolean']['output']>;
-  enableConnectedUserMcpTool?: Maybe<Scalars['Boolean']['output']>;
-  enableConnectedUserProjectWorkflow?: Maybe<Scalars['Boolean']['output']>;
-  enableCustomComponent: Scalars['Boolean']['output'];
-  exportSharedProject?: Maybe<Scalars['Boolean']['output']>;
-  exportSharedWorkflow: Scalars['Boolean']['output'];
-  generateFromDocumentation: ApiConnector;
-  generateSpecification: GenerateSpecificationResponse;
-  importDataTableCsv: Scalars['Boolean']['output'];
-  importOpenApiSpecification: ApiConnector;
-  importProjectTemplate: Scalars['ID']['output'];
-  importWorkflowTemplate: Scalars['ID']['output'];
-  insertDataTableRow: DataTableRow;
-  inviteUser: Scalars['Boolean']['output'];
-  publishAutomationWorkflowProject: Scalars['Boolean']['output'];
-  removeDataTableColumn: Scalars['Boolean']['output'];
-  renameDataTable: Scalars['Boolean']['output'];
-  renameDataTableColumn: Scalars['Boolean']['output'];
-  saveClusterElementTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  saveClusterElementTestOutput?: Maybe<WorkflowNodeTestOutputResult>;
-  saveWorkflowTestConfigurationConnection?: Maybe<Scalars['Boolean']['output']>;
-  startAiAgentEvalRun: AiAgentEvalRun;
-  startDiscoverEndpoints: EndpointDiscoveryResult;
-  startGenerateForEndpoints: GenerationJobStatus;
-  startGenerateFromDocumentationPreview: GenerationJobStatus;
-  testClusterElementScript: ScriptTestExecution;
-  testWorkflowNodeScript: ScriptTestExecution;
-  updateAiAgentEvalScenario: AiAgentEvalScenario;
-  updateAiAgentEvalTest: AiAgentEvalTest;
-  updateAiAgentJudge: AiAgentJudge;
-  updateAiAgentScenarioJudge: AiAgentScenarioJudge;
-  updateAiAgentScenarioToolSimulation: AiAgentScenarioToolSimulation;
-  updateAiSkill: AiSkill;
-  updateAiSkillContent: AiSkill;
-  updateApiConnector: ApiConnector;
-  updateApiKey: Scalars['Boolean']['output'];
-  updateApprovalTask?: Maybe<ApprovalTask>;
-  updateAutomationWorkflowProject: Scalars['Boolean']['output'];
-  updateDataTableRow: DataTableRow;
-  updateDataTableTags: Scalars['Boolean']['output'];
-  updateIdentityProvider: IdentityProviderType;
-  updateKnowledgeBase?: Maybe<KnowledgeBase>;
-  updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
-  updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
-  updateKnowledgeBaseTags: Scalars['Boolean']['output'];
-  updateManagementMcpServerUrl: Scalars['String']['output'];
-  updateMcpComponentWithTools?: Maybe<McpComponent>;
-  updateMcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
-  updateMcpIntegrationInstanceConfigurationVersion?: Maybe<Scalars['Boolean']['output']>;
-  updateMcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
-  updateMcpProject?: Maybe<McpProject>;
-  updateMcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
-  updateMcpServer?: Maybe<McpServer>;
-  updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
-  updateMcpServerUrl: Scalars['String']['output'];
-  updateMcpTool?: Maybe<McpTool>;
-  updateUser: AdminUser;
-  updateWorkspaceApiKey: Scalars['Boolean']['output'];
-};
-
-
-export type MutationAddDataTableColumnArgs = {
-  input: AddColumnInput;
-};
-
-
-export type MutationCancelAiAgentEvalRunArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationCancelGenerationJobArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
-export type MutationCreateAiAgentEvalScenarioArgs = {
-  agentEvalTestId: Scalars['ID']['input'];
-  expectedOutput?: InputMaybe<Scalars['String']['input']>;
-  maxTurns?: InputMaybe<Scalars['Int']['input']>;
-  name: Scalars['String']['input'];
-  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
-  personaPrompt?: InputMaybe<Scalars['String']['input']>;
-  type: AiAgentScenarioType;
-  userMessage?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationCreateAiAgentEvalTestArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationCreateAiAgentJudgeArgs = {
-  configuration: Scalars['Map']['input'];
-  name: Scalars['String']['input'];
-  type: AiAgentJudgeType;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationCreateAiAgentScenarioJudgeArgs = {
-  agentEvalScenarioId: Scalars['ID']['input'];
-  configuration: Scalars['Map']['input'];
-  name: Scalars['String']['input'];
-  type: AiAgentJudgeType;
-};
-
-
-export type MutationCreateAiAgentScenarioToolSimulationArgs = {
-  agentEvalScenarioId: Scalars['ID']['input'];
-  responsePrompt: Scalars['String']['input'];
-  simulationModel?: InputMaybe<Scalars['String']['input']>;
-  toolName: Scalars['String']['input'];
-};
-
-
-export type MutationCreateAiSkillArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  fileBytes: Scalars['String']['input'];
-  filename: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-};
-
-
-export type MutationCreateAiSkillFromInstructionsArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  instructions: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-};
-
-
-export type MutationCreateApiConnectorArgs = {
-  input: CreateApiConnectorInput;
-};
-
-
-export type MutationCreateApiKeyArgs = {
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type?: InputMaybe<PlatformType>;
-};
-
-
-export type MutationCreateApprovalTaskArgs = {
-  approvalTask: ApprovalTaskInput;
-};
-
-
-export type MutationCreateAutomationWorkflowProjectArgs = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  name: Scalars['String']['input'];
-  tags?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-
-export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
-  definition?: InputMaybe<Scalars['String']['input']>;
-  projectId: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateDataTableArgs = {
-  input: CreateDataTableInput;
-};
-
-
-export type MutationCreateEmbeddedMcpServerArgs = {
-  input: CreateEmbeddedMcpServerInput;
-};
-
-
-export type MutationCreateIdentityProviderArgs = {
-  input: IdentityProviderInput;
-};
-
-
-export type MutationCreateKnowledgeBaseArgs = {
-  environmentId: Scalars['ID']['input'];
-  knowledgeBase: KnowledgeBaseInput;
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateMcpComponentArgs = {
-  input: McpComponentInput;
-};
-
-
-export type MutationCreateMcpComponentWithToolsArgs = {
-  input: McpComponentWithToolsInput;
-};
-
-
-export type MutationCreateMcpIntegrationInstanceConfigurationArgs = {
-  input: CreateMcpIntegrationInstanceConfigurationInput;
-};
-
-
-export type MutationCreateMcpIntegrationInstanceConfigurationWorkflowArgs = {
-  input: McpIntegrationInstanceConfigurationWorkflowInput;
-};
-
-
-export type MutationCreateMcpProjectArgs = {
-  input: CreateMcpProjectInput;
-};
-
-
-export type MutationCreateMcpProjectWorkflowArgs = {
-  input: McpProjectWorkflowInput;
-};
-
-
-export type MutationCreateMcpServerArgs = {
-  input: McpServerInput;
-};
-
-
-export type MutationCreateMcpToolArgs = {
-  input: McpToolInput;
-};
-
-
-export type MutationCreateWorkspaceApiKeyArgs = {
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type MutationCreateWorkspaceMcpServerArgs = {
-  input: CreateWorkspaceMcpServerInput;
-};
-
-
-export type MutationDeleteAiAgentEvalScenarioArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAiAgentEvalTestArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAiAgentJudgeArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAiAgentScenarioJudgeArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAiAgentScenarioToolSimulationArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAiSkillArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteApiKeyArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteApprovalTaskArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAutomationWorkflowProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteAutomationWorkflowProjectWorkflowArgs = {
-  workflowUuid: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteConnectedUserMcpServerArgs = {
-  connectedUserId: Scalars['ID']['input'];
-  mcpServerId: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteConnectedUserProjectWorkflowArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteCustomComponentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteDataTableRowArgs = {
-  input: DeleteRowInput;
-};
-
-
-export type MutationDeleteEmbeddedMcpServerArgs = {
-  mcpServerId: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteIdentityProviderArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteJobFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseDocumentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteKnowledgeBaseDocumentChunkArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpComponentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpIntegrationInstanceConfigurationArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpIntegrationInstanceConfigurationWorkflowArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpProjectWorkflowArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpServerArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteMcpToolArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteSharedProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteSharedWorkflowArgs = {
-  workflowId: Scalars['String']['input'];
-};
-
-
-export type MutationDeleteUserArgs = {
-  login: Scalars['String']['input'];
-};
-
-
-export type MutationDeleteWorkspaceApiKeyArgs = {
-  apiKeyId: Scalars['ID']['input'];
-};
-
-
-export type MutationDeleteWorkspaceMcpServerArgs = {
-  mcpServerId: Scalars['ID']['input'];
-};
-
-
-export type MutationDisconnectConnectionArgs = {
-  connectionId: Scalars['ID']['input'];
-};
-
-
-export type MutationDropDataTableArgs = {
-  input: RemoveTableInput;
-};
-
-
-export type MutationDuplicateAutomationWorkflowProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationDuplicateAutomationWorkflowProjectWorkflowArgs = {
-  workflowUuid: Scalars['ID']['input'];
-};
-
-
-export type MutationDuplicateDataTableArgs = {
-  input: DuplicateDataTableInput;
-};
-
-
-export type MutationEnableApiConnectorArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableConnectedUserMcpServerArgs = {
-  connectedUserId: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
-  mcpServerId: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableConnectedUserMcpToolArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableConnectedUserProjectWorkflowArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationEnableCustomComponentArgs = {
-  enable: Scalars['Boolean']['input'];
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationExportSharedProjectArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationExportSharedWorkflowArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  workflowId: Scalars['String']['input'];
-};
-
-
-export type MutationGenerateFromDocumentationArgs = {
-  input: GenerateFromDocumentationInput;
-};
-
-
-export type MutationGenerateSpecificationArgs = {
-  input: GenerateSpecificationInput;
-};
-
-
-export type MutationImportDataTableCsvArgs = {
-  input: ImportCsvInput;
-};
-
-
-export type MutationImportOpenApiSpecificationArgs = {
-  input: ImportOpenApiSpecificationInput;
-};
-
-
-export type MutationImportProjectTemplateArgs = {
-  id: Scalars['String']['input'];
-  sharedProject: Scalars['Boolean']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type MutationImportWorkflowTemplateArgs = {
-  id: Scalars['String']['input'];
-  projectId: Scalars['ID']['input'];
-  sharedWorkflow: Scalars['Boolean']['input'];
-};
-
-
-export type MutationInsertDataTableRowArgs = {
-  input: InsertRowInput;
-};
-
-
-export type MutationInviteUserArgs = {
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  role: Scalars['String']['input'];
-};
-
-
-export type MutationPublishAutomationWorkflowProjectArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationRemoveDataTableColumnArgs = {
-  input: RemoveColumnInput;
-};
-
-
-export type MutationRenameDataTableArgs = {
-  input: RenameDataTableInput;
-};
-
-
-export type MutationRenameDataTableColumnArgs = {
-  input: RenameColumnInput;
-};
-
-
-export type MutationSaveClusterElementTestConfigurationConnectionArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationSaveClusterElementTestOutputArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationSaveWorkflowTestConfigurationConnectionArgs = {
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationStartAiAgentEvalRunArgs = {
-  agentEvalTestId: Scalars['ID']['input'];
-  aiAgentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']>>;
-  environmentId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  scenarioIds?: InputMaybe<Array<Scalars['ID']['input']>>;
-};
-
-
-export type MutationStartDiscoverEndpointsArgs = {
-  input: DiscoverEndpointsInput;
-};
-
-
-export type MutationStartGenerateForEndpointsArgs = {
-  input: GenerateForEndpointsInput;
-};
-
-
-export type MutationStartGenerateFromDocumentationPreviewArgs = {
-  input: GenerateFromDocumentationInput;
-};
-
-
-export type MutationTestClusterElementScriptArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationTestWorkflowNodeScriptArgs = {
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type MutationUpdateAiAgentEvalScenarioArgs = {
-  expectedOutput?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  maxTurns?: InputMaybe<Scalars['Int']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
-  personaPrompt?: InputMaybe<Scalars['String']['input']>;
-  userMessage?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateAiAgentEvalTestArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateAiAgentJudgeArgs = {
-  configuration?: InputMaybe<Scalars['Map']['input']>;
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateAiAgentScenarioJudgeArgs = {
-  configuration?: InputMaybe<Scalars['Map']['input']>;
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateAiAgentScenarioToolSimulationArgs = {
-  id: Scalars['ID']['input'];
-  responsePrompt?: InputMaybe<Scalars['String']['input']>;
-  simulationModel?: InputMaybe<Scalars['String']['input']>;
-  toolName?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateAiSkillArgs = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-};
-
-
-export type MutationUpdateAiSkillContentArgs = {
-  content: Scalars['String']['input'];
-  id: Scalars['ID']['input'];
-  path?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type MutationUpdateApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateApiConnectorInput;
-};
-
-
-export type MutationUpdateApiKeyArgs = {
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-};
-
-
-export type MutationUpdateApprovalTaskArgs = {
-  approvalTask: ApprovalTaskInput;
-};
-
-
-export type MutationUpdateAutomationWorkflowProjectArgs = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  tags?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-
-export type MutationUpdateDataTableRowArgs = {
-  input: UpdateRowInput;
-};
-
-
-export type MutationUpdateDataTableTagsArgs = {
-  input: UpdateDataTableTagsInput;
-};
-
-
-export type MutationUpdateIdentityProviderArgs = {
-  id: Scalars['ID']['input'];
-  input: IdentityProviderInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-  knowledgeBase: KnowledgeBaseInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseDocumentChunkArgs = {
-  id: Scalars['ID']['input'];
-  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseDocumentTagsArgs = {
-  input: UpdateKnowledgeBaseDocumentTagsInput;
-};
-
-
-export type MutationUpdateKnowledgeBaseTagsArgs = {
-  input: UpdateKnowledgeBaseTagsInput;
-};
-
-
-export type MutationUpdateMcpComponentWithToolsArgs = {
-  id: Scalars['ID']['input'];
-  input: McpComponentWithToolsInput;
-};
-
-
-export type MutationUpdateMcpIntegrationInstanceConfigurationArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInstanceConfigurationInput;
-};
-
-
-export type MutationUpdateMcpIntegrationInstanceConfigurationVersionArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInstanceConfigurationVersionInput;
-};
-
-
-export type MutationUpdateMcpIntegrationInstanceConfigurationWorkflowArgs = {
-  id: Scalars['ID']['input'];
-  input: McpIntegrationInstanceConfigurationWorkflowUpdateInput;
-};
-
-
-export type MutationUpdateMcpProjectArgs = {
-  id: Scalars['ID']['input'];
-  input: UpdateMcpProjectInput;
-};
-
-
-export type MutationUpdateMcpProjectWorkflowArgs = {
-  id: Scalars['ID']['input'];
-  input: McpProjectWorkflowUpdateInput;
-};
-
-
-export type MutationUpdateMcpServerArgs = {
-  id: Scalars['ID']['input'];
-  input: McpServerUpdateInput;
-};
-
-
-export type MutationUpdateMcpServerTagsArgs = {
-  id: Scalars['ID']['input'];
-  tags: Array<TagInput>;
-};
-
-
-export type MutationUpdateMcpServerUrlArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type MutationUpdateMcpToolArgs = {
-  id: Scalars['ID']['input'];
-  input: McpToolInput;
-};
-
-
-export type MutationUpdateUserArgs = {
-  login: Scalars['String']['input'];
-  role: Scalars['String']['input'];
-};
-
-
-export type MutationUpdateWorkspaceApiKeyArgs = {
-  apiKeyId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-};
-
-export type NullProperty = Property & {
-  __typename?: 'NullProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type NumberProperty = Property & {
-  __typename?: 'NumberProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['Float']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['Float']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  maxValue?: Maybe<Scalars['Float']['output']>;
-  minValue?: Maybe<Scalars['Float']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  options?: Maybe<Array<Option>>;
-  optionsDataSource?: Maybe<OptionsDataSource>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type ObjectProperty = Property & {
-  __typename?: 'ObjectProperty';
-  additionalProperties?: Maybe<Array<Property>>;
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['Map']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['Map']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  multipleValues?: Maybe<Scalars['Boolean']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  options?: Maybe<Array<Option>>;
-  optionsDataSource?: Maybe<OptionsDataSource>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  properties?: Maybe<Array<Property>>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type Option = {
-  __typename?: 'Option';
-  description?: Maybe<Scalars['String']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  value?: Maybe<Scalars['Any']['output']>;
-};
-
-export type OptionsDataSource = {
-  __typename?: 'OptionsDataSource';
-  optionsLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
-};
-
-export type ParameterDefinitionInput = {
-  description?: InputMaybe<Scalars['String']['input']>;
-  example?: InputMaybe<Scalars['String']['input']>;
-  location: ParameterLocation;
-  name: Scalars['String']['input'];
-  required?: InputMaybe<Scalars['Boolean']['input']>;
-  type: ParameterType;
-};
-
-export enum ParameterLocation {
-  Header = 'HEADER',
-  Path = 'PATH',
-  Query = 'QUERY'
-}
-
-export enum ParameterType {
-  Array = 'ARRAY',
-  Boolean = 'BOOLEAN',
-  Integer = 'INTEGER',
-  Number = 'NUMBER',
-  Object = 'OBJECT',
-  String = 'STRING'
-}
-
-export enum PlatformType {
-  Automation = 'AUTOMATION',
-  Embedded = 'EMBEDDED'
-}
-
-export type Project = {
-  __typename?: 'Project';
-  category?: Maybe<Category>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  tags?: Maybe<Array<Maybe<Tag>>>;
-};
-
-export type ProjectDeployment = {
-  __typename?: 'ProjectDeployment';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  enabled: Scalars['Boolean']['output'];
-  environment: Environment;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  project: Project;
-  projectDeploymentWorkflows: Array<ProjectDeploymentWorkflow>;
-  projectId: Scalars['ID']['output'];
-  projectVersion: Scalars['Int']['output'];
-  tags?: Maybe<Array<Maybe<Tag>>>;
-  version: Scalars['Int']['output'];
-};
-
-export type ProjectDeploymentSearchResult = SearchResult & {
-  __typename?: 'ProjectDeploymentSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  projectName: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type ProjectDeploymentWorkflow = {
-  __typename?: 'ProjectDeploymentWorkflow';
-  connections: Array<ProjectDeploymentWorkflowConnection>;
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  enabled: Scalars['Boolean']['output'];
-  id: Scalars['ID']['output'];
-  inputs?: Maybe<Scalars['Map']['output']>;
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectDeploymentId: Scalars['ID']['output'];
-  projectWorkflow: ProjectWorkflow;
-  staticWebhookUrl?: Maybe<Scalars['String']['output']>;
-  version: Scalars['Int']['output'];
-  workflowExecutionId?: Maybe<Scalars['String']['output']>;
-  workflowId: Scalars['String']['output'];
-};
-
-export type ProjectDeploymentWorkflowConnection = {
-  __typename?: 'ProjectDeploymentWorkflowConnection';
-  connectionId?: Maybe<Scalars['ID']['output']>;
-  workflowConnectionKey: Scalars['String']['output'];
-  workflowNodeName: Scalars['String']['output'];
-};
-
-export type ProjectInfo = {
-  __typename?: 'ProjectInfo';
-  description?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-};
-
-export type ProjectSearchResult = SearchResult & {
-  __typename?: 'ProjectSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type ProjectTemplate = {
-  __typename?: 'ProjectTemplate';
-  authorEmail?: Maybe<Scalars['String']['output']>;
-  authorName?: Maybe<Scalars['String']['output']>;
-  authorRole?: Maybe<Scalars['String']['output']>;
-  authorSocialLinks: Array<Maybe<Scalars['String']['output']>>;
-  categories: Array<Scalars['String']['output']>;
-  components: Array<ComponentDefinitionTuple>;
-  description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  project?: Maybe<ProjectInfo>;
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  publicUrl?: Maybe<Scalars['String']['output']>;
-  workflows: Array<WorkflowInfo>;
-};
-
-export type ProjectWorkflow = {
-  __typename?: 'ProjectWorkflow';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectId: Scalars['ID']['output'];
-  projectVersion: Scalars['Int']['output'];
-  sseStreamResponse: Scalars['Boolean']['output'];
-  uuid?: Maybe<Scalars['String']['output']>;
-  version: Scalars['Int']['output'];
-  workflow: Workflow;
-  workflowId: Scalars['String']['output'];
-};
-
-export type PropertiesDataSource = {
-  __typename?: 'PropertiesDataSource';
-  propertiesLookupDependsOn?: Maybe<Array<Scalars['String']['output']>>;
-};
-
-export type Property = {
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export enum PropertyType {
-  Array = 'ARRAY',
-  Boolean = 'BOOLEAN',
-  Date = 'DATE',
-  DateTime = 'DATE_TIME',
-  DynamicProperties = 'DYNAMIC_PROPERTIES',
-  FileEntry = 'FILE_ENTRY',
-  Integer = 'INTEGER',
-  Null = 'NULL',
-  Number = 'NUMBER',
-  Object = 'OBJECT',
-  String = 'STRING',
-  Task = 'TASK',
-  Time = 'TIME'
-}
-
-export type Query = {
-  __typename?: 'Query';
-  _placeholder?: Maybe<Scalars['Boolean']['output']>;
-  actionDefinition: ActionDefinition;
-  actionDefinitions: Array<ActionDefinition>;
-  adminApiKeys?: Maybe<Array<Maybe<ApiKey>>>;
-  aiAgentEvalResult?: Maybe<AiAgentEvalResult>;
-  aiAgentEvalResultTranscript?: Maybe<Scalars['String']['output']>;
-  aiAgentEvalRun?: Maybe<AiAgentEvalRun>;
-  aiAgentEvalRuns: Array<AiAgentEvalRun>;
-  aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
-  aiAgentEvalTests: Array<AiAgentEvalTest>;
-  aiAgentJudges: Array<AiAgentJudge>;
-  aiSkill: AiSkill;
-  aiSkillFileContent: Scalars['String']['output'];
-  aiSkillFilePaths: Array<Scalars['String']['output']>;
-  aiSkills: Array<AiSkill>;
-  apiConnector?: Maybe<ApiConnector>;
-  apiConnectors: Array<ApiConnector>;
-  apiKey?: Maybe<ApiKey>;
-  apiKeys?: Maybe<Array<Maybe<ApiKey>>>;
-  approvalTask?: Maybe<ApprovalTask>;
-  approvalTasks?: Maybe<Array<Maybe<ApprovalTask>>>;
-  approvalTasksByIds?: Maybe<Array<Maybe<ApprovalTask>>>;
-  authorities: Array<Scalars['String']['output']>;
-  automationSearch: Array<SearchResult>;
-  automationWorkflowProjectCategories: Array<AutomationWorkflowProjectCategory>;
-  automationWorkflowProjectTags: Array<AutomationWorkflowProjectTag>;
-  automationWorkflowProjectVersions: Array<AutomationWorkflowProjectVersion>;
-  automationWorkflowProjects: Array<AutomationWorkflowProject>;
-  clusterElementComponentConnections: Array<ComponentConnection>;
-  clusterElementDefinition: ClusterElementDefinition;
-  clusterElementDefinitions: Array<ClusterElementDefinition>;
-  clusterElementDynamicProperties: Array<Property>;
-  clusterElementMissingRequiredProperties: Array<Scalars['String']['output']>;
-  clusterElementOptions: Array<Option>;
-  clusterElementScriptInput?: Maybe<Scalars['Map']['output']>;
-  componentDefinition: ComponentDefinition;
-  componentDefinitionSearch: Array<ComponentDefinition>;
-  componentDefinitionVersions: Array<ComponentDefinition>;
-  componentDefinitions: Array<ComponentDefinition>;
-  connectedUser?: Maybe<ConnectedUser>;
-  connectedUserMcpServers: Array<ConnectedUserMcpServer>;
-  connectedUserProjects: Array<ConnectedUserProject>;
-  connectedUsers?: Maybe<ConnectedUserPage>;
-  connectionComponentDefinition: ComponentDefinition;
-  connectionDefinition: ConnectionDefinition;
-  connectionDefinitions: Array<ConnectionDefinition>;
-  customComponent?: Maybe<CustomComponent>;
-  customComponentDefinition?: Maybe<CustomComponentDefinition>;
-  customComponents: Array<CustomComponent>;
-  dataTableRows: Array<DataTableRow>;
-  dataTableRowsPage: DataTableRowPage;
-  dataTableTags: Array<Tag>;
-  dataTableTagsByTable: Array<DataTableTagsEntry>;
-  dataTableWebhooks: Array<DataTableWebhook>;
-  dataTables: Array<DataTable>;
-  editorJobFileLogs: LogPage;
-  editorJobFileLogsExist: Scalars['Boolean']['output'];
-  editorTaskExecutionFileLogs: Array<LogEntry>;
-  embeddedMcpServers?: Maybe<Array<Maybe<McpServer>>>;
-  endpointDiscoveryStatus?: Maybe<EndpointDiscoveryResult>;
-  environments?: Maybe<Array<Maybe<Environment>>>;
-  evaluatorFunctionDefinition: EvaluatorFunctionDefinition;
-  evaluatorFunctionDefinitions: Array<EvaluatorFunctionDefinition>;
-  exportDataTableCsv: Scalars['String']['output'];
-  generationJobStatus?: Maybe<GenerationJobStatus>;
-  identityProvider?: Maybe<IdentityProviderType>;
-  identityProviders: Array<Maybe<IdentityProviderType>>;
-  integration?: Maybe<Integration>;
-  integrationWorkflows: Array<IntegrationWorkflow>;
-  integrationWorkflowsByIntegrationId: Array<IntegrationWorkflow>;
-  jobFileLogs: LogPage;
-  jobFileLogsExist: Scalars['Boolean']['output'];
-  knowledgeBase?: Maybe<KnowledgeBase>;
-  knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
-  knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
-  knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
-  knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
-  knowledgeBaseTags?: Maybe<Array<Tag>>;
-  knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
-  knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
-  managementMcpServerUrl?: Maybe<Scalars['String']['output']>;
-  mcpComponent?: Maybe<McpComponent>;
-  mcpComponentDefinitions: Array<ComponentDefinition>;
-  mcpComponents?: Maybe<Array<Maybe<McpComponent>>>;
-  mcpComponentsByServerId?: Maybe<Array<Maybe<McpComponent>>>;
-  mcpIntegrationInstanceConfiguration?: Maybe<McpIntegrationInstanceConfiguration>;
-  mcpIntegrationInstanceConfigurationWorkflow?: Maybe<McpIntegrationInstanceConfigurationWorkflow>;
-  mcpIntegrationInstanceConfigurationWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
-  mcpIntegrationInstanceConfigurationWorkflows?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
-  mcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationId?: Maybe<Array<Maybe<McpIntegrationInstanceConfigurationWorkflow>>>;
-  mcpIntegrationInstanceConfigurations?: Maybe<Array<Maybe<McpIntegrationInstanceConfiguration>>>;
-  mcpIntegrationInstanceConfigurationsByServerId?: Maybe<Array<Maybe<McpIntegrationInstanceConfiguration>>>;
-  mcpProject?: Maybe<McpProject>;
-  mcpProjectWorkflow?: Maybe<McpProjectWorkflow>;
-  mcpProjectWorkflowProperties?: Maybe<Array<Maybe<Property>>>;
-  mcpProjectWorkflows?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
-  mcpProjectWorkflowsByMcpProjectId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
-  mcpProjectWorkflowsByProjectDeploymentWorkflowId?: Maybe<Array<Maybe<McpProjectWorkflow>>>;
-  mcpProjects?: Maybe<Array<Maybe<McpProject>>>;
-  mcpProjectsByServerId?: Maybe<Array<Maybe<McpProject>>>;
-  mcpServer?: Maybe<McpServer>;
-  mcpServerTags?: Maybe<Array<Maybe<Tag>>>;
-  mcpServers?: Maybe<Array<Maybe<McpServer>>>;
-  mcpTool?: Maybe<McpTool>;
-  mcpTools?: Maybe<Array<Maybe<McpTool>>>;
-  mcpToolsByComponentId?: Maybe<Array<Maybe<McpTool>>>;
-  preBuiltProjectTemplates: Array<ProjectTemplate>;
-  preBuiltWorkflowTemplates: Array<WorkflowTemplate>;
-  project?: Maybe<Project>;
-  projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
-  projectTemplate?: Maybe<ProjectTemplate>;
-  projects?: Maybe<Array<Maybe<Project>>>;
-  searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
-  sharedProject?: Maybe<SharedProject>;
-  sharedWorkflow?: Maybe<SharedWorkflow>;
-  taskDispatcherDefinition: TaskDispatcherDefinition;
-  taskDispatcherDefinitionVersions: Array<TaskDispatcherDefinition>;
-  taskDispatcherDefinitions: Array<TaskDispatcherDefinition>;
-  taskExecutionFileLogs: Array<LogEntry>;
-  toolEligibleIntegrationInstanceConfigurationWorkflows: Array<IntegrationWorkflow>;
-  toolEligibleIntegrationVersionWorkflows: Array<IntegrationWorkflow>;
-  toolEligibleProjectVersionWorkflows: Array<ProjectWorkflow>;
-  triggerDefinition: TriggerDefinition;
-  triggerDefinitions: Array<TriggerDefinition>;
-  unifiedApiComponentDefinitions: Array<ComponentDefinition>;
-  user?: Maybe<AdminUser>;
-  users?: Maybe<AdminUserPage>;
-  validateWorkflow: WorkflowValidationResult;
-  validateWorkflowById: WorkflowValidationResult;
-  workflowNodeComponentConnections: Array<ComponentConnection>;
-  workflowNodeMissingRequiredProperties: Array<Scalars['String']['output']>;
-  workflowNodeScriptInput?: Maybe<Scalars['Map']['output']>;
-  workflowTemplate?: Maybe<WorkflowTemplate>;
-  workspaceApiKeys: Array<ApiKey>;
-  workspaceChatWorkflows: Array<ChatWorkflow>;
-  workspaceMcpServers?: Maybe<Array<Maybe<McpServer>>>;
-  workspaceProjectDeployments: Array<ProjectDeployment>;
-};
-
-
-export type QueryActionDefinitionArgs = {
-  actionName: Scalars['String']['input'];
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryActionDefinitionsArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryAdminApiKeysArgs = {
-  environmentId: Scalars['ID']['input'];
-};
-
-
-export type QueryAiAgentEvalResultArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryAiAgentEvalResultTranscriptArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryAiAgentEvalRunArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryAiAgentEvalRunsArgs = {
-  agentEvalTestId: Scalars['ID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryAiAgentEvalTestArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryAiAgentEvalTestsArgs = {
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryAiAgentJudgesArgs = {
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryAiSkillArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryAiSkillFileContentArgs = {
-  id: Scalars['ID']['input'];
-  path: Scalars['String']['input'];
-};
-
-
-export type QueryAiSkillFilePathsArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryApiConnectorArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryApiKeyArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryApiKeysArgs = {
-  environmentId: Scalars['ID']['input'];
-  type: PlatformType;
-};
-
-
-export type QueryApprovalTaskArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryApprovalTasksArgs = {
-  environmentId?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryApprovalTasksByIdsArgs = {
-  ids: Array<Scalars['ID']['input']>;
-};
-
-
-export type QueryAutomationSearchArgs = {
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  query: Scalars['String']['input'];
-};
-
-
-export type QueryAutomationWorkflowProjectVersionsArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryClusterElementComponentConnectionsArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryClusterElementDefinitionArgs = {
-  clusterElementName: Scalars['String']['input'];
-  clusterElementType?: InputMaybe<Scalars['String']['input']>;
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryClusterElementDefinitionsArgs = {
-  clusterElementType: Scalars['String']['input'];
-  rootComponentName: Scalars['String']['input'];
-  rootComponentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryClusterElementDynamicPropertiesArgs = {
-  clusterElementName: Scalars['String']['input'];
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  connectionId?: InputMaybe<Scalars['Long']['input']>;
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']>>;
-  propertyName: Scalars['String']['input'];
-};
-
-
-export type QueryClusterElementMissingRequiredPropertiesArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryClusterElementOptionsArgs = {
-  clusterElementName: Scalars['String']['input'];
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  connectionId?: InputMaybe<Scalars['Long']['input']>;
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']>>;
-  propertyName: Scalars['String']['input'];
-};
-
-
-export type QueryClusterElementScriptInputArgs = {
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryComponentDefinitionArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryComponentDefinitionSearchArgs = {
-  query: Scalars['String']['input'];
-};
-
-
-export type QueryComponentDefinitionVersionsArgs = {
-  componentName: Scalars['String']['input'];
-};
-
-
-export type QueryComponentDefinitionsArgs = {
-  actionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
-  clusterElementDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
-  connectionDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
-  include?: InputMaybe<Array<InputMaybe<Scalars['String']['input']>>>;
-  triggerDefinitions?: InputMaybe<Scalars['Boolean']['input']>;
-};
-
-
-export type QueryConnectedUserArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryConnectedUserMcpServersArgs = {
-  connectedUserId: Scalars['ID']['input'];
-};
-
-
-export type QueryConnectedUserProjectsArgs = {
-  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
-  environmentId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryConnectedUsersArgs = {
-  createDateFrom?: InputMaybe<Scalars['String']['input']>;
-  createDateTo?: InputMaybe<Scalars['String']['input']>;
-  environmentId?: InputMaybe<Scalars['ID']['input']>;
-  integrationId?: InputMaybe<Scalars['ID']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  pageNumber?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryConnectionComponentDefinitionArgs = {
-  componentName: Scalars['String']['input'];
-  connectionVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryConnectionDefinitionArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryConnectionDefinitionsArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryCustomComponentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryCustomComponentDefinitionArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryDataTableRowsArgs = {
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-
-export type QueryDataTableRowsPageArgs = {
-  environmentId: Scalars['ID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  tableId: Scalars['ID']['input'];
-};
-
-
-export type QueryDataTableWebhooksArgs = {
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-
-export type QueryDataTablesArgs = {
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryEditorJobFileLogsArgs = {
-  filter?: InputMaybe<LogFilterInput>;
-  jobId: Scalars['ID']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryEditorJobFileLogsExistArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type QueryEditorTaskExecutionFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-};
-
-
-export type QueryEndpointDiscoveryStatusArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
-export type QueryEvaluatorFunctionDefinitionArgs = {
-  name: Scalars['String']['input'];
-};
-
-
-export type QueryEvaluatorFunctionDefinitionsArgs = {
-  name?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryExportDataTableCsvArgs = {
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-
-export type QueryGenerationJobStatusArgs = {
-  jobId: Scalars['String']['input'];
-};
-
-
-export type QueryIdentityProviderArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryIntegrationArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryIntegrationWorkflowsByIntegrationIdArgs = {
-  integrationId: Scalars['ID']['input'];
-};
-
-
-export type QueryJobFileLogsArgs = {
-  filter?: InputMaybe<LogFilterInput>;
-  jobId: Scalars['ID']['input'];
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryJobFileLogsExistArgs = {
-  jobId: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseDocumentArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBaseDocumentStatusArgs = {
-  id: Scalars['ID']['input'];
-};
-
-
-export type QueryKnowledgeBasesArgs = {
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryMcpComponentArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpComponentsByServerIdArgs = {
-  mcpServerId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpIntegrationInstanceConfigurationArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpIntegrationInstanceConfigurationWorkflowArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpIntegrationInstanceConfigurationWorkflowPropertiesArgs = {
-  mcpIntegrationInstanceConfigurationWorkflowId: Scalars['ID']['input'];
-};
-
-
-export type QueryMcpIntegrationInstanceConfigurationWorkflowsByMcpIntegrationInstanceConfigurationIdArgs = {
-  mcpIntegrationInstanceConfigurationId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpIntegrationInstanceConfigurationsByServerIdArgs = {
-  mcpServerId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpProjectArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpProjectWorkflowArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpProjectWorkflowPropertiesArgs = {
-  mcpProjectWorkflowId: Scalars['ID']['input'];
-};
-
-
-export type QueryMcpProjectWorkflowsByMcpProjectIdArgs = {
-  mcpProjectId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpProjectWorkflowsByProjectDeploymentWorkflowIdArgs = {
-  projectDeploymentWorkflowId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpProjectsByServerIdArgs = {
-  mcpServerId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpServerArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpServerTagsArgs = {
-  type: PlatformType;
-};
-
-
-export type QueryMcpServersArgs = {
-  orderBy?: InputMaybe<McpServerOrderBy>;
-  type: PlatformType;
-};
-
-
-export type QueryMcpToolArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryMcpToolsByComponentIdArgs = {
-  mcpComponentId?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryPreBuiltProjectTemplatesArgs = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  query?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryPreBuiltWorkflowTemplatesArgs = {
-  category?: InputMaybe<Scalars['String']['input']>;
-  query?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryProjectArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
-export type QueryProjectDeploymentWorkflowArgs = {
-  id: Scalars['String']['input'];
-};
-
-
-export type QueryProjectTemplateArgs = {
-  id: Scalars['String']['input'];
-  sharedProject: Scalars['Boolean']['input'];
-};
-
-
-export type QuerySearchKnowledgeBaseArgs = {
-  id: Scalars['ID']['input'];
-  metadataFilters?: InputMaybe<Scalars['String']['input']>;
-  query: Scalars['String']['input'];
-};
-
-
-export type QuerySharedProjectArgs = {
-  projectUuid: Scalars['String']['input'];
-};
-
-
-export type QuerySharedWorkflowArgs = {
-  workflowUuid: Scalars['String']['input'];
-};
-
-
-export type QueryTaskDispatcherDefinitionArgs = {
-  name: Scalars['String']['input'];
-  version: Scalars['Int']['input'];
-};
-
-
-export type QueryTaskDispatcherDefinitionVersionsArgs = {
-  name: Scalars['String']['input'];
-};
-
-
-export type QueryTaskExecutionFileLogsArgs = {
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
-};
-
-
-export type QueryToolEligibleIntegrationInstanceConfigurationWorkflowsArgs = {
-  integrationInstanceConfigurationId: Scalars['ID']['input'];
-};
-
-
-export type QueryToolEligibleIntegrationVersionWorkflowsArgs = {
-  integrationId: Scalars['ID']['input'];
-  integrationVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryToolEligibleProjectVersionWorkflowsArgs = {
-  projectId: Scalars['ID']['input'];
-  projectVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryTriggerDefinitionArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  triggerName: Scalars['String']['input'];
-};
-
-
-export type QueryTriggerDefinitionsArgs = {
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-};
-
-
-export type QueryUnifiedApiComponentDefinitionsArgs = {
-  category: UnifiedApiCategory;
-};
-
-
-export type QueryUserArgs = {
-  login: Scalars['String']['input'];
-};
-
-
-export type QueryUsersArgs = {
-  pageNumber?: InputMaybe<Scalars['Int']['input']>;
-  pageSize?: InputMaybe<Scalars['Int']['input']>;
-};
-
-
-export type QueryValidateWorkflowArgs = {
-  workflow: Scalars['String']['input'];
-};
-
-
-export type QueryValidateWorkflowByIdArgs = {
-  workflowId: Scalars['String']['input'];
-};
-
-
-export type QueryWorkflowNodeComponentConnectionsArgs = {
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryWorkflowNodeMissingRequiredPropertiesArgs = {
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryWorkflowNodeScriptInputArgs = {
-  environmentId: Scalars['Long']['input'];
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-};
-
-
-export type QueryWorkflowTemplateArgs = {
-  id: Scalars['String']['input'];
-  sharedWorkflow: Scalars['Boolean']['input'];
-};
-
-
-export type QueryWorkspaceApiKeysArgs = {
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryWorkspaceChatWorkflowsArgs = {
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryWorkspaceMcpServersArgs = {
-  workspaceId: Scalars['ID']['input'];
-};
-
-
-export type QueryWorkspaceProjectDeploymentsArgs = {
-  environmentId: Scalars['ID']['input'];
-  projectId?: InputMaybe<Scalars['ID']['input']>;
-  tagId?: InputMaybe<Scalars['ID']['input']>;
-  workspaceId: Scalars['ID']['input'];
-};
-
-export type RemoveColumnInput = {
-  columnId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type RemoveTableInput = {
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type RenameColumnInput = {
-  columnId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
-  newName: Scalars['String']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type RenameDataTableInput = {
-  environmentId: Scalars['ID']['input'];
-  newBaseName: Scalars['String']['input'];
-  tableId: Scalars['ID']['input'];
-};
-
-export type RequestBodyDefinitionInput = {
-  contentType: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  required?: InputMaybe<Scalars['Boolean']['input']>;
-  schema: Scalars['String']['input'];
-};
-
-export type Resources = {
-  __typename?: 'Resources';
-  documentationUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export type ResponseDefinitionInput = {
-  contentType?: InputMaybe<Scalars['String']['input']>;
-  description: Scalars['String']['input'];
-  schema?: InputMaybe<Scalars['String']['input']>;
-  statusCode: Scalars['String']['input'];
-};
-
-export type ScriptTestExecution = {
-  __typename?: 'ScriptTestExecution';
-  error?: Maybe<ExecutionError>;
-  output?: Maybe<Scalars['Map']['output']>;
-};
-
-export enum SearchAssetType {
-  ApiCollection = 'API_COLLECTION',
-  ApiEndpoint = 'API_ENDPOINT',
-  Connection = 'CONNECTION',
-  DataTable = 'DATA_TABLE',
-  Deployment = 'DEPLOYMENT',
-  KnowledgeBase = 'KNOWLEDGE_BASE',
-  KnowledgeBaseDocument = 'KNOWLEDGE_BASE_DOCUMENT',
-  Project = 'PROJECT',
-  Workflow = 'WORKFLOW'
-}
-
-export type SearchResult = {
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-  type: SearchAssetType;
-};
-
-export type SelectedEndpointInput = {
-  method: Scalars['String']['input'];
-  path: Scalars['String']['input'];
-};
-
-export type SharedProject = {
-  __typename?: 'SharedProject';
-  description?: Maybe<Scalars['String']['output']>;
-  exported: Scalars['Boolean']['output'];
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  publicUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export type SharedWorkflow = {
-  __typename?: 'SharedWorkflow';
-  description?: Maybe<Scalars['String']['output']>;
-  exported: Scalars['Boolean']['output'];
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  publicUrl?: Maybe<Scalars['String']['output']>;
-};
-
-export type SharedWorkflowInfo = {
-  __typename?: 'SharedWorkflowInfo';
-  description?: Maybe<Scalars['String']['output']>;
-  label: Scalars['String']['output'];
-};
-
-export type StringProperty = Property & {
-  __typename?: 'StringProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  languageId?: Maybe<Scalars['String']['output']>;
-  maxLength?: Maybe<Scalars['Int']['output']>;
-  minLength?: Maybe<Scalars['Int']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  options?: Maybe<Array<Option>>;
-  optionsDataSource?: Maybe<OptionsDataSource>;
-  optionsLoadedDynamically?: Maybe<Scalars['Boolean']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  regex?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type Tag = {
-  __typename?: 'Tag';
-  id: Scalars['ID']['output'];
-  name: Scalars['String']['output'];
-};
-
-export type TagInput = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-  name: Scalars['String']['input'];
-};
-
-export type TaskDispatcherDefinition = {
-  __typename?: 'TaskDispatcherDefinition';
-  description?: Maybe<Scalars['String']['output']>;
-  icon?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  outputDefined: Scalars['Boolean']['output'];
-  outputFunctionDefined?: Maybe<Scalars['Boolean']['output']>;
-  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
-  properties: Array<Property>;
-  resources?: Maybe<Resources>;
-  taskProperties: Array<Property>;
-  title?: Maybe<Scalars['String']['output']>;
-  variablePropertiesDefined?: Maybe<Scalars['Boolean']['output']>;
-  version: Scalars['Int']['output'];
-};
-
-export type TimeProperty = Property & {
-  __typename?: 'TimeProperty';
-  advancedOption?: Maybe<Scalars['Boolean']['output']>;
-  controlType: ControlType;
-  defaultValue?: Maybe<Scalars['String']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  displayCondition?: Maybe<Scalars['String']['output']>;
-  exampleValue?: Maybe<Scalars['String']['output']>;
-  expressionEnabled?: Maybe<Scalars['Boolean']['output']>;
-  hidden?: Maybe<Scalars['Boolean']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name?: Maybe<Scalars['String']['output']>;
-  placeholder?: Maybe<Scalars['String']['output']>;
-  required?: Maybe<Scalars['Boolean']['output']>;
-  type: PropertyType;
-};
-
-export type TriggerDefinition = {
-  __typename?: 'TriggerDefinition';
-  componentName?: Maybe<Scalars['String']['output']>;
-  componentVersion?: Maybe<Scalars['Int']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  help?: Maybe<Help>;
-  name: Scalars['String']['output'];
-  outputDefined: Scalars['Boolean']['output'];
-  outputFunctionDefined: Scalars['Boolean']['output'];
-  outputSchemaDefined?: Maybe<Scalars['Boolean']['output']>;
-  properties: Array<Property>;
-  title?: Maybe<Scalars['String']['output']>;
-  type: TriggerType;
-  workflowNodeDescriptionDefined?: Maybe<Scalars['Boolean']['output']>;
-};
-
-export enum TriggerType {
-  Callable = 'CALLABLE',
-  DynamicWebhook = 'DYNAMIC_WEBHOOK',
-  Hybrid = 'HYBRID',
-  Listener = 'LISTENER',
-  Polling = 'POLLING',
-  StaticWebhook = 'STATIC_WEBHOOK'
-}
-
-export enum UnifiedApiCategory {
-  Accounting = 'ACCOUNTING',
-  Ats = 'ATS',
-  Crm = 'CRM',
-  ECommerce = 'E_COMMERCE',
-  FileStorage = 'FILE_STORAGE',
-  Hris = 'HRIS',
-  MarketingAutomation = 'MARKETING_AUTOMATION',
-  Ticketing = 'TICKETING'
-}
-
-export type UpdateApiConnectorInput = {
-  connectorVersion?: InputMaybe<Scalars['Int']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
-  icon?: InputMaybe<Scalars['String']['input']>;
-  name?: InputMaybe<Scalars['String']['input']>;
-  title?: InputMaybe<Scalars['String']['input']>;
-};
-
-export type UpdateDataTableTagsInput = {
-  tableId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<TagInput>>;
-};
-
-export type UpdateKnowledgeBaseDocumentTagsInput = {
-  knowledgeBaseDocumentId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<Scalars['String']['input']>>;
-};
-
-export type UpdateKnowledgeBaseTagsInput = {
-  knowledgeBaseId: Scalars['ID']['input'];
-  tags?: InputMaybe<Array<TagInput>>;
-};
-
-export type UpdateMcpIntegrationInstanceConfigurationInput = {
-  selectedWorkflowIds: Array<Scalars['String']['input']>;
-};
-
-export type UpdateMcpIntegrationInstanceConfigurationVersionInput = {
-  integrationVersion: Scalars['Int']['input'];
-  workflowUuids: Array<Scalars['String']['input']>;
-};
-
-export type UpdateMcpProjectInput = {
-  selectedWorkflowIds: Array<Scalars['String']['input']>;
-};
-
-export type UpdateRowInput = {
-  environmentId: Scalars['ID']['input'];
-  id: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-  values: Scalars['Map']['input'];
-};
-
-export type Workflow = {
-  __typename?: 'Workflow';
-  createdBy?: Maybe<Scalars['String']['output']>;
-  createdDate?: Maybe<Scalars['Long']['output']>;
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  label: Scalars['String']['output'];
-  lastModifiedBy?: Maybe<Scalars['String']['output']>;
-  lastModifiedDate?: Maybe<Scalars['Long']['output']>;
-  triggers: Array<WorkflowTrigger>;
-  version?: Maybe<Scalars['Int']['output']>;
-};
-
-export type WorkflowInfo = {
-  __typename?: 'WorkflowInfo';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['String']['output'];
-  label: Scalars['String']['output'];
-};
-
-export type WorkflowNodeTestOutputResult = {
-  __typename?: 'WorkflowNodeTestOutputResult';
-  id: Scalars['Long']['output'];
-  workflowId: Scalars['String']['output'];
-  workflowNodeName: Scalars['String']['output'];
-};
-
-export type WorkflowSearchResult = SearchResult & {
-  __typename?: 'WorkflowSearchResult';
-  description?: Maybe<Scalars['String']['output']>;
-  id: Scalars['ID']['output'];
-  label: Scalars['String']['output'];
-  name: Scalars['String']['output'];
-  projectId: Scalars['ID']['output'];
-  type: SearchAssetType;
-};
-
-export type WorkflowTemplate = {
-  __typename?: 'WorkflowTemplate';
-  authorEmail?: Maybe<Scalars['String']['output']>;
-  authorName?: Maybe<Scalars['String']['output']>;
-  authorRole?: Maybe<Scalars['String']['output']>;
-  authorSocialLinks: Array<Maybe<Scalars['String']['output']>>;
-  categories: Array<Scalars['String']['output']>;
-  components: Array<ComponentDefinition>;
-  description?: Maybe<Scalars['String']['output']>;
-  id?: Maybe<Scalars['ID']['output']>;
-  lastModifiedDate?: Maybe<Scalars['String']['output']>;
-  projectVersion?: Maybe<Scalars['Int']['output']>;
-  publicUrl?: Maybe<Scalars['String']['output']>;
-  workflow: SharedWorkflowInfo;
-};
-
-export type WorkflowTrigger = {
-  __typename?: 'WorkflowTrigger';
-  description?: Maybe<Scalars['String']['output']>;
-  label?: Maybe<Scalars['String']['output']>;
-  name: Scalars['String']['output'];
-  parameters?: Maybe<Scalars['Map']['output']>;
-  type: Scalars['String']['output'];
-};
-
-export type WorkflowValidationResult = {
-  __typename?: 'WorkflowValidationResult';
-  errors: Array<Scalars['String']['output']>;
-  warnings: Array<Scalars['String']['output']>;
-};
-
 export type AiAgentEvalResultQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiAgentEvalResultQuery = { __typename?: 'Query', aiAgentEvalResult?: { __typename?: 'AiAgentEvalResult', id: string, status: AiAgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, createdDate?: any | null, scenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AiAgentJudgeVerdict', id: string, judgeName: string, judgeType: AiAgentJudgeType, judgeScope: AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
+export type AiAgentEvalResultQuery = { aiAgentEvalResult: { id: string, status: Types.AiAgentEvalResultStatus, score: number | null, errorMessage: string | null, transcriptFile: string | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> } | null };
 
 export type AiAgentEvalResultTranscriptQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiAgentEvalResultTranscriptQuery = { __typename?: 'Query', aiAgentEvalResultTranscript?: string | null };
+export type AiAgentEvalResultTranscriptQuery = { aiAgentEvalResultTranscript: string | null };
 
 export type AiAgentEvalRunQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiAgentEvalRunQuery = { __typename?: 'Query', aiAgentEvalRun?: { __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, totalInputTokens?: number | null, totalOutputTokens?: number | null, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null, results: Array<{ __typename?: 'AiAgentEvalResult', id: string, status: AiAgentEvalResultStatus, score?: number | null, errorMessage?: string | null, transcriptFile?: string | null, inputTokens?: number | null, outputTokens?: number | null, runIndex?: number | null, createdDate?: any | null, scenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }, verdicts: Array<{ __typename?: 'AiAgentJudgeVerdict', id: string, judgeName: string, judgeType: AiAgentJudgeType, judgeScope: AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
+export type AiAgentEvalRunQuery = { aiAgentEvalRun: { id: string, name: string, status: Types.AiAgentEvalRunStatus, averageScore: number | null, totalScenarios: number, completedScenarios: number, agentVersion: string | null, totalInputTokens: number | null, totalOutputTokens: number | null, startedDate: any, completedDate: any, createdDate: any, results: Array<{ id: string, status: Types.AiAgentEvalResultStatus, score: number | null, errorMessage: string | null, transcriptFile: string | null, inputTokens: number | null, outputTokens: number | null, runIndex: number | null, createdDate: any, scenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }, verdicts: Array<{ id: string, judgeName: string, judgeType: Types.AiAgentJudgeType, judgeScope: Types.AiAgentJudgeScope, passed: boolean, score: number, explanation: string }> }> } | null };
 
 export type AiAgentEvalRunsQueryVariables = Exact<{
-  agentEvalTestId: Scalars['ID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  agentEvalTestId: string | number;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
 }>;
 
 
-export type AiAgentEvalRunsQuery = { __typename?: 'Query', aiAgentEvalRuns: Array<{ __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, averageScore?: number | null, totalScenarios: number, completedScenarios: number, startedDate?: any | null, completedDate?: any | null, createdDate?: any | null }> };
+export type AiAgentEvalRunsQuery = { aiAgentEvalRuns: Array<{ id: string, name: string, status: Types.AiAgentEvalRunStatus, averageScore: number | null, totalScenarios: number, completedScenarios: number, startedDate: any, completedDate: any, createdDate: any }> };
 
 export type AiAgentEvalTestQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiAgentEvalTestQuery = { __typename?: 'Query', aiAgentEvalTest?: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }>, toolSimulations: Array<{ __typename?: 'AiAgentScenarioToolSimulation', id: string, responsePrompt: string, simulationModel?: string | null, toolName: string, createdDate?: any | null, lastModifiedDate?: any | null }> }> } | null };
+export type AiAgentEvalTestQuery = { aiAgentEvalTest: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, scenarios: Array<{ id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, numberOfRuns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }>, toolSimulations: Array<{ id: string, responsePrompt: string, simulationModel: string | null, toolName: string, createdDate: any, lastModifiedDate: any }> }> } | null };
 
 export type AiAgentEvalTestsQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
+  workflowId: string;
+  workflowNodeName: string;
 }>;
 
 
-export type AiAgentEvalTestsQuery = { __typename?: 'Query', aiAgentEvalTests: Array<{ __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null, scenarios: Array<{ __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, toolSimulations: Array<{ __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null }>, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> }> }> };
+export type AiAgentEvalTestsQuery = { aiAgentEvalTests: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any, scenarios: Array<{ id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, numberOfRuns: number | null, createdDate: any, lastModifiedDate: any, toolSimulations: Array<{ id: string, toolName: string, responsePrompt: string, simulationModel: string | null }>, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> }> }> };
 
 export type AiAgentJudgesQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
+  workflowId: string;
+  workflowNodeName: string;
 }>;
 
 
-export type AiAgentJudgesQuery = { __typename?: 'Query', aiAgentJudges: Array<{ __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AiAgentJudgesQuery = { aiAgentJudges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> };
 
 export type CancelAiAgentEvalRunMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type CancelAiAgentEvalRunMutation = { __typename?: 'Mutation', cancelAiAgentEvalRun: { __typename?: 'AiAgentEvalRun', id: string, status: AiAgentEvalRunStatus } };
+export type CancelAiAgentEvalRunMutation = { cancelAiAgentEvalRun: { id: string, status: Types.AiAgentEvalRunStatus } };
 
 export type CreateAiAgentEvalScenarioMutationVariables = Exact<{
-  agentEvalTestId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type: AiAgentScenarioType;
-  userMessage?: InputMaybe<Scalars['String']['input']>;
-  expectedOutput?: InputMaybe<Scalars['String']['input']>;
-  personaPrompt?: InputMaybe<Scalars['String']['input']>;
-  maxTurns?: InputMaybe<Scalars['Int']['input']>;
-  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
+  agentEvalTestId: string | number;
+  name: string;
+  type: Types.AiAgentScenarioType;
+  userMessage?: string | null | undefined;
+  expectedOutput?: string | null | undefined;
+  personaPrompt?: string | null | undefined;
+  maxTurns?: number | null | undefined;
+  numberOfRuns?: number | null | undefined;
 }>;
 
 
-export type CreateAiAgentEvalScenarioMutation = { __typename?: 'Mutation', createAiAgentEvalScenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type CreateAiAgentEvalScenarioMutation = { createAiAgentEvalScenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, numberOfRuns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> } };
 
 export type CreateAiAgentEvalTestMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
+  workflowId: string;
+  workflowNodeName: string;
+  name: string;
+  description?: string | null | undefined;
 }>;
 
 
-export type CreateAiAgentEvalTestMutation = { __typename?: 'Mutation', createAiAgentEvalTest: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentEvalTestMutation = { createAiAgentEvalTest: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type CreateAiAgentJudgeMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  name: Scalars['String']['input'];
-  type: AiAgentJudgeType;
-  configuration: Scalars['Map']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  name: string;
+  type: Types.AiAgentJudgeType;
+  configuration: any;
 }>;
 
 
-export type CreateAiAgentJudgeMutation = { __typename?: 'Mutation', createAiAgentJudge: { __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentJudgeMutation = { createAiAgentJudge: { id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any } };
 
 export type CreateAiAgentScenarioJudgeMutationVariables = Exact<{
-  agentEvalScenarioId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  type: AiAgentJudgeType;
-  configuration: Scalars['Map']['input'];
+  agentEvalScenarioId: string | number;
+  name: string;
+  type: Types.AiAgentJudgeType;
+  configuration: any;
 }>;
 
 
-export type CreateAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', createAiAgentScenarioJudge: { __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiAgentScenarioJudgeMutation = { createAiAgentScenarioJudge: { id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any } };
 
 export type CreateAiAgentScenarioToolSimulationMutationVariables = Exact<{
-  agentEvalScenarioId: Scalars['ID']['input'];
-  toolName: Scalars['String']['input'];
-  responsePrompt: Scalars['String']['input'];
-  simulationModel?: InputMaybe<Scalars['String']['input']>;
+  agentEvalScenarioId: string | number;
+  toolName: string;
+  responsePrompt: string;
+  simulationModel?: string | null | undefined;
 }>;
 
 
-export type CreateAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', createAiAgentScenarioToolSimulation: { __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
+export type CreateAiAgentScenarioToolSimulationMutation = { createAiAgentScenarioToolSimulation: { id: string, toolName: string, responsePrompt: string, simulationModel: string | null } };
 
 export type DeleteAiAgentEvalScenarioMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiAgentEvalScenarioMutation = { __typename?: 'Mutation', deleteAiAgentEvalScenario: boolean };
+export type DeleteAiAgentEvalScenarioMutation = { deleteAiAgentEvalScenario: boolean };
 
 export type DeleteAiAgentEvalTestMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiAgentEvalTestMutation = { __typename?: 'Mutation', deleteAiAgentEvalTest: boolean };
+export type DeleteAiAgentEvalTestMutation = { deleteAiAgentEvalTest: boolean };
 
 export type DeleteAiAgentJudgeMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiAgentJudgeMutation = { __typename?: 'Mutation', deleteAiAgentJudge: boolean };
+export type DeleteAiAgentJudgeMutation = { deleteAiAgentJudge: boolean };
 
 export type DeleteAiAgentScenarioJudgeMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', deleteAiAgentScenarioJudge: boolean };
+export type DeleteAiAgentScenarioJudgeMutation = { deleteAiAgentScenarioJudge: boolean };
 
 export type DeleteAiAgentScenarioToolSimulationMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', deleteAiAgentScenarioToolSimulation: boolean };
+export type DeleteAiAgentScenarioToolSimulationMutation = { deleteAiAgentScenarioToolSimulation: boolean };
 
 export type StartAiAgentEvalRunMutationVariables = Exact<{
-  agentEvalTestId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  environmentId: Scalars['ID']['input'];
-  scenarioIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
-  aiAgentJudgeIds?: InputMaybe<Array<Scalars['ID']['input']> | Scalars['ID']['input']>;
+  agentEvalTestId: string | number;
+  name: string;
+  environmentId: string | number;
+  scenarioIds?: Array<string | number> | string | number | null | undefined;
+  aiAgentJudgeIds?: Array<string | number> | string | number | null | undefined;
 }>;
 
 
-export type StartAiAgentEvalRunMutation = { __typename?: 'Mutation', startAiAgentEvalRun: { __typename?: 'AiAgentEvalRun', id: string, name: string, status: AiAgentEvalRunStatus, totalScenarios: number, completedScenarios: number, agentVersion?: string | null, createdDate?: any | null } };
+export type StartAiAgentEvalRunMutation = { startAiAgentEvalRun: { id: string, name: string, status: Types.AiAgentEvalRunStatus, totalScenarios: number, completedScenarios: number, agentVersion: string | null, createdDate: any } };
 
 export type UpdateAiAgentEvalScenarioMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  userMessage?: InputMaybe<Scalars['String']['input']>;
-  expectedOutput?: InputMaybe<Scalars['String']['input']>;
-  personaPrompt?: InputMaybe<Scalars['String']['input']>;
-  maxTurns?: InputMaybe<Scalars['Int']['input']>;
-  numberOfRuns?: InputMaybe<Scalars['Int']['input']>;
+  id: string | number;
+  name?: string | null | undefined;
+  userMessage?: string | null | undefined;
+  expectedOutput?: string | null | undefined;
+  personaPrompt?: string | null | undefined;
+  maxTurns?: number | null | undefined;
+  numberOfRuns?: number | null | undefined;
 }>;
 
 
-export type UpdateAiAgentEvalScenarioMutation = { __typename?: 'Mutation', updateAiAgentEvalScenario: { __typename?: 'AiAgentEvalScenario', id: string, name: string, type: AiAgentScenarioType, userMessage?: string | null, expectedOutput?: string | null, personaPrompt?: string | null, maxTurns?: number | null, numberOfRuns?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, judges: Array<{ __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null }> } };
+export type UpdateAiAgentEvalScenarioMutation = { updateAiAgentEvalScenario: { id: string, name: string, type: Types.AiAgentScenarioType, userMessage: string | null, expectedOutput: string | null, personaPrompt: string | null, maxTurns: number | null, numberOfRuns: number | null, createdDate: any, lastModifiedDate: any, judges: Array<{ id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any }> } };
 
 export type UpdateAiAgentEvalTestMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  description?: InputMaybe<Scalars['String']['input']>;
+  id: string | number;
+  name?: string | null | undefined;
+  description?: string | null | undefined;
 }>;
 
 
-export type UpdateAiAgentEvalTestMutation = { __typename?: 'Mutation', updateAiAgentEvalTest: { __typename?: 'AiAgentEvalTest', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentEvalTestMutation = { updateAiAgentEvalTest: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type UpdateAiAgentJudgeMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  configuration?: InputMaybe<Scalars['Map']['input']>;
+  id: string | number;
+  name?: string | null | undefined;
+  configuration?: any;
 }>;
 
 
-export type UpdateAiAgentJudgeMutation = { __typename?: 'Mutation', updateAiAgentJudge: { __typename?: 'AiAgentJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentJudgeMutation = { updateAiAgentJudge: { id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any } };
 
 export type UpdateAiAgentScenarioJudgeMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name?: InputMaybe<Scalars['String']['input']>;
-  configuration?: InputMaybe<Scalars['Map']['input']>;
+  id: string | number;
+  name?: string | null | undefined;
+  configuration?: any;
 }>;
 
 
-export type UpdateAiAgentScenarioJudgeMutation = { __typename?: 'Mutation', updateAiAgentScenarioJudge: { __typename?: 'AiAgentScenarioJudge', id: string, name: string, type: AiAgentJudgeType, configuration: any, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiAgentScenarioJudgeMutation = { updateAiAgentScenarioJudge: { id: string, name: string, type: Types.AiAgentJudgeType, configuration: any, createdDate: any, lastModifiedDate: any } };
 
 export type UpdateAiAgentScenarioToolSimulationMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  toolName?: InputMaybe<Scalars['String']['input']>;
-  responsePrompt?: InputMaybe<Scalars['String']['input']>;
-  simulationModel?: InputMaybe<Scalars['String']['input']>;
+  id: string | number;
+  toolName?: string | null | undefined;
+  responsePrompt?: string | null | undefined;
+  simulationModel?: string | null | undefined;
 }>;
 
 
-export type UpdateAiAgentScenarioToolSimulationMutation = { __typename?: 'Mutation', updateAiAgentScenarioToolSimulation: { __typename?: 'AiAgentScenarioToolSimulation', id: string, toolName: string, responsePrompt: string, simulationModel?: string | null } };
+export type UpdateAiAgentScenarioToolSimulationMutation = { updateAiAgentScenarioToolSimulation: { id: string, toolName: string, responsePrompt: string, simulationModel: string | null } };
 
 export type AiSkillQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiSkillQuery = { __typename?: 'Query', aiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type AiSkillQuery = { aiSkill: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type AiSkillFileContentQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-  path: Scalars['String']['input'];
+  id: string | number;
+  path: string;
 }>;
 
 
-export type AiSkillFileContentQuery = { __typename?: 'Query', aiSkillFileContent: string };
+export type AiSkillFileContentQuery = { aiSkillFileContent: string };
 
 export type AiSkillFilePathsQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AiSkillFilePathsQuery = { __typename?: 'Query', aiSkillFilePaths: Array<string> };
+export type AiSkillFilePathsQuery = { aiSkillFilePaths: Array<string> };
 
 export type AiSkillsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AiSkillsQuery = { __typename?: 'Query', aiSkills: Array<{ __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null }> };
+export type AiSkillsQuery = { aiSkills: Array<{ id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any }> };
 
 export type CreateAiSkillMutationVariables = Exact<{
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  filename: Scalars['String']['input'];
-  fileBytes: Scalars['String']['input'];
+  name: string;
+  description?: string | null | undefined;
+  filename: string;
+  fileBytes: string;
 }>;
 
 
-export type CreateAiSkillMutation = { __typename?: 'Mutation', createAiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiSkillMutation = { createAiSkill: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type CreateAiSkillFromInstructionsMutationVariables = Exact<{
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  instructions: Scalars['String']['input'];
+  name: string;
+  description?: string | null | undefined;
+  instructions: string;
 }>;
 
 
-export type CreateAiSkillFromInstructionsMutation = { __typename?: 'Mutation', createAiSkillFromInstructions: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type CreateAiSkillFromInstructionsMutation = { createAiSkillFromInstructions: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type DeleteAiSkillMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAiSkillMutation = { __typename?: 'Mutation', deleteAiSkill: boolean };
+export type DeleteAiSkillMutation = { deleteAiSkill: boolean };
 
 export type UpdateAiSkillMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
+  id: string | number;
+  name: string;
+  description?: string | null | undefined;
 }>;
 
 
-export type UpdateAiSkillMutation = { __typename?: 'Mutation', updateAiSkill: { __typename?: 'AiSkill', id: string, name: string, description?: string | null, createdDate?: any | null, lastModifiedDate?: any | null } };
+export type UpdateAiSkillMutation = { updateAiSkill: { id: string, name: string, description: string | null, createdDate: any, lastModifiedDate: any } };
 
 export type UpdateAiSkillContentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  path?: InputMaybe<Scalars['String']['input']>;
-  content: Scalars['String']['input'];
+  id: string | number;
+  path?: string | null | undefined;
+  content: string;
 }>;
 
 
-export type UpdateAiSkillContentMutation = { __typename?: 'Mutation', updateAiSkillContent: { __typename?: 'AiSkill', description?: string | null, id: string, lastModifiedDate?: any | null, name: string } };
+export type UpdateAiSkillContentMutation = { updateAiSkillContent: { description: string | null, id: string, lastModifiedDate: any, name: string } };
 
 export type ApprovalTaskQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type ApprovalTaskQuery = { __typename?: 'Query', approvalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null };
+export type ApprovalTaskQuery = { approvalTask: { assigneeId: string | null, createdBy: string | null, createdDate: string | null, description: string | null, dueDate: string | null, id: string, jobResumeId: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null };
 
 export type ApprovalTasksQueryVariables = Exact<{
-  environmentId?: InputMaybe<Scalars['Int']['input']>;
+  environmentId?: number | null | undefined;
 }>;
 
 
-export type ApprovalTasksQuery = { __typename?: 'Query', approvalTasks?: Array<{ __typename?: 'ApprovalTask', assigneeId?: string | null, createdBy?: string | null, createdDate?: string | null, description?: string | null, dueDate?: string | null, id: string, jobResumeId?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: string | null, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null> | null };
+export type ApprovalTasksQuery = { approvalTasks: Array<{ assigneeId: string | null, createdBy: string | null, createdDate: string | null, description: string | null, dueDate: string | null, id: string, jobResumeId: string | null, lastModifiedBy: string | null, lastModifiedDate: string | null, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null> | null };
 
 export type CreateApprovalTaskMutationVariables = Exact<{
-  approvalTask: ApprovalTaskInput;
+  approvalTask: Types.ApprovalTaskInput;
 }>;
 
 
-export type CreateApprovalTaskMutation = { __typename?: 'Mutation', createApprovalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, description?: string | null, id: string, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus } | null };
+export type CreateApprovalTaskMutation = { createApprovalTask: { assigneeId: string | null, description: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus } | null };
 
 export type DeleteApprovalTaskMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteApprovalTaskMutation = { __typename?: 'Mutation', deleteApprovalTask?: boolean | null };
+export type DeleteApprovalTaskMutation = { deleteApprovalTask: boolean | null };
 
 export type UpdateApprovalTaskMutationVariables = Exact<{
-  approvalTask: ApprovalTaskInput;
+  approvalTask: Types.ApprovalTaskInput;
 }>;
 
 
-export type UpdateApprovalTaskMutation = { __typename?: 'Mutation', updateApprovalTask?: { __typename?: 'ApprovalTask', assigneeId?: string | null, description?: string | null, dueDate?: string | null, id: string, name: string, priority: ApprovalTaskPriority, status: ApprovalTaskStatus, version: number } | null };
+export type UpdateApprovalTaskMutation = { updateApprovalTask: { assigneeId: string | null, description: string | null, dueDate: string | null, id: string, name: string, priority: Types.ApprovalTaskPriority, status: Types.ApprovalTaskStatus, version: number } | null };
 
 export type CreateMcpProjectMutationVariables = Exact<{
-  input: CreateMcpProjectInput;
+  input: Types.CreateMcpProjectInput;
 }>;
 
 
-export type CreateMcpProjectMutation = { __typename?: 'Mutation', createMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
+export type CreateMcpProjectMutation = { createMcpProject: { id: string, mcpServerId: string, projectDeploymentId: string, projectVersion: number | null } | null };
 
 export type CreateWorkspaceApiKeyMutationVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  environmentId: Scalars['ID']['input'];
+  workspaceId: string | number;
+  name: string;
+  environmentId: string | number;
 }>;
 
 
-export type CreateWorkspaceApiKeyMutation = { __typename?: 'Mutation', createWorkspaceApiKey: string };
+export type CreateWorkspaceApiKeyMutation = { createWorkspaceApiKey: string };
 
 export type CreateMcpServerMutationVariables = Exact<{
-  input: CreateWorkspaceMcpServerInput;
+  input: Types.CreateWorkspaceMcpServerInput;
 }>;
 
 
-export type CreateMcpServerMutation = { __typename?: 'Mutation', createWorkspaceMcpServer?: { __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean } | null };
+export type CreateMcpServerMutation = { createWorkspaceMcpServer: { id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean } | null };
 
 export type DeleteMcpProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpProjectMutation = { __typename?: 'Mutation', deleteMcpProject?: boolean | null };
+export type DeleteMcpProjectMutation = { deleteMcpProject: boolean | null };
 
 export type DeleteMcpProjectWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpProjectWorkflowMutation = { __typename?: 'Mutation', deleteMcpProjectWorkflow?: boolean | null };
+export type DeleteMcpProjectWorkflowMutation = { deleteMcpProjectWorkflow: boolean | null };
 
 export type DeleteSharedProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteSharedProjectMutation = { __typename?: 'Mutation', deleteSharedProject: boolean };
+export type DeleteSharedProjectMutation = { deleteSharedProject: boolean };
 
 export type DeleteSharedWorkflowMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
+  workflowId: string;
 }>;
 
 
-export type DeleteSharedWorkflowMutation = { __typename?: 'Mutation', deleteSharedWorkflow: boolean };
+export type DeleteSharedWorkflowMutation = { deleteSharedWorkflow: boolean };
 
 export type DeleteWorkspaceApiKeyMutationVariables = Exact<{
-  apiKeyId: Scalars['ID']['input'];
+  apiKeyId: string | number;
 }>;
 
 
-export type DeleteWorkspaceApiKeyMutation = { __typename?: 'Mutation', deleteWorkspaceApiKey: boolean };
+export type DeleteWorkspaceApiKeyMutation = { deleteWorkspaceApiKey: boolean };
 
 export type DeleteWorkspaceMcpServerMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteWorkspaceMcpServerMutation = { __typename?: 'Mutation', deleteWorkspaceMcpServer?: boolean | null };
+export type DeleteWorkspaceMcpServerMutation = { deleteWorkspaceMcpServer: boolean | null };
 
 export type DisconnectConnectionMutationVariables = Exact<{
-  connectionId: Scalars['ID']['input'];
+  connectionId: string | number;
 }>;
 
 
-export type DisconnectConnectionMutation = { __typename?: 'Mutation', disconnectConnection: boolean };
+export type DisconnectConnectionMutation = { disconnectConnection: boolean };
 
 export type ExportSharedProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
+  id: string | number;
+  description?: string | null | undefined;
 }>;
 
 
-export type ExportSharedProjectMutation = { __typename?: 'Mutation', exportSharedProject?: boolean | null };
+export type ExportSharedProjectMutation = { exportSharedProject: boolean | null };
 
 export type ExportSharedWorkflowMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
+  workflowId: string;
+  description?: string | null | undefined;
 }>;
 
 
-export type ExportSharedWorkflowMutation = { __typename?: 'Mutation', exportSharedWorkflow: boolean };
+export type ExportSharedWorkflowMutation = { exportSharedWorkflow: boolean };
 
 export type ImportProjectTemplateMutationVariables = Exact<{
-  id: Scalars['String']['input'];
-  workspaceId: Scalars['ID']['input'];
-  sharedProject: Scalars['Boolean']['input'];
+  id: string;
+  workspaceId: string | number;
+  sharedProject: boolean;
 }>;
 
 
-export type ImportProjectTemplateMutation = { __typename?: 'Mutation', importProjectTemplate: string };
+export type ImportProjectTemplateMutation = { importProjectTemplate: string };
 
 export type ImportWorkflowTemplateMutationVariables = Exact<{
-  workflowUuid: Scalars['String']['input'];
-  projectId: Scalars['ID']['input'];
-  sharedWorkflow: Scalars['Boolean']['input'];
+  workflowUuid: string;
+  projectId: string | number;
+  sharedWorkflow: boolean;
 }>;
 
 
-export type ImportWorkflowTemplateMutation = { __typename?: 'Mutation', importWorkflowTemplate: string };
+export type ImportWorkflowTemplateMutation = { importWorkflowTemplate: string };
 
 export type McpProjectWorkflowPropertiesQueryVariables = Exact<{
-  mcpProjectWorkflowId: Scalars['ID']['input'];
+  mcpProjectWorkflowId: string | number;
 }>;
 
 
-export type McpProjectWorkflowPropertiesQuery = { __typename?: 'Query', mcpProjectWorkflowProperties?: Array<
-    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
-    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
-    | { __typename?: 'DateProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DateTimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null }
-    | { __typename?: 'NullProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null }
-    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
-    | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'TimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+export type McpProjectWorkflowPropertiesQuery = { mcpProjectWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
 
 export type McpProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type McpProjectsQuery = { __typename?: 'Query', mcpProjects?: Array<{ __typename?: 'McpProject', id: string, mcpServerId: string, project?: { __typename?: 'Project', id: string, name: string } | null } | null> | null };
+export type McpProjectsQuery = { mcpProjects: Array<{ id: string, mcpServerId: string, project: { id: string, name: string } | null } | null> | null };
 
 export type McpProjectsByServerIdQueryVariables = Exact<{
-  mcpServerId: Scalars['ID']['input'];
+  mcpServerId: string | number;
 }>;
 
 
-export type McpProjectsByServerIdQuery = { __typename?: 'Query', mcpProjectsByServerId?: Array<{ __typename?: 'McpProject', id: string, projectDeploymentId: string, mcpServerId: string, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectVersion?: number | null, project?: { __typename?: 'Project', id: string, name: string, category?: { __typename?: 'Category', id?: string | null, name?: string | null } | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null, mcpProjectWorkflows?: Array<{ __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', id: string, enabled: boolean, inputs?: any | null, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'ProjectDeploymentWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpProjectsByServerIdQuery = { mcpProjectsByServerId: Array<{ id: string, projectDeploymentId: string, mcpServerId: string, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectVersion: number | null, project: { id: string, name: string, category: { id: string | null, name: string | null } | null, tags: Array<{ id: string, name: string } | null> | null } | null, mcpProjectWorkflows: Array<{ id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, projectDeploymentWorkflow: { id: string, enabled: boolean, inputs: any, projectDeploymentId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
 export type PreBuiltProjectTemplatesQueryVariables = Exact<{
-  query?: InputMaybe<Scalars['String']['input']>;
-  category?: InputMaybe<Scalars['String']['input']>;
+  query?: string | null | undefined;
+  category?: string | null | undefined;
 }>;
 
 
-export type PreBuiltProjectTemplatesQuery = { __typename?: 'Query', preBuiltProjectTemplates: Array<{ __typename?: 'ProjectTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string, description?: string | null } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> }> };
+export type PreBuiltProjectTemplatesQuery = { preBuiltProjectTemplates: Array<{ authorName: string | null, categories: Array<string>, description: string | null, id: string | null, projectVersion: number | null, publicUrl: string | null, components: Array<{ key: string | null, value: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { version: number } | null } | null> }>, project: { name: string, description: string | null } | null, workflows: Array<{ id: string, label: string }> }> };
 
 export type PreBuiltWorkflowTemplatesQueryVariables = Exact<{
-  query?: InputMaybe<Scalars['String']['input']>;
-  category?: InputMaybe<Scalars['String']['input']>;
+  query?: string | null | undefined;
+  category?: string | null | undefined;
 }>;
 
 
-export type PreBuiltWorkflowTemplatesQuery = { __typename?: 'Query', preBuiltWorkflowTemplates: Array<{ __typename?: 'WorkflowTemplate', authorName?: string | null, categories: Array<string>, description?: string | null, id?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', version: number } | null }>, workflow: { __typename?: 'SharedWorkflowInfo', label: string, description?: string | null } }> };
+export type PreBuiltWorkflowTemplatesQuery = { preBuiltWorkflowTemplates: Array<{ authorName: string | null, categories: Array<string>, description: string | null, id: string | null, projectVersion: number | null, publicUrl: string | null, components: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { version: number } | null }>, workflow: { label: string, description: string | null } }> };
 
 export type ProjectByIdQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type ProjectByIdQuery = { __typename?: 'Query', project?: { __typename?: 'Project', id: string, name: string } | null };
+export type ProjectByIdQuery = { project: { id: string, name: string } | null };
 
 export type ProjectTemplateQueryVariables = Exact<{
-  id: Scalars['String']['input'];
-  sharedProject: Scalars['Boolean']['input'];
+  id: string;
+  sharedProject: boolean;
 }>;
 
 
-export type ProjectTemplateQuery = { __typename?: 'Query', projectTemplate?: { __typename?: 'ProjectTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, components: Array<{ __typename?: 'ComponentDefinitionTuple', key?: string | null, value: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', componentName: string, version: number } | null } | null> }>, project?: { __typename?: 'ProjectInfo', name: string } | null, workflows: Array<{ __typename?: 'WorkflowInfo', id: string, label: string }> } | null };
+export type ProjectTemplateQuery = { projectTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, components: Array<{ key: string | null, value: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null } | null> }>, project: { name: string } | null, workflows: Array<{ id: string, label: string }> } | null };
 
 export type SharedProjectQueryVariables = Exact<{
-  projectUuid: Scalars['String']['input'];
+  projectUuid: string;
 }>;
 
 
-export type SharedProjectQuery = { __typename?: 'Query', sharedProject?: { __typename?: 'SharedProject', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+export type SharedProjectQuery = { sharedProject: { description: string | null, exported: boolean, projectVersion: number | null, publicUrl: string | null } | null };
 
 export type SharedWorkflowQueryVariables = Exact<{
-  workflowUuid: Scalars['String']['input'];
+  workflowUuid: string;
 }>;
 
 
-export type SharedWorkflowQuery = { __typename?: 'Query', sharedWorkflow?: { __typename?: 'SharedWorkflow', description?: string | null, exported: boolean, projectVersion?: number | null, publicUrl?: string | null } | null };
+export type SharedWorkflowQuery = { sharedWorkflow: { description: string | null, exported: boolean, projectVersion: number | null, publicUrl: string | null } | null };
 
 export type ToolEligibleProjectVersionWorkflowsQueryVariables = Exact<{
-  projectId: Scalars['ID']['input'];
-  projectVersion: Scalars['Int']['input'];
+  projectId: string | number;
+  projectVersion: number;
 }>;
 
 
-export type ToolEligibleProjectVersionWorkflowsQuery = { __typename?: 'Query', toolEligibleProjectVersionWorkflows: Array<{ __typename?: 'ProjectWorkflow', id: string, workflow: { __typename?: 'Workflow', id: string, label: string } }> };
+export type ToolEligibleProjectVersionWorkflowsQuery = { toolEligibleProjectVersionWorkflows: Array<{ id: string, workflow: { id: string, label: string } }> };
 
 export type UpdateMcpProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: UpdateMcpProjectInput;
+  id: string | number;
+  input: Types.UpdateMcpProjectInput;
 }>;
 
 
-export type UpdateMcpProjectMutation = { __typename?: 'Mutation', updateMcpProject?: { __typename?: 'McpProject', id: string, mcpServerId: string, projectDeploymentId: string, projectVersion?: number | null } | null };
+export type UpdateMcpProjectMutation = { updateMcpProject: { id: string, mcpServerId: string, projectDeploymentId: string, projectVersion: number | null } | null };
 
 export type UpdateMcpProjectWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: McpProjectWorkflowUpdateInput;
+  id: string | number;
+  input: Types.McpProjectWorkflowUpdateInput;
 }>;
 
 
-export type UpdateMcpProjectWorkflowMutation = { __typename?: 'Mutation', updateMcpProjectWorkflow?: { __typename?: 'McpProjectWorkflow', id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters?: any | null } | null };
+export type UpdateMcpProjectWorkflowMutation = { updateMcpProjectWorkflow: { id: string, mcpProjectId: any, projectDeploymentWorkflowId: any, parameters: any } | null };
 
 export type UpdateMcpServerMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: McpServerUpdateInput;
+  id: string | number;
+  input: Types.McpServerUpdateInput;
 }>;
 
 
-export type UpdateMcpServerMutation = { __typename?: 'Mutation', updateMcpServer?: { __typename?: 'McpServer', id: string, name: string, enabled: boolean } | null };
+export type UpdateMcpServerMutation = { updateMcpServer: { id: string, name: string, enabled: boolean } | null };
 
 export type UpdateMcpServerTagsMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  tags: Array<TagInput> | TagInput;
+  id: string | number;
+  tags: Array<Types.TagInput> | Types.TagInput;
 }>;
 
 
-export type UpdateMcpServerTagsMutation = { __typename?: 'Mutation', updateMcpServerTags?: Array<{ __typename?: 'Tag', id: string } | null> | null };
+export type UpdateMcpServerTagsMutation = { updateMcpServerTags: Array<{ id: string } | null> | null };
 
 export type UpdateWorkspaceApiKeyMutationVariables = Exact<{
-  apiKeyId: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
+  apiKeyId: string | number;
+  name: string;
 }>;
 
 
-export type UpdateWorkspaceApiKeyMutation = { __typename?: 'Mutation', updateWorkspaceApiKey: boolean };
+export type UpdateWorkspaceApiKeyMutation = { updateWorkspaceApiKey: boolean };
 
 export type WorkflowChatProjectDeploymentWorkflowQueryVariables = Exact<{
-  id: Scalars['String']['input'];
+  id: string;
 }>;
 
 
-export type WorkflowChatProjectDeploymentWorkflowQuery = { __typename?: 'Query', projectDeploymentWorkflow?: { __typename?: 'ProjectDeploymentWorkflow', projectWorkflow: { __typename?: 'ProjectWorkflow', sseStreamResponse: boolean, workflow: { __typename?: 'Workflow', label: string } } } | null };
+export type WorkflowChatProjectDeploymentWorkflowQuery = { projectDeploymentWorkflow: { projectWorkflow: { sseStreamResponse: boolean, workflow: { label: string } } } | null };
 
 export type WorkflowTemplateQueryVariables = Exact<{
-  id: Scalars['String']['input'];
-  sharedWorkflow: Scalars['Boolean']['input'];
+  id: string;
+  sharedWorkflow: boolean;
 }>;
 
 
-export type WorkflowTemplateQuery = { __typename?: 'Query', workflowTemplate?: { __typename?: 'WorkflowTemplate', description?: string | null, projectVersion?: number | null, publicUrl?: string | null, workflow: { __typename?: 'SharedWorkflowInfo', label: string }, components: Array<{ __typename?: 'ComponentDefinition', icon?: string | null, name: string, title?: string | null, version?: number | null, connection?: { __typename?: 'ConnectionDefinition', componentName: string, version: number } | null }> } | null };
+export type WorkflowTemplateQuery = { workflowTemplate: { description: string | null, projectVersion: number | null, publicUrl: string | null, workflow: { label: string }, components: Array<{ icon: string | null, name: string, title: string | null, version: number | null, connection: { componentName: string, version: number } | null }> } | null };
 
 export type WorkspaceApiKeysQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
+  workspaceId: string | number;
+  environmentId: string | number;
 }>;
 
 
-export type WorkspaceApiKeysQuery = { __typename?: 'Query', workspaceApiKeys: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null }> };
+export type WorkspaceApiKeysQuery = { workspaceApiKeys: Array<{ id: string | null, name: string | null, secretKey: string | null, lastUsedDate: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
 export type WorkspaceChatWorkflowsQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
-  environmentId: Scalars['ID']['input'];
+  workspaceId: string | number;
+  environmentId: string | number;
 }>;
 
 
-export type WorkspaceChatWorkflowsQuery = { __typename?: 'Query', workspaceChatWorkflows: Array<{ __typename?: 'ChatWorkflow', projectDeploymentId: string, projectId: string, projectName: string, workflowExecutionId: string, workflowLabel: string }> };
+export type WorkspaceChatWorkflowsQuery = { workspaceChatWorkflows: Array<{ projectDeploymentId: string, projectId: string, projectName: string, workflowExecutionId: string, workflowLabel: string }> };
 
 export type WorkspaceMcpServersQueryVariables = Exact<{
-  workspaceId: Scalars['ID']['input'];
+  workspaceId: string | number;
 }>;
 
 
-export type WorkspaceMcpServersQuery = { __typename?: 'Query', workspaceMcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number, title?: string | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type AddDataTableColumnMutationVariables = Exact<{
-  input: AddColumnInput;
+  input: Types.AddColumnInput;
 }>;
 
 
-export type AddDataTableColumnMutation = { __typename?: 'Mutation', addDataTableColumn: boolean };
+export type AddDataTableColumnMutation = { addDataTableColumn: boolean };
 
 export type CreateDataTableMutationVariables = Exact<{
-  input: CreateDataTableInput;
+  input: Types.CreateDataTableInput;
 }>;
 
 
-export type CreateDataTableMutation = { __typename?: 'Mutation', createDataTable: boolean };
+export type CreateDataTableMutation = { createDataTable: boolean };
 
 export type DataTableRowsQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
+  environmentId: string | number;
+  tableId: string | number;
 }>;
 
 
-export type DataTableRowsQuery = { __typename?: 'Query', dataTableRows: Array<{ __typename?: 'DataTableRow', id: string, values: any }> };
+export type DataTableRowsQuery = { dataTableRows: Array<{ id: string, values: any }> };
 
 export type DataTableRowsPageQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
+  environmentId: string | number;
+  tableId: string | number;
+  limit?: number | null | undefined;
+  offset?: number | null | undefined;
 }>;
 
 
-export type DataTableRowsPageQuery = { __typename?: 'Query', dataTableRowsPage: { __typename?: 'DataTableRowPage', hasMore: boolean, nextOffset?: number | null, items: Array<{ __typename?: 'DataTableRow', id: string, values: any }> } };
+export type DataTableRowsPageQuery = { dataTableRowsPage: { hasMore: boolean, nextOffset: number | null, items: Array<{ id: string, values: any }> } };
 
 export type DataTableTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DataTableTagsQuery = { __typename?: 'Query', dataTableTags: Array<{ __typename?: 'Tag', id: string, name: string }> };
+export type DataTableTagsQuery = { dataTableTags: Array<{ id: string, name: string }> };
 
 export type DataTableTagsByTableQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type DataTableTagsByTableQuery = { __typename?: 'Query', dataTableTagsByTable: Array<{ __typename?: 'DataTableTagsEntry', tableId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> };
+export type DataTableTagsByTableQuery = { dataTableTagsByTable: Array<{ tableId: string, tags: Array<{ id: string, name: string }> }> };
 
 export type DataTablesQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
+  environmentId: string | number;
+  workspaceId: string | number;
 }>;
 
 
-export type DataTablesQuery = { __typename?: 'Query', dataTables: Array<{ __typename?: 'DataTable', id: string, baseName: string, lastModifiedDate?: any | null, columns: Array<{ __typename?: 'DataTableColumn', id: string, name: string, type: ColumnType }> }> };
+export type DataTablesQuery = { dataTables: Array<{ id: string, baseName: string, lastModifiedDate: any, columns: Array<{ id: string, name: string, type: Types.ColumnType }> }> };
 
 export type DeleteDataTableRowMutationVariables = Exact<{
-  input: DeleteRowInput;
+  input: Types.DeleteRowInput;
 }>;
 
 
-export type DeleteDataTableRowMutation = { __typename?: 'Mutation', deleteDataTableRow: boolean };
+export type DeleteDataTableRowMutation = { deleteDataTableRow: boolean };
 
 export type DropDataTableMutationVariables = Exact<{
-  input: RemoveTableInput;
+  input: Types.RemoveTableInput;
 }>;
 
 
-export type DropDataTableMutation = { __typename?: 'Mutation', dropDataTable: boolean };
+export type DropDataTableMutation = { dropDataTable: boolean };
 
 export type DuplicateDataTableMutationVariables = Exact<{
-  input: DuplicateDataTableInput;
+  input: Types.DuplicateDataTableInput;
 }>;
 
 
-export type DuplicateDataTableMutation = { __typename?: 'Mutation', duplicateDataTable: boolean };
+export type DuplicateDataTableMutation = { duplicateDataTable: boolean };
 
 export type ExportDataTableCsvQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  tableId: Scalars['ID']['input'];
+  environmentId: string | number;
+  tableId: string | number;
 }>;
 
 
-export type ExportDataTableCsvQuery = { __typename?: 'Query', exportDataTableCsv: string };
+export type ExportDataTableCsvQuery = { exportDataTableCsv: string };
 
 export type ImportDataTableCsvMutationVariables = Exact<{
-  input: ImportCsvInput;
+  input: Types.ImportCsvInput;
 }>;
 
 
-export type ImportDataTableCsvMutation = { __typename?: 'Mutation', importDataTableCsv: boolean };
+export type ImportDataTableCsvMutation = { importDataTableCsv: boolean };
 
 export type InsertDataTableRowMutationVariables = Exact<{
-  input: InsertRowInput;
+  input: Types.InsertRowInput;
 }>;
 
 
-export type InsertDataTableRowMutation = { __typename?: 'Mutation', insertDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
+export type InsertDataTableRowMutation = { insertDataTableRow: { id: string, values: any } };
 
 export type RemoveDataTableColumnMutationVariables = Exact<{
-  input: RemoveColumnInput;
+  input: Types.RemoveColumnInput;
 }>;
 
 
-export type RemoveDataTableColumnMutation = { __typename?: 'Mutation', removeDataTableColumn: boolean };
+export type RemoveDataTableColumnMutation = { removeDataTableColumn: boolean };
 
 export type RenameDataTableMutationVariables = Exact<{
-  input: RenameDataTableInput;
+  input: Types.RenameDataTableInput;
 }>;
 
 
-export type RenameDataTableMutation = { __typename?: 'Mutation', renameDataTable: boolean };
+export type RenameDataTableMutation = { renameDataTable: boolean };
 
 export type RenameDataTableColumnMutationVariables = Exact<{
-  input: RenameColumnInput;
+  input: Types.RenameColumnInput;
 }>;
 
 
-export type RenameDataTableColumnMutation = { __typename?: 'Mutation', renameDataTableColumn: boolean };
+export type RenameDataTableColumnMutation = { renameDataTableColumn: boolean };
 
 export type UpdateDataTableRowMutationVariables = Exact<{
-  input: UpdateRowInput;
+  input: Types.UpdateRowInput;
 }>;
 
 
-export type UpdateDataTableRowMutation = { __typename?: 'Mutation', updateDataTableRow: { __typename?: 'DataTableRow', id: string, values: any } };
+export type UpdateDataTableRowMutation = { updateDataTableRow: { id: string, values: any } };
 
 export type UpdateDataTableTagsMutationVariables = Exact<{
-  input: UpdateDataTableTagsInput;
+  input: Types.UpdateDataTableTagsInput;
 }>;
 
 
-export type UpdateDataTableTagsMutation = { __typename?: 'Mutation', updateDataTableTags: boolean };
+export type UpdateDataTableTagsMutation = { updateDataTableTags: boolean };
 
 export type CreateKnowledgeBaseMutationVariables = Exact<{
-  knowledgeBase: KnowledgeBaseInput;
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
+  knowledgeBase: Types.KnowledgeBaseInput;
+  environmentId: string | number;
+  workspaceId: string | number;
 }>;
 
 
-export type CreateKnowledgeBaseMutation = { __typename?: 'Mutation', createKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string } | null };
+export type CreateKnowledgeBaseMutation = { createKnowledgeBase: { id: string, name: string } | null };
 
 export type DeleteKnowledgeBaseMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteKnowledgeBaseMutation = { __typename?: 'Mutation', deleteKnowledgeBase?: boolean | null };
+export type DeleteKnowledgeBaseMutation = { deleteKnowledgeBase: boolean | null };
 
 export type DeleteKnowledgeBaseDocumentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteKnowledgeBaseDocumentMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocument?: boolean | null };
+export type DeleteKnowledgeBaseDocumentMutation = { deleteKnowledgeBaseDocument: boolean | null };
 
 export type DeleteKnowledgeBaseDocumentChunkMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', deleteKnowledgeBaseDocumentChunk?: boolean | null };
+export type DeleteKnowledgeBaseDocumentChunkMutation = { deleteKnowledgeBaseDocumentChunk: boolean | null };
 
 export type KnowledgeBaseQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type KnowledgeBaseQuery = { __typename?: 'Query', knowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null, documents?: Array<{ __typename?: 'KnowledgeBaseDocument', id: string, name: string, status: number, tags?: Array<string> | null, createdDate?: any | null, document?: { __typename?: 'FileEntry', name: string, extension?: string | null, mimeType?: string | null, url: string } | null, chunks?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null> | null } | null> | null } | null };
+export type KnowledgeBaseQuery = { knowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any, documents: Array<{ id: string, name: string, status: number, tags: Array<string> | null, createdDate: any, document: { name: string, extension: string | null, mimeType: string | null, url: string } | null, chunks: Array<{ id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any } | null> | null } | null> | null } | null };
 
 export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type KnowledgeBaseDocumentStatusQuery = { __typename?: 'Query', knowledgeBaseDocumentStatus?: { __typename?: 'DocumentStatusUpdate', documentId: string, status: number, timestamp: any, message?: string | null } | null };
+export type KnowledgeBaseDocumentStatusQuery = { knowledgeBaseDocumentStatus: { documentId: string, status: number, timestamp: any, message: string | null } | null };
 
 export type KnowledgeBaseDocumentTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsQuery = { __typename?: 'Query', knowledgeBaseDocumentTags?: Array<string> | null };
+export type KnowledgeBaseDocumentTagsQuery = { knowledgeBaseDocumentTags: Array<string> | null };
 
 export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseDocumentTagsByDocumentQuery = { __typename?: 'Query', knowledgeBaseDocumentTagsByDocument?: Array<{ __typename?: 'KnowledgeBaseDocumentTagsEntry', knowledgeBaseDocumentId: string, tags: Array<string> }> | null };
+export type KnowledgeBaseDocumentTagsByDocumentQuery = { knowledgeBaseDocumentTagsByDocument: Array<{ knowledgeBaseDocumentId: string, tags: Array<string> }> | null };
 
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseTagsQuery = { __typename?: 'Query', knowledgeBaseTags?: Array<{ __typename?: 'Tag', id: string, name: string }> | null };
+export type KnowledgeBaseTagsQuery = { knowledgeBaseTags: Array<{ id: string, name: string }> | null };
 
 export type KnowledgeBaseTagsByKnowledgeBaseQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type KnowledgeBaseTagsByKnowledgeBaseQuery = { __typename?: 'Query', knowledgeBaseTagsByKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseTagsEntry', knowledgeBaseId: string, tags: Array<{ __typename?: 'Tag', id: string, name: string }> }> | null };
+export type KnowledgeBaseTagsByKnowledgeBaseQuery = { knowledgeBaseTagsByKnowledgeBase: Array<{ knowledgeBaseId: string, tags: Array<{ id: string, name: string }> }> | null };
 
 export type KnowledgeBasesQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  workspaceId: Scalars['ID']['input'];
+  environmentId: string | number;
+  workspaceId: string | number;
 }>;
 
 
-export type KnowledgeBasesQuery = { __typename?: 'Query', knowledgeBases?: Array<{ __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null, createdDate?: any | null, lastModifiedDate?: any | null } | null> | null };
+export type KnowledgeBasesQuery = { knowledgeBases: Array<{ id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any } | null> | null };
 
 export type SearchKnowledgeBaseQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
-  query: Scalars['String']['input'];
-  metadataFilters?: InputMaybe<Scalars['String']['input']>;
+  id: string | number;
+  query: string;
+  metadataFilters?: string | null | undefined;
 }>;
 
 
-export type SearchKnowledgeBaseQuery = { __typename?: 'Query', searchKnowledgeBase?: Array<{ __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null, score?: number | null } | null> | null };
+export type SearchKnowledgeBaseQuery = { searchKnowledgeBase: Array<{ id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any, score: number | null } | null> | null };
 
 export type UpdateKnowledgeBaseMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  knowledgeBase: KnowledgeBaseInput;
+  id: string | number;
+  knowledgeBase: Types.KnowledgeBaseInput;
 }>;
 
 
-export type UpdateKnowledgeBaseMutation = { __typename?: 'Mutation', updateKnowledgeBase?: { __typename?: 'KnowledgeBase', id: string, name: string, description?: string | null, maxChunkSize?: number | null, minChunkSizeChars?: number | null, overlap?: number | null } | null };
+export type UpdateKnowledgeBaseMutation = { updateKnowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null } | null };
 
 export type UpdateKnowledgeBaseDocumentChunkMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  knowledgeBaseDocumentChunk: KnowledgeBaseDocumentChunkInput;
+  id: string | number;
+  knowledgeBaseDocumentChunk: Types.KnowledgeBaseDocumentChunkInput;
 }>;
 
 
-export type UpdateKnowledgeBaseDocumentChunkMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentChunk?: { __typename?: 'KnowledgeBaseDocumentChunk', id: string, knowledgeBaseDocumentId: string, content?: string | null, metadata?: any | null } | null };
+export type UpdateKnowledgeBaseDocumentChunkMutation = { updateKnowledgeBaseDocumentChunk: { id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any } | null };
 
 export type UpdateKnowledgeBaseDocumentTagsMutationVariables = Exact<{
-  input: UpdateKnowledgeBaseDocumentTagsInput;
+  input: Types.UpdateKnowledgeBaseDocumentTagsInput;
 }>;
 
 
-export type UpdateKnowledgeBaseDocumentTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseDocumentTags: boolean };
+export type UpdateKnowledgeBaseDocumentTagsMutation = { updateKnowledgeBaseDocumentTags: boolean };
 
 export type UpdateKnowledgeBaseTagsMutationVariables = Exact<{
-  input: UpdateKnowledgeBaseTagsInput;
+  input: Types.UpdateKnowledgeBaseTagsInput;
 }>;
 
 
-export type UpdateKnowledgeBaseTagsMutation = { __typename?: 'Mutation', updateKnowledgeBaseTags: boolean };
+export type UpdateKnowledgeBaseTagsMutation = { updateKnowledgeBaseTags: boolean };
 
 export type AutomationSearchQueryVariables = Exact<{
-  query: Scalars['String']['input'];
-  limit?: InputMaybe<Scalars['Int']['input']>;
+  query: string;
+  limit?: number | null | undefined;
 }>;
 
 
-export type AutomationSearchQuery = { __typename?: 'Query', automationSearch: Array<
-    | { __typename?: 'ApiCollectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ApiEndpointSearchResult', collectionId: string, path?: string | null, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ConnectionSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'DataTableSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'KnowledgeBaseDocumentSearchResult', knowledgeBaseId: string, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'KnowledgeBaseSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ProjectDeploymentSearchResult', projectName: string, id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'ProjectSearchResult', id: string, name: string, description?: string | null, type: SearchAssetType }
-    | { __typename?: 'WorkflowSearchResult', projectId: string, label: string, id: string, name: string, description?: string | null, type: SearchAssetType }
+export type AutomationSearchQuery = { automationSearch: Array<
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { collectionId: string, path: string | null, id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { knowledgeBaseId: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { projectName: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { id: string, name: string, description: string | null, type: Types.SearchAssetType }
+    | { projectId: string, label: string, id: string, name: string, description: string | null, type: Types.SearchAssetType }
   > };
 
 export type AutomationWorkflowProjectCategoriesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AutomationWorkflowProjectCategoriesQuery = { __typename?: 'Query', automationWorkflowProjectCategories: Array<{ __typename?: 'AutomationWorkflowProjectCategory', id: string, name: string }> };
+export type AutomationWorkflowProjectCategoriesQuery = { automationWorkflowProjectCategories: Array<{ id: string, name: string }> };
 
 export type AutomationWorkflowProjectTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AutomationWorkflowProjectTagsQuery = { __typename?: 'Query', automationWorkflowProjectTags: Array<{ __typename?: 'AutomationWorkflowProjectTag', id: string, name: string }> };
+export type AutomationWorkflowProjectTagsQuery = { automationWorkflowProjectTags: Array<{ id: string, name: string }> };
 
 export type AutomationWorkflowProjectVersionsQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type AutomationWorkflowProjectVersionsQuery = { __typename?: 'Query', automationWorkflowProjectVersions: Array<{ __typename?: 'AutomationWorkflowProjectVersion', version: number, status: string, publishedDate?: string | null }> };
+export type AutomationWorkflowProjectVersionsQuery = { automationWorkflowProjectVersions: Array<{ version: number, status: string, publishedDate: string | null }> };
 
 export type AutomationWorkflowProjectsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AutomationWorkflowProjectsQuery = { __typename?: 'Query', automationWorkflowProjects: Array<{ __typename?: 'AutomationWorkflowProject', id: string, name: string, description?: string | null, categoryId?: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion?: number | null, workflowTemplates: Array<{ __typename?: 'AutomationWorkflowProjectWorkflowTemplate', workflowUuid: string, label?: string | null, description?: string | null, lastModifiedDate?: string | null, triggers: Array<{ __typename?: 'AutomationWorkflowProjectComponent', name: string, title?: string | null, icon?: string | null }>, components: Array<{ __typename?: 'AutomationWorkflowProjectComponent', name: string, title?: string | null, icon?: string | null }> }> }> };
+export type AutomationWorkflowProjectsQuery = { automationWorkflowProjects: Array<{ id: string, name: string, description: string | null, categoryId: string | null, tagIds: Array<string>, published: boolean, version: number, lastPublishedVersion: number | null, workflowTemplates: Array<{ workflowUuid: string, label: string | null, description: string | null, lastModifiedDate: string | null, triggers: Array<{ name: string, title: string | null, icon: string | null }>, components: Array<{ name: string, title: string | null, icon: string | null }> }> }> };
 
 export type CreateAutomationWorkflowProjectMutationVariables = Exact<{
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  category?: InputMaybe<Scalars['String']['input']>;
-  tags?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  name: string;
+  description?: string | null | undefined;
+  category?: string | null | undefined;
+  tags?: Array<string> | string | null | undefined;
 }>;
 
 
-export type CreateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', createAutomationWorkflowProject: string };
+export type CreateAutomationWorkflowProjectMutation = { createAutomationWorkflowProject: string };
 
 export type UpdateAutomationWorkflowProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
-  description?: InputMaybe<Scalars['String']['input']>;
-  category?: InputMaybe<Scalars['String']['input']>;
-  tags?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  id: string | number;
+  name: string;
+  description?: string | null | undefined;
+  category?: string | null | undefined;
+  tags?: Array<string> | string | null | undefined;
 }>;
 
 
-export type UpdateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', updateAutomationWorkflowProject: boolean };
+export type UpdateAutomationWorkflowProjectMutation = { updateAutomationWorkflowProject: boolean };
 
 export type DeleteAutomationWorkflowProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteAutomationWorkflowProjectMutation = { __typename?: 'Mutation', deleteAutomationWorkflowProject: boolean };
+export type DeleteAutomationWorkflowProjectMutation = { deleteAutomationWorkflowProject: boolean };
 
 export type CreateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
-  projectId: Scalars['ID']['input'];
-  definition?: InputMaybe<Scalars['String']['input']>;
+  projectId: string | number;
+  definition?: string | null | undefined;
 }>;
 
 
-export type CreateAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', createAutomationWorkflowProjectWorkflow: string };
+export type CreateAutomationWorkflowProjectWorkflowMutation = { createAutomationWorkflowProjectWorkflow: string };
 
 export type DeleteAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
-  workflowUuid: Scalars['ID']['input'];
+  workflowUuid: string | number;
 }>;
 
 
-export type DeleteAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', deleteAutomationWorkflowProjectWorkflow: boolean };
+export type DeleteAutomationWorkflowProjectWorkflowMutation = { deleteAutomationWorkflowProjectWorkflow: boolean };
 
 export type PublishAutomationWorkflowProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type PublishAutomationWorkflowProjectMutation = { __typename?: 'Mutation', publishAutomationWorkflowProject: boolean };
+export type PublishAutomationWorkflowProjectMutation = { publishAutomationWorkflowProject: boolean };
 
 export type ConnectedUserMcpServersQueryVariables = Exact<{
-  connectedUserId: Scalars['ID']['input'];
+  connectedUserId: string | number;
 }>;
 
 
-export type ConnectedUserMcpServersQuery = { __typename?: 'Query', connectedUserMcpServers: Array<{ __typename?: 'ConnectedUserMcpServer', id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate?: string | null, tools: Array<{ __typename?: 'ConnectedUserMcpServerTool', id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }> }> };
+export type ConnectedUserMcpServersQuery = { connectedUserMcpServers: Array<{ id: string, name: string, enabled: boolean, environmentId: string, lastModifiedDate: string | null, tools: Array<{ id: string, componentName: string, componentVersion: number, integrationInstanceId: string, name: string, enabled: boolean }> }> };
 
 export type ConnectedUserProjectsQueryVariables = Exact<{
-  connectedUserId?: InputMaybe<Scalars['ID']['input']>;
-  environmentId?: InputMaybe<Scalars['ID']['input']>;
+  connectedUserId?: string | number | null | undefined;
+  environmentId?: string | number | null | undefined;
 }>;
 
 
-export type ConnectedUserProjectsQuery = { __typename?: 'Query', connectedUserProjects: Array<{ __typename?: 'ConnectedUserProject', id: string, environmentId: string, lastExecutionDate?: string | null, projectId: string, projectVersion?: number | null, connectedUser: { __typename?: 'ConnectedUser', id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ __typename?: 'ConnectedUserProjectWorkflow', id: string, connectedUserId: string, enabled: boolean, lastExecutionDate?: string | null, projectId: string, workflowUuid: string, workflowVersion?: number | null, workflow: { __typename?: 'Workflow', id: string, label: string, triggers: Array<{ __typename?: 'WorkflowTrigger', name: string, type: string, parameters?: any | null }> } }> }> };
+export type ConnectedUserProjectsQuery = { connectedUserProjects: Array<{ id: string, environmentId: string, lastExecutionDate: string | null, projectId: string, projectVersion: number | null, connectedUser: { id: string, environmentId: string, externalId: string }, connectedUserProjectWorkflows: Array<{ id: string, connectedUserId: string, enabled: boolean, lastExecutionDate: string | null, projectId: string, workflowUuid: string, workflowVersion: number | null, workflow: { id: string, label: string, triggers: Array<{ name: string, type: string, parameters: any }> } }> }> };
 
 export type CreateEmbeddedMcpServerMutationVariables = Exact<{
-  input: CreateEmbeddedMcpServerInput;
+  input: Types.CreateEmbeddedMcpServerInput;
 }>;
 
 
-export type CreateEmbeddedMcpServerMutation = { __typename?: 'Mutation', createEmbeddedMcpServer?: { __typename?: 'McpServer', enabled: boolean, environmentId: string, id: string, name: string, type: PlatformType } | null };
+export type CreateEmbeddedMcpServerMutation = { createEmbeddedMcpServer: { enabled: boolean, environmentId: string, id: string, name: string, type: Types.PlatformType } | null };
 
 export type CreateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
-  input: CreateMcpIntegrationInstanceConfigurationInput;
+  input: Types.CreateMcpIntegrationInstanceConfigurationInput;
 }>;
 
 
-export type CreateMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', createMcpIntegrationInstanceConfiguration?: { __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
+export type CreateMcpIntegrationInstanceConfigurationMutation = { createMcpIntegrationInstanceConfiguration: { id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
 
 export type DeleteConnectedUserMcpServerMutationVariables = Exact<{
-  connectedUserId: Scalars['ID']['input'];
-  mcpServerId: Scalars['ID']['input'];
+  connectedUserId: string | number;
+  mcpServerId: string | number;
 }>;
 
 
-export type DeleteConnectedUserMcpServerMutation = { __typename?: 'Mutation', deleteConnectedUserMcpServer?: boolean | null };
+export type DeleteConnectedUserMcpServerMutation = { deleteConnectedUserMcpServer: boolean | null };
 
 export type DeleteConnectedUserProjectWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteConnectedUserProjectWorkflowMutation = { __typename?: 'Mutation', deleteConnectedUserProjectWorkflow?: boolean | null };
+export type DeleteConnectedUserProjectWorkflowMutation = { deleteConnectedUserProjectWorkflow: boolean | null };
 
 export type DeleteEmbeddedMcpServerMutationVariables = Exact<{
-  mcpServerId: Scalars['ID']['input'];
+  mcpServerId: string | number;
 }>;
 
 
-export type DeleteEmbeddedMcpServerMutation = { __typename?: 'Mutation', deleteEmbeddedMcpServer?: boolean | null };
+export type DeleteEmbeddedMcpServerMutation = { deleteEmbeddedMcpServer: boolean | null };
 
 export type DeleteMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', deleteMcpIntegrationInstanceConfiguration?: boolean | null };
+export type DeleteMcpIntegrationInstanceConfigurationMutation = { deleteMcpIntegrationInstanceConfiguration: boolean | null };
 
 export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { __typename?: 'Mutation', deleteMcpIntegrationInstanceConfigurationWorkflow?: boolean | null };
+export type DeleteMcpIntegrationInstanceConfigurationWorkflowMutation = { deleteMcpIntegrationInstanceConfigurationWorkflow: boolean | null };
 
 export type DuplicateAutomationWorkflowProjectMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DuplicateAutomationWorkflowProjectMutation = { __typename?: 'Mutation', duplicateAutomationWorkflowProject: string };
+export type DuplicateAutomationWorkflowProjectMutation = { duplicateAutomationWorkflowProject: string };
 
 export type DuplicateAutomationWorkflowProjectWorkflowMutationVariables = Exact<{
-  workflowUuid: Scalars['ID']['input'];
+  workflowUuid: string | number;
 }>;
 
 
-export type DuplicateAutomationWorkflowProjectWorkflowMutation = { __typename?: 'Mutation', duplicateAutomationWorkflowProjectWorkflow: string };
+export type DuplicateAutomationWorkflowProjectWorkflowMutation = { duplicateAutomationWorkflowProjectWorkflow: string };
 
 export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EmbeddedMcpServersQuery = { __typename?: 'Query', embeddedMcpServers?: Array<{ __typename?: 'McpServer', id: string, enabled: boolean, environmentId: string, lastModifiedDate?: any | null, name: string, type: PlatformType, url: string, mcpComponents?: Array<{ __typename?: 'McpComponent', componentName: string, componentVersion: number, connectionId?: string | null, id: string, lastModifiedDate?: any | null, mcpServerId: string, title?: string | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string, title?: string | null, parameters?: any | null } | null> | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type EmbeddedMcpServersQuery = { embeddedMcpServers: Array<{ id: string, enabled: boolean, environmentId: string, lastModifiedDate: any, name: string, type: Types.PlatformType, url: string, mcpComponents: Array<{ componentName: string, componentVersion: number, connectionId: string | null, id: string, lastModifiedDate: any, mcpServerId: string, title: string | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, title: string | null, parameters: any } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type EnableConnectedUserMcpServerMutationVariables = Exact<{
-  connectedUserId: Scalars['ID']['input'];
-  mcpServerId: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
+  connectedUserId: string | number;
+  mcpServerId: string | number;
+  enable: boolean;
 }>;
 
 
-export type EnableConnectedUserMcpServerMutation = { __typename?: 'Mutation', enableConnectedUserMcpServer?: boolean | null };
+export type EnableConnectedUserMcpServerMutation = { enableConnectedUserMcpServer: boolean | null };
 
 export type EnableConnectedUserMcpToolMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
+  id: string | number;
+  enable: boolean;
 }>;
 
 
-export type EnableConnectedUserMcpToolMutation = { __typename?: 'Mutation', enableConnectedUserMcpTool?: boolean | null };
+export type EnableConnectedUserMcpToolMutation = { enableConnectedUserMcpTool: boolean | null };
 
 export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
+  id: string | number;
+  enable: boolean;
 }>;
 
 
-export type EnableConnectedUserProjectWorkflowMutation = { __typename?: 'Mutation', enableConnectedUserProjectWorkflow?: boolean | null };
+export type EnableConnectedUserProjectWorkflowMutation = { enableConnectedUserProjectWorkflow: boolean | null };
 
 export type IntegrationByIdQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type IntegrationByIdQuery = { __typename?: 'Query', integration?: { __typename?: 'Integration', id: string, name: string } | null };
+export type IntegrationByIdQuery = { integration: { id: string, name: string } | null };
 
 export type IntegrationWorkflowsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IntegrationWorkflowsQuery = { __typename?: 'Query', integrationWorkflows: Array<{ __typename?: 'IntegrationWorkflow', id: string, label: string, description?: string | null, integrationWorkflowId: string, workflowUuid?: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null }> };
+export type IntegrationWorkflowsQuery = { integrationWorkflows: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
 export type IntegrationWorkflowsByIntegrationIdQueryVariables = Exact<{
-  integrationId: Scalars['ID']['input'];
+  integrationId: string | number;
 }>;
 
 
-export type IntegrationWorkflowsByIntegrationIdQuery = { __typename?: 'Query', integrationWorkflowsByIntegrationId: Array<{ __typename?: 'IntegrationWorkflow', id: string, label: string, description?: string | null, integrationWorkflowId: string, workflowUuid?: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null }> };
+export type IntegrationWorkflowsByIntegrationIdQuery = { integrationWorkflowsByIntegrationId: Array<{ id: string, label: string, description: string | null, integrationWorkflowId: string, workflowUuid: string | null, workflowTaskComponentNames: Array<string>, workflowTriggerComponentNames: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any }> };
 
 export type McpComponentDefinitionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type McpComponentDefinitionsQuery = { __typename?: 'Query', mcpComponentDefinitions: Array<{ __typename?: 'ComponentDefinition', clusterElementsCount?: any | null, description?: string | null, icon?: string | null, name: string, title?: string | null, version?: number | null }> };
+export type McpComponentDefinitionsQuery = { mcpComponentDefinitions: Array<{ clusterElementsCount: any, description: string | null, icon: string | null, name: string, title: string | null, version: number | null }> };
 
 export type McpIntegrationInstanceConfigurationWorkflowPropertiesQueryVariables = Exact<{
-  mcpIntegrationInstanceConfigurationWorkflowId: Scalars['ID']['input'];
+  mcpIntegrationInstanceConfigurationWorkflowId: string | number;
 }>;
 
 
-export type McpIntegrationInstanceConfigurationWorkflowPropertiesQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurationWorkflowProperties?: Array<
-    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
-    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
-    | { __typename?: 'DateProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DateTimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null }
-    | { __typename?: 'NullProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null }
-    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
-    | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'TimeProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+export type McpIntegrationInstanceConfigurationWorkflowPropertiesQuery = { mcpIntegrationInstanceConfigurationWorkflowProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+    | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
    | null> | null };
 
 export type McpIntegrationInstanceConfigurationsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type McpIntegrationInstanceConfigurationsQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurations?: Array<{ __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string, integration?: { __typename?: 'Integration', id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows?: Array<{ __typename?: 'McpIntegrationInstanceConfigurationWorkflow', integrationInstanceConfigurationWorkflow?: { __typename?: 'IntegrationInstanceConfigurationWorkflow', workflowId: string } | null } | null> | null } | null> | null };
+export type McpIntegrationInstanceConfigurationsQuery = { mcpIntegrationInstanceConfigurations: Array<{ id: string, integrationInstanceConfigurationId: string, mcpServerId: string, integration: { id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows: Array<{ integrationInstanceConfigurationWorkflow: { workflowId: string } | null } | null> | null } | null> | null };
 
 export type McpIntegrationInstanceConfigurationsByServerIdQueryVariables = Exact<{
-  mcpServerId?: InputMaybe<Scalars['ID']['input']>;
+  mcpServerId?: string | number | null | undefined;
 }>;
 
 
-export type McpIntegrationInstanceConfigurationsByServerIdQuery = { __typename?: 'Query', mcpIntegrationInstanceConfigurationsByServerId?: Array<{ __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, integrationInstanceConfigurationName?: string | null, integrationVersion?: number | null, mcpServerId: string, integration?: { __typename?: 'Integration', componentName: string, id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows?: Array<{ __typename?: 'McpIntegrationInstanceConfigurationWorkflow', id: string, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationInstanceConfigurationId: any, parameters?: any | null, integrationInstanceConfigurationWorkflow?: { __typename?: 'IntegrationInstanceConfigurationWorkflow', id: string, enabled: boolean, inputs?: any | null, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ __typename?: 'IntegrationInstanceConfigurationWorkflowConnection', connectionId?: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow?: { __typename?: 'Workflow', id: string, label: string } | null } | null> | null } | null> | null };
+export type McpIntegrationInstanceConfigurationsByServerIdQuery = { mcpIntegrationInstanceConfigurationsByServerId: Array<{ id: string, integrationInstanceConfigurationId: string, integrationInstanceConfigurationName: string | null, integrationVersion: number | null, lastModifiedDate: any, mcpServerId: string, integration: { componentName: string, id: string, name: string } | null, mcpIntegrationInstanceConfigurationWorkflows: Array<{ id: string, integrationInstanceConfigurationWorkflowId: any, mcpIntegrationInstanceConfigurationId: any, parameters: any, integrationInstanceConfigurationWorkflow: { id: string, enabled: boolean, inputs: any, integrationInstanceConfigurationId: string, version: number, workflowId: string, connections: Array<{ connectionId: string | null, workflowConnectionKey: string, workflowNodeName: string }> } | null, workflow: { id: string, label: string } | null } | null> | null } | null> | null };
 
 export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQueryVariables = Exact<{
-  integrationInstanceConfigurationId: Scalars['ID']['input'];
+  integrationInstanceConfigurationId: string | number;
 }>;
 
 
-export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = { __typename?: 'Query', toolEligibleIntegrationInstanceConfigurationWorkflows: Array<{ __typename?: 'IntegrationWorkflow', id: string, integrationWorkflowId: string, label: string }> };
+export type ToolEligibleIntegrationInstanceConfigurationWorkflowsQuery = { toolEligibleIntegrationInstanceConfigurationWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
 
 export type ToolEligibleIntegrationVersionWorkflowsQueryVariables = Exact<{
-  integrationId: Scalars['ID']['input'];
-  integrationVersion: Scalars['Int']['input'];
+  integrationId: string | number;
+  integrationVersion: number;
 }>;
 
 
-export type ToolEligibleIntegrationVersionWorkflowsQuery = { __typename?: 'Query', toolEligibleIntegrationVersionWorkflows: Array<{ __typename?: 'IntegrationWorkflow', id: string, integrationWorkflowId: string, label: string }> };
+export type ToolEligibleIntegrationVersionWorkflowsQuery = { toolEligibleIntegrationVersionWorkflows: Array<{ id: string, integrationWorkflowId: string, label: string }> };
 
 export type UpdateMcpIntegrationInstanceConfigurationMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInstanceConfigurationInput;
+  id: string | number;
+  input: Types.UpdateMcpIntegrationInstanceConfigurationInput;
 }>;
 
 
-export type UpdateMcpIntegrationInstanceConfigurationMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfiguration?: { __typename?: 'McpIntegrationInstanceConfiguration', id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
+export type UpdateMcpIntegrationInstanceConfigurationMutation = { updateMcpIntegrationInstanceConfiguration: { id: string, integrationInstanceConfigurationId: string, mcpServerId: string } | null };
 
 export type UpdateMcpIntegrationInstanceConfigurationVersionMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: UpdateMcpIntegrationInstanceConfigurationVersionInput;
+  id: string | number;
+  input: Types.UpdateMcpIntegrationInstanceConfigurationVersionInput;
 }>;
 
 
-export type UpdateMcpIntegrationInstanceConfigurationVersionMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfigurationVersion?: boolean | null };
+export type UpdateMcpIntegrationInstanceConfigurationVersionMutation = { updateMcpIntegrationInstanceConfigurationVersion: boolean | null };
 
 export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: McpIntegrationInstanceConfigurationWorkflowUpdateInput;
+  id: string | number;
+  input: Types.McpIntegrationInstanceConfigurationWorkflowUpdateInput;
 }>;
 
 
-export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { __typename?: 'Mutation', updateMcpIntegrationInstanceConfigurationWorkflow?: { __typename?: 'McpIntegrationInstanceConfigurationWorkflow', id: string, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters?: any | null } | null };
+export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { updateMcpIntegrationInstanceConfigurationWorkflow: { id: string, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters: any } | null };
 
 export type ApiConnectorQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type ApiConnectorQuery = { __typename?: 'Query', apiConnector?: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } | null };
+export type ApiConnectorQuery = { apiConnector: { id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null } | null };
 
 export type ApiConnectorsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ApiConnectorsQuery = { __typename?: 'Query', apiConnectors: Array<{ __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null }> };
+export type ApiConnectorsQuery = { apiConnectors: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null }> };
 
 export type CancelGenerationJobMutationVariables = Exact<{
-  jobId: Scalars['String']['input'];
+  jobId: string;
 }>;
 
 
-export type CancelGenerationJobMutation = { __typename?: 'Mutation', cancelGenerationJob: boolean };
+export type CancelGenerationJobMutation = { cancelGenerationJob: boolean };
 
 export type CreateApiConnectorMutationVariables = Exact<{
-  input: CreateApiConnectorInput;
+  input: Types.CreateApiConnectorInput;
 }>;
 
 
-export type CreateApiConnectorMutation = { __typename?: 'Mutation', createApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+export type CreateApiConnectorMutation = { createApiConnector: { id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null } };
 
 export type DeleteApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteApiConnectorMutation = { __typename?: 'Mutation', deleteApiConnector: boolean };
+export type DeleteApiConnectorMutation = { deleteApiConnector: boolean };
 
 export type EnableApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
+  id: string | number;
+  enable: boolean;
 }>;
 
 
-export type EnableApiConnectorMutation = { __typename?: 'Mutation', enableApiConnector: boolean };
+export type EnableApiConnectorMutation = { enableApiConnector: boolean };
 
 export type GenerateSpecificationMutationVariables = Exact<{
-  input: GenerateSpecificationInput;
+  input: Types.GenerateSpecificationInput;
 }>;
 
 
-export type GenerateSpecificationMutation = { __typename?: 'Mutation', generateSpecification: { __typename?: 'GenerateSpecificationResponse', specification?: string | null } };
+export type GenerateSpecificationMutation = { generateSpecification: { specification: string | null } };
 
 export type GenerationJobStatusQueryVariables = Exact<{
-  jobId: Scalars['String']['input'];
+  jobId: string;
 }>;
 
 
-export type GenerationJobStatusQuery = { __typename?: 'Query', generationJobStatus?: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } | null };
+export type GenerationJobStatusQuery = { generationJobStatus: { jobId: string, status: Types.GenerationJobStatusEnum, specification: string | null, errorMessage: string | null } | null };
 
 export type ImportOpenApiSpecificationMutationVariables = Exact<{
-  input: ImportOpenApiSpecificationInput;
+  input: Types.ImportOpenApiSpecificationInput;
 }>;
 
 
-export type ImportOpenApiSpecificationMutation = { __typename?: 'Mutation', importOpenApiSpecification: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+export type ImportOpenApiSpecificationMutation = { importOpenApiSpecification: { id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null } };
 
 export type StartGenerateFromDocumentationPreviewMutationVariables = Exact<{
-  input: GenerateFromDocumentationInput;
+  input: Types.GenerateFromDocumentationInput;
 }>;
 
 
-export type StartGenerateFromDocumentationPreviewMutation = { __typename?: 'Mutation', startGenerateFromDocumentationPreview: { __typename?: 'GenerationJobStatus', jobId: string, status: GenerationJobStatusEnum, specification?: string | null, errorMessage?: string | null } };
+export type StartGenerateFromDocumentationPreviewMutation = { startGenerateFromDocumentationPreview: { jobId: string, status: Types.GenerationJobStatusEnum, specification: string | null, errorMessage: string | null } };
 
 export type UpdateApiConnectorMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: UpdateApiConnectorInput;
+  id: string | number;
+  input: Types.UpdateApiConnectorInput;
 }>;
 
 
-export type UpdateApiConnectorMutation = { __typename?: 'Mutation', updateApiConnector: { __typename?: 'ApiConnector', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, connectorVersion: number, enabled?: boolean | null, specification?: string | null, definition?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null, endpoints?: Array<{ __typename?: 'ApiConnectorEndpoint', id: string, name: string, description?: string | null, path?: string | null, httpMethod?: HttpMethod | null }> | null } };
+export type UpdateApiConnectorMutation = { updateApiConnector: { id: string, name: string, title: string | null, description: string | null, icon: string | null, connectorVersion: number, enabled: boolean | null, specification: string | null, definition: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null, endpoints: Array<{ id: string, name: string, description: string | null, path: string | null, httpMethod: Types.HttpMethod | null }> | null } };
 
 export type EditorJobFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  filter?: InputMaybe<LogFilterInput>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
+  jobId: string | number;
+  filter?: Types.LogFilterInput | null | undefined;
+  page?: number | null | undefined;
+  size?: number | null | undefined;
 }>;
 
 
-export type EditorJobFileLogsQuery = { __typename?: 'Query', editorJobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
+export type EditorJobFileLogsQuery = { editorJobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type EditorJobFileLogsExistQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
+  jobId: string | number;
 }>;
 
 
-export type EditorJobFileLogsExistQuery = { __typename?: 'Query', editorJobFileLogsExist: boolean };
+export type EditorJobFileLogsExistQuery = { editorJobFileLogsExist: boolean };
 
 export type EditorTaskExecutionFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
+  jobId: string | number;
+  taskExecutionId: string | number;
 }>;
 
 
-export type EditorTaskExecutionFileLogsQuery = { __typename?: 'Query', editorTaskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
+export type EditorTaskExecutionFileLogsQuery = { editorTaskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
 
 export type JobFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  filter?: InputMaybe<LogFilterInput>;
-  page?: InputMaybe<Scalars['Int']['input']>;
-  size?: InputMaybe<Scalars['Int']['input']>;
+  jobId: string | number;
+  filter?: Types.LogFilterInput | null | undefined;
+  page?: number | null | undefined;
+  size?: number | null | undefined;
 }>;
 
 
-export type JobFileLogsQuery = { __typename?: 'Query', jobFileLogs: { __typename?: 'LogPage', totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> } };
+export type JobFileLogsQuery = { jobFileLogs: { totalElements: number, totalPages: number, pageNumber: number, pageSize: number, hasNext: boolean, hasPrevious: boolean, content: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> } };
 
 export type JobFileLogsExistQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
+  jobId: string | number;
 }>;
 
 
-export type JobFileLogsExistQuery = { __typename?: 'Query', jobFileLogsExist: boolean };
+export type JobFileLogsExistQuery = { jobFileLogsExist: boolean };
 
 export type TaskExecutionFileLogsQueryVariables = Exact<{
-  jobId: Scalars['ID']['input'];
-  taskExecutionId: Scalars['ID']['input'];
+  jobId: string | number;
+  taskExecutionId: string | number;
 }>;
 
 
-export type TaskExecutionFileLogsQuery = { __typename?: 'Query', taskExecutionFileLogs: Array<{ __typename?: 'LogEntry', timestamp: string, level: LogLevel, componentName: string, componentOperationName?: string | null, taskExecutionId: string, message: string, exceptionType?: string | null, exceptionMessage?: string | null, stackTrace?: string | null }> };
+export type TaskExecutionFileLogsQuery = { taskExecutionFileLogs: Array<{ timestamp: string, level: Types.LogLevel, componentName: string, componentOperationName: string | null, taskExecutionId: string, message: string, exceptionType: string | null, exceptionMessage: string | null, stackTrace: string | null }> };
 
 export type AdminApiKeysQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
+  environmentId: string | number;
 }>;
 
 
-export type AdminApiKeysQuery = { __typename?: 'Query', adminApiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
+export type AdminApiKeysQuery = { adminApiKeys: Array<{ id: string | null, name: string | null, secretKey: string | null, lastUsedDate: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any } | null> | null };
 
 export type ApiKeysQueryVariables = Exact<{
-  environmentId: Scalars['ID']['input'];
-  type: PlatformType;
+  environmentId: string | number;
+  type: Types.PlatformType;
 }>;
 
 
-export type ApiKeysQuery = { __typename?: 'Query', apiKeys?: Array<{ __typename?: 'ApiKey', id?: string | null, name?: string | null, secretKey?: string | null, lastUsedDate?: any | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null } | null> | null };
+export type ApiKeysQuery = { apiKeys: Array<{ id: string | null, name: string | null, secretKey: string | null, lastUsedDate: any, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any } | null> | null };
 
 export type ClusterElementComponentConnectionsQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
 }>;
 
 
-export type ClusterElementComponentConnectionsQuery = { __typename?: 'Query', clusterElementComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
+export type ClusterElementComponentConnectionsQuery = { clusterElementComponentConnections: Array<{ componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
 
 export type ClusterElementDefinitionQueryVariables = Exact<{
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  clusterElementName: Scalars['String']['input'];
+  componentName: string;
+  componentVersion: number;
+  clusterElementName: string;
 }>;
 
 
-export type ClusterElementDefinitionQuery = { __typename?: 'Query', clusterElementDefinition: { __typename?: 'ClusterElementDefinition', componentName?: string | null, componentVersion?: number | null, description?: string | null, name: string, title?: string | null, properties: Array<
-      | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, items?: Array<
-          | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
-          | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
-          | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
-          | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
-          | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-          | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-          | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
-          | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+export type ClusterElementDefinitionQuery = { clusterElementDefinition: { componentName: string | null, componentVersion: number | null, description: string | null, name: string, title: string | null, properties: Array<
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null, items: Array<
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateDefaultValue: string | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateTimeDefaultValue: string | null }
+          | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+          | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+          | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, timeDefaultValue: string | null }
         > | null }
-      | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
-      | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
-      | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
-      | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-      | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-      | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-      | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-      | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-      | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, properties?: Array<
-          | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, arrayDefaultValue?: Array<any | null> | null }
-          | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, booleanDefaultValue?: boolean | null }
-          | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateDefaultValue?: string | null }
-          | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, dateTimeDefaultValue?: string | null }
-          | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-          | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, integerDefaultValue?: any | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-          | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, numberDefaultValue?: number | null, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, objectDefaultValue?: any | null }
-          | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-          | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateDefaultValue: string | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateTimeDefaultValue: string | null }
+      | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+      | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null, properties: Array<
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, arrayDefaultValue: Array<any> | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, booleanDefaultValue: boolean | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateDefaultValue: string | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, dateTimeDefaultValue: string | null }
+          | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+          | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, integerDefaultValue: any, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, numberDefaultValue: number | null, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, objectDefaultValue: any }
+          | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+          | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, timeDefaultValue: string | null }
         > | null }
-      | { __typename?: 'StringProperty', controlType: ControlType, defaultValue?: string | null, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-      | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, timeDefaultValue?: string | null }
+      | { controlType: Types.ControlType, defaultValue: string | null, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+      | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, timeDefaultValue: string | null }
     > } };
 
 export type ClusterElementDynamicPropertiesQueryVariables = Exact<{
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  clusterElementName: Scalars['String']['input'];
-  propertyName: Scalars['String']['input'];
-  connectionId?: InputMaybe<Scalars['Long']['input']>;
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  componentName: string;
+  componentVersion: number;
+  clusterElementName: string;
+  propertyName: string;
+  connectionId?: any;
+  inputParameters?: any;
+  lookupDependsOnPaths?: Array<string> | string | null | undefined;
 }>;
 
 
-export type ClusterElementDynamicPropertiesQuery = { __typename?: 'Query', clusterElementDynamicProperties: Array<
-    | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, items?: Array<
-        | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+export type ClusterElementDynamicPropertiesQuery = { clusterElementDynamicProperties: Array<
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null, items: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
       > | null }
-    | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-    | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-    | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-    | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-    | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null, properties?: Array<
-        | { __typename?: 'ArrayProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'BooleanProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DateProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DateTimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'DynamicPropertiesProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, propertiesDataSource?: { __typename?: 'PropertiesDataSource', propertiesLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'FileEntryProperty', advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'IntegerProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'NullProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'NumberProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'ObjectProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
-        | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-        | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+    | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null, properties: Array<
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, propertiesDataSource: { propertiesLookupDependsOn: Array<string> | null } | null }
+        | { advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+        | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
       > | null }
-    | { __typename?: 'StringProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType, options?: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> | null, optionsDataSource?: { __typename?: 'OptionsDataSource', optionsLookupDependsOn?: Array<string> | null } | null }
-    | { __typename?: 'TimeProperty', controlType: ControlType, label?: string | null, placeholder?: string | null, advancedOption?: boolean | null, description?: string | null, displayCondition?: string | null, expressionEnabled?: boolean | null, hidden?: boolean | null, name?: string | null, required?: boolean | null, type: PropertyType }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, options: Array<{ description: string | null, label: string | null, value: any }> | null, optionsDataSource: { optionsLookupDependsOn: Array<string> | null } | null }
+    | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType }
   > };
 
 export type ClusterElementOptionsQueryVariables = Exact<{
-  componentName: Scalars['String']['input'];
-  componentVersion: Scalars['Int']['input'];
-  clusterElementName: Scalars['String']['input'];
-  propertyName: Scalars['String']['input'];
-  connectionId?: InputMaybe<Scalars['Long']['input']>;
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
-  lookupDependsOnPaths?: InputMaybe<Array<Scalars['String']['input']> | Scalars['String']['input']>;
+  componentName: string;
+  componentVersion: number;
+  clusterElementName: string;
+  propertyName: string;
+  connectionId?: any;
+  inputParameters?: any;
+  lookupDependsOnPaths?: Array<string> | string | null | undefined;
 }>;
 
 
-export type ClusterElementOptionsQuery = { __typename?: 'Query', clusterElementOptions: Array<{ __typename?: 'Option', description?: string | null, label?: string | null, value?: any | null }> };
+export type ClusterElementOptionsQuery = { clusterElementOptions: Array<{ description: string | null, label: string | null, value: any }> };
 
 export type ClusterElementScriptInputQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+  environmentId: any;
 }>;
 
 
-export type ClusterElementScriptInputQuery = { __typename?: 'Query', clusterElementScriptInput?: any | null };
+export type ClusterElementScriptInputQuery = { clusterElementScriptInput: any };
 
 export type ComponentDefinitionSearchQueryVariables = Exact<{
-  query: Scalars['String']['input'];
+  query: string;
 }>;
 
 
-export type ComponentDefinitionSearchQuery = { __typename?: 'Query', componentDefinitionSearch: Array<{ __typename?: 'ComponentDefinition', name: string, title?: string | null, icon?: string | null, description?: string | null, version?: number | null, actionsCount?: number | null, triggersCount?: number | null, clusterElementsCount?: any | null, componentCategories?: Array<{ __typename?: 'ComponentCategory', name: string, label?: string | null }> | null, actions?: Array<{ __typename?: 'ActionDefinition', name: string, title?: string | null, description?: string | null }> | null, triggers?: Array<{ __typename?: 'TriggerDefinition', name: string, title?: string | null, description?: string | null }> | null, clusterElements?: Array<{ __typename?: 'ClusterElementDefinition', type?: { __typename?: 'ClusterElementType', name?: string | null, label?: string | null } | null }> | null }> };
+export type ComponentDefinitionSearchQuery = { componentDefinitionSearch: Array<{ name: string, title: string | null, icon: string | null, description: string | null, version: number | null, actionsCount: number | null, triggersCount: number | null, clusterElementsCount: any, componentCategories: Array<{ name: string, label: string | null }> | null, actions: Array<{ name: string, title: string | null, description: string | null }> | null, triggers: Array<{ name: string, title: string | null, description: string | null }> | null, clusterElements: Array<{ type: { name: string | null, label: string | null } | null }> | null }> };
 
 export type CreateApiKeyMutationVariables = Exact<{
-  name: Scalars['String']['input'];
-  environmentId: Scalars['ID']['input'];
-  type?: InputMaybe<PlatformType>;
+  name: string;
+  environmentId: string | number;
+  type?: Types.PlatformType | null | undefined;
 }>;
 
 
-export type CreateApiKeyMutation = { __typename?: 'Mutation', createApiKey: string };
+export type CreateApiKeyMutation = { createApiKey: string };
 
 export type CreateMcpComponentMutationVariables = Exact<{
-  input: McpComponentInput;
+  input: Types.McpComponentInput;
 }>;
 
 
-export type CreateMcpComponentMutation = { __typename?: 'Mutation', createMcpComponent?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null } | null };
+export type CreateMcpComponentMutation = { createMcpComponent: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null } | null };
 
 export type CreateMcpComponentWithToolsMutationVariables = Exact<{
-  input: McpComponentWithToolsInput;
+  input: Types.McpComponentWithToolsInput;
 }>;
 
 
-export type CreateMcpComponentWithToolsMutation = { __typename?: 'Mutation', createMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+export type CreateMcpComponentWithToolsMutation = { createMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type CreateMcpToolMutationVariables = Exact<{
-  input: McpToolInput;
+  input: Types.McpToolInput;
 }>;
 
 
-export type CreateMcpToolMutation = { __typename?: 'Mutation', createMcpTool?: { __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null } | null };
+export type CreateMcpToolMutation = { createMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any } | null };
 
 export type DeleteApiKeyMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteApiKeyMutation = { __typename?: 'Mutation', deleteApiKey: boolean };
+export type DeleteApiKeyMutation = { deleteApiKey: boolean };
 
 export type DeleteMcpComponentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpComponentMutation = { __typename?: 'Mutation', deleteMcpComponent?: boolean | null };
+export type DeleteMcpComponentMutation = { deleteMcpComponent: boolean | null };
 
 export type DeleteMcpToolMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteMcpToolMutation = { __typename?: 'Mutation', deleteMcpTool?: boolean | null };
+export type DeleteMcpToolMutation = { deleteMcpTool: boolean | null };
 
 export type EnvironmentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EnvironmentsQuery = { __typename?: 'Query', environments?: Array<{ __typename?: 'Environment', id: string, name: string } | null> | null };
+export type EnvironmentsQuery = { environments: Array<{ id: string, name: string } | null> | null };
 
 export type ManagementMcpServerUrlQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type ManagementMcpServerUrlQuery = { __typename?: 'Query', managementMcpServerUrl?: string | null };
+export type ManagementMcpServerUrlQuery = { managementMcpServerUrl: string | null };
 
 export type McpComponentsByServerIdQueryVariables = Exact<{
-  mcpServerId: Scalars['ID']['input'];
+  mcpServerId: string | number;
 }>;
 
 
-export type McpComponentsByServerIdQuery = { __typename?: 'Query', mcpComponentsByServerId?: Array<{ __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, connectionId?: string | null, lastModifiedDate?: any | null, mcpServerId: string, version?: number | null, mcpTools?: Array<{ __typename?: 'McpTool', id: string, mcpComponentId: string, name: string, parameters?: any | null, title?: string | null, version?: number | null } | null> | null } | null> | null };
+export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type McpServerTagsQueryVariables = Exact<{
-  type: PlatformType;
+  type: Types.PlatformType;
 }>;
 
 
-export type McpServerTagsQuery = { __typename?: 'Query', mcpServerTags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null };
+export type McpServerTagsQuery = { mcpServerTags: Array<{ id: string, name: string } | null> | null };
 
 export type McpServersQueryVariables = Exact<{
-  type: PlatformType;
+  type: Types.PlatformType;
 }>;
 
 
-export type McpServersQuery = { __typename?: 'Query', mcpServers?: Array<{ __typename?: 'McpServer', id: string, name: string, type: PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate?: any | null, mcpComponents?: Array<{ __typename?: 'McpComponent', id: string, mcpServerId: string, componentName: string, componentVersion: number, title?: string | null } | null> | null, tags?: Array<{ __typename?: 'Tag', id: string, name: string } | null> | null } | null> | null };
+export type McpServersQuery = { mcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, secretKey: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
-  mcpComponentId: Scalars['ID']['input'];
+  mcpComponentId: string | number;
 }>;
 
 
-export type McpToolsByComponentIdQuery = { __typename?: 'Query', mcpToolsByComponentId?: Array<{ __typename?: 'McpTool', id: string, name: string, title?: string | null, mcpComponentId: string, parameters?: any | null, version?: number | null } | null> | null };
+export type McpToolsByComponentIdQuery = { mcpToolsByComponentId: Array<{ id: string, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
 
 export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+  workflowConnectionKey: string;
+  connectionId: any;
+  environmentId: any;
 }>;
 
 
-export type SaveClusterElementTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveClusterElementTestConfigurationConnection?: boolean | null };
+export type SaveClusterElementTestConfigurationConnectionMutation = { saveClusterElementTestConfigurationConnection: boolean | null };
 
 export type SaveClusterElementTestOutputMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+  environmentId: any;
+  inputParameters?: any;
 }>;
 
 
-export type SaveClusterElementTestOutputMutation = { __typename?: 'Mutation', saveClusterElementTestOutput?: { __typename?: 'WorkflowNodeTestOutputResult', id: any, workflowId: string, workflowNodeName: string } | null };
+export type SaveClusterElementTestOutputMutation = { saveClusterElementTestOutput: { id: any, workflowId: string, workflowNodeName: string } | null };
 
 export type SaveWorkflowTestConfigurationConnectionMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  workflowConnectionKey: Scalars['String']['input'];
-  connectionId: Scalars['Long']['input'];
-  environmentId: Scalars['Long']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  workflowConnectionKey: string;
+  connectionId: any;
+  environmentId: any;
 }>;
 
 
-export type SaveWorkflowTestConfigurationConnectionMutation = { __typename?: 'Mutation', saveWorkflowTestConfigurationConnection?: boolean | null };
+export type SaveWorkflowTestConfigurationConnectionMutation = { saveWorkflowTestConfigurationConnection: boolean | null };
 
 export type TestClusterElementScriptMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  clusterElementType: Scalars['String']['input'];
-  clusterElementWorkflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+  environmentId: any;
+  inputParameters?: any;
 }>;
 
 
-export type TestClusterElementScriptMutation = { __typename?: 'Mutation', testClusterElementScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
+export type TestClusterElementScriptMutation = { testClusterElementScript: { output: any, error: { message: string | null, stackTrace: Array<string | null> | null } | null } };
 
 export type TestWorkflowNodeScriptMutationVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
-  inputParameters?: InputMaybe<Scalars['Map']['input']>;
+  workflowId: string;
+  workflowNodeName: string;
+  environmentId: any;
+  inputParameters?: any;
 }>;
 
 
-export type TestWorkflowNodeScriptMutation = { __typename?: 'Mutation', testWorkflowNodeScript: { __typename?: 'ScriptTestExecution', output?: any | null, error?: { __typename?: 'ExecutionError', message?: string | null, stackTrace?: Array<string | null> | null } | null } };
+export type TestWorkflowNodeScriptMutation = { testWorkflowNodeScript: { output: any, error: { message: string | null, stackTrace: Array<string | null> | null } | null } };
 
 export type UpdateApiKeyMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  name: Scalars['String']['input'];
+  id: string | number;
+  name: string;
 }>;
 
 
-export type UpdateApiKeyMutation = { __typename?: 'Mutation', updateApiKey: boolean };
+export type UpdateApiKeyMutation = { updateApiKey: boolean };
 
 export type UpdateManagementMcpServerUrlMutationVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UpdateManagementMcpServerUrlMutation = { __typename?: 'Mutation', updateManagementMcpServerUrl: string };
+export type UpdateManagementMcpServerUrlMutation = { updateManagementMcpServerUrl: string };
 
 export type UpdateMcpComponentWithToolsMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: McpComponentWithToolsInput;
+  id: string | number;
+  input: Types.McpComponentWithToolsInput;
 }>;
 
 
-export type UpdateMcpComponentWithToolsMutation = { __typename?: 'Mutation', updateMcpComponentWithTools?: { __typename?: 'McpComponent', id: string, componentName: string, componentVersion: number, title?: string | null, mcpServerId: string, connectionId?: string | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+export type UpdateMcpComponentWithToolsMutation = { updateMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type UpdateMcpServerUrlMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type UpdateMcpServerUrlMutation = { __typename?: 'Mutation', updateMcpServerUrl: string };
+export type UpdateMcpServerUrlMutation = { updateMcpServerUrl: string };
 
 export type UpdateMcpToolMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: McpToolInput;
+  id: string | number;
+  input: Types.McpToolInput;
 }>;
 
 
-export type UpdateMcpToolMutation = { __typename?: 'Mutation', updateMcpTool?: { __typename?: 'McpTool', id: string, name: string, mcpComponentId: string, parameters?: any | null, version?: number | null } | null };
+export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
 
 export type ValidateWorkflowQueryVariables = Exact<{
-  workflowDefinition: Scalars['String']['input'];
+  workflowDefinition: string;
 }>;
 
 
-export type ValidateWorkflowQuery = { __typename?: 'Query', validateWorkflow: { __typename?: 'WorkflowValidationResult', errors: Array<string>, warnings: Array<string> } };
+export type ValidateWorkflowQuery = { validateWorkflow: { errors: Array<string>, warnings: Array<string> } };
 
 export type ValidateWorkflowByIdQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
+  workflowId: string;
 }>;
 
 
-export type ValidateWorkflowByIdQuery = { __typename?: 'Query', validateWorkflowById: { __typename?: 'WorkflowValidationResult', errors: Array<string>, warnings: Array<string> } };
+export type ValidateWorkflowByIdQuery = { validateWorkflowById: { errors: Array<string>, warnings: Array<string> } };
 
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
+  workflowId: string;
+  workflowNodeName: string;
 }>;
 
 
-export type WorkflowNodeComponentConnectionsQuery = { __typename?: 'Query', workflowNodeComponentConnections: Array<{ __typename?: 'ComponentConnection', componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
+export type WorkflowNodeComponentConnectionsQuery = { workflowNodeComponentConnections: Array<{ componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
 
 export type WorkflowNodeScriptInputQueryVariables = Exact<{
-  workflowId: Scalars['String']['input'];
-  workflowNodeName: Scalars['String']['input'];
-  environmentId: Scalars['Long']['input'];
+  workflowId: string;
+  workflowNodeName: string;
+  environmentId: any;
 }>;
 
 
-export type WorkflowNodeScriptInputQuery = { __typename?: 'Query', workflowNodeScriptInput?: any | null };
+export type WorkflowNodeScriptInputQuery = { workflowNodeScriptInput: any };
 
 export type CustomComponentQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type CustomComponentQuery = { __typename?: 'Query', customComponent?: { __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null } | null };
+export type CustomComponentQuery = { customComponent: { id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type CustomComponentDefinitionQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type CustomComponentDefinitionQuery = { __typename?: 'Query', customComponentDefinition?: { __typename?: 'CustomComponentDefinition', actions: Array<{ __typename?: 'CustomComponentActionDefinition', name: string, title?: string | null, description?: string | null }>, triggers: Array<{ __typename?: 'CustomComponentTriggerDefinition', name: string, title?: string | null, description?: string | null }> } | null };
+export type CustomComponentDefinitionQuery = { customComponentDefinition: { actions: Array<{ name: string, title: string | null, description: string | null }>, triggers: Array<{ name: string, title: string | null, description: string | null }> } | null };
 
 export type CustomComponentsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type CustomComponentsQuery = { __typename?: 'Query', customComponents: Array<{ __typename?: 'CustomComponent', id: string, name: string, title?: string | null, description?: string | null, icon?: string | null, componentVersion?: number | null, enabled?: boolean | null, language?: CustomComponentLanguage | null, createdBy?: string | null, createdDate?: any | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, version?: number | null }> };
+export type CustomComponentsQuery = { customComponents: Array<{ id: string, name: string, title: string | null, description: string | null, icon: string | null, componentVersion: number | null, enabled: boolean | null, language: Types.CustomComponentLanguage | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null }> };
 
 export type DeleteCustomComponentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteCustomComponentMutation = { __typename?: 'Mutation', deleteCustomComponent: boolean };
+export type DeleteCustomComponentMutation = { deleteCustomComponent: boolean };
 
 export type EnableCustomComponentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  enable: Scalars['Boolean']['input'];
+  id: string | number;
+  enable: boolean;
 }>;
 
 
-export type EnableCustomComponentMutation = { __typename?: 'Mutation', enableCustomComponent: boolean };
+export type EnableCustomComponentMutation = { enableCustomComponent: boolean };
 
 export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type AuthoritiesQuery = { __typename?: 'Query', authorities: Array<string> };
+export type AuthoritiesQuery = { authorities: Array<string> };
 
 export type CreateIdentityProviderMutationVariables = Exact<{
-  input: IdentityProviderInput;
+  input: Types.IdentityProviderInput;
 }>;
 
 
-export type CreateIdentityProviderMutation = { __typename?: 'Mutation', createIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
+export type CreateIdentityProviderMutation = { createIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type DeleteIdentityProviderMutation = { __typename?: 'Mutation', deleteIdentityProvider: boolean };
+export type DeleteIdentityProviderMutation = { deleteIdentityProvider: boolean };
 
 export type DeleteUserMutationVariables = Exact<{
-  login: Scalars['String']['input'];
+  login: string;
 }>;
 
 
-export type DeleteUserMutation = { __typename?: 'Mutation', deleteUser: boolean };
+export type DeleteUserMutation = { deleteUser: boolean };
 
 export type IdentityProviderQueryVariables = Exact<{
-  id: Scalars['ID']['input'];
+  id: string | number;
 }>;
 
 
-export type IdentityProviderQuery = { __typename?: 'Query', identityProvider?: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null };
+export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { __typename?: 'Query', identityProviders: Array<{ __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null> };
 
 export type InviteUserMutationVariables = Exact<{
-  email: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-  role: Scalars['String']['input'];
+  email: string;
+  password: string;
+  role: string;
 }>;
 
 
-export type InviteUserMutation = { __typename?: 'Mutation', inviteUser: boolean };
+export type InviteUserMutation = { inviteUser: boolean };
 
 export type UpdateIdentityProviderMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  input: IdentityProviderInput;
+  id: string | number;
+  input: Types.IdentityProviderInput;
 }>;
 
 
-export type UpdateIdentityProviderMutation = { __typename?: 'Mutation', updateIdentityProvider: { __typename?: 'IdentityProviderType', autoProvision: boolean, clientId?: string | null, createdBy?: string | null, createdDate?: any | null, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri?: string | null, lastModifiedBy?: string | null, lastModifiedDate?: any | null, metadataUri?: string | null, mfaMethod?: string | null, mfaRequired: boolean, name: string, nameIdFormat?: string | null, scopes?: string | null, signingCertificate?: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { updateIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
 
 export type UpdateUserMutationVariables = Exact<{
-  login: Scalars['String']['input'];
-  role: Scalars['String']['input'];
+  login: string;
+  role: string;
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } };
+export type UpdateUserMutation = { updateUser: { id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } };
 
 export type UsersQueryVariables = Exact<{
-  pageNumber?: InputMaybe<Scalars['Int']['input']>;
-  pageSize?: InputMaybe<Scalars['Int']['input']>;
+  pageNumber?: number | null | undefined;
+  pageSize?: number | null | undefined;
 }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users?: { __typename?: 'AdminUserPage', number: number, size: number, totalElements: number, totalPages: number, content: Array<{ __typename?: 'AdminUser', id?: string | null, login?: string | null, email?: string | null, firstName?: string | null, lastName?: string | null, activated?: boolean | null, authorities?: Array<string | null> | null } | null> } | null };
+export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
 
 
@@ -9262,6 +5623,7 @@ export const McpIntegrationInstanceConfigurationsByServerIdDocument = new TypedD
     integrationInstanceConfigurationId
     integrationInstanceConfigurationName
     integrationVersion
+    lastModifiedDate
     mcpIntegrationInstanceConfigurationWorkflows {
       id
       integrationInstanceConfigurationWorkflowId
