@@ -20,9 +20,13 @@ export default defineConfig({
         }),
     ],
     resolve: {
-        alias: {
-            '@': resolve(__dirname, './src'),
-        },
+        alias: [
+            {find: '@', replacement: resolve(__dirname, './src')},
+            {
+                find: /^use-sync-external-store\/shim$/,
+                replacement: resolve(__dirname, './src/shims/use-sync-external-store-shim.ts'),
+            },
+        ],
     },
     build: {
         lib: {
