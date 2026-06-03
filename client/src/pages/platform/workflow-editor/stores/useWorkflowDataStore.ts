@@ -146,6 +146,8 @@ function updateTaskParametersInTasks(
 const useWorkflowDataStore = create<WorkflowDataStateI>()(
     devtools(
         (set, get) => ({
+            workflowNodes: [],
+
             componentActions: [],
 
             componentDefinitions: [],
@@ -167,7 +169,7 @@ const useWorkflowDataStore = create<WorkflowDataStateI>()(
             isNodeDragging: false,
             setIsNodeDragging: (dragging) => set({isNodeDragging: dragging}),
 
-            projectName: null,
+            projectName: '',
             setProjectName: (projectName) => set({projectName}),
 
             savedPositionCrossAxisShift: 0,
