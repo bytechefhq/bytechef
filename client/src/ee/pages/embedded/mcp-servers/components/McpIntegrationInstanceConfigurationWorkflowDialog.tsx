@@ -16,7 +16,6 @@ import {Input} from '@/components/ui/input';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {useGetIntegrationInstanceConfigurationsQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {
-    McpIntegrationInstanceConfiguration,
     McpServer,
     useCreateMcpIntegrationInstanceConfigurationMutation,
     useToolEligibleIntegrationInstanceConfigurationWorkflowsQuery,
@@ -30,6 +29,8 @@ import {useForm} from 'react-hook-form';
 import InlineSVG from 'react-inlinesvg';
 import {z} from 'zod';
 
+import {McpIntegrationInstanceConfigurationItemType} from './mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
+
 const formSchema = z.object({
     integrationInstanceConfigurationId: z.string().min(1, 'Please select an integration instance configuration'),
     mcpServerId: z.string().min(1),
@@ -37,7 +38,7 @@ const formSchema = z.object({
 });
 
 interface McpIntegrationInstanceConfigurationDialogProps {
-    mcpIntegrationInstanceConfiguration?: McpIntegrationInstanceConfiguration;
+    mcpIntegrationInstanceConfiguration?: McpIntegrationInstanceConfigurationItemType;
     mcpServer?: McpServer;
     onClose?: () => void;
     triggerNode?: ReactNode;

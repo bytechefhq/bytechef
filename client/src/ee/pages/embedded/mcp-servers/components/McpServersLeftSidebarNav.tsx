@@ -1,7 +1,6 @@
 import {Type} from '@/ee/pages/embedded/mcp-servers/McpServers';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 import {
-    McpIntegrationInstanceConfiguration,
     PlatformType,
     useMcpIntegrationInstanceConfigurationsQuery,
     useMcpServerTagsQuery,
@@ -40,7 +39,7 @@ const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpSer
 
     const mcpIntegrationInstanceConfigurations =
         mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurations?.filter(
-            (integration): integration is McpIntegrationInstanceConfiguration => integration !== null
+            (integration): integration is NonNullable<typeof integration> => integration !== null
         ) || [];
 
     const serverMcpIntegrationInstanceConfigurations = mcpIntegrationInstanceConfigurations.filter((integration) =>

@@ -1,14 +1,13 @@
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
-import {
-    McpIntegrationInstanceConfigurationWorkflow,
-    useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation,
-} from '@/shared/middleware/graphql';
+import {useDeleteMcpIntegrationInstanceConfigurationWorkflowMutation} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
+import {McpIntegrationInstanceConfigurationWorkflowItemType} from './useMcpIntegrationInstanceConfigurationList';
+
 export default function useMcpIntegrationInstanceConfigurationWorkflowListItem(
-    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflowItemType
 ) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);

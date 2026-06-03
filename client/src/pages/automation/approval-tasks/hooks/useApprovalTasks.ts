@@ -96,7 +96,7 @@ export function useApprovalTasks(): UseApprovalTasksReturnI {
     useEffect(() => {
         if (approvalTasksData?.approvalTasks) {
             const mappedApprovalTasks = approvalTasksData.approvalTasks
-                .filter((approvalTask): approvalTask is ApprovalTask => approvalTask !== null)
+                .filter((approvalTask): approvalTask is NonNullable<typeof approvalTask> => approvalTask !== null)
                 .map(mapApiApprovalTaskToUiApprovalTask);
 
             useApprovalTasksStore.getState().setApprovalTasks(mappedApprovalTasks);

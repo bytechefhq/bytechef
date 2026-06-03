@@ -7,13 +7,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {McpIntegrationInstanceConfiguration} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
+import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationListItemDropdownMenu from './hooks/useMcpIntegrationInstanceConfigurationListItemDropdownMenu';
 
 interface McpIntegrationInstanceConfigurationListItemDropdownMenuProps {
-    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfiguration;
+    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfigurationItemType;
     onEditWorkflowsClick: () => void;
     onUpdateIntegrationVersionClick: () => void;
 }

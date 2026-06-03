@@ -7,13 +7,13 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {McpProject} from '@/shared/middleware/graphql';
 import {EllipsisVerticalIcon} from 'lucide-react';
 
+import {McpProjectItemType} from './hooks/useMcpProjectList';
 import useMcpProjectListItemDropdownMenu from './hooks/useMcpProjectListItemDropdownMenu';
 
 interface McpProjectListItemDropdownMenuProps {
-    mcpProject: McpProject;
+    mcpProject: McpProjectItemType;
     onChangeProjectVersionClick: () => void;
     onEditWorkflowsClick: () => void;
 }

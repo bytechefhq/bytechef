@@ -1,10 +1,9 @@
-import {McpIntegrationInstanceConfigurationWorkflow} from '@/shared/middleware/graphql';
-
 import McpIntegrationInstanceConfigurationWorkflowListItem from './McpIntegrationInstanceConfigurationWorkflowListItem';
+import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 
 interface McpIntegrationInstanceConfigurationWorkflowListProps {
     componentName: string;
-    mcpIntegrationInstanceConfigurationWorkflows?: Array<McpIntegrationInstanceConfigurationWorkflow | null> | null;
+    mcpIntegrationInstanceConfigurationWorkflows?: Array<McpIntegrationInstanceConfigurationWorkflowItemType | null> | null;
 }
 
 const McpIntegrationInstanceConfigurationWorkflowList = ({
@@ -13,7 +12,7 @@ const McpIntegrationInstanceConfigurationWorkflowList = ({
 }: McpIntegrationInstanceConfigurationWorkflowListProps) => {
     const workflows =
         mcpIntegrationInstanceConfigurationWorkflows?.filter(
-            (workflow): workflow is McpIntegrationInstanceConfigurationWorkflow => workflow !== null
+            (workflow): workflow is McpIntegrationInstanceConfigurationWorkflowItemType => workflow !== null
         ) || [];
 
     if (workflows.length === 0) {

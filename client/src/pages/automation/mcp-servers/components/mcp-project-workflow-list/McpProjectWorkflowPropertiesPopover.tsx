@@ -2,13 +2,13 @@ import Button from '@/components/Button/Button';
 import {Form} from '@/components/ui/form';
 import {PopoverContent} from '@/components/ui/popover';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
-import {McpProjectWorkflow} from '@/shared/middleware/graphql';
 import {XIcon} from 'lucide-react';
 
+import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
 import useMcpProjectWorkflowPropertiesPopover from './hooks/useMcpProjectWorkflowPropertiesPopover';
 
 interface McpProjectWorkflowPropertiesPopoverProps {
-    mcpProjectWorkflow: McpProjectWorkflow;
+    mcpProjectWorkflow: McpProjectWorkflowItemType;
     onClose: () => void;
 }
 

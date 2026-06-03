@@ -1,6 +1,6 @@
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Connection} from '@/shared/middleware/automation/configuration';
-import {McpComponent, McpTool, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
+import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 import {ClusterElementDefinitionBasic, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetWorkspaceConnectionsQuery} from '@/shared/queries/automation/connections.queries';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
@@ -127,7 +127,7 @@ const useMcpComponentDialogToolSelectionStep = ({
         }
 
         const validExistingTools = existingTools.mcpToolsByComponentId!.filter(
-            (existingTool): existingTool is McpTool => existingTool !== null
+            (existingTool): existingTool is NonNullable<typeof existingTool> => existingTool !== null
         );
 
         const matchedTools = validExistingTools.map((existingTool) => {

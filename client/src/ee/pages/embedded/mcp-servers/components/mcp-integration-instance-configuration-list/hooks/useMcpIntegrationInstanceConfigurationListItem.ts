@@ -1,10 +1,11 @@
 import {useGetIntegrationInstanceConfigurationQuery} from '@/ee/shared/queries/embedded/integrationInstanceConfigurations.queries';
-import {McpIntegrationInstanceConfiguration} from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
+import {McpIntegrationInstanceConfigurationItemType} from './useMcpIntegrationInstanceConfigurationList';
+
 const useMcpIntegrationInstanceConfigurationListItem = (
-    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfiguration
+    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfigurationItemType
 ) => {
     const [showEditWorkflowsDialog, setShowEditWorkflowsDialog] = useState(false);
     const [showUpdateIntegrationVersionDialog, setShowUpdateIntegrationVersionDialog] = useState(false);

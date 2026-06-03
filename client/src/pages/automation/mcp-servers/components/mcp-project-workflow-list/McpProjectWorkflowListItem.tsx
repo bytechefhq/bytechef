@@ -4,14 +4,14 @@ import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
 import {useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpProjectWorkflow} from '@/shared/middleware/graphql';
 import {BoltIcon, PencilIcon, XIcon} from 'lucide-react';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
+import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
 import useMcpProjectWorkflowBadge from './hooks/useMcpProjectWorkflowBadge';
 
 interface McpProjectWorkflowListItemProps {
-    mcpProjectWorkflow: McpProjectWorkflow;
+    mcpProjectWorkflow: McpProjectWorkflowItemType;
 }
 
 const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowListItemProps) => {

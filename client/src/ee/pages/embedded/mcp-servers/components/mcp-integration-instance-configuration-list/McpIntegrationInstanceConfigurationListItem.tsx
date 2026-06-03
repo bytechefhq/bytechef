@@ -1,17 +1,17 @@
 import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
-import {McpIntegrationInstanceConfiguration} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 import McpIntegrationInstanceConfigurationWorkflowDialog from '../McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpIntegrationInstanceConfigurationListItemDropdownMenu from './McpIntegrationInstanceConfigurationListItemDropdownMenu';
+import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationListItem from './hooks/useMcpIntegrationInstanceConfigurationListItem';
 
 interface McpIntegrationInstanceConfigurationListItemProps {
-    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfiguration;
+    mcpIntegrationInstanceConfiguration: McpIntegrationInstanceConfigurationItemType;
 }
 
 const McpIntegrationInstanceConfigurationListItem = ({

@@ -1,10 +1,12 @@
-import {McpProjectWorkflow, useDeleteMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
+import {useDeleteMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
-export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjectWorkflow) {
+import {McpProjectWorkflowItemType} from './useMcpProjectList';
+
+export default function useMcpProjectWorkflowBadge(mcpProjectWorkflow: McpProjectWorkflowItemType) {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showEditWorkflowDialog, setShowEditWorkflowDialog] = useState(false);
     const queryClient = useQueryClient();
