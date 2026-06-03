@@ -107,39 +107,37 @@ public class OpenRouterChatAction {
         .output(ModelUtils::output)
         .perform(OpenRouterChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL =
-        (inputParameters, connectionParameters, responseFormatRequired) -> {
+    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+        boolean jsonFormat = false;
 
-            boolean jsonFormat = false;
+        if (responseFormatRequired) {
+            ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
 
-            if (responseFormatRequired) {
-                ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-                    RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+            jsonFormat = !responseFormat.equals(TEXT);
+        }
 
-                jsonFormat = !responseFormat.equals(TEXT);
-            }
-
-            return OpenRouterChatModel.builder()
-                .apiKey(connectionParameters.getString(TOKEN))
-                .model(inputParameters.getRequiredString(MODEL))
-                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
-                .logprobs(inputParameters.getBoolean(LOGPROBS))
-                .maxCompletionTokens(inputParameters.getInteger(MAX_COMPLETION_TOKENS))
-                .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                .reasoning(inputParameters.getString(REASONING))
-                .jsonResponseFormat(jsonFormat)
-                .seed(inputParameters.getInteger(SEED))
-                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                .temperature(inputParameters.getDouble(TEMPERATURE))
-                .topK(inputParameters.getDouble(TOP_K))
-                .topLogprobs(inputParameters.getInteger(TOP_LOGPROBS))
-                .topP(inputParameters.getDouble(TOP_P))
-                .verbosity(inputParameters.getString(VERBOSITY))
-                .user(inputParameters.getString(USER))
-                .build();
-        };
+        return OpenRouterChatModel.builder()
+            .apiKey(connectionParameters.getString(TOKEN))
+            .model(inputParameters.getRequiredString(MODEL))
+            .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+            .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+            .logprobs(inputParameters.getBoolean(LOGPROBS))
+            .maxCompletionTokens(inputParameters.getInteger(MAX_COMPLETION_TOKENS))
+            .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+            .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+            .reasoning(inputParameters.getString(REASONING))
+            .jsonResponseFormat(jsonFormat)
+            .seed(inputParameters.getInteger(SEED))
+            .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+            .temperature(inputParameters.getDouble(TEMPERATURE))
+            .topK(inputParameters.getDouble(TOP_K))
+            .topLogprobs(inputParameters.getInteger(TOP_LOGPROBS))
+            .topP(inputParameters.getDouble(TOP_P))
+            .verbosity(inputParameters.getString(VERBOSITY))
+            .user(inputParameters.getString(USER))
+            .build();
+    };
 
     private OpenRouterChatAction() {
     }

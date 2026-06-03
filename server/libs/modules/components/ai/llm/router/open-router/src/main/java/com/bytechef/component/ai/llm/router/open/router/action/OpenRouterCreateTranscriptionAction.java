@@ -89,18 +89,18 @@ public class OpenRouterCreateTranscriptionAction {
         Map<String, Object> body = new HashMap<>();
 
         body.put("input_audio", inputAudio);
-        body.put("model", inputParameters.getRequiredString(MODEL));
+        body.put(MODEL, inputParameters.getRequiredString(MODEL));
 
         String language = inputParameters.getString(LANGUAGE);
 
         if (language != null) {
-            body.put("language", language);
+            body.put(LANGUAGE, language);
         }
 
         Double temperature = inputParameters.getDouble(TEMPERATURE);
 
         if (temperature != null) {
-            body.put("temperature", temperature);
+            body.put(TEMPERATURE, temperature);
         }
 
         RestClient restClient = ModelUtils.getRestClientBuilder()
