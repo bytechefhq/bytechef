@@ -27,7 +27,9 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class NanoGptConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION =
-        RouterConnection.connectionDefinition(BASE_URL);
+        RouterConnection.connectionDefinition(BASE_URL)
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/nano-gpt_v1#connection-setup");
 
     private NanoGptConnection() {
     }
