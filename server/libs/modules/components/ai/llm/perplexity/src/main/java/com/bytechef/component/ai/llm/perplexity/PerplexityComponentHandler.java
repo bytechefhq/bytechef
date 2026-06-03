@@ -34,6 +34,7 @@ public class PerplexityComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("perplexity")
         .title("Perplexity")
+        .version(1)
         .description(
             "Perplexity AI provides a unique AI service that integrates its language models with real-time search " +
                 "capabilities.")
