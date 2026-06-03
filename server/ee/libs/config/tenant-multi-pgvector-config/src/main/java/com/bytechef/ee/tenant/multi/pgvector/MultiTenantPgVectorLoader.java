@@ -79,11 +79,11 @@ public class MultiTenantPgVectorLoader implements InitializingBean {
 
         log.info("Initializing PgVectorStore schema for table: {} in schema: {}", tableName, schemaName);
 
-        jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector");
-        jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS hstore");
+        jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS vector SCHEMA public");
+        jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS hstore SCHEMA public");
 
         if (properties.getIdType() == PgVectorStore.PgIdType.UUID) {
-            jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\"");
+            jdbcTemplate.execute("CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\" SCHEMA public");
         }
 
         jdbcTemplate.execute("CREATE SCHEMA IF NOT EXISTS " + schemaName);
