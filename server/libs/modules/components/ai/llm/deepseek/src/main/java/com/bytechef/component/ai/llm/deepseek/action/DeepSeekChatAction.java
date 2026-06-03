@@ -78,42 +78,45 @@ public class DeepSeekChatAction {
             PRESENCE_PENALTY_PROPERTY,
             STOP_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/deepseek_v1#ask")
         .perform(DeepSeekChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
-        ResponseFormat responseFormat = null;
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters, responseFormatRequired) -> {
 
-        if (responseFormatRequired) {
-            ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
-                RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
+            ResponseFormat responseFormat = null;
 
-            Type type = chatModelResponseFormat == ChatModel.ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+            if (responseFormatRequired) {
+                ChatModel.ResponseFormat chatModelResponseFormat = inputParameters.getRequiredFromPath(
+                    RESPONSE + "." + RESPONSE_FORMAT, ChatModel.ResponseFormat.class);
 
-            responseFormat = ResponseFormat.builder()
-                .type(type)
+                Type type = chatModelResponseFormat == ChatModel.ResponseFormat.TEXT ? Type.TEXT : Type.JSON_OBJECT;
+
+                responseFormat = ResponseFormat.builder()
+                    .type(type)
+                    .build();
+            }
+
+            return DeepSeekChatModel.builder()
+                .deepSeekApi(
+                    DeepSeekApi.builder()
+                        .apiKey(connectionParameters.getString(TOKEN))
+                        .baseUrl("https://api.deepseek.com")
+                        .restClientBuilder(ModelUtils.getRestClientBuilder())
+                        .build())
+                .defaultOptions(
+                    DeepSeekChatOptions.builder()
+                        .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                        .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                        .model(inputParameters.getRequiredString(MODEL))
+                        .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                        .responseFormat(responseFormat)
+                        .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                        .temperature(inputParameters.getDouble(TEMPERATURE))
+                        .topP(inputParameters.getDouble(TOP_P))
+                        .build())
                 .build();
-        }
-
-        return DeepSeekChatModel.builder()
-            .deepSeekApi(
-                DeepSeekApi.builder()
-                    .apiKey(connectionParameters.getString(TOKEN))
-                    .baseUrl("https://api.deepseek.com")
-                    .restClientBuilder(ModelUtils.getRestClientBuilder())
-                    .build())
-            .defaultOptions(
-                DeepSeekChatOptions.builder()
-                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .responseFormat(responseFormat)
-                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .build())
-            .build();
-    };
+        };
 
     private DeepSeekChatAction() {
     }
