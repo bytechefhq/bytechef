@@ -238,11 +238,11 @@ public class BaseFtpActionIntTest {
      * Shared credentials for both containers. Password must satisfy Alpine Linux's strength requirements used by
      * {@code delfer/alpine-ftp-server}'s entrypoint.
      */
-    @Value("${bytechef.test.ftp.password}")
+    @Value("${bytechef.test.ftp.password:T3st@Pass123}")
     protected String ftpPassword;
-    @Value("${bytechef.test.ftp.username}")
+    @Value("${bytechef.test.ftp.username:ftpuser}")
     protected String ftpUsername;
-    @Value("${bytechef.test.ftp.host.ip}")
+    @Value("${bytechef.test.ftp.host.ip:127.0.0.1}")
     protected String ftpHostIp;
 
     /**
