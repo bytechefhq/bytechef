@@ -1,5 +1,7 @@
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
+import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {resolveAutoApplyDefinition} from '@/shared/components/copilot/utils/resolveAutoApplyDefinition';
 import {usePersistJobId} from '@/shared/hooks/usePersistJobId';
 import {useWorkflowTestStream} from '@/shared/hooks/useWorkflowTestStream';
 import {useValidateWorkflowQuery} from '@/shared/middleware/graphql';
@@ -20,6 +22,11 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import type {editor} from 'monaco-editor';
 
 const workflowTestApi = new WorkflowTestApi();
+
+// Shown in the copilot panel in place of the workflow definition once a BUILD-mode turn has been
+// applied straight to the code editor — the editor is the source of truth, so the definition itself
+// no longer needs to occupy the conversation.
+const APPLIED_TO_EDITOR_MESSAGE = '✓ Applied changes to the editor.';
 
 type UseWorkflowCodeEditorSheetReturnType = {
     copilotEnabled: boolean;
@@ -123,12 +130,12 @@ const useWorkflowCodeEditorSheet = ({
         setContext({
             ...currentContext,
             mode: MODE.ASK,
-            parameters: {language: 'json'},
-            source: Source.CODE_EDITOR,
+            parameters: {format: workflow.format?.toLowerCase() ?? 'json'},
+            source: Source.WORKFLOW_CODE_EDITOR,
         });
 
         setCopilotPanelOpen(true);
-    }, [setContext]);
+    }, [setContext, workflow.format]);
 
     const handleCopilotClose = useCallback(() => {
         useCopilotStore.getState().restoreConversationState();
@@ -241,6 +248,26 @@ const useWorkflowCodeEditorSheet = ({
         setUnsavedChangesAlertDialogOpen(false);
         onSheetOpenClose(false);
     }, [onSheetOpenClose]);
+
+    useEffect(() => {
+        // When a BUILD-mode copilot turn completes in the code editor, push the generated definition
+        // straight into the Monaco buffer instead of leaving it in the conversation, then swap the
+        // definition for a short confirmation so the panel stays a readable chat log rather than a dump
+        // of the workflow JSON/YAML.
+        return useCopilotPostTurnRegistry.getState().register(Source.WORKFLOW_CODE_EDITOR, () => {
+            const {appendToLastAssistantMessage, context, messages} = useCopilotStore.getState();
+
+            const definition = resolveAutoApplyDefinition(Source.WORKFLOW_CODE_EDITOR, context?.mode, messages);
+
+            if (!definition) {
+                return;
+            }
+
+            handleDefinitionChange(definition);
+
+            appendToLastAssistantMessage(APPLIED_TO_EDITOR_MESSAGE);
+        });
+    }, [handleDefinitionChange]);
 
     useEffect(() => {
         setDefinition(workflow.definition!);
