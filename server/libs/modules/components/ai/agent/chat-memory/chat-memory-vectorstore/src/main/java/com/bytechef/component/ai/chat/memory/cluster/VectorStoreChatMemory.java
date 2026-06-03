@@ -33,6 +33,11 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.util.Map;
+import java.util.Objects;
+import org.springframework.ai.chat.client.ChatClientRequest;
+import org.springframework.ai.chat.client.ChatClientResponse;
+import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
+import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.vectorstore.VectorStoreChatMemoryAdvisor.Builder;
 
@@ -99,6 +104,45 @@ public class VectorStoreChatMemory {
             .defaultTopK(
                 inputParameters.getInteger(CHAT_MEMORY_RETRIEVE_SIZE, 20));
 
-        return new ChatMemoryFunction.Result(builder.build(), null);
+        return new ChatMemoryFunction.Result(new ToolCallSafeVectorStoreChatMemoryAdvisor(builder.build()), null);
+    }
+
+    /**
+     * Guards {@link VectorStoreChatMemoryAdvisor} against the second iteration of a {@code ToolCallAdvisor} loop. In
+     * that iteration the prompt has only a {@code SystemMessage} and a {@code ToolResponseMessage} — no real user
+     * message — so {@code getUserMessage().getText()} is blank. Passing a blank string to the embedding API causes a
+     * 400 error. When there is no real user message we skip the vector-store lookup and pass the request through
+     * unchanged; the {@code after()} delegation is preserved so the final assistant reply is still stored.
+     */
+    private static class ToolCallSafeVectorStoreChatMemoryAdvisor implements BaseChatMemoryAdvisor {
+
+        private final VectorStoreChatMemoryAdvisor delegate;
+
+        ToolCallSafeVectorStoreChatMemoryAdvisor(VectorStoreChatMemoryAdvisor delegate) {
+            this.delegate = delegate;
+        }
+
+        @Override
+        public ChatClientRequest before(ChatClientRequest request, AdvisorChain advisorChain) {
+            String userText = Objects.requireNonNullElse(request.prompt()
+                .getUserMessage()
+                .getText(), "");
+
+            if (userText.isBlank()) {
+                return request;
+            }
+
+            return delegate.before(request, advisorChain);
+        }
+
+        @Override
+        public ChatClientResponse after(ChatClientResponse response, AdvisorChain advisorChain) {
+            return delegate.after(response, advisorChain);
+        }
+
+        @Override
+        public int getOrder() {
+            return delegate.getOrder();
+        }
     }
 }
