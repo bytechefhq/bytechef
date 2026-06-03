@@ -321,7 +321,7 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
     }
 
     public List<String> getStop() {
-        return stop;
+        return stop == null ? null : new ArrayList<>(stop);
     }
 
     public Integer getSeed() {
@@ -353,7 +353,7 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
     }
 
     public Map<String, Double> getLogitBias() {
-        return logitBias;
+        return logitBias == null ? null : new HashMap<>(logitBias);
     }
 
     public Double getFrequencyPenalty() {
