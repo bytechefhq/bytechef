@@ -34,6 +34,8 @@ import java.util.Map;
  * Provides a list of the component actions.
  *
  * @generated
+ *
+ * @author Igor Beslic
  */
 public class GaurusGetAccountTransactionsAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getAccountTransactions")
