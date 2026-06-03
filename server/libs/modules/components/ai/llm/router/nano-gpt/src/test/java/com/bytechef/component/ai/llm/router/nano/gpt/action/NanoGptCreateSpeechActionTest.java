@@ -41,6 +41,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -80,7 +81,7 @@ class NanoGptCreateSpeechActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform() throws IOException {
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = Mockito.mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(ModelUtils::getRestClientBuilder)
                 .thenReturn(mockedBuilder);
@@ -118,6 +119,7 @@ class NanoGptCreateSpeechActionTest {
             when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> {
                     ContextFunction<File, Executor> fn = fileFunctionArgumentCaptor.getValue();
+
                     return fn.apply(mockedFile);
                 });
 
@@ -133,75 +135,48 @@ class NanoGptCreateSpeechActionTest {
 
             assertEquals(mockedFileEntry, result.get("file"));
             assertNull(result.get("audioUrl"));
-
-            String storedFilename = stringArgumentCaptor.getAllValues()
-                .stream()
-                .filter(s -> s.startsWith("speech."))
-                .findFirst()
-                .orElse(null);
-            assertNotNull(storedFilename);
-            assertEquals("speech.mp3", storedFilename);
-
-            java.util.List<String> capturedStrings = stringArgumentCaptor.getAllValues();
-            int apiKeyIndex = capturedStrings.indexOf("x-api-key");
-            assertNotNull(apiKeyIndex >= 0 ? capturedStrings.get(apiKeyIndex + 1) : null,
-                "API key header value should be present");
-            assertEquals("test-api-key", capturedStrings.get(apiKeyIndex + 1));
-
-            Object body = objectArgumentCaptor.getValue();
-            assertInstanceOf(Map.class, body);
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> requestBody = (Map<String, Object>) body;
-
-            assertEquals("Hello world", requestBody.get("text"));
-            assertEquals("tts-model", requestBody.get("model"));
-            assertEquals("alloy", requestBody.get("voice"));
-            assertEquals("mp3", requestBody.get("response_format"));
-            assertEquals(1.0, requestBody.get("speed"));
-
+            assertEquals(
+                List.of("x-api-key", "test-api-key", "https://nano-gpt.com/api/v1/tts", "speech.mp3"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(
+                Map.of("text", "Hello world", MODEL, "tts-model", VOICE, "alloy", SPEED, 1.0, "response_format", "mp3"),
+                objectArgumentCaptor.getValue());
             assertEquals(MediaType.APPLICATION_JSON, mediaTypeArgumentCaptor.getValue());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
         }
     }
 
     @Test
     void testPerformWithoutOptionalParams() throws IOException {
         Parameters minimalParameters = MockParametersFactory.create(
-            Map.of(
-                INPUT, "Minimal input",
-                MODEL, "tts-model",
-                TOKEN, "test-api-key"));
+            Map.of(INPUT, "Minimal input", MODEL, "tts-model", TOKEN, "test-api-key"));
 
         try (MockedStatic<ModelUtils> modelUtilsMockedStatic = Mockito.mockStatic(ModelUtils.class)) {
             modelUtilsMockedStatic.when(ModelUtils::getRestClientBuilder)
                 .thenReturn(mockedBuilder);
 
-            when(mockedBuilder.defaultHeader(any(), any()))
+            when(mockedBuilder.defaultHeader(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedBuilder);
             when(mockedBuilder.build())
                 .thenReturn(mockedRestClient);
 
             when(mockedRestClient.post())
                 .thenReturn(mockedRequestBodyUriSpec);
-            when(mockedRequestBodyUriSpec.uri(any(String.class)))
+            when(mockedRequestBodyUriSpec.uri(stringArgumentCaptor.capture()))
                 .thenReturn(mockedRequestBodySpec);
-            when(mockedRequestBodySpec.contentType(any()))
+            when(mockedRequestBodySpec.contentType(mediaTypeArgumentCaptor.capture()))
                 .thenReturn(mockedRequestBodySpec);
             when(mockedRequestBodySpec.body(objectArgumentCaptor.capture()))
                 .thenReturn(mockedRequestBodySpec);
 
             when(mockedRequestBodySpec.exchange(any()))
                 .thenReturn(mockedAudioBytes);
-
             when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
                 .thenAnswer(inv -> {
                     ContextFunction<File, Executor> fn = fileFunctionArgumentCaptor.getValue();
+
                     return fn.apply(mockedFile);
                 });
-
-            when(mockedFile.storeContent(any(String.class), any(InputStream.class)))
+            when(mockedFile.storeContent(stringArgumentCaptor.capture(), inputStreamArgumentCaptor.capture()))
                 .thenReturn(mockedFileEntry);
 
             Object rawResult = NanoGptCreateSpeechAction.perform(minimalParameters, minimalParameters, mockedContext);
@@ -212,19 +187,14 @@ class NanoGptCreateSpeechActionTest {
             Map<String, Object> result = (Map<String, Object>) rawResult;
 
             assertEquals(mockedFileEntry, result.get("file"));
-
-            Object body = objectArgumentCaptor.getValue();
-            assertInstanceOf(Map.class, body);
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> requestBody = (Map<String, Object>) body;
-
-            assertEquals("Minimal input", requestBody.get("text"));
-            assertEquals("tts-model", requestBody.get("model"));
-            assertEquals("mp3", requestBody.get("response_format"));
-            assertNotNull(requestBody.containsKey("voice")
-                ? null
-                : "voice absent as expected");
+            assertEquals(
+                List.of("x-api-key", "test-api-key", "https://nano-gpt.com/api/v1/tts", "speech.mp3"),
+                stringArgumentCaptor.getAllValues());
+            assertEquals(
+                Map.of("text", "Minimal input", MODEL, "tts-model", "response_format", "mp3"),
+                objectArgumentCaptor.getValue());
+            assertEquals(MediaType.APPLICATION_JSON, mediaTypeArgumentCaptor.getValue());
+            assertNotNull(fileFunctionArgumentCaptor.getValue());
         }
     }
 }

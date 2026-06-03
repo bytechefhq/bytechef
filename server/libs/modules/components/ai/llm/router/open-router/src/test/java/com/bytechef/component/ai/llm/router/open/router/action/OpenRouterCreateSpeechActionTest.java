@@ -128,18 +128,9 @@ class OpenRouterCreateSpeechActionTest {
 
             assertInstanceOf(ByteArrayInputStream.class, inputStreamArgumentCaptorValue);
             assertArrayEquals(mockedByteArray, inputStreamArgumentCaptorValue.readAllBytes());
-
-            Object value = objectArgumentCaptor.getValue();
-            assertInstanceOf(Map.class, value);
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> body = (Map<String, Object>) value;
-
-            assertEquals("input", body.get("input"));
-            assertEquals("model", body.get("model"));
-            assertEquals("voice", body.get("voice"));
-            assertEquals("pcm", body.get("response_format"));
-            assertEquals(0.0, body.get("speed"));
+            assertEquals(
+                Map.of("input", "input", "model", "model", "voice", "voice", "response_format", "pcm", SPEED, 0.0),
+                objectArgumentCaptor.getValue());
         }
     }
 }

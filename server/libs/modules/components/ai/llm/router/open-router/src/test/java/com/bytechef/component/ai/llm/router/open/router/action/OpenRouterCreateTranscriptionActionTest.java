@@ -105,19 +105,14 @@ class OpenRouterCreateTranscriptionActionTest {
                 mockedParameters, mockedParameters, mockedContext);
 
             assertEquals("transcription", result);
-
             assertEquals(
                 List.of("https://openrouter.ai/api/v1", "Authorization", "Bearer token", "/audio/transcriptions"),
                 stringArgumentCaptor.getAllValues());
-
             assertEquals(MediaType.APPLICATION_JSON, mediaTypeArgumentCaptor.getValue());
-
-            Map<String, Object> body = (Map<String, Object>) objectArgumentCaptor.getValue();
-
-            assertEquals(Map.of("data", "base64data", "format", "wav"), body.get("input_audio"));
-            assertEquals("model", body.get("model"));
-            assertEquals("language", body.get("language"));
-            assertEquals(0.5, body.get("temperature"));
+            assertEquals(
+                Map.of("input_audio", Map.of("data", "base64data", "format", "wav"), "model", "model", "language",
+                    "language", "temperature", 0.5),
+                objectArgumentCaptor.getValue());
         }
     }
 }

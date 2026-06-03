@@ -55,8 +55,7 @@ public class NanoGptCreateTranscriptionAction {
             TRANSCRIPTION_MODEL_PROPERTY,
             fileEntry(FILE)
                 .label("File")
-                .description(
-                    "The audio file to transcribe. Supported formats: MP3, WAV, M4A, OGG, AAC (max 3MB).")
+                .description("The audio file to transcribe. Supported formats: MP3, WAV, M4A, OGG, AAC (max 3MB).")
                 .required(true),
             TRANSCRIPTION_LANGUAGE_PROPERTY)
         .output(outputSchema(string()))
@@ -80,12 +79,12 @@ public class NanoGptCreateTranscriptionAction {
             }
         });
 
-        formData.add("model", inputParameters.getRequiredString(MODEL));
+        formData.add(MODEL, inputParameters.getRequiredString(MODEL));
 
         String language = inputParameters.getString(LANGUAGE);
 
         if (language != null) {
-            formData.add("language", language);
+            formData.add(LANGUAGE, language);
         }
 
         RestClient restClient = ModelUtils.getRestClientBuilder()

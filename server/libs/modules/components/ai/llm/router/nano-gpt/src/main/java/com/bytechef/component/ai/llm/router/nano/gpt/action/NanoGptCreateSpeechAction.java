@@ -122,12 +122,12 @@ public class NanoGptCreateSpeechAction {
         Map<String, Object> requestBody = new HashMap<>();
 
         requestBody.put("text", inputParameters.getRequiredString(INPUT));
-        requestBody.put("model", inputParameters.getRequiredString(MODEL));
+        requestBody.put(MODEL, inputParameters.getRequiredString(MODEL));
 
         String voice = inputParameters.getString(VOICE);
 
         if (voice != null && !voice.isBlank()) {
-            requestBody.put("voice", voice);
+            requestBody.put(VOICE, voice);
         }
 
         String responseFormat = inputParameters.getString(RESPONSE_FORMAT, "mp3");
@@ -137,7 +137,7 @@ public class NanoGptCreateSpeechAction {
         Double speed = inputParameters.getDouble(SPEED);
 
         if (speed != null) {
-            requestBody.put("speed", speed);
+            requestBody.put(SPEED, speed);
         }
 
         RestClient restClient = ModelUtils.getRestClientBuilder()
