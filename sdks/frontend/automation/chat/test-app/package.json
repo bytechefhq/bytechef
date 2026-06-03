@@ -17,22 +17,22 @@
     },
     "dependencies": {
         "@bytechef/automation-chat": "^0.1.0",
-        "next": "16.1.1",
-        "react": "19.2.3",
-        "react-dom": "19.2.3"
+        "next": "16.2.6",
+        "react": "19.2.6",
+        "react-dom": "19.2.6"
     },
     "devDependencies": {
-        "@eslint/js": "^9.21.0",
-        "@tailwindcss/postcss": "4.1.18",
-        "@types/node": "^22.13.8",
-        "@types/react": "19.1.6",
-        "@types/react-dom": "19.1.6",
-        "eslint": "^9.31.0",
-        "eslint-config-next": "16.1.1",
-        "postcss": "^8.5.6",
-        "prettier": "3.5.2",
-        "tailwindcss": "4.1.18",
+        "@eslint/js": "^10.0.1",
+        "@tailwindcss/postcss": "4.3.0",
+        "@types/node": "^25.9.1",
+        "@types/react": "19.2.15",
+        "@types/react-dom": "19.2.3",
+        "eslint": "^10.4.1",
+        "eslint-config-next": "16.2.6",
+        "postcss": "^8.5.15",
+        "prettier": "3.8.3",
+        "tailwindcss": "4.3.0",
         "typescript": "^5.7.3",
-        "typescript-eslint": "^8.25.0"
+        "typescript-eslint": "^8.60.0"
     }
 }
