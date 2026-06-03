@@ -25,10 +25,20 @@ import static com.bytechef.component.definition.ComponentDsl.sampleOutput;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.gaurus.property.GaurusServiceResponseProperties;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 
 /**
  * Provides a list of the component actions.
@@ -36,6 +46,7 @@ import java.util.Map;
  * @generated
  */
 public class GaurusGetExternalUsersAction {
+    private static final String ENDPOINT_URL = "/external-users";
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("getExternalUsers")
         .title("Gets external users for provided client id.")
         .description(null)
@@ -92,4 +103,44 @@ public class GaurusGetExternalUsersAction {
 
     private GaurusGetExternalUsersAction() {
     }
+
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
+        String endpoint = connectionParameters.getRequiredString("baseUri") + ENDPOINT_URL;
+
+        Executor httpExecutor = context.http(http -> http.get(endpoint));
+        String requestId = "SHOUD-GENERATE-0001";
+        String timestamp = String.valueOf(System.currentTimeMillis());
+        String clientId = (String) connectionParameters.get("clientId");
+        String clientSecret = (String) connectionParameters.get("clientSecret");
+
+        Response response = httpExecutor
+            .headers(Map.of("clienId", List.of(clientId), "requestId",
+                List.of(requestId), "timestamp", List.of(timestamp),
+                "signature", List.of(getSignature(clientId, clientSecret, requestId, timestamp, endpoint))))
+            .execute();
+
+        return response.getBody();
+    }
+
+    private static String
+        getSignature(String clientId, String clientSecret, String requestId, String timestamp, String uri) {
+        String forSigning = String.format("%s;%s;%s;%s;", clientId, requestId, timestamp, uri);
+
+        try {
+            Mac mac = Mac.getInstance("HmacSHA256");
+
+            mac.init(new SecretKeySpec(clientSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+
+            return Base64.getEncoder()
+                .encodeToString(mac.doFinal(forSigning.getBytes(StandardCharsets.UTF_8)));
+        } catch (InvalidKeyException | NoSuchAlgorithmException exception) {
+            throw new RuntimeException("Failed to compute HmacSHA256 signature", exception);
+        }
+    }
+
+    public static final String HEADER = "header";
+    public static final String QUERY = "query";
+    public static final String PATH = "path";
+    public static final String BODY = "body";
+    public static final String PROPERTIES = "properties";
 }
