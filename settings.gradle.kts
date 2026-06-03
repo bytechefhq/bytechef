@@ -350,6 +350,7 @@ include("server:libs:modules:components:form")
 include("server:libs:modules:components:ftp")
 include("server:libs:modules:components:freshdesk")
 include("server:libs:modules:components:freshsales")
+include("server:libs:modules:components:gaurus")
 include("server:libs:modules:components:github")
 include("server:libs:modules:components:gitlab")
 include("server:libs:modules:components:google:google-bigquery")
@@ -673,3 +674,5 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")
+
+include("server:libs:modules:components:gaurus")
