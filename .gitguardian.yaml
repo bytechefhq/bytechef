@@ -1,0 +1,8 @@
+version: 2
+secret:
+  ignored-matches:
+    # Throwaway password for the ephemeral FTP/SFTP Testcontainers used by
+    # BaseFtpActionIntTest. It only authenticates against a container that is
+    # created and destroyed within the test run — nothing to rotate or revoke.
+    - name: FTP Testcontainers fixture password (false positive)
+      match: byteChefFtpPass123
