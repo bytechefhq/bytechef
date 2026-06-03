@@ -45,6 +45,7 @@ public class JotformNewSubmissionTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newSubmission")
         .title("New Submission")
         .description("Triggers when someone submits a response to a form.")
+        .help("", "https://docs.bytechef.io/reference/components/jotform_v1#new-submission")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(FORM_ID)

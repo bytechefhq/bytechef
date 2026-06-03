@@ -90,6 +90,8 @@ public class JotformComponentHandler extends AbstractJotformComponentHandler {
                     case "hipaa" -> "https://hipaa-api.jotform.com";
                     default -> throw new IllegalArgumentException("Invalid region: " + region);
                 };
-            });
+            })
+            .help("", "https://docs.bytechef.io/reference/components/jotform_v1#connection-setup")
+            .version(1);
     }
 }
