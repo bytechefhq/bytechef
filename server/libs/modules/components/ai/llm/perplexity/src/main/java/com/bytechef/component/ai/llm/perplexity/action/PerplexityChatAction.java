@@ -116,6 +116,7 @@ public class PerplexityChatAction {
                         .build())
                 .options(
                     OpenAiChatOptions.builder()
+                        .apiKey(connectionParameters.getString(TOKEN))
                         .model(inputParameters.getRequiredString(MODEL))
                         .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                         .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
