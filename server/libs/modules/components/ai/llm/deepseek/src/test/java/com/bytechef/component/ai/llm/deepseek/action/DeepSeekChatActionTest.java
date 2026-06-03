@@ -50,18 +50,17 @@ import org.springframework.ai.deepseek.DeepSeekChatModel;
 import org.springframework.ai.deepseek.DeepSeekChatOptions;
 import org.springframework.ai.deepseek.api.DeepSeekApi;
 import org.springframework.ai.deepseek.api.ResponseFormat;
-import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClient.Builder;
 
 /**
  * @author Nikolina Spehar
  */
 class DeepSeekChatActionTest {
 
-    private final RestClient.Builder mockRestClientBuilder = mock(RestClient.Builder.class);
+    private final Builder mockRestClientBuilder = mock(Builder.class);
     private final Parameters mockedConnectionParameters = MockParametersFactory.create(Map.of(TOKEN, "TOKEN"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
-    private final ArgumentCaptor<RestClient.Builder> restClientBuilderArgumentCaptor =
-        forClass(RestClient.Builder.class);
+    private final ArgumentCaptor<Builder> restClientBuilderArgumentCaptor = forClass(Builder.class);
     private MockedStatic<DeepSeekApi> deepSeekApiMockedStatic;
     private MockedStatic<ModelUtils> modelUtilsMockedStatic;
 
@@ -101,15 +100,9 @@ class DeepSeekChatActionTest {
     @Test
     void testCreateChatModelWithResponseFormat() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                RESPONSE, Map.of(RESPONSE_FORMAT, ChatModel.ResponseFormat.JSON.name()),
-                MODEL, "deepseek-chat",
-                TEMPERATURE, 0.7,
-                MAX_TOKENS, 1000,
-                TOP_P, 0.9,
-                FREQUENCY_PENALTY, 0.5,
-                PRESENCE_PENALTY, 0.3,
-                STOP, List.of("stop")));
+            Map.of(RESPONSE, Map.of(RESPONSE_FORMAT, ChatModel.ResponseFormat.JSON.name()), MODEL, "deepseek-chat",
+                TEMPERATURE, 0.7, MAX_TOKENS, 1000, TOP_P, 0.9, FREQUENCY_PENALTY, 0.5,
+                PRESENCE_PENALTY, 0.3, STOP, List.of("stop")));
 
         org.springframework.ai.chat.model.ChatModel chatModel = DeepSeekChatAction.CHAT_MODEL.createChatModel(
             mockedInputParameters, mockedConnectionParameters, true);
@@ -136,14 +129,8 @@ class DeepSeekChatActionTest {
     @Test
     void testCreateChatModelWithoutResponseFormat() {
         Parameters mockedInputParameters = MockParametersFactory.create(
-            Map.of(
-                MODEL, "deepseek-chat",
-                TEMPERATURE, 0.7,
-                MAX_TOKENS, 1000,
-                TOP_P, 0.9,
-                FREQUENCY_PENALTY, 0.5,
-                PRESENCE_PENALTY, 0.3,
-                STOP, List.of("stop")));
+            Map.of(MODEL, "deepseek-chat", TEMPERATURE, 0.7, MAX_TOKENS, 1000, TOP_P, 0.9, FREQUENCY_PENALTY, 0.5,
+                PRESENCE_PENALTY, 0.3, STOP, List.of("stop")));
 
         org.springframework.ai.chat.model.ChatModel chatModel = DeepSeekChatAction.CHAT_MODEL.createChatModel(
             mockedInputParameters, mockedConnectionParameters, false);
