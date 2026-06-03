@@ -1,15 +1,15 @@
 import Badge from '@/components/Badge/Badge';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import {McpProject} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
 
 import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
 import McpProjectListItemDropdownMenu from './McpProjectListItemDropdownMenu';
+import {McpProjectItemType} from './hooks/useMcpProjectList';
 import useMcpProjectListItem from './hooks/useMcpProjectListItem';
 
 interface McpProjectListItemProps {
-    mcpProject: McpProject;
+    mcpProject: McpProjectItemType;
 }
 
 const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {

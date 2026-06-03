@@ -1,9 +1,10 @@
-import {McpProject} from '@/shared/middleware/graphql';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {useMemo, useState} from 'react';
 
-const useMcpProjectListItem = (mcpProject: McpProject) => {
+import {McpProjectItemType} from './useMcpProjectList';
+
+const useMcpProjectListItem = (mcpProject: McpProjectItemType) => {
     const [showEditWorkflowsDialog, setShowEditWorkflowsDialog] = useState(false);
     const [showChangeProjectVersionDialog, setShowChangeProjectVersionDialog] = useState(false);
 

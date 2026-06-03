@@ -1,15 +1,13 @@
-import {
-    McpProjectWorkflow,
-    useMcpProjectWorkflowPropertiesQuery,
-    useUpdateMcpProjectWorkflowMutation,
-} from '@/shared/middleware/graphql';
+import {useMcpProjectWorkflowPropertiesQuery, useUpdateMcpProjectWorkflowMutation} from '@/shared/middleware/graphql';
 import {PropertyAllType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
+import {McpProjectWorkflowItemType} from './useMcpProjectList';
+
 export default function useMcpProjectWorkflowPropertiesPopover(
-    mcpProjectWorkflow: McpProjectWorkflow,
+    mcpProjectWorkflow: McpProjectWorkflowItemType,
     onClose: () => void
 ) {
     const queryClient = useQueryClient();

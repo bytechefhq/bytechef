@@ -1,14 +1,13 @@
-import {McpProjectWorkflow} from '@/shared/middleware/graphql';
-
 import McpProjectWorkflowListItem from './McpProjectWorkflowListItem';
+import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
 
 interface McpProjectWorkflowListProps {
-    mcpProjectWorkflows?: Array<McpProjectWorkflow | null> | null;
+    mcpProjectWorkflows?: Array<McpProjectWorkflowItemType | null> | null;
 }
 
 const McpProjectWorkflowList = ({mcpProjectWorkflows}: McpProjectWorkflowListProps) => {
     const workflows =
-        mcpProjectWorkflows?.filter((workflow): workflow is McpProjectWorkflow => workflow !== null) || [];
+        mcpProjectWorkflows?.filter((workflow): workflow is NonNullable<typeof workflow> => workflow !== null) || [];
 
     if (workflows.length === 0) {
         return null;

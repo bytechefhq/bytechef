@@ -200,6 +200,7 @@ describe('AutomationWorkflowProjectList', () => {
                         components: [],
                         description: null,
                         label: 'Sync Contacts',
+                        lastModifiedDate: null,
                         triggers: [],
                         workflowUuid: 'wf-uuid-5',
                     },

@@ -2,11 +2,12 @@ import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerConfiguration from '@/shared/components/mcp-server/McpServerConfiguration';
-import {McpProjectWorkflow, McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
+import {McpServer, Tag, useMcpProjectsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import McpServerListItem from 'pages/automation/mcp-servers/components/mcp-server-list/McpServerListItem';
 import {useMemo} from 'react';
 
+import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import McpServerToolsContent from './McpServerToolsContent';
 import useMcpServerList from './hooks/useMcpServerList';
 
@@ -22,9 +23,9 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
 
     const mcpProjects = mcpProjectsData?.mcpProjectsByServerId?.filter((project) => project !== null) || [];
 
-    const mcpProjectWorkflows: McpProjectWorkflow[] = mcpProjects
+    const mcpProjectWorkflows: McpProjectWorkflowItemType[] = mcpProjects
         .flatMap((project) => project?.mcpProjectWorkflows || [])
-        .filter((workflow): workflow is McpProjectWorkflow => workflow !== null);
+        .filter((workflow): workflow is NonNullable<typeof workflow> => workflow !== null);
 
     return <McpServerListItem mcpProjectWorkflows={mcpProjectWorkflows} mcpServer={mcpServer} tags={tags} />;
 };

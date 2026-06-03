@@ -18,7 +18,6 @@ import ProjectDeploymentDialogBasicStepProjectVersionsSelect from '@/pages/autom
 import ProjectDeploymentDialogBasicStepProjectsComboBox from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialogBasicStepProjectsComboBox';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
-    McpProject,
     McpServer,
     useCreateMcpProjectMutation,
     useToolEligibleProjectVersionWorkflowsQuery,
@@ -31,6 +30,8 @@ import {ReactNode, useMemo, useState} from 'react';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
+import {McpProjectItemType} from './mcp-project-workflow-list/hooks/useMcpProjectList';
+
 const formSchema = z.object({
     description: z.string().optional(),
     mcpServerId: z.string().min(1),
@@ -40,7 +41,7 @@ const formSchema = z.object({
 });
 
 interface McpProjectDialogProps {
-    mcpProject?: McpProject;
+    mcpProject?: McpProjectItemType;
     mcpServer?: McpServer;
     onClose?: () => void;
     triggerNode?: ReactNode;

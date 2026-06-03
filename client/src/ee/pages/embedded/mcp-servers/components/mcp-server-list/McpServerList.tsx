@@ -2,14 +2,10 @@ import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
-import {
-    McpIntegrationInstanceConfigurationWorkflow,
-    McpServer,
-    Tag,
-    useMcpIntegrationInstanceConfigurationsByServerIdQuery,
-} from '@/shared/middleware/graphql';
+import {McpServer, Tag, useMcpIntegrationInstanceConfigurationsByServerIdQuery} from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 
+import {McpIntegrationInstanceConfigurationWorkflowItemType} from '../mcp-integration-instance-configuration-list/hooks/useMcpIntegrationInstanceConfigurationList';
 import McpServerListItem from './McpServerListItem';
 import McpServerToolsContent from './McpServerToolsContent';
 import useMcpServerList from './hooks/useMcpServerList';
@@ -29,10 +25,10 @@ const McpServerListItemWithWorkflows = ({mcpServer, tags}: {mcpServer: McpServer
             (integration) => integration !== null
         ) || [];
 
-    const mcpIntegrationInstanceConfigurationWorkflows: McpIntegrationInstanceConfigurationWorkflow[] =
+    const mcpIntegrationInstanceConfigurationWorkflows: McpIntegrationInstanceConfigurationWorkflowItemType[] =
         mcpIntegrationInstanceConfigurations
             .flatMap((integration) => integration?.mcpIntegrationInstanceConfigurationWorkflows || [])
-            .filter((workflow): workflow is McpIntegrationInstanceConfigurationWorkflow => workflow !== null);
+            .filter((workflow): workflow is NonNullable<typeof workflow> => workflow !== null);
 
     return (
         <McpServerListItem

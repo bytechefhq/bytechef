@@ -8,14 +8,15 @@ import McpServerDialog from '@/pages/automation/mcp-servers/components/McpServer
 import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import McpServerListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-server-list/McpServerListItemDropdownMenu';
 import TagList from '@/shared/components/TagList';
-import {McpProjectWorkflow, McpServer, Tag} from '@/shared/middleware/graphql';
+import {McpServer, Tag} from '@/shared/middleware/graphql';
 import {ChevronDown, ServerIcon} from 'lucide-react';
 
+import {McpProjectWorkflowItemType} from '../mcp-project-workflow-list/hooks/useMcpProjectList';
 import useMcpServerListItem from './hooks/useMcpServerListItem';
 
 interface McpServerListItemProps {
     mcpServer: McpServer;
-    mcpProjectWorkflows?: McpProjectWorkflow[];
+    mcpProjectWorkflows?: McpProjectWorkflowItemType[];
     tags?: Tag[];
 }
 

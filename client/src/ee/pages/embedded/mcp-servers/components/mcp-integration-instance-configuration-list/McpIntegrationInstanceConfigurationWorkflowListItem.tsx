@@ -4,15 +4,15 @@ import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import IntegrationInstanceConfigurationEditWorkflowDialog from '@/ee/pages/embedded/integration-instance-configurations/components/IntegrationInstanceConfigurationEditWorkflowDialog';
 import {useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {McpIntegrationInstanceConfigurationWorkflow} from '@/shared/middleware/graphql';
 import {BoltIcon, PencilIcon, XIcon} from 'lucide-react';
 
 import McpIntegrationInstanceConfigurationWorkflowPropertiesPopover from './McpIntegrationInstanceConfigurationWorkflowPropertiesPopover';
+import {McpIntegrationInstanceConfigurationWorkflowItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationWorkflowListItem from './hooks/useMcpIntegrationInstanceConfigurationWorkflowListItem';
 
 interface McpIntegrationInstanceConfigurationWorkflowListItemProps {
     componentName: string;
-    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow;
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflowItemType;
 }
 
 const McpIntegrationInstanceConfigurationWorkflowListItem = ({

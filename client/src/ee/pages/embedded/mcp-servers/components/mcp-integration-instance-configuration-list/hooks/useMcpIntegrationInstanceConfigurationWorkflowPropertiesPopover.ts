@@ -1,5 +1,4 @@
 import {
-    McpIntegrationInstanceConfigurationWorkflow,
     useMcpIntegrationInstanceConfigurationWorkflowPropertiesQuery,
     useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation,
 } from '@/shared/middleware/graphql';
@@ -8,8 +7,10 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useEffect, useMemo} from 'react';
 import {useForm} from 'react-hook-form';
 
+import {McpIntegrationInstanceConfigurationWorkflowItemType} from './useMcpIntegrationInstanceConfigurationList';
+
 export default function useMcpIntegrationInstanceConfigurationWorkflowPropertiesPopover(
-    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflow,
+    mcpIntegrationInstanceConfigurationWorkflow: McpIntegrationInstanceConfigurationWorkflowItemType,
     onClose: () => void
 ) {
     const queryClient = useQueryClient();
