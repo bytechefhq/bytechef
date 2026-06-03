@@ -12,6 +12,7 @@ paths:
       summary: "Get Form Submissions"
       description: "Get all submissions for a specific form."
       operationId: "getFormSubmissions"
+      x-help: "https://docs.bytechef.io/reference/components/jotform_v1#get-form-submissions"
       parameters:
         - name: "formId"
           description: "ID of the form to retrieve submissions for."
