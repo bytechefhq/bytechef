@@ -21,7 +21,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -322,7 +321,7 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
     }
 
     public List<String> getStop() {
-        return Collections.unmodifiableList(stop);
+        return stop == null ? null : new ArrayList<>(stop);
     }
 
     public Integer getSeed() {
@@ -354,7 +353,7 @@ public abstract class RouterChatModel implements org.springframework.ai.chat.mod
     }
 
     public Map<String, Double> getLogitBias() {
-        return Collections.unmodifiableMap(logitBias);
+        return logitBias == null ? null : new HashMap<>(logitBias);
     }
 
     public Double getFrequencyPenalty() {
