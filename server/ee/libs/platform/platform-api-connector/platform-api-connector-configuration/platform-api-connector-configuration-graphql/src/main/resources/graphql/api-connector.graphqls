@@ -120,6 +120,7 @@ input GenerateFromDocumentationInput {
     documentationUrl: String!
     icon: String
     userPrompt: String
+    maxPages: Int
 }
 
 input DiscoverEndpointsInput {

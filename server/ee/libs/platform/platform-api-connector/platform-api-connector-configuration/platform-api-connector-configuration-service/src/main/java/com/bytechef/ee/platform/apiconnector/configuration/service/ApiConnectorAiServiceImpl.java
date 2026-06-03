@@ -11,14 +11,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnecto
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -64,18 +57,16 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
     private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ChatModel chatModel;
-    private final HttpClient httpClient;
+    private final WebScrapeService webScrapeService;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorAiServiceImpl(
-        ApiConnectorGenerationJobService apiConnectorGenerationJobService, ChatModel chatModel) {
+        ApiConnectorGenerationJobService apiConnectorGenerationJobService, ChatModel chatModel,
+        WebScrapeService webScrapeService) {
 
         this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.chatModel = chatModel;
-        this.httpClient = HttpClient.newBuilder()
-            .connectTimeout(Duration.ofSeconds(30))
-            .followRedirects(HttpClient.Redirect.NORMAL)
-            .build();
+        this.webScrapeService = webScrapeService;
     }
 
     @Override
@@ -97,40 +88,31 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     }
 
     private String fetchDocumentation(String documentationUrl) {
-        try {
-            HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(documentationUrl))
-                .timeout(Duration.ofSeconds(30))
-                .header("User-Agent", "ByteChef API Connector Generator")
-                .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
-                .GET()
-                .build();
+        WebScrapeService.ScrapeResult result = webScrapeService.scrape(documentationUrl);
 
-            HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-            if (response.statusCode() != 200) {
-                throw new ConfigurationException(
-                    "Failed to fetch documentation: HTTP " + response.statusCode(),
-                    ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
-            }
-
-            Document document = Jsoup.parse(response.body());
-
-            document.select("script, style, nav, footer, header, aside")
-                .remove();
-
-            return document.body()
-                .text();
-        } catch (IOException | InterruptedException e) {
-            if (e instanceof InterruptedException) {
-                Thread.currentThread()
-                    .interrupt();
-            }
-
+        if (!result.success()) {
             throw new ConfigurationException(
-                "Failed to fetch documentation: " + e.getMessage(),
+                "Failed to fetch documentation: " + result.error(),
                 ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
         }
+
+        return result.content();
+    }
+
+    private String fetchDocumentation(String documentationUrl, int maxPages) {
+        if (maxPages <= 1) {
+            return fetchDocumentation(documentationUrl);
+        }
+
+        WebScrapeService.CrawlResult result = webScrapeService.crawl(documentationUrl, maxPages, List.of());
+
+        if (!result.success()) {
+            throw new ConfigurationException(
+                "Failed to crawl documentation: " + result.error(),
+                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
+
+        return result.content();
     }
 
     private String cleanOpenApiResponse(String response) {
@@ -151,7 +133,9 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
 
     @Override
     @Async
-    public void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userInstructions) {
+    public void generateOpenApiSpecificationAsync(
+        String jobId, String documentationUrl, String userInstructions, int maxPages) {
+
         log.debug("Starting async OpenAPI generation for job {}", jobId);
 
         apiConnectorGenerationJobService.markAsProcessing(jobId);
@@ -163,7 +147,7 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
                 return;
             }
 
-            String documentationContent = fetchDocumentation(documentationUrl);
+            String documentationContent = fetchDocumentation(documentationUrl, maxPages);
 
             if (apiConnectorGenerationJobService.isCancellationRequested(jobId)) {
                 log.debug("Job {} was cancelled after fetching documentation", jobId);

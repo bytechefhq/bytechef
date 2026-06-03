@@ -167,8 +167,10 @@ public class ApiConnectorGraphQlController {
 
         ApiConnectorGenerationJob job = apiConnectorGenerationJobService.create(input.documentationUrl());
 
-        apiConnectorAiService.generateOpenApiSpecificationAsync(job.getId(), input.documentationUrl(),
-            input.userPrompt());
+        int maxPages = input.maxPages() == null ? 1 : Math.max(1, input.maxPages());
+
+        apiConnectorAiService.generateOpenApiSpecificationAsync(
+            job.getId(), input.documentationUrl(), input.userPrompt(), maxPages);
 
         return toGenerationJobStatusRecord(job);
     }
@@ -250,7 +252,8 @@ public class ApiConnectorGraphQlController {
     }
 
     @SuppressFBWarnings("EI")
-    public record GenerateFromDocumentationInput(String name, String documentationUrl, String icon, String userPrompt) {
+    public record GenerateFromDocumentationInput(
+        String name, String documentationUrl, String icon, String userPrompt, Integer maxPages) {
     }
 
     @SuppressFBWarnings("EI")

@@ -30,6 +30,7 @@ public interface ApiConnectorAiService {
      * @param jobId            the job ID to track progress
      * @param documentationUrl the URL to the API documentation
      * @param userPrompt       optional user instructions for endpoint selection
+     * @param maxPages         when greater than 1, crawl up to this many linked pages; otherwise scrape one page
      */
-    void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userPrompt);
+    void generateOpenApiSpecificationAsync(String jobId, String documentationUrl, String userPrompt, int maxPages);
 }
