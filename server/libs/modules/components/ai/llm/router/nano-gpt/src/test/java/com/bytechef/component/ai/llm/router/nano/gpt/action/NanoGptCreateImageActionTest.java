@@ -50,9 +50,8 @@ class NanoGptCreateImageActionTest {
 
     @Test
     void testCreateImageModel() {
-        NanoGptImageModel nanoGptImageModel =
-            (NanoGptImageModel) NanoGptCreateImageAction.IMAGE_MODEL.createImageModel(
-                mockedParameters, mockedConnectionParameters);
+        NanoGptImageModel nanoGptImageModel = (NanoGptImageModel) NanoGptCreateImageAction.IMAGE_MODEL.createImageModel(
+            mockedParameters, mockedConnectionParameters);
 
         assertNotNull(nanoGptImageModel);
 

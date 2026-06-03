@@ -21,6 +21,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.LANGUAGE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,9 +29,13 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.File;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -50,12 +55,16 @@ import org.springframework.web.client.RestClient.ResponseSpec;
  */
 class NanoGptCreateTranscriptionActionTest {
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<File, Context.Http.Executor>> fileFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final ArgumentCaptor<MediaType> mediaTypeArgumentCaptor = forClass(MediaType.class);
     private final RestClient.Builder mockedBuilder = mock(RestClient.Builder.class);
     private final byte[] mockedByteArray = new byte[] {
         1, 1
     };
     private final ActionContext mockedContext = mock(ActionContext.class);
+    private final File mockedFile = mock(File.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(FILE, mockedFileEntry, MODEL, "model", LANGUAGE, "hr", TOKEN, "token"));
@@ -65,10 +74,18 @@ class NanoGptCreateTranscriptionActionTest {
     private final RestClient mockedRestClient = mock(RestClient.class);
     private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.file(any()))
+    void testPerform() throws IOException {
+        when(mockedContext.file(fileFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<File, Context.Http.Executor> fn = fileFunctionArgumentCaptor.getValue();
+
+                return fn.apply(mockedFile);
+            });
+
+        when(mockedFile.readAllBytes(fileEntryArgumentCaptor.capture()))
             .thenReturn(mockedByteArray);
 
         when(mockedFileEntry.getName())
@@ -96,18 +113,16 @@ class NanoGptCreateTranscriptionActionTest {
             when(mockedResponseSpec.body(any(ParameterizedTypeReference.class)))
                 .thenReturn(Map.of("transcription", "transcription"));
 
-            String result = NanoGptCreateTranscriptionAction.perform(
-                mockedParameters, mockedParameters, mockedContext);
+            String result = NanoGptCreateTranscriptionAction.perform(mockedParameters, mockedParameters, mockedContext);
 
             assertEquals("transcription", result);
-
+            assertNotNull(fileFunctionArgumentCaptor.getValue());
+            assertEquals(mockedFileEntry, fileEntryArgumentCaptor.getValue());
             assertEquals(
                 List.of("x-api-key", "token", "https://nano-gpt.com/api/transcribe"),
                 stringArgumentCaptor.getAllValues());
 
             assertEquals(MediaType.MULTIPART_FORM_DATA, mediaTypeArgumentCaptor.getValue());
-
-            Map<String, Object> body = (Map<String, Object>) objectArgumentCaptor.getValue();
 
             ByteArrayResource expectedAudio = new ByteArrayResource(mockedByteArray) {
                 @Override
@@ -116,9 +131,9 @@ class NanoGptCreateTranscriptionActionTest {
                 }
             };
 
-            assertEquals(List.of(expectedAudio), body.get("audio"));
-            assertEquals(List.of("model"), body.get("model"));
-            assertEquals(List.of("hr"), body.get("language"));
+            assertEquals(
+                Map.of("audio", List.of(expectedAudio), "model", List.of("model"), "language", List.of("hr")),
+                objectArgumentCaptor.getValue());
         }
     }
 }
