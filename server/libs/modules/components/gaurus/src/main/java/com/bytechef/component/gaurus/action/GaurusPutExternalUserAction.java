@@ -29,6 +29,8 @@ import java.util.Map;
  * Provides a list of the component actions.
  *
  * @generated
+ *
+ * @author Igor Beslic
  */
 public class GaurusPutExternalUserAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("putExternalUser")

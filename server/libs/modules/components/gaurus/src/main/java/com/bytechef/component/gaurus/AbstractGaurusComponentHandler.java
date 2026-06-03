@@ -32,6 +32,8 @@ import com.bytechef.component.gaurus.connection.GaurusConnection;
  * Provides the base implementation for the REST based component.
  *
  * @generated
+ *
+ * @author Igor Beslic
  */
 public abstract class AbstractGaurusComponentHandler implements OpenApiComponentHandler {
     private final ComponentDefinition componentDefinition = modifyComponent(
