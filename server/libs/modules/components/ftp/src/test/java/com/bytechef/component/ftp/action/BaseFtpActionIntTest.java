@@ -40,8 +40,10 @@ import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.testcontainers.containers.Container.ExecResult;
 import org.testcontainers.containers.FixedHostPortGenericContainer;
 import org.testcontainers.containers.GenericContainer;
+import org.testcontainers.containers.ContainerLaunchException;
 
 /**
  * Integration tests for {@link FtpUploadFileAction} using real FTP and SFTP servers spun up via Testcontainers.
@@ -347,7 +349,7 @@ public class BaseFtpActionIntTest {
     }
 
     protected void resetFtpFiles() throws Exception {
-        var result = ftpContainer.execInContainer("sh", "-c", "rm -rf /ftp/" + ftpUsername + "/*");
+        var result = executeInFtpContainer("sh", "-c", "rm -rf /ftp/" + ftpUsername + "/*");
 
         if (result.getExitCode() != 0) {
             throw new IllegalStateException("Failed to clean FTP test files inside container: " + result.getStderr());
@@ -392,7 +394,7 @@ public class BaseFtpActionIntTest {
         String copyOfFilePath =
             "/ftp/" + ftpUsername + "/" + TEST_FILE_BASE_NAME + "-" + newFileSuffix + TEST_FILE_BASE_EXTENSION;
 
-        var result = ftpContainer.execInContainer(
+        var result = executeInFtpContainer(
             "sh", "-c",
             "cp " + filePath + " " + copyOfFilePath + " && chown " + ftpUsername + ":" + ftpUsername + " "
                 + copyOfFilePath);
@@ -411,7 +413,7 @@ public class BaseFtpActionIntTest {
     protected void uploadTestFileViaFtp() throws Exception {
         String filePath = "/ftp/" + ftpUsername + "/" + TEST_FILE_NAME;
 
-        var result = ftpContainer.execInContainer(
+        var result = executeInFtpContainer(
             "sh", "-c",
             "printf '%s' '" + TEST_CONTENT + "' > " + filePath
                 + " && chown " + ftpUsername + ":" + ftpUsername + " " + filePath);
@@ -452,5 +454,24 @@ public class BaseFtpActionIntTest {
         }
 
         sshClient.disconnect();
+    }
+
+    private ExecResult executeInFtpContainer(String... command) throws Exception {
+        for (int attempt = 1; attempt <= 2; attempt++) {
+            startContainersOnce();
+
+            try {
+                return ftpContainer.execInContainer(command);
+            } catch (ContainerLaunchException exception) {
+                if (attempt == 2 || ftpContainer == null || ftpContainer.isRunning()) {
+                    throw exception;
+                }
+
+                ftpContainer.stop();
+                ftpContainer = null;
+            }
+        }
+
+        throw new IllegalStateException("Failed to execute command in FTP container after retry");
     }
 }
