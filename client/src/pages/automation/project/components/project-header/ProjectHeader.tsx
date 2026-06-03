@@ -24,6 +24,7 @@ import {useShallow} from 'zustand/react/shallow';
 interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
+    embedded?: boolean;
     projectId: number;
     projectWorkflowId: number;
     runDisabled: boolean;
@@ -33,6 +34,7 @@ interface ProjectHeaderProps {
 const ProjectHeader = ({
     bottomResizablePanelRef,
     chatTrigger,
+    embedded,
     projectId,
     projectWorkflowId,
     runDisabled,
@@ -81,9 +83,9 @@ const ProjectHeader = ({
     return (
         <header
             className={twMerge(
-                'flex items-center justify-between bg-surface-main px-3 py-2.5',
-                projectLeftSidebarOpen && 'pr-3 pl-0',
-                copilotLayoutShifted && 'pr-0'
+                'flex items-center justify-between bg-surface-main px-3 py-2.5 transition-[padding] duration-300 ease-in-out',
+                !embedded && projectLeftSidebarOpen && 'pr-3 pl-0',
+                !embedded && copilotLayoutShifted && 'pr-0'
             )}
         >
             <div className="flex items-center">

@@ -79,7 +79,7 @@ const IntegrationHeader = ({
     return (
         <header
             className={twMerge(
-                'flex items-center justify-between bg-surface-main px-3 py-2.5',
+                'flex items-center justify-between bg-surface-main px-3 py-2.5 transition-[padding] duration-300 ease-in-out',
                 leftSidebarOpen && 'pr-3 pl-0',
                 copilotLayoutShifted && 'pr-0'
             )}
