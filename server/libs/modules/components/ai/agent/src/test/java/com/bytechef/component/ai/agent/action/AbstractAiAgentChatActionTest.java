@@ -501,17 +501,37 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
-    void testGetAdvisorsAddsChatMemoryBeforeToolCallAdvisorAndDisablesInternalConversationHistory() throws Exception {
-        Map<String, Object> chatMemoryElement = new HashMap<>();
+    void testGetAdvisorsDisablesConversationHistoryForMessageChatMemoryAdvisor() throws Exception {
+        ClusterElementMap clusterElementMap = buildClusterElementMapWithMemory();
 
-        chatMemoryElement.put("name", "memory_1");
-        chatMemoryElement.put("type", "memoryComponent/v1/memoryElement");
-        chatMemoryElement.put("parameters", Map.of());
+        MessageChatMemoryAdvisor chatMemoryAdvisor = MessageChatMemoryAdvisor
+            .builder(mock(ChatMemory.class))
+            .build();
 
-        ClusterElementMap clusterElementMap = ClusterElementMap.of(
-            Map.of(
-                "clusterElements",
-                Map.of("model", buildModelClusterElement(), "chatMemory", chatMemoryElement)));
+        ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
+
+        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(chatMemoryAdvisor);
+        when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
+            eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
+
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "memory_1", new ComponentConnection("memoryComponent", 1, 2L, Map.of(), null));
+
+        List<Advisor> advisors = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager)
+                .getAdvisors(clusterElementMap, connectionParameters, mock(ActionContext.class));
+
+        int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
+        ToolCallAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+
+        assertThat(chatMemoryIndex).isGreaterThanOrEqualTo(0);
+        assertThat(advisors.indexOf(toolCallAdvisor)).isGreaterThan(chatMemoryIndex);
+        assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isFalse();
+    }
+
+    @Test
+    void testGetAdvisorsKeepsConversationHistoryForNonMessageChatMemoryAdvisor() throws Exception {
+        ClusterElementMap clusterElementMap = buildClusterElementMapWithMemory();
 
         BaseChatMemoryAdvisor chatMemoryAdvisor = mock(BaseChatMemoryAdvisor.class);
 
@@ -521,24 +541,31 @@ class AbstractAiAgentChatActionTest {
         when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
             eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
 
-        ComponentConnection memoryConnection = new ComponentConnection(
-            "memoryComponent", 1, 2L, Map.of(), null);
+        Map<String, ComponentConnection> connectionParameters = Map.of(
+            "memory_1", new ComponentConnection("memoryComponent", 1, 2L, Map.of(), null));
 
-        Map<String, ComponentConnection> connectionParameters = Map.of("memory_1", memoryConnection);
-        ActionContext actionContext = mock(ActionContext.class);
-
-        TestAiAgentChatAction action = new TestAiAgentChatAction(
-            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
-
-        List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, actionContext);
+        List<Advisor> advisors = new TestAiAgentChatAction(
+            aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager)
+                .getAdvisors(clusterElementMap, connectionParameters, mock(ActionContext.class));
 
         int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
         ToolCallAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
-        int toolCallIndex = advisors.indexOf(toolCallAdvisor);
 
         assertThat(chatMemoryIndex).isGreaterThanOrEqualTo(0);
-        assertThat(toolCallIndex).isGreaterThan(chatMemoryIndex);
-        assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isFalse();
+        assertThat(advisors.indexOf(toolCallAdvisor)).isGreaterThan(chatMemoryIndex);
+        assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isTrue();
+    }
+
+    private static ClusterElementMap buildClusterElementMapWithMemory() {
+        Map<String, Object> chatMemoryElement = new HashMap<>();
+
+        chatMemoryElement.put("name", "memory_1");
+        chatMemoryElement.put("type", "memoryComponent/v1/memoryElement");
+        chatMemoryElement.put("parameters", Map.of());
+
+        return ClusterElementMap.of(
+            Map.of("clusterElements",
+                Map.of("model", buildModelClusterElement(), "chatMemory", chatMemoryElement)));
     }
 
     private static Map<String, Object> buildModelClusterElement() {
