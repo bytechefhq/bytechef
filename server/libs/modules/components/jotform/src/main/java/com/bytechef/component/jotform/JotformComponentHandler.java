@@ -25,7 +25,9 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableAuthorization;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.jotform.trigger.JotformNewSubmissionTrigger;
 import com.google.auto.service.AutoService;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,6 +40,11 @@ import java.util.Optional;
 public class JotformComponentHandler extends AbstractJotformComponentHandler {
 
     private static final String REGION = "region";
+
+    @Override
+    public List<ModifiableTriggerDefinition> getTriggers() {
+        return List.of(JotformNewSubmissionTrigger.TRIGGER_DEFINITION);
+    }
 
     @Override
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
