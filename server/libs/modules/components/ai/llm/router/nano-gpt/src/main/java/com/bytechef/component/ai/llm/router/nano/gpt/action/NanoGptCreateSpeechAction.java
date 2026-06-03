@@ -59,6 +59,17 @@ public class NanoGptCreateSpeechAction {
     protected static final int POLL_INTERVAL_MS = 3000;
 
     protected record AudioFetchResult(byte[] bytes, String extension, String audioUrl) {
+
+        protected AudioFetchResult(byte[] bytes, String extension, String audioUrl) {
+            this.bytes = bytes == null ? null : bytes.clone();
+            this.extension = extension;
+            this.audioUrl = audioUrl;
+        }
+
+        @Override
+        public byte[] bytes() {
+            return bytes == null ? null : bytes.clone();
+        }
     }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)
