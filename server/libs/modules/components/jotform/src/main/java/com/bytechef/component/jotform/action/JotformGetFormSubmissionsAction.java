@@ -67,7 +67,8 @@ public class JotformGetFormSubmissionsAction {
                     .required(false))
                 .metadata(
                     Map.of(
-                        "responseType", ResponseType.JSON))));
+                        "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/jotform_v1#get-form-submissions");
 
     private JotformGetFormSubmissionsAction() {
     }
