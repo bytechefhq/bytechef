@@ -44,4 +44,6 @@ bytechef:
 #  help-hub:
 #    enabled: true
   public-url: http://127.0.0.1:8080
+  user-guiding:
+    enabled: true
   webhook-url: ${bytechef.public-url}/webhooks/{id}
