@@ -28,7 +28,7 @@ import com.bytechef.component.definition.ComponentDsl;
 public class GaurusConnection {
     public static final ComponentDsl.ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://bankconnect.gaurus.hr/api/client")
-        .authorizations(null);
+        .authorizations((ComponentDsl.ModifiableAuthorization[]) null);
 
     private GaurusConnection() {
     }
