@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -394,6 +395,15 @@ public class ComponentInitOpenApiGenerator {
         if (schema.getExample() != null) {
             if (Objects.equals(type, "string")) {
                 builder.add(".exampleValue($S)", schema.getExample());
+            } else if (Objects.equals(type, "array")) {
+                ArrayNode exampleArrayNode = (ArrayNode) schema.getExample();
+                Object[] exampleArray = new Object[exampleArrayNode.size()];
+
+                for (int i = 0; i < exampleArray.length; i++) {
+                    exampleArray[i] = exampleArrayNode.get(i);
+                }
+
+                builder.add(".exampleValue($L)", exampleArray);
             } else {
                 builder.add(".exampleValue($L)", schema.getExample());
             }
@@ -1606,30 +1616,28 @@ public class ComponentInitOpenApiGenerator {
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
         List<CodeBlock> codeBlocks = new ArrayList<>();
-        List<Parameter> parameters = operation.getParameters();
+        List<Parameter> parameters = resolveParameters(operation.getParameters(), openAPI);
 
-        if (parameters != null) {
-            for (Parameter parameter : parameters) {
-                CodeBlock.Builder builder = CodeBlock.builder();
+        for (Parameter parameter : parameters) {
+            CodeBlock.Builder builder = CodeBlock.builder();
 
-                builder.add(
-                    getSchemaCodeBlock(
-                        parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
-                        parameter.getSchema(), false, false, openAPI, false));
-                builder.add(
-                    CodeBlock.of(
-                        """
-                            .metadata(
-                               $T.of(
-                                 "type", PropertyType.$L
-                               )
-                            )
-                            """,
-                        Map.class,
-                        StringUtils.upperCase(parameter.getIn())));
+            builder.add(
+                getSchemaCodeBlock(
+                    parameter.getName(), parameter.getDescription(), parameter.getRequired(), null,
+                    parameter.getSchema(), false, false, openAPI, false));
+            builder.add(
+                CodeBlock.of(
+                    """
+                        .metadata(
+                           $T.of(
+                             "type", PropertyType.$L
+                           )
+                        )
+                        """,
+                    Map.class,
+                    StringUtils.upperCase(parameter.getIn())));
 
-                codeBlocks.add(builder.build());
-            }
+            codeBlocks.add(builder.build());
         }
 
         return codeBlocks.stream()
@@ -1734,6 +1742,36 @@ public class ComponentInitOpenApiGenerator {
         return getSchemaCodeBlock(
             propertyName, schema.getDescription(), required, curSchemaName, schema, excludePropertyNameIfEmpty,
             outputSchema, openAPI, bodySchema);
+    }
+
+    private List<Parameter> resolveParameters(List<Parameter> parameters, OpenAPI openAPI) {
+        List<Parameter> resolvedParameters = new ArrayList<>();
+
+        parameters.forEach(explicitParameter -> {
+            if (explicitParameter.get$ref() == null) {
+                resolvedParameters.add(explicitParameter);
+
+                return;
+            }
+
+            String parameterReference = explicitParameter.get$ref();
+
+            if (parameterReference.startsWith("#/components/parameters/")) {
+                parameterReference = parameterReference.substring("#/components/paramaters/".length());
+            }
+
+            Components components = openAPI.getComponents();
+
+            Map<String, Parameter> parameterDefinitions = components.getParameters();
+
+            if (!parameterDefinitions.containsKey(parameterReference)) {
+                throw new IllegalArgumentException("Missing parameter definition for " + explicitParameter.get$ref());
+            }
+
+            resolvedParameters.add(parameterDefinitions.get(parameterReference));
+        });
+
+        return resolvedParameters;
     }
 
     @SuppressWarnings({
