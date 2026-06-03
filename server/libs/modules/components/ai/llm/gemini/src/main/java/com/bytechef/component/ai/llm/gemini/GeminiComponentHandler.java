@@ -35,6 +35,7 @@ public class GeminiComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("gemini")
         .title("Gemini")
+        .version(1)
         .description(
             "Google Gemini is a multimodal generative AI model. This component supports both Vertex AI and the " +
                 "Gemini Developer API.")

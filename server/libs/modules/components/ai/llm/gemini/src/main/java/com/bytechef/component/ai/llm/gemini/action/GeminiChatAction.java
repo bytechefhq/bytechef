@@ -77,36 +77,39 @@ public class GeminiChatAction {
             TOP_K_PROPERTY,
             STOP_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/gemini_v1#ask-gemini")
         .perform(GeminiChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
-        GoogleGenAiChatOptions.Builder builder = GoogleGenAiChatOptions.builder()
-            .model(inputParameters.getRequiredString(MODEL))
-            .temperature(inputParameters.getDouble(TEMPERATURE))
-            .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
-            .topP(inputParameters.getDouble(TOP_P))
-            .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .topK(inputParameters.getInteger(TOP_K))
-            .candidateCount(inputParameters.getInteger(N));
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters, responseFormatRequired) -> {
 
-        if (responseFormatRequired) {
-            ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
-                RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
+            GoogleGenAiChatOptions.Builder builder = GoogleGenAiChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .maxOutputTokens(inputParameters.getInteger(MAX_TOKENS))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .topK(inputParameters.getInteger(TOP_K))
+                .candidateCount(inputParameters.getInteger(N));
 
-            builder.responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json");
-        }
+            if (responseFormatRequired) {
+                ResponseFormat responseFormat = inputParameters.getRequiredFromPath(
+                    RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class);
 
-        Client genAiClient = Client.builder()
-            .project(connectionParameters.getString(PROJECT_ID))
-            .location(connectionParameters.getString(LOCATION))
-            .vertexAI(true)
-            .build();
+                builder.responseMimeType(responseFormat == ResponseFormat.TEXT ? "text/plain" : "application/json");
+            }
 
-        return GoogleGenAiChatModel.builder()
-            .genAiClient(genAiClient)
-            .options(builder.build())
-            .build();
-    };
+            Client genAiClient = Client.builder()
+                .project(connectionParameters.getString(PROJECT_ID))
+                .location(connectionParameters.getString(LOCATION))
+                .vertexAI(true)
+                .build();
+
+            return GoogleGenAiChatModel.builder()
+                .genAiClient(genAiClient)
+                .options(builder.build())
+                .build();
+        };
 
     private GeminiChatAction() {
     }
