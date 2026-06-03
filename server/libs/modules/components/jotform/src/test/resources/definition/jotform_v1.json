@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get all submissions for a specific form.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jotform_v1#get-form-submissions"
+    },
     "metadata": {
       "method": "GET",
       "path": "/form/{formId}/submissions"
@@ -450,6 +453,10 @@
           "description": null,
           "label": "EU (eu.jotform.com)",
           "value": "eu"
+        }, {
+          "description": null,
+          "label": "HIPAA (hipaa-api.jotform.com)",
+          "value": "hipaa"
         } ],
         "optionsDataSource": null,
         "optionsLoadedDynamically": null,
@@ -512,7 +519,10 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jotform_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
@@ -527,7 +537,64 @@
   "resources": null,
   "tags": null,
   "title": "JotForm",
-  "triggers": [ ],
+  "triggers": [ {
+    "batch": null,
+    "deduplicate": null,
+    "deprecated": null,
+    "description": "Triggers when someone submits a response to a form.",
+    "dynamicWebhookRefresh": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/jotform_v1#new-submission"
+    },
+    "listenerDisable": null,
+    "listenerEnable": null,
+    "name": "newSubmission",
+    "outputDefinition": {
+      "output": null,
+      "outputResponse": null,
+      "outputSchema": null,
+      "sampleOutput": null
+    },
+    "poll": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "The ID of the form to watch for new submissions.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Form ID",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "formId",
+      "options": null,
+      "optionsDataSource": {
+        "options": { },
+        "optionsLookupDependsOn": null
+      },
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "New Submission",
+    "type": "DYNAMIC_WEBHOOK",
+    "webhookDisable": { },
+    "webhookEnable": { },
+    "webhookRawBody": null,
+    "webhookRequest": { },
+    "webhookValidate": null,
+    "webhookValidateOnEnable": null,
+    "workflowNodeDescription": null,
+    "workflowSyncExecution": null
+  } ],
   "unifiedApi": null,
   "version": 1
 }
