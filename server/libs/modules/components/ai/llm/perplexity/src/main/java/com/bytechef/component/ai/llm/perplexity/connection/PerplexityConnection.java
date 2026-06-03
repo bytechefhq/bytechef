@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class PerplexityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
         .baseUri((connectionParameters, context) -> "https://api.perplexity.ai")
         .authorizations(
             authorization(BEARER_TOKEN)
