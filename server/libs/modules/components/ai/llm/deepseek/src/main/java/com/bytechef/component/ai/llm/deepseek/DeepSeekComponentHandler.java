@@ -35,8 +35,10 @@ public class DeepSeekComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("deepseek")
         .title("DeepSeek")
+        .version(1)
         .description(
-            "DeepSeek AI provides the open-source DeepSeek V3 model, renowned for its cutting-edge reasoning and problem-solving capabilities.")
+            "DeepSeek AI provides the open-source DeepSeek V3 model, renowned for its cutting-edge reasoning and " +
+                "problem-solving capabilities.")
         .icon("path:assets/deepseek.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
         .connection(DeepSeekConnection.CONNECTION_DEFINITION)
