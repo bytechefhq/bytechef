@@ -139,6 +139,13 @@ public class CopilotApiController {
         return this.agUiService.runAgent(localAgent, agUiParameters);
     }
 
+    /**
+     * Injects the authenticated user id into the run state, resolved server-side from the request security context, so
+     * the agent's tool context can carry it to the shared connection/property picker tools (which rehydrate the user's
+     * security context from it). Never trusts a client-supplied user id. A no-op when the user cannot be resolved or
+     * the user service is not wired in the running app variant — the pickers then simply report missing context rather
+     * than acting as the wrong principal.
+     */
     private void injectAuthenticatedUserId(Map<String, Object> stateMap) {
         if (userService == null) {
             return;
@@ -150,6 +157,12 @@ public class CopilotApiController {
             .ifPresent(userId -> stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, userId));
     }
 
+    /**
+     * Authorizes the client-supplied {@code workflowId} carried in the request state before any agent reads or mutates
+     * that workflow's data, preventing cross-tenant access (IDOR). BUILD turns mutate the workflow and require the
+     * WORKFLOW_EDIT scope; other turns only read and require WORKFLOW_VIEW. Fails closed when the authorization
+     * services are not wired in the running app variant.
+     */
     private void authorizeWorkflowAccess(Map<String, Object> stateMap, Object mode) {
         if (!(stateMap.get("workflowId") instanceof String workflowId) || workflowId.isBlank()) {
             return;

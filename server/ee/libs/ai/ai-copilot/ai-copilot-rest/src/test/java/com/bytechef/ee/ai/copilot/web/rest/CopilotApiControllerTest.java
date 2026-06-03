@@ -10,17 +10,20 @@ package com.bytechef.ee.ai.copilot.web.rest;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
+import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,7 +43,8 @@ class CopilotApiControllerTest {
     private final ProjectWorkflowService projectWorkflowService = mock(ProjectWorkflowService.class);
 
     private final CopilotApiController controller = new CopilotApiController(
-        agUiService, List.of(), Optional.of(permissionService), Optional.of(projectWorkflowService));
+        agUiService, List.of(), Optional.of(permissionService), Optional.of(projectWorkflowService),
+        Optional.empty());
 
     @Test
     void testChatDeniedWhenUserLacksWorkflowScope() {
@@ -99,7 +103,7 @@ class CopilotApiControllerTest {
     @Test
     void testChatFailsClosedWhenAuthorizationServicesAbsent() {
         CopilotApiController controllerWithoutServices = new CopilotApiController(
-            agUiService, List.of(), Optional.empty(), Optional.empty());
+            agUiService, List.of(), Optional.empty(), Optional.empty(), Optional.empty());
 
         AgUiParameters parameters = parameters(Map.<String, Object>of("workflowId", "wf1", "mode", "ASK"));
 
@@ -109,10 +113,51 @@ class CopilotApiControllerTest {
         verify(agUiService, never()).runAgent(any(), any());
     }
 
+    @Test
+    void testChatRoutesWorkflowCodeEditorAsk() {
+        LocalAgent agent = localAgent("workflow_code_editor_ask");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_code_editor", agUiParameters("ASK"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    @Test
+    void testChatRoutesWorkflowCodeEditorBuild() {
+        LocalAgent agent = localAgent("workflow_code_editor_build");
+        CopilotApiController controller = controllerWith(agent);
+
+        when(agUiService.runAgent(eq(agent), any())).thenReturn(new SseEmitter());
+
+        controller.chat("workflow_code_editor", agUiParameters("BUILD"));
+
+        verify(agUiService).runAgent(eq(agent), any());
+    }
+
+    private AgUiParameters agUiParameters(String mode) {
+        return parameters(Map.<String, Object>of("mode", mode));
+    }
+
+    private LocalAgent localAgent(String agentId) {
+        LocalAgent localAgent = mock(LocalAgent.class);
+
+        when(localAgent.getAgentId()).thenReturn(agentId);
+
+        return localAgent;
+    }
+
+    private CopilotApiController controllerWith(LocalAgent localAgent) {
+        return new CopilotApiController(
+            agUiService, List.of(localAgent), Optional.empty(), Optional.empty(), Optional.empty());
+    }
+
     private AgUiParameters parameters(Map<String, Object> stateMap) {
         State state = mock(State.class);
 
-        when(state.getState()).thenReturn(stateMap);
+        when(state.getState()).thenReturn(new HashMap<>(stateMap));
 
         AgUiParameters parameters = mock(AgUiParameters.class);
 
