@@ -292,11 +292,19 @@ public class BaseFtpActionIntTest {
     }
 
     private void startContainersOnce() throws InterruptedException {
-        if (ftpContainer == null) {
+        if (ftpContainer == null || !ftpContainer.isRunning()) {
+            if (ftpContainer != null) {
+                ftpContainer.stop();
+            }
+
             ftpContainer = startFtpContainer();
         }
 
-        if (sftpContainer == null) {
+        if (sftpContainer == null || !sftpContainer.isRunning()) {
+            if (sftpContainer != null) {
+                sftpContainer.stop();
+            }
+
             GenericContainer<?> container = new GenericContainer<>("atmoz/sftp:latest")
                 .withCommand(ftpUsername + ":" + ftpPassword + ":::" + SFTP_UPLOAD_DIR)
                 .withExposedPorts(22);
