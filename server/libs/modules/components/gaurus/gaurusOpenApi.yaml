@@ -1,0 +1,540 @@
+openapi: "3.0.0"
+info:
+  title: "Bank Connect"
+  version: "1.0.0"
+  description: "Bank Connect API specification"
+  contact:
+    email: "psd2@gaurus.hr"
+servers:
+  - url: https://bankconnect.gaurus.hr/api/client
+paths:
+  /accounts:
+    get:
+      tags:
+        - "Accounts"
+      operationId: getAccounts
+      summary: "Gets accounts for provided client id."
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+      responses:
+        "200":
+          description: "Success."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyResponse"
+              example:
+                code: "OK"
+                message: ""
+                hasMoreResults: false
+                data: "AccountResult[]"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /accounts/{iban}/transactions:
+    get:
+      tags:
+        - "Accounts"
+      operationId: getAccountTransactions
+      summary: "Gets transactions for provided IBAN and query parameters."
+      description: "General rules for query parameters:
+        <ul>
+          <li>If lastTransactionid is provided without date parameters system <strong>will not set default values for date range</strong> (only lastTransactionId will be used for data filtering).</li>
+          <li>Max range between dateFrom and dateTo is 7 days. If provided date range is greater, dateFrom is set to the dateTo minus 7 days.</li>
+          <li>If dateFrom and dateTo are not provided:
+            <ul>
+              <li>dateFrom is set to the current date minus 7 days</li>
+              <li>dateTo is set to the current date</li>
+            </ul>
+          </li>
+          <li>If dateFrom is provided and dateTo is not provided:
+            <ol>
+              <li>If dateFrom is set to future date, it is set to the current date.</li>
+              <li>dateTo is set to dateFrom plus 1 day</li>
+            </ol>
+          </li>
+          <li>If dateFrom is not provided and dateTo is provided:
+            <ol>
+              <li>If dateTo is set to future date, it is set to the current date.</li>
+              <li>dateFrom is set to dateTo minus 1 day</li>
+            </ol>
+          </li>
+        </ul>"
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+        - in: path
+          name: iban
+          description: "Account IBAN."
+          required: true
+          schema:
+            type: string
+            example: "HR1210010051863000160"
+        - in: query
+          name: dateFrom
+          description: "Oldest transaction execution date."
+          required: false
+          schema:
+            type: string
+            example: "2021-01-01"
+        - in: query
+          name: dateTo
+          description: "Newest transaction execution date."
+          required: false
+          schema:
+            type: string
+            example: "2021-01-01"
+        - in: query
+          name: lastTransactionId
+          description: "If this parameter is specified, system will return transactions stored after the corresponding transaction."
+          required: false
+          schema:
+            type: integer
+            example: 123
+      responses:
+        "200":
+          description: "Success."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyResponse"
+              example:
+                code: "OK"
+                message: ""
+                hasMoreResults: true
+                data: "TransactionResult[]"
+        "400":
+          description: "Validation failed."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MyResponse"
+              example:
+                code: "VALIDATION_FAILED"
+                message: "Iban valid: false"
+                hasMoreResults: false
+                data: "[]"
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /external-users:
+    get:
+      tags:
+        - "External Users"
+      operationId: getExternalUsers
+      summary: "Gets external users for provided client id."
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+      responses:
+        "200":
+          description: "Success."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceResponse"
+              example:
+                data:
+                  - id: 42
+                    name: "Pero Perić d.o.o."
+                    oib: "12345678901"
+                    mail: "pero@example.com"
+                    bankEntries:
+                      - bankSlug: "erste"
+                        ibans: ["HR1210010051863000160"]
+                        consentJobStatus: "PENDING"
+                errors: []
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    post:
+      tags:
+        - "External Users"
+      operationId: postExternalUsers
+      summary: "Creates external users with bank consent jobs."
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "array"
+              items:
+                $ref: "#/components/schemas/ExternalUserRequest"
+            example:
+              - name: "Pero Perić d.o.o."
+                oib: "12345678901"
+                mail: "pero@example.com"
+                bankEntries:
+                  - bankSlug: "erste"
+                    ibans: ["HR1210010051863000160"]
+                    psuIdType: "HRIdentificationNumber"
+      responses:
+        "200":
+          description: "Success."
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ServiceResponse"
+              example:
+                data:
+                  - existingMails: ["existing@example.com"]
+                    newMails: ["new@example.com"]
+                errors: []
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+  /external-users/{externalUserId}:
+    put:
+      tags:
+        - "External Users"
+      operationId: putExternalUser
+      summary: "Updates an external user."
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+        - in: path
+          name: externalUserId
+          description: "External user identifier."
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+      responses:
+        "200":
+          description: "Success."
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags:
+        - "External Users"
+      operationId: deleteExternalUser
+      summary: "Deletes an external user."
+      parameters:
+        - $ref: "#/components/parameters/ClientId"
+        - $ref: "#/components/parameters/RequestId"
+        - $ref: "#/components/parameters/Timestamp"
+        - $ref: "#/components/parameters/Signature"
+        - in: path
+          name: externalUserId
+          description: "External user identifier."
+          required: true
+          schema:
+            type: integer
+            format: int64
+            example: 42
+      responses:
+        "204":
+          description: "External user deleted successfully."
+        "500":
+          $ref: "#/components/responses/InternalServerError"
+components:
+  parameters:
+    ClientId:
+      in: header
+      name: clientId
+      description: "Client identifier provided by the system."
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "4181a492-97bf-48ee-b29e-d7d6860c5565"
+    RequestId:
+      in: header
+      name: requestId
+      description: "Unique identifier of a request (must be generated by client)."
+      required: true
+      schema:
+        type: string
+        format: uuid
+        example: "17fcaa13-eb6d-467c-a757-2e669179a19e"
+    Timestamp:
+      in: header
+      name: timestamp
+      description: "Current timestamp in UTC format (must be generated by client)."
+      required: true
+      schema:
+        type: string
+        format: date-time
+        example: "2021-01-01T11:38:20.791Z"
+    Signature:
+      in: header
+      name: signature
+      description: "
+        <p>Request signature calculated by client. Algorithm for signing is as follows:</p>
+        <ol>
+          <li>
+            Prepare payload for signing: {clientId};{requestId};{timestamp};{uri};{body}
+            <ul>
+              <li>
+                Uri example: For full URL <b>https://example.com/MyProject/api/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>, {uri} value used for calculation is <b>/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>. Note that leading slash and all query parameters must be included!
+              </li>
+              <li>
+                If request body is not present, use empty string for {body} value.
+              </li>
+            </ul>
+          </li>
+          <li>Using client secret sign the payload with HmacSHA256 algorithm.</li>
+          <li>Encode resulting signature in base64.</li>
+        </ol>"
+      required: true
+      schema:
+        type: string
+        example: "ybHjifCXXHlDNNfY8sOIK9BRoTHlxXYjusUaoN5SCp4="
+  schemas:
+    ServiceResponse:
+      type: "object"
+      description: "Standard response wrapper for all API endpoints."
+      properties:
+        data:
+          type: "array"
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/ExternalUserResult"
+              - $ref: "#/components/schemas/CreateExternalUsersResponse"
+          description: "List of results (empty if the response is not valid)."
+        errors:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/ErrorData"
+          description: "List of errors (empty if the response is valid)."
+    ErrorData:
+      type: "object"
+      properties:
+        code:
+          type: "string"
+          description: "Error code."
+          example: "GENERAL_ERROR"
+        description:
+          type: "string"
+          description: "Error description."
+          example: "General error"
+    AccountResult:
+      type: "object"
+      properties:
+        companyName:
+          type: "string"
+          description: "Account owner. This field is NOT present for the REGULAR users."
+          example: "Gaurus d.o.o."
+        iban:
+          type: "string"
+          description: "Account IBAN."
+          example: "HR1210010051863000160"
+        accountName:
+          type: "string"
+          description: "Account name."
+          example: "Tekući račun"
+        bankName:
+          type: "string"
+          description: "Bank name."
+          example: "Erste bank"
+    ExternalUserResult:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          format: "int64"
+          description: "External user identifier."
+          example: 42
+        name:
+          type: "string"
+          description: "External user company name."
+          example: "Pero Perić d.o.o."
+        oib:
+          type: "string"
+          description: "External user OIB (Croatian personal identification number)."
+          example: "12345678901"
+        mail:
+          type: "string"
+          description: "External user email address."
+          example: "pero@example.com"
+        bankEntries:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BankEntry"
+          description: "List of bank entries with consent status."
+    ExternalUserRequest:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          description: "External user company name."
+          example: "Pero Perić d.o.o."
+        oib:
+          type: "string"
+          description: "External user OIB (Croatian personal identification number)."
+          example: "12345678901"
+        mail:
+          type: "string"
+          description: "External user email address."
+          example: "pero@example.com"
+        bankEntries:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/BankEntryRequest"
+          description: "List of bank entries to create consent jobs for."
+    BankEntry:
+      type: "object"
+      properties:
+        bankSlug:
+          type: "string"
+          description: "Bank identifier slug."
+          example: "erste"
+        ibans:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of IBANs."
+          example: ["HR1210010051863000160"]
+        consentJobStatus:
+          type: "string"
+          format: "enum"
+          enum: ["SUCCESS", "FAILED", "PENDING"]
+          description: "Status of the consent job for this bank entry."
+          example: "PENDING"
+    BankEntryRequest:
+      type: "object"
+      properties:
+        bankSlug:
+          type: "string"
+          description: "Bank identifier slug."
+          example: "erste"
+        ibans:
+          type: "array"
+          items:
+            type: "string"
+          description: "List of IBANs."
+          example: ["HR1210010051863000160"]
+        psuIdType:
+          type: "string"
+          description: "PSU ID type for the bank consent."
+          example: "HRIdentificationNumber"
+    CreateExternalUsersResponse:
+      type: "object"
+      properties:
+        existingMails:
+          type: "array"
+          items:
+            type: "string"
+          description: "Email addresses that already exist in the system."
+          example: ["existing@example.com"]
+        newMails:
+          type: "array"
+          items:
+            type: "string"
+          description: "Email addresses of newly created external users."
+          example: ["new@example.com"]
+    MyResponse:
+      type: "object"
+      properties:
+        code:
+          $ref: "#/components/schemas/MyResponseCode"
+        message:
+          type: "string"
+          description: "The error message, present only if the \"code\" property is not \"OK\"."
+          example: "General error"
+        hasMoreResults:
+          type: "boolean"
+          description: "System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifier plus 1."
+          example: true
+        data:
+          type: "array"
+          items:
+            oneOf:
+              - $ref: "#/components/schemas/AccountResult"
+              - $ref: "#/components/schemas/TransactionResult"
+          description: "List of objects related to the request."
+    MyResponseCode:
+      type: "string"
+      format: "enum"
+      enum: ["OK", "VALIDATION_FAILED", "DATA_UNAVAILABLE", "CONSENT_EXPIRED", "GENERAL_ERROR"]
+      description: "Represents resulting code in case when the system has handled a request."
+    TransactionResult:
+      type: "object"
+      properties:
+        id:
+          type: "integer"
+          description: "Transaction identifier from our system."
+          example: "123"
+        bankResourceId:
+          type: "integer"
+          description: "Transaction identifier from the bank."
+          example: "TID1234567890"
+        senderName:
+          type: "string"
+          description: "Sender name."
+          example: "Pero Perić"
+        senderIban:
+          type: "string"
+          description: "Sender IBAN."
+          example: "HR1210010051863000160"
+        receiverName:
+          type: "string"
+          description: "Receiver name."
+          example: "Miro Mirić"
+        receiverIban:
+          type: "string"
+          description: "Receiver IBAN."
+          example: "HR1210010051863000160"
+        amount:
+          type: "string"
+          description: "Transaction amount."
+          example: "123.45"
+        currency:
+          type: "string"
+          description: "Transaction currency."
+          example: "HRK"
+        paymentOrderExecutionDate:
+          type: "string"
+          description: "Date of the payment."
+          example: "2021-01-02"
+        description:
+          type: "string"
+          description: "Transaction description."
+          example: "Kupovina na POS-u Konzum Ravnice"
+        remittanceInformationStructured:
+          type: "string"
+          description: "Remitance information about the transaction separated by semicolon."
+          example: "HR99;HRXXXXXX-YYYY-ZZZZ;"
+        additionalInformation:
+          type: "string"
+          description: "Some additional information about the transaction separated by semicolon that isn't included in the original description, e.g. creditor or debtor address etc."
+          example: "creditorAddress:JURIŠIĆEVA 4, ZAGREB;debtorAddress:HRAŠĆANSKA 13, ZAGREB"
+        endToEndId:
+          type: "string"
+          description: "SEPA End-To-End-ID."
+          example: "HR99"
+        purposeCode:
+          type: "string"
+          description: "Transaction purpose code."
+          example: "WTER"
+        ultimateCreditor:
+          type: "string"
+          description: "Ultimate creditor name."
+          example: "Pero Perić"
+        ultimateDebtor:
+          type: "string"
+          description: "Ultimate debtor name."
+          example: "Miro Mirić"
+  responses:
+    InternalServerError:
+      description: "Internal server error."
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MyResponse"
+          example:
+            code: "GENERAL_ERROR"
+            message: "General error"
+            hasMoreResults: false
+            data: []
