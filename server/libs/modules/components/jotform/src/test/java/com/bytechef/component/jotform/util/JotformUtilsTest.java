@@ -17,45 +17,81 @@
 package com.bytechef.component.jotform.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
-import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class JotformUtilsTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testGetRootFolderOptions() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(Map.of("content", List.of(Map.of("title", "form", "id", "123"))));
+    void testGetFormIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        List<Option<String>> expectedOptions = List.of(option("form", "123"));
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody(any(TypeReference.class)))
+            .thenReturn(Map.of("content", List.of(Map.of("title", "form", "id", "123"))))
+            .thenReturn(Map.of("content", List.of()));
 
         assertEquals(
-            expectedOptions,
+            List.of(option("form", "123")),
             JotformUtils.getFormIdOptions(mockedParameters, mockedParameters, Map.of(), "", mockedContext));
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("/user/forms", "/user/forms"), stringArgumentCaptor.getAllValues());
+
+        for (ConfigurationBuilder configurationBuilder : configurationBuilderArgumentCaptor.getAllValues()) {
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+        }
+
+        Object[] queryParameters1 = {
+            "offset", 0,
+            "limit", 1000,
+        };
+
+        Object[] queryParameters2 = {
+            "offset", 1,
+            "limit", 1000,
+        };
+
+        List<Object[]> objectsArgumentCaptorAllValues = objectsArgumentCaptor.getAllValues();
+
+        assertEquals(2, objectsArgumentCaptorAllValues.size());
+        assertArrayEquals(queryParameters1, objectsArgumentCaptorAllValues.get(0));
+        assertArrayEquals(queryParameters2, objectsArgumentCaptorAllValues.get(1));
     }
 }
