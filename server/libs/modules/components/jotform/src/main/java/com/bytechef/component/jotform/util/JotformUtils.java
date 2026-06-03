@@ -39,20 +39,26 @@ public class JotformUtils extends AbstractJotformUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, Object> body = context.http(http -> http.get("/user/forms"))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
         List<Option<String>> options = new ArrayList<>();
+        int offset = 0;
+        List<?> list;
 
-        if (body.get("content") instanceof List<?> list) {
+        do {
+            Map<String, Object> body = context.http(http -> http.get("/user/forms"))
+                .queryParameters("offset", offset, "limit", 1000)
+                .configuration(Http.responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            list = body.get("content") instanceof List<?> content ? content : List.of();
+
             for (Object o : list) {
                 if (o instanceof Map<?, ?> map) {
                     options.add(option((String) map.get("title"), (String) map.get("id")));
+                    offset++;
                 }
             }
-        }
+        } while (!list.isEmpty());
 
         return options;
     }
