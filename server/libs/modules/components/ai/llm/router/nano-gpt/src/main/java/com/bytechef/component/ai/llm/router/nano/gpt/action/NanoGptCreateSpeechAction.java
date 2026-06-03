@@ -54,11 +54,11 @@ import org.springframework.web.client.RestClient;
  */
 public class NanoGptCreateSpeechAction {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private static final int MAX_POLL_ATTEMPTS = 40;
-    private static final int POLL_INTERVAL_MS = 3000;
+    protected static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    protected static final int MAX_POLL_ATTEMPTS = 40;
+    protected static final int POLL_INTERVAL_MS = 3000;
 
-    private record AudioFetchResult(byte[] bytes, String extension, String audioUrl) {
+    protected record AudioFetchResult(byte[] bytes, String extension, String audioUrl) {
     }
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action(CREATE_SPEECH)

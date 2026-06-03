@@ -96,6 +96,42 @@ public class NanoGptChatModel extends RouterChatModel {
         }
     }
 
+    public Double getMinP() {
+        return minP;
+    }
+
+    public Integer getMinTokens() {
+        return minTokens;
+    }
+
+    public Integer getMirostatMode() {
+        return mirostatMode;
+    }
+
+    public Double getMirostatTau() {
+        return mirostatTau;
+    }
+
+    public Double getMirostatEta() {
+        return mirostatEta;
+    }
+
+    public Double getRepetitionPenalty() {
+        return repetitionPenalty;
+    }
+
+    public Double getTfs() {
+        return tfs;
+    }
+
+    public Double getTopA() {
+        return topA;
+    }
+
+    public Double getTypicalP() {
+        return typicalP;
+    }
+
     public static class Builder extends RouterChatModel.Builder<Builder> {
 
         private Double minP;

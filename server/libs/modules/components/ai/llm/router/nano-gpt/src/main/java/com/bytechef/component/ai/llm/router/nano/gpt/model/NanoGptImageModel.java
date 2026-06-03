@@ -49,6 +49,42 @@ public class NanoGptImageModel implements ImageModel {
     private final Double strength;
     private final Integer numInferenceSteps;
 
+    public String getModel() {
+        return model;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public String getResponseFormat() {
+        return responseFormat;
+    }
+
+    public String getUser() {
+        return user;
+    }
+
+    public Integer getN() {
+        return n;
+    }
+
+    public Integer getSeed() {
+        return seed;
+    }
+
+    public Double getGuidanceScale() {
+        return guidanceScale;
+    }
+
+    public Double getStrength() {
+        return strength;
+    }
+
+    public Integer getNumInferenceSteps() {
+        return numInferenceSteps;
+    }
+
     private NanoGptImageModel(Builder builder) {
         this.restClient = ModelUtils.getRestClientBuilder()
             .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + builder.apiKey)
