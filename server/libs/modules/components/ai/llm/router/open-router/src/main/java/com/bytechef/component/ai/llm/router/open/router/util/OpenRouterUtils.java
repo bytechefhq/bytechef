@@ -19,7 +19,7 @@ package com.bytechef.component.ai.llm.router.open.router.util;
 import static com.bytechef.component.ai.llm.router.constant.RouterConstants.SUPPORTED_PARAMETERS;
 import static com.bytechef.component.definition.ComponentDsl.option;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.TypeReference;
 import java.math.BigDecimal;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * @author Marko Kriskovic
  */
 public class OpenRouterUtils {
-    public static ActionDefinition.OptionsFunction<String> getOpenRouterModels(String outputType) {
+    public static OptionsFunction<String> getOpenRouterModels(String outputType) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             List<String> supportedParametersArray = inputParameters.getList(SUPPORTED_PARAMETERS, String.class);
             String supportedParametersString = supportedParametersArray != null && !supportedParametersArray.isEmpty()
@@ -60,7 +60,7 @@ public class OpenRouterUtils {
         };
     }
 
-    public static ActionDefinition.OptionsFunction<String> getOpenRouterEmbeddingModels() {
+    public static OptionsFunction<String> getOpenRouterEmbeddingModels() {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {
             ModelsResponse response = context.http(http -> http.get("/embeddings/models"))
                 .configuration(Context.Http.responseType(Context.Http.ResponseType.JSON))

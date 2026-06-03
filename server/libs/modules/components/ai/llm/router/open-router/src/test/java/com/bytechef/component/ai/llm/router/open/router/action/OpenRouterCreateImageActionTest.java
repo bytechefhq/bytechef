@@ -33,15 +33,9 @@ import org.junit.jupiter.api.Test;
 class OpenRouterCreateImageActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            MODEL, "model",
-            SIZE, "1024x1024",
-            ASPECT_RATIO, "1:1",
-            USER, "user"));
+        Map.of(MODEL, "model", SIZE, "1024x1024", ASPECT_RATIO, "1:1", USER, "user"));
 
-    private final Parameters mockedConnectionParameters = MockParametersFactory.create(
-        Map.of(
-            TOKEN, "token"));
+    private final Parameters mockedConnectionParameters = MockParametersFactory.create(Map.of(TOKEN, "token"));
 
     @Test
     void testCreateImageModel() {
