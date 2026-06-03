@@ -31,6 +31,7 @@ public final class PerplexityConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/perplexity_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://api.perplexity.ai")
         .authorizations(
             authorization(BEARER_TOKEN)
