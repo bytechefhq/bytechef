@@ -16,18 +16,16 @@
 
 package com.bytechef.component.ai.agent.utils;
 
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
-import org.junit.jupiter.api.Test;
+import com.bytechef.component.definition.ClusterElementDefinition;
 
 /**
+ * Contributes an additional cluster element to the {@code aiAgentUtils} component. Implementations are discovered as
+ * Spring beans and appended to the component's built-in cluster elements, allowing edition-specific tools (e.g. the EE
+ * skills tool) to be plugged in without the core component depending on them.
+ *
  * @author Ivica Cardic
  */
-public class AiAgentUtilsComponentHandlerTest {
+public interface AiAgentUtilsClusterElementContributor {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json", new AiAgentUtilsComponentHandler(List.of()).getDefinition());
-    }
+    ClusterElementDefinition<?> getClusterElementDefinition();
 }
