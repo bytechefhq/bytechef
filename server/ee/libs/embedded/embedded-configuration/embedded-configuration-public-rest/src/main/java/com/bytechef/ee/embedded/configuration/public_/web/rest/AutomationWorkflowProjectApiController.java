@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseIns
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.AutomationWorkflowProjectModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -59,12 +60,22 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getProjects(
         String externalUserId, EnvironmentModel xEnvironment) {
 
-        return ResponseEntity.ok(toAutomationWorkflowProjectModels());
+        List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
+            .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))
+            .stream()
+            .map(project -> conversionService.convert(project, AutomationWorkflowProjectModel.class))
+            .toList();
+
+        return ResponseEntity.ok(models);
     }
 
     @InitBinder
     public void initBinder(WebDataBinder dataBinder) {
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
+    }
+
+    private Environment getEnvironment(EnvironmentModel xEnvironment) {
+        return environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
     }
 
     private List<AutomationWorkflowProjectModel> toAutomationWorkflowProjectModels() {
