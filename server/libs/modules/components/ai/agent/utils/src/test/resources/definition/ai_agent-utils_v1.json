@@ -1290,9 +1290,9 @@
     "properties": null,
     "title": "File System Tools",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1307,9 +1307,9 @@
     "properties": null,
     "title": "Shell Tools",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1324,9 +1324,9 @@
     "properties": null,
     "title": "Grep Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1341,9 +1341,26 @@
     "properties": null,
     "title": "Glob Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
+    "name": "listDirectoryTool",
+    "description": "List files and directories within a path.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "List Directory Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1358,9 +1375,9 @@
     "properties": null,
     "title": "Smart Web Fetch Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1375,9 +1392,9 @@
     "properties": null,
     "title": "Brave Web Search Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1392,9 +1409,9 @@
     "properties": null,
     "title": "Todo Write Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },
@@ -1409,9 +1426,9 @@
     "properties": null,
     "title": "Task Tool",
     "type": {
-      "name": "CLAUDE_CODE_TOOLS",
-      "key": "claudeCodeTools",
-      "label": "Claude Code Tools",
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
       "multipleElements": true,
       "required": false
     },

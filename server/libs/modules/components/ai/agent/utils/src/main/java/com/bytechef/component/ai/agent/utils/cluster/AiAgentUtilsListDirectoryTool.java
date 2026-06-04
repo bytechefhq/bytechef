@@ -23,31 +23,33 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
-import org.springaicommunity.agent.tools.FileSystemTools;
+import java.nio.file.Path;
+import org.springaicommunity.agent.tools.ListDirectoryTool;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
 
 /**
- * Provides file system tools (Read, Write, Edit) for the AI agent.
+ * Provides directory listing for the AI agent.
  *
  * @author Ivica Cardic
  */
-public class AiAgentUtilsFileSystemTools {
+public class AiAgentUtilsListDirectoryTool {
 
     public static final ClusterElementDefinition<ToolCallbackProviderFunction> CLUSTER_ELEMENT_DEFINITION =
-        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("fileSystemTools")
-            .title("File System Tools")
-            .description("Read, write, and edit files with precise control.")
+        ComponentDsl.<ToolCallbackProviderFunction>clusterElement("listDirectoryTool")
+            .title("List Directory Tool")
+            .description("List files and directories within a path.")
             .type(TOOLS)
-            .object(() -> AiAgentUtilsFileSystemTools::apply);
+            .object(() -> AiAgentUtilsListDirectoryTool::apply);
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        FileSystemTools fileSystemTools = FileSystemTools.builder()
+        ListDirectoryTool listDirectoryTool = ListDirectoryTool.builder()
+            .workingDirectory(Path.of(System.getProperty("user.dir")))
             .build();
 
-        return ToolCallbackProvider.from(ToolCallbacks.from(fileSystemTools));
+        return ToolCallbackProvider.from(ToolCallbacks.from(listDirectoryTool));
     }
 }

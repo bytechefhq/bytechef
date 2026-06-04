@@ -25,11 +25,13 @@ import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAct
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAgentClientTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsAskUserQuestionTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
+import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsListDirectoryTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsShellTools;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
@@ -38,6 +40,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Component;
@@ -51,19 +54,26 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     public AiAgentUtilsComponentHandler(
-        AiSkillFacade aiSkillFacade,
-        List<AiAgentUtilsClusterElementContributor> clusterElementContributors) {
+        AiSkillFacade aiSkillFacade, List<AiAgentUtilsClusterElementContributor> clusterElementContributors,
+        ClusterElementDefinitionService clusterElementDefinitionService) {
+
+        AiAgentUtilsSmartWebFetchTool agentUtilsSmartWebFetchTool = new AiAgentUtilsSmartWebFetchTool(
+            clusterElementDefinitionService);
+
+        AiAgentUtilsTaskTool agentUtilsTaskTool = new AiAgentUtilsTaskTool(clusterElementDefinitionService);
 
         List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
+            AiAgentUtilsAgentClientTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsAskUserQuestionTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsListDirectoryTool.CLUSTER_ELEMENT_DEFINITION,
+            agentUtilsSmartWebFetchTool.clusterElementDefinition,
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
-            AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION,
+            agentUtilsTaskTool.clusterElementDefinition,
             tool(AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
