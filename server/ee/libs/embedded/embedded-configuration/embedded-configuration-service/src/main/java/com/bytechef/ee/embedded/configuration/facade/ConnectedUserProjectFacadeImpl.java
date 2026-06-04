@@ -92,6 +92,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             "tasks": []
         }
         """;
+    private static final String MARKER = "__EMBEDDED__";
 
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
@@ -448,7 +449,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             ConnectedUser connectedUser = connectedUserService.getConnectedUser(
                 connectedUserProject.getConnectedUserId());
 
-            projectDeployment.setName("__EMBEDDED__" + connectedUser.getExternalId());
+            projectDeployment.setName(MARKER + connectedUser.getExternalId());
 
             projectDeployment.setProjectId(connectedUserProject.getProjectId());
             projectDeployment.setProjectVersion(1);
@@ -532,7 +533,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .orElseGet(() -> {
                 Project project = new Project();
 
-                project.setName("__EMBEDDED__" + externalUserId);
+                project.setName(MARKER + externalUserId);
                 project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
 
                 project = projectService.create(project);
