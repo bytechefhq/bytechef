@@ -16,6 +16,7 @@
 
 package com.bytechef.ee.platform.ai.skill.config;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration;
@@ -25,6 +26,7 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
  * @author Ivica Cardic
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
+@ConditionalOnEEVersion
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 @EnableJdbcRepositories(basePackages = "com.bytechef.ee.platform.ai.skill.repository")
 class AiSkillJdbcRepositoryConfiguration {

@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.skill.service;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.repository.AiSkillRepository;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
@@ -29,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 class AiSkillServiceImpl implements AiSkillService {
 
     private final AiSkillRepository aiSkillRepository;
