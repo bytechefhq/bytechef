@@ -1,27 +1,19 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.component.ai.agent.utils.workflow.connection;
+package com.bytechef.ee.component.ai.agent.utils.workflow.connection;
 
 import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
 import com.bytechef.commons.util.MapUtils;
-import com.bytechef.component.ai.agent.utils.util.AiAgentUtilsUtils;
+import com.bytechef.ee.component.ai.agent.utils.util.AiAgentUtilsUtils;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -57,8 +49,10 @@ import org.springframework.stereotype.Component;
  * registry. Unknown components are silently skipped.
  *
  * @author Ivica Cardic
+ * @version ee
  */
 @Component
+@ConditionalOnEEVersion
 @SuppressFBWarnings("EI")
 public class SkillComponentConnectionFactory implements ClusterElementConnectionFactory {
 

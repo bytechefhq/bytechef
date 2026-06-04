@@ -669,6 +669,7 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-execution:p
 include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-client")
 include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:platform-workflow-worker-remote-rest")
 
+include("server:ee:libs:modules:components:ai-agent-utils")
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")

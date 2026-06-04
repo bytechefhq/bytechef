@@ -1,20 +1,11 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.component.ai.agent.utils.cluster;
+package com.bytechef.ee.component.ai.agent.utils.cluster;
 
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -23,7 +14,7 @@ import static com.bytechef.component.definition.ai.agent.BaseToolFunction.TOOLS;
 import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRIES;
 import static com.bytechef.ee.platform.ai.skill.SkillArchiveConstants.MAX_ZIP_ENTRY_SIZE;
 
-import com.bytechef.component.ai.agent.utils.util.AiAgentUtilsUtils;
+import com.bytechef.component.ai.agent.utils.AiAgentUtilsClusterElementContributor;
 import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -32,8 +23,10 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.script.constant.ScriptConstants;
 import com.bytechef.component.script.engine.PolyglotEngine;
+import com.bytechef.ee.component.ai.agent.utils.util.AiAgentUtilsUtils;
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.JobContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
@@ -57,6 +50,7 @@ import org.springaicommunity.agent.tools.SkillsTool;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.ai.tool.function.FunctionToolCallback;
+import org.springframework.stereotype.Component;
 
 /**
  * Provides a TOOLS cluster element that loads selected AiSkill zip archives, extracts .md files, and passes them to
@@ -65,8 +59,11 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
  * {@link PolyglotEngine}.
  *
  * @author Ivica Cardic
+ * @version ee
  */
-public class AiAgentUtilsSkillsTool {
+@Component
+@ConditionalOnEEVersion
+public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContributor {
 
     private static final Map<String, String> EXTENSION_TO_LANGUAGE_ID = Map.of(
         "js", "js",
@@ -85,7 +82,7 @@ public class AiAgentUtilsSkillsTool {
     private final AiSkillFacade aiSkillFacade;
     private final PolyglotEngine polyglotEngine;
 
-    public final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
+    private final ClusterElementDefinition<MultipleConnectionsToolCallbackProviderFunction> clusterElementDefinition;
 
     @SuppressFBWarnings("EI")
     public AiAgentUtilsSkillsTool(AiSkillFacade aiSkillFacade, PolyglotEngine polyglotEngine) {
@@ -111,6 +108,11 @@ public class AiAgentUtilsSkillsTool {
                                     (ClusterElementDefinition.OptionsFunction<Long>) this::getSkillOptions)
                                 .required(true)))
                 .object(() -> this::apply);
+    }
+
+    @Override
+    public ClusterElementDefinition<?> getClusterElementDefinition() {
+        return clusterElementDefinition;
     }
 
     @SuppressWarnings("PMD.UnusedFormalParameter")

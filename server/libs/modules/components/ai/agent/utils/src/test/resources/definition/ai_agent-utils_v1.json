@@ -103,66 +103,6 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "skillsTool",
-    "description": "Extend AI agent capabilities with reusable, composable knowledge modules defined in Markdown with YAML front-matter.",
-    "element": { },
-    "help": null,
-    "outputDefinition": null,
-    "processErrorResponse": null,
-    "properties": [ {
-      "advancedOption": null,
-      "controlType": "ARRAY_BUILDER",
-      "defaultValue": null,
-      "description": "Select skills to make available to the agent.",
-      "displayCondition": null,
-      "exampleValue": null,
-      "expressionEnabled": null,
-      "hidden": null,
-      "items": [ {
-        "advancedOption": null,
-        "controlType": "SELECT",
-        "defaultValue": null,
-        "description": null,
-        "displayCondition": null,
-        "exampleValue": null,
-        "expressionEnabled": null,
-        "hidden": null,
-        "label": "Skill",
-        "maxValue": null,
-        "metadata": { },
-        "minValue": null,
-        "name": "skillId",
-        "options": null,
-        "optionsDataSource": {
-          "options": { },
-          "optionsLookupDependsOn": null
-        },
-        "placeholder": null,
-        "required": true,
-        "type": "INTEGER"
-      } ],
-      "label": "Skills",
-      "maxItems": null,
-      "metadata": { },
-      "minItems": null,
-      "multipleValues": null,
-      "name": "skills",
-      "options": null,
-      "optionsDataSource": null,
-      "placeholder": "Choose a skill...",
-      "required": null,
-      "type": "ARRAY"
-    } ],
-    "title": "Skills Tool",
-    "type": {
-      "name": "TOOLS",
-      "key": "tools",
-      "label": "Tools",
-      "multipleElements": true,
-      "required": false
-    },
-    "workflowNodeDescription": null
-  }, {
     "name": "todoWriteTool",
     "description": "Structured task management with state tracking.",
     "element": { },

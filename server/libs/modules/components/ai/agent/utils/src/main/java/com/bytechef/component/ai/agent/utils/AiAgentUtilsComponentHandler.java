@@ -24,14 +24,14 @@ import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGlobTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsGrepTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsShellTools;
-import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSkillsTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsSmartWebFetchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTaskTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsTodoWriteTool;
+import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.script.engine.PolyglotEngine;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.stereotype.Component;
 
 /**
@@ -42,27 +42,27 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
 
     private final ComponentDefinition componentDefinition;
 
-    public AiAgentUtilsComponentHandler(
-        AiSkillFacade aiSkillFacade, PolyglotEngine polyglotEngine) {
+    public AiAgentUtilsComponentHandler(List<AiAgentUtilsClusterElementContributor> clusterElementContributors) {
+        List<ClusterElementDefinition<?>> clusterElements = new ArrayList<>(List.of(
+            AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
+            AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION));
 
-        AiAgentUtilsSkillsTool agentUtilsSkillsTool = new AiAgentUtilsSkillsTool(
-            aiSkillFacade, polyglotEngine);
+        for (AiAgentUtilsClusterElementContributor clusterElementContributor : clusterElementContributors) {
+            clusterElements.add(clusterElementContributor.getClusterElementDefinition());
+        }
 
         this.componentDefinition = component("aiAgentUtils")
             .title("AI Agent Utils")
             .description("AI Agent Utils brings Claude Code-inspired tools and agent skills.")
             .icon("path:assets/agent-utils.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
-            .clusterElements(
-                AiAgentUtilsFileSystemTools.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsShellTools.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsGrepTool.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsGlobTool.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsSmartWebFetchTool.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
-                agentUtilsSkillsTool.clusterElementDefinition,
-                AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
-                AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION);
+            .clusterElements(clusterElements);
     }
 
     @Override
