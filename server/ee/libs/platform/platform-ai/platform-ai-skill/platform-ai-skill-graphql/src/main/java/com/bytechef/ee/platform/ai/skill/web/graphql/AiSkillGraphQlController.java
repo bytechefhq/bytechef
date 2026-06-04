@@ -18,6 +18,7 @@ package com.bytechef.ee.platform.ai.skill.web.graphql;
 
 import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
 import java.util.List;
@@ -31,6 +32,7 @@ import org.springframework.stereotype.Controller;
  * @author Ivica Cardic
  */
 @Controller
+@ConditionalOnEEVersion
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiSkillGraphQlController {
 

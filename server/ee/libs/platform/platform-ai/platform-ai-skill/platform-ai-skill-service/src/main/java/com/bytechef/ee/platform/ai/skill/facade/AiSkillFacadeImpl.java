@@ -23,6 +23,7 @@ import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
 import com.bytechef.ee.platform.ai.skill.file.storage.AiSkillFileStorage;
 import com.bytechef.ee.platform.ai.skill.service.AiSkillService;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -55,6 +56,7 @@ import org.springframework.util.Assert;
  */
 @Service
 @Transactional
+@ConditionalOnEEVersion
 @SuppressFBWarnings(
     value = "REDOS",
     justification = "SKILL_NAME_PATTERN uses fixed separators between character classes — runs in linear time")

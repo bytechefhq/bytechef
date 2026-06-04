@@ -18,6 +18,7 @@ package com.bytechef.ee.platform.ai.skill.web.rest;
 
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ContentDisposition;
@@ -34,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api/ai/agent-skills")
+@ConditionalOnEEVersion
 class AiSkillDownloadController {
 
     private final AiSkillFacade aiSkillFacade;
