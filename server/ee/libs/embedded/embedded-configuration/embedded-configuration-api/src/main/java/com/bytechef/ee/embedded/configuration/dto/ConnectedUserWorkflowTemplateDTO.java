@@ -18,7 +18,7 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record ConnectedUserWorkflowTemplateDTO(
     String workflowUuid, String label, String description, String lastModifiedDate,
-    List<Component> triggers, List<Component> components) {
+    List<Component> triggers, List<Component> components, String permissionExpression) {
 
     public record Component(String name, String title, String icon) {
     }

@@ -18,5 +18,6 @@ import java.util.List;
 @SuppressFBWarnings("EI")
 public record AutomationWorkflowProjectDTO(
     long id, String name, String description, Long categoryId, List<Long> tagIds, boolean published, int version,
-    Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates) {
+    Integer lastPublishedVersion, List<ConnectedUserWorkflowTemplateDTO> workflowTemplates,
+    String permissionExpression) {
 }

@@ -75,11 +75,11 @@ public class AutomationWorkflowProjectApiControllerIntTest {
 
         ConnectedUserWorkflowTemplateDTO workflowDTO = new ConnectedUserWorkflowTemplateDTO(
             WORKFLOW_UUID, "Welcome Email Workflow", "Sends a welcome email to new users", null,
-            List.of(), List.of(componentDTO));
+            List.of(), List.of(componentDTO), null);
 
         AutomationWorkflowProjectDTO projectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID, "Onboarding Project", "New user onboarding automations", null, List.of(), true, 1, 1,
-            List.of(workflowDTO));
+            List.of(workflowDTO), null);
 
         when(automationWorkflowProjectFacade.getPublishedProjects())
             .thenReturn(List.of(projectDTO));
@@ -143,7 +143,7 @@ public class AutomationWorkflowProjectApiControllerIntTest {
     public void testGetFrontendProjectsUnpublishedProjectHasEmptyWorkflows() {
         AutomationWorkflowProjectDTO unpublishedProjectDTO = new AutomationWorkflowProjectDTO(
             PROJECT_ID + 1, "Draft Project", "A project with no published version", null, List.of(), false, 1, null,
-            List.of());
+            List.of(), null);
 
         when(automationWorkflowProjectFacade.getPublishedProjects())
             .thenReturn(List.of(unpublishedProjectDTO));

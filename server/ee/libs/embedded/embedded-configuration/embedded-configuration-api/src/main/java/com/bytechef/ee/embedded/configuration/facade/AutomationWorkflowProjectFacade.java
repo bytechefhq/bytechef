@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCateg
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
 /**
@@ -20,7 +21,8 @@ import java.util.List;
  */
 public interface AutomationWorkflowProjectFacade {
 
-    long createProject(String name, String description, String category, List<String> tags);
+    long createProject(
+        String name, String description, String category, List<String> tags, String permissionExpression);
 
     String duplicateProjectWorkflow(String workflowId);
 
@@ -32,7 +34,7 @@ public interface AutomationWorkflowProjectFacade {
 
     List<AutomationWorkflowProjectTagDTO> getTags();
 
-    String createProjectWorkflow(long projectId, String definition);
+    String createProjectWorkflow(long projectId, String definition, String permissionExpression);
 
     void deleteProject(long projectId);
 
@@ -44,7 +46,15 @@ public interface AutomationWorkflowProjectFacade {
 
     List<AutomationWorkflowProjectDTO> getPublishedProjects();
 
+    List<AutomationWorkflowProjectDTO> getPublishedProjects(String externalUserId, Environment environment);
+
     void publishProject(long projectId);
 
-    void updateProject(long projectId, String name, String description, String category, List<String> tags);
+    void updateProject(
+        long projectId, String name, String description, String category, List<String> tags,
+        String permissionExpression);
+
+    void updateProjectWorkflow(String workflowId, String label, String description);
+
+    void updateProjectWorkflowPermissionExpression(String workflowId, String permissionExpression);
 }

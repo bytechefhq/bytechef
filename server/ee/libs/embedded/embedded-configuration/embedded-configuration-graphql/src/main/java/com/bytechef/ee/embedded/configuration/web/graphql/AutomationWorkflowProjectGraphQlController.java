@@ -56,20 +56,20 @@ public class AutomationWorkflowProjectGraphQlController {
     @MutationMapping
     public String createAutomationWorkflowProject(
         @Argument String name, @Argument String description, @Argument String category,
-        @Argument List<String> tags) {
+        @Argument List<String> tags, @Argument String permissionExpression) {
 
         return String.valueOf(
-            automationWorkflowProjectFacade.createProject(name, description, category,
-                tags == null ? List.of() : tags));
+            automationWorkflowProjectFacade.createProject(
+                name, description, category, tags == null ? List.of() : tags, permissionExpression));
     }
 
     @MutationMapping
     public boolean updateAutomationWorkflowProject(
         @Argument String id, @Argument String name, @Argument String description, @Argument String category,
-        @Argument List<String> tags) {
+        @Argument List<String> tags, @Argument String permissionExpression) {
 
         automationWorkflowProjectFacade.updateProject(
-            Long.parseLong(id), name, description, category, tags == null ? List.of() : tags);
+            Long.parseLong(id), name, description, category, tags == null ? List.of() : tags, permissionExpression);
 
         return true;
     }
@@ -89,8 +89,29 @@ public class AutomationWorkflowProjectGraphQlController {
     }
 
     @MutationMapping
-    public String createAutomationWorkflowProjectWorkflow(@Argument String projectId, @Argument String definition) {
-        return automationWorkflowProjectFacade.createProjectWorkflow(Long.parseLong(projectId), definition);
+    public String createAutomationWorkflowProjectWorkflow(
+        @Argument String projectId, @Argument String definition, @Argument String permissionExpression) {
+
+        return automationWorkflowProjectFacade.createProjectWorkflow(
+            Long.parseLong(projectId), definition, permissionExpression);
+    }
+
+    @MutationMapping
+    public boolean updateAutomationWorkflowProjectWorkflow(
+        @Argument String workflowUuid, @Argument String label, @Argument String description) {
+
+        automationWorkflowProjectFacade.updateProjectWorkflow(workflowUuid, label, description);
+
+        return true;
+    }
+
+    @MutationMapping
+    public boolean updateAutomationWorkflowProjectWorkflowPermissionExpression(
+        @Argument String workflowUuid, @Argument String permissionExpression) {
+
+        automationWorkflowProjectFacade.updateProjectWorkflowPermissionExpression(workflowUuid, permissionExpression);
+
+        return true;
     }
 
     @MutationMapping
