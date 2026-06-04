@@ -109,7 +109,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-web")
-    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:ai:mcp:mcp-server"))
     implementation(project(":server:libs:ai:mcp:mcp-server-configuration:mcp-server-configuration-graphql"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-config"))
