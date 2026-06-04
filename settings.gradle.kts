@@ -32,7 +32,6 @@ include("cli:commands:component:init:openapi")
 
 include("server:apps:server-app")
 
-include("server:libs:platform:platform-ai:platform-ai-tool-api")
 include("server:libs:ai:mcp:mcp-server")
 include("server:libs:ai:mcp:mcp-server-configuration:mcp-server-configuration-graphql")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-automation")
