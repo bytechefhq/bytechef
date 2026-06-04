@@ -1541,6 +1541,10 @@ components:
         name:
           description: "The name of an integration."
           type: "string"
+        permissionExpression:
+          description: "The SpEL permission expression evaluated against the connected user to control\
+            \ integration visibility."
+          type: "string"
     IntegrationInstance:
       description: "Contains configurations and connections required for the execution\
         \ of integration workflows for a connected user."
