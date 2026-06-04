@@ -7,6 +7,7 @@ type AutomationWorkflowProject {
     published: Boolean!
     version: Int!
     lastPublishedVersion: Int
+    permissionExpression: String
     workflowTemplates: [AutomationWorkflowProjectWorkflowTemplate!]!
 }
 
@@ -14,6 +15,7 @@ type AutomationWorkflowProjectWorkflowTemplate {
     workflowUuid: ID!
     label: String
     description: String
+    permissionExpression: String
     lastModifiedDate: String
     triggers: [AutomationWorkflowProjectComponent!]!
     components: [AutomationWorkflowProjectComponent!]!
@@ -49,11 +51,13 @@ extend type Query {
 }
 
 extend type Mutation {
-    createAutomationWorkflowProject(name: String!, description: String, category: String, tags: [String!]): ID!
-    updateAutomationWorkflowProject(id: ID!, name: String!, description: String, category: String, tags: [String!]): Boolean!
+    createAutomationWorkflowProject(name: String!, description: String, category: String, tags: [String!], permissionExpression: String): ID!
+    updateAutomationWorkflowProject(id: ID!, name: String!, description: String, category: String, tags: [String!], permissionExpression: String): Boolean!
     deleteAutomationWorkflowProject(id: ID!): Boolean!
     publishAutomationWorkflowProject(id: ID!): Boolean!
-    createAutomationWorkflowProjectWorkflow(projectId: ID!, definition: String): ID!
+    createAutomationWorkflowProjectWorkflow(projectId: ID!, definition: String, permissionExpression: String): ID!
+    updateAutomationWorkflowProjectWorkflow(workflowUuid: ID!, label: String!, description: String): Boolean!
+    updateAutomationWorkflowProjectWorkflowPermissionExpression(workflowUuid: ID!, permissionExpression: String): Boolean!
     deleteAutomationWorkflowProjectWorkflow(workflowUuid: ID!): Boolean!
     duplicateAutomationWorkflowProjectWorkflow(workflowUuid: ID!): ID!
     duplicateAutomationWorkflowProject(id: ID!): ID!
