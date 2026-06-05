@@ -136,7 +136,7 @@ public class ReadEmailAction {
         Store protocolStore = session.getStore(emailProtocol.name());
 
         protocolStore.connect(
-            connectionParameters.getRequiredString(HOST), connectionParameters.getRequiredString(USERNAME),
+            connectionParameters.getRequiredString(HOST), port, connectionParameters.getRequiredString(USERNAME),
             connectionParameters.getRequiredString(PASSWORD));
 
         Folder folder = protocolStore.getFolder("INBOX");
