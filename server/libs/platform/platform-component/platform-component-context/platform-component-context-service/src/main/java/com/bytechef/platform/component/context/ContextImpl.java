@@ -677,7 +677,8 @@ class ContextImpl implements Context {
             this.jobId = jobId;
             this.logFileStorageWriter = logFileStorageWriter;
             this.log = LoggerFactory.getLogger(
-                componentName + (componentOperationName == null ? "" : "." + componentOperationName));
+                "com.bytechef.component." + componentName +
+                    (componentOperationName == null ? "" : "." + componentOperationName));
             this.taskExecutionId = taskExecutionId;
         }
 
