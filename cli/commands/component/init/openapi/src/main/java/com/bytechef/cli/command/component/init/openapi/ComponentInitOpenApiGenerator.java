@@ -91,6 +91,7 @@ import javax.lang.model.element.Modifier;
 import javax.tools.JavaCompiler;
 import javax.tools.ToolProvider;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1615,8 +1616,8 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private CodeBlock getParametersPropertiesCodeBlock(Operation operation, OpenAPI openAPI) {
-        List<CodeBlock> codeBlocks = new ArrayList<>();
         List<Parameter> parameters = resolveParameters(operation.getParameters(), openAPI);
+        List<CodeBlock> codeBlocks = new ArrayList<>();
 
         for (Parameter parameter : parameters) {
             CodeBlock.Builder builder = CodeBlock.builder();
@@ -1745,6 +1746,10 @@ public class ComponentInitOpenApiGenerator {
     }
 
     private List<Parameter> resolveParameters(List<Parameter> parameters, OpenAPI openAPI) {
+        if (parameters == null) {
+            return Collections.emptyList();
+        }
+
         List<Parameter> resolvedParameters = new ArrayList<>();
 
         parameters.forEach(explicitParameter -> {
@@ -1754,24 +1759,39 @@ public class ComponentInitOpenApiGenerator {
                 return;
             }
 
-            String parameterReference = explicitParameter.get$ref();
-
-            if (parameterReference.startsWith("#/components/parameters/")) {
-                parameterReference = parameterReference.substring("#/components/paramaters/".length());
-            }
-
-            Components components = openAPI.getComponents();
-
-            Map<String, Parameter> parameterDefinitions = components.getParameters();
-
-            if (!parameterDefinitions.containsKey(parameterReference)) {
-                throw new IllegalArgumentException("Missing parameter definition for " + explicitParameter.get$ref());
-            }
-
-            resolvedParameters.add(parameterDefinitions.get(parameterReference));
+            resolvedParameters.add(getComponentParameter(openAPI, explicitParameter));
         });
 
         return resolvedParameters;
+    }
+
+    private static @NonNull Parameter getComponentParameter(OpenAPI openAPI, Parameter explicitParameter) {
+        Components components = openAPI.getComponents();
+
+        if (components == null) {
+            throw new IllegalArgumentException(
+                "Components section of spec misses. Unable to resolve " + explicitParameter.get$ref());
+        }
+
+        Map<String, Parameter> parameterDefinitions = components.getParameters();
+        String parameterName = getParameterNameFromComponentReference(explicitParameter);
+
+        if ((parameterDefinitions == null) || !parameterDefinitions.containsKey(parameterName)) {
+            throw new IllegalArgumentException(
+                "Components section of spec misses the parameter definition for " + explicitParameter.get$ref());
+        }
+
+        return parameterDefinitions.get(parameterName);
+    }
+
+    private static String getParameterNameFromComponentReference(Parameter parameter) {
+        String parameterReference = parameter.get$ref();
+
+        if (parameterReference.startsWith("#/components/parameters/")) {
+            parameterReference = parameterReference.substring("#/components/parameters/".length());
+        }
+
+        return parameterReference;
     }
 
     @SuppressWarnings({
