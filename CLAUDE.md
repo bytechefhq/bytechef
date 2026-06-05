@@ -648,3 +648,17 @@ In IntelliJ IDEA:
 **Integration test failures**
 - Ensure Docker is running (required for Testcontainers)
 - Review test logs in `build/test-results/`
+
+## Agent skills
+
+### Issue tracker
+
+Issues and PRDs are tracked on GitHub at `bytechefhq/bytechef` (pinned explicitly because this clone has multiple remotes). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Five canonical triage roles mapped to this repo's labels — `needs triage` and `wontfix` reuse existing labels; `needs-info` / `ready-for-agent` / `ready-for-human` are new. See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: one `CONTEXT.md` + `docs/adr/` at the repo root. See `docs/agents/domain.md`.
