@@ -248,13 +248,15 @@ const EmbeddableWorkflowEditorInner = ({
 
                         <ResizableHandle className="bg-muted" />
 
-                        <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                        <ResizablePanel className="flex" defaultSize={0} panelRef={bottomResizablePanelRef}>
                             {workflowTestExecution && (
-                                <WorkflowExecutionsTestOutput
-                                    onCloseClick={handleTestOutputCloseClick}
-                                    workflowIsRunning={workflowIsRunning}
-                                    workflowTestExecution={workflowTestExecution}
-                                />
+                                <div className="m-3 flex flex-1 overflow-hidden rounded-lg bg-background">
+                                    <WorkflowExecutionsTestOutput
+                                        onCloseClick={handleTestOutputCloseClick}
+                                        workflowIsRunning={workflowIsRunning}
+                                        workflowTestExecution={workflowTestExecution}
+                                    />
+                                </div>
                             )}
                         </ResizablePanel>
                     </ResizablePanelGroup>

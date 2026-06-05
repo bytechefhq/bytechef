@@ -9,6 +9,7 @@ import {useRun} from '@/pages/platform/workflow-editor/hooks/useRun';
 import {RequestI, WorkflowEditorProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import WorkflowTestRunLeaveDialog from '@/shared/components/WorkflowTestRunLeaveDialog';
+import useCopilotLayoutShifted from '@/shared/components/copilot/hooks/useCopilotLayoutShifted';
 import {useWorkflowTestRunGuard} from '@/shared/hooks/useWorkflowTestRunGuard';
 import {WebhookTriggerTestApi} from '@/shared/middleware/automation/configuration';
 import {useAutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
@@ -72,6 +73,8 @@ const AutomationWorkflow = () => {
     const projectId = currentProject?.id ?? '';
 
     const {runDisabled} = useRun();
+
+    const copilotLayoutShifted = useCopilotLayoutShifted();
 
     const useGetConnectionsQuery = (request: RequestI, enabled?: boolean) =>
         useGetWorkspaceConnectionsQuery(
@@ -183,13 +186,21 @@ const AutomationWorkflow = () => {
 
                         <ResizableHandle className="bg-muted" />
 
-                        <ResizablePanel className="bg-background" defaultSize={0} panelRef={bottomResizablePanelRef}>
+                        <ResizablePanel className="flex" defaultSize={0} panelRef={bottomResizablePanelRef}>
                             {(workflowIsRunning || workflowTestExecution) && (
-                                <WorkflowExecutionsTestOutput
-                                    onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
-                                    workflowIsRunning={workflowIsRunning}
-                                    workflowTestExecution={workflowTestExecution}
-                                />
+                                <div
+                                    className={twMerge(
+                                        'm-3 flex flex-1 overflow-hidden rounded-lg bg-background',
+                                        leftSidebarOpen && 'ml-0',
+                                        copilotLayoutShifted && 'mr-0'
+                                    )}
+                                >
+                                    <WorkflowExecutionsTestOutput
+                                        onCloseClick={handleWorkflowExecutionsTestOutputCloseClick}
+                                        workflowIsRunning={workflowIsRunning}
+                                        workflowTestExecution={workflowTestExecution}
+                                    />
+                                </div>
                             )}
                         </ResizablePanel>
                     </ResizablePanelGroup>

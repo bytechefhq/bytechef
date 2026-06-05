@@ -114,11 +114,11 @@ const WorkflowExecutionsTestOutput = ({
                                         defaultSize={resizablePanelSize}
                                     >
                                         {subflowStack.length === 0 && rootJob && (
-                                            <div className="flex h-9 items-center gap-1 px-3 py-2">
+                                            <div className="my-2 flex h-9 items-center gap-1 px-3">
                                                 <WorkflowIcon className="size-3 shrink-0 text-content-neutral-primary" />
 
                                                 <TruncatedLabel
-                                                    className="text-xs leading-4 font-medium text-content-neutral-primary"
+                                                    className="text-sm leading-4 font-medium text-content-neutral-primary"
                                                     label={rootJob.label ?? ''}
                                                 />
                                             </div>
