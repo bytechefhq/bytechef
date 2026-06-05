@@ -18,7 +18,9 @@ package com.bytechef.component.freshdesk.action;
 
 import static com.bytechef.component.OpenApiComponentHandler.PropertyType;
 import static com.bytechef.component.definition.ComponentDsl.action;
-import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
@@ -79,18 +81,64 @@ public class FreshdeskCreateContactAction {
                 .label("Job Title")
                 .description("Job title of the contact.")
                 .required(false))
-        .output(outputSchema(object()
-            .properties(string("description").description("A small description of the contact.")
+        .output(outputSchema(object().properties(bool("active").description("Whether the contact is active.")
+            .required(false),
+            string("address").description("Address of the contact.")
                 .required(false),
-                string("email").description("Primary email address of the contact.")
-                    .required(false),
-                number("id").description("ID of the contact.")
-                    .required(false),
-                string("job_title").description("Job title of the contact.")
+            integer("company_id").description("ID of the primary company of the contact.")
+                .required(false),
+            bool("view_all_tickets").description("Whether the contact can view all tickets.")
+                .required(false),
+            bool("deleted").description("Whether the contact is deleted.")
+                .required(false),
+            string("description").description("Description of the contact.")
+                .required(false),
+            string("email").description("Email address of the contact.")
+                .required(false),
+            integer("id").description("ID of the contact.")
+                .required(false),
+            string("contact_type").description("Type of the contact.")
+                .required(false),
+            string("job_title").description("Job title of the contact.")
+                .required(false),
+            string("language").description("Language of the contact.")
+                .required(false),
+            string("mobile").description("Mobile number of the contact.")
+                .required(false),
+            string("name").description("Name of the contact.")
+                .required(false),
+            string("phone").description("Phone number of the contact.")
+                .required(false),
+            string("time_zone").description("Time zone of the contact.")
+                .required(false),
+            string("twitter_id").description("Twitter ID of the contact.")
+                .required(false),
+            array("social_handler").items(string().description("List of social handlers of the contact."))
+                .description("List of social handlers of the contact.")
+                .required(false),
+            array("other_emails").items(string().description("List of additional email addresses of the contact."))
+                .description("List of additional email addresses of the contact.")
+                .required(false),
+            array("other_companies").items(object().properties(integer("company_id").description("ID of the company.")
+                .required(false),
+                bool("view_all_tickets").description("Whether the contact can view all tickets of the company.")
                     .required(false))
+                .description("List of other companies associated with the contact."))
+                .description("List of other companies associated with the contact.")
+                .required(false),
+            string("created_at").description("Timestamp when the contact was created.")
+                .required(false),
+            string("updated_at").description("Timestamp when the contact was last updated.")
+                .required(false),
+            array("tags").items(string().description("List of tags associated with the contact."))
+                .description("List of tags associated with the contact.")
+                .required(false),
+            string("avatar").description("Avatar of the contact.")
+                .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/freshdesk_v1#create-contact");
 
     private FreshdeskCreateContactAction() {
     }
