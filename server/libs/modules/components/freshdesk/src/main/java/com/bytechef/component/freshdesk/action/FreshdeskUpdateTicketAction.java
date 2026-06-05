@@ -28,7 +28,9 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.BodyContentType;
 import static com.bytechef.component.definition.Context.Http.ResponseType;
 
+import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.freshdesk.util.FreshdeskUtils;
 import java.util.Map;
 
 /**
@@ -36,35 +38,41 @@ import java.util.Map;
  *
  * @generated
  */
-public class FreshdeskCreateTicketAction {
-    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createTicket")
-        .title("Create Ticket")
-        .description("Creates a new ticket")
+public class FreshdeskUpdateTicketAction {
+    public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateTicket")
+        .title("Update Ticket")
+        .description("Update a ticket")
         .metadata(
             Map.of(
-                "method", "POST",
-                "path", "/tickets", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
+                "method", "PUT",
+                "path", "/tickets/{ticketId}", "bodyContentType", BodyContentType.JSON, "mimeType", "application/json"
 
             ))
-        .properties(string("subject").metadata(
-            Map.of(
-                "type", PropertyType.BODY))
-            .label("Subject")
-            .description("Subject of the ticket.")
-            .required(true),
+        .properties(string("ticketId").label("Ticket Id")
+            .required(false)
+            .options((ActionDefinition.OptionsFunction<String>) FreshdeskUtils::getTicketIdOptions)
+            .metadata(
+                Map.of(
+                    "type", PropertyType.PATH)),
+            string("subject").metadata(
+                Map.of(
+                    "type", PropertyType.BODY))
+                .label("Subject")
+                .description("Subject of the ticket.")
+                .required(false),
             string("email").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Email")
                 .description(
                     "Email address of the requester. If no contact exists with this email address in Freshdesk, it will be added as a new contact.")
-                .required(true),
+                .required(false),
             string("description").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
                 .label("Description")
                 .description("HTML content of the ticket.")
-                .required(true),
+                .required(false),
             integer("priority").metadata(
                 Map.of(
                     "type", PropertyType.BODY))
@@ -151,8 +159,8 @@ public class FreshdeskCreateTicketAction {
             .metadata(
                 Map.of(
                     "responseType", ResponseType.JSON))))
-        .help("", "https://docs.bytechef.io/reference/components/freshdesk_v1#create-ticket");
+        .help("", "https://docs.bytechef.io/reference/components/freshdesk_v1#update-ticket");
 
-    private FreshdeskCreateTicketAction() {
+    private FreshdeskUpdateTicketAction() {
     }
 }

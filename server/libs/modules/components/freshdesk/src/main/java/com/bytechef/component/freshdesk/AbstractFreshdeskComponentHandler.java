@@ -24,6 +24,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.freshdesk.action.FreshdeskCreateCompanyAction;
 import com.bytechef.component.freshdesk.action.FreshdeskCreateContactAction;
 import com.bytechef.component.freshdesk.action.FreshdeskCreateTicketAction;
+import com.bytechef.component.freshdesk.action.FreshdeskUpdateTicketAction;
 import com.bytechef.component.freshdesk.connection.FreshdeskConnection;
 
 /**
@@ -39,11 +40,13 @@ public abstract class AbstractFreshdeskComponentHandler implements OpenApiCompon
                 "Freshdesk is a cloud-based customer support software that helps businesses manage customer queries and tickets efficiently.")
             .version(1))
                 .actions(modifyActions(FreshdeskCreateCompanyAction.ACTION_DEFINITION,
-                    FreshdeskCreateContactAction.ACTION_DEFINITION, FreshdeskCreateTicketAction.ACTION_DEFINITION))
+                    FreshdeskCreateContactAction.ACTION_DEFINITION, FreshdeskCreateTicketAction.ACTION_DEFINITION,
+                    FreshdeskUpdateTicketAction.ACTION_DEFINITION))
                 .connection(modifyConnection(FreshdeskConnection.CONNECTION_DEFINITION))
                 .clusterElements(modifyClusterElements(tool(FreshdeskCreateCompanyAction.ACTION_DEFINITION),
                     tool(FreshdeskCreateContactAction.ACTION_DEFINITION),
-                    tool(FreshdeskCreateTicketAction.ACTION_DEFINITION)))
+                    tool(FreshdeskCreateTicketAction.ACTION_DEFINITION),
+                    tool(FreshdeskUpdateTicketAction.ACTION_DEFINITION)))
                 .triggers(getTriggers());
 
     @Override
