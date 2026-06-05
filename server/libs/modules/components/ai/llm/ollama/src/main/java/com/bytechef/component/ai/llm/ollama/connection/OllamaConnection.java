@@ -31,13 +31,14 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefini
 public final class OllamaConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
         .baseUri((connectionParameters, context) -> "http://localhost:11434/")
         .authorizations(
             authorization(BEARER_TOKEN)
                 .title("Bearer Token")
                 .properties(
                     string(URL)
-                        .label("Url")
+                        .label("URL")
                         .description("URL to your Ollama server")));
 
     private OllamaConnection() {

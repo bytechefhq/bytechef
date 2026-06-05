@@ -35,6 +35,7 @@ public class OllamaComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("ollama")
         .title("Ollama")
+        .version(1)
         .description(
             "Get up and running with large language models.")
         .icon("path:assets/ollama.svg")
