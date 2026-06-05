@@ -1,4 +1,5 @@
 dependencies {
+    implementation(("io.micrometer:micrometer-tracing"))
     implementation(libs.com.github.mizosoft.methanol)
     implementation("org.apache.commons:commons-lang3")
     implementation("org.aspectj:aspectjweaver")

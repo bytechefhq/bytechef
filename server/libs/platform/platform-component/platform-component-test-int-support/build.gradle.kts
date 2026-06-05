@@ -1,4 +1,5 @@
 dependencies {
+    implementation(("io.micrometer:micrometer-tracing"))
     implementation("org.mockito:mockito-core")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-cache")

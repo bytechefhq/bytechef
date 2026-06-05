@@ -39,6 +39,7 @@ import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.file.storage.TempFileStorageImpl;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
+import io.micrometer.tracing.Tracer;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -127,6 +128,11 @@ public class ComponentTestIntConfiguration {
     @Bean
     JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry() {
         return new JobPrincipalAccessorRegistry(List.of());
+    }
+
+    @Bean
+    Tracer tracer() {
+        return Mockito.mock(Tracer.class);
     }
 
     @Bean

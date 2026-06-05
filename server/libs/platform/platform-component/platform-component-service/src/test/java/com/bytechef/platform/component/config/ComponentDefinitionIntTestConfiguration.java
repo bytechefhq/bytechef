@@ -18,7 +18,10 @@ package com.bytechef.platform.component.config;
 
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import io.micrometer.tracing.Tracer;
+import org.mockito.Mockito;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
@@ -33,5 +36,10 @@ import org.springframework.context.annotation.Import;
 })
 @Configuration
 public class ComponentDefinitionIntTestConfiguration {
+
+    @Bean
+    Tracer tracer() {
+        return Mockito.mock(Tracer.class);
+    }
 
 }
