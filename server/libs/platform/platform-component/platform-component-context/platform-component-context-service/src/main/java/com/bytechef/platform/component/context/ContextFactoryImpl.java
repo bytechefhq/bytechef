@@ -31,6 +31,7 @@ import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.data.storage.DataStorage;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.tracing.Tracer;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.ApplicationContext;
@@ -52,13 +53,14 @@ public class ContextFactoryImpl implements ContextFactory {
     private final LogFileStorage logFileStorage;
     private final TempFileStorage tempFileStorage;
     private final String publicUrl;
+    private final Tracer tracer;
 
     @SuppressFBWarnings("EI")
     public ContextFactoryImpl(
         ApplicationContext applicationContext, ApplicationProperties applicationProperties, CacheManager cacheManager,
         DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         FileStorageServiceRegistry fileStorageServiceRegistry, LogFileStorage logFileStorage,
-        TempFileStorage tempFileStorage) {
+        TempFileStorage tempFileStorage, Tracer tracer) {
 
         this.applicationContext = applicationContext;
         this.cacheManager = cacheManager;
@@ -74,6 +76,7 @@ public class ContextFactoryImpl implements ContextFactory {
         this.eventPublisher = eventPublisher;
         this.logFileStorage = logFileStorage;
         this.tempFileStorage = tempFileStorage;
+        this.tracer = tracer;
         this.publicUrl = applicationProperties.getPublicUrl();
     }
 
@@ -97,6 +100,7 @@ public class ContextFactoryImpl implements ContextFactory {
             .publicUrl(publicUrl)
             .taskExecutionId(taskExecutionId != null ? taskExecutionId : 0)
             .type(type)
+            .tracer(tracer)
             .workflowId(workflowId)
             .build();
     }

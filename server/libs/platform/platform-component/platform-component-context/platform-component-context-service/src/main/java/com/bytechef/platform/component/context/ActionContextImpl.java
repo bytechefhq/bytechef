@@ -30,9 +30,12 @@ import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.micrometer.tracing.TraceContext;
+import io.micrometer.tracing.Tracer;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -63,6 +66,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable String publicUrl;
     private final long taskExecutionId;
     private final TempFileStorage tempFileStorage;
+    private final @Nullable Tracer tracer;
     private final @Nullable String workflowId;
     private final @Nullable Long environmentId;
 
@@ -82,6 +86,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.logFileStorageWriter = builder.logFileStorageWriter;
         this.taskExecutionId = builder.taskExecutionId;
         this.tempFileStorage = builder.tempFileStorage;
+        this.tracer = builder.tracer;
 
         if (builder.jobId != null && builder.publicUrl != null) {
             this.approval = new ApprovalImpl(builder.jobId, builder.publicUrl);
@@ -152,6 +157,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
         private long taskExecutionId;
+        private @Nullable Tracer tracer;
         private final TempFileStorage tempFileStorage;
         private @Nullable PlatformType type;
         private @Nullable String workflowId;
@@ -174,6 +180,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder componentConnection(@Nullable ComponentConnection componentConnection) {
             this.componentConnection = componentConnection;
+
+            return this;
+        }
+
+        Builder tracer(@Nullable Tracer tracer) {
+            this.tracer = tracer;
 
             return this;
         }
@@ -235,6 +247,24 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         ActionContextImpl build() {
             return new ActionContextImpl(this);
         }
+    }
+
+    @Override
+    public String getTraceId() {
+        if (tracer == null) {
+            return UUID.randomUUID()
+                .toString();
+        }
+
+        TraceContext context = tracer.currentTraceContext()
+            .context();
+
+        if (context == null) {
+            return UUID.randomUUID()
+                .toString();
+        }
+
+        return context.traceId();
     }
 
     @Override

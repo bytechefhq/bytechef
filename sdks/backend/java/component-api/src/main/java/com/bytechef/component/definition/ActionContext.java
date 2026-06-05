@@ -29,6 +29,13 @@ import java.util.function.Consumer;
 public interface ActionContext extends Context {
 
     /**
+     * Returns trace id which originates from micro meter
+     *
+     * @return traceId
+     */
+    String getTraceId();
+
+    /**
      * @param approvalFunction
      */
     Links approval(ContextFunction<Approval, Links> approvalFunction);

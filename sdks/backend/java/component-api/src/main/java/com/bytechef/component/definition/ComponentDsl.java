@@ -4107,6 +4107,11 @@ public final class ComponentDsl {
         }
 
         @Override
+        public String getTraceId() {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
         public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
             return context.xml(xmlFunction);
         }
