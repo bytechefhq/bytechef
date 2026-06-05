@@ -43,7 +43,7 @@ paths:
                 type: "object"
                 properties:
                   id:
-                    type: "number"
+                    type: "integer"
                     description: "ID of the company."
                   name:
                     type: "string"
@@ -51,9 +51,32 @@ paths:
                   description:
                     type: "string"
                     description: "Description of the company."
+                  domains:
+                    type: "array"
+                    description: "List of domains associated with the company."
+                    items:
+                      type: "string"
                   note:
                     type: "string"
                     description: "Note about the company."
+                  created_at:
+                    type: "string"
+                    description: "Timestamp when the company was created."
+                  updated_at:
+                    type: "string"
+                    description: "Timestamp when the company was last updated."
+                  health_score:
+                    type: "string"
+                    description: "Health score of the company."
+                  account_tier:
+                    type: "string"
+                    description: "Account tier of the company."
+                  renewal_date:
+                    type: "string"
+                    description: "Renewal date of the company subscription."
+                  industry:
+                    type: "string"
+                    description: "Industry of the company."
   /contacts:
     post:
       tags:
@@ -101,18 +124,90 @@ paths:
               schema:
                 type: "object"
                 properties:
+                  active:
+                    type: "boolean"
+                    description: "Whether the contact is active."
+                  address:
+                    type: "string"
+                    description: "Address of the contact."
+                  company_id:
+                    type: "integer"
+                    description: "ID of the primary company of the contact."
+                  view_all_tickets:
+                    type: "boolean"
+                    description: "Whether the contact can view all tickets."
+                  deleted:
+                    type: "boolean"
+                    description: "Whether the contact is deleted."
                   description:
                     type: "string"
-                    description: "A small description of the contact."
+                    description: "Description of the contact."
                   email:
                     type: "string"
-                    description: "Primary email address of the contact."
+                    description: "Email address of the contact."
                   id:
-                    type: "number"
+                    type: "integer"
                     description: "ID of the contact."
+                  contact_type:
+                    type: "string"
+                    description: "Type of the contact."
                   job_title:
                     type: "string"
                     description: "Job title of the contact."
+                  language:
+                    type: "string"
+                    description: "Language of the contact."
+                  mobile:
+                    type: "string"
+                    description: "Mobile number of the contact."
+                  name:
+                    type: "string"
+                    description: "Name of the contact."
+                  phone:
+                    type: "string"
+                    description: "Phone number of the contact."
+                  time_zone:
+                    type: "string"
+                    description: "Time zone of the contact."
+                  twitter_id:
+                    type: "string"
+                    description: "Twitter ID of the contact."
+                  social_handler:
+                    type: "array"
+                    description: "List of social handlers of the contact."
+                    items:
+                      type: "string"
+                  other_emails:
+                    type: "array"
+                    description: "List of additional email addresses of the contact."
+                    items:
+                      type: "string"
+                  other_companies:
+                    type: "array"
+                    description: "List of other companies associated with the contact."
+                    items:
+                      type: "object"
+                      properties:
+                        company_id:
+                          type: "integer"
+                          description: "ID of the company."
+                        view_all_tickets:
+                          type: "boolean"
+                          description: "Whether the contact can view all tickets of the company."
+                  created_at:
+                    type: "string"
+                    description: "Timestamp when the contact was created."
+                  updated_at:
+                    type: "string"
+                    description: "Timestamp when the contact was last updated."
+                  tags:
+                    type: "array"
+                    description: "List of tags associated with the contact."
+                    items:
+                      type: "string"
+                  avatar:
+                    type: "string"
+                    description: "Avatar of the contact."
   /tickets:
     post:
       tags:
@@ -169,22 +264,102 @@ paths:
               schema:
                 type: "object"
                 properties:
-                  subject:
-                    type: "string"
-                    description: "Subject of the ticket."
-                  email:
-                    type: "string"
-                    format: "email"
-                    description: "Email address of the requester."
-                  description:
-                    type: "string"
-                    description: "HTML content of the ticket."
+                  cc_emails:
+                    type: "array"
+                    description: "List of email addresses added in the cc field of the ticket."
+                    items:
+                      type: "string"
+                  fwd_emails:
+                    type: "array"
+                    description: "List of email addresses added while forwarding a ticket."
+                    items:
+                      type: "string"
+                  reply_cc_emails:
+                    type: "array"
+                    description: "List of email addresses added while replying to a ticket."
+                    items:
+                      type: "string"
+                  email_config_id:
+                    type: "integer"
+                    description: "ID of the email config used for the ticket."
+                  group_id:
+                    type: "integer"
+                    description: "ID of the group the ticket is assigned to."
                   priority:
                     type: "integer"
                     description: "Priority of the ticket."
+                  requester_id:
+                    type: "integer"
+                    description: "ID of the requester of the ticket."
+                  responder_id:
+                    type: "integer"
+                    description: "ID of the agent the ticket is assigned to."
+                  source:
+                    type: "integer"
+                    description: "Channel through which the ticket was created."
                   status:
                     type: "integer"
                     description: "Status of the ticket."
+                  subject:
+                    type: "string"
+                    description: "Subject of the ticket."
+                  company_id:
+                    type: "integer"
+                    description: "ID of the company the ticket belongs to."
+                  id:
+                    type: "integer"
+                    description: "ID of the ticket."
+                  type:
+                    type: "string"
+                    description: "Type of the ticket."
+                  to_emails:
+                    type: "array"
+                    description: "List of email addresses the ticket was sent to."
+                    items:
+                      type: "string"
+                  product_id:
+                    type: "integer"
+                    description: "ID of the product the ticket belongs to."
+                  fr_escalated:
+                    type: "boolean"
+                    description: "Whether the ticket has been escalated as the result of first response time being breached."
+                  spam:
+                    type: "boolean"
+                    description: "Whether the ticket has been marked as spam."
+                  urgent:
+                    type: "boolean"
+                    description: "Whether the ticket is marked as urgent."
+                  is_escalated:
+                    type: "boolean"
+                    description: "Whether the ticket has been escalated."
+                  created_at:
+                    type: "string"
+                    description: "Timestamp when the ticket was created."
+                  updated_at:
+                    type: "string"
+                    description: "Timestamp when the ticket was last updated."
+                  due_by:
+                    type: "string"
+                    description: "Timestamp when the ticket is due to be resolved."
+                  fr_due_by:
+                    type: "string"
+                    description: "Timestamp when the first response is due."
+                  description_text:
+                    type: "string"
+                    description: "Plain text version of the ticket description."
+                  description:
+                    type: "string"
+                    description: "HTML content of the ticket description."
+                  tags:
+                    type: "array"
+                    description: "List of tags associated with the ticket."
+                    items:
+                      type: "string"
+                  attachments:
+                    type: "array"
+                    description: "List of attachments associated with the ticket."
+                    items:
+                      type: "object"
 components:
   securitySchemes:
     basicAuth:
