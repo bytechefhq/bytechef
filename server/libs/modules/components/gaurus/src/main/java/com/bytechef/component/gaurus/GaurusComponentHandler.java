@@ -26,68 +26,80 @@ import com.google.auto.service.AutoService;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
- * This class will not be overwritten on the subsequent calls of the generator.
+ * This class will not be overwritten on the repeated calls of the generator.
  *
  * @author Igor Beslic
  */
 @AutoService(OpenApiComponentHandler.class)
 public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
 
+    private static final String EMPTY_BODY = "";
+
     public ComponentDsl.ModifiableActionDefinition
         modifyAction(ComponentDsl.ModifiableActionDefinition modifiableActionDefinition) {
-        if (Objects.equals("getExternalUsers", modifiableActionDefinition.getName())) {
-            Optional<Map<String, Object>> metadata = modifiableActionDefinition.getMetadata();
 
-            Map<String, Object> metadataMap = metadata.orElseGet(Collections::emptyMap);
+        Optional<Map<String, Object>> metadata = modifiableActionDefinition.getMetadata();
 
-            String path = (String) metadataMap.get("path");
+        Map<String, Object> metadataMap = metadata.orElseGet(Collections::emptyMap);
 
-            modifiableActionDefinition.perform(new ActionDefinition.PerformFunction() {
-                @Override
-                public Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-                    throws Exception {
-                    String endpoint =
-                        connectionParameters.getRequiredString("baseUri") + path;
+        String path = (String) metadataMap.get("path");
 
-                    Context.Http.Executor httpExecutor = context.http(http -> http.get(endpoint));
+        modifiableActionDefinition.perform(new ActionDefinition.PerformFunction() {
+            @Override
+            public Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
+                throws Exception {
+                String endpoint =
+                    connectionParameters.getRequiredString("baseUri") + path;
 
-                    String clientId = connectionParameters.getString("clientId");
-                    String clientSecret = connectionParameters.getString("clientSecret");
-                    String requestId = "SHOUD-GENERATE-0001";
-                    String timestamp =
-                        DateFormatUtils.ISO_8601_EXTENDED_DATETIME_TIME_ZONE_FORMAT.format(System.currentTimeMillis());
+                Context.Http.Executor httpExecutor = context.http(http -> http.get(endpoint));
 
-                    Context.Http.Response response = httpExecutor
-                        .configuration(Context.Http
-                            .allowUnauthorizedCerts(connectionParameters.getBoolean("allowSelfSignedCert", false)))
-                        .headers(Map.of("clienId", List.of(clientId), "requestId",
-                            List.of(requestId), "timestamp", List.of(timestamp),
-                            "signature", List.of(getSignature(clientId, clientSecret, requestId, timestamp, endpoint))))
-                        .execute();
+                String clientId = connectionParameters.getString("clientId");
+                String clientSecret = connectionParameters.getString("clientSecret");
+                String requestId = asUuid(context.getTraceId());
+                String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now()
+                    .truncatedTo(ChronoUnit.MILLIS));
 
-                    return response.getBody();
-                }
-            });
-        }
+                String body = EMPTY_BODY;
+                String signature = getSignature(clientId, clientSecret, requestId, timestamp, path, body, context);
+
+                context.log(log -> log.debug(
+                    "Executing endpoint: {} with clientId: {}, requestId: {}, timestamp: {}, uri: {}, body: {}, signature {}",
+                    endpoint, clientId, requestId, timestamp, path, body, signature));
+
+                Context.Http.Response response = httpExecutor
+                    .configuration(Context.Http
+                        .allowUnauthorizedCerts(connectionParameters.getBoolean("allowSelfSignedCert", false)))
+                    .headers(Map.of("clientId", List.of(clientId), "requestId",
+                        List.of(requestId), "timestamp", List.of(timestamp),
+                        "signature", List.of(signature)))
+                    .execute();
+
+                return response.getBody();
+            }
+        });
 
         return modifiableActionDefinition;
     }
 
     private static String getSignature(
-        String clientId, String clientSecret, String requestId, String timestamp, String uri) {
+        String clientId, String clientSecret, String requestId, String timestamp, String uri, String body,
+        ActionContext context) {
 
-        String forSigning = String.format("%s;%s;%s;%s;", clientId, requestId, timestamp, uri);
+        String forSigning = String.format("%s;%s;%s;%s;%s", clientId, requestId, timestamp, uri, body);
+
+        context.log(log -> log.debug("Signing {} with {}", forSigning, clientSecret));
 
         try {
             Mac mac = Mac.getInstance("HmacSHA256");
@@ -100,4 +112,13 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
             throw new RuntimeException("Failed to compute HmacSHA256 signature", exception);
         }
     }
+
+    private static String asUuid(String rawUuid) {
+        if (rawUuid.contains("-")) {
+            return rawUuid;
+        }
+
+        return rawUuid.replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+    }
+
 }
