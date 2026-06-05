@@ -35,6 +35,7 @@ import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListen
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
+import com.bytechef.component.ai.llm.advisor.ToolHistoryToolCallAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -68,7 +69,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
@@ -348,7 +348,7 @@ public abstract class AbstractAiAgentChatAction {
 
         // tool call
 
-        ToolCallAdvisor.Builder<?> toolCallAdvisorBuilder = ToolCallAdvisor.builder()
+        ToolHistoryToolCallAdvisor.Builder toolCallAdvisorBuilder = ToolHistoryToolCallAdvisor.builder()
             .toolCallingManager(toolCallingManager);
 
         // memory
