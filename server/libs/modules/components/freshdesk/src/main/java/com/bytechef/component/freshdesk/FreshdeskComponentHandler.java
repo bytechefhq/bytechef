@@ -43,6 +43,7 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
     public ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition
             .customAction(true)
+            .customActionHelp("", "https://developers.freshdesk.com/api/#introduction")
             .icon("path:assets/freshdesk.svg")
             .categories(ComponentCategory.CUSTOMER_SUPPORT);
     }
@@ -52,6 +53,8 @@ public class FreshdeskComponentHandler extends AbstractFreshdeskComponentHandler
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/freshdesk_v1#connection-setup")
             .authorizations(
                 authorization(AuthorizationType.BASIC_AUTH)
                     .title("Basic Auth")
