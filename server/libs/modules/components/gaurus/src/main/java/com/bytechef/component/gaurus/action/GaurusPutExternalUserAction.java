@@ -43,7 +43,7 @@ public class GaurusPutExternalUserAction {
 
             ))
         .properties(string("clientId").label("Client Id")
-            .description("Client identifer provided by the system.")
+            .description("Client identifier provided by the system.")
             .required(true)
             .exampleValue("4181a492-97bf-48ee-b29e-d7d6860c5565")
             .metadata(
