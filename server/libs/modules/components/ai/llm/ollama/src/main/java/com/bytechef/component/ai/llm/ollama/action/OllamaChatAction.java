@@ -149,9 +149,12 @@ public class OllamaChatAction {
             PENALIZE_NEW_LINE_PROPERTY,
             TRUNCATE_PROPERTY)
         .output(ModelUtils::output)
+        .help("", "https://docs.bytechef.io/reference/components/ollama_v1#ask")
         .perform(OllamaChatAction::perform);
 
-    public static final ChatModel CHAT_MODEL = (inputParameters, connectionParameters, responseFormatRequired) -> {
+    public static final ChatModel CHAT_MODEL =
+        (inputParameters, connectionParameters, responseFormatRequired) -> {
+
         String url = connectionParameters.getString(URL);
 
         OllamaApi ollamaApi = url.isEmpty() ? OllamaApi.builder()
