@@ -128,30 +128,33 @@ public class SendEmailAction {
                         }
                     });
         } else {
-            session = Session
-                .getInstance(EmailUtils.getMailSessionProperties(port, EmailProtocol.smtp, connectionParameters));
+            session = Session.getInstance(
+                EmailUtils.getMailSessionProperties(port, EmailProtocol.smtp, connectionParameters));
         }
 
         Message message = new MimeMessage(session);
 
         message.setFrom(new InternetAddress(inputParameters.getRequiredString(FROM)));
 
-        message.setRecipients(RecipientType.TO, InternetAddress.parse(
-            String.join(",", inputParameters.getRequiredList(TO, String.class))));
+        message.setRecipients(
+            RecipientType.TO,
+            InternetAddress.parse(String.join(",", inputParameters.getRequiredList(TO, String.class))));
 
         if (inputParameters.containsKey(CC)) {
-            message.setRecipients(RecipientType.CC, InternetAddress.parse(
-                String.join(",", inputParameters.getRequiredList(CC, String.class))));
+            message.setRecipients(
+                RecipientType.CC,
+                InternetAddress.parse(String.join(",", inputParameters.getRequiredList(CC, String.class))));
         }
 
         if (inputParameters.containsKey(BCC)) {
-            message.setRecipients(RecipientType.BCC, InternetAddress.parse(
-                String.join(",", inputParameters.getRequiredList(BCC, String.class))));
+            message.setRecipients(
+                RecipientType.BCC,
+                InternetAddress.parse(String.join(",", inputParameters.getRequiredList(BCC, String.class))));
         }
 
         if (inputParameters.containsKey(REPLY_TO)) {
-            message.setReplyTo(InternetAddress.parse(
-                String.join(",", inputParameters.getRequiredList(REPLY_TO, String.class))));
+            message.setReplyTo(
+                InternetAddress.parse(String.join(",", inputParameters.getRequiredList(REPLY_TO, String.class))));
         }
 
         if (inputParameters.containsKey(SUBJECT)) {
@@ -183,8 +186,8 @@ public class SendEmailAction {
         Transport.send(message);
 
         context.log(log -> log.debug(
-            "Message sent: from:{}, to:{}, subject:{}",
-            message.getFrom(), message.getRecipients(RecipientType.TO), message.getSubject()));
+            "Message sent: from:{}, to:{}, subject:{}", message.getFrom(), message.getRecipients(RecipientType.TO),
+            message.getSubject()));
 
         return null;
     }
