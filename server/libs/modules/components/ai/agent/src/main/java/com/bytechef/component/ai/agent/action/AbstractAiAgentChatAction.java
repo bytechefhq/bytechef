@@ -68,7 +68,6 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -361,17 +360,12 @@ public abstract class AbstractAiAgentChatAction {
         if (chatMemoryAdvisor != null) {
             advisors.add(chatMemoryAdvisor);
 
-            // Disable ToolCallAdvisor's internal conversation history only when a MessageChatMemoryAdvisor
-            // is present. That advisor adds previous messages to the prompt directly, so ToolCallAdvisor
-            // must not duplicate them (double bookkeeping → malformed tool-call sequences on OpenAI).
-            //
-            // VectorStoreChatMemoryAdvisor is NOT a MessageChatMemoryAdvisor — it only augments the system
-            // message via semantic search and does not inject conversation messages into the prompt. With it,
-            // ToolCallAdvisor must keep its internal history so the second loop iteration includes the
-            // AssistantMessage(toolCalls) that OpenAI requires before the ToolResponseMessage.
-            if (chatMemoryAdvisor instanceof MessageChatMemoryAdvisor) {
-                toolCallAdvisorBuilder.disableInternalConversationHistory();
-            }
+            // Spring AI auto-applies this when ToolCallAdvisor is auto-registered (see DefaultChatClient
+            // .autoRegisterToolCallAdvisor), but we register manually to supply our own ToolCallingManager,
+            // so the auto-disable path is skipped and we must call it ourselves. Removing this line makes
+            // ToolCallAdvisor carry full conversation history alongside the downstream ChatMemoryAdvisor —
+            // double bookkeeping that produces malformed tool-call sequences on OpenAI.
+            toolCallAdvisorBuilder.disableInternalConversationHistory();
         }
 
         advisors.add(toolCallAdvisorBuilder.build());
