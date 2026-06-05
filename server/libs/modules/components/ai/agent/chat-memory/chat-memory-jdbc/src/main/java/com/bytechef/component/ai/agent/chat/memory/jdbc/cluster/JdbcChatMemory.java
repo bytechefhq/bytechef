@@ -20,7 +20,6 @@ import static com.bytechef.component.ai.agent.chat.memory.jdbc.constant.JdbcChat
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction.CHAT_MEMORY;
 
-import com.bytechef.component.ai.agent.chat.memory.jdbc.util.FilteringWindowChatMemory;
 import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
@@ -74,7 +73,7 @@ public class JdbcChatMemory {
             .build();
 
         return new ChatMemoryFunction.Result(
-            MessageChatMemoryAdvisor.builder(new FilteringWindowChatMemory(chatMemory))
+            MessageChatMemoryAdvisor.builder(chatMemory)
                 .build(),
             chatMemory);
     }
