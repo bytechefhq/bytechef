@@ -134,6 +134,7 @@ public class ReadEmailAction {
         }
 
         Store protocolStore = session.getStore(emailProtocol.name());
+
         protocolStore.connect(
             connectionParameters.getRequiredString(HOST), connectionParameters.getRequiredString(USERNAME),
             connectionParameters.getRequiredString(PASSWORD));
@@ -173,8 +174,8 @@ public class ReadEmailAction {
         }
 
         context.log(log -> log.debug(
-            "Messages read: size:{}, from:{}, to:{}",
-            filtered.size(), inputParameters.get("from"), inputParameters.get("to")));
+            "Messages read: size:{}, from:{}, to:{}", filtered.size(), inputParameters.get("from"),
+            inputParameters.get("to")));
 
         return filtered.toArray(new Map[0]);
     }
