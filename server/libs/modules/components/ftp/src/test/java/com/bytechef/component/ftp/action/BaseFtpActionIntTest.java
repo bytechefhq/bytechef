@@ -121,6 +121,11 @@ public class BaseFtpActionIntTest {
         }
 
         @Override
+        public String getTraceId() {
+            throw new UnsupportedOperationException("Disabled in test mode");
+        }
+
+        @Override
         public <R> R xml(ContextFunction<Xml, R> xmlFunction) {
             throw new UnsupportedOperationException("Disabled in test mode");
         }
