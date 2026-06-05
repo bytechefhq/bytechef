@@ -148,12 +148,14 @@ public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
      * <ul>
      * <li>An {@link AssistantMessage} with tool calls followed by one or more empty {@link ToolResponseMessage} objects
      * (broken cross-turn sequences from old storage).</li>
-     * <li>Orphaned empty {@link ToolResponseMessage} objects not preceded by an AssistantMessage with tool calls.</li>
+     * <li>Orphaned {@link ToolResponseMessage} objects (empty or non-empty) not immediately preceded by an
+     * {@link AssistantMessage} with tool calls. This covers both stale data and sequences truncated by the message
+     * window.</li>
      * </ul>
      * Within-turn safety: the {@link AssistantMessage} with tool calls is saved before its {@link ToolResponseMessage},
      * so mid-turn reads contain only the former and it is preserved intact.
      */
-    static List<Message> filterBrokenToolCallSequences(List<Message> messages) {
+    public static List<Message> filterBrokenToolCallSequences(List<Message> messages) {
         List<Message> result = new ArrayList<>(messages.size());
 
         for (int i = 0; i < messages.size(); i++) {
@@ -173,8 +175,12 @@ public class OrderedJdbcChatMemoryRepository implements ChatMemoryRepository {
 
                     continue;
                 }
-            } else if (message instanceof ToolResponseMessage toolResponse && toolResponse.getResponses()
-                .isEmpty()) {
+            } else if (message instanceof ToolResponseMessage
+                && (result.isEmpty()
+                    || !(result.get(result.size() - 1) instanceof AssistantMessage precedingMsg
+                        && precedingMsg.hasToolCalls()))) {
+                // Covers stale empty-response records from old storage AND window-truncated orphans where
+                // the AssistantMessage was cut off by the message window.
                 continue;
             }
 
