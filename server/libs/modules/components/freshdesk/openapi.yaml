@@ -15,6 +15,7 @@ paths:
       description: "Creates a new company"
       operationId: "createCompany"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-company"
       requestBody:
         content:
           application/json:
@@ -61,6 +62,7 @@ paths:
       description: "Creates a new contact"
       operationId: "createContact"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-contact"
       requestBody:
         content:
           application/json:
@@ -119,6 +121,7 @@ paths:
       description: "Creates a new ticket"
       operationId: "createTicket"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-ticket"
       requestBody:
         content:
           application/json:
