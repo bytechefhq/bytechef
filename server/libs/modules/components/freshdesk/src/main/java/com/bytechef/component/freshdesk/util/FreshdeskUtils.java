@@ -16,10 +16,43 @@
 
 package com.bytechef.component.freshdesk.util;
 
+import static com.bytechef.component.definition.ComponentDsl.option;
+
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Option;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Nikolina Spehar
  */
 public class FreshdeskUtils extends AbstractFreshdeskUtils {
     private FreshdeskUtils() {
+    }
+
+    public static List<Option<String>> getTicketIdOptions(
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
+
+        List<Map<String, Object>> response = context.http(http -> http.get("/tickets"))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Option<String>> ticketIdOptions = new ArrayList<>();
+
+        for (Map<String, Object> map : response) {
+            ticketIdOptions.add(
+                option(map.get("subject")
+                    .toString(),
+                    map.get("id")
+                        .toString()));
+        }
+
+        return ticketIdOptions;
     }
 }
