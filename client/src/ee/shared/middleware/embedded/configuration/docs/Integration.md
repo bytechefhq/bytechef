@@ -20,6 +20,7 @@ Name | Type
 `lastIntegrationVersion` | number
 `multipleInstances` | boolean
 `name` | string
+`permissionExpression` | string
 `category` | [Category](Category.md)
 `integrationWorkflowIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
@@ -45,6 +46,7 @@ const example = {
   "lastIntegrationVersion": null,
   "multipleInstances": null,
   "name": null,
+  "permissionExpression": null,
   "category": null,
   "integrationWorkflowIds": null,
   "tags": null,
