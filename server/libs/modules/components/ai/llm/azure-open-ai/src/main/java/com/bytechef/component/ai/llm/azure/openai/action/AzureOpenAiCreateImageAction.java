@@ -127,7 +127,7 @@ public class AzureOpenAiCreateImageAction {
                 .deploymentName(inputParameters.getRequiredString(MODEL))
                 .height(size.getDimensions()[1])
                 .model(inputParameters.getRequiredString(MODEL))
-                .N(inputParameters.getInteger(N))
+                .n(inputParameters.getInteger(N))
                 .responseFormat(responseFormat.getValue())
                 .style(style.getValue())
                 .user(inputParameters.getString(USER))

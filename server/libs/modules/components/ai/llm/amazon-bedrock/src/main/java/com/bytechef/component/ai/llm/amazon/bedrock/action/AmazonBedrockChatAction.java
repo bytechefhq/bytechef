@@ -81,7 +81,7 @@ public class AmazonBedrockChatAction {
                                 connectionParameters.getRequiredString(SECRET_ACCESS_KEY))))
                     .region(Region.of(connectionParameters.getRequiredString(REGION)))
                     .build())
-            .defaultOptions(
+            .options(
                 BedrockChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))

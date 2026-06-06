@@ -52,7 +52,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.ToolCallAdvisor;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -372,14 +372,14 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
-    void testChatMemoryAdvisorOrderedDownstreamOfToolCallAdvisor() throws Exception {
-        // Regression for the M7 ordering bug: with disableInternalConversationHistory() active,
-        // ToolCallAdvisor passes only [systemMsg, lastMessage] between loop iterations and relies on a
-        // DOWNSTREAM ChatMemoryAdvisor to rehydrate the preceding assistant-with-tool-calls each turn.
-        // If a future change places ChatMemoryAdvisor at a lower order than ToolCallAdvisor, memory
-        // moves outside the tool-call loop and the second model call lands at OpenAI as
-        // [systemMsg, toolResultMsg], producing
-        // "messages with role 'tool' must be a response to a preceding message with 'tool_calls'".
+    void testChatMemoryAdvisorOrderedUpstreamOfToolCallingAdvisor() throws Exception {
+        // Spring AI 2.0.0-RC1 default ordering: ChatMemoryAdvisor (DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER,
+        // MIN+200) runs upstream of ToolCallingAdvisor (DEFAULT_ORDER, MIN+300), so memory wraps the whole
+        // tool-call loop — persisted history is applied once before the loop and only the final assistant
+        // message is written back. Validity inside the loop comes from ToolCallingAdvisor retaining the
+        // (assistant-with-tool_calls, toolResultMsg) pairs in its own in-loop history
+        // (conversationHistoryEnabled defaults to true), so OpenAI never sees an orphaned tool result. This
+        // test pins the default composition so a future bump that changes it surfaces at the dependency PR.
         Parameters inputParameters = MockParametersFactory.create(Map.of());
 
         Map<String, Object> modelElement = buildModelElement();
@@ -432,9 +432,9 @@ class AbstractAiAgentChatActionTest {
             List<Advisor> advisors = ((DefaultChatClient.DefaultChatClientRequestSpec) spec).getAdvisors();
 
             Advisor toolCallAdvisor = advisors.stream()
-                .filter(ToolCallAdvisor.class::isInstance)
+                .filter(ToolCallingAdvisor.class::isInstance)
                 .findFirst()
-                .orElseThrow(() -> new AssertionError("ToolCallAdvisor missing from advisor chain"));
+                .orElseThrow(() -> new AssertionError("ToolCallingAdvisor missing from advisor chain"));
 
             Advisor chatMemoryAdvisor = advisors.stream()
                 .filter(advisor -> advisor instanceof BaseChatMemoryAdvisor)
@@ -443,22 +443,21 @@ class AbstractAiAgentChatActionTest {
 
             assertThat(chatMemoryAdvisor.getOrder())
                 .as(
-                    "ChatMemoryAdvisor MUST run downstream of ToolCallAdvisor so memory participates in " +
-                        "every tool-call iteration. With disableInternalConversationHistory() active, the " +
-                        "inverse ordering causes OpenAI to reject the second iteration's prompt because the " +
-                        "tool-result message has no preceding assistant-with-tool-calls.")
-                .isGreaterThan(toolCallAdvisor.getOrder());
+                    "Spring AI RC1 default ordering places ChatMemoryAdvisor upstream of ToolCallingAdvisor; " +
+                        "ToolCallingAdvisor's own in-loop history (conversationHistoryEnabled=true) is what " +
+                        "keeps each tool-call iteration valid, not advisor ordering.")
+                .isLessThan(toolCallAdvisor.getOrder());
         }
     }
 
     @Test
     void testSpringAiDefaultOrdersComposeCorrectly() {
         // Safety net for Spring AI version bumps. Our chat-memory components and AbstractAiAgentChatAction
-        // both rely on Spring AI's builder defaults (no explicit .order(...) / .advisorOrder(...) calls)
-        // to produce ToolCallAdvisor < ChatMemoryAdvisor. If a future bump inverts these defaults, every
-        // chat-memory-backed agent breaks with the same OpenAI tool-message ordering error — this test
-        // surfaces the regression at the dependency-bump PR rather than in production.
-        ToolCallAdvisor toolCallAdvisor = ToolCallAdvisor.builder()
+        // both rely on Spring AI's builder defaults (no explicit .order(...) / .advisorOrder(...) calls).
+        // As of 2.0.0-RC1 those defaults place ChatMemoryAdvisor (MIN+200) upstream of ToolCallingAdvisor
+        // (MIN+300). If a future bump changes this relationship, the regression surfaces at the
+        // dependency-bump PR rather than in production.
+        ToolCallingAdvisor toolCallingAdvisor = ToolCallingAdvisor.builder()
             .build();
 
         MessageChatMemoryAdvisor chatMemoryAdvisor = MessageChatMemoryAdvisor
@@ -466,8 +465,8 @@ class AbstractAiAgentChatActionTest {
             .build();
 
         assertThat(chatMemoryAdvisor.getOrder())
-            .as("Spring AI default ordering must keep ChatMemoryAdvisor downstream of ToolCallAdvisor")
-            .isGreaterThan(toolCallAdvisor.getOrder());
+            .as("Spring AI default ordering must keep ChatMemoryAdvisor upstream of ToolCallingAdvisor")
+            .isLessThan(toolCallingAdvisor.getOrder());
     }
 
     private static Map<String, Object> buildModelElement() {
@@ -494,7 +493,7 @@ class AbstractAiAgentChatActionTest {
 
         List<Advisor> advisors = action.getAdvisors(clusterElementMap, Map.of(), actionContext);
 
-        ToolCallAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+        ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
 
         assertThat(toolCallAdvisor).isNotNull();
         assertThat(advisors).noneMatch(BaseChatMemoryAdvisor.class::isInstance);
@@ -502,7 +501,7 @@ class AbstractAiAgentChatActionTest {
     }
 
     @Test
-    void testGetAdvisorsAddsChatMemoryBeforeToolCallAdvisorAndDisablesInternalConversationHistory() throws Exception {
+    void testGetAdvisorsAddsChatMemoryBeforeToolCallAdvisor() throws Exception {
         Map<String, Object> chatMemoryElement = new HashMap<>();
 
         chatMemoryElement.put("name", "memory_1");
@@ -535,12 +534,15 @@ class AbstractAiAgentChatActionTest {
         List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, actionContext);
 
         int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
-        ToolCallAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
+        ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
         int toolCallIndex = advisors.indexOf(toolCallAdvisor);
 
         assertThat(chatMemoryIndex).isGreaterThanOrEqualTo(0);
         assertThat(toolCallIndex).isGreaterThan(chatMemoryIndex);
-        assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isFalse();
+
+        // With ChatMemoryAdvisor now upstream of the tool loop (RC1 defaults), ToolCallingAdvisor keeps its
+        // internal in-loop history enabled — the former disableInternalConversationHistory() workaround is gone.
+        assertThat(readConversationHistoryEnabled(toolCallAdvisor)).isTrue();
     }
 
     private static Map<String, Object> buildModelClusterElement() {
@@ -571,24 +573,24 @@ class AbstractAiAgentChatActionTest {
         when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
     }
 
-    private static ToolCallAdvisor findToolCallAdvisor(List<Advisor> advisors) {
+    private static ToolCallingAdvisor findToolCallAdvisor(List<Advisor> advisors) {
         return advisors.stream()
-            .filter(ToolCallAdvisor.class::isInstance)
-            .map(ToolCallAdvisor.class::cast)
+            .filter(ToolCallingAdvisor.class::isInstance)
+            .map(ToolCallingAdvisor.class::cast)
             .findFirst()
-            .orElseThrow(() -> new AssertionError("Expected ToolCallAdvisor in advisor list"));
+            .orElseThrow(() -> new AssertionError("Expected ToolCallingAdvisor in advisor list"));
     }
 
-    private static boolean readConversationHistoryEnabled(ToolCallAdvisor toolCallAdvisor) {
+    private static boolean readConversationHistoryEnabled(ToolCallingAdvisor toolCallAdvisor) {
         try {
-            Field field = ToolCallAdvisor.class.getDeclaredField("conversationHistoryEnabled");
+            Field field = ToolCallingAdvisor.class.getDeclaredField("conversationHistoryEnabled");
 
             field.setAccessible(true);
 
             return field.getBoolean(toolCallAdvisor);
         } catch (ReflectiveOperationException exception) {
             throw new AssertionError(
-                "Unable to read conversationHistoryEnabled from ToolCallAdvisor — "
+                "Unable to read conversationHistoryEnabled from ToolCallingAdvisor — "
                     + "field name changed in Spring AI?",
                 exception);
         }

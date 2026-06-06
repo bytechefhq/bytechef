@@ -132,7 +132,7 @@ public class OpenAiCreateImageAction {
 
             OpenAiImageOptions.Builder builder = OpenAiImageOptions.builder()
                 .model(model)
-                .N(inputParameters.getInteger(N))
+                .n(inputParameters.getInteger(N))
                 .user(inputParameters.getString(USER));
 
             Size size = inputParameters.getRequired(SIZE, Size.class);

@@ -162,7 +162,7 @@ public class OllamaChatAction {
 
         return OllamaChatModel.builder()
             .ollamaApi(ollamaApi)
-            .defaultOptions(
+            .options(
                 OllamaChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .temperature(inputParameters.getDouble(TEMPERATURE))

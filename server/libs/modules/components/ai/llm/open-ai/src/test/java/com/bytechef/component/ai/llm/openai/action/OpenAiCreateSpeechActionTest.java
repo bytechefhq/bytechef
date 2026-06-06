@@ -100,7 +100,7 @@ class OpenAiCreateSpeechActionTest {
                 .thenReturn(mockedSpeechModelBuilder);
             when(mockedSpeechModelBuilder.openAiClient(openAIClientArgumentCaptor.capture()))
                 .thenReturn(mockedSpeechModelBuilder);
-            when(mockedSpeechModelBuilder.defaultOptions(optionsCaptor.capture()))
+            when(mockedSpeechModelBuilder.options(optionsCaptor.capture()))
                 .thenReturn(mockedSpeechModelBuilder);
             when(mockedSpeechModelBuilder.build())
                 .thenReturn(mockedSpeechModel);

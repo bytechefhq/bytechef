@@ -35,6 +35,8 @@ subprojects {
 
     dependencyManagement {
         dependencies {
+            dependency("com.anthropic:anthropic-java-client-okhttp:${rootProject.libs.versions.anthropic.java.get()}")
+            dependency("com.openai:openai-java-client-okhttp:${rootProject.libs.versions.openai.java.get()}")
             dependency("org.testcontainers:junit-jupiter:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:localstack:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:postgresql:${rootProject.libs.versions.testcontainers.get()}")

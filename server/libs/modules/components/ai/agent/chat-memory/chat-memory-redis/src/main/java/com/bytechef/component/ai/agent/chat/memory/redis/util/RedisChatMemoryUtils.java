@@ -35,7 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.redis.RedisChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
-import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.RedisClient;
 
 /**
  * @author Ivica Cardic
@@ -46,7 +46,7 @@ public class RedisChatMemoryUtils {
     }
 
     public static ChatMemoryRepository getChatMemoryRepository(Parameters connectionParameters) {
-        JedisPooled jedisClient = getJedisClient(connectionParameters);
+        RedisClient jedisClient = getJedisClient(connectionParameters);
         String keyPrefix = connectionParameters.getString(KEY_PREFIX, DEFAULT_KEY_PREFIX);
 
         RedisChatMemoryRepository.Builder builder = RedisChatMemoryRepository.builder()
@@ -62,7 +62,7 @@ public class RedisChatMemoryUtils {
         return new OrderedRedisChatMemoryRepository(builder.build(), jedisClient, "chat-memory-idx");
     }
 
-    public static JedisPooled getJedisClient(Parameters connectionParameters) {
+    public static RedisClient getJedisClient(Parameters connectionParameters) {
         String host = connectionParameters.getRequiredString(HOST);
         int port = connectionParameters.getRequiredInteger(PORT);
         String username = connectionParameters.getString(USERNAME);
@@ -73,12 +73,12 @@ public class RedisChatMemoryUtils {
                 throw new IllegalArgumentException("Password is required when username is provided");
             }
 
-            return new JedisPooled(host, port, username, password);
+            return RedisClient.create(host, port, username, password);
         } else if (password != null && !password.isBlank()) {
-            return new JedisPooled(host, port, null, password);
+            return RedisClient.create(host, port, null, password);
         }
 
-        return new JedisPooled(host, port);
+        return RedisClient.create(host, port);
     }
 
     private static Duration parseDuration(String timeToLive) {

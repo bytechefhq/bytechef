@@ -120,7 +120,7 @@ public class NvidiaChatAction {
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
-                    .N(inputParameters.getInteger(N))
+                    .n(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                     .responseFormat(responseFormat)
                     .stop(inputParameters.getList(STOP, new TypeReference<>() {}))

@@ -1,6 +1,7 @@
 version="1.0"
 
 dependencies {
+    implementation("com.openai:openai-java-client-okhttp")
     api("org.springframework:spring-web")
     api("org.springframework:spring-webflux")
     api("org.springframework.ai:spring-ai-openai")

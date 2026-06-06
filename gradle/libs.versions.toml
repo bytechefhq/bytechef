@@ -1,29 +1,27 @@
 [versions]
+anthropic-java = "2.35.0"
 checkstyle = "13.4.0"
 com-google-auto-service = "1.1.1"
 findsecbugs = "1.14.0"
 graalvm = "25.0.2"
-io-modelcontextprotocol-sdk = "2.0.0-M3"
+io-modelcontextprotocol-sdk = "2.0.0-RC1"
 jackson = "2.19.2"
 jacoco = "0.8.13"
 java = "25"
 jjwt = "0.13.0"
+openai-java = "4.38.0"
 org-mapstruct = "1.6.3"
 org-mapstruct-extensions-spring = "2.0.0"
 org-springdoc = "3.0.3"
 pmd = "7.23.0"
 spotbugs = "4.9.8"
-spring-ai = "2.0.0-M8"
+spring-ai = "2.0.0-RC1"
 spring-boot = "4.0.6"
 spring-cloud-aws = "4.0.2"
 spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.1"
 springaicommunity-agent-judge = "0.9.1"
 springaicommunity-agent-utils = "0.8.0"
-# Note: tool-search-tool and tool-searcher-vectorstore are temporarily vendored
-# under //spring-ai-tool-search-tool/ because upstream 2.1.0 builds against
-# spring-ai 2.0.0-M4 and is binary-incompatible with M7+. See
-# spring-ai-tool-search-tool/README.md for the removal plan.
 testcontainers = "1.21.3"
 
 [libraries]
