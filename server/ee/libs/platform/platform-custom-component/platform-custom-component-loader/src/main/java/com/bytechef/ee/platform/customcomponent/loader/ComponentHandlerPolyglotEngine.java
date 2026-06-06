@@ -18,6 +18,7 @@ import com.bytechef.component.definition.Help;
 import com.bytechef.component.definition.OutputDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
+import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
@@ -243,6 +244,11 @@ class ComponentHandlerPolyglotEngine {
 
         @Override
         public Optional<String> getIcon() {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<List<? extends PropertyGroup>> getInputs() {
             return Optional.empty();
         }
 

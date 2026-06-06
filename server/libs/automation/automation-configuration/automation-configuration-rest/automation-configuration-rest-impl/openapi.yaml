@@ -1190,6 +1190,8 @@ components:
   schemas:
     Category:
       $ref: "../../../../platform/platform-category/platform-category-rest/openapi.yaml#/components/schemas/Category"
+    ComponentInputReference:
+      $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/ComponentInputReference"
     Connection:
       description: "Contains all required information to open a connection to a service\
         \ defined by componentName parameter."
@@ -1531,6 +1533,8 @@ components:
               description: "The workflow uuid"
               type: "string"
               readOnly: true
+    WorkflowInput:
+      $ref: "../../../../platform/platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/WorkflowInput"
     Workspace:
       description: "A workspace."
       required:

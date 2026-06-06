@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -206,12 +205,12 @@ public class WorkflowTestConfigurationServiceImpl implements WorkflowTestConfigu
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, Object value, long environmentId) {
         WorkflowTestConfiguration workflowTestConfiguration = getWorkflowTestConfiguration(workflowId, environmentId);
 
-        Map<String, String> inputs = new HashMap<>(workflowTestConfiguration.getInputs());
+        Map<String, Object> inputs = new HashMap<>(workflowTestConfiguration.getInputs());
 
-        if (StringUtils.isEmpty(value)) {
+        if (value == null || (value instanceof String string && string.isEmpty())) {
             inputs.remove(key);
         } else {
             inputs.put(key, value);

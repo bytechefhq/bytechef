@@ -22,37 +22,23 @@ import java.util.Optional;
 /**
  * @author Ivica Cardic
  */
-public interface WorkflowComponentDefinition {
+public interface PropertyGroup {
 
     /**
      *
      * @return
      */
-    Optional<List<ActionDefinition>> getActions();
+    String getName();
 
     /**
      *
      * @return
      */
-    Optional<Boolean> getCustomAction();
+    Optional<String> getLabel();
 
     /**
      *
      * @return
      */
-    Optional<Help> getCustomActionHelp();
-
-    /**
-     * Returns the component-level workflow inputs, always modeled as property groups (a lone property is a group with
-     * one property).
-     *
-     * @return
-     */
-    Optional<List<? extends PropertyGroup>> getInputs();
-
-    /**
-     *
-     * @return
-     */
-    Optional<List<TriggerDefinition>> getTriggers();
+    List<? extends Property.ValueProperty<?>> getProperties();
 }

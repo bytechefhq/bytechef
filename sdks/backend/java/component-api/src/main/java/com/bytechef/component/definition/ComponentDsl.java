@@ -37,6 +37,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -45,6 +46,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -79,6 +81,10 @@ public final class ComponentDsl {
 
     public static ModifiableComponentDefinition component(String name) {
         return new ModifiableComponentDefinition(name);
+    }
+
+    public static ModifiablePropertyGroup propertyGroup(String name) {
+        return new ModifiablePropertyGroup(name);
     }
 
     public static ModifiableConnectionDefinition connection() {
@@ -1298,6 +1304,7 @@ public final class ComponentDsl {
         private List<String> tags;
         private Map<String, Object> metadata;
         private String name;
+        private List<ModifiablePropertyGroup> inputs;
         private Resources resources;
         private int version = VERSION_1;
         private String title;
@@ -1318,6 +1325,25 @@ public final class ComponentDsl {
 
         public <A extends ActionDefinition> ModifiableComponentDefinition actions(List<A> actionDefinitions) {
             this.actions = Collections.unmodifiableList(Objects.requireNonNull(actionDefinitions));
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final <P extends Property.ValueProperty<?>> ModifiableComponentDefinition inputs(P... inputs) {
+            if (inputs != null) {
+                this.inputs = Arrays.stream(inputs)
+                    .map(property -> new ModifiablePropertyGroup(property.getName()).properties(property))
+                    .collect(Collectors.toList());
+            }
+
+            return this;
+        }
+
+        public ModifiableComponentDefinition inputs(ModifiablePropertyGroup... inputs) {
+            if (inputs != null) {
+                this.inputs = List.of(inputs);
+            }
 
             return this;
         }
@@ -1454,6 +1480,11 @@ public final class ComponentDsl {
         }
 
         @Override
+        public Optional<List<? extends PropertyGroup>> getInputs() {
+            return Optional.ofNullable(inputs);
+        }
+
+        @Override
         public Optional<List<ComponentCategory>> getComponentCategories() {
             return Optional.ofNullable(componentCategories);
         }
@@ -1547,14 +1578,15 @@ public final class ComponentDsl {
                 Objects.equals(description, that.description) && Objects.equals(icon, that.icon) &&
                 Objects.equals(tags, that.tags) && Objects.equals(metadata, that.metadata) &&
                 Objects.equals(name, that.name) && Objects.equals(resources, that.resources) &&
-                Objects.equals(title, that.title) && Objects.equals(triggers, that.triggers);
+                Objects.equals(title, that.title) && Objects.equals(triggers, that.triggers) &&
+                Objects.equals(inputs, that.inputs);
         }
 
         @Override
         public int hashCode() {
             return Objects.hash(
                 actions, componentCategories, connection, customAction, customActionHelp, description, icon, tags,
-                metadata, name, resources, version, title, triggers);
+                metadata, name, resources, version, title, triggers, inputs);
         }
 
         @Override
@@ -1574,8 +1606,69 @@ public final class ComponentDsl {
                 ", tags=" + tags +
                 ", actionDefinitions=" + actions +
                 ", triggerDefinitions=" + triggers +
+                ", inputs=" + inputs +
                 ", icon='" + icon + '\'' +
                 '}';
+        }
+    }
+
+    public static final class ModifiablePropertyGroup implements PropertyGroup {
+
+        private String label;
+        private final String name;
+        private List<? extends Property.ValueProperty<?>> properties = List.of();
+
+        private ModifiablePropertyGroup(String name) {
+            this.name = Objects.requireNonNull(name);
+        }
+
+        public ModifiablePropertyGroup label(String label) {
+            this.label = label;
+
+            return this;
+        }
+
+        @SafeVarargs
+        public final <P extends Property.ValueProperty<?>> ModifiablePropertyGroup properties(P... properties) {
+            if (properties != null) {
+                this.properties = List.of(properties);
+            }
+
+            return this;
+        }
+
+        @Override
+        public String getName() {
+            return name;
+        }
+
+        @Override
+        public Optional<String> getLabel() {
+            return Optional.ofNullable(label);
+        }
+
+        @Override
+        public List<? extends Property.ValueProperty<?>> getProperties() {
+            return properties;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+
+            if (!(o instanceof ModifiablePropertyGroup that)) {
+                return false;
+            }
+
+            return Objects.equals(name, that.name) && Objects.equals(label, that.label) &&
+                Objects.equals(properties, that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(name, label, properties);
         }
     }
 

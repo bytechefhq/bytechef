@@ -97,6 +97,11 @@ public class ConnectionIntTestConfiguration {
             }
 
             @Override
+            public Optional<List<? extends com.bytechef.component.definition.PropertyGroup>> getInputs() {
+                return Optional.empty();
+            }
+
+            @Override
             public Optional<String> getDescription() {
                 return Optional.empty();
             }

@@ -127,9 +127,8 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         return environmentId;
     }
 
-    @SuppressWarnings("unchecked")
-    public Map<String, String> getInputs() {
-        return Collections.unmodifiableMap((Map<String, String>) inputs.getMap());
+    public Map<String, Object> getInputs() {
+        return Collections.unmodifiableMap(inputs.getMap());
     }
 
     public Long getId() {
@@ -166,7 +165,7 @@ public class WorkflowTestConfiguration implements Comparable<WorkflowTestConfigu
         this.id = id;
     }
 
-    public void setInputs(Map<String, String> inputs) {
+    public void setInputs(Map<String, Object> inputs) {
         if (inputs != null) {
             this.inputs = new MapWrapper(inputs);
         }

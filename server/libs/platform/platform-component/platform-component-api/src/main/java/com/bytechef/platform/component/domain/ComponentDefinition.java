@@ -51,6 +51,7 @@ public class ComponentDefinition {
     private String description;
     private String icon;
     private String name;
+    private List<PropertyGroup> inputs;
     private Resources resources;
     private List<String> tags;
     private List<TriggerDefinition> triggers;
@@ -64,12 +65,14 @@ public class ComponentDefinition {
     public ComponentDefinition(String name) {
         this.actions = List.of();
         this.name = name;
+        this.inputs = List.of();
         this.tags = List.of();
         this.triggers = List.of();
     }
 
     public ComponentDefinition(com.bytechef.component.definition.ComponentDefinition componentDefinition) {
         this.actions = getActions(componentDefinition);
+        this.inputs = getInputs(componentDefinition);
 
         this.clusterElement = !componentDefinition.getClusterElements()
             .orElse(List.of())
@@ -189,6 +192,10 @@ public class ComponentDefinition {
         return name;
     }
 
+    public List<PropertyGroup> getInputs() {
+        return inputs;
+    }
+
     @Nullable
     public Resources getResources() {
         return resources;
@@ -235,6 +242,7 @@ public class ComponentDefinition {
             Objects.equals(clusterElementTypes, that.clusterElementTypes) &&
             Objects.equals(connection, that.connection) && Objects.equals(description, that.description) &&
             Objects.equals(icon, that.icon) && Objects.equals(name, that.name) &&
+            Objects.equals(inputs, that.inputs) &&
             Objects.equals(resources, that.resources) && Objects.equals(tags, that.tags) &&
             Objects.equals(triggers, that.triggers) && Objects.equals(title, that.title) &&
             unifiedApiCategory == that.unifiedApiCategory;
@@ -245,7 +253,7 @@ public class ComponentDefinition {
         return Objects.hash(
             actionClusterElementTypes, actions, componentCategories, clusterElement, clusterElementClusterElementTypes,
             clusterElements, clusterElementTypes, clusterRoot, connection, connectionRequired, description, icon, name,
-            resources, tags, triggers, title, unifiedApiCategory, version);
+            inputs, resources, tags, triggers, title, unifiedApiCategory, version);
     }
 
     @Override
@@ -260,6 +268,7 @@ public class ComponentDefinition {
             ", clusterRoot=" + clusterRoot +
             ", clusterElement=" + clusterElement +
             ", actions=" + actions +
+            ", inputs=" + inputs +
             ", triggers=" + triggers +
             ", clusterElementTypes=" + clusterElementTypes +
             ", actionClusterElementTypes=" + actionClusterElementTypes +
@@ -292,6 +301,14 @@ public class ComponentDefinition {
                     clusterElementDefinition, componentDefinition.getName(), componentDefinition.getVersion(),
                     componentDefinition.getIcon()
                         .orElse(null))))
+            .orElse(Collections.emptyList());
+    }
+
+    private static List<PropertyGroup> getInputs(
+        com.bytechef.component.definition.ComponentDefinition componentDefinition) {
+
+        return componentDefinition.getInputs()
+            .map(inputs -> CollectionUtils.map(inputs, PropertyGroup::new))
             .orElse(Collections.emptyList());
     }
 
