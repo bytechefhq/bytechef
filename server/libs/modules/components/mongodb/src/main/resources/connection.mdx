@@ -1,0 +1,20 @@
+## Connection Setup
+
+[Official documentation](https://www.mongodb.com/docs/manual/reference/connection-string/)
+
+ByteChef connects to MongoDB using a standard connection string, so both MongoDB Atlas (SRV) and self-hosted deployments are supported.
+
+### MongoDB Atlas
+
+1. In [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), open your cluster and click **Connect → Drivers**.
+2. Copy the SRV connection string (it looks like `mongodb+srv://cluster0.example.mongodb.net`).
+3. Under **Database Access**, create a database user (username and password).
+4. Under **Network Access**, allow your current IP address.
+5. Enter the connection string, database name and the user's credentials when creating the connection.
+
+### Self-hosted
+
+1. Use a standard connection string such as `mongodb://host:27017`.
+2. Provide the database name and, if authentication is enabled, the username and password.
+
+TLS, X.509 and other advanced authentication options can be supplied directly in the connection string. See the [connection string options](https://www.mongodb.com/docs/manual/reference/connection-string-options/) for details.

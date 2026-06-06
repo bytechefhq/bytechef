@@ -1,0 +1,18 @@
+### Filters, documents and pipelines
+
+Properties such as **Filter**, **Update**, **Document** and the **Pipeline** stages are
+expressed as JSON objects that map directly to MongoDB's query language.
+
+- **Filter** uses [query operators](https://www.mongodb.com/docs/manual/reference/operator/query/),
+  e.g. `{"age": {"$gte": 18}, "active": true}`.
+- **Update** uses [update operators](https://www.mongodb.com/docs/manual/reference/operator/update/),
+  e.g. `{"$set": {"status": "active"}, "$inc": {"loginCount": 1}}`.
+- **Pipeline** is an ordered list of [aggregation stages](https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/),
+  e.g. `[{"$match": {"active": true}}, {"$group": {"_id": "$country", "total": {"$sum": 1}}}]`.
+
+### New Document trigger
+
+The **New Document** trigger detects new documents by tracking the highest value seen for the
+configured **Order By Field**. Use a monotonically increasing field such as `_id` (the default)
+or a creation timestamp so that newly inserted documents are reliably detected. The first poll
+records the current position and does not emit the existing backlog.
