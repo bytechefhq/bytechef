@@ -53,7 +53,7 @@ class EmbeddedWorkflowInputOptionFacadeImplTest {
         when(integrationWorkflowService.getWorkflowId(7L, "wf-uuid")).thenReturn("wf-id");
 
         Workflow.Input input = new Workflow.Input(
-            "channel", "Channel", "STRING", true, new Workflow.ComponentInputReference("slack", 1, "channel"));
+            "channel", "Channel", "STRING", true /* , new Workflow.ComponentInputReference("slack", 1, "channel") */);
 
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
@@ -102,8 +102,8 @@ class EmbeddedWorkflowInputOptionFacadeImplTest {
         when(integrationWorkflowService.getWorkflowId(7L, "wf-uuid")).thenReturn("wf-id");
 
         Workflow.Input input = new Workflow.Input(
-            "sheet", "Sheet", "OBJECT", true,
-            new Workflow.ComponentInputReference("googleSheets", 1, "sheetSelection"));
+            "sheet", "Sheet", "OBJECT", true
+        /* , new Workflow.ComponentInputReference("googleSheets", 1, "sheetSelection") */);
 
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
@@ -152,7 +152,7 @@ class EmbeddedWorkflowInputOptionFacadeImplTest {
         when(integrationWorkflowService.getWorkflowId(7L, "wf-uuid")).thenReturn("wf-id");
 
         Workflow.Input input = new Workflow.Input(
-            "channel", "Channel", "STRING", true, new Workflow.ComponentInputReference("slack", 1, "channel"));
+            "channel", "Channel", "STRING", true /* , new Workflow.ComponentInputReference("slack", 1, "channel") */);
 
         WorkflowTrigger workflowTrigger = mock(WorkflowTrigger.class);
 
@@ -202,7 +202,7 @@ class EmbeddedWorkflowInputOptionFacadeImplTest {
         when(integrationWorkflowService.getWorkflowId(7L, "wf-uuid")).thenReturn("wf-id");
 
         Workflow.Input input = new Workflow.Input(
-            "channel", "Channel", "STRING", true, new Workflow.ComponentInputReference("slack", 1, "channel"));
+            "channel", "Channel", "STRING", true /* , new Workflow.ComponentInputReference("slack", 1, "channel") */);
 
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 
@@ -270,7 +270,7 @@ class EmbeddedWorkflowInputOptionFacadeImplTest {
         when(integrationWorkflowService.getWorkflowId(7L, "wf-uuid")).thenReturn("wf-id");
 
         Workflow.Input input = new Workflow.Input(
-            "channel", "Channel", "STRING", true, new Workflow.ComponentInputReference("slack", 1, "channel"));
+            "channel", "Channel", "STRING", true /* ,new Workflow.ComponentInputReference("slack", 1, "channel") */);
 
         WorkflowTask workflowTask = mock(WorkflowTask.class);
 

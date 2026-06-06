@@ -67,21 +67,22 @@ public class EmbeddedWorkflowInputOptionFacadeImpl implements EmbeddedWorkflowIn
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
-        Workflow.Input input = workflow.getInputs()
-            .stream()
-            .filter(currentInput -> inputName.equals(currentInput.name()))
-            .findFirst()
-            .orElseThrow(() -> new IllegalArgumentException("Unknown workflow input: " + inputName));
+        // TODO
+//        Workflow.Input input = workflow.getInputs()
+//            .stream()
+//            .filter(currentInput -> inputName.equals(currentInput.name()))
+//            .findFirst()
+//            .orElseThrow(() -> new IllegalArgumentException("Unknown workflow input: " + inputName));
 
-        Workflow.ComponentInputReference componentReference = input.componentReference();
+        // Workflow.ComponentInputReference componentReference = input.componentReference();
 
-        if (componentReference == null) {
-            throw new IllegalArgumentException("Workflow input does not reference a component: " + inputName);
-        }
+//        if (componentReference == null) {
+//            throw new IllegalArgumentException("Workflow input does not reference a component: " + inputName);
+//        }
 
-        String componentName = componentReference.componentName();
-        int componentVersion =
-            componentReference.componentVersion() == null ? 1 : componentReference.componentVersion();
+        String componentName = null; // componentReference.componentName();
+        int componentVersion = 1;
+        // componentReference.componentVersion() == null ? 1 : componentReference.componentVersion();
 
         List<String> lookupDependsOnPaths = List.copyOf(lookupDependsOnValues.keySet());
 
