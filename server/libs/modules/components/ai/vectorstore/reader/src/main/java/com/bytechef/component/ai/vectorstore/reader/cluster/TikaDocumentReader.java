@@ -22,6 +22,7 @@ import static com.bytechef.platform.component.definition.ai.vectorstore.Document
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction;
 
@@ -51,9 +52,10 @@ public class TikaDocumentReader extends AbstractDocumentReader {
 
         FileResult result = getFile(inputParameters, context);
 
+        FileEntry fileEntry = result.fileEntry();
+
         return withFilename(
             new org.springframework.ai.reader.tika.TikaDocumentReader(result.fileSystemResource()),
-            result.fileEntry()
-                .getName());
+            fileEntry.getName());
     }
 }

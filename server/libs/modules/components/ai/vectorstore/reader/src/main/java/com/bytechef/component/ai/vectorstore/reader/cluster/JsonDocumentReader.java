@@ -25,6 +25,7 @@ import com.bytechef.component.ai.vectorstore.reader.util.DocumentReaderConstants
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction;
 import java.util.List;
@@ -61,7 +62,8 @@ public class JsonDocumentReader extends AbstractDocumentReader {
         JsonReader jsonReader = (keys == null) ? new JsonReader(result.fileSystemResource())
             : new JsonReader(result.fileSystemResource(), keys.toArray(new String[0]));
 
-        return withFilename(jsonReader, result.fileEntry()
-            .getName());
+        FileEntry fileEntry = result.fileEntry();
+
+        return withFilename(jsonReader, fileEntry.getName());
     }
 }
