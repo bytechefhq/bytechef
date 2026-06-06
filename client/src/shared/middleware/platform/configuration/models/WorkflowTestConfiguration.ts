@@ -53,10 +53,10 @@ export interface WorkflowTestConfiguration {
     environmentId: number;
     /**
      * The input parameters used as workflow input values.
-     * @type {{ [key: string]: string; }}
+     * @type {{ [key: string]: any; }}
      * @memberof WorkflowTestConfiguration
      */
-    inputs?: { [key: string]: string; };
+    inputs?: { [key: string]: any; };
     /**
      * The last modified by.
      * @type {string}

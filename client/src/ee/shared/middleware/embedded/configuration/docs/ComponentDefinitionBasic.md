@@ -12,6 +12,7 @@ Name | Type
 `componentCategories` | [Array&lt;ComponentCategory&gt;](ComponentCategory.md)
 `description` | string
 `icon` | string
+`inputsCount` | number
 `name` | string
 `title` | string
 `triggersCount` | number
@@ -29,6 +30,7 @@ const example = {
   "componentCategories": null,
   "description": null,
   "icon": null,
+  "inputsCount": null,
   "name": null,
   "title": null,
   "triggersCount": null,

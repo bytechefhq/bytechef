@@ -13,6 +13,14 @@
  */
 
 import { mapValues } from '../runtime';
+import type { ComponentInputReference } from './ComponentInputReference';
+import {
+    ComponentInputReferenceFromJSON,
+    ComponentInputReferenceFromJSONTyped,
+    ComponentInputReferenceToJSON,
+    ComponentInputReferenceToJSONTyped,
+} from './ComponentInputReference';
+
 /**
  * 
  * @export
@@ -43,6 +51,12 @@ export interface WorkflowInput {
      * @memberof WorkflowInput
      */
     type?: string;
+    /**
+     * 
+     * @type {ComponentInputReference}
+     * @memberof WorkflowInput
+     */
+    componentReference?: ComponentInputReference;
 }
 
 /**
@@ -67,6 +81,7 @@ export function WorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boole
         'name': json['name'],
         'required': json['required'] == null ? undefined : json['required'],
         'type': json['type'] == null ? undefined : json['type'],
+        'componentReference': json['componentReference'] == null ? undefined : ComponentInputReferenceFromJSON(json['componentReference']),
     };
 }
 
@@ -85,6 +100,7 @@ export function WorkflowInputToJSONTyped(value?: WorkflowInput | null, ignoreDis
         'name': value['name'],
         'required': value['required'],
         'type': value['type'],
+        'componentReference': ComponentInputReferenceToJSON(value['componentReference']),
     };
 }
 

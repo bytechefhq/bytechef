@@ -58,6 +58,12 @@ export interface ComponentDefinitionBasic {
      */
     icon?: string;
     /**
+     * The number of selectable workflow inputs a component declares
+     * @type {number}
+     * @memberof ComponentDefinitionBasic
+     */
+    inputsCount?: number;
+    /**
      * The name of a component.
      * @type {string}
      * @memberof ComponentDefinitionBasic
@@ -107,6 +113,7 @@ export function ComponentDefinitionBasicFromJSONTyped(json: any, ignoreDiscrimin
         'componentCategories': json['componentCategories'] == null ? undefined : ((json['componentCategories'] as Array<any>).map(ComponentCategoryFromJSON)),
         'description': json['description'] == null ? undefined : json['description'],
         'icon': json['icon'] == null ? undefined : json['icon'],
+        'inputsCount': json['inputsCount'] == null ? undefined : json['inputsCount'],
         'name': json['name'],
         'title': json['title'] == null ? undefined : json['title'],
         'triggersCount': json['triggersCount'] == null ? undefined : json['triggersCount'],
@@ -130,6 +137,7 @@ export function ComponentDefinitionBasicToJSONTyped(value?: ComponentDefinitionB
         'componentCategories': value['componentCategories'] == null ? undefined : ((value['componentCategories'] as Array<any>).map(ComponentCategoryToJSON)),
         'description': value['description'],
         'icon': value['icon'],
+        'inputsCount': value['inputsCount'],
         'name': value['name'],
         'title': value['title'],
         'triggersCount': value['triggersCount'],

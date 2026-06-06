@@ -13,6 +13,13 @@
  */
 
 import { mapValues } from '../runtime';
+import type { PropertyGroup } from './PropertyGroup';
+import {
+    PropertyGroupFromJSON,
+    PropertyGroupFromJSONTyped,
+    PropertyGroupToJSON,
+    PropertyGroupToJSONTyped,
+} from './PropertyGroup';
 import type { ConnectionDefinitionBasic } from './ConnectionDefinitionBasic';
 import {
     ConnectionDefinitionBasicFromJSON,
@@ -190,6 +197,12 @@ export interface ComponentDefinition {
      * @memberof ComponentDefinition
      */
     version: number;
+    /**
+     * The component's selectable workflow inputs, each a property group (a lone property is a group with one property).
+     * @type {Array<PropertyGroup>}
+     * @memberof ComponentDefinition
+     */
+    inputs?: Array<PropertyGroup>;
 }
 
 
@@ -235,6 +248,7 @@ export function ComponentDefinitionFromJSONTyped(json: any, ignoreDiscriminator:
         'triggers': json['triggers'] == null ? undefined : ((json['triggers'] as Array<any>).map(TriggerDefinitionBasicFromJSON)),
         'unifiedApiCategory': json['unifiedApiCategory'] == null ? undefined : UnifiedApiCategoryFromJSON(json['unifiedApiCategory']),
         'version': json['version'],
+        'inputs': json['inputs'] == null ? undefined : ((json['inputs'] as Array<any>).map(PropertyGroupFromJSON)),
     };
 }
 
@@ -268,6 +282,7 @@ export function ComponentDefinitionToJSONTyped(value?: ComponentDefinition | nul
         'triggers': value['triggers'] == null ? undefined : ((value['triggers'] as Array<any>).map(TriggerDefinitionBasicToJSON)),
         'unifiedApiCategory': UnifiedApiCategoryToJSON(value['unifiedApiCategory']),
         'version': value['version'],
+        'inputs': value['inputs'] == null ? undefined : ((value['inputs'] as Array<any>).map(PropertyGroupToJSON)),
     };
 }
 

@@ -26,6 +26,7 @@ Name | Type
 `triggers` | [Array&lt;TriggerDefinitionBasic&gt;](TriggerDefinitionBasic.md)
 `unifiedApiCategory` | [UnifiedApiCategory](UnifiedApiCategory.md)
 `version` | number
+`inputs` | [Array&lt;PropertyGroup&gt;](PropertyGroup.md)
 
 ## Example
 
@@ -53,6 +54,7 @@ const example = {
   "triggers": null,
   "unifiedApiCategory": null,
   "version": null,
+  "inputs": null,
 } satisfies ComponentDefinition
 
 console.log(example)
