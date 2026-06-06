@@ -22,6 +22,7 @@ import static com.bytechef.platform.component.definition.ai.vectorstore.Document
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction;
 import org.springframework.ai.reader.ExtractedTextFormatter;
@@ -55,9 +56,10 @@ public class PagePdfDocumentReader extends AbstractDocumentReader {
             .withPagesPerDocument(1)
             .build();
 
+        FileEntry fileEntry = result.fileEntry();
+
         return withFilename(
             new org.springframework.ai.reader.pdf.PagePdfDocumentReader(result.fileSystemResource(), config),
-            result.fileEntry()
-                .getName());
+            fileEntry.getName());
     }
 }
