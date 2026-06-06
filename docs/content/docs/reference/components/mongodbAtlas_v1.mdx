@@ -1,0 +1,199 @@
+---
+title: "MongoDB Atlas Vector Search"
+description: "MongoDB Atlas Vector Search combines document storage with vector similarity search, enabling storage and retrieval of high-dimensional embeddings for AI and machine learning applications."
+---
+
+
+Categories: Artificial Intelligence
+
+
+Type: mongodbAtlas/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| connectionString | Connection String | STRING | The MongoDB Atlas connection string, e.g. mongodb+srv://cluster0.example.mongodb.net. | true |
+| databaseName | Database Name | STRING | The name of the database to store the vectors in. | true |
+| username | Username | STRING | Username for authentication with MongoDB Atlas. | false |
+| password | Password | STRING | Password for authentication with MongoDB Atlas. | false |
+| collectionName | Collection Name | STRING | The name of the collection to store the vectors in. | false |
+| indexName | Vector Index Name | STRING | The name of the Atlas Vector Search index. | false |
+| pathName | Path Name | STRING | The path where the embeddings are stored within the document. | false |
+| numCandidates | Number of Candidates | INTEGER | The number of candidates to consider during approximate nearest neighbor search. | false |
+| metadataFields | Metadata Fields To Filter | STRING | A comma-separated list of metadata fields that can be used to filter search results. | false |
+| initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the collection and the vector search index. | false |
+
+
+
+## Connection Setup
+
+[Official documentation](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/)
+
+Step-by-step guide:
+
+1. Create a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster running MongoDB 6.0.11, 7.0.2, or later, with Vector Search enabled.
+2. Go to Database Access and create a database user (username and password).
+3. Go to Network Access and allow your current IP address.
+4. Go to Database → Connect → Drivers and copy the connection string (it looks like `mongodb+srv://cluster0.example.mongodb.net`).
+5. Create the database and collection that will store the vectors.
+6. Create an Atlas Vector Search index on the collection, or enable **Initialize Schema** to have it created automatically.
+
+Now you have the Connection String, Database Name, Username, Password, Collection Name and Vector Index Name and can create a connection.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Delete Documents
+Name: delete
+
+`Delete documents from the vector store by metadata`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Documents",
+  "name" : "delete",
+  "parameters" : {
+    "metadata" : [ { } ]
+  },
+  "type" : "mongodbAtlas/v1/delete"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Load Documents
+Name: load
+
+`Loads documents into the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Load Documents",
+  "name" : "load",
+  "parameters" : {
+    "metadata" : [ { } ]
+  },
+  "type" : "mongodbAtlas/v1/load"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Search Documents
+Name: search
+
+`Query documents from the vector store using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| query | Query | STRING | The query to be executed. | true |
+| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+| topK | Top K | INTEGER | The top 'k' similar results to return. | false |
+| similarityThreshold | Similarity Threshold | NUMBER | Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Search Documents",
+  "name" : "search",
+  "parameters" : {
+    "query" : "",
+    "metadata" : [ { } ],
+    "topK" : 1,
+    "similarityThreshold" : 0.0
+  },
+  "type" : "mongodbAtlas/v1/search"
+}
+```
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+
+
+
+
+
+### Update Documents
+Name: update
+
+`Updates documents in the vector store by deleting existing ones matching the metadata filter and loading new ones using LLM embeddings.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Documents",
+  "name" : "update",
+  "parameters" : {
+    "metadata" : [ { } ]
+  },
+  "type" : "mongodbAtlas/v1/update"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+
+
