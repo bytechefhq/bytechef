@@ -1,0 +1,574 @@
+---
+title: "MongoDB"
+description: "MongoDB is a source-available, cross-platform, document-oriented database. Query, insert, update and delete documents in your collections."
+---
+
+
+Categories: Developer Tools
+
+
+Type: mongodb/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| connectionString | Connection String | STRING | The MongoDB connection string. Supports both standard (mongodb://) and SRV (mongodb+srv://) formats, as well as TLS and authentication options. | true |
+| database | Database | STRING | The name of the database to connect to. | true |
+| username | Username | STRING | Username for authentication. Leave empty if credentials are in the connection string or no authentication is required. | false |
+| password | Password | STRING | Password for authentication. Leave empty if credentials are in the connection string or no authentication is required. | false |
+
+
+
+## Connection Setup
+
+[Official documentation](https://www.mongodb.com/docs/manual/reference/connection-string/)
+
+ByteChef connects to MongoDB using a standard connection string, so both MongoDB Atlas (SRV) and self-hosted deployments are supported.
+
+### MongoDB Atlas
+
+1. In [MongoDB Atlas](https://www.mongodb.com/cloud/atlas), open your cluster and click **Connect → Drivers**.
+2. Copy the SRV connection string (it looks like `mongodb+srv://cluster0.example.mongodb.net`).
+3. Under **Database Access**, create a database user (username and password).
+4. Under **Network Access**, allow your current IP address.
+5. Enter the connection string, database name and the user's credentials when creating the connection.
+
+### Self-hosted
+
+1. Use a standard connection string such as `mongodb://host:27017`.
+2. Provide the database name and, if authentication is enabled, the username and password.
+
+TLS, X.509 and other advanced authentication options can be supplied directly in the connection string. See the [connection string options](https://www.mongodb.com/docs/manual/reference/connection-string-options/) for details.
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Find
+Name: find
+
+`Finds documents in a collection matching a filter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to query. | true |
+| filter | Filter | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The query filter as a JSON object. Leave empty to match all documents. | false |
+| projection | Projection | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The fields to include or exclude as a JSON object, e.g. &#123;"name": 1, "_id": 0&#125;. | false |
+| sort | Sort | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The sort order as a JSON object, e.g. &#123;"createdAt": -1&#125; for descending. | false |
+| limit | Limit | INTEGER | The maximum number of documents to return. Leave empty for no limit. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Find",
+  "name" : "find",
+  "parameters" : {
+    "collection" : "",
+    "filter" : { },
+    "projection" : { },
+    "sort" : { },
+    "limit" : 1
+  },
+  "type" : "mongodb/v1/find"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+null
+
+
+
+
+
+#### Output Example
+```json
+[ { } ]
+```
+
+
+
+
+### Insert One
+Name: insertOne
+
+`Inserts a single document into a collection.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to insert into. | true |
+| document | Document | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The document to insert as a JSON object. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Insert One",
+  "name" : "insertOne",
+  "parameters" : {
+    "collection" : "",
+    "document" : { }
+  },
+  "type" : "mongodb/v1/insertOne"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| insertedId | STRING | The identifier of the inserted document. |
+
+
+
+
+#### Output Example
+```json
+{
+  "insertedId" : ""
+}
+```
+
+
+
+
+### Insert Many
+Name: insertMany
+
+`Inserts multiple documents into a collection.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to insert into. | true |
+| documents | Documents | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | The documents to insert, each as a JSON object. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Insert Many",
+  "name" : "insertMany",
+  "parameters" : {
+    "collection" : "",
+    "documents" : [ { } ]
+  },
+  "type" : "mongodb/v1/insertMany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| insertedCount | INTEGER | The number of documents inserted. |
+| insertedIds | ARRAY <details> <summary> Items </summary> [STRING] </details> | The identifiers of the inserted documents. |
+
+
+
+
+#### Output Example
+```json
+{
+  "insertedCount" : 1,
+  "insertedIds" : [ "" ]
+}
+```
+
+
+
+
+### Update One
+Name: updateOne
+
+`Updates a single document in a collection matching a filter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to update. | true |
+| filter | Filter | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The query filter that selects the document to update, as a JSON object. | true |
+| update | Update | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The update to apply, as a JSON object using update operators, e.g. &#123;"$set": &#123;"status": "active"&#125;&#125;. | true |
+| upsert | Upsert | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to insert a new document when no document matches the filter. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update One",
+  "name" : "updateOne",
+  "parameters" : {
+    "collection" : "",
+    "filter" : { },
+    "update" : { },
+    "upsert" : false
+  },
+  "type" : "mongodb/v1/updateOne"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| matchedCount | INTEGER | The number of documents that matched the filter. |
+| modifiedCount | INTEGER | The number of documents that were modified. |
+| upsertedId | STRING | The identifier of the upserted document, if any. |
+
+
+
+
+#### Output Example
+```json
+{
+  "matchedCount" : 1,
+  "modifiedCount" : 1,
+  "upsertedId" : ""
+}
+```
+
+
+
+
+### Update Many
+Name: updateMany
+
+`Updates all documents in a collection matching a filter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to update. | true |
+| filter | Filter | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The query filter that selects the documents to update, as a JSON object. | true |
+| update | Update | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The update to apply, as a JSON object using update operators, e.g. &#123;"$set": &#123;"status": "active"&#125;&#125;. | true |
+| upsert | Upsert | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to insert a new document when no document matches the filter. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update Many",
+  "name" : "updateMany",
+  "parameters" : {
+    "collection" : "",
+    "filter" : { },
+    "update" : { },
+    "upsert" : false
+  },
+  "type" : "mongodb/v1/updateMany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| matchedCount | INTEGER | The number of documents that matched the filter. |
+| modifiedCount | INTEGER | The number of documents that were modified. |
+| upsertedId | STRING | The identifier of the upserted document, if any. |
+
+
+
+
+#### Output Example
+```json
+{
+  "matchedCount" : 1,
+  "modifiedCount" : 1,
+  "upsertedId" : ""
+}
+```
+
+
+
+
+### Delete One
+Name: deleteOne
+
+`Deletes a single document from a collection matching a filter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to delete from. | true |
+| filter | Filter | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The query filter that selects the document to delete, as a JSON object. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete One",
+  "name" : "deleteOne",
+  "parameters" : {
+    "collection" : "",
+    "filter" : { }
+  },
+  "type" : "mongodb/v1/deleteOne"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedCount | INTEGER | The number of documents deleted. |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedCount" : 1
+}
+```
+
+
+
+
+### Delete Many
+Name: deleteMany
+
+`Deletes all documents from a collection matching a filter.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to delete from. | true |
+| filter | Filter | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The query filter that selects the documents to delete, as a JSON object. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete Many",
+  "name" : "deleteMany",
+  "parameters" : {
+    "collection" : "",
+    "filter" : { }
+  },
+  "type" : "mongodb/v1/deleteMany"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedCount | INTEGER | The number of documents deleted. |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedCount" : 1
+}
+```
+
+
+
+
+### Aggregate
+Name: aggregate
+
+`Runs an aggregation pipeline against a collection.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to aggregate. | true |
+| pipeline | Pipeline | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | The aggregation pipeline, an ordered list of stages, each as a JSON object, e.g. &#123;"$match": &#123;"active": true&#125;&#125;. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Aggregate",
+  "name" : "aggregate",
+  "parameters" : {
+    "collection" : "",
+    "pipeline" : [ { } ]
+  },
+  "type" : "mongodb/v1/aggregate"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+null
+
+
+
+
+
+#### Output Example
+```json
+[ { } ]
+```
+
+
+
+
+
+## Triggers
+
+
+### New Document
+Name: newDocument
+
+`Triggers when a new document is added to a collection.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| collection | Collection | STRING | The name of the collection to watch. | true |
+| orderBy | Order By Field | STRING | The field used to detect new documents. Use a monotonically increasing field such as _id or a creation timestamp. | true |
+
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+null
+
+
+
+
+
+#### JSON Example
+```json
+{
+  "label" : "New Document",
+  "name" : "newDocument",
+  "parameters" : {
+    "collection" : "",
+    "orderBy" : ""
+  },
+  "type" : "mongodb/v1/newDocument"
+}
+```
+
+
+
+
+
+<hr />
+
+# Additional Instructions
+
+### Filters, documents and pipelines
+
+Properties such as **Filter**, **Update**, **Document** and the **Pipeline** stages are
+expressed as JSON objects that map directly to MongoDB's query language.
+
+- **Filter** uses [query operators](https://www.mongodb.com/docs/manual/reference/operator/query/),
+  e.g. `{"age": {"$gte": 18}, "active": true}`.
+- **Update** uses [update operators](https://www.mongodb.com/docs/manual/reference/operator/update/),
+  e.g. `{"$set": {"status": "active"}, "$inc": {"loginCount": 1}}`.
+- **Pipeline** is an ordered list of [aggregation stages](https://www.mongodb.com/docs/manual/reference/operator/aggregation-pipeline/),
+  e.g. `[{"$match": {"active": true}}, {"$group": {"_id": "$country", "total": {"$sum": 1}}}]`.
+
+### New Document trigger
+
+The **New Document** trigger detects new documents by tracking the highest value seen for the
+configured **Order By Field**. Use a monotonically increasing field such as `_id` (the default)
+or a creation timestamp so that newly inserted documents are reliably detected. The first poll
+records the current position and does not emit the existing backlog.
