@@ -29,6 +29,7 @@ public final class MongoDBConstants {
     public static final String FILTER = "filter";
     public static final String LIMIT = "limit";
     public static final String MONGODB = "mongodb";
+    public static final String ORDER_BY = "orderBy";
     public static final String PIPELINE = "pipeline";
     public static final String PROJECTION = "projection";
     public static final String SORT = "sort";

@@ -31,6 +31,7 @@ import com.bytechef.component.mongodb.action.MongoDBInsertOneAction;
 import com.bytechef.component.mongodb.action.MongoDBUpdateManyAction;
 import com.bytechef.component.mongodb.action.MongoDBUpdateOneAction;
 import com.bytechef.component.mongodb.connection.MongoDBConnection;
+import com.bytechef.component.mongodb.trigger.MongoDBNewDocumentTrigger;
 import com.google.auto.service.AutoService;
 
 /**
@@ -64,7 +65,9 @@ public class MongoDBComponentHandler implements ComponentHandler {
             tool(MongoDBUpdateManyAction.ACTION_DEFINITION),
             tool(MongoDBDeleteOneAction.ACTION_DEFINITION),
             tool(MongoDBDeleteManyAction.ACTION_DEFINITION),
-            tool(MongoDBAggregateAction.ACTION_DEFINITION));
+            tool(MongoDBAggregateAction.ACTION_DEFINITION))
+        .triggers(
+            MongoDBNewDocumentTrigger.TRIGGER_DEFINITION);
 
     @Override
     public ComponentDefinition getDefinition() {
