@@ -1,0 +1,14 @@
+## Connection Setup
+
+[Official documentation](https://www.mongodb.com/docs/atlas/atlas-vector-search/vector-search-overview/)
+
+Step-by-step guide:
+
+1. Create a [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster running MongoDB 6.0.11, 7.0.2, or later, with Vector Search enabled.
+2. Go to Database Access and create a database user (username and password).
+3. Go to Network Access and allow your current IP address.
+4. Go to Database → Connect → Drivers and copy the connection string (it looks like `mongodb+srv://cluster0.example.mongodb.net`).
+5. Create the database and collection that will store the vectors.
+6. Create an Atlas Vector Search index on the collection, or enable **Initialize Schema** to have it created automatically.
+
+Now you have the Connection String, Database Name, Username, Password, Collection Name and Vector Index Name and can create a connection.
