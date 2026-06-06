@@ -41,18 +41,6 @@
         "value": "codestral-latest"
       }, {
         "description": null,
-        "label": "devstral-medium-latest",
-        "value": "devstral-medium-latest"
-      }, {
-        "description": null,
-        "label": "devstral-small-latest",
-        "value": "devstral-small-latest"
-      }, {
-        "description": null,
-        "label": "magistral-medium-latest",
-        "value": "magistral-medium-latest"
-      }, {
-        "description": null,
         "label": "ministral-14b-latest",
         "value": "ministral-14b-latest"
       }, {
@@ -75,10 +63,6 @@
         "description": null,
         "label": "mistral-small-latest",
         "value": "mistral-small-latest"
-      }, {
-        "description": null,
-        "label": "open-mistral-nemo",
-        "value": "open-mistral-nemo"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -2428,18 +2412,6 @@
         "value": "codestral-latest"
       }, {
         "description": null,
-        "label": "devstral-medium-latest",
-        "value": "devstral-medium-latest"
-      }, {
-        "description": null,
-        "label": "devstral-small-latest",
-        "value": "devstral-small-latest"
-      }, {
-        "description": null,
-        "label": "magistral-medium-latest",
-        "value": "magistral-medium-latest"
-      }, {
-        "description": null,
         "label": "ministral-14b-latest",
         "value": "ministral-14b-latest"
       }, {
@@ -2462,10 +2434,6 @@
         "description": null,
         "label": "mistral-small-latest",
         "value": "mistral-small-latest"
-      }, {
-        "description": null,
-        "label": "open-mistral-nemo",
-        "value": "open-mistral-nemo"
       } ],
       "optionsDataSource": null,
       "optionsLoadedDynamically": null,
@@ -2697,6 +2665,7 @@
   "customActionHelp": null,
   "description": "Open, efficient, helpful and trustworthy AI models through ground-breaking innovations.",
   "icon": "path:assets/mistral.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mistral",
   "resources": null,

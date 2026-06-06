@@ -19,6 +19,7 @@ package com.bytechef.platform.component.definition.ai.agent;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
@@ -40,6 +41,9 @@ public interface ChatMemoryFunction {
      * building a second memory instance. {@code chatMemory} is {@code null} for advisor types (e.g. VectorStore) that
      * do not expose a standard {@link ChatMemory}.
      */
+    @SuppressFBWarnings({
+        "EI", "EI2"
+    })
     record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
     }
 

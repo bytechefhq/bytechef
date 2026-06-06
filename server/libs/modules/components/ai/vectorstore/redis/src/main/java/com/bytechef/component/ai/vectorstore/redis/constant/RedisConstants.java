@@ -21,7 +21,7 @@ import static com.bytechef.component.definition.Authorization.USERNAME;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.redis.RedisVectorStore;
-import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.RedisClient;
 
 /**
  * @author Monika Kušter
@@ -37,13 +37,13 @@ public class RedisConstants {
 
         int i = publicEndpoint.indexOf(":");
 
-        JedisPooled jedisPooled = new JedisPooled(
+        RedisClient redisClient = RedisClient.create(
             publicEndpoint.substring(0, i),
             Integer.parseInt(publicEndpoint.substring(i + 1)),
             connectionParameters.getRequiredString(USERNAME),
             connectionParameters.getRequiredString(PASSWORD));
 
-        return RedisVectorStore.builder(jedisPooled, embeddingModel)
+        return RedisVectorStore.builder(redisClient, embeddingModel)
             .initializeSchema(connectionParameters.getRequiredBoolean(INITIALIZE_SCHEMA))
             .build();
     };

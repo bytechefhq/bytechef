@@ -59,7 +59,7 @@ class ChatModelActionTest extends AbstractActionTest {
 
         when(mockedChat.createChatModel(mockedParameters, mockedParameters, true)).thenReturn(mockedChatModelModel);
 
-        when(mockedChatModelModel.getDefaultOptions()).thenReturn(ChatOptions.builder()
+        when(mockedChatModelModel.getOptions()).thenReturn(ChatOptions.builder()
             .build());
         when(mockedChatModelModel.call(any(Prompt.class))).thenReturn(
             new ChatResponse(List.of(new Generation(new AssistantMessage(ANSWER)))));

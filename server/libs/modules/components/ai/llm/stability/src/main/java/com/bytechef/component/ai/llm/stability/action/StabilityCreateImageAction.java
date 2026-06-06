@@ -151,7 +151,7 @@ public class StabilityCreateImageAction {
             .cfgScale(inputParameters.getFloat(CFG_SCALE))
             .clipGuidancePreset(inputParameters.getString(CLIP_GUIDANCE_PRESET))
             .height(inputParameters.getInteger(HEIGHT))
-            .N(inputParameters.getInteger(N))
+            .n(inputParameters.getInteger(N))
             .responseFormat(inputParameters.getString(RESPONSE_FORMAT))
             .sampler(inputParameters.getString(SAMPLER))
             .seed(inputParameters.getLong(SEED))

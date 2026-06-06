@@ -31,9 +31,7 @@ import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 import org.springframework.ai.chat.observation.ChatModelObservationConvention;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.model.tool.DefaultToolExecutionEligibilityPredicate;
 import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.ai.model.tool.ToolExecutionEligibilityPredicate;
 import org.springframework.ai.openai.OpenAiChatModel;
 import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
@@ -72,7 +70,6 @@ class AiModelConfiguration {
     @Primary
     @ConditionalOnProperty(prefix = "bytechef.ai.provider.anthropic", name = "api-key")
     AnthropicChatModel anthropicChatModel(
-        ObjectProvider<ToolExecutionEligibilityPredicate> anthropicToolExecutionEligibilityPredicate,
         ObjectProvider<ObservationRegistry> observationRegistryProvider,
         ObjectProvider<ChatModelObservationConvention> observationConvention, ToolCallingManager toolCallingManager) {
 
@@ -102,8 +99,6 @@ class AiModelConfiguration {
                     .build())
             .observationRegistry(observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP))
             .toolCallingManager(toolCallingManager)
-            .toolExecutionEligibilityPredicate(anthropicToolExecutionEligibilityPredicate
-                .getIfUnique(DefaultToolExecutionEligibilityPredicate::new))
             .build();
 
         observationConvention.ifAvailable(chatModel::setObservationConvention);
@@ -116,7 +111,6 @@ class AiModelConfiguration {
     OpenAiChatModel openAiChatModel(
         ObjectProvider<ObservationRegistry> observationRegistry,
         ObjectProvider<ChatModelObservationConvention> observationConvention,
-        ObjectProvider<ToolExecutionEligibilityPredicate> openAiToolExecutionEligibilityPredicate,
         ToolCallingManager toolCallingManager) {
 
         ApplicationProperties.Ai.Provider.Chat.OpenAi.Options openAiChatOptions = ai.getProvider()
@@ -150,8 +144,6 @@ class AiModelConfiguration {
                     .build())
             .toolCallingManager(toolCallingManager)
             .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .toolExecutionEligibilityPredicate(
-                openAiToolExecutionEligibilityPredicate.getIfUnique(DefaultToolExecutionEligibilityPredicate::new))
             .build();
 
         observationConvention.ifAvailable(chatModel::setObservationConvention);

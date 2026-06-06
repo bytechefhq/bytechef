@@ -104,7 +104,7 @@ public class GeminiChatAction {
 
         return GoogleGenAiChatModel.builder()
             .genAiClient(genAiClient)
-            .defaultOptions(builder.build())
+            .options(builder.build())
             .build();
     };
 

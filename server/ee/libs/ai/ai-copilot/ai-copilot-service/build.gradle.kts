@@ -103,7 +103,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.boot:spring-boot-jackson")
-    implementation("org.springframework.ai:spring-ai-advisors-vector-store")
+    implementation("org.springframework.ai:spring-ai-vector-store-advisor")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":ag-ui:packages:core"))
     implementation(project(":ag-ui:utils:json"))

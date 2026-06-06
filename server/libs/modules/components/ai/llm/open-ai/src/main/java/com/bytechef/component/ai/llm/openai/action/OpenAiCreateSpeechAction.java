@@ -118,7 +118,7 @@ public class OpenAiCreateSpeechAction {
                 OpenAIOkHttpClient.builder()
                     .apiKey(connectionParameters.getRequiredString(TOKEN))
                     .build())
-            .defaultOptions(speechOptions)
+            .options(speechOptions)
             .build();
 
         TextToSpeechResponse response = speechModel.call(new TextToSpeechPrompt(input));

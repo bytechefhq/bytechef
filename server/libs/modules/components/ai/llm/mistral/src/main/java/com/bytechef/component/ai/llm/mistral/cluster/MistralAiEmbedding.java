@@ -57,7 +57,7 @@ public class MistralAiEmbedding {
                     .build())
             .options(
                 MistralAiEmbeddingOptions.builder()
-                    .withModel(inputParameters.getRequiredString(MODEL))
+                    .model(inputParameters.getRequiredString(MODEL))
                     .build())
             .build();
     }

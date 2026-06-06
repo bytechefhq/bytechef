@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
-import redis.clients.jedis.JedisPooled;
+import redis.clients.jedis.RedisClient;
 import redis.clients.jedis.search.aggr.AggregationBuilder;
 import redis.clients.jedis.search.aggr.AggregationResult;
 import redis.clients.jedis.search.aggr.Reducers;
@@ -35,10 +35,10 @@ import redis.clients.jedis.search.aggr.SortedField;
 class OrderedRedisChatMemoryRepository implements ChatMemoryRepository {
 
     private final ChatMemoryRepository delegate;
-    private final JedisPooled jedisClient;
+    private final RedisClient jedisClient;
     private final String indexName;
 
-    OrderedRedisChatMemoryRepository(ChatMemoryRepository delegate, JedisPooled jedisClient, String indexName) {
+    OrderedRedisChatMemoryRepository(ChatMemoryRepository delegate, RedisClient jedisClient, String indexName) {
         this.delegate = delegate;
         this.jedisClient = jedisClient;
         this.indexName = indexName;

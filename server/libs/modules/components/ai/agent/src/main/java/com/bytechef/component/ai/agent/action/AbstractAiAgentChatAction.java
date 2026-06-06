@@ -35,7 +35,6 @@ import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListen
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
-import com.bytechef.component.ai.llm.advisor.ToolHistoryToolCallAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -69,6 +68,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.messages.Message;
@@ -153,10 +153,11 @@ public abstract class AbstractAiAgentChatAction {
             .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
             .advisors(getConversationAdvisor(conversationId))
             .messages(ModelUtils.getMessages(inputParameters, context))
-            .tools(spec -> spec.callbacks(
+            .tools(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
-                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context)));
+                    context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context)
+                        .toArray());
     }
 
     private ChatMemoryFunction.Result buildChatMemoryResult(
@@ -346,29 +347,26 @@ public abstract class AbstractAiAgentChatAction {
             }
         }
 
-        // tool call
-
-        ToolHistoryToolCallAdvisor.Builder toolCallAdvisorBuilder = ToolHistoryToolCallAdvisor.builder()
-            .toolCallingManager(toolCallingManager);
-
         // memory
 
-        Advisor chatMemoryAdvisor = chatMemoryResult
+        chatMemoryResult
             .map(ChatMemoryFunction.Result::advisor)
-            .orElse(null);
+            .ifPresent(advisors::add);
 
-        if (chatMemoryAdvisor != null) {
-            advisors.add(chatMemoryAdvisor);
-
-            // Spring AI auto-applies this when ToolCallAdvisor is auto-registered (see DefaultChatClient
-            // .autoRegisterToolCallAdvisor), but we register manually to supply our own ToolCallingManager,
-            // so the auto-disable path is skipped and we must call it ourselves. Removing this line makes
-            // ToolCallAdvisor carry full conversation history alongside the downstream ChatMemoryAdvisor —
-            // double bookkeeping that produces malformed tool-call sequences on OpenAI.
-            toolCallAdvisorBuilder.disableInternalConversationHistory();
-        }
-
-        advisors.add(toolCallAdvisorBuilder.build());
+        // tool call
+        //
+        // Spring AI 2.0.0-RC1 orders ChatMemoryAdvisor (DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER, MIN+200) upstream
+        // of ToolCallingAdvisor (DEFAULT_ORDER, MIN+300), so memory wraps the whole tool-execution loop:
+        // persisted history is applied once before the loop and only the final assistant message is written back.
+        // ToolCallingAdvisor retains the intermediate (assistant-with-tool_calls, tool-result) pairs in its own
+        // in-loop history (conversationHistoryEnabled defaults to true), so the standard composition already emits
+        // well-formed tool-call sequences. This replaces the former custom ToolHistoryToolCallAdvisor +
+        // disableInternalConversationHistory() workaround, which was only required under the M-series ordering
+        // where ChatMemoryAdvisor sat downstream of the tool loop and therefore could not rehydrate it.
+        advisors.add(
+            ToolCallingAdvisor.builder()
+                .toolCallingManager(toolCallingManager)
+                .build());
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))

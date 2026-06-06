@@ -102,7 +102,7 @@ public class DeepSeekChatAction {
                     .baseUrl("https://api.deepseek.com")
                     .restClientBuilder(ModelUtils.getRestClientBuilder())
                     .build())
-            .defaultOptions(
+            .options(
                 DeepSeekChatOptions.builder()
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))

@@ -100,7 +100,7 @@ public class MistralChatAction {
                     .restClientBuilder(ModelUtils.getRestClientBuilder())
                     .responseErrorHandler(RetryUtils.DEFAULT_RESPONSE_ERROR_HANDLER)
                     .build())
-            .defaultOptions(
+            .options(
                 MistralAiChatOptions.builder()
                     .model(inputParameters.getRequiredString(MODEL))
                     .temperature(inputParameters.getDouble(TEMPERATURE))
