@@ -1032,14 +1032,12 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "smartWebFetchTool": [ "model" ],
     "nsfw": [ "model" ],
-    "sanitizeText": [ "sanitizeText" ],
-    "jailbreak": [ "model" ],
     "custom": [ "model" ],
+    "topicalAlignment": [ "model" ],
     "checkForViolations": [ "checkForViolations" ],
-    "taskTool": [ "model" ],
-    "topicalAlignment": [ "model" ]
+    "sanitizeText": [ "sanitizeText" ],
+    "jailbreak": [ "model" ]
   },
   "clusterElementTypes": [ {
     "name": "MODEL",

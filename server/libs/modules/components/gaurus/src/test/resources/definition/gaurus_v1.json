@@ -304,10 +304,10 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "hasMoreResults": false,
           "data": "AccountResult[]",
           "code": "OK",
-          "message": ""
+          "message": "",
+          "hasMoreResults": false
         }
       },
       "outputSchema": {
@@ -466,10 +466,10 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "hasMoreResults": false,
         "data": "AccountResult[]",
         "code": "OK",
-        "message": ""
+        "message": "",
+        "hasMoreResults": false
       }
     },
     "perform": { },
@@ -742,10 +742,10 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "hasMoreResults": true,
           "data": "TransactionResult[]",
           "code": "OK",
-          "message": ""
+          "message": "",
+          "hasMoreResults": true
         }
       },
       "outputSchema": {
@@ -904,10 +904,10 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "hasMoreResults": true,
         "data": "TransactionResult[]",
         "code": "OK",
-        "message": ""
+        "message": "",
+        "hasMoreResults": true
       }
     },
     "perform": { },
@@ -1721,8 +1721,8 @@
         "placeholder": null,
         "sampleOutput": {
           "data": [ {
-            "newMails": [ "new@example.com" ],
-            "existingMails": [ "existing@example.com" ]
+            "existingMails": [ "existing@example.com" ],
+            "newMails": [ "new@example.com" ]
           } ],
           "errors": [ ]
         }
@@ -1881,8 +1881,8 @@
       },
       "sampleOutput": {
         "data": [ {
-          "newMails": [ "new@example.com" ],
-          "existingMails": [ "existing@example.com" ]
+          "existingMails": [ "existing@example.com" ],
+          "newMails": [ "new@example.com" ]
         } ],
         "errors": [ ]
       }
@@ -2481,6 +2481,7 @@
   "customActionHelp": null,
   "description": "Bank Connect API specification",
   "icon": null,
+  "inputs": null,
   "metadata": null,
   "name": "gaurus",
   "resources": null,
