@@ -20,15 +20,19 @@ Copilot is available in two modes: **Ask** and **Build**.
 The Copilot panel opens from the workflow editor toolbar. Click the **AI Copilot** button (sparkle icon) to toggle it. Use the **Ask** / **Build** toggle at the top of the panel to switch modes.
 
 Copilot is also available in:
- - the **Code Editor**  - located in the Script component for generating code blocks in JavaScript, Python, and Ruby
- - **Cluster Elements** - located in Ai Agent component or in any vector database component, used for generating all configurations from zero
+ - the **Code Editor** - located in the Script component for generating code blocks in JavaScript, Python, and Ruby
+ - **Cluster Elements** - located in the AI Agent component or in any vector database component, used for generating all configurations from zero
+ - the **Skills** page - opens as a side panel for editing the currently-viewed skill, or as a full-page chat from the **Create Skill → Create With AI** dropdown
+
+Each surface has its own pair of Ask and Build agents wired with surface-specific tools and prompts. The list of surfaces and their conversation modes lives in the controller as a `Source` enum (`WORKFLOW_EDITOR`, `CODE_EDITOR`, `CLUSTER_ELEMENT`, `SKILLS`).
+
 ---
 
 ## Ask Mode
 
-Ask mode is a read-only assistant for exploring and understanding workflows.
+Ask mode is a read-only assistant for exploring and understanding the current surface.
 
-**Both modes share:**
+**Both modes share (workflow editor):**
 - Full context of the current workflow definition
 - The last execution error on the workflow
 - Read-only access to component and task definitions
@@ -37,17 +41,19 @@ Ask mode is a read-only assistant for exploring and understanding workflows.
 - Searches the internet for relevant information (via Firecrawl, if configured)
 - Queries the ByteChef documentation knowledge base
 - Suggests when to switch to Build mode for making changes
-- Cannot modify the workflow
+- Cannot modify anything on the current surface
 
 Use Ask mode to get explanations, debug errors, research components, or plan changes before building.
+
+On the **Skills** surface, Ask is scoped to *explaining* and *auditing* skills — it can summarize a skill, diff its SKILL.md against the agentskills.io format, or suggest improvements, but it refuses mutations and directs you to Build mode.
 
 ---
 
 ## Build Mode
 
-Build mode has full access to create and modify workflows on your behalf.
+Build mode has full access to create and modify content on the current surface.
 
-**Build mode can:**
+**Build mode (workflow editor) can:**
 - Create new workflows or update existing ones
 - Search and configure components and actions
 - Validate task configurations before applying them
@@ -55,6 +61,13 @@ Build mode has full access to create and modify workflows on your behalf.
 - Deploy the workflow directly from the conversation
 
 Build mode follows a structured process: discover the right components → configure them → pre-validate → build → validate the full workflow → deploy. It will fix any validation errors before proceeding.
+
+**Build mode (Skills) can:**
+- Create new skills from a conversation (via the `createAiSkill` tool)
+- Edit the body of any file in a skill archive (`updateAiSkillContent`)
+- Rename a skill or rewrite its description (`updateAiSkill`)
+- Delete a skill
+- Both Skills agents are *context-aware*: when you have a skill open, `currentSelectedSkillId` and `currentSelectedSkillName` are injected into every turn so "this skill" resolves to the visible one.
 
 ---
 
