@@ -48,7 +48,7 @@ public final class GuardrailContext {
     private final Map<String, ComponentConnection> componentConnections;
     private final @Nullable ChatClient chatClient;
     private final Context context;
-    private final List<Message> conversationHistory;
+    private final List<Message> conversationHistoryMessages;
 
     public GuardrailContext(
         Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
@@ -62,7 +62,7 @@ public final class GuardrailContext {
     private GuardrailContext(
         Parameters inputParameters, Parameters connectionParameters, Parameters parentParameters,
         Parameters extensions, Map<String, ComponentConnection> componentConnections,
-        @Nullable ChatClient chatClient, Context context, List<Message> conversationHistory) {
+        @Nullable ChatClient chatClient, Context context, List<Message> conversationHistoryMessages) {
 
         this.inputParameters = inputParameters == null ? ParametersFactory.create(Map.of()) : inputParameters;
         this.connectionParameters = connectionParameters == null
@@ -73,7 +73,8 @@ public final class GuardrailContext {
         this.componentConnections = componentConnections == null ? Map.of() : Map.copyOf(componentConnections);
         this.chatClient = chatClient;
         this.context = Objects.requireNonNull(context, "context");
-        this.conversationHistory = conversationHistory == null ? List.of() : List.copyOf(conversationHistory);
+        this.conversationHistoryMessages =
+            conversationHistoryMessages == null ? List.of() : List.copyOf(conversationHistoryMessages);
     }
 
     public Parameters inputParameters() {
@@ -130,13 +131,13 @@ public final class GuardrailContext {
         return chatClient;
     }
 
-    public List<Message> conversationHistory() {
-        return conversationHistory;
+    public List<Message> conversationHistoryMessages() {
+        return conversationHistoryMessages;
     }
 
-    public GuardrailContext withConversationHistory(List<Message> history) {
+    public GuardrailContext withConversationHistoryMessages(List<Message> conversationHistoryMessages) {
         return new GuardrailContext(inputParameters, connectionParameters, parentParameters, extensions,
-            componentConnections, chatClient, context, history);
+            componentConnections, chatClient, context, conversationHistoryMessages);
     }
 
     public Context context() {
