@@ -6,6 +6,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ConnectedUserProjectWorkflowModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowFromPromptRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.CreateFrontendProjectWorkflowRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import org.springframework.lang.Nullable;
@@ -38,7 +39,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.507447+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:44:54.600950+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
 @Tag(name = "connected-user-project-workflow", description = "The Embedded Connected User Project Workflow Public API")
 public interface ConnectedUserProjectWorkflowApi {
@@ -46,6 +47,82 @@ public interface ConnectedUserProjectWorkflowApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_COPY_FRONTEND_WORKFLOW_TEMPLATE = "/automation/workflow-templates/{workflowUuid}/copy";
+    /**
+     * POST /automation/workflow-templates/{workflowUuid}/copy : Copy a catalog workflow template into a new user workflow
+     * Copy a catalog workflow template into a new user workflow.
+     *
+     * @param workflowUuid The workflow template uuid. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "copyFrontendWorkflowTemplate",
+        summary = "Copy a catalog workflow template into a new user workflow",
+        description = "Copy a catalog workflow template into a new user workflow.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_COPY_FRONTEND_WORKFLOW_TEMPLATE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<String> copyFrontendWorkflowTemplate(
+        @Parameter(name = "workflowUuid", description = "The workflow template uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_COPY_WORKFLOW_TEMPLATE = "/{externalUserId}/automation/workflow-templates/{workflowUuid}/copy";
+    /**
+     * POST /{externalUserId}/automation/workflow-templates/{workflowUuid}/copy : Copy a catalog workflow template into a new user workflow
+     * Copy a catalog workflow template into a new user workflow.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param workflowUuid The workflow template uuid. (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "copyWorkflowTemplate",
+        summary = "Copy a catalog workflow template into a new user workflow",
+        description = "Copy a catalog workflow template into a new user workflow.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_COPY_WORKFLOW_TEMPLATE,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<String> copyWorkflowTemplate(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "workflowUuid", description = "The workflow template uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_CREATE_FRONTEND_PROJECT_WORKFLOW = "/automation/workflows";
     /**
@@ -78,6 +155,44 @@ public interface ConnectedUserProjectWorkflowApi {
     )
     default ResponseEntity<String> createFrontendProjectWorkflow(
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_CREATE_FRONTEND_PROJECT_WORKFLOW_FROM_PROMPT = "/automation/workflows/generate";
+    /**
+     * POST /automation/workflows/generate : Generate a new workflow from a natural language prompt
+     * Generate a new workflow for the connected user from a natural language prompt using AI Copilot.
+     *
+     * @param createFrontendProjectWorkflowFromPromptRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "createFrontendProjectWorkflowFromPrompt",
+        summary = "Generate a new workflow from a natural language prompt",
+        description = "Generate a new workflow for the connected user from a natural language prompt using AI Copilot.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_CREATE_FRONTEND_PROJECT_WORKFLOW_FROM_PROMPT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> createFrontendProjectWorkflowFromPrompt(
+        @Parameter(name = "CreateFrontendProjectWorkflowFromPromptRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -118,6 +233,46 @@ public interface ConnectedUserProjectWorkflowApi {
     default ResponseEntity<String> createProjectWorkflow(
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_CREATE_PROJECT_WORKFLOW_FROM_PROMPT = "/{externalUserId}/automation/workflows/generate";
+    /**
+     * POST /{externalUserId}/automation/workflows/generate : Generate a new workflow from a natural language prompt
+     * Generate a new workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param createFrontendProjectWorkflowFromPromptRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The new workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "createProjectWorkflowFromPrompt",
+        summary = "Generate a new workflow from a natural language prompt",
+        description = "Generate a new workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The new workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_CREATE_PROJECT_WORKFLOW_FROM_PROMPT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> createProjectWorkflowFromPrompt(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "CreateFrontendProjectWorkflowFromPromptRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
@@ -614,6 +769,46 @@ public interface ConnectedUserProjectWorkflowApi {
     }
 
 
+    String PATH_UPDATE_FRONTEND_PROJECT_WORKFLOW_FROM_PROMPT = "/automation/workflows/{workflowUuid}/generate";
+    /**
+     * POST /automation/workflows/{workflowUuid}/generate : Update an existing workflow from a natural language prompt
+     * Update an existing workflow for the connected user from a natural language prompt using AI Copilot.
+     *
+     * @param workflowUuid The uuid of the workflow to update. (required)
+     * @param createFrontendProjectWorkflowFromPromptRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The updated workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "updateFrontendProjectWorkflowFromPrompt",
+        summary = "Update an existing workflow from a natural language prompt",
+        description = "Update an existing workflow for the connected user from a natural language prompt using AI Copilot.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "jwtBearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_UPDATE_FRONTEND_PROJECT_WORKFLOW_FROM_PROMPT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> updateFrontendProjectWorkflowFromPrompt(
+        @Parameter(name = "workflowUuid", description = "The uuid of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "CreateFrontendProjectWorkflowFromPromptRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
     String PATH_UPDATE_FRONTEND_WORKFLOW_CONFIGURATION_CONNECTION = "/automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey}";
     /**
      * PUT /automation/workflows/{workflowUuid}/workflow-nodes/{workflowNodeName}/connection/{workflowConnectionKey} : Update a workflow configuration connection
@@ -687,6 +882,48 @@ public interface ConnectedUserProjectWorkflowApi {
         @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow to delete.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "CreateFrontendProjectWorkflowRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowRequestModel createFrontendProjectWorkflowRequestModel,
+        @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
+    ) {
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_UPDATE_PROJECT_WORKFLOW_FROM_PROMPT = "/{externalUserId}/automation/workflows/{workflowUuid}/generate";
+    /**
+     * POST /{externalUserId}/automation/workflows/{workflowUuid}/generate : Update an existing workflow from a natural language prompt
+     * Update an existing workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.
+     *
+     * @param externalUserId The external user id. (required)
+     * @param workflowUuid The uuid of the workflow to update. (required)
+     * @param createFrontendProjectWorkflowFromPromptRequestModel  (required)
+     * @param xEnvironment The environment. (optional)
+     * @return The updated workflow uuid. (status code 200)
+     */
+    @Operation(
+        operationId = "updateProjectWorkflowFromPrompt",
+        summary = "Update an existing workflow from a natural language prompt",
+        description = "Update an existing workflow for a connected user identified by external user id from a natural language prompt using AI Copilot.",
+        tags = { "connected-user-project-workflow" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The updated workflow uuid.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = String.class))
+            })
+        },
+        security = {
+            @SecurityRequirement(name = "bearerAuth")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectedUserProjectWorkflowApi.PATH_UPDATE_PROJECT_WORKFLOW_FROM_PROMPT,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<String> updateProjectWorkflowFromPrompt(
+        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+        @Parameter(name = "workflowUuid", description = "The uuid of the workflow to update.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
+        @Parameter(name = "CreateFrontendProjectWorkflowFromPromptRequestModel", description = "", required = true) @Valid @RequestBody CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequestModel,
         @Parameter(name = "X-Environment", description = "The environment.", in = ParameterIn.HEADER) @RequestHeader(value = "X-Environment", required = false) @Nullable EnvironmentModel xEnvironment
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

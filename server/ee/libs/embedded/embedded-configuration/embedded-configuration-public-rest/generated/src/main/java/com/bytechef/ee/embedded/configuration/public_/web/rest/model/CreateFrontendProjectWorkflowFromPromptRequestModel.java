@@ -17,34 +17,45 @@ import java.util.*;
 import jakarta.annotation.Generated;
 
 /**
- * UpdateFrontendWorkflowConfigurationConnectionRequestModel
+ * CreateFrontendProjectWorkflowFromPromptRequestModel
  */
 
-@JsonTypeName("updateFrontendWorkflowConfigurationConnection_request")
+@JsonTypeName("createFrontendProjectWorkflowFromPrompt_request")
 @Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:44:54.600950+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
-public class UpdateFrontendWorkflowConfigurationConnectionRequestModel {
+public class CreateFrontendProjectWorkflowFromPromptRequestModel {
 
-  private @Nullable Long connectionId;
+  private String prompt;
 
-  public UpdateFrontendWorkflowConfigurationConnectionRequestModel connectionId(@Nullable Long connectionId) {
-    this.connectionId = connectionId;
+  public CreateFrontendProjectWorkflowFromPromptRequestModel() {
+    super();
+  }
+
+  /**
+   * Constructor with only required parameters
+   */
+  public CreateFrontendProjectWorkflowFromPromptRequestModel(String prompt) {
+    this.prompt = prompt;
+  }
+
+  public CreateFrontendProjectWorkflowFromPromptRequestModel prompt(String prompt) {
+    this.prompt = prompt;
     return this;
   }
 
   /**
-   * Get connectionId
-   * @return connectionId
+   * Natural language description of the workflow to build.
+   * @return prompt
    */
-  
-  @Schema(name = "connectionId", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
-  @JsonProperty("connectionId")
-  public @Nullable Long getConnectionId() {
-    return connectionId;
+  @NotNull 
+  @Schema(name = "prompt", description = "Natural language description of the workflow to build.", requiredMode = Schema.RequiredMode.REQUIRED)
+  @JsonProperty("prompt")
+  public String getPrompt() {
+    return prompt;
   }
 
-  @JsonProperty("connectionId")
-  public void setConnectionId(@Nullable Long connectionId) {
-    this.connectionId = connectionId;
+  @JsonProperty("prompt")
+  public void setPrompt(String prompt) {
+    this.prompt = prompt;
   }
 
   @Override
@@ -55,20 +66,20 @@ public class UpdateFrontendWorkflowConfigurationConnectionRequestModel {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    UpdateFrontendWorkflowConfigurationConnectionRequestModel updateFrontendWorkflowConfigurationConnectionRequest = (UpdateFrontendWorkflowConfigurationConnectionRequestModel) o;
-    return Objects.equals(this.connectionId, updateFrontendWorkflowConfigurationConnectionRequest.connectionId);
+    CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequest = (CreateFrontendProjectWorkflowFromPromptRequestModel) o;
+    return Objects.equals(this.prompt, createFrontendProjectWorkflowFromPromptRequest.prompt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(connectionId);
+    return Objects.hash(prompt);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class UpdateFrontendWorkflowConfigurationConnectionRequestModel {\n");
-    sb.append("    connectionId: ").append(toIndentedString(connectionId)).append("\n");
+    sb.append("class CreateFrontendProjectWorkflowFromPromptRequestModel {\n");
+    sb.append("    prompt: ").append(toIndentedString(prompt)).append("\n");
     sb.append("}");
     return sb.toString();
   }

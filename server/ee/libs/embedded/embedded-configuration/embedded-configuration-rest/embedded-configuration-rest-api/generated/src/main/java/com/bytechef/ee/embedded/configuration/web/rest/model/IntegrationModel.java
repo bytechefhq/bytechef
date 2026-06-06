@@ -31,7 +31,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Integration", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("Integration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.853258+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:44:55.026256+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationModel {
 
   private String componentName;
@@ -62,6 +62,8 @@ public class IntegrationModel {
   private Boolean multipleInstances = false;
 
   private @Nullable String name;
+
+  private @Nullable String permissionExpression;
 
   private @Nullable CategoryModel category;
 
@@ -358,6 +360,27 @@ public class IntegrationModel {
     this.name = name;
   }
 
+  public IntegrationModel permissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+    return this;
+  }
+
+  /**
+   * The SpEL permission expression evaluated against the connected user to control integration visibility.
+   * @return permissionExpression
+   */
+  
+  @Schema(name = "permissionExpression", description = "The SpEL permission expression evaluated against the connected user to control integration visibility.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("permissionExpression")
+  public @Nullable String getPermissionExpression() {
+    return permissionExpression;
+  }
+
+  @JsonProperty("permissionExpression")
+  public void setPermissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+  }
+
   public IntegrationModel category(@Nullable CategoryModel category) {
     this.category = category;
     return this;
@@ -480,6 +503,7 @@ public class IntegrationModel {
         Objects.equals(this.lastIntegrationVersion, integration.lastIntegrationVersion) &&
         Objects.equals(this.multipleInstances, integration.multipleInstances) &&
         Objects.equals(this.name, integration.name) &&
+        Objects.equals(this.permissionExpression, integration.permissionExpression) &&
         Objects.equals(this.category, integration.category) &&
         Objects.equals(this.integrationWorkflowIds, integration.integrationWorkflowIds) &&
         Objects.equals(this.tags, integration.tags) &&
@@ -488,7 +512,7 @@ public class IntegrationModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, category, integrationWorkflowIds, tags, version);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression, category, integrationWorkflowIds, tags, version);
   }
 
   @Override
@@ -508,6 +532,7 @@ public class IntegrationModel {
     sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("    category: ").append(toIndentedString(category)).append("\n");
     sb.append("    integrationWorkflowIds: ").append(toIndentedString(integrationWorkflowIds)).append("\n");
     sb.append("    tags: ").append(toIndentedString(tags)).append("\n");
