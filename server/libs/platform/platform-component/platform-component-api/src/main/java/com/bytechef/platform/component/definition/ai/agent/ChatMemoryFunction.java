@@ -40,7 +40,8 @@ public interface ChatMemoryFunction {
      * building a second memory instance. {@code chatMemory} is {@code null} for advisor types (e.g. VectorStore) that
      * do not expose a standard {@link ChatMemory}.
      */
-    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {}
+    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
+    }
 
     /**
      * @param inputParameters

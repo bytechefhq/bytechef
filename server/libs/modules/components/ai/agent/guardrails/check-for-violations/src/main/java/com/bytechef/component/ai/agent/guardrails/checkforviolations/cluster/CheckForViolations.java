@@ -93,7 +93,7 @@ public final class CheckForViolations {
 
         CheckForViolationsAdvisor.Builder builder = CheckForViolationsAdvisor.builder()
             .blockedMessage(inputParameters.getString(BLOCKED_MESSAGE, DEFAULT_BLOCKED_MESSAGE))
-            .conversationHistory(conversationHistory)
+            .conversationHistoryMessages(conversationHistory)
             .context(context);
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);

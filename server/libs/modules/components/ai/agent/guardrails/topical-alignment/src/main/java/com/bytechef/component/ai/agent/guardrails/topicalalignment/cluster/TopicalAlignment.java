@@ -109,7 +109,8 @@ public final class TopicalAlignment {
 
         double threshold = inputParameters.getDouble(THRESHOLD, DEFAULT_THRESHOLD);
 
-        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text, context.conversationHistory());
+        return classifyWith(chatClient, userPrompt, threshold, systemMessage, text,
+            context.conversationHistoryMessages());
     }
 
     static Optional<Violation> classifyWith(

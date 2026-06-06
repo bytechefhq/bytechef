@@ -145,7 +145,7 @@ public final class Custom {
             throw new IllegalArgumentException("Custom guardrail requires at least one entry in 'Classifiers'");
         }
 
-        return applyMultiple(chatClient, systemMessage, text, entries, context.conversationHistory());
+        return applyMultiple(chatClient, systemMessage, text, entries, context.conversationHistoryMessages());
     }
 
     private static List<Violation> applyMultiple(

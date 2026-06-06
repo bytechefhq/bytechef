@@ -78,16 +78,16 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     private static final Set<String> INTERNAL_INFO_KEYS = Set.of("maskEntities");
 
     private final String blockedMessage;
-    private final List<CheckEntry> checks;
+    private final List<CheckEntry> checkEntries;
     private final Context context;
-    private final List<Message> conversationHistory;
+    private final List<Message> conversationHistoryMessages;
 
     private CheckForViolationsAdvisor(Builder builder) {
         this.blockedMessage = builder.blockedMessage;
-        this.checks = List.copyOf(builder.checks);
+        this.checkEntries = List.copyOf(builder.checkEntries);
         this.context = Objects.requireNonNull(builder.context, "context");
-        this.conversationHistory =
-            builder.conversationHistory == null ? List.of() : List.copyOf(builder.conversationHistory);
+        this.conversationHistoryMessages =
+            builder.conversationHistoryMessages == null ? List.of() : List.copyOf(builder.conversationHistoryMessages);
     }
 
     private void contextLog(Context.ContextConsumer<Context.Log> logConsumer) {
@@ -196,7 +196,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
         MaskEntityMapUtils maskEntities = new MaskEntityMapUtils(context);
 
         // Stage 1: PREFLIGHT (rule-based) — runs against the progressively-mutated user text and may mask.
-        for (CheckEntry entry : checks) {
+        for (CheckEntry entry : checkEntries) {
             if (entry.function.stage() != GuardrailStage.PREFLIGHT || !shouldRun(entry, VALIDATE_INPUT)) {
                 continue;
             }
@@ -259,14 +259,15 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
     }
 
     private void runStage(GuardrailStage stage, String validateKey, String text, List<Violation> aggregated) {
-        for (CheckEntry entry : checks) {
+        for (CheckEntry entry : checkEntries) {
             if (entry.function.stage() != stage || !shouldRun(entry, validateKey)) {
                 continue;
             }
 
-            GuardrailContext effectiveContext = (conversationHistory.isEmpty() || !VALIDATE_INPUT.equals(validateKey))
-                ? entry.context
-                : entry.context.withConversationHistory(conversationHistory);
+            GuardrailContext effectiveContext =
+                (conversationHistoryMessages.isEmpty() || !VALIDATE_INPUT.equals(validateKey))
+                    ? entry.context
+                    : entry.context.withConversationHistoryMessages(conversationHistoryMessages);
 
             try {
                 List<Violation> results = entry.function.applyAll(text, effectiveContext);
@@ -494,9 +495,9 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
 
         private String blockedMessage = "";
         private final List<PendingCheck> pendingChecks = new ArrayList<>();
-        private final List<CheckEntry> checks = new ArrayList<>();
+        private final List<CheckEntry> checkEntries = new ArrayList<>();
         private Context context;
-        private List<Message> conversationHistory;
+        private List<Message> conversationHistoryMessages;
 
         public Builder blockedMessage(String value) {
             this.blockedMessage = value;
@@ -510,8 +511,8 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
             return this;
         }
 
-        public Builder conversationHistory(List<Message> value) {
-            this.conversationHistory = List.copyOf(value);
+        public Builder conversationHistoryMessages(List<Message> value) {
+            this.conversationHistoryMessages = List.copyOf(value);
 
             return this;
         }
@@ -561,7 +562,7 @@ public final class CheckForViolationsAdvisor implements CallAdvisor, StreamAdvis
                     .context(context)
                     .build();
 
-                checks.add(new CheckEntry(pending.guardrailName, pending.function, guardrailContext));
+                checkEntries.add(new CheckEntry(pending.guardrailName, pending.function, guardrailContext));
             }
 
             return new CheckForViolationsAdvisor(this);

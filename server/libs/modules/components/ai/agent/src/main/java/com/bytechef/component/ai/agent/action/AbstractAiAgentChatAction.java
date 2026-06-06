@@ -153,6 +153,100 @@ public abstract class AbstractAiAgentChatAction {
                     context.isEditorEnvironment(), toolExecutionListener, toolSimulations, chatModel, context));
     }
 
+    private ChatMemoryFunction.Result buildChatMemoryResult(
+        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
+        ActionContext context) {
+
+        ChatMemoryFunction chatMemoryFunction = clusterElementDefinitionService.getClusterElement(
+            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
+            clusterElement.getClusterElementName());
+
+        try {
+            return chatMemoryFunction.apply(
+                ParametersFactory.create(clusterElement.getParameters()),
+                getConnectionParameters(componentConnections, clusterElement),
+                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
+        } catch (Exception e) {
+            throw clusterElementInitializationException(clusterElement, "chat memory", e, context);
+        }
+    }
+
+    private static RuntimeException clusterElementInitializationException(
+        ClusterElement clusterElement, String kind, Throwable cause, ActionContext context) {
+
+        Class<? extends Throwable> causeClass = cause.getClass();
+
+        String message = String.format(
+            "Failed to initialize %s advisor for cluster element '%s' (component=%s v%d): %s",
+            kind, clusterElement.getClusterElementName(), clusterElement.getComponentName(),
+            clusterElement.getComponentVersion(),
+            cause.getMessage() == null ? causeClass.getSimpleName() : cause.getMessage());
+
+        context.log(log -> log.error(message, cause));
+
+        return new IllegalStateException(message, cause);
+    }
+
+    private static ToolCallback createObservableToolCallback(
+        ToolCallback delegate, AtomicReference<@Nullable AgentThinking> thinkingReference,
+        ToolExecutionListener toolExecutionListener, ActionContext context) {
+
+        return new ToolCallback() {
+
+            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return toolDefinition;
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return observeAndCall(toolInput, () -> delegate.call(toolInput));
+            }
+
+            @Override
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                return observeAndCall(toolInput, () -> delegate.call(toolInput, toolContext));
+            }
+
+            private String observeAndCall(String toolInput, Supplier<String> execution) {
+                log.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
+
+                Map<String, Object> inputs;
+
+                try {
+                    inputs = JsonParser.fromJson(toolInput, new TypeReference<>() {});
+                } catch (Exception exception) {
+                    context.log(
+                        log -> log.debug(
+                            "Failed to parse tool input as JSON for '{}': {}", toolDefinition.name(),
+                            exception.getMessage()));
+
+                    inputs = Map.of("rawInput", toolInput);
+                }
+
+                String result = execution.get();
+
+                AgentThinking agentThinking = thinkingReference.getAndSet(null);
+
+                try {
+                    toolExecutionListener.onToolExecution(
+                        new ToolExecutionEvent(
+                            toolDefinition.name(), inputs, result,
+                            agentThinking != null ? agentThinking.reasoning() : null,
+                            agentThinking != null ? agentThinking.confidence() : null));
+                } catch (Exception exception) {
+                    context.log(
+                        log -> log.warn(
+                            "Tool execution listener failed for '{}'", toolDefinition.name(), exception));
+                }
+
+                return result;
+            }
+        };
+    }
+
     private static ChatClient.ChatClientRequestSpec createPrompt(
         ChatClient chatClient, Parameters inputParameters, ActionContext context) {
 
@@ -167,6 +261,40 @@ public abstract class AbstractAiAgentChatAction {
             inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
 
         return chatClient.prompt(converter.getFormat());
+    }
+
+    private static ToolCallback createSimulationAwareToolCallback(
+        ToolCallback delegate, Map<String, Map<String, String>> toolSimulations, ChatModel chatModel,
+        ActionContext context) {
+
+        String toolName = delegate.getToolDefinition()
+            .name();
+
+        Map<String, String> simulation = toolSimulations.get(toolName);
+
+        if (simulation == null) {
+            return delegate;
+        }
+
+        return new ToolCallback() {
+
+            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
+
+            @Override
+            public ToolDefinition getToolDefinition() {
+                return toolDefinition;
+            }
+
+            @Override
+            public String call(String toolInput) {
+                return getSimulatedResult(toolInput, simulation, chatModel, context);
+            }
+
+            @Override
+            public String call(String toolInput, @Nullable ToolContext toolContext) {
+                return getSimulatedResult(toolInput, simulation, chatModel, context);
+            }
+        };
     }
 
     private List<Advisor> getAdvisors(
@@ -224,63 +352,20 @@ public abstract class AbstractAiAgentChatAction {
         return advisors;
     }
 
-    private ChatMemoryFunction.Result buildChatMemoryResult(
-        Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
-        ActionContext context) {
-
-        ChatMemoryFunction chatMemoryFunction = clusterElementDefinitionService.getClusterElement(
-            clusterElement.getComponentName(), clusterElement.getComponentVersion(),
-            clusterElement.getClusterElementName());
-
-        try {
-            return chatMemoryFunction.apply(
-                ParametersFactory.create(clusterElement.getParameters()),
-                getConnectionParameters(componentConnections, clusterElement),
-                ParametersFactory.create(clusterElement.getExtensions()), componentConnections);
-        } catch (Exception e) {
-            throw clusterElementInitializationException(clusterElement, "chat memory", e, context);
-        }
-    }
-
-    private List<Message> loadConversationHistory(
-        @Nullable ChatMemory chatMemory, ClusterElementMap clusterElementMap) {
-
-        if (chatMemory == null) {
-            return List.of();
-        }
-
-        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
-            .map(clusterElement -> {
-                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
-                String conversationId = chatMemoryParameters.getString("conversationId");
-
-                if (conversationId == null) {
-                    return List.<Message>of();
-                }
-
-                try {
-                    List<Message> all = chatMemory.get(conversationId);
-
-                    if (all.isEmpty()) {
-                        return List.<Message>of();
-                    }
-
-                    int size = all.size();
-
-                    return size <= 3 ? List.copyOf(all) : List.copyOf(all.subList(size - 3, size));
-                } catch (Exception exception) {
-                    return List.<Message>of();
-                }
-            })
-            .orElse(List.of());
-    }
-
     private static Parameters getConnectionParameters(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement) {
 
         ComponentConnection componentConnection = componentConnections.get(clusterElement.getWorkflowNodeName());
 
         return ParametersFactory.create(componentConnection);
+    }
+
+    private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(@Nullable String conversationId) {
+        return advisor -> {
+            if (conversationId != null) {
+                advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
+            }
+        };
     }
 
     private Advisor getGuardrailsAdvisor(
@@ -302,14 +387,6 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
-    private static Consumer<ChatClient.AdvisorSpec> getConversationAdvisor(@Nullable String conversationId) {
-        return advisor -> {
-            if (conversationId != null) {
-                advisor.param(ChatMemory.CONVERSATION_ID, conversationId);
-            }
-        };
-    }
-
     private Advisor getRagAdvisor(
         Map<String, ComponentConnection> componentConnections, ClusterElement clusterElement,
         ActionContext context) {
@@ -328,20 +405,39 @@ public abstract class AbstractAiAgentChatAction {
         }
     }
 
-    private static RuntimeException clusterElementInitializationException(
-        ClusterElement clusterElement, String kind, Throwable cause, ActionContext context) {
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private static String getSimulatedResult(
+        String toolInput, Map<String, String> simulation, ChatModel chatModel, ActionContext context) {
 
-        Class<? extends Throwable> causeClass = cause.getClass();
+        String responsePrompt = simulation.get(RESPONSE_PROMPT);
+        String simulationModel = simulation.get(SIMULATION_MODEL);
 
-        String message = String.format(
-            "Failed to initialize %s advisor for cluster element '%s' (component=%s v%d): %s",
-            kind, clusterElement.getClusterElementName(), clusterElement.getComponentName(),
-            clusterElement.getComponentVersion(),
-            cause.getMessage() == null ? causeClass.getSimpleName() : cause.getMessage());
+        try {
+            ChatClient simulationClient = ChatClient.builder(chatModel)
+                .build();
 
-        context.log(log -> log.error(message, cause));
+            String prompt =
+                "Given this tool call input: %s\n\nGenerate a realistic response following these instructions: %s"
+                    .formatted(toolInput, responsePrompt);
 
-        return new IllegalStateException(message, cause);
+            ChatClient.ChatClientRequestSpec requestSpec = simulationClient.prompt()
+                .user(prompt);
+
+            if (simulationModel != null && !simulationModel.isEmpty()) {
+                requestSpec = requestSpec.options(
+                    ChatOptions.builder()
+                        .model(simulationModel));
+            }
+
+            String generatedResponse = requestSpec.call()
+                .content();
+
+            return generatedResponse != null ? generatedResponse : TOOL_SIMULATION_UNAVAILABLE;
+        } catch (Exception exception) {
+            context.log(log -> log.warn("Failed to generate simulated response", exception));
+
+            return TOOL_SIMULATION_UNAVAILABLE;
+        }
     }
 
     private List<ToolCallback> getToolCallbacks(
@@ -431,132 +527,36 @@ public abstract class AbstractAiAgentChatAction {
         return Arrays.asList(augmentedToolCallbackProvider.getToolCallbacks());
     }
 
-    private static ToolCallback createSimulationAwareToolCallback(
-        ToolCallback delegate, Map<String, Map<String, String>> toolSimulations, ChatModel chatModel,
-        ActionContext context) {
+    private List<Message> loadConversationHistory(
+        @Nullable ChatMemory chatMemory, ClusterElementMap clusterElementMap) {
 
-        String toolName = delegate.getToolDefinition()
-            .name();
-
-        Map<String, String> simulation = toolSimulations.get(toolName);
-
-        if (simulation == null) {
-            return delegate;
+        if (chatMemory == null) {
+            return List.of();
         }
 
-        return new ToolCallback() {
+        return clusterElementMap.fetchClusterElement(CHAT_MEMORY)
+            .map(clusterElement -> {
+                Parameters chatMemoryParameters = ParametersFactory.create(clusterElement.getParameters());
+                String conversationId = chatMemoryParameters.getString("conversationId");
 
-            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
-
-            @Override
-            public ToolDefinition getToolDefinition() {
-                return toolDefinition;
-            }
-
-            @Override
-            public String call(String toolInput) {
-                return getSimulatedResult(toolInput, simulation, chatModel, context);
-            }
-
-            @Override
-            public String call(String toolInput, @Nullable ToolContext toolContext) {
-                return getSimulatedResult(toolInput, simulation, chatModel, context);
-            }
-        };
-    }
-
-    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    private static String getSimulatedResult(
-        String toolInput, Map<String, String> simulation, ChatModel chatModel, ActionContext context) {
-
-        String responsePrompt = simulation.get(RESPONSE_PROMPT);
-        String simulationModel = simulation.get(SIMULATION_MODEL);
-
-        try {
-            ChatClient simulationClient = ChatClient.builder(chatModel)
-                .build();
-
-            String prompt =
-                "Given this tool call input: %s\n\nGenerate a realistic response following these instructions: %s"
-                    .formatted(toolInput, responsePrompt);
-
-            ChatClient.ChatClientRequestSpec requestSpec = simulationClient.prompt()
-                .user(prompt);
-
-            if (simulationModel != null && !simulationModel.isEmpty()) {
-                requestSpec = requestSpec.options(
-                    ChatOptions.builder()
-                        .model(simulationModel));
-            }
-
-            String generatedResponse = requestSpec.call()
-                .content();
-
-            return generatedResponse != null ? generatedResponse : TOOL_SIMULATION_UNAVAILABLE;
-        } catch (Exception exception) {
-            context.log(log -> log.warn("Failed to generate simulated response", exception));
-
-            return TOOL_SIMULATION_UNAVAILABLE;
-        }
-    }
-
-    private static ToolCallback createObservableToolCallback(
-        ToolCallback delegate, AtomicReference<@Nullable AgentThinking> thinkingReference,
-        ToolExecutionListener toolExecutionListener, ActionContext context) {
-
-        return new ToolCallback() {
-
-            private final ToolDefinition toolDefinition = delegate.getToolDefinition();
-
-            @Override
-            public ToolDefinition getToolDefinition() {
-                return toolDefinition;
-            }
-
-            @Override
-            public String call(String toolInput) {
-                return observeAndCall(toolInput, () -> delegate.call(toolInput));
-            }
-
-            @Override
-            public String call(String toolInput, @Nullable ToolContext toolContext) {
-                return observeAndCall(toolInput, () -> delegate.call(toolInput, toolContext));
-            }
-
-            private String observeAndCall(String toolInput, Supplier<String> execution) {
-                log.debug("Tool '{}' request: {}", toolDefinition.name(), toolInput);
-
-                Map<String, Object> inputs;
-
-                try {
-                    inputs = JsonParser.fromJson(toolInput, new TypeReference<>() {});
-                } catch (Exception exception) {
-                    context.log(
-                        log -> log.debug(
-                            "Failed to parse tool input as JSON for '{}': {}", toolDefinition.name(),
-                            exception.getMessage()));
-
-                    inputs = Map.of("rawInput", toolInput);
+                if (conversationId == null) {
+                    return List.<Message>of();
                 }
 
-                String result = execution.get();
-
-                AgentThinking agentThinking = thinkingReference.getAndSet(null);
-
                 try {
-                    toolExecutionListener.onToolExecution(
-                        new ToolExecutionEvent(
-                            toolDefinition.name(), inputs, result,
-                            agentThinking != null ? agentThinking.reasoning() : null,
-                            agentThinking != null ? agentThinking.confidence() : null));
-                } catch (Exception exception) {
-                    context.log(
-                        log -> log.warn(
-                            "Tool execution listener failed for '{}'", toolDefinition.name(), exception));
-                }
+                    List<Message> all = chatMemory.get(conversationId);
 
-                return result;
-            }
-        };
+                    if (all.isEmpty()) {
+                        return List.<Message>of();
+                    }
+
+                    int size = all.size();
+
+                    return size <= 3 ? List.copyOf(all) : List.copyOf(all.subList(size - 3, size));
+                } catch (Exception exception) {
+                    return List.<Message>of();
+                }
+            })
+            .orElse(List.of());
     }
 }
