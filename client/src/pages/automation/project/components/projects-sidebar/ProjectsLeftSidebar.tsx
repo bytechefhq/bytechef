@@ -348,7 +348,7 @@ const ProjectsLeftSidebar = ({
                 <WorkflowDialog
                     createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
-                    projectId={selectedProjectId}
+                    parentId={selectedProjectId}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}

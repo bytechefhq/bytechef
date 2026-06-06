@@ -349,7 +349,11 @@ const ProjectWorkflowListItem = ({
             {showEditDialog && workflow && (
                 <WorkflowDialog
                     onClose={() => setShowEditDialog(false)}
-                    projectId={project.id}
+                    onSave={() =>
+                        queryClient.invalidateQueries({
+                            queryKey: ProjectWorkflowKeys.projectWorkflow(project.id!, parseInt(workflow.id!)),
+                        })
+                    }
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
