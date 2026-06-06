@@ -39,6 +39,7 @@ subprojects {
             dependency("com.openai:openai-java-client-okhttp:${rootProject.libs.versions.openai.java.get()}")
             dependency("org.testcontainers:junit-jupiter:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:localstack:${rootProject.libs.versions.testcontainers.get()}")
+            dependency("org.testcontainers:mongodb:${rootProject.libs.versions.testcontainers.get()}")
             dependency("org.testcontainers:postgresql:${rootProject.libs.versions.testcontainers.get()}")
         }
     }
