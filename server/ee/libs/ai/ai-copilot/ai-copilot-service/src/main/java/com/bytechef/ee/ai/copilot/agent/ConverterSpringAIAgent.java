@@ -52,8 +52,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -103,6 +101,8 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
                  - After modifying the object, the assistant MUST persist the result by using Data Storage inside the branch:
                     - Specifically, it MUST append the resulting value to a list using an "append value to list" operation.
             """;
+    private static final Pattern LABEL_PATTERN = Pattern.compile(
+        "\\{\\s*\"label\"[\\s\\S]*\\}", Pattern.DOTALL);
 
     protected ConverterSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
@@ -152,15 +152,11 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
             return text;
         }
 
-        Pattern pattern = Pattern.compile(
-            "\\{\\s*\"label\"[\\s\\S]*\\}",
-            Pattern.DOTALL
-        );
-
-        Matcher matcher = pattern.matcher(text);
+        Matcher matcher = LABEL_PATTERN.matcher(text);
 
         if (matcher.find()) {
-            return matcher.group().trim();
+            return matcher.group()
+                .trim();
         }
 
         return text;
