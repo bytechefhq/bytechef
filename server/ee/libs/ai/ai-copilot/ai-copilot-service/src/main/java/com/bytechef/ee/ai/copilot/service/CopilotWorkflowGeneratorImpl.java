@@ -14,12 +14,14 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
+import com.bytechef.ai.mcp.tool.platform.TaskTools;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -55,7 +57,7 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
     }
 
     @Override
-    public void generateWorkflow(String workflowId, String prompt) {
+    public void generateWorkflow(String workflowId, String prompt, Set<String> allowedComponentNames) {
         String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
 
         LocalAgent localAgent = localAgentMap.get(agentId);
@@ -64,9 +66,16 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
             throw new IllegalStateException("Workflow editor BUILD agent not available: " + agentId);
         }
 
-        State state = new State(new HashMap<>(Map.of(
-            "workflowId", workflowId,
-            "mode", Mode.BUILD.name())));
+        Map<String, Object> stateMap = new HashMap<>();
+
+        stateMap.put("workflowId", workflowId);
+        stateMap.put("mode", Mode.BUILD.name());
+
+        if (allowedComponentNames != null && !allowedComponentNames.isEmpty()) {
+            stateMap.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
+        }
+
+        State state = new State(stateMap);
 
         UserMessage userMessage = new UserMessage();
 

@@ -20,11 +20,15 @@ import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
+import com.bytechef.ee.embedded.configuration.domain.Integration;
+import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectCategoryDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectTagDTO;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectVersionDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
@@ -39,6 +43,7 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,6 +91,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
     private final WorkflowNodeTestOutputService workflowNodeTestOutputService;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
+    private final IntegrationService integrationService;
 
     @SuppressFBWarnings("EI")
     public AutomationWorkflowProjectFacadeImpl(
@@ -94,7 +101,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, ProjectService projectService,
         ProjectWorkflowFacade projectWorkflowFacade, ProjectWorkflowService projectWorkflowService,
         TagService tagService, WorkflowNodeTestOutputService workflowNodeTestOutputService,
-        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
+        IntegrationService integrationService) {
 
         this.categoryService = categoryService;
         this.componentDefinitionService = componentDefinitionService;
@@ -107,6 +116,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         this.workflowNodeTestOutputService = workflowNodeTestOutputService;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
+        this.integrationService = integrationService;
     }
 
     @Override
@@ -143,7 +154,9 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
             externalUserId, DEFAULT_DEFINITION, environment);
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
-        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt);
+        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
+
+        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, allowedComponentNames);
 
         return workflowUuid;
     }
@@ -431,6 +444,31 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         }
 
         return project;
+    }
+
+    Set<String> resolveAllowedComponentNames(Environment environment) {
+        List<IntegrationInstanceConfiguration> enabledConfigurations =
+            integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
+
+        List<Long> integrationIds = enabledConfigurations.stream()
+            .map(IntegrationInstanceConfiguration::getIntegrationId)
+            .filter(Objects::nonNull)
+            .distinct()
+            .toList();
+
+        Set<String> allowedComponentNames = integrationService.getIntegrations(integrationIds)
+            .stream()
+            .map(Integration::getComponentName)
+            .filter(Objects::nonNull)
+            .collect(Collectors.toCollection(HashSet::new));
+
+        componentDefinitionService.getComponentDefinitions()
+            .stream()
+            .filter(componentDefinition -> !componentDefinition.isConnectionRequired())
+            .map(ComponentDefinition::getName)
+            .forEach(allowedComponentNames::add);
+
+        return allowedComponentNames;
     }
 
     private Long resolveCategory(String categoryName) {

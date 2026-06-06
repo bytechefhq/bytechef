@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.ai.copilot.service;
 
+import java.util.Set;
+
 /**
  * @version ee
  *
@@ -14,5 +16,5 @@ package com.bytechef.ee.ai.copilot.service;
  */
 public interface CopilotWorkflowGenerator {
 
-    void generateWorkflow(String workflowId, String prompt);
+    void generateWorkflow(String workflowId, String prompt, Set<String> allowedComponentNames);
 }

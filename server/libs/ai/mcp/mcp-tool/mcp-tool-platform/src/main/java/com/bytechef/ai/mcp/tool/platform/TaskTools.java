@@ -34,9 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.annotation.Tool;
 import org.springframework.ai.tool.annotation.ToolParam;
 import org.springframework.stereotype.Component;
@@ -48,6 +51,8 @@ import org.springframework.stereotype.Component;
 public class TaskTools {
 
     private static final Logger log = LoggerFactory.getLogger(TaskTools.class);
+
+    public static final String TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY = "allowedComponentNames";
 
     private static final String INVALID_TASK_TYPE =
         "Invalid task type. Must be 'action', 'trigger', 'taskDispatcher', or 'clusterElement'";
@@ -254,7 +259,8 @@ public class TaskTools {
         @ToolParam(
             required = false,
             description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types") String type,
-        @ToolParam(required = false, description = "Limit on number of results returned") Integer limit) {
+        @ToolParam(required = false, description = "Limit on number of results returned") Integer limit,
+        ToolContext toolContext) {
 
         try {
             List<TaskMinimalInfo> allTasks = new ArrayList<>();
@@ -302,6 +308,8 @@ public class TaskTools {
                 }
             }
 
+            allTasks = filterByAllowedComponentNames(allTasks, toolContext);
+
             if (limit != null && limit > 0 && allTasks.size() > limit) {
                 allTasks = allTasks.subList(0, limit);
             }
@@ -311,7 +319,7 @@ public class TaskTools {
                 String limitInfo = limit != null ? " (limited to " + limit + ")" : "";
 
                 log.debug(
-                    "listTasks({}, {}): Found {} total tasks{}{} ({} actions, {} triggers, {} taskDispatchers)",
+                    "listTasks({}, {}): Found {} tasks after allow-list filter{}{} (pre-filter type breakdown: {} actions, {} triggers, {} taskDispatchers)",
                     type, limit, allTasks.size(), typeFilter, limitInfo, actionsCount, triggersCount,
                     taskDispatchersCount);
             }
@@ -332,7 +340,8 @@ public class TaskTools {
             required = false,
             description = "Type filter: 'action', 'trigger', 'taskDispatcher', or null for all types") String type,
         @ToolParam(
-            required = false, description = "Limit on number of results returned (defaults to 30)") Integer limit) {
+            required = false, description = "Limit on number of results returned (defaults to 30)") Integer limit,
+        ToolContext toolContext) {
 
         try {
             List<TaskMinimalInfo> matchingTasks = new ArrayList<>();
@@ -382,6 +391,8 @@ public class TaskTools {
                 }
             }
 
+            matchingTasks = filterByAllowedComponentNames(matchingTasks, toolContext);
+
             if (normalizedType == null) {
                 matchingTasks.sort((task1, task2) -> ToolUtils.compareTasks(task1.name, task1.description,
                     task1.componentName, task2.name, task2.description, task2.componentName, query.toLowerCase()));
@@ -396,7 +407,7 @@ public class TaskTools {
                 String limitInfo = " (limited to " + effectiveLimit + ")";
 
                 log.debug(
-                    "searchTasks({}, {}, {}): Found {} tasks matching query '{}'{}{} ({} actions, {} triggers, {} taskDispatchers)",
+                    "searchTasks({}, {}, {}): Found {} tasks matching query '{}' after allow-list filter{}{} (pre-filter type breakdown: {} actions, {} triggers, {} taskDispatchers)",
                     query, type, limit, matchingTasks.size(), query, typeFilter, limitInfo, actionsCount,
                     triggersCount, taskDispatchersCount);
             }
@@ -470,6 +481,46 @@ public class TaskTools {
         @JsonProperty("properties") @JsonPropertyDescription("The properties of the task as JSON string") String properties,
         @JsonProperty("clusterElements") @JsonPropertyDescription("The cluster elements defined in the action. Value contains information on containing multiple elements") Map<String, String> clusterElements,
         @JsonProperty("outputProperties") @JsonPropertyDescription("The output properties of the task as JSON string") String outputProperties) {
+    }
+
+    @SuppressWarnings("unchecked")
+    private static @Nullable Set<String> getAllowedComponentNames(@Nullable ToolContext toolContext) {
+        if (toolContext == null) {
+            return null;
+        }
+
+        Object value = toolContext.getContext()
+            .get(TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY);
+
+        if (value instanceof Set<?> set) {
+            return (Set<String>) set;
+        }
+
+        return null;
+    }
+
+    private static List<TaskMinimalInfo> filterByAllowedComponentNames(
+        List<TaskMinimalInfo> tasks, @Nullable ToolContext toolContext) {
+
+        Set<String> allowedComponentNames = getAllowedComponentNames(toolContext);
+
+        if (allowedComponentNames == null || allowedComponentNames.isEmpty()) {
+            if (log.isDebugEnabled()) {
+                log.debug("No allow-list present in tool context; returning all {} tasks unfiltered", tasks.size());
+            }
+
+            return tasks;
+        }
+
+        List<TaskMinimalInfo> filteredTasks = new ArrayList<>();
+
+        for (TaskMinimalInfo task : tasks) {
+            if (task.componentName() == null || allowedComponentNames.contains(task.componentName())) {
+                filteredTasks.add(task);
+            }
+        }
+
+        return filteredTasks;
     }
 
     /**
