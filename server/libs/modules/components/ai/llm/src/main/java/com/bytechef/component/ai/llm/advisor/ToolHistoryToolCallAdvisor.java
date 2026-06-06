@@ -32,19 +32,20 @@ import org.springframework.ai.model.tool.ToolExecutionResult;
  * {@link ToolCallAdvisor.Builder#disableInternalConversationHistory()} is active.
  *
  * <p>
- * When conversation history is delegated to a downstream {@link org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor},
- * the default implementation passes only {@code [SystemMessage, ToolResponseMessage_last]} as instructions for the next
- * iteration and relies on the memory advisor to reconstruct context from the database. However, when the memory store
- * is wrapped with {@code ToolCallIntermediateMessageFilteringChatMemory} (which prevents
- * {@link AssistantMessage}-with-tool_calls and {@link ToolResponseMessage} from being persisted to keep the database
- * clean), the memory advisor can no longer provide the required tool-call context.
+ * When conversation history is delegated to a downstream
+ * {@link org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor}, the default implementation passes only
+ * {@code [SystemMessage, ToolResponseMessage_last]} as instructions for the next iteration and relies on the memory
+ * advisor to reconstruct context from the database. However, when the memory store is wrapped with
+ * {@code ToolCallIntermediateMessageFilteringChatMemory} (which prevents {@link AssistantMessage}-with-tool_calls and
+ * {@link ToolResponseMessage} from being persisted to keep the database clean), the memory advisor can no longer
+ * provide the required tool-call context.
  *
  * <p>
  * This class overrides {@link #doGetNextInstructionsForToolCall} to extract all
  * {@code (AssistantMessage-with-tool_calls, ToolResponseMessage)} pairs directly from the in-memory
- * {@link ToolExecutionResult#conversationHistory()} and include them in the instructions. The memory advisor then
- * only needs to supply the original user messages (which are still persisted), avoiding both database pollution and
- * context gaps during multi-step tool call loops.
+ * {@link ToolExecutionResult#conversationHistory()} and include them in the instructions. The memory advisor then only
+ * needs to supply the original user messages (which are still persisted), avoiding both database pollution and context
+ * gaps during multi-step tool call loops.
  *
  * @author Marko Kriskovic
  */
@@ -79,15 +80,15 @@ public class ToolHistoryToolCallAdvisor extends ToolCallAdvisor {
         Message systemMessage = chatClientRequest.prompt()
             .getSystemMessage();
 
-        List<Message> instructions = new ArrayList<>(toolCallPairs.size() + 1);
+        List<Message> instructionMessages = new ArrayList<>(toolCallPairs.size() + 1);
 
         if (systemMessage != null) {
-            instructions.add(systemMessage);
+            instructionMessages.add(systemMessage);
         }
 
-        instructions.addAll(toolCallPairs);
+        instructionMessages.addAll(toolCallPairs);
 
-        return instructions;
+        return instructionMessages;
     }
 
     @Override
@@ -125,22 +126,22 @@ public class ToolHistoryToolCallAdvisor extends ToolCallAdvisor {
      * Extracts all {@code (AssistantMessage-with-tool_calls, ToolResponseMessage)} pairs from a conversation history,
      * ignoring user and system messages. Used to reconstruct tool-call context without relying on persisted history.
      */
-    private static List<Message> extractToolCallPairs(List<Message> history) {
-        List<Message> pairs = new ArrayList<>();
+    private static List<Message> extractToolCallPairs(List<Message> conversationHistoryMessages) {
+        List<Message> toolCallPairMessages = new ArrayList<>();
 
-        for (int i = 0; i < history.size() - 1; i++) {
-            if (history.get(i) instanceof AssistantMessage assistantMessage
-                && assistantMessage.hasToolCalls()
-                && history.get(i + 1) instanceof ToolResponseMessage toolResponseMessage) {
+        for (int i = 0; i < conversationHistoryMessages.size() - 1; i++) {
+            if (conversationHistoryMessages.get(i) instanceof AssistantMessage assistantMessage &&
+                assistantMessage.hasToolCalls() &&
+                conversationHistoryMessages.get(i + 1) instanceof ToolResponseMessage toolResponseMessage) {
 
-                pairs.add(assistantMessage);
-                pairs.add(toolResponseMessage);
+                toolCallPairMessages.add(assistantMessage);
+                toolCallPairMessages.add(toolResponseMessage);
 
                 i++;
             }
         }
 
-        return pairs;
+        return toolCallPairMessages;
     }
 
     public static Builder builder() {
