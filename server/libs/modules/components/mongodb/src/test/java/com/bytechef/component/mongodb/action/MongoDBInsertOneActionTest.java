@@ -21,6 +21,7 @@ import static com.bytechef.component.mongodb.constant.MongoDBConstants.DOCUMENT;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -64,13 +65,11 @@ class MongoDBInsertOneActionTest {
         when(mockedCollection.insertOne(documentArgumentCaptor.capture()))
             .thenReturn(mockedInsertOneResult);
 
-        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class)) {
+        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class, CALLS_REAL_METHODS)) {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getMongoClient(any()))
                 .thenReturn(mockedMongoClient);
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getCollection(any(), any(), anyString()))
                 .thenReturn(mockedCollection);
-            mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.toDocument(any()))
-                .thenCallRealMethod();
 
             Map<String, Object> result = MongoDBInsertOneAction.perform(
                 inputParameters, mockedConnectionParameters, mockedActionContext);
