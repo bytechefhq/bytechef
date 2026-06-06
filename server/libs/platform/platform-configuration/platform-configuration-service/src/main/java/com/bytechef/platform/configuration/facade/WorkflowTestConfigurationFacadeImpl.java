@@ -30,6 +30,7 @@ import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -139,16 +140,16 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, String value, long environmentId) {
+    public void saveWorkflowTestConfigurationInputs(String workflowId, String key, Object value, long environmentId) {
         Validate.notEmpty(key, "Missing required param: " + key);
 
         workflowTestConfigurationService.saveWorkflowTestConfigurationInputs(workflowId, key, value, environmentId);
     }
 
-    private static Map<String, String> getInputs(
+    private static Map<String, Object> getInputs(
         Workflow workflow, WorkflowTestConfiguration workflowTestConfiguration) {
 
-        Map<String, String> inputMap = new HashMap<>(workflowTestConfiguration.getInputs());
+        Map<String, Object> inputMap = new HashMap<>(workflowTestConfiguration.getInputs());
 
         for (String key : new HashSet<>(inputMap.keySet())) {
             if (!CollectionUtils.anyMatch(workflow.getInputs(), input -> Objects.equals(input.name(), key))) {
@@ -211,11 +212,19 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
         }
     }
 
-    private static void validateInputs(Map<String, ?> inputs, Workflow workflow) {
+    static void validateInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
                 Validate.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
-                Validate.notEmpty((String) inputs.get(input.name()), "Missing required param: " + input.name());
+
+                Object value = inputs.get(input.name());
+
+                boolean empty = value == null
+                    || (value instanceof CharSequence charSequence && charSequence.isEmpty())
+                    || (value instanceof Map<?, ?> map && map.isEmpty())
+                    || (value instanceof Collection<?> collection && collection.isEmpty());
+
+                Validate.isTrue(!empty, "Missing required param: " + input.name());
             }
         }
     }

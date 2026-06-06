@@ -23,6 +23,7 @@ import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.definition.ConnectionDefinition;
 import com.bytechef.component.definition.Help;
+import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.Resources;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition;
@@ -49,6 +50,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     protected final List<String> tags;
     protected final Map<String, Object> metadata;
     protected final String name;
+    protected final List<? extends PropertyGroup> inputs;
     protected final Resources resources;
     protected final String title;
     protected final List<TriggerDefinition> triggers;
@@ -67,6 +69,7 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
         this.tags = OptionalUtils.orElse(componentDefinition.getTags(), null);
         this.metadata = OptionalUtils.orElse(componentDefinition.getMetadata(), null);
         this.name = componentDefinition.getName();
+        this.inputs = OptionalUtils.orElse(componentDefinition.getInputs(), null);
         this.resources = OptionalUtils.orElse(componentDefinition.getResources(), null);
         this.title = OptionalUtils.orElse(componentDefinition.getTitle(), null);
         this.triggers = OptionalUtils.orElse(componentDefinition.getTriggers(), null);
@@ -122,6 +125,11 @@ public abstract class AbstractComponentDefinitionWrapper implements ComponentDef
     @Override
     public String getName() {
         return name;
+    }
+
+    @Override
+    public Optional<List<? extends PropertyGroup>> getInputs() {
+        return Optional.ofNullable(inputs == null ? null : new ArrayList<>(inputs));
     }
 
     @Override

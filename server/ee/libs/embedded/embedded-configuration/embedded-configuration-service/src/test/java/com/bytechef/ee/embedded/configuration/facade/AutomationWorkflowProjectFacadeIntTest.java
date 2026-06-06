@@ -24,11 +24,18 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.ee.embedded.configuration.dto.AutomationWorkflowProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserWorkflowTemplateDTO;
+import com.bytechef.ee.embedded.configuration.security.EmbeddedPermissionEvaluator;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.platform.category.domain.Category;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
+import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
@@ -44,6 +51,9 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.githubproxy.client.GitHubProxyClient;
+import com.bytechef.platform.mcp.service.McpComponentService;
+import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.mcp.service.McpToolService;
 import com.bytechef.platform.oauth2.service.OAuth2Service;
 import com.bytechef.platform.security.facade.ApiKeyFacade;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -83,10 +93,16 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
     })
 @Import(PostgreSQLContainerConfiguration.class)
 @MockitoBean(types = {
-    ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class, ComponentConnectionFacade.class,
+    ActionDefinitionFacade.class, ApiKeyFacade.class, ApiKeyService.class, AuthorityService.class,
+    ClusterElementDefinitionService.class, TriggerDefinitionFacade.class,
+    ComponentConnectionFacade.class,
     ComponentDefinitionService.class, ConnectedUserService.class, ConnectionDefinitionService.class,
-    ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class, EnvironmentService.class,
-    GitHubProxyClient.class, JobFacade.class, JobService.class, OAuth2ParametersFacade.class,
+    ConnectionFacade.class, ConnectionLifecycleFacade.class, ConnectionService.class,
+    EmbeddedPermissionEvaluator.class, EnvironmentService.class,
+    GitHubProxyClient.class, JobFacade.class, JobService.class, McpComponentService.class,
+    McpIntegrationInstanceConfigurationService.class, McpIntegrationInstanceConfigurationWorkflowService.class,
+    McpIntegrationInstanceToolService.class, McpServerService.class, McpToolService.class,
+    OAuth2ParametersFacade.class,
     OAuth2Service.class, PrincipalJobFacade.class, PrincipalJobService.class, ProjectDeploymentFacade.class,
     ProjectDeploymentService.class, ProjectDeploymentWorkflowService.class, ProjectFacade.class,
     TaskExecutionService.class, TriggerDefinitionService.class, TriggerExecutionService.class,

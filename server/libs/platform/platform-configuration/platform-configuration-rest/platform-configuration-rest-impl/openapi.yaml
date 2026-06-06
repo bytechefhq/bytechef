@@ -612,7 +612,8 @@ paths:
                 key:
                   type: "string"
                 value:
-                  type: "string"
+                  description: "The input value; a primitive for primitive inputs, or a nested\
+                    \ object for component-property inputs."
         required: true
       responses:
         "204":
@@ -2057,6 +2058,27 @@ components:
         version:
           description: "The version of a component."
           type: "integer"
+        inputs:
+          type: "array"
+          description: "The component's selectable workflow inputs, each a property group (a lone\
+            \ property is a group with one property)."
+          items:
+            $ref: "#/components/schemas/PropertyGroup"
+    PropertyGroup:
+      title: "Property group"
+      description: "A named group of component input properties rendered as one compound input."
+      type: "object"
+      required:
+        - "name"
+      properties:
+        name:
+          type: "string"
+        label:
+          type: "string"
+        properties:
+          type: "array"
+          items:
+            $ref: "#/components/schemas/Property"
     ComponentDefinitionBasic:
       description: "A component contains a set of reusable code(actions) that accomplish\
         \ specific tasks, triggers and connections if there is a need for a connection\
@@ -2085,6 +2107,9 @@ components:
         icon:
           description: "The icon."
           type: "string"
+        inputsCount:
+          description: "The number of selectable workflow inputs a component declares"
+          type: "integer"
         name:
           description: "The name of a component."
           type: "string"
@@ -3033,6 +3058,28 @@ components:
           description: "The type of an input, for example \\\"string\\\""
           type: "string"
           default: "string"
+        componentReference:
+          $ref: "#/components/schemas/ComponentInputReference"
+    ComponentInputReference:
+      title: "Component input reference"
+      description: "An all-or-nothing reference from a workflow input to a component-defined input\
+        \ group."
+      type: "object"
+      required:
+        - "componentName"
+        - "componentVersion"
+        - "groupName"
+      properties:
+        componentName:
+          description: "The name of the referenced component."
+          type: "string"
+        componentVersion:
+          description: "The version of the referenced component."
+          type: "integer"
+          format: "int32"
+        groupName:
+          description: "The name of the referenced component input group."
+          type: "string"
     WorkflowOutput:
       type: "object"
       required:
@@ -3126,8 +3173,7 @@ components:
           description: "The input parameters used as workflow\
             \ input values."
           type: "object"
-          additionalProperties:
-            type: "string"
+          additionalProperties: true
         lastModifiedBy:
           description: "The last modified by."
           type: "string"
