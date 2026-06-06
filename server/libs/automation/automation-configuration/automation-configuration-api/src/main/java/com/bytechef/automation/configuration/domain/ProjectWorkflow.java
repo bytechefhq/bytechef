@@ -68,6 +68,9 @@ public final class ProjectWorkflow {
     @Version
     private int version;
 
+    @Column("permission_expression")
+    private String permissionExpression;
+
     public ProjectWorkflow() {
     }
 
@@ -152,6 +155,10 @@ public final class ProjectWorkflow {
         return version;
     }
 
+    public String getPermissionExpression() {
+        return permissionExpression;
+    }
+
     public void setProjectVersion(int projectVersion) {
         this.projectVersion = projectVersion;
     }
@@ -170,6 +177,10 @@ public final class ProjectWorkflow {
 
     public void setVersion(int version) {
         this.version = version;
+    }
+
+    public void setPermissionExpression(String permissionExpression) {
+        this.permissionExpression = permissionExpression;
     }
 
     @Override
