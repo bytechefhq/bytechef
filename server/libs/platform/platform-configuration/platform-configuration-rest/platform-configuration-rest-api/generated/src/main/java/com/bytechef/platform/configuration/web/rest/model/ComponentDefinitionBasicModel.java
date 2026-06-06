@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinitionBasic", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinitionBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.526728+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ComponentDefinitionBasicModel {
 
   private @Nullable Integer actionsCount;
@@ -42,6 +42,8 @@ public class ComponentDefinitionBasicModel {
   private @Nullable String description;
 
   private @Nullable String icon;
+
+  private @Nullable Integer inputsCount;
 
   private String name;
 
@@ -184,6 +186,27 @@ public class ComponentDefinitionBasicModel {
     this.icon = icon;
   }
 
+  public ComponentDefinitionBasicModel inputsCount(@Nullable Integer inputsCount) {
+    this.inputsCount = inputsCount;
+    return this;
+  }
+
+  /**
+   * The number of selectable workflow inputs a component declares
+   * @return inputsCount
+   */
+  
+  @Schema(name = "inputsCount", description = "The number of selectable workflow inputs a component declares", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputsCount")
+  public @Nullable Integer getInputsCount() {
+    return inputsCount;
+  }
+
+  @JsonProperty("inputsCount")
+  public void setInputsCount(@Nullable Integer inputsCount) {
+    this.inputsCount = inputsCount;
+  }
+
   public ComponentDefinitionBasicModel name(String name) {
     this.name = name;
     return this;
@@ -282,6 +305,7 @@ public class ComponentDefinitionBasicModel {
         Objects.equals(this.componentCategories, componentDefinitionBasic.componentCategories) &&
         Objects.equals(this.description, componentDefinitionBasic.description) &&
         Objects.equals(this.icon, componentDefinitionBasic.icon) &&
+        Objects.equals(this.inputsCount, componentDefinitionBasic.inputsCount) &&
         Objects.equals(this.name, componentDefinitionBasic.name) &&
         Objects.equals(this.title, componentDefinitionBasic.title) &&
         Objects.equals(this.triggersCount, componentDefinitionBasic.triggersCount) &&
@@ -290,7 +314,7 @@ public class ComponentDefinitionBasicModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionsCount, clusterElementsCount, componentCategories, description, icon, name, title, triggersCount, version);
+    return Objects.hash(actionsCount, clusterElementsCount, componentCategories, description, icon, inputsCount, name, title, triggersCount, version);
   }
 
   @Override
@@ -302,6 +326,7 @@ public class ComponentDefinitionBasicModel {
     sb.append("    componentCategories: ").append(toIndentedString(componentCategories)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
+    sb.append("    inputsCount: ").append(toIndentedString(inputsCount)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    title: ").append(toIndentedString(title)).append("\n");
     sb.append("    triggersCount: ").append(toIndentedString(triggersCount)).append("\n");

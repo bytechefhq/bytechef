@@ -27,7 +27,7 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 
 @Schema(name = "Errors_inner_meta", description = "Additional metadata about the error.")
 @JsonTypeName("Errors_inner_meta")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-18T13:58:41.005994+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.484100+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ErrorsInnerMetaModel {
 
   private @Nullable Object cause;
