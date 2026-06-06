@@ -20,6 +20,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/CategoryMode
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentDefinitionBasicModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ComponentInputReferenceModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectedUserProjectWorkflowModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/web/rest/model/ConnectionModel.java

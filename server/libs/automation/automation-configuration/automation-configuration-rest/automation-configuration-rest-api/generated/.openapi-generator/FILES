@@ -17,6 +17,7 @@ src/main/java/com/bytechef/automation/configuration/web/rest/model/CategoryModel
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentCategoryModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentDefinitionBasicModel.java
+src/main/java/com/bytechef/automation/configuration/web/rest/model/ComponentInputReferenceModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionBaseModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/automation/configuration/web/rest/model/CreateProjectDeploymentWorkflowJob200ResponseModel.java

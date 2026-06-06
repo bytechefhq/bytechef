@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "WorkflowTestConfiguration", description = "Contains configuration and connections required for the test execution of a particular workflow.")
 @JsonTypeName("WorkflowTestConfiguration")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.526728+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class WorkflowTestConfigurationModel {
 
   @Valid
@@ -44,7 +44,7 @@ public class WorkflowTestConfigurationModel {
   private Long environmentId;
 
   @Valid
-  private Map<String, String> inputs = new HashMap<>();
+  private Map<String, Object> inputs = new HashMap<>();
 
   private @Nullable String lastModifiedBy;
 
@@ -158,12 +158,12 @@ public class WorkflowTestConfigurationModel {
     this.environmentId = environmentId;
   }
 
-  public WorkflowTestConfigurationModel inputs(Map<String, String> inputs) {
+  public WorkflowTestConfigurationModel inputs(Map<String, Object> inputs) {
     this.inputs = inputs;
     return this;
   }
 
-  public WorkflowTestConfigurationModel putInputsItem(String key, String inputsItem) {
+  public WorkflowTestConfigurationModel putInputsItem(String key, Object inputsItem) {
     if (this.inputs == null) {
       this.inputs = new HashMap<>();
     }
@@ -178,12 +178,12 @@ public class WorkflowTestConfigurationModel {
   
   @Schema(name = "inputs", description = "The input parameters used as workflow input values.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("inputs")
-  public Map<String, String> getInputs() {
+  public Map<String, Object> getInputs() {
     return inputs;
   }
 
   @JsonProperty("inputs")
-  public void setInputs(Map<String, String> inputs) {
+  public void setInputs(Map<String, Object> inputs) {
     this.inputs = inputs;
   }
 

@@ -36,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.526728+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 @Validated
 @Tag(name = "workflow-test-configuration", description = "The Platform Workflow Test Configuration Internal API")
 public interface WorkflowTestConfigurationApi {
@@ -115,7 +115,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -204,7 +204,7 @@ public interface WorkflowTestConfigurationApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"inputs\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
+                    String exampleString = "{ \"__version\" : 1, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"inputs\" : { \"key\" : \"\" }, \"lastModifiedBy\" : \"lastModifiedBy\", \"connections\" : [ { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 }, { \"workflowNodeName\" : \"workflowNodeName\", \"workflowConnectionKey\" : \"workflowConnectionKey\", \"connectionId\" : 0 } ], \"workflowId\" : \"workflowId\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

@@ -5,7 +5,10 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Arrays;
+import org.openapitools.jackson.nullable.JsonNullable;
 import org.springframework.lang.Nullable;
+import java.util.NoSuchElementException;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
 import jakarta.validation.Valid;
@@ -21,12 +24,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("saveWorkflowTestConfigurationInputs_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.526728+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class SaveWorkflowTestConfigurationInputsRequestModel {
 
   private @Nullable String key;
 
-  private @Nullable String value;
+  private JsonNullable<Object> value = JsonNullable.<Object>undefined();
 
   public SaveWorkflowTestConfigurationInputsRequestModel key(@Nullable String key) {
     this.key = key;
@@ -49,24 +52,23 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
     this.key = key;
   }
 
-  public SaveWorkflowTestConfigurationInputsRequestModel value(@Nullable String value) {
-    this.value = value;
+  public SaveWorkflowTestConfigurationInputsRequestModel value(Object value) {
+    this.value = JsonNullable.of(value);
     return this;
   }
 
   /**
-   * Get value
+   * The input value; a primitive for primitive inputs, or a nested object for component-property inputs.
    * @return value
    */
   
-  @Schema(name = "value", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @Schema(name = "value", description = "The input value; a primitive for primitive inputs, or a nested object for component-property inputs.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
   @JsonProperty("value")
-  public @Nullable String getValue() {
+  public JsonNullable<Object> getValue() {
     return value;
   }
 
-  @JsonProperty("value")
-  public void setValue(@Nullable String value) {
+  public void setValue(JsonNullable<Object> value) {
     this.value = value;
   }
 
@@ -80,12 +82,23 @@ public class SaveWorkflowTestConfigurationInputsRequestModel {
     }
     SaveWorkflowTestConfigurationInputsRequestModel saveWorkflowTestConfigurationInputsRequest = (SaveWorkflowTestConfigurationInputsRequestModel) o;
     return Objects.equals(this.key, saveWorkflowTestConfigurationInputsRequest.key) &&
-        Objects.equals(this.value, saveWorkflowTestConfigurationInputsRequest.value);
+        equalsNullable(this.value, saveWorkflowTestConfigurationInputsRequest.value);
+  }
+
+  private static <T> boolean equalsNullable(JsonNullable<T> a, JsonNullable<T> b) {
+    return a == b || (a != null && b != null && a.isPresent() && b.isPresent() && Objects.deepEquals(a.get(), b.get()));
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(key, value);
+    return Objects.hash(key, hashCodeNullable(value));
+  }
+
+  private static <T> int hashCodeNullable(JsonNullable<T> a) {
+    if (a == null) {
+      return 1;
+    }
+    return a.isPresent() ? Arrays.deepHashCode(new Object[]{a.get()}) : 31;
   }
 
   @Override

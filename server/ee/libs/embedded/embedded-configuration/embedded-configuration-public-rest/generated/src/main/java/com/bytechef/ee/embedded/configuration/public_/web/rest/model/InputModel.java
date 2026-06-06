@@ -2,6 +2,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest.model;
 
 import java.net.URI;
 import java.util.Objects;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputTypeModel;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -23,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-05-27T21:00:27.680399+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.507447+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class InputModel {
 
   private @Nullable String label;
@@ -33,6 +34,8 @@ public class InputModel {
   private Boolean required = false;
 
   private InputTypeModel type = InputTypeModel.STRING;
+
+  private @Nullable ComponentInputReferenceModel componentReference;
 
   public InputModel() {
     super();
@@ -130,6 +133,27 @@ public class InputModel {
     this.type = type;
   }
 
+  public InputModel componentReference(@Nullable ComponentInputReferenceModel componentReference) {
+    this.componentReference = componentReference;
+    return this;
+  }
+
+  /**
+   * Get componentReference
+   * @return componentReference
+   */
+  @Valid 
+  @Schema(name = "componentReference", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("componentReference")
+  public @Nullable ComponentInputReferenceModel getComponentReference() {
+    return componentReference;
+  }
+
+  @JsonProperty("componentReference")
+  public void setComponentReference(@Nullable ComponentInputReferenceModel componentReference) {
+    this.componentReference = componentReference;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -142,12 +166,13 @@ public class InputModel {
     return Objects.equals(this.label, input.label) &&
         Objects.equals(this.name, input.name) &&
         Objects.equals(this.required, input.required) &&
-        Objects.equals(this.type, input.type);
+        Objects.equals(this.type, input.type) &&
+        Objects.equals(this.componentReference, input.componentReference);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, name, required, type);
+    return Objects.hash(label, name, required, type, componentReference);
   }
 
   @Override
@@ -158,6 +183,7 @@ public class InputModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
+    sb.append("    componentReference: ").append(toIndentedString(componentReference)).append("\n");
     sb.append("}");
     return sb.toString();
   }

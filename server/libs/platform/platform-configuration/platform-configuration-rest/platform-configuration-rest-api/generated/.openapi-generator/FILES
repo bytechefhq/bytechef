@@ -30,6 +30,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentCatego
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentConnectionModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentDefinitionModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/ComponentInputReferenceModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionBasicModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionHelpModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ConnectionDefinitionModel.java
@@ -59,6 +60,7 @@ src/main/java/com/bytechef/platform/configuration/web/rest/model/OptionModel.jav
 src/main/java/com/bytechef/platform/configuration/web/rest/model/OptionsDataSourceModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/OutputResponseModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertiesDataSourceModel.java
+src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyGroupModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/PropertyTypeModel.java
 src/main/java/com/bytechef/platform/configuration/web/rest/model/ResourcesModel.java

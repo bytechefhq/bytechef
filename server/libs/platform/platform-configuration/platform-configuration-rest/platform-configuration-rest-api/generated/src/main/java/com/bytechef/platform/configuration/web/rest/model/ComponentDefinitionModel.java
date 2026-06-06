@@ -7,6 +7,7 @@ import com.bytechef.platform.configuration.web.rest.model.ClusterElementDefiniti
 import com.bytechef.platform.configuration.web.rest.model.ClusterElementTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ComponentCategoryModel;
 import com.bytechef.platform.configuration.web.rest.model.ConnectionDefinitionBasicModel;
+import com.bytechef.platform.configuration.web.rest.model.PropertyGroupModel;
 import com.bytechef.platform.configuration.web.rest.model.ResourcesModel;
 import com.bytechef.platform.configuration.web.rest.model.TriggerDefinitionBasicModel;
 import com.bytechef.platform.configuration.web.rest.model.UnifiedApiCategoryModel;
@@ -36,7 +37,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentDefinition", description = "A component contains a set of reusable code(actions) that accomplish specific tasks, triggers and connections if there is a need for a connection to an outside service.")
 @JsonTypeName("ComponentDefinition")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-30T09:41:49.693717532+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.526728+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class ComponentDefinitionModel {
 
   @Valid
@@ -84,6 +85,9 @@ public class ComponentDefinitionModel {
   private @Nullable UnifiedApiCategoryModel unifiedApiCategory;
 
   private Integer version;
+
+  @Valid
+  private List<@Valid PropertyGroupModel> inputs = new ArrayList<>();
 
   public ComponentDefinitionModel() {
     super();
@@ -563,6 +567,35 @@ public class ComponentDefinitionModel {
     this.version = version;
   }
 
+  public ComponentDefinitionModel inputs(List<@Valid PropertyGroupModel> inputs) {
+    this.inputs = inputs;
+    return this;
+  }
+
+  public ComponentDefinitionModel addInputsItem(PropertyGroupModel inputsItem) {
+    if (this.inputs == null) {
+      this.inputs = new ArrayList<>();
+    }
+    this.inputs.add(inputsItem);
+    return this;
+  }
+
+  /**
+   * The component's selectable workflow inputs, each a property group (a lone property is a group with one property).
+   * @return inputs
+   */
+  @Valid 
+  @Schema(name = "inputs", description = "The component's selectable workflow inputs, each a property group (a lone property is a group with one property).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("inputs")
+  public List<@Valid PropertyGroupModel> getInputs() {
+    return inputs;
+  }
+
+  @JsonProperty("inputs")
+  public void setInputs(List<@Valid PropertyGroupModel> inputs) {
+    this.inputs = inputs;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -590,12 +623,13 @@ public class ComponentDefinitionModel {
         Objects.equals(this.title, componentDefinition.title) &&
         Objects.equals(this.triggers, componentDefinition.triggers) &&
         Objects.equals(this.unifiedApiCategory, componentDefinition.unifiedApiCategory) &&
-        Objects.equals(this.version, componentDefinition.version);
+        Objects.equals(this.version, componentDefinition.version) &&
+        Objects.equals(this.inputs, componentDefinition.inputs);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElementClusterElementTypes, clusterElements, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version);
+    return Objects.hash(actionClusterElementTypes, actions, clusterElement, clusterElementClusterElementTypes, clusterElements, clusterElementTypes, clusterRoot, componentCategories, connection, connectionRequired, description, icon, name, resources, tags, title, triggers, unifiedApiCategory, version, inputs);
   }
 
   @Override
@@ -621,6 +655,7 @@ public class ComponentDefinitionModel {
     sb.append("    triggers: ").append(toIndentedString(triggers)).append("\n");
     sb.append("    unifiedApiCategory: ").append(toIndentedString(unifiedApiCategory)).append("\n");
     sb.append("    version: ").append(toIndentedString(version)).append("\n");
+    sb.append("    inputs: ").append(toIndentedString(inputs)).append("\n");
     sb.append("}");
     return sb.toString();
   }
