@@ -14,19 +14,20 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
+import CopilotGenerateDescriptionButton from '@/shared/components/copilot/CopilotGenerateDescriptionButton';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {UseMutationResult, UseQueryResult, useQueryClient} from '@tanstack/react-query';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
 
 interface WorkflowDialogProps {
+    additionalContent?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     createWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
     onClose?: () => void;
-    projectId?: number;
-    integrationId?: number;
+    onSave?: () => void;
+    parentId?: number;
     triggerNode?: ReactNode;
     /* eslint-disable @typescript-eslint/no-explicit-any */
     updateWorkflowMutation?: UseMutationResult<any, object, any, unknown>;
@@ -35,10 +36,11 @@ interface WorkflowDialogProps {
 }
 
 const WorkflowDialog = ({
+    additionalContent,
     createWorkflowMutation,
-    integrationId,
     onClose,
-    projectId,
+    onSave,
+    parentId,
     triggerNode,
     updateWorkflowMutation,
     useGetWorkflowQuery,
@@ -48,7 +50,7 @@ const WorkflowDialog = ({
 
     const {data: workflow} = useGetWorkflowQuery(workflowId ?? '', !!workflowId);
 
-    const queryClient = useQueryClient();
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const form = useForm({
         defaultValues: {
@@ -91,21 +93,9 @@ const WorkflowDialog = ({
                     version: workflow.version,
                 },
             });
-
-            if (projectId) {
-                queryClient.invalidateQueries({
-                    queryKey: ProjectWorkflowKeys.projectWorkflow(projectId!, parseInt(workflow.id!)),
-                });
-            }
-
-            if (integrationId) {
-                queryClient.invalidateQueries({
-                    queryKey: IntegrationWorkflowKeys.integrationWorkflow(integrationId!, parseInt(workflow.id!)),
-                });
-            }
         } else {
             mutate({
-                id: projectId ?? integrationId,
+                id: parentId,
                 workflow: {
                     /* eslint-disable sort-keys */
                     definition: JSON.stringify(
@@ -128,6 +118,10 @@ const WorkflowDialog = ({
                     ),
                 },
             });
+        }
+
+        if (onSave) {
+            onSave();
         }
 
         closeDialog();
@@ -203,7 +197,19 @@ const WorkflowDialog = ({
                         name="description"
                         render={({field}) => (
                             <FormItem>
-                                <FormLabel>Description</FormLabel>
+                                <div className="flex items-center justify-between">
+                                    <FormLabel>Description</FormLabel>
+
+                                    {workflow?.id && (
+                                        <CopilotGenerateDescriptionButton
+                                            environmentId={currentEnvironmentId}
+                                            onApply={(value) =>
+                                                form.setValue('description', value, {shouldDirty: true})
+                                            }
+                                            workflowId={workflow.id}
+                                        />
+                                    )}
+                                </div>
 
                                 <FormControl>
                                     <Textarea
@@ -217,6 +223,8 @@ const WorkflowDialog = ({
                             </FormItem>
                         )}
                     />
+
+                    {additionalContent}
 
                     <DialogFooter>
                         <DialogClose asChild>

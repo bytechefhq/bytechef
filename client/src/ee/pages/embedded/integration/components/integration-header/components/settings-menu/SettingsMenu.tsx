@@ -9,11 +9,13 @@ import WorkflowTabButtons from '@/ee/pages/embedded/integration/components/integ
 import {useSettingsMenu} from '@/ee/pages/embedded/integration/components/integration-header/components/settings-menu/hooks/useSettingsMenu';
 import IntegrationDialog from '@/ee/pages/embedded/integrations/components/IntegrationDialog';
 import {Integration, Workflow} from '@/ee/shared/middleware/embedded/configuration';
+import {IntegrationWorkflowKeys} from '@/ee/shared/queries/embedded/integrationWorkflows.queries';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {UpdateWorkflowMutationType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -37,6 +39,8 @@ const SettingsMenu = ({integration, updateWorkflowMutation, workflow}: Integrati
             showEditWorkflowDialog: state.showEditWorkflowDialog,
         }))
     );
+
+    const queryClient = useQueryClient();
 
     const {handleDeleteIntegrationAlertDialogClick, handleDeleteWorkflowAlertDialogClick, handleImportWorkflow} =
         useSettingsMenu({integration, workflow});
@@ -123,8 +127,15 @@ const SettingsMenu = ({integration, updateWorkflowMutation, workflow}: Integrati
 
             {showEditWorkflowDialog && (
                 <WorkflowDialog
-                    integrationId={integration.id}
                     onClose={() => setShowEditWorkflowDialog(false)}
+                    onSave={() =>
+                        queryClient.invalidateQueries({
+                            queryKey: IntegrationWorkflowKeys.integrationWorkflow(
+                                integration.id!,
+                                parseInt(workflow.id!)
+                            ),
+                        })
+                    }
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

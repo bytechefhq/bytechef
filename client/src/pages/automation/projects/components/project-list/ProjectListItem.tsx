@@ -660,7 +660,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                 <WorkflowDialog
                     createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
-                    projectId={project.id}
+                    parentId={project.id}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}

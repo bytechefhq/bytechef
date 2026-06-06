@@ -158,7 +158,7 @@ const ProjectWorkflowList = ({
                         button={
                             <WorkflowDialog
                                 createWorkflowMutation={createProjectWorkflowMutation}
-                                projectId={project.id}
+                                parentId={project.id}
                                 triggerNode={
                                     <ButtonGroup className="mx-auto">
                                         <Button
@@ -240,7 +240,7 @@ const ProjectWorkflowList = ({
                 <WorkflowDialog
                     createWorkflowMutation={createProjectWorkflowMutation}
                     onClose={() => setShowWorkflowDialog(false)}
-                    projectId={project.id}
+                    parentId={project.id}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}

@@ -15,8 +15,10 @@ import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useW
 import DeleteWorkflowAlertDialog from '@/shared/components/DeleteWorkflowAlertDialog';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {Project, Workflow} from '@/shared/middleware/automation/configuration';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
+import {useQueryClient} from '@tanstack/react-query';
 import {SettingsIcon} from 'lucide-react';
 import {useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
@@ -43,6 +45,8 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             showEditWorkflowDialog: state.showEditWorkflowDialog,
         }))
     );
+
+    const queryClient = useQueryClient();
 
     const {
         handleDeleteProjectAlertDialogClick,
@@ -145,7 +149,11 @@ const SettingsMenu = ({project, updateWorkflowMutation, workflow}: ProjectHeader
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    projectId={project.id}
+                    onSave={() =>
+                        queryClient.invalidateQueries({
+                            queryKey: ProjectWorkflowKeys.projectWorkflow(project.id!, parseInt(workflow.id!)),
+                        })
+                    }
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}
