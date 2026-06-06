@@ -408,7 +408,8 @@ class AbstractAiAgentChatActionTest {
             .builder(mock(ChatMemory.class))
             .build();
 
-        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(productionStyleChatMemoryAdvisor);
+        when(chatMemoryFunction.apply(any(), any(), any(), any()))
+            .thenReturn(new ChatMemoryFunction.Result(productionStyleChatMemoryAdvisor, null));
 
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
@@ -517,7 +518,8 @@ class AbstractAiAgentChatActionTest {
 
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
-        when(chatMemoryFunction.apply(any(), any(), any(), any())).thenReturn(chatMemoryAdvisor);
+        when(chatMemoryFunction.apply(any(), any(), any(), any()))
+            .thenReturn(new ChatMemoryFunction.Result(chatMemoryAdvisor, null));
         when(clusterElementDefinitionService.<ChatMemoryFunction>getClusterElement(
             eq("memoryComponent"), eq(1), eq("memoryElement"))).thenReturn(chatMemoryFunction);
 
