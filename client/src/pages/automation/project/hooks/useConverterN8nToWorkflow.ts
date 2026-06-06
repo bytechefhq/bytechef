@@ -11,7 +11,6 @@ export const useConvertN8nToWorkflow = () => {
     const setWorkflow = useWorkflowDataStore((state) => state.setWorkflow);
     const [isRunning, setIsRunning] = useState(false);
 
-
     const convertN8nWorkflow = useCallback(
         async (workflowJson: string) => {
             const json = JSON.parse(workflowJson);
@@ -51,9 +50,9 @@ export const useConvertN8nToWorkflow = () => {
                     } catch (e) {
                         console.error('Failed to parse workflow', e);
 
-                        throw new Error(
-                            'The n8n workflow could not be converted into a valid ByteChef workflow.'
-                        );
+                        throw new Error('The n8n workflow could not be converted into a valid ByteChef workflow.', {
+                            cause: e,
+                        });
                     } finally {
                         setIsRunning(false);
                     }
