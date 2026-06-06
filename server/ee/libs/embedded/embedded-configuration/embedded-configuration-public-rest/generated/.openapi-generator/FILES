@@ -20,10 +20,10 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Conn
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestConnectionModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendIntegrationInstanceRequestModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowFromPromptRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CreateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/CredentialStatusModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/EnvironmentModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/GenerateFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/InputTypeModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/IntegrationBasicModel.java

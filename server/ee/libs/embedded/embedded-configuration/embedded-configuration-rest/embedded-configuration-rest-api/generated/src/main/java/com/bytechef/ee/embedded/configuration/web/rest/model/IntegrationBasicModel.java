@@ -26,7 +26,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "IntegrationBasic", description = "A group of workflows that make one logical integration.")
 @JsonTypeName("IntegrationBasic")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.853258+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:44:55.026256+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
 public class IntegrationBasicModel {
 
   private String componentName;
@@ -57,6 +57,8 @@ public class IntegrationBasicModel {
   private Boolean multipleInstances = false;
 
   private @Nullable String name;
+
+  private @Nullable String permissionExpression;
 
   public IntegrationBasicModel() {
     super();
@@ -343,6 +345,27 @@ public class IntegrationBasicModel {
     this.name = name;
   }
 
+  public IntegrationBasicModel permissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+    return this;
+  }
+
+  /**
+   * The SpEL permission expression evaluated against the connected user to control integration visibility.
+   * @return permissionExpression
+   */
+  
+  @Schema(name = "permissionExpression", description = "The SpEL permission expression evaluated against the connected user to control integration visibility.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("permissionExpression")
+  public @Nullable String getPermissionExpression() {
+    return permissionExpression;
+  }
+
+  @JsonProperty("permissionExpression")
+  public void setPermissionExpression(@Nullable String permissionExpression) {
+    this.permissionExpression = permissionExpression;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -364,12 +387,13 @@ public class IntegrationBasicModel {
         Objects.equals(this.lastStatus, integrationBasic.lastStatus) &&
         Objects.equals(this.lastIntegrationVersion, integrationBasic.lastIntegrationVersion) &&
         Objects.equals(this.multipleInstances, integrationBasic.multipleInstances) &&
-        Objects.equals(this.name, integrationBasic.name);
+        Objects.equals(this.name, integrationBasic.name) &&
+        Objects.equals(this.permissionExpression, integrationBasic.permissionExpression);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name);
+    return Objects.hash(componentName, createdBy, createdDate, description, icon, id, lastModifiedBy, lastModifiedDate, lastPublishedDate, lastStatus, lastIntegrationVersion, multipleInstances, name, permissionExpression);
   }
 
   @Override
@@ -389,6 +413,7 @@ public class IntegrationBasicModel {
     sb.append("    lastIntegrationVersion: ").append(toIndentedString(lastIntegrationVersion)).append("\n");
     sb.append("    multipleInstances: ").append(toIndentedString(multipleInstances)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    permissionExpression: ").append(toIndentedString(permissionExpression)).append("\n");
     sb.append("}");
     return sb.toString();
   }
