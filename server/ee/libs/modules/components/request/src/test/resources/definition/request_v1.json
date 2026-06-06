@@ -10,6 +10,7 @@
   "customActionHelp": null,
   "description": "Send an HTTP request from your application to a designated integration and workflow, with the option to receive a synchronous response.",
   "icon": "path:assets/request.svg",
+  "inputs": null,
   "metadata": null,
   "name": "request",
   "resources": null,

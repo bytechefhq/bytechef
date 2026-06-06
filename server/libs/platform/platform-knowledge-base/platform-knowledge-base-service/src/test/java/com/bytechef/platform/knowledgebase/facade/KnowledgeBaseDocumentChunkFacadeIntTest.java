@@ -106,6 +106,8 @@ class KnowledgeBaseDocumentChunkFacadeIntTest {
         knowledgeBaseDocumentChunkRepository.save(chunk1);
         knowledgeBaseDocumentChunkRepository.save(chunk2);
 
+        when(knowledgeBaseFileStorage.chunkContentExists(chunk1.getContent())).thenReturn(true);
+        when(knowledgeBaseFileStorage.chunkContentExists(chunk2.getContent())).thenReturn(true);
         when(knowledgeBaseFileStorage.readChunkContent(chunk1.getContent())).thenReturn("Chunk 1 content");
         when(knowledgeBaseFileStorage.readChunkContent(chunk2.getContent())).thenReturn("Chunk 2 content");
 
