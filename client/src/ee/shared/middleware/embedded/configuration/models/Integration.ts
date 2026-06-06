@@ -120,6 +120,12 @@ export interface Integration {
      */
     name?: string;
     /**
+     * The SpEL permission expression evaluated against the connected user to control integration visibility.
+     * @type {string}
+     * @memberof Integration
+     */
+    permissionExpression?: string;
+    /**
      * 
      * @type {Category}
      * @memberof Integration
@@ -179,6 +185,7 @@ export function IntegrationFromJSONTyped(json: any, ignoreDiscriminator: boolean
         'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
         'multipleInstances': json['multipleInstances'],
         'name': json['name'] == null ? undefined : json['name'],
+        'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
         'category': json['category'] == null ? undefined : CategoryFromJSON(json['category']),
         'integrationWorkflowIds': json['integrationWorkflowIds'] == null ? undefined : json['integrationWorkflowIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
@@ -203,6 +210,7 @@ export function IntegrationToJSONTyped(value?: Omit<Integration, 'createdBy'|'cr
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
         'multipleInstances': value['multipleInstances'],
         'name': value['name'],
+        'permissionExpression': value['permissionExpression'],
         'category': CategoryToJSON(value['category']),
         'integrationWorkflowIds': value['integrationWorkflowIds'],
         'tags': value['tags'] == null ? undefined : ((value['tags'] as Array<any>).map(TagToJSON)),

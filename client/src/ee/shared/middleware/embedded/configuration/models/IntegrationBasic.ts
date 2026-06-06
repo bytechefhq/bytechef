@@ -105,6 +105,12 @@ export interface IntegrationBasic {
      * @memberof IntegrationBasic
      */
     name?: string;
+    /**
+     * The SpEL permission expression evaluated against the connected user to control integration visibility.
+     * @type {string}
+     * @memberof IntegrationBasic
+     */
+    permissionExpression?: string;
 }
 
 
@@ -141,6 +147,7 @@ export function IntegrationBasicFromJSONTyped(json: any, ignoreDiscriminator: bo
         'lastIntegrationVersion': json['lastIntegrationVersion'] == null ? undefined : json['lastIntegrationVersion'],
         'multipleInstances': json['multipleInstances'],
         'name': json['name'] == null ? undefined : json['name'],
+        'permissionExpression': json['permissionExpression'] == null ? undefined : json['permissionExpression'],
     };
 }
 
@@ -161,6 +168,7 @@ export function IntegrationBasicToJSONTyped(value?: Omit<IntegrationBasic, 'crea
         'lastStatus': IntegrationStatusToJSON(value['lastStatus']),
         'multipleInstances': value['multipleInstances'],
         'name': value['name'],
+        'permissionExpression': value['permissionExpression'],
     };
 }
 
