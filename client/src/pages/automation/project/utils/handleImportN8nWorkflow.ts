@@ -4,7 +4,7 @@ import {
 } from '@/shared/middleware/automation/configuration';
 import {UseMutationResult} from '@tanstack/react-query';
 import {ChangeEvent} from 'react';
-import {toast} from "sonner";
+import {toast} from 'sonner';
 
 const handleImportN8nWorkflow = async (
     event: ChangeEvent<HTMLInputElement>,
