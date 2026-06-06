@@ -5,15 +5,17 @@ import {Textarea} from '@/components/ui/textarea';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {getTask} from '@/pages/platform/workflow-editor/utils/getTask';
+import CopilotGenerateDescriptionButton from '@/shared/components/copilot/CopilotGenerateDescriptionButton';
 import {
     ClusterElementDefinition,
     ComponentDefinition,
     TaskDispatcherDefinition,
     TriggerDefinition,
 } from '@/shared/middleware/platform/configuration';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {ComponentIcon} from 'lucide-react';
-import {ChangeEvent} from 'react';
+import {ChangeEvent, useRef} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
@@ -40,6 +42,10 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             workflow: state.workflow,
         }))
     );
+
+    const notesTextareaRef = useRef<HTMLTextAreaElement>(null);
+
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const handleLabelChange = useDebouncedCallback((event: ChangeEvent<HTMLInputElement>) => {
         if (!currentNode) {
@@ -200,7 +206,24 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
             </fieldset>
 
             <fieldset className="space-y-1">
-                <Label>Notes</Label>
+                <div className="flex items-center justify-between">
+                    <Label>Notes</Label>
+
+                    <CopilotGenerateDescriptionButton
+                        environmentId={currentEnvironmentId}
+                        onApply={(value) => {
+                            if (notesTextareaRef.current) {
+                                notesTextareaRef.current.value = value;
+                            }
+
+                            handleNotesChange({
+                                target: {value},
+                            } as ChangeEvent<HTMLTextAreaElement>);
+                        }}
+                        workflowId={workflow.id}
+                        workflowNodeName={currentNode?.workflowNodeName}
+                    />
+                </div>
 
                 <Textarea
                     className="bg-white shadow-none"
@@ -209,6 +232,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                     name="nodeNotes"
                     onChange={handleNotesChange}
                     placeholder="Write some notes for yourself..."
+                    ref={notesTextareaRef}
                     rows={6}
                 />
             </fieldset>
