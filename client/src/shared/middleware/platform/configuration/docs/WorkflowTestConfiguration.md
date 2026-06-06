@@ -11,7 +11,7 @@ Name | Type
 `createdBy` | string
 `createdDate` | Date
 `environmentId` | number
-`inputs` | { [key: string]: string; }
+`inputs` | { [key: string]: any; }
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `workflowId` | string

@@ -1,24 +1,27 @@
 
-# SaveWorkflowTestConfigurationInputsRequest
+# PropertyGroup
 
+A named group of component input properties rendered as one compound input.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`key` | string
-`value` | any
+`name` | string
+`label` | string
+`properties` | [Array&lt;Property&gt;](Property.md)
 
 ## Example
 
 ```typescript
-import type { SaveWorkflowTestConfigurationInputsRequest } from ''
+import type { PropertyGroup } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "key": null,
-  "value": null,
-} satisfies SaveWorkflowTestConfigurationInputsRequest
+  "name": null,
+  "label": null,
+  "properties": null,
+} satisfies PropertyGroup
 
 console.log(example)
 
@@ -27,7 +30,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SaveWorkflowTestConfigurationInputsRequest
+const exampleParsed = JSON.parse(exampleJSON) as PropertyGroup
 console.log(exampleParsed)
 ```
 

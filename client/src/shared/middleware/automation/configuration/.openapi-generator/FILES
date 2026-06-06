@@ -17,6 +17,7 @@ docs/ComponentCategory.md
 docs/ComponentConnection.md
 docs/ComponentDefinitionApi.md
 docs/ComponentDefinitionBasic.md
+docs/ComponentInputReference.md
 docs/Connection.md
 docs/ConnectionApi.md
 docs/ConnectionBase.md
@@ -61,6 +62,7 @@ models/Category.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinitionBasic.ts
+models/ComponentInputReference.ts
 models/Connection.ts
 models/ConnectionBase.ts
 models/CreateProjectDeploymentWorkflowJob200Response.ts

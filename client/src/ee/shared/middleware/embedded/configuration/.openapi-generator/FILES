@@ -21,6 +21,7 @@ docs/ComponentCategory.md
 docs/ComponentConnection.md
 docs/ComponentDefinitionApi.md
 docs/ComponentDefinitionBasic.md
+docs/ComponentInputReference.md
 docs/ConnectedUserProjectWorkflow.md
 docs/ConnectedUserProjectWorkflowApi.md
 docs/Connection.md
@@ -71,6 +72,7 @@ models/Category.ts
 models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinitionBasic.ts
+models/ComponentInputReference.ts
 models/ConnectedUserProjectWorkflow.ts
 models/Connection.ts
 models/ConnectionBase.ts

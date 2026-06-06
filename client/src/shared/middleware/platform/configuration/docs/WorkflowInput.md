@@ -10,6 +10,7 @@ Name | Type
 `name` | string
 `required` | boolean
 `type` | string
+`componentReference` | [ComponentInputReference](ComponentInputReference.md)
 
 ## Example
 
@@ -22,6 +23,7 @@ const example = {
   "name": null,
   "required": null,
   "type": null,
+  "componentReference": null,
 } satisfies WorkflowInput
 
 console.log(example)

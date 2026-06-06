@@ -31,6 +31,7 @@ docs/ComponentConnection.md
 docs/ComponentDefinition.md
 docs/ComponentDefinitionApi.md
 docs/ComponentDefinitionBasic.md
+docs/ComponentInputReference.md
 docs/ConnectionDefinition.md
 docs/ConnectionDefinitionApi.md
 docs/ConnectionDefinitionBasic.md
@@ -64,6 +65,7 @@ docs/OptionsDataSource.md
 docs/OutputResponse.md
 docs/PropertiesDataSource.md
 docs/Property.md
+docs/PropertyGroup.md
 docs/PropertyType.md
 docs/Resources.md
 docs/SaveWorkflowTestConfigurationInputsRequest.md
@@ -117,6 +119,7 @@ models/ComponentCategory.ts
 models/ComponentConnection.ts
 models/ComponentDefinition.ts
 models/ComponentDefinitionBasic.ts
+models/ComponentInputReference.ts
 models/ConnectionDefinition.ts
 models/ConnectionDefinitionBasic.ts
 models/ConnectionDefinitionHelp.ts
@@ -147,6 +150,7 @@ models/OptionsDataSource.ts
 models/OutputResponse.ts
 models/PropertiesDataSource.ts
 models/Property.ts
+models/PropertyGroup.ts
 models/PropertyType.ts
 models/Resources.ts
 models/SaveWorkflowTestConfigurationInputsRequest.ts

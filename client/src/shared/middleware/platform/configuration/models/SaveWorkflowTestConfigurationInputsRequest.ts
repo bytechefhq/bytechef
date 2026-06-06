@@ -26,11 +26,11 @@ export interface SaveWorkflowTestConfigurationInputsRequest {
      */
     key?: string;
     /**
-     * 
-     * @type {string}
+     * The input value; a primitive for primitive inputs, or a nested object for component-property inputs.
+     * @type {any}
      * @memberof SaveWorkflowTestConfigurationInputsRequest
      */
-    value?: string;
+    value?: any | null;
 }
 
 /**

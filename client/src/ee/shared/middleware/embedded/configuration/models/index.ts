@@ -6,6 +6,7 @@ export * from './Category';
 export * from './ComponentCategory';
 export * from './ComponentConnection';
 export * from './ComponentDefinitionBasic';
+export * from './ComponentInputReference';
 export * from './ConnectedUserProjectWorkflow';
 export * from './Connection';
 export * from './ConnectionBase';

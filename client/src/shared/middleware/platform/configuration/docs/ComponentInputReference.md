@@ -1,24 +1,27 @@
 
-# SaveWorkflowTestConfigurationInputsRequest
+# ComponentInputReference
 
+An all-or-nothing reference from a workflow input to a component-defined input group.
 
 ## Properties
 
 Name | Type
 ------------ | -------------
-`key` | string
-`value` | any
+`componentName` | string
+`componentVersion` | number
+`groupName` | string
 
 ## Example
 
 ```typescript
-import type { SaveWorkflowTestConfigurationInputsRequest } from ''
+import type { ComponentInputReference } from ''
 
 // TODO: Update the object below with actual values
 const example = {
-  "key": null,
-  "value": null,
-} satisfies SaveWorkflowTestConfigurationInputsRequest
+  "componentName": null,
+  "componentVersion": null,
+  "groupName": null,
+} satisfies ComponentInputReference
 
 console.log(example)
 
@@ -27,7 +30,7 @@ const exampleJSON: string = JSON.stringify(example)
 console.log(exampleJSON)
 
 // Parse the JSON string back to an object
-const exampleParsed = JSON.parse(exampleJSON) as SaveWorkflowTestConfigurationInputsRequest
+const exampleParsed = JSON.parse(exampleJSON) as ComponentInputReference
 console.log(exampleParsed)
 ```
 
