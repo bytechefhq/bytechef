@@ -23,6 +23,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -73,13 +74,11 @@ class MongoDBFindActionTest {
         when(mockedFindIterable.into(any()))
             .thenReturn(new ArrayList<>(expectedDocuments));
 
-        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class)) {
+        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class, CALLS_REAL_METHODS)) {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getMongoClient(any()))
                 .thenReturn(mockedMongoClient);
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getCollection(any(), any(), anyString()))
                 .thenReturn(mockedCollection);
-            mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.toDocument(any()))
-                .thenCallRealMethod();
 
             List<Document> result = MongoDBFindAction.perform(
                 inputParameters, mockedConnectionParameters, mockedActionContext);
