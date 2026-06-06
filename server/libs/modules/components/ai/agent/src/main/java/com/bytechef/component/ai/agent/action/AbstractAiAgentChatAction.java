@@ -202,12 +202,14 @@ public abstract class AbstractAiAgentChatAction {
             clusterElementMap.fetchClusterElement(CHAT_MEMORY)
                 .map(clusterElement -> buildChatMemoryResult(connectionParameters, clusterElement, context));
 
-        List<Message> conversationHistory = chatMemoryResult
-            .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
-            .orElse(List.of());
+        if (!guardrailClusterElements.isEmpty()) {
+            List<Message> conversationHistory = chatMemoryResult
+                .map(result -> loadConversationHistory(result.chatMemory(), clusterElementMap))
+                .orElse(List.of());
 
-        for (ClusterElement clusterElement : guardrailClusterElements) {
-            advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement, context, conversationHistory));
+            for (ClusterElement clusterElement : guardrailClusterElements) {
+                advisors.add(getGuardrailsAdvisor(connectionParameters, clusterElement, context, conversationHistory));
+            }
         }
 
         chatMemoryResult.map(ChatMemoryFunction.Result::advisor)
