@@ -16,17 +16,26 @@
 
 package com.bytechef.ai.mcp.tool.platform;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.ActionMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.ComponentTools.TriggerMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.TaskDispatcherTools.TaskDispatcherMinimalInfo;
+import com.bytechef.ai.mcp.tool.platform.TaskTools.TaskMinimalInfo;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.ai.chat.model.ToolContext;
 
 /**
  * @author Marko Kriskovic
@@ -117,5 +126,117 @@ class TaskToolsTest {
 
         assertNotNull(result);
         verify(componentTools).getOutputProperty("myComponent", "customAction", 5);
+    }
+
+    @Test
+    void testListTasksFiltersDisallowedComponentsButKeepsTaskDispatchers() {
+        when(componentTools.listActions()).thenReturn(List.of(
+            new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
+        when(componentTools.listTriggers()).thenReturn(List.of(
+            new TriggerMinimalInfo("newMessage", "New message", "slack")));
+        when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of(
+            new TaskDispatcherMinimalInfo("condition", "Branch on a condition", 1)));
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+
+        List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactlyInAnyOrder("slack", "slack", null);
+    }
+
+    @Test
+    void testListTasksWithoutToolContextReturnsEverything() {
+        when(componentTools.listActions()).thenReturn(List.of(
+            new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
+        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
+
+        List<TaskMinimalInfo> result = taskTools.listTasks(null, null, null);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactlyInAnyOrder("slack", "googleSheets");
+    }
+
+    @Test
+    void testSearchTasksFiltersDisallowedComponentsButKeepsTaskDispatchers() {
+        when(componentTools.searchActions("row")).thenReturn(List.of(
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets"),
+            new ActionMinimalInfo("addRow", "Add a row", "airtable")));
+        when(componentTools.searchTriggers("row")).thenReturn(List.of());
+        when(taskDispatcherTools.searchTaskDispatchers("row")).thenReturn(List.of(
+            new TaskDispatcherMinimalInfo("loop", "Loop over rows", 1)));
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("googleSheets")));
+
+        List<TaskMinimalInfo> result = taskTools.searchTasks("row", null, null, toolContext);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactlyInAnyOrder("googleSheets", null);
+    }
+
+    @Test
+    void testListTasksAppliesAllowListFilterBeforeLimit() {
+        when(componentTools.listActions()).thenReturn(List.of(
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets"),
+            new ActionMinimalInfo("addRow", "Add a row", "googleSheets"),
+            new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
+            new ActionMinimalInfo("updateMessage", "Update a message", "slack")));
+        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of("slack")));
+
+        // The two disallowed googleSheets actions come first; a limit-first implementation would
+        // truncate to them and then filter to an empty list. Filtering before the limit keeps both slack actions.
+        List<TaskMinimalInfo> result = taskTools.listTasks(null, 2, toolContext);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactly("slack", "slack");
+    }
+
+    @Test
+    void testListTasksWithEmptyAllowListReturnsEverything() {
+        when(componentTools.listActions()).thenReturn(List.of(
+            new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
+        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, Set.of()));
+
+        List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactlyInAnyOrder("slack", "googleSheets");
+    }
+
+    @Test
+    void testListTasksWithNonSetAllowListValueReturnsEverything() {
+        when(componentTools.listActions()).thenReturn(List.of(
+            new ActionMinimalInfo("sendMessage", "Send a message", "slack"),
+            new ActionMinimalInfo("createRow", "Create a row", "googleSheets")));
+        when(componentTools.listTriggers()).thenReturn(List.of());
+        when(taskDispatcherTools.listTaskDispatchers()).thenReturn(List.of());
+
+        ToolContext toolContext = new ToolContext(Map.of(
+            TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, List.of("slack")));
+
+        List<TaskMinimalInfo> result = taskTools.listTasks(null, null, toolContext);
+
+        assertThat(result)
+            .extracting(TaskMinimalInfo::componentName)
+            .containsExactlyInAnyOrder("slack", "googleSheets");
     }
 }
