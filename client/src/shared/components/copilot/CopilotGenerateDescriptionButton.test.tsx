@@ -10,8 +10,7 @@ vi.mock('./useGenerateWorkflowDescription', () => ({
 }));
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
-    useApplicationInfoStore: (selector: (state: unknown) => unknown) =>
-        selector({ai: {copilot: {enabled: true}}}),
+    useApplicationInfoStore: (selector: (state: unknown) => unknown) => selector({ai: {copilot: {enabled: true}}}),
 }));
 
 vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
@@ -28,13 +27,7 @@ describe('CopilotGenerateDescriptionButton', () => {
 
         generateMock.mockResolvedValue({value: 'Syncs records nightly.'});
 
-        render(
-            <CopilotGenerateDescriptionButton
-                environmentId={1}
-                onApply={onApply}
-                workflowId="wf1"
-            />
-        );
+        render(<CopilotGenerateDescriptionButton environmentId={1} onApply={onApply} workflowId="wf1" />);
 
         fireEvent.click(screen.getByRole('button', {name: /generate with ai/i}));
 

@@ -301,7 +301,7 @@ module.exports = {
             maxWidth: {
                 'data-pill-panel-width': '400px',
                 'integration-connect-portal-dialog-width': '600px',
-                'output-tab-sample-data-dialog-width': '800px',
+                'output-tab-sample-data-dialog-width': '1100px',
                 'select-trigger-width': 'var(--radix-select-trigger-width)',
                 'workflow-execution-content-width': '1000px',
                 'workflow-execution-sheet-width': '500px',
@@ -314,7 +314,7 @@ module.exports = {
                 'workflow-test-configuration-dialog-width': '600px',
             },
             minHeight: {
-                'output-tab-sample-data-dialog-height': '400px',
+                'output-tab-sample-data-dialog-height': '720px',
             },
             minWidth: {
                 'api-key-dialog-width': '550px',
