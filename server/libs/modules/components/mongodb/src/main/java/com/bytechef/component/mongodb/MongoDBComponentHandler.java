@@ -25,6 +25,8 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.mongodb.action.MongoDBFindAction;
 import com.bytechef.component.mongodb.action.MongoDBInsertManyAction;
 import com.bytechef.component.mongodb.action.MongoDBInsertOneAction;
+import com.bytechef.component.mongodb.action.MongoDBUpdateManyAction;
+import com.bytechef.component.mongodb.action.MongoDBUpdateOneAction;
 import com.bytechef.component.mongodb.connection.MongoDBConnection;
 import com.google.auto.service.AutoService;
 
@@ -45,11 +47,15 @@ public class MongoDBComponentHandler implements ComponentHandler {
         .actions(
             MongoDBFindAction.ACTION_DEFINITION,
             MongoDBInsertOneAction.ACTION_DEFINITION,
-            MongoDBInsertManyAction.ACTION_DEFINITION)
+            MongoDBInsertManyAction.ACTION_DEFINITION,
+            MongoDBUpdateOneAction.ACTION_DEFINITION,
+            MongoDBUpdateManyAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MongoDBFindAction.ACTION_DEFINITION),
             tool(MongoDBInsertOneAction.ACTION_DEFINITION),
-            tool(MongoDBInsertManyAction.ACTION_DEFINITION));
+            tool(MongoDBInsertManyAction.ACTION_DEFINITION),
+            tool(MongoDBUpdateOneAction.ACTION_DEFINITION),
+            tool(MongoDBUpdateManyAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
