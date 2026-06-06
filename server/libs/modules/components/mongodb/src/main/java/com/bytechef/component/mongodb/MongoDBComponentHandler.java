@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.mongodb.action.MongoDBAggregateAction;
 import com.bytechef.component.mongodb.action.MongoDBDeleteManyAction;
 import com.bytechef.component.mongodb.action.MongoDBDeleteOneAction;
 import com.bytechef.component.mongodb.action.MongoDBFindAction;
@@ -53,7 +54,8 @@ public class MongoDBComponentHandler implements ComponentHandler {
             MongoDBUpdateOneAction.ACTION_DEFINITION,
             MongoDBUpdateManyAction.ACTION_DEFINITION,
             MongoDBDeleteOneAction.ACTION_DEFINITION,
-            MongoDBDeleteManyAction.ACTION_DEFINITION)
+            MongoDBDeleteManyAction.ACTION_DEFINITION,
+            MongoDBAggregateAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MongoDBFindAction.ACTION_DEFINITION),
             tool(MongoDBInsertOneAction.ACTION_DEFINITION),
@@ -61,7 +63,8 @@ public class MongoDBComponentHandler implements ComponentHandler {
             tool(MongoDBUpdateOneAction.ACTION_DEFINITION),
             tool(MongoDBUpdateManyAction.ACTION_DEFINITION),
             tool(MongoDBDeleteOneAction.ACTION_DEFINITION),
-            tool(MongoDBDeleteManyAction.ACTION_DEFINITION));
+            tool(MongoDBDeleteManyAction.ACTION_DEFINITION),
+            tool(MongoDBAggregateAction.ACTION_DEFINITION));
 
     @Override
     public ComponentDefinition getDefinition() {
