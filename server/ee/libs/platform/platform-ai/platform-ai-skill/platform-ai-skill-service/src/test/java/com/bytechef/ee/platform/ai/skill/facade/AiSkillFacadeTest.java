@@ -296,7 +296,8 @@ class AiSkillFacadeTest {
     void testCreateAdditionalFilesInSkill() {
         long skillId = 1L;
 
-        byte[] existingZipBytes = createZipBytes("SKILL.md", "---\nname: \"my-skill\"\ndescription: \"\"\n---\n\nInstructions");
+        byte[] existingZipBytes =
+            createZipBytes("SKILL.md", "---\nname: \"my-skill\"\ndescription: \"\"\n---\n\nInstructions");
 
         FileEntry oldFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
         FileEntry newFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill-new.skill");

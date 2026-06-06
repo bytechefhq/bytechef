@@ -120,7 +120,7 @@ public class SkillComponentConnectionFactory implements ClusterElementConnection
 
                 ConnectionDefinition connection = componentDefinition.getConnection();
 
-                if(connection != null) {
+                if (connection != null) {
                     connections.add(ComponentConnection.of(
                         workflowNodeName, componentName,
                         componentDefinition.getVersion(), componentDefinition.isConnectionRequired()));

@@ -378,7 +378,8 @@ class AiSkillFacadeImpl implements AiSkillFacade {
         byte[] zipBytes = aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry);
 
         for (Map.Entry<String, String> entry : additionalFiles.entrySet()) {
-            byte[] contentBytes = entry.getValue().getBytes(StandardCharsets.UTF_8);
+            byte[] contentBytes = entry.getValue()
+                .getBytes(StandardCharsets.UTF_8);
 
             if (contentBytes.length > MAX_ZIP_ENTRY_SIZE) {
                 throw new IllegalArgumentException(
@@ -735,7 +736,8 @@ class AiSkillFacadeImpl implements AiSkillFacade {
 
             for (Map.Entry<String, String> entry : additionalFiles.entrySet()) {
                 zipOutputStream.putNextEntry(new ZipEntry(entry.getKey()));
-                zipOutputStream.write(entry.getValue().getBytes(StandardCharsets.UTF_8));
+                zipOutputStream.write(entry.getValue()
+                    .getBytes(StandardCharsets.UTF_8));
                 zipOutputStream.closeEntry();
             }
 
