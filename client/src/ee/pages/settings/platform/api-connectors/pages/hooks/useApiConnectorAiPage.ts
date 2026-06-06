@@ -37,6 +37,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
         icon,
         isProcessing,
         jobId,
+        maxPages,
         name,
         nextStep,
         previousStep,
@@ -302,6 +303,7 @@ const useApiConnectorAiPage = (): UseApiConnectorAiPageI => {
                 input: {
                     documentationUrl,
                     icon: icon || undefined,
+                    maxPages,
                     name,
                     userPrompt: userPrompt || undefined,
                 },

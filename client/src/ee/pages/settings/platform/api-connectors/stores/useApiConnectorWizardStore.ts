@@ -18,6 +18,7 @@ const initialState = {
     icon: undefined,
     isProcessing: false,
     jobId: null as string | null,
+    maxPages: 1,
     name: '',
     selectedEndpointIds: [] as string[],
     specification: undefined,
@@ -109,6 +110,10 @@ export const useApiConnectorWizardStore = create<ApiConnectorWizardStoreType>()(
 
             setJobId: (jobId: string | null) => {
                 set({jobId});
+            },
+
+            setMaxPages: (maxPages: number) => {
+                set({maxPages});
             },
 
             setName: (name: string) => {

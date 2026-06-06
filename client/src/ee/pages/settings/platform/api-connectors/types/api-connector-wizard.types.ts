@@ -24,6 +24,7 @@ export interface ApiConnectorWizardActionsI {
     setIcon: (icon: string) => void;
     setIsProcessing: (isProcessing: boolean) => void;
     setJobId: (jobId: string | null) => void;
+    setMaxPages: (maxPages: number) => void;
     setName: (name: string) => void;
     setSelectedEndpointIds: (ids: string[]) => void;
     setSpecification: (specification?: string) => void;
@@ -43,6 +44,7 @@ export interface ApiConnectorWizardStateI {
     icon?: string;
     isProcessing: boolean;
     jobId: string | null;
+    maxPages: number;
     name: string;
     selectedEndpointIds: string[];
     specification?: string;
