@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
-
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+package com.bytechef.platform.ai.auto.memory;
 
 /**
+ * Thrown by {@link AiAutoMemoryService} when the requested memory row cannot be located within the supplied workspace +
+ * user + environment scope. Distinct from {@link DuplicateAiAutoMemoryNameException} (the inverse outcome on the same
+ * uniqueness key) so callers can branch cleanly without string-matching messages.
+ *
  * @author Ivica Cardic
  */
-public class AiAgentUtilsComponentHandlerTest {
+public class AiAutoMemoryNotFoundException extends RuntimeException {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of(), null, null)
-                .getDefinition());
+    public AiAutoMemoryNotFoundException(String message) {
+        super(message);
     }
 }

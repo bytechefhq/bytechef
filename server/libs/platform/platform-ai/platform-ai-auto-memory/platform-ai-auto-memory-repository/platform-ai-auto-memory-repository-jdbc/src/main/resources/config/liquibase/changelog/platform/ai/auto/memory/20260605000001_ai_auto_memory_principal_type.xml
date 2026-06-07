@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260605000001-1" author="Ivica Cardic">
+        <renameColumn tableName="ai_auto_memory" oldColumnName="user_id" newColumnName="principal_id"
+                      columnDataType="BIGINT"/>
+    </changeSet>
+
+    <changeSet id="20260605000001-2" author="Ivica Cardic">
+        <addColumn tableName="ai_auto_memory">
+            <column name="principal_type" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="20260605000001-3" author="Ivica Cardic">
+        <dropIndex tableName="ai_auto_memory" indexName="idx_ai_auto_memory_user_env"/>
+
+        <createIndex tableName="ai_auto_memory" indexName="idx_ai_auto_memory_principal_env">
+            <column name="principal_type"/>
+            <column name="principal_id"/>
+            <column name="environment"/>
+            <column name="memory_type"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260424000001" author="Ivica Cardic">
+        <createTable tableName="ai_auto_memory">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="TEXT"/>
+            <column name="memory_type" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="content" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Sidebar lookup index. Workspace dimension joins through workspace_ai_auto_memory. -->
+        <createIndex tableName="ai_auto_memory"
+                     indexName="idx_ai_auto_memory_user_env">
+            <column name="user_id"/>
+            <column name="environment"/>
+            <column name="memory_type"/>
+        </createIndex>
+
+        <!--
+            Defense in depth: AiAutoMemory.NAME_PATTERN enforces the slug regex in setName(...) but Spring Data
+            JDBC reflection bypasses the setter on hydration. Pattern matches AiAutoMemory.NAME_PATTERN exactly:
+            ^[a-z0-9_-]{1,64}$.
+        -->
+        <sql>
+            ALTER TABLE ai_auto_memory
+            ADD CONSTRAINT ck_ai_auto_memory_name_slug
+            CHECK (name ~ '^[a-z0-9_-]{1,64}$')
+        </sql>
+
+        <createTable tableName="workspace_ai_auto_memory">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ai_auto_memory_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_ai_auto_memory"
+            tableName="workspace_ai_auto_memory"
+            columnNames="workspace_id, ai_auto_memory_id"/>
+
+        <createIndex tableName="workspace_ai_auto_memory"
+                     indexName="idx_workspace_ai_auto_memory_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_ai_auto_memory"
+            baseColumnNames="ai_auto_memory_id"
+            constraintName="fk_workspace_ai_auto_memory_memory"
+            referencedTableName="ai_auto_memory"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

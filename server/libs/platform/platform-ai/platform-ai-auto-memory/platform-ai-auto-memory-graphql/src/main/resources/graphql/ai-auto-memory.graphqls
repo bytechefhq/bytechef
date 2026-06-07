@@ -1,0 +1,63 @@
+type AiAutoMemory {
+    id: ID!
+    workspaceId: Long!
+    userId: Long!
+    name: String!
+    title: String!
+    description: String
+    memoryType: AiAutoMemoryType!
+    content: String!
+    environmentId: Long!
+    createdAt: Long
+    updatedAt: Long
+}
+
+enum AiAutoMemoryType {
+    USER
+    FEEDBACK
+    PROJECT
+    REFERENCE
+}
+
+extend type Query {
+    """
+    Lists the current user's memories in the workspace, scoped to the supplied environment so DEVELOPMENT
+    preferences do not bleed into PRODUCTION sessions and vice versa. The optional memoryType filter narrows
+    results to a single category. Ordered by updatedAt DESC.
+    """
+    aiAutoMemories(
+        workspaceId: ID!,
+        environment: Int!,
+        memoryType: AiAutoMemoryType
+    ): [AiAutoMemory!]!
+
+    """
+    Returns a single memory by id, verifying ownership against (workspaceId, currentUserId). Returns null when
+    missing or owned by another user — the same shape on both errors so a probe cannot enumerate ids across
+    workspaces.
+    """
+    aiAutoMemory(workspaceId: ID!, id: ID!): AiAutoMemory
+}
+
+extend type Mutation {
+    """
+    Partial update of a memory by primary key, scoped to (workspaceId, currentUserId). The memory's environment
+    is immutable post-create so it does not appear in the patch input — environments do not move.
+    """
+    updateAiAutoMemory(input: UpdateAiAutoMemoryInput!): AiAutoMemory!
+
+    """
+    Deletes a memory by primary key. Returns true on success; throws NotFound when the row does not exist or
+    Forbidden when the row belongs to another user.
+    """
+    deleteAiAutoMemory(workspaceId: ID!, id: ID!): Boolean!
+}
+
+input UpdateAiAutoMemoryInput {
+    id: ID!
+    workspaceId: ID!
+    title: String
+    description: String
+    memoryType: AiAutoMemoryType
+    content: String
+}

@@ -1400,6 +1400,23 @@
     },
     "workflowNodeDescription": null
   }, {
+    "name": "autoMemoryTool",
+    "description": "Persistent long-term memory scoped to the running workflow deployment.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": null,
+    "title": "Auto Memory Tool",
+    "type": {
+      "name": "TOOLS",
+      "key": "tools",
+      "label": "Tools",
+      "multipleElements": true,
+      "required": false
+    },
+    "workflowNodeDescription": null
+  }, {
     "name": "todoWriteTool",
     "description": "Structured task management with state tracking.",
     "element": { },
