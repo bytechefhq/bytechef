@@ -17,12 +17,13 @@ import {useForm} from 'react-hook-form';
 export interface AutomationWorkflowFormValuesI {
     description: string;
     label: string;
+    permissionExpression: string;
 }
 
 interface AutomationWorkflowDialogProps {
     onClose: () => void;
     onSubmit: (values: AutomationWorkflowFormValuesI) => void;
-    workflow?: {description?: string | null; label?: string | null};
+    workflow?: {description?: string | null; label?: string | null; permissionExpression?: string | null};
 }
 
 const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkflowDialogProps) => {
@@ -32,6 +33,7 @@ const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkf
         defaultValues: {
             description: workflow?.description ?? '',
             label: workflow?.label ?? '',
+            permissionExpression: workflow?.permissionExpression ?? '',
         },
     });
 
@@ -93,6 +95,22 @@ const AutomationWorkflowDialog = ({onClose, onSubmit, workflow}: AutomationWorkf
 
                                     <FormControl>
                                         <Textarea rows={5} {...field} />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={control}
+                            name="permissionExpression"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Permission Expression</FormLabel>
+
+                                    <FormControl>
+                                        <Textarea placeholder="e.g. metadata['tier'] == 'gold'" rows={3} {...field} />
                                     </FormControl>
 
                                     <FormMessage />

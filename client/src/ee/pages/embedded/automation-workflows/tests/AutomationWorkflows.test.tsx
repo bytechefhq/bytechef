@@ -43,6 +43,8 @@ const hoisted = vi.hoisted(() => {
         publishProjectMutate: vi.fn(),
         tags: [] as Array<{id: string; name: string}>,
         updateProjectMutate: vi.fn(),
+        updateWorkflowMutate: vi.fn(),
+        updateWorkflowPermissionExpressionMutate: vi.fn(),
     };
 });
 
@@ -86,6 +88,14 @@ vi.mock('@/shared/middleware/graphql', () => ({
         isPending: false,
         mutate: hoisted.updateProjectMutate,
     }),
+    useUpdateAutomationWorkflowProjectWorkflowMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowMutate,
+    }),
+    useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation: () => ({
+        isPending: false,
+        mutate: hoisted.updateWorkflowPermissionExpressionMutate,
+    }),
 }));
 
 vi.mock('react-router-dom', () => ({
@@ -118,6 +128,8 @@ beforeEach(() => {
     hoisted.publishProjectMutate.mockReset();
     hoisted.tags = [];
     hoisted.updateProjectMutate.mockReset();
+    hoisted.updateWorkflowMutate.mockReset();
+    hoisted.updateWorkflowPermissionExpressionMutate.mockReset();
 });
 
 describe('AutomationWorkflows', () => {

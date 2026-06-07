@@ -28,6 +28,7 @@ export interface AutomationWorkflowProjectFormValuesI {
     category?: string;
     description: string;
     name: string;
+    permissionExpression: string;
     tags: Array<string>;
 }
 
@@ -35,6 +36,7 @@ interface AutomationWorkflowProjectFormI {
     category?: SelectOptionType;
     description: string;
     name: string;
+    permissionExpression: string;
     tags: Array<SelectOptionType>;
 }
 
@@ -78,6 +80,7 @@ const AutomationWorkflowProjectDialog = ({
             category: existingCategoryName ? {label: existingCategoryName, value: existingCategoryName} : undefined,
             description: project?.description || '',
             name: project?.name || '',
+            permissionExpression: project?.permissionExpression ?? '',
             tags: existingTagNames.map((name) => ({label: name, value: name})),
         },
     });
@@ -89,6 +92,7 @@ const AutomationWorkflowProjectDialog = ({
             category: formValues.category?.value || undefined,
             description: formValues.description,
             name: formValues.name,
+            permissionExpression: formValues.permissionExpression,
             tags: (formValues.tags || []).map((tag) => tag.value),
         });
     };
@@ -194,6 +198,22 @@ const AutomationWorkflowProjectDialog = ({
                                             }}
                                             options={tagOptions}
                                         />
+                                    </FormControl>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+
+                        <FormField
+                            control={control}
+                            name="permissionExpression"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>Permission Expression</FormLabel>
+
+                                    <FormControl>
+                                        <Textarea placeholder="e.g. metadata['plan'] == 'pro'" rows={3} {...field} />
                                     </FormControl>
 
                                     <FormMessage />

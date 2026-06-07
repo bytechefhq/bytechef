@@ -14,6 +14,8 @@ import {
     useDeleteAutomationWorkflowProjectWorkflowMutation,
     usePublishAutomationWorkflowProjectMutation,
     useUpdateAutomationWorkflowProjectMutation,
+    useUpdateAutomationWorkflowProjectWorkflowMutation,
+    useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
 import {FolderIcon} from 'lucide-react';
@@ -36,6 +38,9 @@ type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automation
 
 const AutomationWorkflows = () => {
     const [editProject, setEditProject] = useState<AutomationWorkflowProjectType | undefined>();
+    const [editWorkflow, setEditWorkflow] = useState<
+        AutomationWorkflowProjectType['workflowTemplates'][number] | undefined
+    >();
     const [pendingWorkflowProjectId, setPendingWorkflowProjectId] = useState<string | null>(null);
     const [showProjectDialog, setShowProjectDialog] = useState(false);
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
@@ -91,6 +96,9 @@ const AutomationWorkflows = () => {
     const deleteWorkflowMutation = useDeleteAutomationWorkflowProjectWorkflowMutation();
     const publishProjectMutation = usePublishAutomationWorkflowProjectMutation();
     const updateProjectMutation = useUpdateAutomationWorkflowProjectMutation();
+    const updateWorkflowMutation = useUpdateAutomationWorkflowProjectWorkflowMutation();
+    const updateWorkflowPermissionExpressionMutation =
+        useUpdateAutomationWorkflowProjectWorkflowPermissionExpressionMutation();
 
     const invalidateProjects = () => {
         queryClient.invalidateQueries({queryKey: ['automationWorkflowProjectCategories']});
@@ -115,6 +123,7 @@ const AutomationWorkflows = () => {
                     description: values.description || undefined,
                     id: editProject.id,
                     name: values.name,
+                    permissionExpression: values.permissionExpression,
                     tags: values.tags,
                 },
                 {
@@ -131,6 +140,7 @@ const AutomationWorkflows = () => {
                     category: values.category || undefined,
                     description: values.description || undefined,
                     name: values.name,
+                    permissionExpression: values.permissionExpression,
                     tags: values.tags,
                 },
                 {
@@ -152,6 +162,7 @@ const AutomationWorkflows = () => {
     const handleWorkflowDialogClose = () => {
         setShowWorkflowDialog(false);
         setPendingWorkflowProjectId(null);
+        setEditWorkflow(undefined);
     };
 
     const handleWorkflowDialogSubmit = (values: AutomationWorkflowFormValuesI) => {
@@ -168,7 +179,7 @@ const AutomationWorkflows = () => {
         });
 
         createWorkflowMutation.mutate(
-            {definition, projectId: pendingWorkflowProjectId},
+            {definition, permissionExpression: values.permissionExpression, projectId: pendingWorkflowProjectId},
             {
                 onSuccess: (data) => {
                     invalidateProjects();
@@ -180,6 +191,37 @@ const AutomationWorkflows = () => {
 
         setShowWorkflowDialog(false);
         setPendingWorkflowProjectId(null);
+    };
+
+    const handleEditWorkflow = (workflow: AutomationWorkflowProjectType['workflowTemplates'][number]) => {
+        setEditWorkflow(workflow);
+        setShowWorkflowDialog(true);
+    };
+
+    const handleEditWorkflowSubmit = (values: AutomationWorkflowFormValuesI) => {
+        if (!editWorkflow) {
+            return;
+        }
+
+        const workflowUuid = editWorkflow.workflowUuid;
+
+        updateWorkflowMutation.mutate(
+            {description: values.description, label: values.label, workflowUuid},
+            {
+                onSuccess: () => {
+                    updateWorkflowPermissionExpressionMutation.mutate(
+                        {permissionExpression: values.permissionExpression, workflowUuid},
+                        {
+                            onSuccess: () => {
+                                invalidateProjects();
+
+                                handleWorkflowDialogClose();
+                            },
+                        }
+                    );
+                },
+            }
+        );
     };
 
     const handleImportWorkflow = (projectId: string) => {
@@ -233,6 +275,8 @@ const AutomationWorkflows = () => {
     const handleUpdateTags = (project: AutomationWorkflowProjectType, tagNames: string[]) => {
         const categoryName = categories?.find((category) => category.id === project.categoryId)?.name;
 
+        // permissionExpression intentionally omitted: the backend leaves a stored expression unchanged
+        // when the argument is null (tag-only update must not clobber it).
         updateProjectMutation.mutate(
             {
                 category: categoryName || undefined,
@@ -281,6 +325,7 @@ const AutomationWorkflows = () => {
                         onDeleteProject={handleDeleteProject}
                         onDeleteWorkflow={handleDeleteWorkflow}
                         onEditProject={handleEditProject}
+                        onEditWorkflow={handleEditWorkflow}
                         onImportWorkflow={handleImportWorkflow}
                         onPublishProject={handlePublishProject}
                         onSelectWorkflow={openWorkflowEditor}
@@ -309,7 +354,19 @@ const AutomationWorkflows = () => {
             )}
 
             {showWorkflowDialog && (
-                <AutomationWorkflowDialog onClose={handleWorkflowDialogClose} onSubmit={handleWorkflowDialogSubmit} />
+                <AutomationWorkflowDialog
+                    onClose={handleWorkflowDialogClose}
+                    onSubmit={editWorkflow ? handleEditWorkflowSubmit : handleWorkflowDialogSubmit}
+                    workflow={
+                        editWorkflow
+                            ? {
+                                  description: editWorkflow.description,
+                                  label: editWorkflow.label,
+                                  permissionExpression: editWorkflow.permissionExpression,
+                              }
+                            : undefined
+                    }
+                />
             )}
 
             <input

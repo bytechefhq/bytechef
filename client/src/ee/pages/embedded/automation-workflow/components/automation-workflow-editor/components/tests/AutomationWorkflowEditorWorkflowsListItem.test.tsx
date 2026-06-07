@@ -14,6 +14,7 @@ const workflow = {
     description: 'Sends mail',
     label: 'Mailer',
     lastModifiedDate: '2026-02-11T09:30:00Z',
+    permissionExpression: null,
     triggers: [],
     workflowUuid: 'wf-1',
 };

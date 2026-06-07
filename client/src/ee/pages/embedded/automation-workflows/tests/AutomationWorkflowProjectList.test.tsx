@@ -28,6 +28,7 @@ const makeProject = (
     categoryId: null,
     description: null,
     lastPublishedVersion: null,
+    permissionExpression: null,
     published: false,
     tagIds: [],
     version: 1,
@@ -40,6 +41,7 @@ describe('AutomationWorkflowProjectList', () => {
     const onDeleteProject = vi.fn();
     const onDeleteWorkflow = vi.fn();
     const onEditProject = vi.fn();
+    const onEditWorkflow = vi.fn();
     const onImportWorkflow = vi.fn();
     const onPublishProject = vi.fn();
     const onSelectWorkflow = vi.fn();
@@ -52,6 +54,7 @@ describe('AutomationWorkflowProjectList', () => {
         onDeleteProject,
         onDeleteWorkflow,
         onEditProject,
+        onEditWorkflow,
         onImportWorkflow,
         onPublishProject,
         onSelectWorkflow,
@@ -64,6 +67,7 @@ describe('AutomationWorkflowProjectList', () => {
         onDeleteProject.mockReset();
         onDeleteWorkflow.mockReset();
         onEditProject.mockReset();
+        onEditWorkflow.mockReset();
         onImportWorkflow.mockReset();
         onPublishProject.mockReset();
         onSelectWorkflow.mockReset();
@@ -201,6 +205,7 @@ describe('AutomationWorkflowProjectList', () => {
                         description: null,
                         label: 'Sync Contacts',
                         lastModifiedDate: null,
+                        permissionExpression: null,
                         triggers: [],
                         workflowUuid: 'wf-uuid-5',
                     },

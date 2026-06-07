@@ -8,9 +8,10 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import LoadingIndicator from '@/shared/components/LoadingIndicator';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
+import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {onlineManager, useIsFetching} from '@tanstack/react-query';
+import {onlineManager, useIsFetching, useQueryClient} from '@tanstack/react-query';
 import {EditIcon} from 'lucide-react';
 import {RefObject} from 'react';
 import {PanelImperativeHandle} from 'react-resizable-panels';
@@ -41,6 +42,8 @@ const WorkflowBuilderHeader = ({
         }))
     );
     const workflow = useWorkflowDataStore((state) => state.workflow);
+
+    const queryClient = useQueryClient();
 
     const isFetching = useIsFetching();
     const {
@@ -101,6 +104,11 @@ const WorkflowBuilderHeader = ({
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
+                    onSave={() =>
+                        queryClient.invalidateQueries({
+                            queryKey: ProjectWorkflowKeys.projectWorkflow(projectId, parseInt(workflow.id!)),
+                        })
+                    }
                     parentId={projectId}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}

@@ -8,10 +8,13 @@ import {useState} from 'react';
 import AutomationWorkflowProjectWorkflowListItem from './AutomationWorkflowProjectWorkflowListItem';
 
 type AutomationWorkflowProjectType = AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number];
+type AutomationWorkflowProjectWorkflowTemplateType =
+    AutomationWorkflowProjectsQuery['automationWorkflowProjects'][number]['workflowTemplates'][number];
 
 interface AutomationWorkflowProjectWorkflowListProps {
     onCreateWorkflow: (projectId: string) => void;
     onDeleteWorkflow: (workflowUuid: string) => void;
+    onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
     project: AutomationWorkflowProjectType;
 }
@@ -19,6 +22,7 @@ interface AutomationWorkflowProjectWorkflowListProps {
 const AutomationWorkflowProjectWorkflowList = ({
     onCreateWorkflow,
     onDeleteWorkflow,
+    onEditWorkflow,
     onSelectWorkflow,
     project,
 }: AutomationWorkflowProjectWorkflowListProps) => {
@@ -41,6 +45,7 @@ const AutomationWorkflowProjectWorkflowList = ({
                             <AutomationWorkflowProjectWorkflowListItem
                                 key={workflow.workflowUuid}
                                 onDeleteWorkflow={setWorkflowUuidToDelete}
+                                onEditWorkflow={onEditWorkflow}
                                 onSelectWorkflow={onSelectWorkflow}
                                 workflow={workflow}
                             />

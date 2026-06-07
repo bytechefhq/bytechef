@@ -4,7 +4,7 @@ import Button from '@/components/Button/Button';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
-import {ComponentIcon, EllipsisVerticalIcon, Trash2Icon} from 'lucide-react';
+import {ComponentIcon, EllipsisVerticalIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';
 
 type AutomationWorkflowProjectWorkflowTemplateType =
@@ -12,12 +12,14 @@ type AutomationWorkflowProjectWorkflowTemplateType =
 
 interface AutomationWorkflowProjectWorkflowListItemProps {
     onDeleteWorkflow: (workflowUuid: string) => void;
+    onEditWorkflow: (workflow: AutomationWorkflowProjectWorkflowTemplateType) => void;
     onSelectWorkflow: (workflowUuid: string) => void;
     workflow: AutomationWorkflowProjectWorkflowTemplateType;
 }
 
 const AutomationWorkflowProjectWorkflowListItem = ({
     onDeleteWorkflow,
+    onEditWorkflow,
     onSelectWorkflow,
     workflow,
 }: AutomationWorkflowProjectWorkflowListItemProps) => {
@@ -113,6 +115,17 @@ const AutomationWorkflowProjectWorkflowListItem = ({
                     </DropdownMenuTrigger>
 
                     <DropdownMenuContent align="end" className="p-0">
+                        <DropdownMenuItem
+                            aria-label="Edit Workflow"
+                            onClick={(event) => {
+                                event.stopPropagation();
+
+                                onEditWorkflow(workflow);
+                            }}
+                        >
+                            <PencilIcon /> Edit
+                        </DropdownMenuItem>
+
                         <DropdownMenuItem
                             aria-label="Delete Workflow"
                             className="dropdown-menu-item-destructive"
