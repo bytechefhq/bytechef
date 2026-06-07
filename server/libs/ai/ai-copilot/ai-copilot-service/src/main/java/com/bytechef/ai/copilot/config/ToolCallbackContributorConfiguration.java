@@ -21,6 +21,7 @@ import com.bytechef.ai.copilot.tool.CodeEditorAgentToolCallback;
 import com.bytechef.ai.copilot.tool.ConverterAgentToolCallback;
 import com.bytechef.ai.copilot.tool.SkillsAgentToolCallback;
 import com.bytechef.ai.copilot.tool.WorkflowEditorAgentToolCallback;
+import com.bytechef.ai.copilot.tool.WorkflowExecutionAgentToolCallback;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import java.util.ArrayList;
@@ -47,6 +48,7 @@ class ToolCallbackContributorConfiguration {
         @Qualifier("codeEditorBuildSubAgentChatClient") ObjectProvider<ChatClient> codeEditorProvider,
         @Qualifier("clusterElementBuildSubAgentChatClient") ObjectProvider<ChatClient> clusterElementProvider,
         @Qualifier("skillsBuildSubAgentChatClient") ObjectProvider<ChatClient> skillsProvider,
+        @Qualifier("workflowExecutionBuildSubAgentChatClient") ObjectProvider<ChatClient> workflowExecutionProvider,
         @Qualifier("converterBuildSubAgentChatClientSupplier") //
         ObjectProvider<Supplier<ChatClient>> converterSupplierProvider) {
 
@@ -64,6 +66,8 @@ class ToolCallbackContributorConfiguration {
                 chatClient -> toolCallbacks.add(new ClusterElementAgentToolCallback(chatClient)));
             skillsProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(new SkillsAgentToolCallback(chatClient)));
+            workflowExecutionProvider.ifAvailable(
+                chatClient -> toolCallbacks.add(new WorkflowExecutionAgentToolCallback(chatClient)));
             converterSupplierProvider.ifAvailable(
                 converterChatClientSupplier -> toolCallbacks.add(
                     new ConverterAgentToolCallback(converterChatClientSupplier)));

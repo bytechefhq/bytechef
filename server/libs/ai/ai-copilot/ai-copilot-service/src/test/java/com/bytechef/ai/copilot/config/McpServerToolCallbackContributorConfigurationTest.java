@@ -44,16 +44,17 @@ class McpServerToolCallbackContributorConfigurationTest {
 
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
             emptyProvider(), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
-            present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(mock(ChatClient.class)), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
             present(converterChatClientSupplier));
 
-        assertThat(contributor.getToolCallbacks()).hasSize(5);
+        assertThat(contributor.getToolCallbacks()).hasSize(6);
     }
 
     @Test
     void contributesNothingWhenAllAbsent() {
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
-            emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider());
+            emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(), emptyProvider(),
+            emptyProvider());
 
         assertThat(contributor.getToolCallbacks()).isEmpty();
     }

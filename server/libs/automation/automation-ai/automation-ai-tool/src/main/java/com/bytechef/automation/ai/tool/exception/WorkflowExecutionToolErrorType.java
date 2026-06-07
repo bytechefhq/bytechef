@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.copilot.util;
+package com.bytechef.automation.ai.tool.exception;
+
+import com.bytechef.exception.AbstractErrorType;
 
 /**
  * @author Ivica Cardic
  */
-public enum Source {
+public class WorkflowExecutionToolErrorType extends AbstractErrorType {
 
-    WORKFLOW_EDITOR, CODE_EDITOR, CONVERTER, CLUSTER_ELEMENT, SKILLS, JSON_SCHEMA_BUILDER, SAMPLE_OUTPUT,
-    WORKFLOW_EXECUTION
+    public static final WorkflowExecutionToolErrorType GET_WORKFLOW_EXECUTION = new WorkflowExecutionToolErrorType(100);
+    public static final WorkflowExecutionToolErrorType LIST_WORKFLOW_EXECUTIONS =
+        new WorkflowExecutionToolErrorType(101);
+
+    private WorkflowExecutionToolErrorType(int errorKey) {
+        super(WorkflowExecutionToolErrorType.class, errorKey);
+    }
 }
