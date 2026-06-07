@@ -129,8 +129,8 @@ public class EmbeddedMcpServerConfiguration {
                 return McpTransportContext.create(
                     Map.of(
                         ENVIRONMENT, environment,
-                        EXTERNAL_USER_ID,
-                        externalUserId, SECRET_KEY, secretKey));
+                        EXTERNAL_USER_ID, externalUserId,
+                        SECRET_KEY, secretKey));
             })
             .build();
     }

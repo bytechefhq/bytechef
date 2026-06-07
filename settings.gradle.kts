@@ -34,6 +34,7 @@ include("server:apps:server-app")
 
 include("server:libs:ai:mcp:mcp-server")
 include("server:libs:ai:mcp:mcp-server-configuration:mcp-server-configuration-graphql")
+include("server:libs:ai:mcp:mcp-tool:mcp-tool-api")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-automation")
 include("server:libs:ai:mcp:mcp-tool:mcp-tool-platform")
 
@@ -539,6 +540,8 @@ include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-api")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
+include("server:ee:libs:ai:mcp:mcp-tool:mcp-tool-api")
+include("server:ee:libs:ai:mcp:mcp-tool:mcp-tool-automation")
 
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-api")
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-configuration:automation-api-platform-configuration-rest")

@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation("org.springframework.security:spring-security-web")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-api"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
     implementation(project(":server:libs:core:commons:commons-util"))
@@ -15,4 +16,8 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
 }

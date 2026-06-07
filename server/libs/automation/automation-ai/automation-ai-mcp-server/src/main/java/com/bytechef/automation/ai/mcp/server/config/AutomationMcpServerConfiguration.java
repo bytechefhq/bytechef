@@ -37,6 +37,7 @@ import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationM
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.service.McpProjectService;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
+import com.bytechef.automation.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.component.map.MapTaskDispatcherAdapterTaskHandler;
 import com.bytechef.component.map.constant.MapConstants;
@@ -44,6 +45,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.ai.tool.spi.McpServerWorkspaceToolContributor;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
@@ -85,6 +87,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -160,7 +163,9 @@ public class AutomationMcpServerConfiguration {
     @Bean
     FilterableMcpAsyncServer automationMcpAsyncServer(
         McpComponentService mcpComponentService, McpProjectService mcpProjectService,
-        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade) {
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
+        ObjectProvider<McpServerWorkspaceToolContributor> workspaceToolProviders,
+        WorkspaceMcpServerService workspaceMcpServerService) {
 
         return new FilterableMcpServerBuilder(automationWebMvcStreamableHttpServerTransportProvider())
             .serverInfo("automation-mcp-server", "1.0.0")
@@ -180,30 +185,44 @@ public class AutomationMcpServerConfiguration {
                     return List.of();
                 }
 
-                String secretKey = secretKeyObject.toString();
-
-                McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
-
-                List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
-
-                mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
-                    .stream()
-                    .flatMap(
-                        mcpComponent -> CollectionUtils.stream(
-                            mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
-                    .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(
-                        mcpToolFacade.getFunctionToolCallback(mcpTool)))
-                    .forEach(tools::add);
-
-                mcpProjectService.getMcpServerMcpProjects(mcpServer.getId())
-                    .stream()
-                    .flatMap(mcpProject -> CollectionUtils.stream(mcpToolFacade.getFunctionToolCallbacks(mcpProject)))
-                    .map(McpToolUtils::toAsyncToolSpecification)
-                    .forEach(tools::add);
-
-                return tools;
+                return buildToolSpecifications(
+                    secretKeyObject.toString(), mcpComponentService, mcpProjectService, mcpServerService,
+                    mcpToolService, mcpToolFacade, workspaceToolProviders, workspaceMcpServerService);
             })
             .build();
+    }
+
+    static List<McpServerFeatures.AsyncToolSpecification> buildToolSpecifications(
+        String secretKey, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
+        ObjectProvider<McpServerWorkspaceToolContributor> workspaceToolProviders,
+        WorkspaceMcpServerService workspaceMcpServerService) {
+
+        McpServer mcpServer = mcpServerService.getMcpServer(secretKey);
+
+        List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
+
+        mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
+            .stream()
+            .flatMap(
+                mcpComponent -> CollectionUtils.stream(
+                    mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
+            .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
+            .forEach(tools::add);
+
+        mcpProjectService.getMcpServerMcpProjects(mcpServer.getId())
+            .stream()
+            .flatMap(mcpProject -> CollectionUtils.stream(mcpToolFacade.getFunctionToolCallbacks(mcpProject)))
+            .map(McpToolUtils::toAsyncToolSpecification)
+            .forEach(tools::add);
+
+        workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(mcpServer.getId())
+            .ifPresent(workspaceId -> workspaceToolProviders.orderedStream()
+                .flatMap(provider -> CollectionUtils.stream(provider.getFunctionToolCallbacks(workspaceId)))
+                .map(McpToolUtils::toAsyncToolSpecification)
+                .forEach(tools::add));
+
+        return tools;
     }
 
     @Bean
