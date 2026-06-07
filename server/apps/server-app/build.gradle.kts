@@ -263,6 +263,7 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:suspend"))
     implementation(project(":server:libs:modules:task-dispatchers:terminate"))
 
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-graphql"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-rest"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-service"))
     implementation(project(":server:libs:ai:ai-copilot:ai-copilot-service"))

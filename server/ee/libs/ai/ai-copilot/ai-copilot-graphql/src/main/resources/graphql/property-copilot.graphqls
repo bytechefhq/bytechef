@@ -1,0 +1,26 @@
+extend type Mutation {
+    generatePropertyValue(input: GeneratePropertyValueInput!): GeneratePropertyValuePayload!
+}
+
+enum PropertyCopilotMode {
+    TEXT
+    FORMULA
+    JSON_SCHEMA
+}
+
+input GeneratePropertyValueInput {
+    prompt: String!
+    mode: PropertyCopilotMode!
+    workflowId: ID!
+    workflowNodeName: String!
+    propertyPath: String!
+    propertyType: String
+    dynamic: Boolean!
+    environmentId: Int!
+}
+
+type GeneratePropertyValuePayload {
+    value: String!
+    valid: Boolean!
+    message: String
+}
