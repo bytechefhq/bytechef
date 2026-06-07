@@ -173,8 +173,8 @@ const IntegrationWorkflowListItem = ({
 
             {showEditDialog && workflow && (
                 <WorkflowDialog
-                    integrationId={integration.id}
                     onClose={() => setShowEditDialog(false)}
+                    parentId={integration.id}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

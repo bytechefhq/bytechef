@@ -101,7 +101,7 @@ const WorkflowBuilderHeader = ({
             {showEditWorkflowDialog && (
                 <WorkflowDialog
                     onClose={() => setShowEditWorkflowDialog(false)}
-                    projectId={projectId}
+                    parentId={projectId}
                     updateWorkflowMutation={updateWorkflowMutation}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                     workflowId={workflow.id!}

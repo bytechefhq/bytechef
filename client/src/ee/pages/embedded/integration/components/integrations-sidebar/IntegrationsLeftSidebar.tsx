@@ -214,8 +214,8 @@ const IntegrationsLeftSidebar = ({
             {showWorkflowDialog && (
                 <WorkflowDialog
                     createWorkflowMutation={createIntegrationWorkflowMutation}
-                    integrationId={selectedIntegrationId === 0 ? integrationId : selectedIntegrationId}
                     onClose={() => setShowWorkflowDialog(false)}
+                    parentId={selectedIntegrationId === 0 ? integrationId : selectedIntegrationId}
                     useGetWorkflowQuery={useGetWorkflowQuery}
                 />
             )}
