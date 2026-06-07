@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
+import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
@@ -16,13 +17,19 @@ import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -35,6 +42,8 @@ import org.springframework.ai.tool.ToolCallback;
  */
 public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowEditorSpringAIAgent.class);
+
     private static final String ADDITIONAL_RULES =
         """
             ## Additional Rules
@@ -46,6 +55,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
+    private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService,
         final WorkflowNodeOutputFacade workflowNodeOutputFacade)
@@ -55,10 +65,37 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+        this.overrideChatClientResolver = builder.overrideChatClientResolver;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    protected ChatClient resolveChatClient(RunAgentInput input) {
+        if (overrideChatClientResolver == null) {
+            return super.resolveChatClient(input);
+        }
+
+        try {
+            ChatClient override = overrideChatClientResolver.resolve(input.state());
+
+            if (override != null) {
+                return override;
+            }
+        } catch (RuntimeException exception) {
+            log.warn(
+                "WorkflowEditorSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
+                exception.getMessage());
+        }
+
+        return super.resolveChatClient(input);
+    }
+
+    @Override
+    protected Map<String, Object> toolContext(RunAgentInput input) {
+        return CopilotToolContextUtils.toToolContext(input.state());
     }
 
     @Override
@@ -109,6 +146,13 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
         private WorkflowService workflowService;
         private WorkflowNodeOutputFacade workflowNodeOutputFacade;
+        private @Nullable OverrideChatClientResolver overrideChatClientResolver;
+
+        public Builder overrideChatClientResolver(@Nullable OverrideChatClientResolver overrideChatClientResolver) {
+            this.overrideChatClientResolver = overrideChatClientResolver;
+
+            return this;
+        }
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
