@@ -18,6 +18,7 @@ package com.bytechef.automation.mcp.service;
 
 import com.bytechef.automation.mcp.domain.WorkspaceMcpServer;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service interface for managing workspace MCP server relationships.
@@ -33,6 +34,14 @@ public interface WorkspaceMcpServerService {
      * @return a list of MCP servers in the specified workspace
      */
     List<WorkspaceMcpServer> getWorkspaceMcpServers(Long workspaceId);
+
+    /**
+     * Resolves the workspace that owns the given MCP server, when one is assigned.
+     *
+     * @param mcpServerId the MCP server ID
+     * @return the workspace ID owning the MCP server, or {@link Optional#empty()} when no assignment exists
+     */
+    Optional<Long> fetchWorkspaceIdByMcpServerId(Long mcpServerId);
 
     /**
      * Assigns an MCP server to a workspace.
