@@ -31,7 +31,6 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bson.Document;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -88,7 +87,7 @@ class MongoDBNewDocumentTriggerIntTest {
         List<?> records = secondPoll.records();
 
         assertEquals(1, records.size());
-        assertEquals(3, ((Document) records.get(0)).getInteger("seq"));
+        assertEquals(3, ((Map<?, ?>) records.get(0)).get("seq"));
     }
 
     private void insertEvent(int seq) {

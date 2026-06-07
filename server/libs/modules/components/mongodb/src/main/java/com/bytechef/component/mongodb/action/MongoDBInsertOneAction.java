@@ -31,7 +31,6 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.InsertOneResult;
 import java.util.Map;
-import org.bson.BsonValue;
 import org.bson.Document;
 
 public class MongoDBInsertOneAction {
@@ -70,9 +69,9 @@ public class MongoDBInsertOneAction {
             InsertOneResult insertOneResult = collection.insertOne(
                 MongoDBUtils.toDocument(inputParameters.getRequiredMap(DOCUMENT)));
 
-            BsonValue insertedId = insertOneResult.getInsertedId();
+            Object insertedId = MongoDBUtils.fromBsonValue(insertOneResult.getInsertedId());
 
-            return Map.of("insertedId", insertedId == null ? "" : insertedId.toString());
+            return Map.of("insertedId", insertedId == null ? "" : insertedId);
         }
     }
 }

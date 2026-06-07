@@ -56,14 +56,14 @@ class MongoDBAggregateActionTest {
         MongoCollection<Document> mockedCollection = mock(MongoCollection.class);
         AggregateIterable<Document> mockedAggregateIterable = mock(AggregateIterable.class);
 
-        List<Document> expectedDocuments = List.of(new Document("total", 42));
+        List<Document> aggregatedDocuments = List.of(new Document("total", 42));
 
         ArgumentCaptor<List<Document>> pipelineArgumentCaptor = ArgumentCaptor.forClass(List.class);
 
         when(mockedCollection.aggregate(pipelineArgumentCaptor.capture()))
             .thenReturn(mockedAggregateIterable);
         when(mockedAggregateIterable.into(any()))
-            .thenReturn(new ArrayList<>(expectedDocuments));
+            .thenReturn(new ArrayList<>(aggregatedDocuments));
 
         try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class, CALLS_REAL_METHODS)) {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getMongoClient(any()))
@@ -71,10 +71,10 @@ class MongoDBAggregateActionTest {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getCollection(any(), any(), anyString()))
                 .thenReturn(mockedCollection);
 
-            List<Document> result = MongoDBAggregateAction.perform(
+            List<Map<String, Object>> result = MongoDBAggregateAction.perform(
                 inputParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertEquals(expectedDocuments, result);
+            assertEquals(List.of(Map.of("total", 42)), result);
             assertEquals(
                 List.of(new Document("$match", Map.of("active", true))), pipelineArgumentCaptor.getValue());
         }

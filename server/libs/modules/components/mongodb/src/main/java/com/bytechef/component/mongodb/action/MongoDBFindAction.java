@@ -37,6 +37,7 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.bson.Document;
 
 public class MongoDBFindAction {
@@ -78,7 +79,7 @@ public class MongoDBFindAction {
     private MongoDBFindAction() {
     }
 
-    public static List<Document> perform(
+    public static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         try (MongoClient mongoClient = MongoDBUtils.getMongoClient(connectionParameters)) {
@@ -106,7 +107,7 @@ public class MongoDBFindAction {
                 findIterable.limit(limit);
             }
 
-            return findIterable.into(new ArrayList<>());
+            return MongoDBUtils.normalizeDocuments(findIterable.into(new ArrayList<>()));
         }
     }
 }

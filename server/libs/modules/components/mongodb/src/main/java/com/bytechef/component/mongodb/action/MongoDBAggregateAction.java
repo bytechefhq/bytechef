@@ -62,7 +62,7 @@ public class MongoDBAggregateAction {
     private MongoDBAggregateAction() {
     }
 
-    public static List<Document> perform(
+    public static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, ActionContext actionContext) {
 
         try (MongoClient mongoClient = MongoDBUtils.getMongoClient(connectionParameters)) {
@@ -72,8 +72,9 @@ public class MongoDBAggregateAction {
             List<Document> pipeline = MongoDBUtils.toDocuments(
                 inputParameters.getRequiredList(PIPELINE, new TypeReference<Map<String, ?>>() {}));
 
-            return collection.aggregate(pipeline)
-                .into(new ArrayList<>());
+            return MongoDBUtils.normalizeDocuments(
+                collection.aggregate(pipeline)
+                    .into(new ArrayList<>()));
         }
     }
 }

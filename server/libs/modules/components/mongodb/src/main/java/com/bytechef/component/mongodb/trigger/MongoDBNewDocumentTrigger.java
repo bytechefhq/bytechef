@@ -33,13 +33,16 @@ import com.bytechef.component.mongodb.util.MongoDBUtils;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class MongoDBNewDocumentTrigger {
 
     private static final String LAST_VALUE = "lastValue";
+    private static final String LAST_VALUE_IS_OBJECT_ID = "lastValueIsObjectId";
 
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newDocument")
         .title("New Document")
@@ -72,7 +75,7 @@ public class MongoDBNewDocumentTrigger {
         TriggerContext triggerContext) {
 
         String orderBy = inputParameters.getRequiredString(ORDER_BY);
-        Object lastValue = closureParameters.get(LAST_VALUE);
+        Object lastValue = readLastValue(closureParameters);
 
         try (MongoClient mongoClient = MongoDBUtils.getMongoClient(connectionParameters)) {
             MongoCollection<Document> collection = MongoDBUtils.getCollection(
@@ -84,9 +87,9 @@ public class MongoDBNewDocumentTrigger {
                     .sort(new Document(orderBy, -1))
                     .first();
 
-                Object position = newest == null ? "" : newest.get(orderBy);
+                Object position = newest == null ? null : newest.get(orderBy);
 
-                return new PollOutput(List.of(), Map.of(LAST_VALUE, position), false);
+                return new PollOutput(List.of(), writeLastValue(position), false);
             }
 
             List<Document> documents = collection.find(new Document(orderBy, new Document("$gt", lastValue)))
@@ -101,7 +104,35 @@ public class MongoDBNewDocumentTrigger {
                 newLastValue = lastDocument.get(orderBy);
             }
 
-            return new PollOutput(documents, Map.of(LAST_VALUE, newLastValue), false);
+            return new PollOutput(MongoDBUtils.normalizeDocuments(documents), writeLastValue(newLastValue), false);
         }
+    }
+
+    /**
+     * Stores the order-by cursor in the closure parameters. The closure is JSON-persisted between polls, so an
+     * {@link ObjectId} (the default {@code _id} order-by field) is stored as its hex string and flagged, allowing it to
+     * be reconstructed on the next poll for the {@code $gt} comparison.
+     */
+    private static Map<String, Object> writeLastValue(Object value) {
+        Map<String, Object> closure = new HashMap<>();
+
+        if (value instanceof ObjectId objectId) {
+            closure.put(LAST_VALUE, objectId.toHexString());
+            closure.put(LAST_VALUE_IS_OBJECT_ID, true);
+        } else {
+            closure.put(LAST_VALUE, value);
+        }
+
+        return closure;
+    }
+
+    private static Object readLastValue(Parameters closureParameters) {
+        Object lastValue = closureParameters.get(LAST_VALUE);
+
+        if (lastValue instanceof String hexString && closureParameters.getBoolean(LAST_VALUE_IS_OBJECT_ID, false)) {
+            return new ObjectId(hexString);
+        }
+
+        return lastValue;
     }
 }

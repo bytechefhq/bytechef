@@ -40,7 +40,6 @@ import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.bson.Document;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -88,24 +87,40 @@ class MongoDBComponentHandlerIntTest {
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, DOCUMENT, Map.of("name", "Joe", "age", 30))),
             connectionParameters, null);
 
-        assertTrue(insertResult.get("insertedId") instanceof String insertedId && !insertedId.isBlank());
+        Object insertedId = insertResult.get("insertedId");
 
-        List<Document> documents = MongoDBFindAction.perform(
+        assertTrue(insertedId instanceof String id && !id.isBlank());
+
+        List<Map<String, Object>> documents = MongoDBFindAction.perform(
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of("name", "Joe"))),
             connectionParameters, null);
 
         assertEquals(1, documents.size());
         assertEquals("Joe", documents.get(0)
-            .getString("name"));
+            .get("name"));
         assertEquals(30, documents.get(0)
-            .getInteger("age"));
+            .get("age"));
+
+        // Round trip: the _id returned by find is the normalized hex string and matches insertOne's insertedId,
+        // so it can be fed straight back into a filter.
+        Object foundId = documents.get(0)
+            .get("_id");
+
+        assertEquals(insertedId, foundId);
+
+        List<Map<String, Object>> byId = MongoDBFindAction.perform(
+            inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of("name", "Joe"))),
+            connectionParameters, null);
+
+        assertEquals(insertedId, byId.get(0)
+            .get("_id"));
     }
 
     @Test
     void testInsertManyAndFindWithSortAndLimit() {
         insertPeople();
 
-        List<Document> documents = MongoDBFindAction.perform(
+        List<Map<String, Object>> documents = MongoDBFindAction.perform(
             inputParameters(
                 Map.of(
                     COLLECTION, COLLECTION_NAME, FILTER, Map.of(),
@@ -114,9 +129,9 @@ class MongoDBComponentHandlerIntTest {
 
         assertEquals(2, documents.size());
         assertEquals("Ann", documents.get(0)
-            .getString("name"));
+            .get("name"));
         assertEquals("Bob", documents.get(1)
-            .getString("name"));
+            .get("name"));
     }
 
     @Test
@@ -133,12 +148,12 @@ class MongoDBComponentHandlerIntTest {
         assertEquals(1L, updateResult.get("matchedCount"));
         assertEquals(1L, updateResult.get("modifiedCount"));
 
-        List<Document> documents = MongoDBFindAction.perform(
+        List<Map<String, Object>> documents = MongoDBFindAction.perform(
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of("name", "Bob"))),
             connectionParameters, null);
 
         assertEquals(99, documents.get(0)
-            .getInteger("age"));
+            .get("age"));
     }
 
     @Test
@@ -166,7 +181,7 @@ class MongoDBComponentHandlerIntTest {
 
         assertEquals(1L, deleteResult.get("deletedCount"));
 
-        List<Document> documents = MongoDBFindAction.perform(
+        List<Map<String, Object>> documents = MongoDBFindAction.perform(
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of())),
             connectionParameters, null);
 
@@ -193,7 +208,7 @@ class MongoDBComponentHandlerIntTest {
         groupStage.put("_id", null);
         groupStage.put("totalAge", Map.of("$sum", "$age"));
 
-        List<Document> documents = MongoDBAggregateAction.perform(
+        List<Map<String, Object>> documents = MongoDBAggregateAction.perform(
             inputParameters(
                 Map.of(
                     COLLECTION, COLLECTION_NAME,
@@ -205,7 +220,7 @@ class MongoDBComponentHandlerIntTest {
 
         assertEquals(1, documents.size());
         assertEquals(55, documents.get(0)
-            .getInteger("totalAge"));
+            .get("totalAge"));
     }
 
     private void insertPeople() {
