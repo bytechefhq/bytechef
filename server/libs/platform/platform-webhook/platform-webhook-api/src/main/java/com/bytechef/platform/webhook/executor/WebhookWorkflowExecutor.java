@@ -60,7 +60,11 @@ public interface WebhookWorkflowExecutor {
 
     /**
      * Executes a webhook workflow synchronously based on the provided workflow execution identifier and webhook
-     * request.
+     * request. Used for the non-streaming chat reply path: the workflow runs to completion, the
+     * {@code chat/responseToRequest} step's {@code WebhookResponse} is collected via the task-execution-complete
+     * callback, and the final outputs map is returned. For streaming AI agent workflows, callers should route through
+     * {@link #executeAsync(WorkflowExecutionId, WebhookRequest, SseStreamBridge)} instead so per-token deltas reach the
+     * bridge as the AI agent produces them.
      *
      * @param workflowExecutionId the unique identifier of the workflow execution, including details such as tenant,
      *                            type, and trigger
