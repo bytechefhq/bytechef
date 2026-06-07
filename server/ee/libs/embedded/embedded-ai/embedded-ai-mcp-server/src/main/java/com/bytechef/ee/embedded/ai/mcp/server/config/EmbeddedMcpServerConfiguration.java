@@ -47,6 +47,7 @@ import com.bytechef.message.event.MessageEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -143,7 +144,8 @@ public class EmbeddedMcpServerConfiguration {
     EmbeddedMcpToolFacade embeddedMcpToolFacade(
         ApplicationProperties applicationProperties, ChildJobPrincipalFactory childJobPrincipalFactory,
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        ClusterElementDefinitionService clusterElementDefinitionService, ConnectedUserService connectedUserService,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         ContextService contextService, CounterService counterService, TaskFileStorage durableTaskFileStorage,
         Environment environment, Evaluator evaluator,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -178,12 +180,13 @@ public class EmbeddedMcpServerConfiguration {
             taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, TIMEOUT, workflowService);
 
         return new EmbeddedMcpToolFacade(
-            clusterElementDefinitionFacade, clusterElementDefinitionService, connectedUserService,
-            evaluator, integrationInstanceConfigurationService, integrationInstanceConfigurationWorkflowService,
-            integrationInstanceService, integrationInstanceWorkflowService, integrationService, jobSyncExecutor,
-            jwtTokenService, mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService,
-            mcpIntegrationInstanceToolService, mcpServerService, principalJobFacade,
-            applicationProperties.getPublicUrl(), taskExecutionService, taskFileStorage, workflowService);
+            clusterElementDefinitionFacade, clusterElementDefinitionService, componentDefinitionService,
+            connectedUserService, evaluator, integrationInstanceConfigurationService,
+            integrationInstanceConfigurationWorkflowService, integrationInstanceService,
+            integrationInstanceWorkflowService, integrationService, jobSyncExecutor, jwtTokenService,
+            mcpComponentService, mcpIntegrationInstanceConfigurationWorkflowService, mcpIntegrationInstanceToolService,
+            mcpServerService, principalJobFacade, applicationProperties.getPublicUrl(), taskExecutionService,
+            taskFileStorage, workflowService);
     }
 
     @Bean
