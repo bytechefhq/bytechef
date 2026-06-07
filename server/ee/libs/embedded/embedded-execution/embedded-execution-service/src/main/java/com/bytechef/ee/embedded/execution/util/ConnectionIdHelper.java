@@ -14,6 +14,7 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,7 +48,16 @@ public class ConnectionIdHelper {
                 .map(IntegrationInstance::getConnectionId)
                 .orElse(null);
         } else {
+            ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserid, environment);
+
             IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(instanceId);
+
+            Long connectedUserId = connectedUser.getId();
+
+            if (!connectedUserId.equals(integrationInstance.getConnectedUserId())) {
+                throw new AccessDeniedException(
+                    "Integration instance " + instanceId + " is not owned by the connected user");
+            }
 
             connectionId = integrationInstance.getConnectionId();
         }

@@ -9,4 +9,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
+    implementation("org.springframework.security:spring-security-core")
+
+    testImplementation("org.mockito:mockito-core")
 }
