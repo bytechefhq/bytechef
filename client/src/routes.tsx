@@ -63,6 +63,7 @@ const AssetFiles = lazy(() => import('@/pages/automation/asset-files/AssetFiles'
 const AiHub = lazy(() => import('@/pages/automation/ai-hub/AiHub'));
 const ContextStoreSources = lazy(() => import('@/pages/automation/context-store/ContextStoreSources'));
 const ContextStores = lazy(() => import('@/pages/automation/context-store/ContextStores'));
+const AiAutoMemoriesPage = lazy(() => import('@/pages/automation/ai/memories/Memories'));
 const AiHubPersonalAgentsPage = lazy(() => import('@/pages/automation/ai-hub/personal-agents/AiHubPersonalAgents'));
 const AiHubPersonalAgentFormPage = lazy(
     () => import('@/pages/automation/ai-hub/personal-agents/AiHubPersonalAgentForm')
@@ -859,6 +860,18 @@ export const getRouter = (queryClient: QueryClient) =>
                                         </PrivateRoute>
                                     ),
                                     path: 'ai-hub/tasks/:taskId',
+                                },
+                                {
+                                    element: (
+                                        <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN, AUTHORITIES.USER]}>
+                                            <EEVersion>
+                                                <LazyLoadWrapper hasLeftSidebar>
+                                                    <AiAutoMemoriesPage />
+                                                </LazyLoadWrapper>
+                                            </EEVersion>
+                                        </PrivateRoute>
+                                    ),
+                                    path: 'ai/memories',
                                 },
                                 {
                                     element: (

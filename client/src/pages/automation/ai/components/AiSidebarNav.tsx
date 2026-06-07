@@ -9,7 +9,10 @@ interface SectionDefinitionI {
     label: string;
 }
 
-const SKILLS_SECTIONS: SectionDefinitionI[] = [{id: 'skills', label: 'Skills'}];
+const SKILLS_SECTIONS: SectionDefinitionI[] = [
+    {id: 'skills', label: 'Skills'},
+    {id: 'memories', label: 'Memories'},
+];
 
 const GATEWAY_SECTIONS: SectionDefinitionI[] = [
     {id: 'providers', label: 'Providers'},
