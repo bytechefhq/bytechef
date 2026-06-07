@@ -616,6 +616,8 @@ include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:e
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-rest")
 include("server:ee:libs:embedded:embedded-workflow:embedded-workflow-execution:embedded-workflow-execution-service")
 
+include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api")
+include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-api")
 include("server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-impl")
