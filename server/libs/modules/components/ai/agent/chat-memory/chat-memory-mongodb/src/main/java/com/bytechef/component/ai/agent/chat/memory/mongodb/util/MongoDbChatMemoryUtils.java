@@ -28,6 +28,7 @@ import com.bytechef.component.definition.Parameters;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
+import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import java.util.ArrayList;
@@ -42,6 +43,10 @@ import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
  * @author Ivica Cardic
  */
 public class MongoDbChatMemoryUtils {
+
+    private static final MongoDriverInformation DRIVER_INFORMATION = MongoDriverInformation.builder()
+        .driverName("ByteChef")
+        .build();
 
     private MongoDbChatMemoryUtils() {
     }
@@ -59,7 +64,7 @@ public class MongoDbChatMemoryUtils {
             mongoBuilder.credential(MongoCredential.createCredential(username, databaseName, password.toCharArray()));
         }
 
-        MongoClient mongoClient = MongoClients.create(mongoBuilder.build());
+        MongoClient mongoClient = MongoClients.create(mongoBuilder.build(), DRIVER_INFORMATION);
 
         MongoTemplate mongoTemplate = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));
