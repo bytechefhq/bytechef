@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.mcp.tool.platform.util;
 
+import com.bytechef.platform.component.domain.OptionsDataSource;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.domain.BaseOption;
 import com.bytechef.platform.domain.BaseProperty;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
@@ -309,7 +311,7 @@ public final class ToolUtils {
         String required = property.getRequired() ? " (required)\"" : "\"";
         String displayCondition = property.getDisplayCondition() == null ? "" : " @" + property.displayCondition + "@";
 
-        return switch (property.getType()) {
+        String sampleValue = switch (property.getType()) {
             case PropertyDecorator.Type.ARRAY -> generateArrayValue(property.getItems());
             case PropertyDecorator.Type.BOOLEAN -> "\"boolean" + displayCondition + required;
             case PropertyDecorator.Type.DATE -> "\"date" + displayCondition + required;
@@ -325,6 +327,48 @@ public final class ToolUtils {
             case PropertyDecorator.Type.TASK -> "\"task" + displayCondition + required;
             default -> "\"string" + displayCondition + required;
         };
+
+        return appendLookupMetadata(property, sampleValue);
+    }
+
+    /**
+     * Wraps the sample value in a JSON object with {@code lookupRequired} and {@code lookupDependsOn} fields when the
+     * underlying property implements {@link OptionsDataSourceAware} with a non-null {@link OptionsDataSource}.
+     */
+    private static String appendLookupMetadata(PropertyDecorator property, String sampleValue) {
+        BaseProperty baseProperty = property.property;
+
+        if (!(baseProperty instanceof OptionsDataSourceAware optionsDataSourceAware)) {
+            return sampleValue;
+        }
+
+        OptionsDataSource optionsDataSource = optionsDataSourceAware.getOptionsDataSource();
+
+        if (optionsDataSource == null) {
+            return sampleValue;
+        }
+
+        List<String> dependsOn = optionsDataSource.getOptionsLookupDependsOn();
+
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("{ \"value\": ")
+            .append(sampleValue)
+            .append(", \"lookupRequired\": true, \"lookupDependsOn\": [");
+
+        for (int i = 0; i < dependsOn.size(); i++) {
+            if (i > 0) {
+                sb.append(", ");
+            }
+
+            sb.append("\"")
+                .append(dependsOn.get(i))
+                .append("\"");
+        }
+
+        sb.append("] }");
+
+        return sb.toString();
     }
 
     /**
