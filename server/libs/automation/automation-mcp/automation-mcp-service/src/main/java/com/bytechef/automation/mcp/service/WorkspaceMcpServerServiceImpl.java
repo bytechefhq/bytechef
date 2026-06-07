@@ -19,6 +19,7 @@ package com.bytechef.automation.mcp.service;
 import com.bytechef.automation.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.mcp.repository.WorkspaceMcpServerRepository;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,16 @@ public class WorkspaceMcpServerServiceImpl implements WorkspaceMcpServerService 
     @Transactional(readOnly = true)
     public List<WorkspaceMcpServer> getWorkspaceMcpServers(Long workspaceId) {
         return workspaceMcpServerRepository.findAllByWorkspaceId(workspaceId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<Long> fetchWorkspaceIdByMcpServerId(Long mcpServerId) {
+        List<WorkspaceMcpServer> workspaceMcpServers = workspaceMcpServerRepository.findByMcpServerId(mcpServerId);
+
+        return workspaceMcpServers.stream()
+            .map(WorkspaceMcpServer::getWorkspaceId)
+            .findFirst();
     }
 
     @Override
