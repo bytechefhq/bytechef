@@ -79,15 +79,15 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
 
         UserMessage userMessage = new UserMessage();
 
-        userMessage.setId(UUID.randomUUID()
-            .toString());
+        UUID uuid = UUID.randomUUID();
+
+        userMessage.setId(uuid.toString());
+
         userMessage.setContent(prompt);
 
         RunAgentParameters parameters = RunAgentParameters.builder()
-            .threadId(UUID.randomUUID()
-                .toString())
-            .runId(UUID.randomUUID()
-                .toString())
+            .threadId(uuid.toString())
+            .runId(uuid.toString())
             .messages(List.<BaseMessage>of(userMessage))
             .state(state)
             .build();
