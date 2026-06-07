@@ -5,6 +5,7 @@
  */
 package com.bytechef.platform.workflow.test.web.rest;
 
+import com.bytechef.platform.workflow.test.web.rest.model.WorkflowTestVoiceSessionTokenModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -32,7 +33,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.495981+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.602696+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "workflow-test", description = "The Platform Workflow Test Internal API")
 public interface WorkflowTestApi {
@@ -40,6 +41,47 @@ public interface WorkflowTestApi {
     default Optional<NativeWebRequest> getRequest() {
         return Optional.empty();
     }
+
+    String PATH_ISSUE_WORKFLOW_TEST_VOICE_SESSION_TOKEN = "/workflow-tests/{workflowId}/voice-session-token";
+    /**
+     * POST /workflow-tests/{workflowId}/voice-session-token : Issue workflow-test voice session token
+     * Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user&#39;s session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.
+     *
+     * @param workflowId Id of the workflow to test. (required)
+     * @return Token issued. (status code 200)
+     */
+    @Operation(
+        operationId = "issueWorkflowTestVoiceSessionToken",
+        summary = "Issue workflow-test voice session token",
+        description = "Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user's session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.",
+        tags = { "workflow-test" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "Token issued.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = WorkflowTestVoiceSessionTokenModel.class))
+            })
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = WorkflowTestApi.PATH_ISSUE_WORKFLOW_TEST_VOICE_SESSION_TOKEN,
+        produces = { "application/json" }
+    )
+    default ResponseEntity<WorkflowTestVoiceSessionTokenModel> issueWorkflowTestVoiceSessionToken(
+        @Parameter(name = "workflowId", description = "Id of the workflow to test.", required = true, in = ParameterIn.PATH) @PathVariable("workflowId") String workflowId
+    ) {
+        getRequest().ifPresent(request -> {
+            for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
+                if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+                    String exampleString = "{ \"expiresInSeconds\" : 0, \"token\" : \"token\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    break;
+                }
+            }
+        });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
 
     String PATH_STOP_WORKFLOW_TEST = "/workflow-tests/{jobId}/stop";
     /**

@@ -7,6 +7,7 @@ package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.automation.configuration.web.rest.model.ConnectionModel;
 import org.springframework.lang.Nullable;
+import com.bytechef.automation.configuration.web.rest.model.RegisterExistingConnectionRequestModel;
 import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,7 +36,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:17.010679+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:59.729452+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connection", description = "The Automation Connection Internal API")
 public interface ConnectionApi {
@@ -136,7 +137,7 @@ public interface ConnectionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 }";
+                    String exampleString = "{ \"visibility\" : \"PRIVATE\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"credentialStoreType\" : \"DATABASE\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"managed\" : true, \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"status\" : \"ACTIVE\", \"workspaceId\" : 5 }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -185,12 +186,47 @@ public interface ConnectionApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 }, { \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"workspaceId\" : 5 } ]";
+                    String exampleString = "[ { \"visibility\" : \"PRIVATE\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"credentialStoreType\" : \"DATABASE\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"managed\" : true, \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"status\" : \"ACTIVE\", \"workspaceId\" : 5 }, { \"visibility\" : \"PRIVATE\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"credentialStoreType\" : \"DATABASE\", \"lastModifiedBy\" : \"lastModifiedBy\", \"active\" : true, \"credentialStatus\" : \"VALID\", \"tags\" : [ { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 }, { \"__version\" : 6, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"createdBy\" : \"createdBy\", \"lastModifiedDate\" : \"2000-01-23T04:56:07.000+00:00\", \"lastModifiedBy\" : \"lastModifiedBy\", \"name\" : \"name\", \"id\" : 0 } ], \"authorizationParameters\" : { \"key\" : \"\" }, \"__version\" : 5, \"connectionParameters\" : { \"key\" : \"\" }, \"createdDate\" : \"2000-01-23T04:56:07.000+00:00\", \"environmentId\" : 6, \"createdBy\" : \"createdBy\", \"managed\" : true, \"baseUri\" : \"baseUri\", \"name\" : \"name\", \"authorizationType\" : \"API_KEY\", \"componentName\" : \"componentName\", \"id\" : 1, \"parameters\" : { \"key\" : \"\" }, \"connectionVersion\" : 0, \"status\" : \"ACTIVE\", \"workspaceId\" : 5 } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }
         });
+        return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
+
+    }
+
+
+    String PATH_REGISTER_EXISTING_CONNECTION = "/connections/register-existing";
+    /**
+     * POST /connections/register-existing : Register a connection backed by an externally-provisioned credential
+     * Register a connection backed by an externally-provisioned credential.
+     *
+     * @param registerExistingConnectionRequestModel  (required)
+     * @return The connection id. (status code 200)
+     *         or Read-only store rejected the write, or secret not found at credentialRef. (status code 400)
+     */
+    @Operation(
+        operationId = "registerExistingConnection",
+        summary = "Register a connection backed by an externally-provisioned credential",
+        description = "Register a connection backed by an externally-provisioned credential.",
+        tags = { "connection" },
+        responses = {
+            @ApiResponse(responseCode = "200", description = "The connection id.", content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = Long.class))
+            }),
+            @ApiResponse(responseCode = "400", description = "Read-only store rejected the write, or secret not found at credentialRef.")
+        }
+    )
+    @RequestMapping(
+        method = RequestMethod.POST,
+        value = ConnectionApi.PATH_REGISTER_EXISTING_CONNECTION,
+        produces = { "application/json" },
+        consumes = { "application/json" }
+    )
+    default ResponseEntity<Long> registerExistingConnection(
+        @Parameter(name = "RegisterExistingConnectionRequestModel", description = "", required = true) @Valid @RequestBody RegisterExistingConnectionRequestModel registerExistingConnectionRequestModel
+    ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);
 
     }

@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Usage", description = "Token usage information.")
 @JsonTypeName("Usage")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-04-27T13:29:16.334179+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:58.575661+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class UsageModel {
 
   private @Nullable Long promptTokens;
