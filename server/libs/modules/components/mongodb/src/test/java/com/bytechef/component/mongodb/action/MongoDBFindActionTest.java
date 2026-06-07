@@ -41,6 +41,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -60,7 +61,9 @@ class MongoDBFindActionTest {
         MongoCollection<Document> mockedCollection = mock(MongoCollection.class);
         FindIterable<Document> mockedFindIterable = mock(FindIterable.class);
 
-        List<Document> expectedDocuments = List.of(new Document("name", "Joe"));
+        ObjectId objectId = new ObjectId("507f1f77bcf86cd799439011");
+
+        List<Document> foundDocuments = List.of(new Document("_id", objectId).append("name", "Joe"));
 
         ArgumentCaptor<Document> filterArgumentCaptor = ArgumentCaptor.forClass(Document.class);
 
@@ -69,7 +72,7 @@ class MongoDBFindActionTest {
         when(mockedFindIterable.limit(anyInt()))
             .thenReturn(mockedFindIterable);
         when(mockedFindIterable.into(any()))
-            .thenReturn(new ArrayList<>(expectedDocuments));
+            .thenReturn(new ArrayList<>(foundDocuments));
 
         try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class, CALLS_REAL_METHODS)) {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getMongoClient(any()))
@@ -77,10 +80,12 @@ class MongoDBFindActionTest {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getCollection(any(), any(), anyString()))
                 .thenReturn(mockedCollection);
 
-            List<Document> result = MongoDBFindAction.perform(
+            List<Map<String, Object>> result = MongoDBFindAction.perform(
                 inputParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertEquals(expectedDocuments, result);
+            // The ObjectId _id is normalized to its hex string for clean workflow output
+            assertEquals(
+                List.of(Map.of("_id", "507f1f77bcf86cd799439011", "name", "Joe")), result);
             assertEquals(new Document("active", true), filterArgumentCaptor.getValue());
 
             verify(mockedFindIterable).limit(5);

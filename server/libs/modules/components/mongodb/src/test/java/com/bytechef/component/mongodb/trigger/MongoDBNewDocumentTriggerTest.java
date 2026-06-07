@@ -21,6 +21,7 @@ import static com.bytechef.component.mongodb.constant.MongoDBConstants.ORDER_BY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
@@ -69,7 +70,7 @@ class MongoDBNewDocumentTriggerTest {
         when(mockedFindIterable.into(any()))
             .thenReturn(newDocuments);
 
-        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class)) {
+        try (MockedStatic<MongoDBUtils> mongoDBUtilsMockedStatic = mockStatic(MongoDBUtils.class, CALLS_REAL_METHODS)) {
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getMongoClient(any()))
                 .thenReturn(mockedMongoClient);
             mongoDBUtilsMockedStatic.when(() -> MongoDBUtils.getCollection(any(), any(), anyString()))
@@ -78,7 +79,11 @@ class MongoDBNewDocumentTriggerTest {
             PollOutput pollOutput = MongoDBNewDocumentTrigger.poll(
                 inputParameters, mockedConnectionParameters, closureParameters, mockedTriggerContext);
 
-            assertEquals(new PollOutput(newDocuments, Map.of("lastValue", 12), false), pollOutput);
+            // Emitted records are normalized to plain maps; the integer _id cursor is stored as-is
+            assertEquals(
+                new PollOutput(
+                    List.of(Map.of("_id", 11), Map.of("_id", 12)), Map.of("lastValue", 12), false),
+                pollOutput);
             assertEquals(new Document("_id", new Document("$gt", 10)), filterArgumentCaptor.getValue());
         }
     }

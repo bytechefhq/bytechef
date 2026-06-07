@@ -34,8 +34,9 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.InsertOneResult;
 import java.util.Map;
-import org.bson.BsonString;
+import org.bson.BsonObjectId;
 import org.bson.Document;
+import org.bson.types.ObjectId;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -58,7 +59,7 @@ class MongoDBInsertOneActionTest {
         ArgumentCaptor<Document> documentArgumentCaptor = ArgumentCaptor.forClass(Document.class);
 
         when(mockedInsertOneResult.getInsertedId())
-            .thenReturn(new BsonString("abc123"));
+            .thenReturn(new BsonObjectId(new ObjectId("507f1f77bcf86cd799439011")));
         when(mockedCollection.insertOne(documentArgumentCaptor.capture()))
             .thenReturn(mockedInsertOneResult);
 
@@ -71,7 +72,7 @@ class MongoDBInsertOneActionTest {
             Map<String, Object> result = MongoDBInsertOneAction.perform(
                 inputParameters, mockedConnectionParameters, mockedActionContext);
 
-            assertEquals(Map.of("insertedId", "BsonString{value='abc123'}"), result);
+            assertEquals(Map.of("insertedId", "507f1f77bcf86cd799439011"), result);
             assertEquals(new Document("name", "Joe"), documentArgumentCaptor.getValue());
         }
     }

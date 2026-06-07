@@ -35,7 +35,6 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.result.InsertManyResult;
 import java.util.List;
 import java.util.Map;
-import org.bson.BsonValue;
 import org.bson.Document;
 
 public class MongoDBInsertManyAction {
@@ -79,10 +78,10 @@ public class MongoDBInsertManyAction {
 
             InsertManyResult insertManyResult = collection.insertMany(documents);
 
-            List<String> insertedIds = insertManyResult.getInsertedIds()
+            List<Object> insertedIds = insertManyResult.getInsertedIds()
                 .values()
                 .stream()
-                .map(BsonValue::toString)
+                .map(MongoDBUtils::fromBsonValue)
                 .toList();
 
             return Map.of(

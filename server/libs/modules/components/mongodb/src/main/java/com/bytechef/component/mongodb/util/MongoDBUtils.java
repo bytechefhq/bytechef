@@ -30,9 +30,15 @@ import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+import java.util.Base64;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.bson.BsonValue;
 import org.bson.Document;
+import org.bson.types.Binary;
+import org.bson.types.Decimal128;
+import org.bson.types.ObjectId;
 
 public final class MongoDBUtils {
 
@@ -75,7 +81,7 @@ public final class MongoDBUtils {
             return new Document();
         }
 
-        return new Document(new java.util.LinkedHashMap<>(map));
+        return new Document(new LinkedHashMap<>(map));
     }
 
     public static List<Document> toDocuments(List<? extends Map<String, ?>> maps) {
@@ -86,5 +92,75 @@ public final class MongoDBUtils {
         return maps.stream()
             .map(MongoDBUtils::toDocument)
             .toList();
+    }
+
+    /**
+     * Converts documents returned by the driver into plain JSON-friendly maps, replacing BSON-specific types (such as
+     * {@link ObjectId}) with values that serialize cleanly in workflow output.
+     */
+    public static List<Map<String, Object>> normalizeDocuments(List<Document> documents) {
+        return documents.stream()
+            .map(MongoDBUtils::normalizeDocument)
+            .toList();
+    }
+
+    public static Map<String, Object> normalizeDocument(Document document) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Object> entry : document.entrySet()) {
+            result.put(entry.getKey(), normalizeValue(entry.getValue()));
+        }
+
+        return result;
+    }
+
+    /**
+     * Unwraps a BSON identifier (e.g. the {@code _id} returned by an insert) into a plain value, so that the value can
+     * be used directly in a subsequent filter.
+     */
+    public static Object fromBsonValue(BsonValue bsonValue) {
+        if (bsonValue == null) {
+            return null;
+        }
+
+        if (bsonValue.isObjectId()) {
+            return bsonValue.asObjectId()
+                .getValue()
+                .toHexString();
+        }
+
+        if (bsonValue.isString()) {
+            return bsonValue.asString()
+                .getValue();
+        }
+
+        if (bsonValue.isInt32()) {
+            return bsonValue.asInt32()
+                .getValue();
+        }
+
+        if (bsonValue.isInt64()) {
+            return bsonValue.asInt64()
+                .getValue();
+        }
+
+        return bsonValue.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object normalizeValue(Object value) {
+        return switch (value) {
+            case null -> null;
+            case ObjectId objectId -> objectId.toHexString();
+            case Decimal128 decimal128 -> decimal128.bigDecimalValue();
+            case Binary binary -> Base64.getEncoder()
+                .encodeToString(binary.getData());
+            case Document document -> normalizeDocument(document);
+            case Map<?, ?> map -> normalizeDocument(new Document((Map<String, Object>) map));
+            case List<?> list -> list.stream()
+                .map(MongoDBUtils::normalizeValue)
+                .toList();
+            default -> value;
+        };
     }
 }
