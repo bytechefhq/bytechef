@@ -88,20 +88,12 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
         Optional<Property> property = propertyService.fetchProperty(
             provider.getKey(), Scope.PLATFORM, null, (long) environment);
 
-        if (property.isPresent() && property.get()
-            .isEnabled()) {
-
-            Object apiKey = property.get()
-                .get("apiKey");
-
-            if (apiKey != null && !apiKey.toString()
-                .isBlank()) {
-
-                return apiKey.toString();
-            }
-        }
-
-        return configApiKey(provider);
+        return property
+            .filter(Property::isEnabled)
+            .map(enabledProperty -> enabledProperty.get("apiKey"))
+            .map(Object::toString)
+            .filter(apiKey -> !apiKey.isBlank())
+            .orElseGet(() -> configApiKey(provider));
     }
 
     private @Nullable String configApiKey(Provider provider) {
