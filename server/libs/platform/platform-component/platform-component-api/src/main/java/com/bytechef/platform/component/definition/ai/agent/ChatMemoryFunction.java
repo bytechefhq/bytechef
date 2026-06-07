@@ -37,17 +37,6 @@ public interface ChatMemoryFunction {
     ClusterElementType CHAT_MEMORY = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Memory");
 
     /**
-     * Holds the advisor and the backing {@link ChatMemory} together so callers can read conversation history without
-     * building a second memory instance. {@code chatMemory} is {@code null} for advisor types (e.g. VectorStore) that
-     * do not expose a standard {@link ChatMemory}.
-     */
-    @SuppressFBWarnings({
-        "EI", "EI2"
-    })
-    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
-    }
-
-    /**
      * @param inputParameters
      * @param connectionParameters
      * @param extensions
@@ -58,4 +47,15 @@ public interface ChatMemoryFunction {
     Result apply(
         Parameters inputParameters, Parameters connectionParameters, Parameters extensions,
         Map<String, ComponentConnection> componentConnections) throws Exception;
+
+    /**
+     * Holds the advisor and the backing {@link ChatMemory} together so callers can read conversation history without
+     * building a second memory instance. {@code chatMemory} is {@code null} for advisor types (e.g. VectorStore) that
+     * do not expose a standard {@link ChatMemory}.
+     */
+    @SuppressFBWarnings({
+        "EI", "EI2"
+    })
+    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
+    }
 }
