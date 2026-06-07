@@ -24,24 +24,23 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Cluster Element Copilot subagent to the parent ai_hub
- * agent.
+ * Hand-rolled Spring AI {@link ToolCallback} that exposes the Code Editor Copilot subagent to the parent ai_hub agent.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class ClusterElementAgentToolCallback implements ToolCallback {
+public class CodeEditorAgentToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(ClusterElementAgentToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(CodeEditorAgentToolCallback.class);
 
     private static final String DESCRIPTION =
         """
-            Delegate a user request about cluster elements to a specialised Cluster Element subagent.
-            Cluster elements are the slotted child operations inside cluster-root components (AI Agent,
-            Knowledge Base, etc.) — model, chat memory, RAG source, guardrails, tools. The subagent owns
-            the canonical behaviour for designing, editing, and explaining cluster element configuration;
-            prefer calling it over reasoning about cluster element shape directly.""";
+            Delegate a user request about embedded script code to a specialised Code Editor subagent.
+            Use this for requests that write, edit, debug, or explain JavaScript / Python / Ruby script
+            embedded inside a workflow task. The subagent owns the canonical behaviour for this domain;
+            prefer calling it over generating script code directly. Returns the updated script (BUILD)
+            or an explanation (ASK).""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -56,18 +55,18 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient clusterElementChatClient;
+    private final ChatClient codeEditorChatClient;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public ClusterElementAgentToolCallback(ChatClient clusterElementChatClient) {
-        this.clusterElementChatClient = clusterElementChatClient;
+    public CodeEditorAgentToolCallback(ChatClient codeEditorChatClient) {
+        this.codeEditorChatClient = codeEditorChatClient;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("cluster_element_agent")
+            .name("code_editor_agent")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -81,7 +80,7 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            ClusterElementAgentInput input = jsonMapper.readValue(toolInput, ClusterElementAgentInput.class);
+            CodeEditorAgentInput input = jsonMapper.readValue(toolInput, CodeEditorAgentInput.class);
 
             String request = input.request();
 
@@ -94,29 +93,29 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.CLUSTER_ELEMENT_AGENT, parentAgent,
-                () -> clusterElementChatClient.prompt(request)
+            String result = CurrentAgentContext.callWith(Agent.CODE_EDITOR_AGENT, parentAgent,
+                () -> codeEditorChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
                     .content());
 
             if (result == null) {
-                log.warn("cluster_element subagent returned null for request='{}'", request);
+                log.warn("code_editor subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "cluster_element subagent returned null");
+                return ToolErrors.toolError(jsonMapper, "code_editor subagent returned null");
             }
 
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "cluster_element_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "code_editor_agent rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, ClusterElementAgentToolCallback.class, "cluster_element_agent", exception);
+                jsonMapper, CodeEditorAgentToolCallback.class, "code_editor_agent", exception);
         }
     }
 
@@ -124,6 +123,6 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
         return ToolErrors.toolError(jsonMapper, message);
     }
 
-    public record ClusterElementAgentInput(String request) {
+    public record CodeEditorAgentInput(String request) {
     }
 }
