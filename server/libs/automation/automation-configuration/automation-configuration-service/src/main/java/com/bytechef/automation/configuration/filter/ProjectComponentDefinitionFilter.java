@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class ProjectComponentDefinitionFilter implements ComponentDefinitionFilter {
 
-    private static final List<String> COMPONENT_NAMES = List.of("appEvent", "request");
+    private static final List<String> COMPONENT_NAMES = List.of("appEvent", "embeddedWorkflowBuilder", "request");
 
     @Override
     public boolean filter(ComponentDefinition componentDefinition) {
