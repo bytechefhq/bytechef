@@ -14,7 +14,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.ee.ai.hub.tool.AiHubToolInvocationContext;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
@@ -138,10 +137,7 @@ class ClusterElementAgentToolCallbackTest {
         when(requestSpec.call()).thenReturn(responseSpec);
         when(responseSpec.content()).thenReturn("ok");
 
-        AiHubToolInvocationContext invocationContext =
-            new AiHubToolInvocationContext(11L, 42L, (short) 0, "describe the cluster", 1L);
-
-        Map<String, Object> parentContextMap = invocationContext.toToolContext();
+        Map<String, Object> parentContextMap = Map.of("workspaceId", 11L, "userId", 42L);
 
         ToolContext parentToolContext = new ToolContext(parentContextMap);
 
