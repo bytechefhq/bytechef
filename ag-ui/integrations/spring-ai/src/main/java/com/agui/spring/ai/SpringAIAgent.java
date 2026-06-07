@@ -175,6 +175,33 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     /**
+     * Hook for subclasses to contribute per-invocation values into Spring AI's
+     * {@link org.springframework.ai.chat.model.ToolContext}. The returned map is merged into the request via
+     * {@code ChatClient.ChatClientRequestSpec.toolContext(Map)} and reaches every {@link ToolCallback#call(String,
+     * org.springframework.ai.chat.model.ToolContext) toolCallback.call} invocation regardless of which thread eventually
+     * executes it. Default returns an empty map (no-op).
+     *
+     * @param input the current run input
+     * @return the per-invocation ToolContext entries (never {@code null})
+     */
+    protected Map<String, Object> toolContext(RunAgentInput input) {
+        return Collections.emptyMap();
+    }
+
+    /**
+     * Hook for subclasses to contribute per-invocation {@link ToolCallback} instances on top of the static set
+     * configured at builder time. The returned list is concatenated with the builder-supplied
+     * {@link #toolCallbacks} before {@code ChatClient.ChatClientRequestSpec.toolCallbacks(...)} is called, so
+     * the LLM sees union(static, dynamic) for this turn only. Default returns an empty list (no-op).
+     *
+     * @param input the current run input
+     * @return additional per-invocation tool callbacks (never {@code null})
+     */
+    protected List<ToolCallback> additionalToolCallbacks(RunAgentInput input) {
+        return Collections.emptyList();
+    }
+
+    /**
      * Handles individual chat response events from the streaming response.
      *
      * This method processes each chunk of the streaming response and emits
@@ -197,11 +224,6 @@ public class SpringAIAgent extends LocalAgent {
                     var call = new ToolCall(toolCall.id(), "function", new FunctionCall(toolCall.name(), toolCall.arguments()));
 
                     assistantMessage.getToolCalls().add(call);
-
-                    var toolCallId = toolCall.id();
-                    deferredEvents.add(toolCallStartEvent(messageId, toolCall.name(), toolCallId));
-                    deferredEvents.add(toolCallArgsEvent(toolCall.arguments(), toolCallId));
-                    deferredEvents.add(toolCallEndEvent(toolCallId));
 
                     subscriber.onNewToolCall(call);
                 });
@@ -250,6 +272,25 @@ public class SpringAIAgent extends LocalAgent {
     }
 
     /**
+     * Hook for subclasses to select a different ChatClient per request based on input state.
+     *
+     * <p>Default returns the builder-time client (constructed from {@link Builder#chatModel(ChatModel)}). Subclasses
+     * that need per-request model resolution — e.g. a host application that picks the model based on a per-agent or
+     * per-user setting carried in {@link RunAgentInput#state()} — can override this method to return a freshly built
+     * client over the resolved {@link ChatModel}. Implementations should cache the resolved client where appropriate;
+     * the default {@link ChatClient.Builder#build()} is cheap but not free.
+     *
+     * <p>Backward-compat note: every existing call site of {@code this.chatClient} in this class routes through this
+     * method, so non-overriding subclasses see exactly the same behaviour as before this hook existed.
+     *
+     * @param input the current run input (state, messages, tools, context)
+     * @return the {@link ChatClient} to use for this request; must not be {@code null}
+     */
+    protected ChatClient resolveChatClient(RunAgentInput input) {
+        return this.chatClient;
+    }
+
+    /**
      * Constructs and configures the Spring AI ChatClient request specification.
      *
      * This method builds a complete chat request by combining:
@@ -268,7 +309,7 @@ public class SpringAIAgent extends LocalAgent {
      * @return configured ChatClient request specification ready for execution
      */
     private ChatClient.ChatClientRequestSpec getChatRequest(RunAgentInput input, String content, String messageId, List<BaseEvent> deferredEvents, SystemMessage systemMessage, AgentSubscriber subscriber) throws AGUIException {
-        ChatClient.ChatClientRequestSpec chatRequest = this.chatClient.prompt(
+        ChatClient.ChatClientRequestSpec chatRequest = resolveChatClient(input).prompt(
             Prompt
                 .builder()
                 .content(content)
@@ -301,10 +342,16 @@ public class SpringAIAgent extends LocalAgent {
             }
         }
 
-        if (!this.toolCallbacks.isEmpty()) {
+        List<ToolCallback> dynamicCallbacks = this.additionalToolCallbacks(input);
+        List<ToolCallback> mergedCallbacks = new ArrayList<>(this.toolCallbacks);
+        if (dynamicCallbacks != null && !dynamicCallbacks.isEmpty()) {
+            mergedCallbacks.addAll(dynamicCallbacks);
+        }
+
+        if (!mergedCallbacks.isEmpty()) {
             try {
                 chatRequest = chatRequest.toolCallbacks(
-                    this.toolCallbacks
+                    mergedCallbacks
                         .stream()
                         .map(toolCallback -> new AgUiFunctionToolCallback(toolCallback, (AgUiToolCallbackParams params) -> {
                             var toolCallId = UUID.randomUUID().toString();
@@ -339,6 +386,16 @@ public class SpringAIAgent extends LocalAgent {
                 chatRequest.advisors(a -> a.param(ChatMemory.CONVERSATION_ID, input.threadId()));
             } catch (RuntimeException e) {
                 throw new AGUIException("Could not add chat memory", e);
+            }
+        }
+
+        Map<String, Object> toolContext = this.toolContext(input);
+
+        if (toolContext != null && !toolContext.isEmpty()) {
+            try {
+                chatRequest = chatRequest.toolContext(toolContext);
+            } catch (RuntimeException e) {
+                throw new AGUIException("Could not add tool context", e);
             }
         }
 
