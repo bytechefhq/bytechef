@@ -29,7 +29,6 @@ public class UpdateConnectedUserWorkflowAction {
     public static final String DEFINITION = "definition";
     public static final String WORKFLOW_UUID = "workflowUuid";
 
-    @SuppressFBWarnings("EI2")
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @SuppressFBWarnings("EI2")

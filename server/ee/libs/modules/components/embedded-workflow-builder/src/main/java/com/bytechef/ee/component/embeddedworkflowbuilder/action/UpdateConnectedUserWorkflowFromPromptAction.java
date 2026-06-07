@@ -29,7 +29,6 @@ public class UpdateConnectedUserWorkflowFromPromptAction {
     public static final String PROMPT = "prompt";
     public static final String WORKFLOW_UUID = "workflowUuid";
 
-    @SuppressFBWarnings("EI2")
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @SuppressFBWarnings("EI2")
