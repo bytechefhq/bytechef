@@ -301,6 +301,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-graphql"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-service"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-service"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-file-storage:platform-ai-skill-file-storage-impl"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-graphql"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-rest"))

@@ -8,20 +8,20 @@
 package com.bytechef.ee.ai.copilot.agent;
 
 import com.agui.core.state.State;
-import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
-import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
-import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
-import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
-import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
+import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
+// Gateway resolver path disabled for now — see the commented block at the bottom of this class.
+// import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
+// import com.bytechef.ee.automation.ai.gateway.service.WorkspaceAiGatewayProviderService;
+// import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProvider;
+// import com.bytechef.ee.platform.ai.gateway.domain.AiGatewayProviderType;
+// import com.bytechef.ee.platform.ai.gateway.provider.AiGatewayChatModelFactory;
+// import com.bytechef.ee.platform.ai.gateway.service.AiGatewayProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -56,18 +56,17 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
      */
     static final String WORKSPACE_ID_KEY = "workspaceId";
 
-    private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
-    private final AiGatewayProviderService aiGatewayProviderService;
-    private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
+    /**
+     * AG-UI state key for the active environment id (client-supplied). Used to resolve the platform AI provider catalog
+     * API key for the chosen provider.
+     */
+    static final String ENVIRONMENT_ID_KEY = "environmentId";
+
+    private final CatalogChatClientResolver catalogChatClientResolver;
 
     @SuppressFBWarnings("EI")
-    public CopilotChatClientResolver(
-        WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService,
-        AiGatewayProviderService aiGatewayProviderService, AiGatewayChatModelFactory aiGatewayChatModelFactory) {
-
-        this.workspaceAiGatewayProviderService = workspaceAiGatewayProviderService;
-        this.aiGatewayProviderService = aiGatewayProviderService;
-        this.aiGatewayChatModelFactory = aiGatewayChatModelFactory;
+    public CopilotChatClientResolver(CatalogChatClientResolver catalogChatClientResolver) {
+        this.catalogChatClientResolver = catalogChatClientResolver;
     }
 
     @Override
@@ -89,53 +88,14 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        Long workspaceId = asLong(state.get(WORKSPACE_ID_KEY));
+        Long environment = asLong(state.get(ENVIRONMENT_ID_KEY));
 
-        if (workspaceId == null) {
-            log.warn(
-                "Copilot user-selected LLM override skipped: state has no parseable workspaceId. Falling back to "
-                    + "workspace default for this turn.");
+        if (environment != null) {
+            ChatClient catalogChatClient = catalogChatClientResolver.resolve(
+                environment.intValue(), llmProvider, llmModel);
 
-            return null;
-        }
-
-        AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
-
-        if (provider == null) {
-            log.warn(
-                "Copilot user-selected LLM override skipped: workspace {} has no enabled provider matching '{}'. "
-                    + "Falling back to workspace default for this turn.",
-                workspaceId, llmProvider);
-
-            return null;
-        }
-
-        ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
-
-        return ChatClient.builder(chatModel)
-            .defaultOptions(
-                ChatOptions.builder()
-                    .model(llmModel))
-            .build();
-    }
-
-    private @Nullable AiGatewayProvider resolveProvider(long workspaceId, String llmProvider) {
-        for (WorkspaceAiGatewayProvider workspaceProvider : workspaceAiGatewayProviderService
-            .getWorkspaceProviders(workspaceId)) {
-
-            AiGatewayProvider aiGatewayProvider = aiGatewayProviderService.getProvider(
-                workspaceProvider.getProviderId());
-
-            if (aiGatewayProvider == null || !aiGatewayProvider.isEnabled()) {
-                continue;
-            }
-
-            AiGatewayProviderType type = aiGatewayProvider.getType();
-
-            String name = type.name();
-
-            if (name.equalsIgnoreCase(llmProvider)) {
-                return aiGatewayProvider;
+            if (catalogChatClient != null) {
+                return catalogChatClient;
             }
         }
 
@@ -161,4 +121,65 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
     }
+
+    // ---------------------------------------------------------------------------------------------------------------
+    // AI Gateway fallback path — disabled for now. Restore by re-adding the gateway imports/fields/constructor params
+    // and inlining the block below after the catalog attempt in resolve(...).
+    // ---------------------------------------------------------------------------------------------------------------
+    //
+    // private final WorkspaceAiGatewayProviderService workspaceAiGatewayProviderService;
+    // private final AiGatewayProviderService aiGatewayProviderService;
+    // private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
+    //
+    // Long workspaceId = asLong(state.get(WORKSPACE_ID_KEY));
+    //
+    // if (workspaceId == null) {
+    // log.warn(
+    // "Copilot user-selected LLM override skipped: state has no parseable workspaceId. Falling back to "
+    // + "workspace default for this turn.");
+    //
+    // return null;
+    // }
+    //
+    // AiGatewayProvider provider = resolveProvider(workspaceId, llmProvider);
+    //
+    // if (provider == null) {
+    // log.warn(
+    // "Copilot user-selected LLM override skipped: workspace {} has no enabled provider matching '{}'. "
+    // + "Falling back to workspace default for this turn.",
+    // workspaceId, llmProvider);
+    //
+    // return null;
+    // }
+    //
+    // ChatModel chatModel = aiGatewayChatModelFactory.getChatModel(provider);
+    //
+    // return ChatClient.builder(chatModel)
+    // .defaultOptions(
+    // ChatOptions.builder()
+    // .model(llmModel))
+    // .build();
+    //
+    // private @Nullable AiGatewayProvider resolveProvider(long workspaceId, String llmProvider) {
+    // for (WorkspaceAiGatewayProvider workspaceProvider : workspaceAiGatewayProviderService
+    // .getWorkspaceProviders(workspaceId)) {
+    //
+    // AiGatewayProvider aiGatewayProvider = aiGatewayProviderService.getProvider(
+    // workspaceProvider.getProviderId());
+    //
+    // if (aiGatewayProvider == null || !aiGatewayProvider.isEnabled()) {
+    // continue;
+    // }
+    //
+    // AiGatewayProviderType type = aiGatewayProvider.getType();
+    //
+    // String name = type.name();
+    //
+    // if (name.equalsIgnoreCase(llmProvider)) {
+    // return aiGatewayProvider;
+    // }
+    // }
+    //
+    // return null;
+    // }
 }
