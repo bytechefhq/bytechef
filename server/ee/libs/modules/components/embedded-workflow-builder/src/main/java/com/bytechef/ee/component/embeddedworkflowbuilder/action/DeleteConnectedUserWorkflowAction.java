@@ -28,7 +28,6 @@ public class DeleteConnectedUserWorkflowAction {
 
     public static final String WORKFLOW_UUID = "workflowUuid";
 
-    @SuppressFBWarnings("EI2")
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @SuppressFBWarnings("EI2")

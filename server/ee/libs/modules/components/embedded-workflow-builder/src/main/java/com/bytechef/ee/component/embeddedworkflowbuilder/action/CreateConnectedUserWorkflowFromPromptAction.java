@@ -28,7 +28,6 @@ public class CreateConnectedUserWorkflowFromPromptAction {
 
     public static final String PROMPT = "prompt";
 
-    @SuppressFBWarnings("EI2")
     private final ConnectedUserProjectFacade connectedUserProjectFacade;
 
     @SuppressFBWarnings("EI2")
