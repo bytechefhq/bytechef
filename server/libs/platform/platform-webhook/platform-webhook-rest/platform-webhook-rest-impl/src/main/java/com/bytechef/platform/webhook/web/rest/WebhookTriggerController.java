@@ -26,6 +26,7 @@ import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.job.sync.SseStreamBridge;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutionFacade;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
@@ -36,7 +37,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -65,18 +65,21 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerController.class);
 
+    private final WebhookWorkflowExecutionFacade webhookWorkflowExecutionFacade;
     private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerController(
         ApplicationProperties applicationProperties, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         TempFileStorage tempFileStorage, TriggerDefinitionService triggerDefinitionService,
-        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowService workflowService) {
+        WebhookWorkflowExecutionFacade webhookWorkflowExecutionFacade, WebhookWorkflowExecutor webhookWorkflowExecutor,
+        WorkflowService workflowService) {
 
         super(
             jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(), tempFileStorage,
             triggerDefinitionService, webhookWorkflowExecutor, workflowService);
 
+        this.webhookWorkflowExecutionFacade = webhookWorkflowExecutionFacade;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
@@ -109,10 +112,11 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
             ResponseEntity<?> responseEntity;
 
             boolean head = Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name());
-            boolean disabled = isWorkflowDisabled(workflowExecutionId);
+            boolean disabled = webhookWorkflowExecutionFacade.isWorkflowDisabled(workflowExecutionId);
 
             if (head || disabled) {
-                WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+                WebhookTriggerFlags webhookTriggerFlags =
+                    webhookWorkflowExecutionFacade.getWebhookTriggerFlags(workflowExecutionId);
 
                 WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
@@ -162,25 +166,10 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
 
-            if (isWorkflowDisabled(workflowExecutionId)) {
-                bridge.onError(new IllegalStateException("Workflow is disabled."));
-
-                return emitter;
-            }
-
             WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
-                workflowExecutionId, webhookRequest, bridge);
-
-            future.whenComplete((unused, throwable) -> {
-                if (throwable != null) {
-                    bridge.onError(throwable);
-                } else {
-                    bridge.onComplete();
-                }
-            });
+            webhookWorkflowExecutionFacade.executeStreaming(workflowExecutionId, webhookRequest, bridge);
 
             return emitter;
         });
