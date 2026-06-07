@@ -10,6 +10,7 @@ docs/WebhookRetry.md
 docs/WorkflowTask.md
 docs/WorkflowTestApi.md
 docs/WorkflowTestExecution.md
+docs/WorkflowTestVoiceSessionToken.md
 docs/WorkflowTrigger.md
 index.ts
 models/ComponentConnection.ts
@@ -21,6 +22,7 @@ models/Webhook.ts
 models/WebhookRetry.ts
 models/WorkflowTask.ts
 models/WorkflowTestExecution.ts
+models/WorkflowTestVoiceSessionToken.ts
 models/WorkflowTrigger.ts
 models/index.ts
 runtime.ts

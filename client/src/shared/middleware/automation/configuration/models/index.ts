@@ -21,6 +21,7 @@ export * from './ProjectDeploymentWorkflowConnection';
 export * from './ProjectStatus';
 export * from './ProjectVersion';
 export * from './PublishProjectRequest';
+export * from './RegisterExistingConnectionRequest';
 export * from './StartWebhookTriggerTest200Response';
 export * from './Tag';
 export * from './UpdateConnectionRequest';

@@ -26,11 +26,11 @@ import {
 
 export interface CreateConnectedUserConnectionRequest {
     connectedUserId: number;
-    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'sharedProjectIds'|'status'>;
+    connection: Omit<Connection, 'active'|'managed'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'>;
 }
 
 export interface CreateConnectionRequest {
-    connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'sharedProjectIds'|'status'>;
+    connection: Omit<Connection, 'active'|'managed'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'>;
 }
 
 export interface DeleteConnectionRequest {

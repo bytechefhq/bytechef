@@ -48,6 +48,12 @@ export interface Connection {
      */
     readonly active?: boolean;
     /**
+     * True when this connection is system-managed (e.g. an enabled AI provider) and cannot be edited or deleted.
+     * @type {boolean}
+     * @memberof Connection
+     */
+    readonly managed?: boolean;
+    /**
      * 
      * @type {AuthorizationType}
      * @memberof Connection
@@ -102,6 +108,12 @@ export interface Connection {
      */
     credentialStatus?: CredentialStatus;
     /**
+     * Backend that stores the credential payload. Defaults to DATABASE.
+     * @type {ConnectionCredentialStoreTypeEnum}
+     * @memberof Connection
+     */
+    credentialStoreType?: ConnectionCredentialStoreTypeEnum;
+    /**
      * The id of an environment.
      * @type {number}
      * @memberof Connection
@@ -138,12 +150,6 @@ export interface Connection {
      */
     parameters: { [key: string]: any; };
     /**
-     * IDs of projects this connection is shared with. Typically populated when visibility is PROJECT.
-     * @type {Array<number>}
-     * @memberof Connection
-     */
-    readonly sharedProjectIds?: Array<number>;
-    /**
      * 
      * @type {Array<Tag>}
      * @memberof Connection
@@ -156,7 +162,7 @@ export interface Connection {
      */
     readonly status?: ConnectionStatusEnum;
     /**
-     * Visibility scope controlling which users can see and use a connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. PROJECT and ORGANIZATION are assigned by share / organization flows, not by direct client request. On CE or embedded surfaces the server always forces PRIVATE regardless of the request body.
+     * Visibility scope controlling which users can see and use a connection. Accepted on create: PRIVATE (default) or WORKSPACE — setting WORKSPACE requires ROLE_ADMIN. ORGANIZATION is assigned by organization flows, not by direct client request. On CE or embedded surfaces the server always forces PRIVATE regardless of the request body.
      * @type {ConnectionVisibilityEnum}
      * @memberof Connection
      */
@@ -173,6 +179,16 @@ export interface Connection {
 /**
  * @export
  */
+export const ConnectionCredentialStoreTypeEnum = {
+    Database: 'DATABASE',
+    AwsSecretsManager: 'AWS_SECRETS_MANAGER',
+    HashicorpVault: 'HASHICORP_VAULT'
+} as const;
+export type ConnectionCredentialStoreTypeEnum = typeof ConnectionCredentialStoreTypeEnum[keyof typeof ConnectionCredentialStoreTypeEnum];
+
+/**
+ * @export
+ */
 export const ConnectionStatusEnum = {
     Active: 'ACTIVE',
     PendingReassignment: 'PENDING_REASSIGNMENT',
@@ -185,7 +201,6 @@ export type ConnectionStatusEnum = typeof ConnectionStatusEnum[keyof typeof Conn
  */
 export const ConnectionVisibilityEnum = {
     Private: 'PRIVATE',
-    Project: 'PROJECT',
     Workspace: 'WORKSPACE',
     Organization: 'ORGANIZATION'
 } as const;
@@ -214,6 +229,7 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
     return {
         
         'active': json['active'] == null ? undefined : json['active'],
+        'managed': json['managed'] == null ? undefined : json['managed'],
         'authorizationType': json['authorizationType'] == null ? undefined : AuthorizationTypeFromJSON(json['authorizationType']),
         'authorizationParameters': json['authorizationParameters'] == null ? undefined : json['authorizationParameters'],
         'baseUri': json['baseUri'] == null ? undefined : json['baseUri'],
@@ -223,13 +239,13 @@ export function ConnectionFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'createdBy': json['createdBy'] == null ? undefined : json['createdBy'],
         'createdDate': json['createdDate'] == null ? undefined : (new Date(json['createdDate'])),
         'credentialStatus': json['credentialStatus'] == null ? undefined : CredentialStatusFromJSON(json['credentialStatus']),
+        'credentialStoreType': json['credentialStoreType'] == null ? undefined : json['credentialStoreType'],
         'environmentId': json['environmentId'] == null ? undefined : json['environmentId'],
         'id': json['id'] == null ? undefined : json['id'],
         'lastModifiedBy': json['lastModifiedBy'] == null ? undefined : json['lastModifiedBy'],
         'lastModifiedDate': json['lastModifiedDate'] == null ? undefined : (new Date(json['lastModifiedDate'])),
         'name': json['name'],
         'parameters': json['parameters'],
-        'sharedProjectIds': json['sharedProjectIds'] == null ? undefined : json['sharedProjectIds'],
         'tags': json['tags'] == null ? undefined : ((json['tags'] as Array<any>).map(TagFromJSON)),
         'status': json['status'] == null ? undefined : json['status'],
         'visibility': json['visibility'] == null ? undefined : json['visibility'],
@@ -241,7 +257,7 @@ export function ConnectionToJSON(json: any): Connection {
     return ConnectionToJSONTyped(json, false);
 }
 
-export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'sharedProjectIds'|'status'> | null, ignoreDiscriminator: boolean = false): any {
+export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'managed'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'status'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
@@ -253,6 +269,7 @@ export function ConnectionToJSONTyped(value?: Omit<Connection, 'active'|'authori
         'componentName': value['componentName'],
         'connectionVersion': value['connectionVersion'],
         'credentialStatus': CredentialStatusToJSON(value['credentialStatus']),
+        'credentialStoreType': value['credentialStoreType'],
         'environmentId': value['environmentId'],
         'name': value['name'],
         'parameters': value['parameters'],

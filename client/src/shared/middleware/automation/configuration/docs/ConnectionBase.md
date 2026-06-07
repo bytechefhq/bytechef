@@ -17,13 +17,13 @@ Name | Type
 `createdBy` | string
 `createdDate` | Date
 `credentialStatus` | [CredentialStatus](CredentialStatus.md)
+`credentialStoreType` | string
 `environmentId` | number
 `id` | number
 `lastModifiedBy` | string
 `lastModifiedDate` | Date
 `name` | string
 `parameters` | { [key: string]: any; }
-`sharedProjectIds` | Array&lt;number&gt;
 `tags` | [Array&lt;Tag&gt;](Tag.md)
 `status` | string
 `visibility` | string
@@ -46,13 +46,13 @@ const example = {
   "createdBy": null,
   "createdDate": null,
   "credentialStatus": null,
+  "credentialStoreType": null,
   "environmentId": null,
   "id": null,
   "lastModifiedBy": null,
   "lastModifiedDate": null,
   "name": null,
   "parameters": null,
-  "sharedProjectIds": null,
   "tags": null,
   "status": null,
   "visibility": null,

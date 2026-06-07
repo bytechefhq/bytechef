@@ -13,6 +13,15 @@
  */
 
 import * as runtime from '../runtime';
+import {
+    type WorkflowTestVoiceSessionToken,
+    WorkflowTestVoiceSessionTokenFromJSON,
+    WorkflowTestVoiceSessionTokenToJSON,
+} from '../models/WorkflowTestVoiceSessionToken';
+
+export interface IssueWorkflowTestVoiceSessionTokenRequest {
+    workflowId: string;
+}
 
 export interface StopWorkflowTestRequest {
     jobId: string;
@@ -22,6 +31,53 @@ export interface StopWorkflowTestRequest {
  * 
  */
 export class WorkflowTestApi extends runtime.BaseAPI {
+
+    /**
+     * Creates request options for issueWorkflowTestVoiceSessionToken without sending the request
+     */
+    async issueWorkflowTestVoiceSessionTokenRequestOpts(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['workflowId'] == null) {
+            throw new runtime.RequiredError(
+                'workflowId',
+                'Required parameter "workflowId" was null or undefined when calling issueWorkflowTestVoiceSessionToken().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-tests/{workflowId}/voice-session-token`;
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
+
+        return {
+            path: urlPath,
+            method: 'POST',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user\'s session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.
+     * Issue workflow-test voice session token
+     */
+    async issueWorkflowTestVoiceSessionTokenRaw(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<WorkflowTestVoiceSessionToken>> {
+        const requestOptions = await this.issueWorkflowTestVoiceSessionTokenRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => WorkflowTestVoiceSessionTokenFromJSON(jsonValue));
+    }
+
+    /**
+     * Mint a single-use, short-lived token authorizing a browser to open a workflow-test voice WebSocket at /internal/workflow-tests/{workflowId}/wss. The token is keyed to the user\'s session cookie at mint time; the WS upgrade validates the token and discards it. TTL is 60 seconds.
+     * Issue workflow-test voice session token
+     */
+    async issueWorkflowTestVoiceSessionToken(requestParameters: IssueWorkflowTestVoiceSessionTokenRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowTestVoiceSessionToken> {
+        const response = await this.issueWorkflowTestVoiceSessionTokenRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
 
     /**
      * Creates request options for stopWorkflowTest without sending the request

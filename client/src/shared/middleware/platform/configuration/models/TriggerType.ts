@@ -23,7 +23,8 @@ export const TriggerType = {
     Hybrid: 'HYBRID',
     Listener: 'LISTENER',
     Polling: 'POLLING',
-    DynamicWebhook: 'DYNAMIC_WEBHOOK'
+    DynamicWebhook: 'DYNAMIC_WEBHOOK',
+    Websocket: 'WEBSOCKET'
 } as const;
 export type TriggerType = typeof TriggerType[keyof typeof TriggerType];
 
