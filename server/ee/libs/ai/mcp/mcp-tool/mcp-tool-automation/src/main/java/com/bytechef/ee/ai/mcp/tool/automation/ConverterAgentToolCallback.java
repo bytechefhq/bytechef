@@ -24,23 +24,23 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 /**
- * Hand-rolled Spring AI {@link ToolCallback} that exposes the Skills Copilot subagent to the parent ai_hub agent.
+ * Hand-rolled Spring AI {@link ToolCallback} that exposes the Converter Copilot subagent to the parent ai_hub BUILD
+ * agent. BUILD-only — there is no ASK variant of the Converter Copilot specialist.
  *
  * @version ee
  *
  * @author Ivica Cardic
  */
-public class SkillsAgentToolCallback implements ToolCallback {
+public class ConverterAgentToolCallback implements ToolCallback {
 
-    private static final Logger log = LoggerFactory.getLogger(SkillsAgentToolCallback.class);
+    private static final Logger log = LoggerFactory.getLogger(ConverterAgentToolCallback.class);
 
     private static final String DESCRIPTION =
         """
-            Delegate a user request about workflow Skills to a specialised Skills subagent.
-            Skills are reusable parameterised workflow templates the user can compose into projects.
-            The subagent owns the canonical behaviour for listing, explaining, creating, updating, and
-            composing Skills; prefer calling it over reasoning about skills directly. The result is a
-            synthesised markdown report or, in build mode, a summary of the mutations performed.""";
+            Delegate a request to convert an external workflow definition (n8n, Make, Zapier, Workato,
+            etc.) into a ByteChef workflow. The Converter subagent owns the canonical behaviour for this
+            domain — translating constructs, mapping integrations, and producing valid ByteChef workflow
+            JSON plus a rationale.""";
 
     private static final String INPUT_SCHEMA =
         """
@@ -55,18 +55,18 @@ public class SkillsAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient skillsChatClient;
+    private final ChatClient converterChatClient;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SkillsAgentToolCallback(ChatClient skillsChatClient) {
-        this.skillsChatClient = skillsChatClient;
+    public ConverterAgentToolCallback(ChatClient converterChatClient) {
+        this.converterChatClient = converterChatClient;
     }
 
     @Override
     public ToolDefinition getToolDefinition() {
         return ToolDefinition.builder()
-            .name("skills_agent")
+            .name("converter_agent")
             .description(DESCRIPTION)
             .inputSchema(INPUT_SCHEMA)
             .build();
@@ -80,7 +80,7 @@ public class SkillsAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            SkillsAgentInput input = jsonMapper.readValue(toolInput, SkillsAgentInput.class);
+            ConverterAgentInput input = jsonMapper.readValue(toolInput, ConverterAgentInput.class);
 
             String request = input.request();
 
@@ -93,29 +93,29 @@ public class SkillsAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.SKILLS, parentAgent,
-                () -> skillsChatClient.prompt(request)
+            String result = CurrentAgentContext.callWith(Agent.CONVERTER_AGENT, parentAgent,
+                () -> converterChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
                     .content());
 
             if (result == null) {
-                log.warn("skills subagent returned null for request='{}'", request);
+                log.warn("converter subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "skills subagent returned null");
+                return ToolErrors.toolError(jsonMapper, "converter subagent returned null");
             }
 
             return result;
         } catch (JacksonException exception) {
             log.warn(
-                "skills_agent rejected malformed tool input: {} — first 200 chars of input: {}",
+                "converter_agent rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, SkillsAgentToolCallback.class, "skills_agent", exception);
+                jsonMapper, ConverterAgentToolCallback.class, "converter_agent", exception);
         }
     }
 
@@ -123,6 +123,6 @@ public class SkillsAgentToolCallback implements ToolCallback {
         return ToolErrors.toolError(jsonMapper, message);
     }
 
-    public record SkillsAgentInput(String request) {
+    public record ConverterAgentInput(String request) {
     }
 }
