@@ -2,7 +2,6 @@ bytechef:
   ai:
     copilot:
       enabled: false
-      provider: anthropic
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
