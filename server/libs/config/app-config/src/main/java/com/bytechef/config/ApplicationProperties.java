@@ -716,28 +716,9 @@ public class ApplicationProperties {
         public static class Copilot {
 
             /**
-             * AI provider for Copilot functionality.
-             */
-            public enum Provider {
-                /**
-                 * OpenAI provider
-                 */
-                OPENAI,
-                /**
-                 * Anthropic provider
-                 */
-                ANTHROPIC
-            }
-
-            /**
              * Whether Copilot is enabled
              */
             private boolean enabled;
-
-            /**
-             * AI provider for Copilot
-             */
-            private Provider provider = Provider.OPENAI;
 
             public boolean isEnabled() {
                 return enabled;
@@ -745,14 +726,6 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
-            }
-
-            public Provider getProvider() {
-                return provider;
-            }
-
-            public void setProvider(Provider provider) {
-                this.provider = provider;
             }
         }
 
