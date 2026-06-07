@@ -672,6 +672,7 @@ include("server:ee:libs:platform:platform-workflow:platform-workflow-worker:plat
 include("server:ee:libs:modules:components:api-platform")
 include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")
+include("server:ee:libs:modules:components:embedded-workflow-builder")
 include("server:ee:libs:modules:components:request")
 
 include("server:libs:modules:components:gaurus")
