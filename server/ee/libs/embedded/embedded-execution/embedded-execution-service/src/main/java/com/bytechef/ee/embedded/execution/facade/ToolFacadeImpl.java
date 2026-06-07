@@ -18,6 +18,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.execution.facade.dto.ToolDTO;
 import com.bytechef.ee.embedded.execution.util.ConnectionIdHelper;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -124,8 +125,11 @@ public class ToolFacadeImpl implements ToolFacade {
         Long connectionId = connectionIdHelper.getConnectionId(
             externalUserId, result.componentName(), instanceId, environment);
 
+        Map<String, Object> parameters = EmbeddedToolConstants.withConnectedUserContext(
+            inputParameters, externalUserId, environment);
+
         return clusterElementDefinitionFacade.executeTool(
-            result.componentName(), result.clusterElementName(), inputParameters, connectionId);
+            result.componentName(), result.clusterElementName(), parameters, connectionId);
     }
 
     private static boolean filterByCategoryNames(List<String> categoryNames, ComponentDefinition componentDefinition) {

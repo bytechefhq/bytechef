@@ -28,6 +28,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflo
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
+import com.bytechef.ee.embedded.execution.constant.EmbeddedToolConstants;
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceTool;
@@ -42,8 +43,10 @@ import com.bytechef.platform.ai.tool.util.FromAiInputSchemaUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
@@ -84,6 +87,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
+    private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserService connectedUserService;
     private final JwtTokenService jwtTokenService;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
@@ -105,7 +109,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     @SuppressFBWarnings("EI")
     public EmbeddedMcpToolFacade(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
-        ClusterElementDefinitionService clusterElementDefinitionService, ConnectedUserService connectedUserService,
+        ClusterElementDefinitionService clusterElementDefinitionService,
+        ComponentDefinitionService componentDefinitionService, ConnectedUserService connectedUserService,
         Evaluator evaluator, IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
@@ -120,6 +125,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
+        this.componentDefinitionService = componentDefinitionService;
         this.connectedUserService = connectedUserService;
         this.jwtTokenService = jwtTokenService;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
@@ -297,7 +303,9 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             Long connectionId = fetchConnectionId(externalUserId, componentName, environment);
 
-            if (connectionId == null) {
+            if (connectionId == null
+                && isConnectionRequired(componentDefinitionService, componentName, componentVersion)) {
+
                 long integrationId = getIntegrationId(componentName);
 
                 return getConnectionRequiredResponse(
@@ -310,9 +318,11 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 resolvedParameters.put(entry.getKey(), resolveParameterValue(entry.getValue(), request));
             }
 
+            Map<String, Object> mergedParameters = EmbeddedToolConstants.withConnectedUserContext(
+                MapUtils.concat(request, resolvedParameters), externalUserId, environment);
+
             return clusterElementDefinitionFacade.executeTool(
-                componentName, componentVersion, clusterElementName, MapUtils.concat(request, resolvedParameters),
-                connectionId);
+                componentName, componentVersion, clusterElementName, mergedParameters, connectionId);
         };
     }
 
@@ -428,6 +438,15 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             return Optional.empty();
         }
+    }
+
+    static boolean isConnectionRequired(
+        ComponentDefinitionService componentDefinitionService, String componentName, int componentVersion) {
+
+        ComponentDefinition componentDefinition =
+            componentDefinitionService.getComponentDefinition(componentName, componentVersion);
+
+        return componentDefinition.getConnection() != null;
     }
 
     private static @Nullable WorkflowTrigger getMcpToolCallableTrigger(Workflow workflow) {
