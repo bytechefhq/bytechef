@@ -22,10 +22,14 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
+ * Renamed from {@code KnowledgeBaseJdbcRepositoryConfiguration} to avoid simple-name collisions with the platform-side
+ * configuration of the same role when both modules are component-scanned in the same Spring context (e.g. integration
+ * tests under {@code AutomationKnowledgeBaseIntTestConfiguration}).
+ *
  * @author Ivica Cardic
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")
 @ConditionalOnBean(AbstractJdbcConfiguration.class)
 @EnableJdbcRepositories(basePackages = "com.bytechef.automation.knowledgebase.repository")
-class KnowledgeBaseJdbcRepositoryConfiguration {
+class AutomationKnowledgeBaseJdbcRepositoryConfiguration {
 }

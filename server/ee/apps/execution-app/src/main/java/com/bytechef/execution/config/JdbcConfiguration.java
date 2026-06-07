@@ -13,7 +13,8 @@ import com.bytechef.atlas.execution.repository.jdbc.converter.StringToWebhooksCo
 import com.bytechef.atlas.execution.repository.jdbc.converter.WebhooksToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.ExecutionErrorToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToPGObjectConverter;
+import com.bytechef.commons.data.jdbc.converter.PGobjectToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToExecutionErrorConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
@@ -55,8 +56,9 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
         return Arrays.asList(
             new ExecutionErrorToStringConverter(objectMapper),
             new FileEntryToStringConverter(objectMapper),
-            new MapWrapperToStringConverter(objectMapper),
+            new MapWrapperToPGObjectConverter(objectMapper),
             new JobResumeIdToStringConverter(),
+            new PGobjectToMapWrapperConverter(objectMapper),
             new StringToExecutionErrorConverter(objectMapper),
             new StringToFileEntryConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper),

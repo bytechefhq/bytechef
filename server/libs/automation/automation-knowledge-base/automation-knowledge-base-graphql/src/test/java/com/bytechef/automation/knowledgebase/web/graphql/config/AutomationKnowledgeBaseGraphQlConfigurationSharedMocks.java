@@ -17,12 +17,15 @@
 package com.bytechef.automation.knowledgebase.web.graphql.config;
 
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
+import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseSourceFacade;
+import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseSourceService;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import com.bytechef.platform.tag.service.TagService;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -40,7 +43,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @MockitoBean(types = {
     EnvironmentService.class, KnowledgeBaseDocumentChunkFacade.class, KnowledgeBaseDocumentFacade.class,
     KnowledgeBaseDocumentService.class, KnowledgeBaseFacade.class, KnowledgeBaseService.class,
-    TagService.class, WorkspaceKnowledgeBaseFacade.class
+    KnowledgeBaseSourceService.class, TagService.class, WorkspaceKnowledgeBaseFacade.class,
+    WorkspaceKnowledgeBaseSourceFacade.class, WorkspaceKnowledgeBaseSourceService.class
 })
 public @interface AutomationKnowledgeBaseGraphQlConfigurationSharedMocks {
 }

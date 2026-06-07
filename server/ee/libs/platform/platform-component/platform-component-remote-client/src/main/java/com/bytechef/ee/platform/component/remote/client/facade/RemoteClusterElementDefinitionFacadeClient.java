@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.component.remote.client.facade;
 
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
@@ -53,11 +54,19 @@ public class RemoteClusterElementDefinitionFacadeClient implements ClusterElemen
     }
 
     @Override
+    public List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public @Nullable OutputResponse executeOutput(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable Long connectionId) {
 
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override

@@ -14,6 +14,7 @@ import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -57,6 +58,14 @@ public class RemoteClusterElementDefinitionServiceClient implements ClusterEleme
         @Nullable ComponentConnection componentConnection, ClusterElementResolverFunction clusterElementResolver) {
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection) {
+
+        return List.of();
     }
 
     @Override

@@ -36,6 +36,8 @@ info:
       enabled: ${bytechef.ai.gateway.enabled:false}
     knowledgeBase:
       enabled: ${bytechef.ai.knowledge-base.enabled:false}
+  contextStore:
+    enabled: ${bytechef.context-store.enabled:false}
   analytics:
     enabled: ${bytechef.analytics.enabled}
     postHog:

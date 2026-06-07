@@ -21,6 +21,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToPGObjectConverter;
+import com.bytechef.commons.data.jdbc.converter.PGobjectToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
@@ -124,6 +126,8 @@ public class KnowledgeBaseIntTestConfiguration {
         protected List<?> userConverters() {
             return Arrays.asList(
                 new FileEntryToStringConverter(objectMapper),
+                new MapWrapperToPGObjectConverter(objectMapper),
+                new PGobjectToMapWrapperConverter(objectMapper),
                 new StringToFileEntryConverter(objectMapper));
         }
     }

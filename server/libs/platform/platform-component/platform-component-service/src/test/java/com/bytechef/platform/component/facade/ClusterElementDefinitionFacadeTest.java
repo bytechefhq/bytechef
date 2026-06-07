@@ -31,6 +31,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.connection.domain.Connection;
@@ -195,6 +196,55 @@ class ClusterElementDefinitionFacadeTest {
         verify(clusterElementDefinitionService).executeDynamicProperties(
             eq(componentName), eq(componentVersion), eq(clusterElementName), eq(propertyName),
             anyMap(), anyList(), isNull(), any(ClusterElementResolverFunction.class));
+    }
+
+    @Test
+    void testExecuteFieldsResolvesConnectionAndDelegatesToService() {
+        String componentName = "airtable";
+        int componentVersion = 1;
+        String clusterElementName = "airtableSource";
+        long connectionId = 77L;
+        Map<String, Object> inputParameters = Map.of("baseId", "appXYZ");
+
+        Connection connection = mock(Connection.class);
+
+        when(connection.getComponentName()).thenReturn("airtable");
+        when(connection.getConnectionVersion()).thenReturn(1);
+        when(connection.getParameters()).thenReturn(Map.of());
+        when(connectionService.getConnection(connectionId)).thenReturn(connection);
+
+        List<Field> expectedFields = List.of(
+            new Field("name", "Name", "String"), new Field("score", "Score", "Integer"));
+
+        when(clusterElementDefinitionService.executeFields(
+            eq(componentName), eq(componentVersion), eq(clusterElementName), anyMap(),
+            any(ComponentConnection.class)))
+                .thenReturn(expectedFields);
+
+        List<Field> result = clusterElementDefinitionFacade.executeFields(
+            componentName, componentVersion, clusterElementName, inputParameters, connectionId);
+
+        assertEquals(expectedFields, result);
+
+        verify(connectionService).getConnection(connectionId);
+    }
+
+    @Test
+    void testExecuteFieldsWithoutConnectionIdPassesNullConnection() {
+        String componentName = "csvFile";
+        int componentVersion = 1;
+        String clusterElementName = "csvSource";
+
+        when(clusterElementDefinitionService.executeFields(
+            eq(componentName), eq(componentVersion), eq(clusterElementName), anyMap(), isNull()))
+                .thenReturn(List.of());
+
+        List<Field> result = clusterElementDefinitionFacade.executeFields(
+            componentName, componentVersion, clusterElementName, Map.of(), null);
+
+        assertEquals(List.of(), result);
+
+        verify(connectionService, never()).getConnection(any(Long.class));
     }
 
     @Test

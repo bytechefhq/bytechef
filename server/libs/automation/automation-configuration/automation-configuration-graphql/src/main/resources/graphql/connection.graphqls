@@ -1,3 +1,22 @@
+extend type Query {
+    """Workspace connections whose component exposes at least one ItemReader cluster element.
+    Used by Context Store and Knowledge Base Source create-source dialogs to filter the
+    connection picker."""
+    dataStreamCompatibleConnections(workspaceId: ID!, environmentId: ID!): [DataStreamCompatibleConnection!]!
+}
+
+"""Slim DTO returned by dataStreamCompatibleConnections so the connection picker can render
+without coupling to the full Connection type."""
+type DataStreamCompatibleConnection {
+    id: ID!
+    name: String!
+    """Component name, resolved via connectionDefinition.componentName (NOT
+    componentConnection.componentVersion — the two often differ; use the connection definition
+    as the authoritative source)."""
+    componentName: String!
+    componentVersion: Int!
+}
+
 """Connection status indicating the lifecycle state of a connection."""
 enum ConnectionStatus {
     ACTIVE

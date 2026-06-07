@@ -1,0 +1,8 @@
+spring:
+  liquibase:
+    contexts: mono
+
+bytechef:
+  context-store:
+    enabled: true
+  edition: ee

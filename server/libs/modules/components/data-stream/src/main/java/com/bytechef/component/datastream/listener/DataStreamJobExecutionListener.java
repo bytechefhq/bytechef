@@ -16,6 +16,9 @@
 
 package com.bytechef.component.datastream.listener;
 
+import com.bytechef.component.definition.datastream.ItemReader;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -37,6 +40,16 @@ public class DataStreamJobExecutionListener implements JobExecutionListener {
     @Override
     public void afterJob(JobExecution jobExecution) {
         if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
+            LocalDateTime startTime = jobExecution.getStartTime();
+
+            if (startTime != null) {
+                long startMillis = startTime.toInstant(ZoneOffset.UTC)
+                    .toEpochMilli();
+
+                jobExecution.getExecutionContext()
+                    .putLong(ItemReader.SINCE_KEY, startMillis);
+            }
+
             log.info("Job id=%s completed".formatted(jobExecution.getId()));
         }
     }

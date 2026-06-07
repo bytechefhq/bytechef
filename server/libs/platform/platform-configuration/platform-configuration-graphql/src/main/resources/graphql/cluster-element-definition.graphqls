@@ -19,6 +19,25 @@ extend type Query {
         inputParameters: Map
         lookupDependsOnPaths: [String!]
     ): [Option!]!
+    """Workflow-less variant of FieldsProvider.getFields() — used by the Add Context Source wizard to
+    populate ID Field and Indexed Fields name dropdowns. Returns an empty list when the cluster element
+    does not implement FieldsProvider (the wizard then falls back to free-text input)."""
+    clusterElementFields(
+        componentName: String!
+        componentVersion: Int!
+        clusterElementName: String!
+        connectionId: Long
+        inputParameters: Map
+    ): [Field!]!
+}
+
+type Field {
+    name: String!
+    label: String
+    """Java class simple name of the field's type, e.g. String, Long, Instant. Used by the wizard to
+    auto-prefill the indexed-field-type selector (String → TEXT, Long/Integer/Double/Float → NUMERIC,
+    Instant/LocalDateTime/LocalDate → TIMESTAMP, anything else → TEXT). User can override."""
+    type: String
 }
 
 type ClusterElementDefinition {

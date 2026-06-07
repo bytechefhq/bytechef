@@ -18,7 +18,12 @@ package com.bytechef.platform.knowledgebase.service;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 public interface KnowledgeBaseDocumentService {
 
@@ -64,4 +69,62 @@ public interface KnowledgeBaseDocumentService {
      *         save operation (e.g., generated IDs, timestamps)
      */
     KnowledgeBaseDocument saveKnowledgeBaseDocument(KnowledgeBaseDocument knowledgeBaseDocument);
+
+    /**
+     * Creates a new synced document tied to a Knowledge Base source. Persists {@code text} to platform file storage as
+     * {@code <sourceRecordId>.md}, populates the five sync columns ({@code source_id}, {@code source_record_id},
+     * {@code synced_payload_hash}, {@code last_seen_at}, {@code deleted_at = NULL}), saves the document, and publishes
+     * {@code KnowledgeBaseDocumentEvent} to kick the chunker pipeline. Used by the DESTINATION cluster element writer
+     * in Phase 13 Task 31.
+     *
+     * <p>
+     * {@code metadataFieldsWhitelist} — when non-null, narrows {@code metadata} to the listed field names before
+     * flattening to {@code key=value} tags. Mirrors {@code KnowledgeBaseSource.metadataFields}. Null preserves MVP
+     * behavior: every metadata key becomes a tag.
+     * </p>
+     */
+    KnowledgeBaseDocument createSyncedDocument(
+        long kbId, long sourceId, String sourceRecordId, String name, String text, Map<String, ?> metadata,
+        @Nullable Map<String, ?> metadataFieldsWhitelist, String payloadHash, Instant now);
+
+    /**
+     * Replaces the content of an existing synced document. Idempotent fast path: if the new {@code payloadHash} matches
+     * the stored one and the row is not tombstoned, just bumps {@code last_seen_at} (no file rewrite, no chunker
+     * re-run, no event publication). Otherwise: writes the new {@code text} to a new {@code FileEntry}, swaps the
+     * document's pointer, eagerly deletes the old {@code FileEntry}, clears {@code deleted_at}, sets status to
+     * {@code STATUS_UPLOADED} (which re-triggers the chunker pipeline), saves, and publishes
+     * {@code KnowledgeBaseDocumentEvent}.
+     *
+     * <p>
+     * {@code metadataFieldsWhitelist} — same semantics as on {@link #createSyncedDocument}.
+     * </p>
+     */
+    KnowledgeBaseDocument replaceSyncedDocument(
+        long documentId, String name, String text, Map<String, ?> metadata,
+        @Nullable Map<String, ?> metadataFieldsWhitelist, String payloadHash, Instant now);
+
+    /**
+     * Soft-deletes synced documents whose {@code source_record_id} is not in {@code seenSourceRecordIds} for the given
+     * source by setting {@code deleted_at = now}. Manual uploads ({@code source_id IS NULL}) are unaffected. Returns
+     * the number of rows tombstoned. Called by the {@code KnowledgeBaseSourceSyncJobListener} after each FULL_REPLACE
+     * sync run completes.
+     */
+    int tombstoneUnseen(long sourceId, Set<String> seenSourceRecordIds, Instant now);
+
+    /**
+     * Looks up an existing synced document by its {@code (source_id, source_record_id)} sync key. Used by the
+     * DESTINATION cluster element writer (Phase 13 Task 31) to decide between create / unchanged-fast-path / replace
+     * paths per record.
+     */
+    Optional<KnowledgeBaseDocument> findSyncedDocument(long sourceId, String sourceRecordId);
+
+    /**
+     * Bumps {@code last_seen_at} on the given synced document and saves it. Used by the DESTINATION cluster element
+     * writer's unchanged-record fast path (Phase 13 Task 31): when a record's payload hash matches the stored hash and
+     * the row is not tombstoned, neither the file nor the chunker pipeline needs to be re-run — only the heartbeat
+     * needs to be refreshed so the post-job tombstone sweep doesn't reap the row. Avoids the extra
+     * {@code findById}-then-save round-trip that {@link #replaceSyncedDocument} would incur on its own service-side
+     * fast path.
+     */
+    KnowledgeBaseDocument bumpLastSeenAt(KnowledgeBaseDocument document, Instant now);
 }

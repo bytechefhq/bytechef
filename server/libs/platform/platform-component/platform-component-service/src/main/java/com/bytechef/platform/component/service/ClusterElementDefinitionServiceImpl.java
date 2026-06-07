@@ -34,6 +34,8 @@ import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
 import com.bytechef.component.definition.approval.ApprovalChannelFunction;
+import com.bytechef.component.definition.datastream.FieldDefinition;
+import com.bytechef.component.definition.datastream.FieldsProvider;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
@@ -53,6 +55,7 @@ import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsTo
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import com.bytechef.platform.component.definition.datastream.ClusterElementResolverFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ClusterElementDefinitionErrorType;
@@ -131,6 +134,45 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return doExecuteOptions(
             componentName, componentVersion, clusterElementName, propertyName, inputParameters,
             lookupDependsOnPaths, searchText, componentConnection, clusterElementContext);
+    }
+
+    @Override
+    @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_FIELDS")
+    public List<Field> executeFields(
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> inputParameters, @ConnectionParam @Nullable ComponentConnection componentConnection) {
+
+        Object clusterElement = getClusterElement(componentName, componentVersion, clusterElementName);
+
+        if (!(clusterElement instanceof FieldsProvider fieldsProvider)) {
+            return List.of();
+        }
+
+        ClusterElementContext clusterElementContext = contextFactory.createClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection, true);
+
+        Parameters inputParams = ParametersFactory.create(inputParameters);
+        Parameters connectionParams = ParametersFactory.create(componentConnection);
+
+        try {
+            List<FieldDefinition> fieldDefinitions = fieldsProvider.getFields(
+                inputParams, connectionParams, clusterElementContext);
+
+            if (fieldDefinitions == null) {
+                return List.of();
+            }
+
+            return fieldDefinitions.stream()
+                .map(Field::new)
+                .toList();
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ConfigurationException(
+                exception, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_FIELDS);
+        }
     }
 
     @Override

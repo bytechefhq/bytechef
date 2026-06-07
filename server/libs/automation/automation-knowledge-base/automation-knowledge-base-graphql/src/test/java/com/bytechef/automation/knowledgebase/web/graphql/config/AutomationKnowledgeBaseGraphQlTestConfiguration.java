@@ -20,13 +20,17 @@ import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.graphql.execution.RuntimeWiringConfigurer;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 
 /**
- * Test configuration for KnowledgeBase GraphQL integration tests.
+ * Test configuration for KnowledgeBase GraphQL integration tests. {@link EnableMethodSecurity} is required so that
+ * {@code @PreAuthorize} on controller mutations (e.g. {@code refreshKnowledgeBaseSource}) is enforced in slice tests;
+ * without it, anonymous callers slip past admin-only mutations.
  *
  * @author Ivica Cardic
  */
 @Configuration
+@EnableMethodSecurity
 public class AutomationKnowledgeBaseGraphQlTestConfiguration {
 
     @Bean

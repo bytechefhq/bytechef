@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.facade;
 
+import com.bytechef.platform.component.domain.Field;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.domain.OutputResponse;
@@ -43,6 +44,15 @@ public interface ClusterElementDefinitionFacade {
         Map<String, ?> inputParameters, Map<String, ?> extensions, List<String> lookupDependsOnPaths,
         String searchText, @Nullable Long connectionId, Map<String, Long> clusterElementConnectionIds,
         Map<String, Map<String, ?>> clusterElementInputParameters);
+
+    /**
+     * Workflow-less variant of {@link com.bytechef.component.definition.datastream.FieldsProvider#getFields} surfaced
+     * for the Add Context Source wizard. Returns an empty list when the cluster element does not implement
+     * {@code FieldsProvider} (the wizard then falls back to a free-text input).
+     */
+    List<Field> executeFields(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable Long connectionId);
 
     @Nullable
     OutputResponse executeOutput(

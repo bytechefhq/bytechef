@@ -1,0 +1,106 @@
+extend type Query {
+    knowledgeBaseSource(id: ID!): KnowledgeBaseSource
+    knowledgeBaseSources(workspaceId: ID!, environmentId: ID!, filter: KnowledgeBaseSourceFilter): [KnowledgeBaseSource!]!
+}
+
+extend type Mutation {
+    createKnowledgeBaseSource(input: CreateKnowledgeBaseSourceInput!): KnowledgeBaseSource!
+    updateKnowledgeBaseSource(id: ID!, input: UpdateKnowledgeBaseSourceInput!): KnowledgeBaseSource!
+    deleteKnowledgeBaseSource(id: ID!): Boolean!
+    refreshKnowledgeBaseSource(id: ID!): ID!
+    setKnowledgeBaseSourceEnabled(id: ID!, enabled: Boolean!): KnowledgeBaseSource!
+}
+
+type KnowledgeBaseSource {
+    id: ID!
+    workspaceId: ID
+    name: String!
+    knowledgeBaseId: ID!
+    sourceComponentName: String!
+    sourceComponentVersion: Int!
+    sourceClusterElementName: String
+    connectionId: ID
+    cadence: String!
+    status: KnowledgeBaseSourceStatus!
+    enabled: Boolean!
+    lastSyncRunAt: Long
+    lastSyncJobExecutionId: ID
+    workflowId: String
+    """Optional metadata-tag whitelist controlling which incoming metadata fields are flattened
+    into KB document tags. {fields: [...]} narrows; null preserves MVP behavior (every field
+    becomes a tag). Mirrors ContextStoreEntity.storedFields."""
+    metadataFields: Map
+    """Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence.
+    Null = single-trigger MVP behavior."""
+    fullReplaceCadence: String
+    """Phase 17b: tombstone-derivation strategy. PERIODIC_FULL_REPLACE pairs with fullReplaceCadence,
+    UPSTREAM_CHANGE_FEED is reserved for components that emit deletion events, NONE makes the source
+    append-only."""
+    tombstoneStrategy: TombstoneStrategy!
+}
+
+enum KnowledgeBaseSourceStatus {
+    BUILDING_PREVIEW
+    PREVIEW
+    READY
+    FAILED
+    DISABLED
+}
+
+enum TombstoneStrategy {
+    PERIODIC_FULL_REPLACE
+    UPSTREAM_CHANGE_FEED
+    NONE
+}
+
+input CreateKnowledgeBaseSourceInput {
+    workspaceId: ID!
+    environmentId: ID
+    knowledgeBaseId: ID!
+    name: String!
+    sourceComponentName: String!
+    sourceComponentVersion: Int!
+    """Optional. When omitted, the server picks the first ItemReader cluster element on the
+    source component. Supply a name only when the component defines more than one ItemReader."""
+    sourceClusterElementName: String
+    connectionId: ID
+    cadence: String!
+    """Optional. Input parameters for the SOURCE cluster element captured by the create wizard
+    (e.g., Airtable BASE_ID/TABLE_ID, HubSpot OBJECT_TYPE). Threaded through to the auto-generated
+    workflow's SOURCE cluster element. Omit for readers with no input properties."""
+    parameters: Map
+    """Optional metadata-tag whitelist shaped as {fields: ["fieldA", "fieldB"]}. Narrows which
+    incoming metadata keys become KB document tags at sync time. Omit (or null) to keep MVP
+    behavior — every field becomes a tag."""
+    metadataFields: Map
+    """Phase 17b: optional rare full-replace cadence paired with the regular incremental cadence
+    (e.g., '@daily' alongside an '@hourly' cadence). Null = single-trigger MVP."""
+    fullReplaceCadence: String
+    """Phase 17b: tombstone-derivation strategy. Defaults to PERIODIC_FULL_REPLACE when omitted."""
+    tombstoneStrategy: TombstoneStrategy
+}
+
+input UpdateKnowledgeBaseSourceInput {
+    name: String
+    cadence: String
+    enabled: Boolean
+    """Optional metadata-tag whitelist update. Null leaves the current whitelist unchanged;
+    {} clears it (revert to full-flatten); {fields: [...]} replaces it."""
+    metadataFields: Map
+    """Phase 17b: optional full-replace cadence update. Null leaves the current value unchanged.
+    Empty string \"\" clears it (drops back to single-trigger). Any other value replaces it."""
+    fullReplaceCadence: String
+    """Phase 17b: optional tombstone strategy update. Null leaves the current value unchanged."""
+    tombstoneStrategy: TombstoneStrategy
+}
+
+input KnowledgeBaseSourceFilter {
+    enabled: Boolean
+}
+
+extend type KnowledgeBaseDocument {
+    sourceId: ID
+    sourceRecordId: String
+    lastSeenAt: Long
+    deletedAt: Long
+}

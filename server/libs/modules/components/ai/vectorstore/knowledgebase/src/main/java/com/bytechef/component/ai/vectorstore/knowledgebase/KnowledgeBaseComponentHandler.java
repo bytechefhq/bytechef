@@ -17,7 +17,15 @@
 package com.bytechef.component.ai.vectorstore.knowledgebase;
 
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.destination.KnowledgeBaseItemWriter.MODE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.destination.KnowledgeBaseItemWriter.MODE_FULL_REPLACE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.destination.KnowledgeBaseItemWriter.MODE_PARTIAL;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.destination.KnowledgeBaseItemWriter.SOURCE_ID;
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.integer;
+import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.datastream.ItemWriter.DESTINATION;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
@@ -28,10 +36,13 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseS
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseUpdateAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseUpdateTool;
+import com.bytechef.component.ai.vectorstore.knowledgebase.destination.KnowledgeBaseItemWriter;
 import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -41,6 +52,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseSourceService;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -66,13 +78,14 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseSourceService knowledgeBaseSourceService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
                 clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
                 knowledgeBaseDocumentService, knowledgeBaseDocumentTagService, knowledgeBaseFileStorage,
-                knowledgeBaseService, vectorStore);
+                knowledgeBaseService, knowledgeBaseSourceService, vectorStore);
     }
 
     @Override
@@ -90,7 +103,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
             KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
-            VectorStore vectorStore) {
+            KnowledgeBaseSourceService knowledgeBaseSourceService, VectorStore vectorStore) {
 
             super(
                 component(KNOWLEDGE_BASE)
@@ -119,7 +132,39 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                             knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseVectorStore.of(
                             vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService)));
+                            knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService),
+                        writeAsDocumentClusterElement(
+                            knowledgeBaseSourceService, knowledgeBaseDocumentService)));
+        }
+
+        private static ModifiableClusterElementDefinition<KnowledgeBaseItemWriter> writeAsDocumentClusterElement(
+            KnowledgeBaseSourceService knowledgeBaseSourceService,
+            KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
+
+            return ComponentDsl.<KnowledgeBaseItemWriter>clusterElement("writeAsDocument")
+                .title("Write as Knowledge Base Document")
+                .description(
+                    "Upsert source records into the target Knowledge Base as documents. " +
+                        "FULL_REPLACE mode tombstones documents whose source_record_id is not seen this run; " +
+                        "PARTIAL mode skips the tombstone sweep for backfills and partial-update workflows.")
+                .type(DESTINATION)
+                .object(() -> new KnowledgeBaseItemWriter(
+                    knowledgeBaseSourceService, knowledgeBaseDocumentService))
+                .properties(
+                    integer(SOURCE_ID)
+                        .label("Knowledge Base Source ID")
+                        .description("ID of the KnowledgeBaseSource that owns this sync.")
+                        .required(true),
+                    string(MODE)
+                        .label("Sync mode")
+                        .description(
+                            "FULL_REPLACE = tombstone records not seen this run (default); " +
+                                "PARTIAL = leave unseen records untouched (use for backfills / partial updates).")
+                        .options(
+                            option(MODE_FULL_REPLACE, MODE_FULL_REPLACE),
+                            option(MODE_PARTIAL, MODE_PARTIAL))
+                        .defaultValue(MODE_FULL_REPLACE)
+                        .required(false));
         }
 
         @Override

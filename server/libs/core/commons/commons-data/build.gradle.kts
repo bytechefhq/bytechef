@@ -1,5 +1,7 @@
 dependencies {
+    api("org.postgresql:postgresql")
     api("org.springframework:spring-core")
+    api("org.springframework.data:spring-data-commons")
     api("tools.jackson.core:jackson-databind")
     api(project(":server:libs:core:encryption:encryption-api"))
     api(project(":server:libs:core:error:error-api"))

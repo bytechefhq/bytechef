@@ -1935,6 +1935,72 @@
       "required": true
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "writeAsDocument",
+    "description": "Upsert source records into the target Knowledge Base as documents. FULL_REPLACE mode tombstones documents whose source_record_id is not seen this run; PARTIAL mode skips the tombstone sweep for backfills and partial-update workflows.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "INTEGER",
+      "defaultValue": null,
+      "description": "ID of the KnowledgeBaseSource that owns this sync.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Knowledge Base Source ID",
+      "maxValue": null,
+      "metadata": { },
+      "minValue": null,
+      "name": "sourceId",
+      "options": null,
+      "optionsDataSource": null,
+      "placeholder": null,
+      "required": true,
+      "type": "INTEGER"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": "FULL_REPLACE",
+      "description": "FULL_REPLACE = tombstone records not seen this run (default); PARTIAL = leave unseen records untouched (use for backfills / partial updates).",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Sync mode",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "mode",
+      "options": [ {
+        "description": null,
+        "label": "FULL_REPLACE",
+        "value": "FULL_REPLACE"
+      }, {
+        "description": null,
+        "label": "PARTIAL",
+        "value": "PARTIAL"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": false,
+      "type": "STRING"
+    } ],
+    "title": "Write as Knowledge Base Document",
+    "type": {
+      "name": "DESTINATION",
+      "key": "destination",
+      "label": "Destination",
+      "multipleElements": false,
+      "required": false
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "artificial-intelligence",

@@ -89,12 +89,35 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
 
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
+        // Phase 17b: extract trigger-time JobParameter overrides from the parent Atlas Job's metadata BEFORE
+        // building Spring Batch JobParameters. Two consumption paths:
+        // 1) "datastream.mode" overrides the DESTINATION cluster element's baked "mode" parameter — folded into
+        // the destination value Map below so the destination writer's existing inputParameters.getString(MODE)
+        // sees the override transparently.
+        // 2) Every other entry (e.g. datastream.since) is added as a top-level Spring Batch JobParameter the
+        // reader-side ItemStreamReaderDelegate consumes via stepExecution.getJobParameters().
+        //
+        // The reserved key string "__jobParameters" matches JobMetadataKeys.JOB_PARAMETERS in
+        // platform-workflow-coordinator-api. Inlined here to avoid pulling a coordinator-api dep into this lean
+        // component module — see Phase 17b spec Layer 5 "Risks / open questions" for the dep-layering rationale.
+        Map<String, ?> jobParameterOverrides = extractJobParameterOverrides(actionContextAware.getJobMetadata());
+
         JobParameters jobParameters = new JobParameters(
             new HashSet<>() {
                 {
                     ClusterElement clusterElement = clusterElementMap.getClusterElement(DESTINATION);
 
                     Map<String, Object> value = getValue(clusterElement, connectionParameters);
+
+                    // Override the destination's baked "mode" with the trigger-time override, if any. Per Phase 17b
+                    // commit 4, the paired-cadence workflow generators emit jobParameters.datastream.mode = PARTIAL
+                    // on the incremental trigger and FULL_REPLACE on the full trigger; this is where that takes
+                    // effect at the writer's mode selector.
+                    Object datastreamModeOverride = jobParameterOverrides.get("datastream.mode");
+
+                    if (datastreamModeOverride != null) {
+                        value.put("mode", String.valueOf(datastreamModeOverride));
+                    }
 
                     add(new JobParameter<>(DESTINATION.name(), value, Map.class));
 
@@ -136,6 +159,34 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
                             new JobParameter<>(
                                 MODE_TYPE, String.valueOf(actionContextAware.getPlatformType()), String.class));
                     }
+
+                    // Phase 17b: add every other entry as a top-level Spring Batch JobParameter. datastream.mode
+                    // was already consumed above as a destination-parameter override; the remaining entries
+                    // (datastream.since today, more keys in future contributor extensions) flow through to the
+                    // reader-side ItemStreamReaderDelegate.
+                    for (Map.Entry<String, ?> entry : jobParameterOverrides.entrySet()) {
+                        String overrideKey = entry.getKey();
+                        Object overrideValue = entry.getValue();
+
+                        if (overrideValue == null || "datastream.mode".equals(overrideKey)) {
+                            continue;
+                        }
+
+                        // Spring Batch JobParameter is strongly typed — pick a class based on the value's
+                        // runtime type. datastream.since arrives as Long (epoch millis from the contributor).
+                        // Other types fall back to String via toString() so a future contributor adding a
+                        // Boolean / Double override doesn't need this site updated, just the reader that
+                        // consumes the parameter.
+                        if (overrideValue instanceof Long longValue) {
+                            add(new JobParameter<>(overrideKey, longValue, Long.class));
+                        } else if (overrideValue instanceof Number numberValue) {
+                            add(new JobParameter<>(overrideKey, numberValue.longValue(), Long.class));
+                        } else if (overrideValue instanceof Boolean booleanValue) {
+                            add(new JobParameter<>(overrideKey, booleanValue, Boolean.class));
+                        } else {
+                            add(new JobParameter<>(overrideKey, String.valueOf(overrideValue), String.class));
+                        }
+                    }
                 }
             });
 
@@ -162,6 +213,24 @@ public class DataStreamStreamActionDefinition extends AbstractActionDefinitionWr
             "endTime", Objects.requireNonNull(jobExecution.getEndTime()),
             "status", jobExecution.getStatus(),
             "startTime", Objects.requireNonNull(jobExecution.getStartTime()));
+    }
+
+    /**
+     * Phase 17b: pulls the trigger-time JobParameter override map out of the parent Atlas Job's metadata. The map sits
+     * under the reserved key {@code "__jobParameters"} ({@code JobMetadataKeys.JOB_PARAMETERS} in
+     * {@code platform-workflow-coordinator-api}). Returns an empty map for pre-17b workflows, editor-environment runs
+     * without a persisted Job, or any malformed metadata shape — the action then proceeds with no overrides, exactly
+     * the pre-17b behavior.
+     */
+    @SuppressWarnings("unchecked")
+    private static Map<String, ?> extractJobParameterOverrides(Map<String, Object> jobMetadata) {
+        Object value = jobMetadata.get("__jobParameters");
+
+        if (value instanceof Map<?, ?>) {
+            return (Map<String, ?>) value;
+        }
+
+        return Map.of();
     }
 
     private static @NonNull Map<String, Object> getValue(

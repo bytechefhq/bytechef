@@ -10,7 +10,8 @@ package com.bytechef.connection.config;
 import com.bytechef.commons.data.jdbc.converter.EncryptedMapWrapperToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.EncryptedStringWrapperToStringConverter;
-import com.bytechef.commons.data.jdbc.converter.MapWrapperToStringConverter;
+import com.bytechef.commons.data.jdbc.converter.MapWrapperToPGObjectConverter;
+import com.bytechef.commons.data.jdbc.converter.PGobjectToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToEncryptedStringWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToMapWrapperConverter;
 import com.bytechef.encryption.Encryption;
@@ -46,7 +47,8 @@ public class JdbcConfiguration extends AbstractJdbcConfiguration {
             new EncryptedStringToMapWrapperConverter(encryption, objectMapper),
             new EncryptedStringWrapperToStringConverter(encryption),
             new StringToEncryptedStringWrapperConverter(encryption),
-            new MapWrapperToStringConverter(objectMapper),
+            new MapWrapperToPGObjectConverter(objectMapper),
+            new PGobjectToMapWrapperConverter(objectMapper),
             new StringToMapWrapperConverter(objectMapper));
     }
 }

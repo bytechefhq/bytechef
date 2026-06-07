@@ -73,6 +73,11 @@ public class ApplicationProperties {
     private Component component = new Component();
 
     /**
+     * Context Store configuration
+     */
+    private ContextStore contextStore = new ContextStore();
+
+    /**
      * Workflow coordinator configuration
      */
     private Coordinator coordinator = new Coordinator();
@@ -233,6 +238,10 @@ public class ApplicationProperties {
         return component;
     }
 
+    public ContextStore getContextStore() {
+        return contextStore;
+    }
+
     public Coordinator getCoordinator() {
         return coordinator;
     }
@@ -367,6 +376,10 @@ public class ApplicationProperties {
 
     public void setComponent(Component component) {
         this.component = component;
+    }
+
+    public void setContextStore(ContextStore contextStore) {
+        this.contextStore = contextStore;
     }
 
     public void setCoordinator(Coordinator coordinator) {
@@ -3264,6 +3277,97 @@ public class ApplicationProperties {
 
             public void setExclude(List<String> exclude) {
                 this.exclude = exclude;
+            }
+        }
+    }
+
+    /**
+     * Context Store configuration. Postgres is the default records backend; ClickHouse is an optional deployment-wide
+     * opt-in activated by setting {@link ClickHouse#url}. When the URL is set the ClickHouse datasource bean is wired,
+     * a {@code @Primary} ClickHouse repository overrides the Postgres adapter for record reads/writes, and the
+     * typed-projection provisioner runs on entity create.
+     *
+     * <p>
+     * Without a ClickHouse URL the entire ClickHouse bean tree stays uninstantiated and every source persists to
+     * Postgres. There is no per-source backend choice — the deployment runs one backend at a time.
+     * </p>
+     */
+    public static class ContextStore {
+
+        /**
+         * Whether the Context Store surface is enabled. Mirrors the {@code Ai.Hub} pattern: a single flag toggles every
+         * Context Store bean — GraphQL controllers, JDBC services, ClickHouse provisioner, sync-job listeners, and the
+         * {@code contextStore} component handler — so a deployment can disable the entire feature without removing the
+         * modules from the classpath. When false, none of the Context Store beans are instantiated.
+         */
+        private boolean enabled;
+
+        /**
+         * ClickHouse datasource configuration. The ClickHouse bean tree activates only when {@link ClickHouse#url} is
+         * non-null.
+         */
+        private ClickHouse clickhouse = new ClickHouse();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public ClickHouse getClickhouse() {
+            return clickhouse;
+        }
+
+        public void setClickhouse(ClickHouse clickhouse) {
+            this.clickhouse = clickhouse;
+        }
+
+        /**
+         * ClickHouse datasource configuration. Mirrors {@link Ai.Vectorstore.PgVector}'s shape so operators recognise
+         * the pattern.
+         */
+        public static class ClickHouse {
+
+            /**
+             * Database password
+             */
+            private String password;
+
+            /**
+             * JDBC URL for ClickHouse server (e.g. {@code jdbc:clickhouse://host:8123/database}). When unset, the
+             * datasource bean is not created and Postgres is the only records backend.
+             */
+            private String url;
+
+            /**
+             * Database username
+             */
+            private String username;
+
+            public String getPassword() {
+                return password;
+            }
+
+            public void setPassword(String password) {
+                this.password = password;
+            }
+
+            public String getUrl() {
+                return url;
+            }
+
+            public void setUrl(String url) {
+                this.url = url;
+            }
+
+            public String getUsername() {
+                return username;
+            }
+
+            public void setUsername(String username) {
+                this.username = username;
             }
         }
     }
