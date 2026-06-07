@@ -650,10 +650,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     Set<String> resolveAllowedComponentNames(Environment environment) {
-        List<IntegrationInstanceConfiguration> enabledConfigurations =
+        List<IntegrationInstanceConfiguration> enabledIntegrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations(environment, true);
 
-        List<Long> integrationIds = enabledConfigurations.stream()
+        List<Long> integrationIds = enabledIntegrationInstanceConfigurations.stream()
             .map(IntegrationInstanceConfiguration::getIntegrationId)
             .filter(Objects::nonNull)
             .distinct()
