@@ -14,9 +14,7 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
-import CopilotGenerateDescriptionButton from '@/shared/components/copilot/CopilotGenerateDescriptionButton';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {KeyboardEvent, ReactNode, useEffect, useRef, useState} from 'react';
 import {useForm} from 'react-hook-form';
@@ -49,8 +47,6 @@ const WorkflowDialog = ({
     const [isOpen, setIsOpen] = useState(!triggerNode);
 
     const {data: workflow} = useGetWorkflowQuery(workflowId ?? '', !!workflowId);
-
-    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
     const form = useForm({
         defaultValues: {
@@ -197,19 +193,7 @@ const WorkflowDialog = ({
                         name="description"
                         render={({field}) => (
                             <FormItem>
-                                <div className="flex items-center justify-between">
-                                    <FormLabel>Description</FormLabel>
-
-                                    {workflow?.id && (
-                                        <CopilotGenerateDescriptionButton
-                                            environmentId={currentEnvironmentId}
-                                            onApply={(value) =>
-                                                form.setValue('description', value, {shouldDirty: true})
-                                            }
-                                            workflowId={workflow.id}
-                                        />
-                                    )}
-                                </div>
+                                <FormLabel>Description</FormLabel>
 
                                 <FormControl>
                                     <Textarea
