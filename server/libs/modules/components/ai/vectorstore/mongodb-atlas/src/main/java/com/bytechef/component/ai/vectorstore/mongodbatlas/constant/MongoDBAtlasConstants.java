@@ -23,6 +23,7 @@ import com.bytechef.component.ai.vectorstore.VectorStore;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
+import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import java.util.Arrays;
@@ -43,6 +44,10 @@ public class MongoDBAtlasConstants {
     public static final String NUM_CANDIDATES = "numCandidates";
     public static final String PATH_NAME = "pathName";
 
+    private static final MongoDriverInformation DRIVER_INFORMATION = MongoDriverInformation.builder()
+        .driverName("ByteChef")
+        .build();
+
     public static final VectorStore VECTOR_STORE = (inputParameters, connectionParameters, embeddingModel) -> {
         ConnectionString connectionString = new ConnectionString(
             connectionParameters.getRequiredString(CONNECTION_STRING));
@@ -59,7 +64,7 @@ public class MongoDBAtlasConstants {
                 MongoCredential.createCredential(username, databaseName, password.toCharArray()));
         }
 
-        MongoClient mongoClient = MongoClients.create(settingsBuilder.build());
+        MongoClient mongoClient = MongoClients.create(settingsBuilder.build(), DRIVER_INFORMATION);
 
         MongoTemplate mongoTemplate = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));

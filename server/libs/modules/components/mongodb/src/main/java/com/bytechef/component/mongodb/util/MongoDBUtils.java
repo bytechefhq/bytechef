@@ -25,6 +25,7 @@ import com.bytechef.component.definition.Parameters;
 import com.mongodb.ConnectionString;
 import com.mongodb.MongoClientSettings;
 import com.mongodb.MongoCredential;
+import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import com.mongodb.client.MongoCollection;
@@ -34,6 +35,10 @@ import java.util.Map;
 import org.bson.Document;
 
 public final class MongoDBUtils {
+
+    private static final MongoDriverInformation DRIVER_INFORMATION = MongoDriverInformation.builder()
+        .driverName("ByteChef")
+        .build();
 
     private MongoDBUtils() {
     }
@@ -54,7 +59,7 @@ public final class MongoDBUtils {
                 MongoCredential.createCredential(username, database, password.toCharArray()));
         }
 
-        return MongoClients.create(settingsBuilder.build());
+        return MongoClients.create(settingsBuilder.build(), DRIVER_INFORMATION);
     }
 
     public static MongoCollection<Document> getCollection(
