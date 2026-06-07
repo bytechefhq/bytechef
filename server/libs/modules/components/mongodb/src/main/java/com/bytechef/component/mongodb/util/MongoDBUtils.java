@@ -33,9 +33,6 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public final class MongoDBUtils {
 
     private MongoDBUtils() {

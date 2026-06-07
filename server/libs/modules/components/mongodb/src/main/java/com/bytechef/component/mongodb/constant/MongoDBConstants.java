@@ -16,9 +16,6 @@
 
 package com.bytechef.component.mongodb.constant;
 
-/**
- * @author Alex Bevilacqua
- */
 public final class MongoDBConstants {
 
     public static final String COLLECTION = "collection";

@@ -19,9 +19,6 @@ package com.bytechef.component.mongodb;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import org.junit.jupiter.api.Test;
 
-/**
- * @author Alex Bevilacqua
- */
 class MongoDBComponentHandlerTest {
 
     @Test

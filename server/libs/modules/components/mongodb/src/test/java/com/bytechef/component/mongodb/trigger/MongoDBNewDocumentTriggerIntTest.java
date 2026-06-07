@@ -43,8 +43,6 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Integration test for {@link MongoDBNewDocumentTrigger} exercised against a real MongoDB instance spun up via
  * Testcontainers.
- *
- * @author Alex Bevilacqua
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers

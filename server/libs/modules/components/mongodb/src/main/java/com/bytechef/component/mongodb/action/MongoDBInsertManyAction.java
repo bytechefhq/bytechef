@@ -38,9 +38,6 @@ import java.util.Map;
 import org.bson.BsonValue;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBInsertManyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("insertMany")

@@ -36,9 +36,6 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property.ControlType;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAtlasConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()

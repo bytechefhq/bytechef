@@ -37,9 +37,6 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBNewDocumentTrigger {
 
     private static final String LAST_VALUE = "lastValue";

@@ -34,9 +34,6 @@ import com.mongodb.client.result.DeleteResult;
 import java.util.Map;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBDeleteManyAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deleteMany")

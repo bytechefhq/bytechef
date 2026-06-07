@@ -23,9 +23,6 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.definition.ai.agent.VectorStoreFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAtlasVectorStore {
 
     public static ClusterElementDefinition<VectorStoreFunction> of(

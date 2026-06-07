@@ -41,9 +41,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
-/**
- * @author Alex Bevilacqua
- */
 class MongoDBNewDocumentTriggerTest {
 
     private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);

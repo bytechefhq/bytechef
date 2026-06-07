@@ -25,9 +25,6 @@ import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsTo
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAtlasSearchTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
