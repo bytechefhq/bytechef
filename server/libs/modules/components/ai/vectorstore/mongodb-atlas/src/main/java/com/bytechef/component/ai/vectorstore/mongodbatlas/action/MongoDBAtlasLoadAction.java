@@ -24,9 +24,6 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAtlasLoadAction {
 
     public static ActionDefinition of(ClusterElementDefinitionService clusterElementDefinitionService) {

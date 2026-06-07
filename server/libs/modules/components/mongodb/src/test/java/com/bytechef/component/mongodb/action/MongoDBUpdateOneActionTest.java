@@ -42,9 +42,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
-/**
- * @author Alex Bevilacqua
- */
 class MongoDBUpdateOneActionTest {
 
     private final ActionContext mockedActionContext = mock(ActionContext.class);

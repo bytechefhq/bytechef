@@ -28,9 +28,6 @@ import static com.bytechef.component.mongodb.constant.MongoDBConstants.DATABASE;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Property.ControlType;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()

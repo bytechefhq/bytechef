@@ -39,9 +39,6 @@ import java.util.ArrayList;
 import java.util.List;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBFindAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("find")

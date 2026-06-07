@@ -36,9 +36,6 @@ import java.util.List;
 import java.util.Map;
 import org.bson.Document;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAggregateAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("aggregate")

@@ -31,9 +31,6 @@ import org.springframework.ai.vectorstore.mongodb.atlas.MongoDBAtlasVectorStore;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
 
-/**
- * @author Alex Bevilacqua
- */
 public class MongoDBAtlasConstants {
 
     public static final String COLLECTION_NAME = "collectionName";

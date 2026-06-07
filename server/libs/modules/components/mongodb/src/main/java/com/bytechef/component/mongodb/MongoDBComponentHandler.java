@@ -34,9 +34,6 @@ import com.bytechef.component.mongodb.connection.MongoDBConnection;
 import com.bytechef.component.mongodb.trigger.MongoDBNewDocumentTrigger;
 import com.google.auto.service.AutoService;
 
-/**
- * @author Alex Bevilacqua
- */
 @AutoService(ComponentHandler.class)
 public class MongoDBComponentHandler implements ComponentHandler {
 

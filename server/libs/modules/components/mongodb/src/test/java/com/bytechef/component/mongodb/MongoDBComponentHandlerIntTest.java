@@ -53,8 +53,6 @@ import org.testcontainers.utility.DockerImageName;
 /**
  * Integration tests for the MongoDB connector actions and trigger, exercised against a real MongoDB instance spun up
  * via Testcontainers.
- *
- * @author Alex Bevilacqua
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers

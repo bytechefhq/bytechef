@@ -23,9 +23,6 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.workflow.worker.task.handler.AbstractTaskHandler;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Alex Bevilacqua
- */
 @Component(MONGODB_ATLAS + "/v1/" + SEARCH)
 public class MongoDBAtlasSearchTaskHandler extends AbstractTaskHandler {
 

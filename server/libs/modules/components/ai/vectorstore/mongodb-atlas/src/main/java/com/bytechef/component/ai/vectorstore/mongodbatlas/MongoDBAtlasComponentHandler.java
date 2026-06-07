@@ -34,9 +34,6 @@ import com.bytechef.platform.component.definition.VectorStoreComponentDefinition
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import org.springframework.stereotype.Component;
 
-/**
- * @author Alex Bevilacqua
- */
 @Component(MONGODB_ATLAS + "_v1_ComponentHandler")
 public class MongoDBAtlasComponentHandler implements ComponentHandler {
 
