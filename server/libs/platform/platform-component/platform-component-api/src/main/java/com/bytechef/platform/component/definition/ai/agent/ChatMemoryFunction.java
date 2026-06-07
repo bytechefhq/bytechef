@@ -22,8 +22,9 @@ import com.bytechef.platform.component.ComponentConnection;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
-import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.api.BaseAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.tool.ToolCallback;
 
 /**
  * @author Ivica Cardic
@@ -56,6 +57,10 @@ public interface ChatMemoryFunction {
     @SuppressFBWarnings({
         "EI", "EI2"
     })
-    record Result(BaseChatMemoryAdvisor advisor, @Nullable ChatMemory chatMemory) {
+    record Result(BaseAdvisor advisor, @Nullable ChatMemory chatMemory, @Nullable ToolCallback[] toolCallbacks) {
+
+        public Result(BaseAdvisor advisor, @Nullable ChatMemory chatMemory) {
+            this(advisor, chatMemory, null);
+        }
     }
 }
