@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.mcp.tool.usage;
+package com.bytechef.ee.platform.ai.agent.tool;
 
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;

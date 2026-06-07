@@ -4,7 +4,7 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("tools.jackson.core:jackson-databind")
-    implementation(project(":server:ee:libs:ai:mcp:mcp-tool:mcp-tool-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
     implementation(project(":server:libs:core:commons:commons-util"))

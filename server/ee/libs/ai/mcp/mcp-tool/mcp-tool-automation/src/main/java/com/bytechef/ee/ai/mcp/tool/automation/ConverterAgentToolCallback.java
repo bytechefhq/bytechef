@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.ai.mcp.tool.automation;
 
-import com.bytechef.ee.ai.mcp.tool.usage.Agent;
-import com.bytechef.ee.ai.mcp.tool.usage.CurrentAgentContext;
-import com.bytechef.ee.ai.mcp.tool.usage.CurrentAgentContext.AgentBinding;
-import com.bytechef.ee.ai.mcp.tool.util.ToolErrors;
+import com.bytechef.ee.platform.ai.agent.tool.Agent;
+import com.bytechef.ee.platform.ai.agent.tool.CurrentAgentContext;
+import com.bytechef.ee.platform.ai.agent.tool.CurrentAgentContext.AgentBinding;
+import com.bytechef.ee.platform.ai.agent.tool.ToolErrors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
