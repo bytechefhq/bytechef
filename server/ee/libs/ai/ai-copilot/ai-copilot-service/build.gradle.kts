@@ -119,4 +119,11 @@ dependencies {
     implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
 
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
+    implementation(project(":server:ee:libs:ai:mcp:mcp-tool:mcp-tool-automation"))
+
+    // For CopilotChatClientResolver — resolves per-request user-selected (provider, model) overrides against the
+    // workspace's AI Gateway. Optional at runtime (bean is @ConditionalOnProperty("bytechef.ai.gateway.enabled")),
+    // but the compile-time dependency on the gateway api is unavoidable.
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-gateway:automation-ai-gateway-api"))
+    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-gateway:platform-ai-gateway-api"))
 }
