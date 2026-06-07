@@ -42,6 +42,7 @@ com-squareup-javapoet = "com.squareup:javapoet:1.13.0"
 com-vladsch-flexmark = "com.vladsch.flexmark:flexmark-all:0.64.8"
 commons-text = "org.apache.commons:commons-text:1.15.0"
 commons-validator = "commons-validator:commons-validator:1.10.1"
+io-github-a2asdk-a2a-java-sdk-client = { module = "io.github.a2asdk:a2a-java-sdk-client", version.ref = "a2a-java-sdk" }
 io-swagger-core-v3-swagger-annotations = "io.swagger.core.v3:swagger-annotations:2.2.50"
 io-swagger-parser-v3-swagger-parser = "io.swagger.parser.v3:swagger-parser:2.1.43"
 jjwt-api = { module = "io.jsonwebtoken:jjwt-api", version.ref = "jjwt" }
