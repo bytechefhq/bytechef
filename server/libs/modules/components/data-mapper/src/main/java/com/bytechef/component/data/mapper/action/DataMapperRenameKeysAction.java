@@ -53,8 +53,7 @@ public class DataMapperRenameKeysAction {
                 .required(true),
             array(MAPPINGS)
                 .label("Mappings")
-                .description(
-                    "An array of objects that contains properties 'From Path' and 'To'.")
+                .description("An array of objects that contains properties 'From Path' and 'To'.")
                 .items(
                     object()
                         .properties(
@@ -68,12 +67,13 @@ public class DataMapperRenameKeysAction {
                                 .description("Defines what you want to change the name of the input property key to.")))
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#rename-keys")
         .perform(DataMapperRenameKeysAction::perform);
 
     private DataMapperRenameKeysAction() {
     }
 
-    protected static Map<String, Object> perform(
+    public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<StringMapping> mappings = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());

@@ -118,21 +118,21 @@ public class DataMapperMapObjectsToObjectAction {
                 .description("Should fields with empty string values be included in the new object?")
                 .defaultValue(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#map-objects-to-object")
         .perform(DataMapperMapObjectsToObjectAction::perform);
 
     private DataMapperMapObjectsToObjectAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         List<RequiredStringMapping> mappings = inputParameters.getList(
             MAPPINGS, RequiredStringMapping.class, List.of());
 
         Map<String, Pair<String, Boolean>> mappingMap = mappings.stream()
             .collect(
                 Collectors.toMap(
-                    RequiredStringMapping::getFrom, value -> Pair.create(value.getTo(), value.isRequiredField())));
+                    RequiredStringMapping::getFrom,
+                    value -> Pair.create(value.getTo(), value.isRequiredField())));
 
         InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
 

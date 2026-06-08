@@ -40,7 +40,7 @@ public class DataMapperMergeAndPivotByKeyAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("mergeAndPivotPropertiesByKey")
         .title("Merge and Pivot Properties by Key")
         .description(
-            "Creates a new object out of all objects that have the same key as the specified field kay and an object " +
+            "Creates a new object out of all objects that have the same key as the specified field key and an object " +
                 "as value. That value of the new object contains values of all properties that share the specified " +
                 "field key as keys and the they all have the specified field value as a value.")
         .properties(
@@ -58,13 +58,15 @@ public class DataMapperMergeAndPivotByKeyAction {
                 .description("The value of each property in the newly created objects value.")
                 .required(true))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/data-mapper_v1#merge-and-pivot-properties-by-key")
         .perform(DataMapperMergeAndPivotByKeyAction::perform);
 
     private DataMapperMergeAndPivotByKeyAction() {
     }
 
-    @SuppressWarnings("unchecked")
-    protected static Map<String, Map<Object, Object>> perform(
+    public static Map<String, Map<Object, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<Object> input = inputParameters.getList(INPUT, Object.class, List.of());
