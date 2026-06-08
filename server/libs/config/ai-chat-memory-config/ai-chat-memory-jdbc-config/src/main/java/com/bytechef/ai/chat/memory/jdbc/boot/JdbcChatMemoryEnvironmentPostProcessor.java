@@ -35,7 +35,15 @@ public class JdbcChatMemoryEnvironmentPostProcessor implements EnvironmentPostPr
     public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
         Map<String, Object> source = new HashMap<>();
 
-        if (!Objects.equals(environment.getProperty("bytechef.ai.memory.provider", String.class), "jdbc")) {
+        if (Objects.equals(environment.getProperty("bytechef.ai.memory.provider", String.class), "jdbc")) {
+
+            // Liquibase (master.xml -> includeAll platform/ai/chat_memory) owns the SPRING_AI_CHAT_MEMORY
+            // schema, so suppress Spring AI's own JdbcChatMemoryRepositorySchemaInitializer. Its default mode is
+            // EMBEDDED (a no-op on PostgreSQL), but on an embedded DB it would run Spring AI's bundled schema and
+            // race/diverge with the Liquibase changelog. Setting it to never makes Liquibase the single source of
+            // truth without dropping the JdbcChatMemoryRepository bean (which an autoconfigure.exclude would).
+            source.put("spring.ai.chat.memory.repository.jdbc.initialize-schema", "never");
+        } else {
             source.put(
                 "spring.autoconfigure.exclude",
                 StringUtils.join(
