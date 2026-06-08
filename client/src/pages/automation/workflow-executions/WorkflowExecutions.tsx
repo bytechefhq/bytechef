@@ -3,13 +3,11 @@ import ComboBox from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
-import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
-import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
@@ -88,20 +86,6 @@ export const WorkflowExecutions = () => {
 
     return (
         <LayoutContainer
-            footer={
-                workflowExecutionPage?.content &&
-                workflowExecutionPage.content.length > 0 && (
-                    <Footer centerTitle position="main">
-                        <TablePagination
-                            onClick={handlePaginationClick}
-                            pageNumber={filterPageNumber ? filterPageNumber : 0}
-                            pageSize={workflowExecutionPage.size!}
-                            totalElements={workflowExecutionPage.totalElements!}
-                            totalPages={workflowExecutionPage.totalPages!}
-                        />
-                    </Footer>
-                )
-            }
             header={
                 <Header
                     centerTitle
@@ -229,7 +213,14 @@ export const WorkflowExecutions = () => {
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
-                    <WorkflowExecutionsTable data={workflowExecutions} />
+                    <WorkflowExecutionsTable
+                        data={workflowExecutions}
+                        onPaginationClick={handlePaginationClick}
+                        pageNumber={filterPageNumber ? filterPageNumber : 0}
+                        pageSize={workflowExecutionPage?.size ?? 0}
+                        totalElements={workflowExecutionPage?.totalElements ?? 0}
+                        totalPages={workflowExecutionPage?.totalPages ?? 0}
+                    />
                 ) : (
                     <EmptyList
                         icon={<ActivityIcon className="size-24 text-gray-300" />}
