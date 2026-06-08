@@ -95,11 +95,10 @@ docker compose -f docker-compose.dev.server.yml up -d
     - `atlas-configuration/` - Workflow configuration management
 
 - **`automation/`** - iPaaS automation implementation
-    - `automation-ai/` - AI-powered automation features
+    - `automation-ai/` - AI-powered automation features, including `automation-ai-mcp-*` (MCP / Model Context Protocol integration)
     - `automation-configuration/` - Project and workflow configuration
     - `automation-data-table/` - Data table management
     - `automation-knowledge-base/` - Knowledge base integration
-    - `automation-mcp/` - MCP (Model Context Protocol) integration
     - `automation-search/` - Search services for automation entities
     - `automation-swagger/` - OpenAPI/Swagger surface for automation APIs
     - `automation-task/` - Task management services
