@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper;
 
+import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceTool;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
-import com.bytechef.ee.embedded.mcp.domain.McpIntegrationInstanceTool;
 import org.mapstruct.Mapper;
 import org.springframework.core.convert.converter.Converter;
 

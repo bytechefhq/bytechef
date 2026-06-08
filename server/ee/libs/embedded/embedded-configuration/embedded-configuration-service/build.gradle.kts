@@ -22,7 +22,7 @@ dependencies {
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
-    implementation(project(":server:ee:libs:embedded:embedded-mcp:embedded-mcp-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
 
     testImplementation("org.springframework.boot:spring-boot-starter-cache-test")
     testImplementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-service"))

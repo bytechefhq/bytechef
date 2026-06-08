@@ -51,7 +51,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
-    implementation(project(":server:ee:libs:embedded:embedded-mcp:embedded-mcp-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
 
     testImplementation("org.springframework:spring-webflux")
     testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
