@@ -1,5 +1,5 @@
 dependencies {
-    api(project(":server:libs:automation:automation-mcp:automation-mcp-api"))
+    api(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     api(project(":server:libs:platform:platform-component:platform-component-api"))
     api(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     api(project(":server:libs:platform:platform-mcp:platform-mcp-api"))

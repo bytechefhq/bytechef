@@ -14,7 +14,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp-server-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
-    implementation(project(":server:libs:automation:automation-mcp:automation-mcp-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-mcp:automation-ai-mcp-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:evaluator:evaluator-api"))
     implementation(project(":server:libs:core:exception:exception-api"))
