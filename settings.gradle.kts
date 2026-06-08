@@ -539,6 +539,7 @@ include("server:ee:apps:worker-app")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-rest")
 include("server:ee:libs:atlas:atlas-execution:atlas-execution-remote-client")
 
+include("server:ee:libs:ai:ai-api")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-api")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-rest")
 include("server:ee:libs:ai:ai-copilot:ai-copilot-service")
