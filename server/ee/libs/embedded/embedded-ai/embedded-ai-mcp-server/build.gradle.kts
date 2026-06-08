@@ -44,7 +44,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-api"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-api"))
     implementation(project(":server:ee:libs:embedded:embedded-execution:embedded-execution-api"))
-    implementation(project(":server:ee:libs:embedded:embedded-mcp:embedded-mcp-api"))
+    implementation(project(":server:ee:libs:embedded:embedded-ai:embedded-ai-mcp-api"))
     implementation(project(":server:ee:libs:embedded:embedded-security:embedded-security-api"))
 
     runtimeOnly(libs.jjwt.impl)

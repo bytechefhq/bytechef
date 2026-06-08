@@ -8,6 +8,11 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.config;
 
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFacade;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
+import com.bytechef.ee.embedded.ai.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserConnectionFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
@@ -16,11 +21,6 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigu
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
-import com.bytechef.ee.embedded.mcp.facade.McpIntegrationInstanceToolFacade;
-import com.bytechef.ee.embedded.mcp.facade.McpIntegrationInstanceWorkflowFacade;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationService;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceConfigurationWorkflowService;
-import com.bytechef.ee.embedded.mcp.service.McpIntegrationInstanceToolService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.mcp.service.McpComponentService;

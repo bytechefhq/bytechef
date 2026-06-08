@@ -8,7 +8,7 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.embedded.mcp.facade.McpIntegrationInstanceToolFacade;
+import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
