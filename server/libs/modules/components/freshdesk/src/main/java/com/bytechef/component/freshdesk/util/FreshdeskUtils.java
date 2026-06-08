@@ -46,11 +46,9 @@ public class FreshdeskUtils extends AbstractFreshdeskUtils {
         List<Option<String>> ticketIdOptions = new ArrayList<>();
 
         for (Map<String, Object> map : response) {
-            ticketIdOptions.add(
-                option(map.get("subject")
-                    .toString(),
-                    map.get("id")
-                        .toString()));
+            Object id = map.get("id");
+
+            ticketIdOptions.add(option((String) map.get("subject"), id.toString()));
         }
 
         return ticketIdOptions;

@@ -12,7 +12,7 @@ paths:
       tags:
         - "Companies"
       summary: "Create Company"
-      description: "Creates a new company"
+      description: "Creates a new compan."
       operationId: "createCompany"
       x-ai-agent-tool: true
       x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-company"
@@ -82,7 +82,7 @@ paths:
       tags:
         - "Contacts"
       summary: "Create Contact"
-      description: "Creates a new contact"
+      description: "Creates a new contact."
       operationId: "createContact"
       x-ai-agent-tool: true
       x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-contact"
@@ -213,7 +213,7 @@ paths:
       tags:
         - "Tickets"
       summary: "Create Ticket"
-      description: "Creates a new ticket"
+      description: "Creates a new ticket."
       operationId: "createTicket"
       x-ai-agent-tool: true
       x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#create-ticket"
@@ -365,7 +365,7 @@ paths:
       tags:
         - "Tickets"
       summary: "Update Ticket"
-      description: "Update a ticket"
+      description: "Updates a ticket."
       operationId: "updateTicket"
       x-ai-agent-tool: true
       x-help: "https://docs.bytechef.io/reference/components/freshdesk_v1#update-ticket"
