@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260608000001-1" author="Ivica Cardic" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SPRING_AI_CHAT_MEMORY"/>
+            </not>
+        </preConditions>
+
+        <sql>
+            CREATE TABLE SPRING_AI_CHAT_MEMORY (
+                conversation_id VARCHAR(36) NOT NULL,
+                content TEXT NOT NULL,
+                type VARCHAR(10) NOT NULL CHECK (type IN ('USER', 'ASSISTANT', 'SYSTEM', 'TOOL')),
+                "timestamp" TIMESTAMP NOT NULL,
+                sequence_id BIGINT NOT NULL
+            );
+
+            CREATE INDEX SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_TIMESTAMP_IDX
+                ON SPRING_AI_CHAT_MEMORY(conversation_id, "timestamp");
+
+            CREATE INDEX SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_SEQUENCE_ID_IDX
+                ON SPRING_AI_CHAT_MEMORY(conversation_id, sequence_id);
+        </sql>
+
+        <rollback>
+            <sql>DROP TABLE SPRING_AI_CHAT_MEMORY;</sql>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="20260608000001-2" author="Ivica Cardic" dbms="postgresql">
+        <preConditions onFail="MARK_RAN">
+            <and>
+                <tableExists tableName="SPRING_AI_CHAT_MEMORY"/>
+                <not>
+                    <columnExists tableName="SPRING_AI_CHAT_MEMORY" columnName="sequence_id"/>
+                </not>
+            </and>
+        </preConditions>
+
+        <sql>
+            ALTER TABLE SPRING_AI_CHAT_MEMORY ADD COLUMN sequence_id BIGINT;
+
+            UPDATE SPRING_AI_CHAT_MEMORY m
+            SET sequence_id = sub.rn
+            FROM (
+                SELECT ctid,
+                       ROW_NUMBER() OVER (PARTITION BY conversation_id ORDER BY "timestamp") AS rn
+                FROM SPRING_AI_CHAT_MEMORY
+            ) sub
+            WHERE m.ctid = sub.ctid;
+
+            ALTER TABLE SPRING_AI_CHAT_MEMORY ALTER COLUMN sequence_id SET NOT NULL;
+
+            CREATE INDEX IF NOT EXISTS SPRING_AI_CHAT_MEMORY_CONVERSATION_ID_SEQUENCE_ID_IDX
+                ON SPRING_AI_CHAT_MEMORY(conversation_id, sequence_id);
+        </sql>
+
+        <rollback>
+            <sql>ALTER TABLE SPRING_AI_CHAT_MEMORY DROP COLUMN sequence_id;</sql>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
