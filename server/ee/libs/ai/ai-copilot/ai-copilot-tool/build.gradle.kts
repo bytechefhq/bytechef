@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
 
+    implementation(project(":server:ee:libs:ai:ai-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
 
