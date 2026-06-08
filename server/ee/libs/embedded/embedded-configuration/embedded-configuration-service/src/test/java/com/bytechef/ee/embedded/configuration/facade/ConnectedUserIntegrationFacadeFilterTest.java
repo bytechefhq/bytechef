@@ -192,7 +192,7 @@ class ConnectedUserIntegrationFacadeFilterTest {
 
         return new IntegrationInstanceConfigurationWorkflowDTO(
             List.of(), null, null, Map.of(), enabled, id, null, null, null, null, 0, null, "workflowId-" + id,
-            workflowUuid);
+            workflowUuid, Map.of());
     }
 
     private ConnectedUserIntegrationFacadeImpl createFacade() {
