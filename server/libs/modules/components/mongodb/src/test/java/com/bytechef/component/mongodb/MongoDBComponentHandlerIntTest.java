@@ -62,7 +62,7 @@ class MongoDBComponentHandlerIntTest {
 
     @Container
     private static final MongoDBContainer MONGODB_CONTAINER = new MongoDBContainer(
-        DockerImageName.parse("mongo:7.0"));
+        DockerImageName.parse("mongo:8.0"));
 
     private Parameters connectionParameters;
 
