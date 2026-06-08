@@ -57,7 +57,8 @@ public class SendfoxCreateListAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/sendfox_v1#create-list");
 
     private SendfoxCreateListAction() {
     }
