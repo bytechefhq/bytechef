@@ -7,10 +7,10 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
-import com.bytechef.ee.ai.copilot.agent.tool.Agent;
-import com.bytechef.ee.ai.copilot.agent.tool.CurrentAgentContext;
-import com.bytechef.ee.ai.copilot.agent.tool.CurrentAgentContext.AgentBinding;
-import com.bytechef.ee.ai.copilot.agent.tool.ToolErrors;
+import com.bytechef.ee.ai.agent.tool.Agent;
+import com.bytechef.ee.ai.agent.tool.CurrentAgentContext;
+import com.bytechef.ee.ai.agent.tool.CurrentAgentContext.AgentBinding;
+import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
