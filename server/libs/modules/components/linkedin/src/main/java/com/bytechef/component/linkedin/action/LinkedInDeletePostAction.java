@@ -32,6 +32,7 @@ public class LinkedInDeletePostAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("deletePost")
         .title("Delete Post")
         .description("Delete a post from LinkedIn.")
+        .help("", "https://docs.bytechef.io/reference/components/linkedin_v1#delete-post")
         .properties(
             string(URN)
                 .label("URN")
@@ -50,5 +51,4 @@ public class LinkedInDeletePostAction {
 
         return null;
     }
-
 }

@@ -65,6 +65,7 @@ public class LinkedInCreatePostAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
         .description("Create a post on LinkedIn.")
+        .help("", "https://docs.bytechef.io/reference/components/linkedin_v1#create-post")
         .properties(
             string(AUTHOR)
                 .label("Post As")

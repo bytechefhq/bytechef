@@ -39,6 +39,7 @@ public class LinkedInConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.linkedin.com")
+        .help("", "https://docs.bytechef.io/reference/components/linkedin_v1#connection-setup")
         .authorizations(
             authorization(OAUTH2_AUTHORIZATION_CODE)
                 .title("OAuth2 Authorization Code")
@@ -89,7 +90,8 @@ public class LinkedInConnection {
                     Map.of(
                         "X-Restli-Protocol-Version", List.of("2.0.0"),
                         "Linkedin-Version", List.of("202604"),
-                        AUTHORIZATION, List.of(BEARER + " " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
+                        AUTHORIZATION, List.of(BEARER + " " + connectionParameters.getRequiredString(ACCESS_TOKEN))))))
+        .version(1);
 
     private LinkedInConnection() {
     }
