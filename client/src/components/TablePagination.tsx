@@ -59,11 +59,11 @@ const TablePagination = ({onClick, pageNumber, pageSize, totalElements, totalPag
                 <div className="flex-1">
                     <p className="text-sm text-gray-700">
                         Showing
-                        <span className="px-2 font-medium">{pageNumber * pageSize + 1}</span>
+                        <span className="px-1 font-medium">{pageNumber * pageSize + 1}</span>
                         to
-                        <span className="px-2 font-medium">{Math.min(totalElements, (pageNumber + 1) * pageSize)}</span>
+                        <span className="px-1 font-medium">{Math.min(totalElements, (pageNumber + 1) * pageSize)}</span>
                         of
-                        <span className="px-2 font-medium">{totalElements}</span>
+                        <span className="px-1 font-medium">{totalElements}</span>
                         results
                     </p>
                 </div>
