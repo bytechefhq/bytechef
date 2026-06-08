@@ -64,4 +64,6 @@ public interface ProjectService {
     Project update(long id, List<Long> tagIds);
 
     Project update(Project project);
+
+    Project updatePermissionExpression(long id, @Nullable String permissionExpression);
 }

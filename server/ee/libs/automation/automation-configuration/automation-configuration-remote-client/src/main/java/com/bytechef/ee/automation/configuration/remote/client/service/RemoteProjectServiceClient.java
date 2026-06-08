@@ -146,4 +146,9 @@ public class RemoteProjectServiceClient implements ProjectService {
     public Project update(Project project) {
         throw new UnsupportedOperationException();
     }
+
+    @Override
+    public Project updatePermissionExpression(long id, String permissionExpression) {
+        throw new UnsupportedOperationException();
+    }
 }
