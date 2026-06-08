@@ -5,7 +5,7 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.copilot.agent.tool;
+package com.bytechef.ee.ai.agent.tool;
 
 import java.util.Map;
 import org.slf4j.Logger;
