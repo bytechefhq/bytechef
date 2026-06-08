@@ -13,6 +13,7 @@ paths:
       description: "Creates a new contact."
       operationId: "createContact"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/sendfox_v1#create-contact"
       requestBody:
         content:
           application/json:
@@ -135,6 +136,7 @@ paths:
       description: "Creates a new list."
       operationId: "createList"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/sendfox_v1#create-list"
       requestBody:
         content:
           application/json:
@@ -171,6 +173,7 @@ paths:
       description: "Unsubscribes a contact."
       operationId: "unsubscribeContact"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/sendfox_v1#unsubscribe-contact"
       requestBody:
         content:
           application/json:
