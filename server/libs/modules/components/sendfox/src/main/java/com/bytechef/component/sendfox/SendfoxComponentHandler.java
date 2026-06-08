@@ -19,6 +19,7 @@ package com.bytechef.component.sendfox;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDsl.ModifiableComponentDefinition;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.google.auto.service.AutoService;
 
 /**
@@ -32,6 +33,16 @@ public class SendfoxComponentHandler extends AbstractSendfoxComponentHandler {
         return modifiableComponentDefinition
             .categories(ComponentCategory.ADVERTISING)
             .icon("path:assets/sendfox.svg")
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://help.sendfox.com/category/270-api-integrations");
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/sendfox_v1#connection-setup");
     }
 }
