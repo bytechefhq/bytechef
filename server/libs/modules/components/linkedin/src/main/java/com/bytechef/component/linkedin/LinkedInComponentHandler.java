@@ -40,6 +40,7 @@ public final class LinkedInComponentHandler implements ComponentHandler {
             "LinkedIn is a professional networking platform that enables users to connect with colleagues, discover " +
                 "job opportunities, and share industry-related content.")
         .customAction(true)
+        .customActionHelp("", "https://learn.microsoft.com/en-us/linkedin/marketing/overview?view=li-lms-2026-05")
         .icon("path:assets/linkedin.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.SOCIAL_MEDIA)
         .connection(LinkedInConnection.CONNECTION_DEFINITION)
@@ -49,7 +50,8 @@ public final class LinkedInComponentHandler implements ComponentHandler {
         .triggers(LinkedInNewPostTrigger.TRIGGER_DEFINITION)
         .clusterElements(
             tool(LinkedInCreatePostAction.ACTION_DEFINITION),
-            tool(LinkedInDeletePostAction.ACTION_DEFINITION));
+            tool(LinkedInDeletePostAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

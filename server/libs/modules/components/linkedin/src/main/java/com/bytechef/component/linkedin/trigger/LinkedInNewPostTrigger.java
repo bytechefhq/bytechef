@@ -46,6 +46,7 @@ public class LinkedInNewPostTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newPost")
         .title("New Post")
         .description("Triggers when a new post is created in a specific organization.")
+        .help("", "https://docs.bytechef.io/reference/components/linkedin_v1#new-post")
         .type(TriggerType.POLLING)
         .properties(
             string(URN)
