@@ -56,13 +56,13 @@ const SubflowBanner = ({className}: {className?: string}) => {
     return (
         <div
             className={twMerge(
-                'absolute left-2 top-2 z-10 flex w-[483px] items-center gap-2 rounded-md border border-stroke-warning-secondary bg-surface-warning-secondary px-3 py-2',
+                'absolute top-2 left-2 z-10 flex w-[483px] items-center gap-2 rounded-md border border-stroke-warning-secondary bg-surface-warning-secondary px-3 py-2',
                 className
             )}
         >
             <InfoIcon className="size-6 shrink-0 text-content-onwarning" />
 
-            <span className="flex-1 whitespace-nowrap text-sm font-medium text-content-neutral-primary">
+            <span className="flex-1 text-sm font-medium whitespace-nowrap text-content-neutral-primary">
                 Currently inside of a subflow.
             </span>
 
