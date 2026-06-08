@@ -34,6 +34,7 @@ import com.bytechef.atlas.worker.task.handler.TaskHandlerRegistry;
 import com.bytechef.atlas.worker.task.handler.TaskHandlerResolver;
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
 import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
+import com.bytechef.automation.ai.mcp.server.spi.McpServerWorkspaceToolCallbackContributor;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.mcp.service.McpProjectService;
 import com.bytechef.automation.mcp.service.McpProjectWorkflowService;
@@ -45,7 +46,6 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
-import com.bytechef.platform.ai.tool.spi.McpServerWorkspaceToolContributor;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
@@ -164,7 +164,7 @@ public class AutomationMcpServerConfiguration {
     FilterableMcpAsyncServer automationMcpAsyncServer(
         McpComponentService mcpComponentService, McpProjectService mcpProjectService,
         McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
-        ObjectProvider<McpServerWorkspaceToolContributor> workspaceToolProviders,
+        ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
         return new FilterableMcpServerBuilder(automationWebMvcStreamableHttpServerTransportProvider())
@@ -195,7 +195,7 @@ public class AutomationMcpServerConfiguration {
     static List<McpServerFeatures.AsyncToolSpecification> buildToolSpecifications(
         String secretKey, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
         McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
-        ObjectProvider<McpServerWorkspaceToolContributor> workspaceToolProviders,
+        ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
         McpServer mcpServer = mcpServerService.getMcpServer(secretKey);

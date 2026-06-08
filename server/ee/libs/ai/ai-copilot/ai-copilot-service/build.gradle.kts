@@ -109,17 +109,19 @@ dependencies {
     implementation(project(":ag-ui:utils:json"))
     implementation(project(":ag-ui:packages:server"))
     implementation(project(":ag-ui:integrations:spring-ai"))
+    implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
+    implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
-    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-automation"))
-    implementation(project(":server:libs:ai:mcp:mcp-tool:mcp-tool-platform"))
 
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
-    implementation(project(":server:ee:libs:ai:mcp:mcp-tool:mcp-tool-automation"))
+    implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-tool"))
+    implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
 
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
 }

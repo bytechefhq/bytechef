@@ -8,7 +8,7 @@
 package com.bytechef.ee.ai.copilot.util;
 
 import com.agui.core.state.State;
-import com.bytechef.ai.mcp.tool.platform.TaskTools;
+import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 

@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-@ConditionalOnProperty(prefix = "bytechef.ai.gateway", name = "enabled", havingValue = "true")
+@ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotChatClientResolver implements OverrideChatClientResolver {
 
     private static final Logger log = LoggerFactory.getLogger(CopilotChatClientResolver.class);
