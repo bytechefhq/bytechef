@@ -141,9 +141,7 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         String normalized = normalizePermissionExpression(permissionExpression);
 
         if (normalized != null) {
-            projectWorkflow.setPermissionExpression(normalized);
-
-            projectWorkflowService.update(projectWorkflow);
+            projectWorkflowService.updatePermissionExpression(projectWorkflow.getId(), normalized);
         }
 
         return projectWorkflow.getWorkflowId();
@@ -317,11 +315,15 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
         project.setCategoryId(resolveCategory(category));
         project.setTagIds(resolveTags(tags));
 
-        if (permissionExpression != null) {
-            project.setPermissionExpression(normalizePermissionExpression(permissionExpression));
-        }
-
         projectService.update(project);
+
+        // The permission expression is persisted via the dedicated updatePermissionExpression(...); the generic
+        // update(...) above intentionally leaves the column untouched so model-derived updates from the main
+        // automation app don't wipe a stored expression. A null argument means "not supplied" (leave as-is); a
+        // blank argument normalizes to null and clears the stored value.
+        if (permissionExpression != null) {
+            projectService.updatePermissionExpression(projectId, normalizePermissionExpression(permissionExpression));
+        }
     }
 
     @Override
@@ -347,9 +349,8 @@ public class AutomationWorkflowProjectFacadeImpl implements AutomationWorkflowPr
 
         getMarkedProject(projectWorkflow.getProjectId());
 
-        projectWorkflow.setPermissionExpression(normalizePermissionExpression(permissionExpression));
-
-        projectWorkflowService.update(projectWorkflow);
+        projectWorkflowService.updatePermissionExpression(
+            projectWorkflow.getId(), normalizePermissionExpression(permissionExpression));
     }
 
     @Override

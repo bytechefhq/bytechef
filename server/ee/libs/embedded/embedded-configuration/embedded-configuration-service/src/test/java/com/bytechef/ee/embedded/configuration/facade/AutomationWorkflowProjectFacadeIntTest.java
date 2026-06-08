@@ -214,6 +214,51 @@ public class AutomationWorkflowProjectFacadeIntTest {
     }
 
     @Test
+    void testUpdateProjectPersistsPermissionExpression() {
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+
+        automationWorkflowProjectFacade.updateProject(
+            projectId, "Gated", "", null, List.of(), "metadata['tier'] == 'pro'");
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .permissionExpression()).isEqualTo("metadata['tier'] == 'pro'");
+    }
+
+    @Test
+    void testCreateProjectWorkflowPersistsPermissionExpression() {
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+
+        automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, "metadata['tier'] == 'pro'");
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()
+            .getFirst()
+            .permissionExpression()).isEqualTo("metadata['tier'] == 'pro'");
+    }
+
+    @Test
+    void testUpdateProjectWorkflowPermissionExpressionPersistsAndClears() {
+        long projectId = automationWorkflowProjectFacade.createProject("Gated", "", null, List.of(), null);
+
+        String workflowUuid = automationWorkflowProjectFacade.createProjectWorkflow(projectId, null, null);
+
+        automationWorkflowProjectFacade.updateProjectWorkflowPermissionExpression(
+            workflowUuid, "metadata['tier'] == 'pro'");
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()
+            .getFirst()
+            .permissionExpression()).isEqualTo("metadata['tier'] == 'pro'");
+
+        automationWorkflowProjectFacade.updateProjectWorkflowPermissionExpression(workflowUuid, "");
+
+        assertThat(automationWorkflowProjectFacade.getProject(projectId)
+            .workflowTemplates()
+            .getFirst()
+            .permissionExpression()).isNull();
+    }
+
+    @Test
     void testDeleteProject() {
         long projectId = automationWorkflowProjectFacade.createProject("Temp", "", null, List.of(), null);
 

@@ -108,26 +108,24 @@ class AutomationWorkflowProjectFacadePermissionFilterTest {
 
         facade.updateProject(7L, "Pro", "desc", null, List.of(), "");
 
-        ArgumentCaptor<Project> captor = ArgumentCaptor.forClass(Project.class);
-
-        verify(projectService).update(captor.capture());
-
-        assertThat(captor.getValue()
-            .getPermissionExpression()).isNull();
+        // A blank argument normalizes to null and clears the stored value through the dedicated
+        // updatePermissionExpression(...); the generic update(...) intentionally leaves the column untouched.
+        verify(projectService).updatePermissionExpression(7L, null);
     }
 
     @Test
     void testUpdateProjectWorkflowPermissionExpressionWritesJoinEntity() {
-        ProjectWorkflow projectWorkflow = new ProjectWorkflow(1L, 1, "wf-1");
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
 
+        when(projectWorkflow.getId()).thenReturn(5L);
+        when(projectWorkflow.getProjectId()).thenReturn(1L);
         when(projectWorkflowService.getWorkflowProjectWorkflow("wf-1")).thenReturn(projectWorkflow);
         when(projectService.getProject(1L)).thenReturn(markedPublishedProject(1L, "P", null));
 
         facade.updateProjectWorkflowPermissionExpression("wf-1", "metadata['tier'] == 'gold'");
 
-        assertThat(projectWorkflow.getPermissionExpression()).isEqualTo("metadata['tier'] == 'gold'");
-
-        verify(projectWorkflowService).update(projectWorkflow);
+        // The expression is persisted through the dedicated updatePermissionExpression(...) on the join entity.
+        verify(projectWorkflowService).updatePermissionExpression(5L, "metadata['tier'] == 'gold'");
     }
 
     private static ConnectedUser connectedUser(Map<String, String> metadata) {

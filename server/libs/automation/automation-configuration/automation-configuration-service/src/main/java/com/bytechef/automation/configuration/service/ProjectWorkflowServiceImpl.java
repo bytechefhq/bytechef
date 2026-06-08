@@ -21,6 +21,7 @@ import com.bytechef.automation.configuration.repository.ProjectWorkflowRepositor
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -215,5 +216,15 @@ public class ProjectWorkflowServiceImpl implements ProjectWorkflowService {
         curProjectWorkflow.setUuid(projectWorkflow.getUuidAsString());
 
         return projectWorkflowRepository.save(curProjectWorkflow);
+    }
+
+    @Override
+    public ProjectWorkflow updatePermissionExpression(long id, @Nullable String permissionExpression) {
+        ProjectWorkflow projectWorkflow = projectWorkflowRepository.findById(id)
+            .orElseThrow(() -> new IllegalArgumentException("ProjectWorkflow not found"));
+
+        projectWorkflow.setPermissionExpression(permissionExpression);
+
+        return projectWorkflowRepository.save(projectWorkflow);
     }
 }
