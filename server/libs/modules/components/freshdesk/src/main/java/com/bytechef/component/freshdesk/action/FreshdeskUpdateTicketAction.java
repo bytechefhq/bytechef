@@ -41,7 +41,7 @@ import java.util.Map;
 public class FreshdeskUpdateTicketAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("updateTicket")
         .title("Update Ticket")
-        .description("Update a ticket")
+        .description("Updates a ticket.")
         .metadata(
             Map.of(
                 "method", "PUT",

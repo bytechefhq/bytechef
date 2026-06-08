@@ -37,7 +37,7 @@ import java.util.Map;
 public class FreshdeskCreateCompanyAction {
     public static final ComponentDsl.ModifiableActionDefinition ACTION_DEFINITION = action("createCompany")
         .title("Create Company")
-        .description("Creates a new company")
+        .description("Creates a new compan.")
         .metadata(
             Map.of(
                 "method", "POST",
