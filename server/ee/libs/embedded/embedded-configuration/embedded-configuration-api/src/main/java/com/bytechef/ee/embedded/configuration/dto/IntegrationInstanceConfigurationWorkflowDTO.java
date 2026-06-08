@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.dto;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflow;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfigurationWorkflowConnection;
+import com.bytechef.platform.component.domain.PropertyGroup;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -25,7 +26,7 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
     List<IntegrationInstanceConfigurationWorkflowConnection> connections, String createdBy, Instant createdDate,
     Map<String, ?> inputs, boolean enabled, Long id, Instant lastExecutionDate, String lastModifiedBy,
     Instant lastModifiedDate, Long integrationInstanceConfigurationId, int version, Workflow workflow,
-    String workflowId, String workflowUuid)
+    String workflowId, String workflowUuid, Map<String, PropertyGroup> componentInputGroups)
     implements Comparable<IntegrationInstanceConfigurationWorkflowDTO> {
 
     public IntegrationInstanceConfigurationWorkflowDTO(
@@ -43,12 +44,26 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
             integrationInstanceConfigurationWorkflow.getLastModifiedDate(),
             integrationInstanceConfigurationWorkflow.getIntegrationInstanceConfigurationId(),
             integrationInstanceConfigurationWorkflow.getVersion(), workflow,
-            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowUuid);
+            integrationInstanceConfigurationWorkflow.getWorkflowId(), workflowUuid, Map.of());
     }
 
     @Override
     public int compareTo(IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO) {
         return workflowId.compareTo(integrationInstanceConfigurationWorkflowDTO.workflowId);
+    }
+
+    /**
+     * Returns a copy with the resolved component-defined input groups, keyed by workflow input name. The flat
+     * {@link Workflow.Input#componentReference()} only carries the group identifiers; this holds the resolved group the
+     * embedded SDK renders.
+     */
+    public IntegrationInstanceConfigurationWorkflowDTO withComponentInputGroups(
+        Map<String, PropertyGroup> componentInputGroups) {
+
+        return new IntegrationInstanceConfigurationWorkflowDTO(
+            connections, createdBy, createdDate, inputs, enabled, id, lastExecutionDate, lastModifiedBy,
+            lastModifiedDate, integrationInstanceConfigurationId, version, workflow, workflowId, workflowUuid,
+            componentInputGroups);
     }
 
     public IntegrationInstanceConfigurationWorkflow toIntegrationInstanceConfigurationWorkflow() {

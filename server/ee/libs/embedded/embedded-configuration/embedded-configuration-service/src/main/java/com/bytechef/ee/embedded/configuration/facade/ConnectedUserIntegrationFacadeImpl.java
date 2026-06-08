@@ -41,6 +41,7 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -322,11 +323,52 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .filter(workflowDTO -> !mcpWorkflowUuids.contains(workflowDTO.workflowUuid()))
             .filter(workflowDTO -> embeddedPermissionEvaluator.evaluate(
                 permissionExpressionsByUuid.get(workflowDTO.workflowUuid()), connectedUser))
+            .map(this::resolveComponentInputGroups)
             .toList();
 
         return integrationInstanceConfigurationDTO.toBuilder()
             .integrationInstanceConfigurationWorkflows(visibleWorkflows)
             .build();
+    }
+
+    /**
+     * Resolves each component-defined workflow input's flat {@link Workflow.ComponentInputReference} into the actual
+     * component property group, so the embedded SDK renders the rich component widget (e.g. a Slack channel select)
+     * instead of a plain text input.
+     */
+    private IntegrationInstanceConfigurationWorkflowDTO resolveComponentInputGroups(
+        IntegrationInstanceConfigurationWorkflowDTO workflowDTO) {
+
+        Workflow workflow = workflowDTO.workflow();
+
+        if (workflow == null) {
+            return workflowDTO;
+        }
+
+        Map<String, PropertyGroup> componentInputGroups = new HashMap<>();
+
+        for (Workflow.Input input : workflow.getInputs()) {
+            Workflow.ComponentInputReference componentReference = input.componentReference();
+
+            if (componentReference == null) {
+                continue;
+            }
+
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                componentReference.componentName(), componentReference.componentVersion());
+
+            componentDefinition.getInputs()
+                .stream()
+                .filter(propertyGroup -> Objects.equals(propertyGroup.getName(), componentReference.groupName()))
+                .findFirst()
+                .ifPresent(propertyGroup -> componentInputGroups.put(input.name(), propertyGroup));
+        }
+
+        if (componentInputGroups.isEmpty()) {
+            return workflowDTO;
+        }
+
+        return workflowDTO.withComponentInputGroups(componentInputGroups);
     }
 
     private ConnectedUserIntegrationDTO toConnectedUserIntegrationDTO(

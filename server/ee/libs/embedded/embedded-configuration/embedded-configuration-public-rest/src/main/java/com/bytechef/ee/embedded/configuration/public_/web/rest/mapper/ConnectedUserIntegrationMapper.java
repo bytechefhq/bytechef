@@ -8,12 +8,16 @@
 package com.bytechef.ee.embedded.configuration.public_.web.rest.mapper;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.component.definition.Property.Type;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstance;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.ConnectedUserIntegrationInstanceWorkflow;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.OAuth2;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyGroupModel;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputTypeModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationBasicModel;
@@ -24,6 +28,24 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Integration
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpIntegrationInstanceToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.McpToolModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OAuth2Model;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
+import com.bytechef.platform.component.domain.ArrayProperty;
+import com.bytechef.platform.component.domain.BooleanProperty;
+import com.bytechef.platform.component.domain.DateProperty;
+import com.bytechef.platform.component.domain.DateTimeProperty;
+import com.bytechef.platform.component.domain.IntegerProperty;
+import com.bytechef.platform.component.domain.NumberProperty;
+import com.bytechef.platform.component.domain.ObjectProperty;
+import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.OptionsDataSource;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
+import com.bytechef.platform.component.domain.Property;
+import com.bytechef.platform.component.domain.PropertyGroup;
+import com.bytechef.platform.component.domain.StringProperty;
+import com.bytechef.platform.component.domain.TimeProperty;
+import com.bytechef.platform.component.domain.ValueProperty;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -94,7 +116,9 @@ public interface ConnectedUserIntegrationMapper {
         OAuth2Model map(OAuth2 oAuth2);
 
         @Mapping(target = "description", source = "workflow.description")
-        @Mapping(target = "inputs", source = "workflow.inputs")
+        @Mapping(
+            target = "inputs",
+            expression = "java(mapInputs(integrationInstanceConfigurationWorkflowDTO))")
         @Mapping(target = "label", source = "workflow.label")
         IntegrationWorkflowModel map(
             IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO);
@@ -122,12 +146,57 @@ public interface ConnectedUserIntegrationMapper {
         IntegrationInstanceWorkflowModel map(
             ConnectedUserIntegrationInstanceWorkflow integrationInstanceWorkflow);
 
+        default List<InputModel> mapInputs(
+            IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO) {
+
+            Workflow workflow = integrationInstanceConfigurationWorkflowDTO.workflow();
+
+            if (workflow == null) {
+                return List.of();
+            }
+
+            Map<String, PropertyGroup> componentInputGroups =
+                integrationInstanceConfigurationWorkflowDTO.componentInputGroups();
+
+            Map<String, PropertyGroup> resolvedGroups =
+                componentInputGroups == null ? Map.of() : componentInputGroups;
+
+            return workflow.getInputs()
+                .stream()
+                .map(input -> {
+                    InputModel inputModel = map(input);
+
+                    PropertyGroup propertyGroup = resolvedGroups.get(input.name());
+
+                    if (propertyGroup != null && inputModel.getComponentReference() != null) {
+                        inputModel.getComponentReference()
+                            .group(map(propertyGroup));
+                    }
+
+                    return inputModel;
+                })
+                .toList();
+        }
+
         default InputModel map(Workflow.Input input) {
-            return new InputModel()
+            InputModel inputModel = new InputModel()
+                .internalOnly(input.internalOnly())
                 .label(input.label())
                 .name(input.name())
+                .objectName(input.objectName())
                 .required(input.required())
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
+
+            Workflow.ComponentInputReference componentReference = input.componentReference();
+
+            if (componentReference != null) {
+                inputModel.componentReference(
+                    new ComponentInputReferenceModel(
+                        componentReference.componentName(), componentReference.componentVersion(),
+                        componentReference.groupName()));
+            }
+
+            return inputModel;
         }
 
         default InputModel mapWorkflowInput(ConnectedUserIntegrationDTO.WorkflowInputInfo input) {
@@ -136,6 +205,82 @@ public interface ConnectedUserIntegrationMapper {
                 .name(input.name())
                 .required(input.required())
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
+        }
+
+        default ComponentPropertyGroupModel map(PropertyGroup propertyGroup) {
+            ComponentPropertyGroupModel componentPropertyGroupModel =
+                new ComponentPropertyGroupModel(propertyGroup.getName())
+                    .label(propertyGroup.getLabel());
+
+            for (Property property : propertyGroup.getProperties()) {
+                componentPropertyGroupModel.addPropertiesItem(map(property));
+            }
+
+            return componentPropertyGroupModel;
+        }
+
+        default ComponentPropertyModel map(Property property) {
+            ComponentPropertyModel componentPropertyModel =
+                new ComponentPropertyModel(property.getName(), toInputType(property.getType()))
+                    .required(property.getRequired());
+
+            if (property instanceof ValueProperty<?> valueProperty) {
+                componentPropertyModel.label(valueProperty.getLabel());
+
+                var controlType = valueProperty.getControlType();
+
+                if (controlType != null) {
+                    componentPropertyModel.controlType(controlType.name());
+                }
+            }
+
+            for (Option option : getStaticOptions(property)) {
+                componentPropertyModel.addOptionsItem(
+                    new OptionModel(option.getLabel(), String.valueOf(option.getValue())));
+            }
+
+            if (property instanceof OptionsDataSourceAware optionsDataSourceAware) {
+                OptionsDataSource optionsDataSource = optionsDataSourceAware.getOptionsDataSource();
+
+                if (optionsDataSource != null) {
+                    componentPropertyModel.dynamicOptions(true);
+
+                    for (String optionsLookupDependsOn : optionsDataSource.getOptionsLookupDependsOn()) {
+                        componentPropertyModel.addOptionsLookupDependsOnItem(optionsLookupDependsOn);
+                    }
+                }
+            }
+
+            return componentPropertyModel;
+        }
+
+        private static InputTypeModel toInputType(Type type) {
+            return switch (type) {
+                case BOOLEAN -> InputTypeModel.BOOLEAN;
+                case DATE -> InputTypeModel.DATE;
+                case DATE_TIME -> InputTypeModel.DATE_TIME;
+                case INTEGER -> InputTypeModel.INTEGER;
+                case NUMBER -> InputTypeModel.NUMBER;
+                case TIME -> InputTypeModel.TIME;
+                default -> InputTypeModel.STRING;
+            };
+        }
+
+        private static List<Option> getStaticOptions(Property property) {
+            List<Option> options = switch (property) {
+                case StringProperty stringProperty -> stringProperty.getOptions();
+                case IntegerProperty integerProperty -> integerProperty.getOptions();
+                case NumberProperty numberProperty -> numberProperty.getOptions();
+                case BooleanProperty booleanProperty -> booleanProperty.getOptions();
+                case DateProperty dateProperty -> dateProperty.getOptions();
+                case DateTimeProperty dateTimeProperty -> dateTimeProperty.getOptions();
+                case TimeProperty timeProperty -> timeProperty.getOptions();
+                case ObjectProperty objectProperty -> objectProperty.getOptions();
+                case ArrayProperty arrayProperty -> arrayProperty.getOptions();
+                default -> List.of();
+            };
+
+            return options == null ? List.of() : options;
         }
     }
 }
