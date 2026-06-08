@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/sendfox_v1#create-contact"
+    },
     "metadata": {
       "path": "/contacts",
       "mimeType": "application/json",
@@ -1362,7 +1365,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new list.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/sendfox_v1#create-list"
+    },
     "metadata": {
       "path": "/lists",
       "mimeType": "application/json",
@@ -1593,7 +1599,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Unsubscribes a contact.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/sendfox_v1#unsubscribe-contact"
+    },
     "metadata": {
       "path": "/unsubscribe",
       "mimeType": "application/json",
@@ -5761,14 +5770,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/sendfox_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://help.sendfox.com/category/270-api-integrations"
+  },
   "description": "SendFox lets you automate email campaigns, complete with custom opt-in forms and landing pages, so you're not tanking your budget to get new subscribers.",
   "icon": "path:assets/sendfox.svg",
   "inputs": null,
