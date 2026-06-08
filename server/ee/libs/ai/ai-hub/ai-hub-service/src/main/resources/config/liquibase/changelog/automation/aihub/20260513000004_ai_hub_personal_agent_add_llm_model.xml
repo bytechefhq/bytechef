@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-agent LLM provider + model selection. Today every personal agent runs on whatever LLM the workspace has
+        globally configured; "personal agent" implied "their own personality AND their own brain," but the brain part
+        was missing. After this migration, an admin can pick a different model per personal agent (e.g. fast Haiku
+        for a quick-answer agent, slower Opus for a research agent).
+
+        Both nullable: null = fall back to the workspace default. Service-layer guard enforces "both set or both null"
+        — setting only one is invalid. Workspace LLM provider availability is checked at save time.
+
+        Cost attribution: ai_llm_usage rows already record `model` per turn, so reports automatically attribute usage
+        to the per-agent model with no schema changes required there.
+    -->
+    <changeSet id="20260513000004-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_personal_agent">
+            <column name="llm_provider" type="VARCHAR(64)"/>
+            <column name="llm_model" type="VARCHAR(128)"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="llm_provider" tableName="ai_hub_personal_agent"/>
+            <dropColumn columnName="llm_model" tableName="ai_hub_personal_agent"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

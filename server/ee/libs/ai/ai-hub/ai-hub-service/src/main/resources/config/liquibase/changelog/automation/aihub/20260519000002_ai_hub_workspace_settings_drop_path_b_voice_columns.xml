@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Complete the Path B (AI Hub native realtime voice) retirement started in 20260519000001.
+
+        The three remaining Path B columns — voice_connection_id, voice_model, voice_id — were
+        added in 20260513000001 to support the AiHubVoiceProvider SPI (Deepgram, ElevenLabs,
+        OpenAI Realtime). That SPI was deleted in commit a8650575832 and the voice_provider
+        discriminator column was already dropped in 20260519000001.
+
+        The companion columns now have no callers: no Java getter/setter on AiHubWorkspaceSettings
+        calls them, and they are not exposed via the workspace-settings GraphQL schema (which only
+        surfaces voiceWebhookUrl). Dropping them completes the cleanup.
+
+        Safe to drop: all three columns were introduced on this feature branch (20260513000001)
+        and no workspace has been provisioned against them outside development.
+    -->
+    <changeSet id="20260519000002-1" author="Ivica Cardic">
+        <dropColumn columnName="voice_connection_id" tableName="ai_hub_workspace_settings"/>
+        <dropColumn columnName="voice_model" tableName="ai_hub_workspace_settings"/>
+        <dropColumn columnName="voice_id" tableName="ai_hub_workspace_settings"/>
+
+        <rollback>
+            <addColumn tableName="ai_hub_workspace_settings">
+                <column name="voice_connection_id" type="BIGINT"/>
+                <column name="voice_model" type="VARCHAR(128)"/>
+                <column name="voice_id" type="VARCHAR(128)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

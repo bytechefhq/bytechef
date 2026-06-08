@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260429140001-1" author="Ivica Cardic">
+        <!--
+            Denormalised environment column. Strictly speaking this is derivable from a JOIN on
+            ai_hub_task, but the audit-listing UI filters by environment per row and the join
+            cost is non-trivial under the partial index needed for that filter. Adding the column once at write
+            time is cheaper than paying the join on every list page load.
+        -->
+        <addColumn tableName="ai_hub_task_artifact">
+            <column name="environment" type="INT"/>
+        </addColumn>
+
+        <update tableName="ai_hub_task_artifact">
+            <column name="environment" valueNumeric="0"/>
+        </update>
+
+        <addNotNullConstraint
+            tableName="ai_hub_task_artifact" columnName="environment" columnDataType="INT"/>
+
+        <createIndex tableName="ai_hub_task_artifact"
+                     indexName="idx_cc_task_artifact_environment">
+            <column name="environment"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

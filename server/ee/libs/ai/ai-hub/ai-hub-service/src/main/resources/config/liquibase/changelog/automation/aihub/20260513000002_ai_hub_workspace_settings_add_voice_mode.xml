@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Path B v1.2 — voice_mode column.
+
+        Discriminates how the LLM step is wired when voice_provider is set:
+          - ordinal 0 = VOICE_AGENT_PASSTHROUGH (the v1.1 behaviour — provider runs the full
+            STT+LLM+TTS pipeline, AI Hub only contributes the system-prompt text)
+          - ordinal 1 = STT_TTS_NATIVE_LLM (v1.2 default — provider runs STT and TTS only,
+            AI Hub's AiHubRoutingAgent drives the LLM in between, so personal-agent overlay,
+            workspace LLM provider, tools, and chat-memory continuity all apply during voice
+            turns the same way they apply during text turns)
+
+        Persisted as INT ordinal per the project's enum-storage convention (see
+        feedback_enum_storage.md). NULL = use default (NATIVE_LLM). Append new modes at the end
+        to preserve ordinal stability — the EnumOrdinalStabilityTest will pin this.
+    -->
+    <changeSet id="20260513000002-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_workspace_settings">
+            <column name="voice_mode" type="INT"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="voice_mode" tableName="ai_hub_workspace_settings"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

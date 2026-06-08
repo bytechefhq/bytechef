@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adds ai_hub_personal_agent_resource — a per-agent template list of (kind, resourceId, resourceName)
+        references the agent pre-declares (workflows, files, data tables, knowledge bases, MCP servers, API
+        collections, workflow executions, previous tasks). When a task is created against the agent, these rows
+        are copied into ai_hub_task_artifact as *_REFERENCED artifacts. Mirrors ai_hub_personal_agent_tool.
+
+        resource_id is VARCHAR, not BIGINT: composer resource ids are strings and workflow ids are non-numeric,
+        so a uniform string column avoids per-kind columns. kind is an INT ordinal of
+        AiHubPersonalAgentResourceKind.
+    -->
+    <changeSet id="20260521000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_personal_agent_resource">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ai_hub_personal_agent_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_hub_personal_agent_resource_agent"
+                             references="ai_hub_personal_agent(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_id" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="resource_name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            Unique on (agent, kind, resource_id): adding the same resource twice is a no-op rather than producing
+            duplicate rows that would later attach the same artifact twice to a spawned task.
+        -->
+        <addUniqueConstraint tableName="ai_hub_personal_agent_resource"
+                             columnNames="ai_hub_personal_agent_id, kind, resource_id"
+                             constraintName="uk_ai_hub_personal_agent_resource"/>
+
+        <createIndex tableName="ai_hub_personal_agent_resource"
+                     indexName="idx_ai_hub_personal_agent_resource_agent">
+            <column name="ai_hub_personal_agent_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="ai_hub_personal_agent_resource"
+                       indexName="idx_ai_hub_personal_agent_resource_agent"/>
+            <dropUniqueConstraint tableName="ai_hub_personal_agent_resource"
+                                  constraintName="uk_ai_hub_personal_agent_resource"/>
+            <dropTable tableName="ai_hub_personal_agent_resource"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

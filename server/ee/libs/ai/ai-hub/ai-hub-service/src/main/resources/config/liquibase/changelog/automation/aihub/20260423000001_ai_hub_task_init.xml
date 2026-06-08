@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260423000001" author="Ivica Cardic">
+        <createTable tableName="ai_hub_task">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="thread_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="title" type="VARCHAR(255)"/>
+            <column name="last_preview" type="TEXT"/>
+            <column name="message_count" type="INTEGER" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="status" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updated_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!-- Sidebar list query — workspace dimension joins through workspace_ai_hub_task. -->
+        <createIndex tableName="ai_hub_task"
+                     indexName="idx_ai_hub_task_user_status">
+            <column name="user_id"/>
+            <column name="status"/>
+            <column name="updated_at" descending="true"/>
+        </createIndex>
+
+        <createTable tableName="workspace_ai_hub_task">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ai_hub_task_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_ai_hub_task"
+            tableName="workspace_ai_hub_task"
+            columnNames="workspace_id, ai_hub_task_id"/>
+
+        <createIndex tableName="workspace_ai_hub_task"
+                     indexName="idx_workspace_ai_hub_task_workspace">
+            <column name="workspace_id"/>
+        </createIndex>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_ai_hub_task"
+            baseColumnNames="ai_hub_task_id"
+            constraintName="fk_workspace_ai_hub_task_task"
+            referencedTableName="ai_hub_task"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+    </changeSet>
+</databaseChangeLog>

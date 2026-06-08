@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        AI Hub per-workspace settings. One row per workspace. Currently carries just the voice webhook URL but is
+        the natural home for any future workspace-scoped AI Hub config (voice provider, model defaults, retention
+        policies, etc.) so we don't keep growing a different table for each setting.
+
+        workspaceId placement: AI Hub is an automation-package feature, so workspaceId lives directly on the entity
+        rather than via a workspace_<entity> relation table (per the project's workspace_id-placement convention).
+        The unique constraint enforces one-row-per-workspace semantics.
+    -->
+    <changeSet id="20260512000001-1" author="Ivica Cardic">
+        <createTable tableName="ai_hub_workspace_settings">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="voice_webhook_url" type="VARCHAR(2048)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            constraintName="uk_ai_hub_workspace_settings_workspace_id"
+            tableName="ai_hub_workspace_settings"
+            columnNames="workspace_id"/>
+
+        <rollback>
+            <dropTable tableName="ai_hub_workspace_settings"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

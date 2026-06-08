@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adds three columns to `ai_hub_task` so workflow-chat tasks can live in the
+        same table as standard ai-hub tasks:
+
+          - `kind`: int ordinal of the TaskKind enum (0 = STANDARD, 1 = WORKFLOW_CHAT). Defaults to
+            0 (STANDARD) so every existing task row keeps its current semantic. New columns are
+            nullable for the workflow-chat fields below since standard tasks don't carry them.
+
+          - `workflow_execution_id`: the workflow execution id this task chats with. Stored as a
+            VARCHAR because WorkflowExecutionId.parse() reads a composite string (tenantId + UUID), not
+            a numeric id.
+
+          - `project_deployment_id`: surfaces the parent project deployment in the sidebar grouping
+            without requiring a JOIN at render time. Nullable for STANDARD rows.
+
+        New `kind` is appended at the end of the column list per the JDBC enum-storage convention; ordinal
+        stability is enforced by EnumOrdinalStabilityTest in the api module.
+
+        No partial unique index on (workspace, user, environment, workflow_execution_id): workflow-chat
+        creation is always-new, not find-or-create — every click on a workflow-chat sidebar row spawns a
+        fresh task. Multiple tasks per (user, workflow) tuple are the expected behavior,
+        not a duplicate to be deduped.
+    -->
+    <changeSet id="20260502000001-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_task">
+            <column name="kind" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workflow_execution_id" type="VARCHAR(256)">
+                <constraints nullable="true"/>
+            </column>
+            <column name="project_deployment_id" type="BIGINT">
+                <constraints nullable="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="project_deployment_id" tableName="ai_hub_task"/>
+            <dropColumn columnName="workflow_execution_id" tableName="ai_hub_task"/>
+            <dropColumn columnName="kind" tableName="ai_hub_task"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

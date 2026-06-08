@@ -132,6 +132,34 @@
     <includeAll path="classpath:config/liquibase/changelog/platform/ai/chat_memory" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
 
     <!--
+        automation/aihub is loaded AFTER automation/asset_file: the
+        20260429120001_*_ai_hub_task_asset_file_init.xml changeset has a
+        FK reference to asset_file(id), which is created under the `execution` context.
+        Liquibase resolves changesets in master.xml document order regardless of which
+        contexts gate them, so any deployment that runs both contexts (mono, multitenant)
+        must see asset_file before automation/aihub. Kept under `configuration` contextFilter
+        because the bulk of ai_hub tables (task, memory, usage) are still
+        configuration-tier — only the join table touches asset_file.
+    -->
+    <!--
+        platform/ai/auto/memory holds the shared ai_auto_memory table — extracted from CC's ai_hub_memory
+        so any agent surface (AI Hub today, the future AI agent runtime) can reuse the same auto-curated
+        long-term memory store.
+    -->
+    <includeAll path="classpath:config/liquibase/changelog/platform/ai/auto/memory" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+
+    <includeAll path="classpath:config/liquibase/changelog/automation/aihub" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or configuration or multitenant" />
+
+    <!--
+        automation/aihub_execution holds the v2.2+ per-task tool persistence tables
+        (ai_hub_task_component, ai_hub_task_tool). They live in
+        aihub_execution/ rather than aihub/ because their FKs reach into the execution-tier
+        connection(id) table — so they must be loaded under the `execution` context, after both
+        automation/aihub/ (FK to ai_hub_task) and platform/execution/ (FK to connection).
+    -->
+    <includeAll path="classpath:config/liquibase/changelog/automation/aihub_execution" relativeToChangelogFile="false" errorIfMissingOrEmpty="false" contextFilter="mono or execution or multitenant" />
+
+    <!--
         platform/ai/tool/usage holds the shared ai_tool_usage table used by every agent surface for tool-call
         metering (AI Hub today; the future AI agent runtime + ad-hoc tool runners next). Replaces the
         EE-only ai_hub_tool_usage; the column shape is mostly the same but task_id was generalised to

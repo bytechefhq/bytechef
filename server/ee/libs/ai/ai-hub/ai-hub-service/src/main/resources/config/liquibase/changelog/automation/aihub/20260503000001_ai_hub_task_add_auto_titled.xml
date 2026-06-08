@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adds `auto_titled` to `ai_hub_task` so the LLM title generator can decide whether
+        to regenerate. Semantics:
+
+          - TRUE (default for new rows):    title was set automatically (createWorkflowChat or unset),
+                                            LLM is free to regenerate on the next turn.
+          - FALSE:                          title was set authoritatively (LLM-regenerated, user-renamed),
+                                            generateTaskTitle short-circuits.
+
+        Backfill rule for existing rows:
+          - title IS NULL                → TRUE  (never been titled, eligible)
+          - kind = 1 (WORKFLOW_CHAT)     → TRUE  (workflow chats got an initial label-based title that
+                                                  should still be regenerable once)
+          - otherwise                    → FALSE (standard tasks with LLM-generated or user-set
+                                                  titles, locked from auto-regeneration)
+
+        Why TRUE for workflow chats specifically: createWorkflowChat sets the initial title to
+        "${projectName} — ${workflowLabel}" so the sidebar has something meaningful to show. After 2+
+        turns the LLM can generate a more specific title (e.g. "Refund inquiry from Alice"). Without
+        this backfill, workflow chats would be permanently stuck on the project-name title.
+    -->
+    <changeSet id="20260503000001-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_task">
+            <column name="auto_titled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+
+        <!--
+            Backfill: lock existing standard rows that already have a title; leave workflow chats and
+            unnamed standard rows eligible. The CASE expression compiles to a single UPDATE so even a
+            workspace with thousands of tasks runs in one round-trip.
+        -->
+        <sql>
+            UPDATE ai_hub_task
+            SET auto_titled = CASE
+                WHEN title IS NULL THEN TRUE
+                WHEN kind = 1 THEN TRUE
+                ELSE FALSE
+            END;
+        </sql>
+
+        <rollback>
+            <dropColumn columnName="auto_titled" tableName="ai_hub_task"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

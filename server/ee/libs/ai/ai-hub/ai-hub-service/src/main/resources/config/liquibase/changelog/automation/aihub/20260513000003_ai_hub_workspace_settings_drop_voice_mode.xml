@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Path B is single-mode by design: the provider does STT + TTS only, AI Hub's AiHubRoutingAgent drives the LLM in
+        between. The voice_mode column added in 20260513000002 supported a VOICE_AGENT_PASSTHROUGH alternative where the
+        provider also ran the LLM, but that mode duplicates what Path A's workflow-routed voice already does — better,
+        because the workflow author has full control over the voice pipeline. Removing it eliminates a misleading toggle
+        and clarifies the contract: Path B = "AI Hub voice with AI Hub LLM in the loop," full stop.
+
+        Safe to drop because no workspace has been deployed against the column outside dev (the parent migration
+        20260513000002 was committed on the same feature branch). The companion enum, SPI mode field, GraphQL surface,
+        and popover toggle are all removed in the same code change.
+    -->
+    <changeSet id="20260513000003-1" author="Ivica Cardic">
+        <dropColumn columnName="voice_mode" tableName="ai_hub_workspace_settings"/>
+
+        <rollback>
+            <addColumn tableName="ai_hub_workspace_settings">
+                <column name="voice_mode" type="INT"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

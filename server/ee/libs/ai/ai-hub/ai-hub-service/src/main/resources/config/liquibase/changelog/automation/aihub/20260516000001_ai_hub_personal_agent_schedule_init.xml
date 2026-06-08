@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260516000001-1" author="Ivica Cardic">
+        <createTable tableName="ai_hub_personal_agent_schedule">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ai_hub_personal_agent_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_hub_pa_schedule_agent"
+                             references="ai_hub_personal_agent(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="environment" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="title" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="prompt" type="TEXT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="frequency_kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="interval_minutes" type="INT"/>
+            <column name="minute_of_hour" type="INT"/>
+            <column name="time_of_day" type="TIME"/>
+            <column name="day_of_week" type="INT"/>
+            <column name="day_of_month" type="INT"/>
+            <column name="cron_expression" type="VARCHAR(255)"/>
+            <column name="effective_cron_expression" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="zone_id" type="VARCHAR(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="start_date" type="TIMESTAMP"/>
+            <column name="lifecycle_kind" type="INT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="max_runs" type="INT"/>
+            <column name="remaining_runs" type="INT"/>
+            <column name="consecutive_failures" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_run_at" type="TIMESTAMP"/>
+            <column name="next_run_at" type="TIMESTAMP"/>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint tableName="ai_hub_personal_agent_schedule"
+                             columnNames="ai_hub_personal_agent_id"
+                             constraintName="uk_ai_hub_personal_agent_schedule_agent"/>
+
+        <createIndex tableName="ai_hub_personal_agent_schedule"
+                     indexName="idx_ai_hub_personal_agent_schedule_workspace_user">
+            <column name="workspace_id"/>
+            <column name="user_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

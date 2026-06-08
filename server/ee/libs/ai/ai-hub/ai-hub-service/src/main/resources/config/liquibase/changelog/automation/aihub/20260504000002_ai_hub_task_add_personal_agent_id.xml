@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adds ai_hub_personal_agent_id to ai_hub_task so PERSONAL_AGENT-kind rows can carry a FK back to
+        the ai_hub_personal_agent definition. Nullable because STANDARD and WORKFLOW_CHAT rows leave it
+        null — same shape as workflow_execution_id / project_deployment_id which are kind-specific and null
+        otherwise.
+
+        The FK uses ON DELETE CASCADE: when a user deletes a personal agent, every task spawned from it
+        goes with it. Mirrors the personal-agent-tool FK behavior; preserving orphan tasks whose `kind`
+        still says PERSONAL_AGENT but whose agent_id is null would leave the sidebar in an inconsistent state.
+
+        No partial unique index on (workspace, user, environment, ai_hub_personal_agent_id): task creation
+        from a personal agent is always-new, not find-or-create — every click on a personal-agent sidebar
+        row spawns a fresh task. Multiple tasks per (user, agent) tuple are the expected
+        behavior, not a duplicate to be deduped.
+    -->
+    <changeSet id="20260504000002-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_task">
+            <column name="ai_hub_personal_agent_id" type="BIGINT">
+                <constraints nullable="true"
+                             foreignKeyName="fk_cc_task_personal_agent"
+                             references="ai_hub_personal_agent(id)"
+                             deleteCascade="true"/>
+            </column>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="ai_hub_personal_agent_id" tableName="ai_hub_task"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

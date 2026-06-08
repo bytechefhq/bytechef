@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Path B schema extension. Adds four nullable columns to ai_hub_workspace_settings so a workspace can
+        configure a native-voice provider (Deepgram, OpenAI Realtime, ElevenLabs) instead of pointing at a
+        customer-built voice workflow (Path A's voice_webhook_url).
+
+        Path A and Path B are mutually exclusive:
+          - voice_webhook_url set → AI Hub routes voice through the customer's workflow webhook
+          - voice_provider set     → AI Hub routes voice through its own /api/automation/internal/ai-hub/voice
+                                     WS endpoint, which proxies to the configured provider
+          - both null              → voice disabled
+
+        The mutex isn't enforced at the DB layer because Path B still ships in phases — Phase 1 (this
+        migration) is purely additive. The mutual-exclusion check lives in the service layer once
+        AiHubVoiceProvider lookups go live (Phase 2). Existing Path A rows keep working unchanged.
+
+        Column rationale:
+          - voice_provider: enum-as-string ("DEEPGRAM" | "OPENAI_REALTIME" | "ELEVENLABS"). String to avoid
+            ordinal-stability concerns; the enum lives in Java alone and SQL stores the name.
+          - voice_connection_id: FK-soft to a connection row carrying the provider's API key. Not declared
+            as a hard FK because connection deletion shouldn't cascade-clear voice config — instead voice
+            falls back to disabled and the admin re-configures.
+          - voice_model: provider-specific model identifier (e.g. "gpt-4o-realtime", "eleven_turbo_v2_5").
+          - voice_id: provider-specific TTS voice identifier (e.g. "aura-asteria-en", "21m00Tcm4TlvDq8ikWAM").
+    -->
+    <changeSet id="20260513000001-1" author="Ivica Cardic">
+        <addColumn tableName="ai_hub_workspace_settings">
+            <column name="voice_provider" type="VARCHAR(64)"/>
+            <column name="voice_connection_id" type="BIGINT"/>
+            <column name="voice_model" type="VARCHAR(128)"/>
+            <column name="voice_id" type="VARCHAR(128)"/>
+        </addColumn>
+
+        <rollback>
+            <dropColumn columnName="voice_provider" tableName="ai_hub_workspace_settings"/>
+            <dropColumn columnName="voice_connection_id" tableName="ai_hub_workspace_settings"/>
+            <dropColumn columnName="voice_model" tableName="ai_hub_workspace_settings"/>
+            <dropColumn columnName="voice_id" tableName="ai_hub_workspace_settings"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

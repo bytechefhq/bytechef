@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Adds ai_hub_personal_agent_tool — a per-agent template list of (componentName, componentVersion,
+        operationName) triples that get auto-attached to every new task the agent spawns. Mirrors the AI
+        Agent simple-mode tools picker: an agent declares "I can use these tools" once at creation, then every chat
+        with that agent starts with those tools attached without the user having to re-select them per turn.
+
+        Why a separate table rather than a JSONB array column on ai_hub_personal_agent: the task
+        copy path needs to insert per-tool rows into ai_hub_task_tool, which is row-based. Keeping
+        the same shape on both sides means the copy is a straight INSERT...SELECT rather than a JSON-array
+        deserialise + per-row insert loop. Also lets future per-tool features (parameter templates, conditional
+        gating) attach to the row without schema churn.
+
+        Operation_name is the cluster-element name the tool maps to (e.g. "sendMessage" for slack). Version is
+        explicit so an agent pinned to slack v2 keeps working when v3 ships — the task_tool insertion
+        carries the same version forward.
+    -->
+    <changeSet id="20260505000002" author="Ivica Cardic">
+        <createTable tableName="ai_hub_personal_agent_tool">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="ai_hub_personal_agent_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ai_hub_personal_agent_tool_agent"
+                             references="ai_hub_personal_agent(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="component_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="component_version" type="INT" defaultValueNumeric="1">
+                <constraints nullable="false"/>
+            </column>
+            <column name="operation_name" type="VARCHAR(128)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_at" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <!--
+            Unique on (agent, component, version, operation): adding the same tool twice should be a no-op rather
+            than producing duplicate rows that would later attach the same tool twice to a task. The
+            partial-component-version dimension means slack v1 and slack v2 can both be on the same agent (e.g. a
+            migration window), but adding slack v1 sendMessage twice is a no-op.
+        -->
+        <addUniqueConstraint tableName="ai_hub_personal_agent_tool"
+                             columnNames="ai_hub_personal_agent_id, component_name, component_version, operation_name"
+                             constraintName="uk_ai_hub_personal_agent_tool"/>
+
+        <!--
+            Lookup index for the "list tools for this agent" query. The unique constraint above gives us a
+            (ai_hub_personal_agent_id, ...) prefix-usable index, but creating the explicit single-column index keeps the
+            list query plan stable even if the unique constraint's column order changes.
+        -->
+        <createIndex tableName="ai_hub_personal_agent_tool"
+                     indexName="idx_ai_hub_personal_agent_tool_agent">
+            <column name="ai_hub_personal_agent_id"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="ai_hub_personal_agent_tool" indexName="idx_ai_hub_personal_agent_tool_agent"/>
+            <dropUniqueConstraint tableName="ai_hub_personal_agent_tool"
+                                  constraintName="uk_ai_hub_personal_agent_tool"/>
+            <dropTable tableName="ai_hub_personal_agent_tool"/>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>

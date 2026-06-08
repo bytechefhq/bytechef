@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Path B (AI Hub native realtime voice) is fully retired. The AiHubVoiceProvider SPI and its
+        Deepgram implementation were deleted in commit a8650575832. The voice_provider column was the
+        only consumer — it stored the provider discriminator (e.g. "DEEPGRAM", "ELEVENLABS") that
+        routed audio through AI Hub's native voice WS endpoint.
+
+        The companion columns voice_connection_id, voice_model, and voice_id (added in
+        20260513000001) are dropped in 20260519000002 — none of them have any callers in the Java
+        layer and they are not exposed via the workspace-settings GraphQL schema. voice_provider is
+        dropped first here because its Java field has no remaining callers after the SPI deletion.
+
+        Safe to drop: the parent migration (20260513000001) was committed on this feature branch and
+        no workspace has been provisioned against it outside development.
+    -->
+    <changeSet id="20260519000001-1" author="Ivica Cardic">
+        <dropColumn columnName="voice_provider" tableName="ai_hub_workspace_settings"/>
+
+        <rollback>
+            <addColumn tableName="ai_hub_workspace_settings">
+                <column name="voice_provider" type="VARCHAR(64)"/>
+            </addColumn>
+        </rollback>
+    </changeSet>
+</databaseChangeLog>
