@@ -2,6 +2,7 @@ package com.agui.server;
 
 import com.agui.core.agent.Agent;
 import com.agui.core.agent.AgentSubscriber;
+import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.agent.RunAgentParameters;
 import com.agui.core.context.Context;
@@ -15,6 +16,7 @@ import com.agui.core.state.State;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.function.Function;
 
 /**
@@ -133,7 +135,28 @@ public abstract class LocalAgent implements Agent {
             parameters.getForwardedProps()
         );
 
-        CompletableFuture.runAsync(() -> this.run(input, subscriber));
+        CompletableFuture
+            .runAsync(() -> this.run(input, subscriber))
+            .whenComplete((unused, throwable) -> {
+                if (throwable == null) {
+                    future.complete(null);
+
+                    return;
+                }
+
+                Throwable cause = throwable instanceof CompletionException && throwable.getCause() != null
+                    ? throwable.getCause()
+                    : throwable;
+
+                try {
+                    subscriber.onRunFailed(
+                        new AgentSubscriberParams(input.messages(), this.state, this, input), cause);
+                } catch (RuntimeException runFailedException) {
+                    cause.addSuppressed(runFailedException);
+                }
+
+                future.completeExceptionally(cause);
+            });
 
         return future;
     }
