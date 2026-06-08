@@ -234,19 +234,22 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                                 .description(TO_DESCRIPTION)
                                 .required(true))))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/data-mapper_v1#replace-all-specified-values")
         .perform(DataMapperReplaceAllSpecifiedValuesAction::perform);
 
     private DataMapperReplaceAllSpecifiedValuesAction() {
     }
 
-    @SuppressWarnings("unchecked")
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
         Map<Object, Object> mappingMap = mappings.stream()
-            .collect(HashMap::new, (map, value) -> map.put(value.getFrom(), value.getTo()), HashMap::putAll);
+            .collect(
+                HashMap::new,
+                (map, value) -> map.put(value.getFrom(), value.getTo()),
+                HashMap::putAll);
 
         InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
         ValueType mappingType = inputParameters.getRequired(TYPE, ValueType.class);

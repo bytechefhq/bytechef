@@ -315,14 +315,13 @@ public class DataMapperReplaceValueAction {
                                 .description(TO_DESCRIPTION)
                                 .required(true))))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#replace-value")
         .perform(DataMapperReplaceValueAction::perform);
 
     private DataMapperReplaceValueAction() {
     }
 
-    protected static Object perform(
-        Parameters inputParameters, Parameters connectionParameters, Context context) {
-
+    public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         Class<?> type = DataMapperUtils.getType(inputParameters);
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 

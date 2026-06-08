@@ -76,12 +76,15 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                                         "input value to. Dot notation.")))
                 .required(true))
         .output()
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/data-mapper_v1#replace-multiple-values-by-key")
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
     private DataMapperReplaceMultipleValuesByKeyAction() {
     }
 
-    protected static Map<String, Object> perform(
+    public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<StringMapping> mappings = inputParameters.getList(MAPPINGS, StringMapping.class, List.of());

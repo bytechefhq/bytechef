@@ -68,21 +68,23 @@ public class DataMapperMapObjectsToArrayAction {
             string(FIELD_KEY)
                 .label("Field Key")
                 .description(
-                    "Property key of each newly created object in the array. Its property value will be a property key from the input.")
+                    "Property key of each newly created object in the array. Its property value will be a property " +
+                        "key from the input.")
                 .required(true),
             string(VALUE_KEY)
                 .label("Value Key")
                 .description(
-                    "Property key of each newly created object in the array. Its property value will be a property value from the input.")
+                    "Property key of each newly created object in the array. Its property value will be a property " +
+                        "value from the input.")
                 .required(true))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#map-objects-to-array")
         .perform(DataMapperMapObjectsToArrayAction::perform);
 
     private DataMapperMapObjectsToArrayAction() {
     }
 
-    @SuppressWarnings("unchecked")
-    protected static List<Map<String, Object>> perform(
+    public static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
         List<Map<String, Object>> output = new ArrayList<>();
