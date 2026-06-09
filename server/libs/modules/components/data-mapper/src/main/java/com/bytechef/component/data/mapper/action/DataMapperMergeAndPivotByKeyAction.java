@@ -58,14 +58,13 @@ public class DataMapperMergeAndPivotByKeyAction {
                 .description("The value of each property in the newly created objects value.")
                 .required(true))
         .output()
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/data-mapper_v1#merge-and-pivot-properties-by-key")
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#merge-and-pivot-properties-by-key")
         .perform(DataMapperMergeAndPivotByKeyAction::perform);
 
     private DataMapperMergeAndPivotByKeyAction() {
     }
 
+    @SuppressWarnings("unchecked")
     public static Map<String, Map<Object, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 

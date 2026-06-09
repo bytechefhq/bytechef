@@ -31,7 +31,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -39,72 +38,55 @@ import org.junit.jupiter.api.Test;
  */
 class DataMapperRenameKeysActionTest {
 
-    private Parameters connectionParameters;
-    private ActionContext context;
-    private Parameters inputParameters;
-
-    @BeforeEach
-    void beforeEach() {
-        connectionParameters = mock(Parameters.class);
-        context = mock(ActionContext.class);
-        inputParameters = mock(Parameters.class);
-    }
+    private final Parameters connectionParameters = mock(Parameters.class);
+    private final ActionContext context = mock(ActionContext.class);
+    private final Parameters inputParameters = mock(Parameters.class);
 
     @Test
     void testPerformWithEmptyMappings() {
-        // Setup
-        Map<String, String> inputJson = new LinkedHashMap<>();
+        Map<String, String> inputJson = Map.of("key", "value");
 
-        inputJson.put("key", "value");
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of());
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(List.of());
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertEquals(inputJson, result, "Result should be unchanged when mappings are empty");
     }
 
     @Test
     void testPerformRenameKeysSingleKey() {
-        // Setup
         Map<String, String> inputJson = new LinkedHashMap<>();
 
         inputJson.put("oldKey", "value");
 
-        List<StringMapping> mappings = List.of(new StringMapping("oldKey", "newKey"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of(new StringMapping("oldKey", "newKey")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(result.containsKey("newKey"), "Result should contain new key");
         assertFalse(result.containsKey("oldKey"), "Result should not contain old key");
     }
 
     @Test
     void testPerformRenameKeysMultipleMapping() {
-        // Setup
         Map<String, String> inputJson = new LinkedHashMap<>();
 
         inputJson.put("oldKey1", "value1");
         inputJson.put("oldKey2", "value2");
 
-        List<StringMapping> mappings =
-            List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of(new StringMapping("oldKey1", "newKey1"), new StringMapping("oldKey2", "newKey2")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(result.containsKey("newKey1"), "Result should contain new key");
         assertTrue(result.containsKey("newKey2"), "Result should contain new key");
         assertFalse(result.containsKey("oldKey1"), "Result should not contain old key");
@@ -113,7 +95,6 @@ class DataMapperRenameKeysActionTest {
 
     @Test
     void testPerformRenameKeysNestedKey() {
-        // Setup
         Map<String, String> secondJson = new LinkedHashMap<>();
 
         secondJson.put("oldKey", "value");
@@ -122,15 +103,13 @@ class DataMapperRenameKeysActionTest {
 
         inputJson.put("parent", secondJson);
 
-        List<StringMapping> mappings = List.of(new StringMapping("parent.oldKey", "newKey"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of(new StringMapping("parent.oldKey", "newKey")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(((Map<?, ?>) result.get("parent")).containsKey("newKey"), "Result should contain new nested key");
         assertFalse(
             ((Map<?, ?>) result.get("parent")).containsKey("oldKey"), "Result should not contain old nested key");
@@ -138,7 +117,6 @@ class DataMapperRenameKeysActionTest {
 
     @Test
     void testPerformRenameKeysNestedKeyMultipleMappings() {
-        // Setup
         Map<String, String> secondJson = new LinkedHashMap<>();
 
         secondJson.put("oldKey", "value");
@@ -147,16 +125,13 @@ class DataMapperRenameKeysActionTest {
 
         inputJson.put("parent", secondJson);
 
-        List<StringMapping> mappings = List.of(
-            new StringMapping("parent", "father"), new StringMapping("father.oldKey", "newKey"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of(new StringMapping("parent", "father"), new StringMapping("father.oldKey", "newKey")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(result.containsKey("father"), "Result should contain renamed parent key");
         assertTrue(((Map<?, ?>) result.get("father")).containsKey("newKey"), "Result should contain new nested key");
         assertFalse(
@@ -165,7 +140,6 @@ class DataMapperRenameKeysActionTest {
 
     @Test
     void testPerformRenameKeysNestedArray() {
-        // Setup
         Map<String, String> secondJson = new LinkedHashMap<>();
 
         secondJson.put("oldKey", "value");
@@ -178,15 +152,13 @@ class DataMapperRenameKeysActionTest {
 
         inputJson.put("parent", list);
 
-        List<StringMapping> mappings = List.of(new StringMapping("parent[0].oldKey", "newKey"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(List.of(new StringMapping("parent[0].oldKey", "newKey")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(
             ((Map<?, ?>) ((List<?>) result.get("parent")).getFirst()).containsKey("newKey"),
             "Result should contain new nested key");
@@ -197,7 +169,6 @@ class DataMapperRenameKeysActionTest {
 
     @Test
     void testPerformRenameKeysNestedArrayMultipleMappings() {
-        // Setup
         Map<String, String> secondJson = new LinkedHashMap<>();
 
         secondJson.put("oldKey", "value");
@@ -210,16 +181,14 @@ class DataMapperRenameKeysActionTest {
 
         inputJson.put("parent", list);
 
-        List<StringMapping> mappings = List.of(
-            new StringMapping("parent", "father"), new StringMapping("father[0].oldKey", "newKey"));
+        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of()))
+            .thenReturn(
+                List.of(new StringMapping("parent", "father"), new StringMapping("father[0].oldKey", "newKey")));
+        when(inputParameters.get(INPUT))
+            .thenReturn(inputJson);
 
-        when(inputParameters.getList(MAPPINGS, StringMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.get(INPUT)).thenReturn(inputJson);
-
-        // Execute
         Map<String, Object> result = DataMapperRenameKeysAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertTrue(result.containsKey("father"), "Result should contain renamed parent key");
         assertTrue(
             ((Map<?, ?>) ((List<?>) result.get("father")).getFirst()).containsKey("newKey"),

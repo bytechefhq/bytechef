@@ -84,6 +84,7 @@ public class DataMapperMapObjectsToArrayAction {
     private DataMapperMapObjectsToArrayAction() {
     }
 
+    @SuppressWarnings("unchecked")
     public static List<Map<String, Object>> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 

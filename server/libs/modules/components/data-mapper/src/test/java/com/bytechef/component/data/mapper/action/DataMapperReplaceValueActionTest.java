@@ -38,7 +38,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -48,16 +47,9 @@ import org.mockito.Mockito;
  */
 class DataMapperReplaceValueActionTest {
 
-    private Parameters connectionParameters;
-    private ActionContext context;
-    private Parameters inputParameters;
-
-    @BeforeEach
-    void beforeEach() {
-        connectionParameters = mock(Parameters.class);
-        context = mock(ActionContext.class);
-        inputParameters = mock(Parameters.class);
-    }
+    private final Parameters connectionParameters = mock(Parameters.class);
+    private final ActionContext context = mock(ActionContext.class);
+    private final Parameters inputParameters = mock(Parameters.class);
 
     @Test
     void testPerformWithArrayType() {
@@ -125,7 +117,8 @@ class DataMapperReplaceValueActionTest {
     void testPerformWithStringTypeRegexNotExists() {
         String inputValue = "input value";
 
-        when(inputParameters.getString(VALUE)).thenReturn(inputValue);
+        when(inputParameters.getString(VALUE))
+            .thenReturn(inputValue);
 
         setupAndAssertTest(
             inputValue, "m", "_", "defaultValue", ValueType.STRING, result -> assertEquals(
@@ -134,16 +127,17 @@ class DataMapperReplaceValueActionTest {
 
     @Test
     void testPerformEmptyMapping() {
-        // Setup
-        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(List.of());
-        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class))).thenReturn(ValueType.INTEGER);
-        when(inputParameters.get(eq(VALUE), any())).thenReturn(1);
-        when((String) inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn("defaultValue");
+        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
+            .thenReturn(List.of());
+        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class)))
+            .thenReturn(ValueType.INTEGER);
+        when(inputParameters.get(eq(VALUE), any()))
+            .thenReturn(1);
+        when((String) inputParameters.get(eq(DEFAULT_VALUE), any()))
+            .thenReturn("defaultValue");
 
-        // Execute
         Object result = DataMapperReplaceValueAction.perform(inputParameters, connectionParameters, context);
 
-        // Verify
         assertEquals("defaultValue", result, "Result should be default value due to empty mapping.");
     }
 
@@ -173,10 +167,14 @@ class DataMapperReplaceValueActionTest {
 
         when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
             .thenReturn(List.of(new ObjectMapping(inputMapping, outputMapping)));
-        when(inputParameters.get(eq(VALUE), any())).thenReturn(inputValue);
-        when(inputParameters.getString(eq(VALUE))).thenReturn(inputValue.toString());
-        when(inputParameters.get(eq(DEFAULT_VALUE), any())).thenReturn(defaultValue);
-        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class))).thenReturn(type);
+        when(inputParameters.get(eq(VALUE), any()))
+            .thenReturn(inputValue);
+        when(inputParameters.getString(eq(VALUE)))
+            .thenReturn(inputValue.toString());
+        when(inputParameters.get(eq(DEFAULT_VALUE), any()))
+            .thenReturn(defaultValue);
+        when(inputParameters.getRequired(eq(TYPE), eq(ValueType.class)))
+            .thenReturn(type);
 
         try (MockedStatic<DataMapperUtils> dataMapperUtilsMockedStatic = mockStatic(
             DataMapperUtils.class, Mockito.CALLS_REAL_METHODS)) {

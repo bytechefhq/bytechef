@@ -76,9 +76,7 @@ public class DataMapperReplaceMultipleValuesByKeyAction {
                                         "input value to. Dot notation.")))
                 .required(true))
         .output()
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/data-mapper_v1#replace-multiple-values-by-key")
+        .help("", "https://docs.bytechef.io/reference/components/data-mapper_v1#replace-multiple-values-by-key")
         .perform(DataMapperReplaceMultipleValuesByKeyAction::perform);
 
     private DataMapperReplaceMultipleValuesByKeyAction() {

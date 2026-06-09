@@ -242,6 +242,7 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
     private DataMapperReplaceAllSpecifiedValuesAction() {
     }
 
+    @SuppressWarnings("unchecked")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         List<ObjectMapping> mappings = inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of());
 
