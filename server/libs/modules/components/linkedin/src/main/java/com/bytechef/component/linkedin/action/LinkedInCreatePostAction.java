@@ -76,7 +76,9 @@ public class LinkedInCreatePostAction {
                 .defaultValue(Author.PERSON.name())
                 .required(true),
             string(URN)
-                .description("Organization URN")
+                .label("Organization Number")
+                .description(
+                    "Enter the organization number in the URN field. For example, 03262013 not urn:li:company:03262013.")
                 .displayCondition("%s == '%s'".formatted(AUTHOR, Author.ORGANIZATION.name()))
                 .required(true),
             string(COMMENTARY)
