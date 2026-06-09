@@ -37,7 +37,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -45,16 +44,9 @@ import org.junit.jupiter.api.Test;
  */
 class DataMapperReplaceAllSpecifiedValuesActionTest {
 
-    private Parameters connectionParameters;
-    private ActionContext context;
-    private Parameters inputParameters;
-
-    @BeforeEach
-    public void beforeEach() {
-        connectionParameters = mock(Parameters.class);
-        context = mock(ActionContext.class);
-        inputParameters = mock(Parameters.class);
-    }
+    private final Parameters connectionParameters = mock(Parameters.class);
+    private final ActionContext context = mock(ActionContext.class);
+    private final Parameters inputParameters = mock(Parameters.class);
 
     @Test
     void testPerformWithStringTypeObject() {
@@ -306,9 +298,12 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     }
 
     private void setupAndAssertTest(List<Object> inputValue, List<ObjectMapping> mappings, Consumer<List<?>> consumer) {
-        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.getList(INPUT, Object.class, List.of())).thenReturn(inputValue);
-        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.ARRAY);
+        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
+            .thenReturn(mappings);
+        when(inputParameters.getList(INPUT, Object.class, List.of()))
+            .thenReturn(inputValue);
+        when(inputParameters.get(INPUT_TYPE, InputType.class))
+            .thenReturn(InputType.ARRAY);
 
         Object result = DataMapperReplaceAllSpecifiedValuesAction.perform(
             inputParameters, connectionParameters, context);
@@ -319,9 +314,12 @@ class DataMapperReplaceAllSpecifiedValuesActionTest {
     private void setupAndAssertTest(
         Map<String, Object> inputValue, List<ObjectMapping> mappings, Consumer<Object> consumer) {
 
-        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of())).thenReturn(mappings);
-        when(inputParameters.getMap(INPUT, Object.class, Map.of())).thenReturn(inputValue);
-        when(inputParameters.get(INPUT_TYPE, InputType.class)).thenReturn(InputType.OBJECT);
+        when(inputParameters.getList(MAPPINGS, ObjectMapping.class, List.of()))
+            .thenReturn(mappings);
+        when(inputParameters.getMap(INPUT, Object.class, Map.of()))
+            .thenReturn(inputValue);
+        when(inputParameters.get(INPUT_TYPE, InputType.class))
+            .thenReturn(InputType.OBJECT);
 
         Object result = DataMapperReplaceAllSpecifiedValuesAction.perform(
             inputParameters, connectionParameters, context);

@@ -131,8 +131,7 @@ public class DataMapperMapObjectsToObjectAction {
         Map<String, Pair<String, Boolean>> mappingMap = mappings.stream()
             .collect(
                 Collectors.toMap(
-                    RequiredStringMapping::getFrom,
-                    value -> Pair.create(value.getTo(), value.isRequiredField())));
+                    RequiredStringMapping::getFrom, value -> Pair.create(value.getTo(), value.isRequiredField())));
 
         InputType inputType = inputParameters.get(INPUT_TYPE, InputType.class);
 
