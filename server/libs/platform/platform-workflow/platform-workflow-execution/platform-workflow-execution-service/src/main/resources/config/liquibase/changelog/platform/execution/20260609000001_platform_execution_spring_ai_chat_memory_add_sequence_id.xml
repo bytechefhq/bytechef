@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260609000001" author="mkriskovic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="spring_ai_chat_memory"/>
+            <not>
+                <columnExists tableName="spring_ai_chat_memory" columnName="sequence_id"/>
+            </not>
+        </preConditions>
+        <addColumn tableName="spring_ai_chat_memory">
+            <column name="sequence_id" type="BIGINT" defaultValueNumeric="0">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+        <createIndex indexName="spring_ai_chat_memory_conversation_id_sequence_id_idx"
+                     tableName="spring_ai_chat_memory">
+            <column name="conversation_id"/>
+            <column name="sequence_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

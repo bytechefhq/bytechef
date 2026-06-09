@@ -1,7 +1,32 @@
+bytechef:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/bytechef_scheduler
+    username: postgres
+    password: postgres
+  message-broker:
+    provider: redis
 spring:
   application:
     name: scheduler-app
   config:
     import: optional:configserver:http://localhost:6111
+  datasource:
+    type: com.zaxxer.hikari.HikariDataSource
+    url: ${bytechef.datasource.url}
+    username: ${bytechef.datasource.username}
+    password: ${bytechef.datasource.password}
+    hikari:
+      poolName: Hikari
+  liquibase:
+    contexts: scheduler
   profiles:
     active: #spring.profiles.active#
+  quartz:
+    job-store-type: jdbc
+    jdbc:
+      initialize-schema: never
+    properties:
+      org.quartz.jobStore.driverDelegateClass: org.quartz.impl.jdbcjobstore.PostgreSQLDelegate
+  task:
+    execution:
+      thread-name-prefix: scheduler-app-task-
