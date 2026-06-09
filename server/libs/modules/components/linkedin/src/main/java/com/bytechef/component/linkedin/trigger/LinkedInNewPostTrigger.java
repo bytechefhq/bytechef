@@ -50,8 +50,8 @@ public class LinkedInNewPostTrigger {
         .type(TriggerType.POLLING)
         .properties(
             string(URN)
-                .label("Organization URN")
-                .description("URN of the organization to monitor for new posts.")
+                .label("Organization Number")
+                .description("Number of the organization to monitor for new posts.")
                 .required(true))
         .output(
             outputSchema(
