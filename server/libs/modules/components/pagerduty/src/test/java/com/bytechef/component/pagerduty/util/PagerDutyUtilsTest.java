@@ -32,48 +32,51 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class PagerDutyUtilsTest {
 
-    private static final Context mockedContext = mock(Context.class);
-    private static final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private static final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             TITLE, "title", SERVICE, "service", PRIORITY, "priority", URGENCY, "urgency",
             DETAILS, "details", ASSIGNMENTS, List.of("assignee1", "assignee2"), INCIDENT_KEY, "incidentKey",
             INCIDENT_TYPE, "incidentType", ESCALATION_POLICY, "escalationPolicy"));
-    private static final Http.Response mockedResponse = mock(Http.Response.class);
-
-    @BeforeEach
-    void beforeEach() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-    }
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetEscalationPolicyIdOptions() {
+    void testGetEscalationPolicyIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("escalation_policies", List.of(
                 Map.of(NAME, "policy1", ID, "1"),
@@ -87,10 +90,23 @@ class PagerDutyUtilsTest {
             option("policy2", "2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/escalation_policies", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetIncidentIdOptions() {
+    void testGetIncidentIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("incidents", List.of(
                 Map.of(TITLE, "incident1", ID, "1"),
@@ -104,10 +120,23 @@ class PagerDutyUtilsTest {
             option("incident2", "2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/incidents", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetIncidentTypeOptions() {
+    void testGetIncidentTypeOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("incident_types", List.of(
                 Map.of("display_name", "displayName1", NAME, "incidentType1"),
@@ -121,10 +150,23 @@ class PagerDutyUtilsTest {
             option("displayName2", "incidentType2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/incidents/types", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetPriorityOptions() {
+    void testGetPriorityOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("priorities", List.of(
                 Map.of(NAME, "priority1", ID, "1"),
@@ -138,6 +180,13 @@ class PagerDutyUtilsTest {
             option("priority2", "2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/priorities", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -150,7 +199,13 @@ class PagerDutyUtilsTest {
     }
 
     @Test
-    void testGetServiceIdOptions() {
+    void testGetServiceIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("services", List.of(
                 Map.of(NAME, "service1", ID, "1"),
@@ -164,10 +219,23 @@ class PagerDutyUtilsTest {
             option("service2", "2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/services", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetUserIdOptions() {
+    void testGetUserIdOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("users", List.of(
                 Map.of(NAME, "user1", ID, "1"),
@@ -181,6 +249,13 @@ class PagerDutyUtilsTest {
             option("user2", "2"));
 
         assertEquals(expectedOptions, options);
+        assertEquals("/users", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     private Map<String, Object> getExpectedBody() {

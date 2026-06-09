@@ -19,15 +19,22 @@ package com.bytechef.component.pagerduty.trigger;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ID;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.SERVICE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -37,67 +44,78 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class PagerDutyNewOrUpdatedIncidentTriggerTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final Map<String, Object> mockedMap = Map.of("event", Map.of());
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(ID, "123", SERVICE, "service"));
-    private final Response mockedResponse = mock(Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final Parameters mockedWebhookEnableOutput = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
+    void testWebhookDisable(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         PagerDutyNewOrUpdatedIncidentTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId", mockedTriggerContext);
+            mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId",
+            mockedContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
+        verify(mockedContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).execute();
+
+        assertEquals("/webhook_subscriptions/123", stringArgumentCaptor.getValue());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
     }
 
     @Test
-    void testWebhookEnable() {
-        when(mockedTriggerContext.http(any()))
+    void testWebhookEnable(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("webhook_subscription", Map.of(ID, "123")));
 
         String webhookUrl = "testWebhookUrl";
         WebhookEnableOutput webhookEnableOutput = PagerDutyNewOrUpdatedIncidentTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
+            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedContext);
 
-        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "123"), null);
+        WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(
+            Map.of(ID, "123"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhook_subscriptions", stringArgumentCaptor.getValue());
 
-        Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
 
         Map<String, Object> expectedBody = Map.of(
             "webhook_subscription", Map.of(
@@ -118,7 +136,7 @@ class PagerDutyNewOrUpdatedIncidentTriggerTest {
                     "type", "service_reference"),
                 "type", "webhook_subscription"));
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -128,7 +146,7 @@ class PagerDutyNewOrUpdatedIncidentTriggerTest {
 
         Object result = PagerDutyNewOrUpdatedIncidentTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutput, null);
 
         assertEquals(Map.of(), result);
     }
