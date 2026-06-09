@@ -31,6 +31,7 @@ import static com.bytechef.component.microsoft.share.point.constant.MicrosoftSha
 import static com.bytechef.component.microsoft.share.point.util.MicrosoftSharePointUtils.getFolderId;
 import static com.bytechef.microsoft.commons.MicrosoftConstants.ID;
 import static com.bytechef.microsoft.commons.MicrosoftConstants.NAME;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.RECURSIVE;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -57,6 +58,10 @@ public class MicrosoftSharePointGetFolderContentsAction {
                     "ID of the folder whose contents you want to list. If no folder is selected, root folder will be listed.")
                 .optionsLookupDependsOn(SITE_ID)
                 .options((OptionsFunction<String>) MicrosoftSharePointUtils::getFolderIdOptions)
+                .required(false),
+            bool(RECURSIVE)
+                .label("Include Subfolders")
+                .description("Whether to include subfolders in the results.")
                 .required(false))
         .output(
             outputSchema(
@@ -129,8 +134,9 @@ public class MicrosoftSharePointGetFolderContentsAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
         return context
             .http(http -> http.get(
-                "/sites/%s/drive/items/%s/children".formatted(
-                    inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters))))
+                (inputParameters.getBoolean(RECURSIVE, false) ? "/sites/%s/drive/items/%s/delta"
+                    : "/sites/%s/drive/items/%s/children").formatted(
+                        inputParameters.getRequiredString(SITE_ID), getFolderId(inputParameters))))
             .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
