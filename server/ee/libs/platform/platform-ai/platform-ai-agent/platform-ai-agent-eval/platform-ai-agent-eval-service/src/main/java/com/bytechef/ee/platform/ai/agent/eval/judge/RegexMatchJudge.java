@@ -16,12 +16,12 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
+import io.github.markpollack.judge.DeterministicJudge;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
-import org.springaicommunity.judge.DeterministicJudge;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
 
 /**
  * A deterministic judge that checks whether the agent output matches (or does not match) a regular expression pattern.

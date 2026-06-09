@@ -21,17 +21,17 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeType;
+import io.github.markpollack.judge.Judge;
+import io.github.markpollack.judge.JudgeMetadata;
+import io.github.markpollack.judge.JudgeType;
+import io.github.markpollack.judge.Judges;
+import io.github.markpollack.judge.NamedJudge;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.result.JudgmentStatus;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.judge.Judge;
-import org.springaicommunity.judge.JudgeMetadata;
-import org.springaicommunity.judge.JudgeType;
-import org.springaicommunity.judge.Judges;
-import org.springaicommunity.judge.NamedJudge;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
-import org.springaicommunity.judge.result.JudgmentStatus;
 
 /**
  * @author ByteChef

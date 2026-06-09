@@ -19,12 +19,12 @@ package com.bytechef.ee.platform.ai.agent.eval.judge;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.score.NumericalScore;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
-import org.springaicommunity.judge.result.JudgmentStatus;
-import org.springaicommunity.judge.score.NumericalScore;
 
 /**
  * @author ByteChef

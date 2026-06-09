@@ -16,9 +16,9 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
-import org.springaicommunity.judge.DeterministicJudge;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
+import io.github.markpollack.judge.DeterministicJudge;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
 
 /**
  * A deterministic judge that checks whether the agent output length is within the specified min/max character bounds.
