@@ -15,7 +15,6 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.Co
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.OAuth2;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyGroupModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
@@ -180,21 +179,21 @@ public interface ConnectedUserIntegrationMapper {
 
         default InputModel map(Workflow.Input input) {
             InputModel inputModel = new InputModel()
-                .internalOnly(input.internalOnly())
+//                .internalOnly(input.internalOnly())
                 .label(input.label())
                 .name(input.name())
-                .objectName(input.objectName())
+//                .objectName(input.objectName())
                 .required(input.required())
                 .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
 
-            Workflow.ComponentInputReference componentReference = input.componentReference();
+//            Workflow.ComponentInputReference componentReference = input.componentReference();
 
-            if (componentReference != null) {
-                inputModel.componentReference(
-                    new ComponentInputReferenceModel(
-                        componentReference.componentName(), componentReference.componentVersion(),
-                        componentReference.groupName()));
-            }
+//            if (componentReference != null) {
+//                inputModel.componentReference(
+//                    new ComponentInputReferenceModel(
+//                        componentReference.componentName(), componentReference.componentVersion(),
+//                        componentReference.groupName()));
+//            }
 
             return inputModel;
         }

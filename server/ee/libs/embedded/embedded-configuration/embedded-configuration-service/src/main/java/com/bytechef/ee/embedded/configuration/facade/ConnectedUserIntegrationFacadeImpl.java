@@ -41,7 +41,6 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
-import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -345,30 +344,30 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             return workflowDTO;
         }
 
-        Map<String, PropertyGroup> componentInputGroups = new HashMap<>();
+//        Map<String, PropertyGroup> componentInputGroups = new HashMap<>();
 
-        for (Workflow.Input input : workflow.getInputs()) {
-            Workflow.ComponentInputReference componentReference = input.componentReference();
+//        for (Workflow.Input input : workflow.getInputs()) {
+//            Workflow.ComponentInputReference componentReference = input.componentReference();
 
-            if (componentReference == null) {
-                continue;
-            }
+//            if (componentReference == null) {
+//                continue;
+//            }
 
-            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-                componentReference.componentName(), componentReference.componentVersion());
+//            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+//                componentReference.componentName(), componentReference.componentVersion());
+//
+//            componentDefinition.getInputs()
+//                .stream()
+//                .filter(propertyGroup -> Objects.equals(propertyGroup.getName(), componentReference.groupName()))
+//                .findFirst()
+//                .ifPresent(propertyGroup -> componentInputGroups.put(input.name(), propertyGroup));
+//        }
 
-            componentDefinition.getInputs()
-                .stream()
-                .filter(propertyGroup -> Objects.equals(propertyGroup.getName(), componentReference.groupName()))
-                .findFirst()
-                .ifPresent(propertyGroup -> componentInputGroups.put(input.name(), propertyGroup));
-        }
+//        if (componentInputGroups.isEmpty()) {
+        return workflowDTO;
+//        }
 
-        if (componentInputGroups.isEmpty()) {
-            return workflowDTO;
-        }
-
-        return workflowDTO.withComponentInputGroups(componentInputGroups);
+//        return workflowDTO.withComponentInputGroups(componentInputGroups);
     }
 
     private ConnectedUserIntegrationDTO toConnectedUserIntegrationDTO(
