@@ -17,11 +17,11 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.llm.LLMJudge;
+import io.github.markpollack.judge.result.Judgment;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.llm.LLMJudge;
-import org.springaicommunity.judge.result.Judgment;
 import org.springframework.ai.chat.client.ChatClient;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;

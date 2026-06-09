@@ -17,17 +17,17 @@
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
 import com.bytechef.ee.platform.ai.agent.eval.constant.AiAgentJudgeType;
+import io.github.markpollack.judge.Judge;
+import io.github.markpollack.judge.JudgeType;
+import io.github.markpollack.judge.Judges;
 import java.util.Map;
 import java.util.Objects;
-import org.springaicommunity.judge.Judge;
-import org.springaicommunity.judge.JudgeType;
-import org.springaicommunity.judge.Judges;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.stereotype.Component;
 
 /**
  * Factory that converts persisted judge configuration (type + configuration map) into agent-judge {@link Judge}
- * instances, wrapped with {@link org.springaicommunity.judge.NamedJudge} for name-based lookups.
+ * instances, wrapped with {@link io.github.markpollack.judge.NamedJudge} for name-based lookups.
  *
  * @author ByteChef
  */

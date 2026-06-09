@@ -16,13 +16,13 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
+import io.github.markpollack.judge.DeterministicJudge;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.springaicommunity.judge.DeterministicJudge;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;

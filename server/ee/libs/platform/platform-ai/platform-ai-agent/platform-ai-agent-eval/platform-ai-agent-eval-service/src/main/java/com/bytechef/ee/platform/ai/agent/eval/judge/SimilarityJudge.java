@@ -16,13 +16,13 @@
 
 package com.bytechef.ee.platform.ai.agent.eval.judge;
 
+import io.github.markpollack.judge.DeterministicJudge;
+import io.github.markpollack.judge.context.JudgmentContext;
+import io.github.markpollack.judge.result.Judgment;
+import io.github.markpollack.judge.result.JudgmentStatus;
+import io.github.markpollack.judge.score.NumericalScore;
 import java.util.HashMap;
 import java.util.Map;
-import org.springaicommunity.judge.DeterministicJudge;
-import org.springaicommunity.judge.context.JudgmentContext;
-import org.springaicommunity.judge.result.Judgment;
-import org.springaicommunity.judge.result.JudgmentStatus;
-import org.springaicommunity.judge.score.NumericalScore;
 
 /**
  * A deterministic judge that measures text similarity between the agent output and an expected output using either edit
