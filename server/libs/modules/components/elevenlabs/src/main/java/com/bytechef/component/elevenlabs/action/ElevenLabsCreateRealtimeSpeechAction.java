@@ -58,6 +58,7 @@ public class ElevenLabsCreateRealtimeSpeechAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRealtimeSpeech")
         .title("Create Realtime Speech")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-speech")
         .description(
             "Generate speech in real-time using ElevenLabs WebSocket-based text-to-speech API. " +
                 "Receives text via WebSocket, forwards to ElevenLabs for speech synthesis, " +

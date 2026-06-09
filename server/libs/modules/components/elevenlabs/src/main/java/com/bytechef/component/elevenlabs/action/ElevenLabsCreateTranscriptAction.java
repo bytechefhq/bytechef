@@ -43,6 +43,7 @@ public class ElevenLabsCreateTranscriptAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTranscript")
         .title("Create Transcript")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-transcript")
         .description("Transcribe an audio or video file.")
         .properties(
             string(MODEL_ID)

@@ -39,11 +39,14 @@ public class ElevenLabsComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("elevenLabs")
         .title("ElevenLabs")
+        .version(1)
         .description(
             "ElevenLabs is an AI-powered voice synthesis company specializing in ultra-realistic text-to-speech " +
                 "and voice cloning technology.")
         .icon("path:assets/elevenlabs.svg")
         .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
+        .customAction(true)
+        .customActionHelp("", "https://elevenlabs.io/docs/api-reference/introduction")
         .connection(ElevenLabsConnection.CONNECTION_DEFINITION)
         .actions(
             ElevenLabsCreateRealtimeSpeechAction.ACTION_DEFINITION,

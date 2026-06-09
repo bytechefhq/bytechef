@@ -43,6 +43,9 @@ public class ElevenLabsCreateSpeechWithTimingAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSpeechWithTiming")
         .title("Create Speech With Timing")
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech-with-timing")
         .description(
             "Generate speech from text with precise character-level timing information for audio-text synchronization.")
         .properties(

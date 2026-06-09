@@ -39,6 +39,7 @@ public class ElevenLabsCreateSoundEffectAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSoundEffect")
         .title("Create Sound Effect")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-sound-effect")
         .description(
             "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound " +
                 "effects model in the world.")
