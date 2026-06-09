@@ -118,6 +118,7 @@ public class PagerDutyUpdateIncidentAction {
                 .options((OptionsFunction<String>) PagerDutyUtils::getEscalationPolicyIdOptions)
                 .required(false))
         .output(outputSchema(INCIDENT_OBJECT))
+        .help("", "https://docs.bytechef.io/reference/components/pagerduty_v1#update-incident")
         .perform(PagerDutyUpdateIncidentAction::perform);
 
     private PagerDutyUpdateIncidentAction() {
