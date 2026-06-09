@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.agent.utils;
-
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
-import com.bytechef.test.jsonasssert.JsonFileAssert;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+package com.bytechef.component.ai.agent.utils.constant;
 
 /**
- * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
-public class AiAgentUtilsComponentHandlerTest {
+public class AiAgentUtilsConstants {
 
-    @Test
-    public void testGetComponentDefinition() {
-        JsonFileAssert.assertEquals(
-            "definition/ai_agent-utils_v1.json",
-            new AiAgentUtilsComponentHandler(Mockito.mock(AiSkillFacade.class), List.of()).getDefinition());
+    public static final String ADDITIONAL_FILES = "additionalFiles";
+    public static final String CONTENT = "content";
+    public static final String DESCRIPTION = "description";
+    public static final String FILES = "files";
+    public static final String ID = "id";
+    public static final String INSTRUCTIONS = "instructions";
+    public static final String NAME = "name";
+    public static final String PATH = "path";
+
+    private AiAgentUtilsConstants() {
     }
 }
