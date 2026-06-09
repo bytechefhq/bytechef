@@ -49,8 +49,7 @@ public enum Agent {
     }
 
     /**
-     * The wire-format key for this agent — matches the {@code agentId} routed by the chat REST controller. Useful for
-     * log lines and for callers (e.g. agent builders) that need the snake-case identifier.
+     * The wire-format key for this agent — matches the {@code agentId} routed by the chat REST controller.
      */
     public String key() {
         return key;
@@ -58,20 +57,14 @@ public enum Agent {
 
     /**
      * Whether this enum value represents a coarse fallback emitted because no {@link CurrentAgentContext.AgentBinding}
-     * was bound. Fallback values ({@link #AI_HUB}, {@link #WORKFLOW_EDITOR}, {@link #CODE_EDITOR},
-     * {@link #CLUSTER_ELEMENT}, {@link #FILES}, {@link #UNKNOWN}) are mixed into the same persisted column as bound
-     * agents — without filtering on {@code !isFallback()} a "cost by agent" query lumps unattributed traffic in with
-     * the surface that should have been bound.
+     * was bound.
      */
     public boolean isFallback() {
         return fallback;
     }
 
     /**
-     * Resolves an {@link Agent} from its wire-format key (case-sensitive). Returns {@link #UNKNOWN} when the key is
-     * {@code null} or does not match any registered agent. Both inputs collapse to {@code UNKNOWN} by design — the
-     * usage pipeline tolerates malformed/missing agent ids by attributing them to a single bucket rather than failing
-     * the call. Callers that need to distinguish "not provided" from "unrecognized" should null-check before calling.
+     * Resolves an {@link Agent} from its wire-format key (case-sensitive).
      */
     public static Agent fromKey(String key) {
         if (key == null) {
