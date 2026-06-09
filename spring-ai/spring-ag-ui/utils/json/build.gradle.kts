@@ -3,7 +3,7 @@ plugins {
 }
 
 dependencies {
-    api(project(":ag-ui:packages:core"))
+    api(project(":spring-ai:spring-ag-ui:packages:core"))
 
     implementation("tools.jackson.core:jackson-databind")
 }

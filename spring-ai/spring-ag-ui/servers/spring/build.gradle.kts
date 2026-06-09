@@ -3,10 +3,10 @@ plugins {
 }
 
 dependencies {
-    api(project(":ag-ui:packages:core"))
-    api(project(":ag-ui:packages:server"))
+    api(project(":spring-ai:spring-ag-ui:packages:core"))
+    api(project(":spring-ai:spring-ag-ui:packages:server"))
 
-    implementation(project(":ag-ui:utils:json"))
+    implementation(project(":spring-ai:spring-ag-ui:utils:json"))
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
