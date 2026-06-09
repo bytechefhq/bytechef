@@ -80,7 +80,7 @@ Name: createPost
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | author | Post As | STRING <details> <summary> Options </summary> <span>PERSON</span>, <span>ORGANIZATION</span> </details> | Choose whether to post as a Person or Organization. | true |
-| urn | null | STRING | Organization URN | true |
+| urn | Organization Number | STRING | Enter the organization number in the URN field. For example, 03262013 not urn:li:company:03262013. | true |
 | commentary | Text | STRING | The user generated commentary for the post. | true |
 | contentType | Media Category | STRING <details> <summary> Options </summary> <span>ARTICLE</span>, <span>DOCUMENT</span>, <span>IMAGES</span> </details> | Type of media to be posted. | false |
 | visibility | Visibility | STRING <details> <summary> Options </summary> <span title="Anyone can view this.">PUBLIC</span>, <span title="Represents 1st degree network of owner.">CONNECTIONS</span> </details> | Visibility restrictions on content. | true |
@@ -141,6 +141,9 @@ Type: STRING
 
 
 
+#### Find Organization Number
+
+To find the Organization Number, click [here](/reference/components/linkedin_v1#how-to-find-your-linkedin-organization-number).
 
 
 
@@ -191,7 +194,7 @@ Type: POLLING
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| urn | Organization URN | STRING | URN of the organization to monitor for new posts. | true |
+| urn | Organization Number | STRING | Number of the organization to monitor for new posts. | true |
 
 
 #### Output
@@ -235,6 +238,9 @@ Items Type: OBJECT
   "type" : "linkedin/v1/newPost"
 }
 ```
+#### Find Organization Number
+
+To find the Organization Number, click [here](/reference/components/linkedin_v1#how-to-find-your-linkedin-organization-number).
 
 
 
@@ -246,3 +252,13 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find your LinkedIn Organization Number
+
+1. Log in to LinkedIn and open the Organization Page for your company (you need to be an administrator of the page).
+2. Look at the URL in your web browser's address bar.
+3. Find the numeric value that appears immediately after `/company/` or `/organization/` in the URL. For example: in `https://www.linkedin.com/company/12345678/` the Organization Number is `12345678`.
+4. Copy this number and paste it into the **Organization Number** field in ByteChef.
