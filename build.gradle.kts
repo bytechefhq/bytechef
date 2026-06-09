@@ -33,7 +33,7 @@ subprojects {
         exclude(group = "com.vaadin.external.google", module = "android-json")
     }
 
-    if (project.path.startsWith(":ag-ui")) {
+    if (project.path.startsWith(":spring-ai:spring-ag-ui")) {
         tasks.matching { it.name.startsWith("spotless") || it.name.startsWith("checkstyle") || it.name.startsWith("pmd") || it.name.startsWith("spotbugs") }.configureEach {
             enabled = false
         }

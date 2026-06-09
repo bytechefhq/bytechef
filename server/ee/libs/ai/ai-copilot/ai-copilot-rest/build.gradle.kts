@@ -3,9 +3,10 @@ dependencies {
 
     implementation("org.springframework:spring-webmvc")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation(project(":ag-ui:packages:core"))
-    implementation(project(":ag-ui:packages:server"))
-    implementation(project(":ag-ui:servers:spring"))
+    implementation("org.springframework.security:spring-security-core")
+    implementation(project(":spring-ai:spring-ag-ui:packages:core"))
+    implementation(project(":spring-ai:spring-ag-ui:packages:server"))
+    implementation(project(":spring-ai:spring-ag-ui:servers:spring"))
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
