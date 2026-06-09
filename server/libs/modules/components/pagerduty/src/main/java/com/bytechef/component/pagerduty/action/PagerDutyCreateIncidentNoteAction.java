@@ -99,6 +99,7 @@ public class PagerDutyCreateIncidentNoteAction {
                                     .description("The note content."),
                                 string("created_at")
                                     .description("The time at which the note was submitted.")))))
+        .help("", "https://docs.bytechef.io/reference/components/pagerduty_v1#create-incident-note")
         .perform(PagerDutyCreateIncidentNoteAction::perform);
 
     private PagerDutyCreateIncidentNoteAction() {

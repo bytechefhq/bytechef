@@ -141,7 +141,8 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
                                                                 "The API show URL at which the object is accessible."),
                                                         string("html_url")
                                                             .description(
-                                                                "A URL at which the entity is uniquely displayed in the Web app.")))),
+                                                                "A URL at which the entity is uniquely displayed in " +
+                                                                    "the Web app.")))),
                                 object("escalation_policy")
                                     .description("Escalation Policy.")
                                     .properties(
@@ -171,6 +172,9 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
                                     .properties(
                                         string("name")
                                             .description("Name of the incident type."))))))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/pagerduty_v1#new-or-updated-incident-trigger")
         .webhookEnable(PagerDutyNewOrUpdatedIncidentTrigger::webhookEnable)
         .webhookDisable(PagerDutyNewOrUpdatedIncidentTrigger::webhookDisable)
         .webhookRequest(PagerDutyNewOrUpdatedIncidentTrigger::webhookRequest);

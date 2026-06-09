@@ -37,12 +37,15 @@ public class PagerDutyComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("pagerDuty")
         .title("PagerDuty")
+        .version(1)
         .description(
             "With PagerDuty, you can get real-time alerts, manage on-call schedules, and automate parts of your " +
                 "incident response process.")
         .icon("path:assets/pagerduty.svg")
         .categories(ComponentCategory.PROJECT_MANAGEMENT)
         .customAction(true)
+        .customActionHelp(
+            "", "https://developer.pagerduty.com/api-reference/e65c5833eeb07-pager-duty-api")
         .connection(PagerDutyConnection.CONNECTION_DEFINITION)
         .actions(
             PagerDutyCreateIncidentAction.ACTION_DEFINITION,

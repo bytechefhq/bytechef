@@ -34,6 +34,8 @@ import java.util.Map;
 public class PagerDutyConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/pagerduty_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://api.pagerduty.com")
         .authorizations(
             authorization(AuthorizationType.CUSTOM)
