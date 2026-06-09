@@ -98,7 +98,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
         Map<String, Long> clusterElementConnectionIds = connections.stream()
             .collect(Collectors.toMap(
                 WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                WorkflowTestConfigurationConnection::getConnectionId));
+                WorkflowTestConfigurationConnection::getConnectionId,
+                (existing, ignored) -> existing));
 
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
             workflowId, environmentId);
@@ -234,7 +235,8 @@ public class WorkflowNodeOptionFacadeImpl implements WorkflowNodeOptionFacade {
                             connection.getWorkflowNodeName(), workflowNodeName))
                         .collect(Collectors.toMap(
                             WorkflowTestConfigurationConnection::getWorkflowConnectionKey,
-                            WorkflowTestConfigurationConnection::getConnectionId));
+                            WorkflowTestConfigurationConnection::getConnectionId,
+                            (existing, ignored) -> existing));
 
                     return actionDefinitionFacade.executeOptions(
                         workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), propertyName,
