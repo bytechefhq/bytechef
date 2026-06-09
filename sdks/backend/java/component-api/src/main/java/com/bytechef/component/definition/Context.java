@@ -355,6 +355,21 @@ public interface Context {
             private ResponseType() {
             }
 
+            @Override
+            public int hashCode() {
+                return Objects.hash(contentType, type);
+            }
+
+            @Override
+            public boolean equals(Object obj) {
+                if (this == obj)
+                    return true;
+                if (obj == null || getClass() != obj.getClass())
+                    return false;
+                ResponseType other = (ResponseType) obj;
+                return Objects.equals(contentType, other.contentType) && type == other.type;
+            }
+
             private ResponseType(String contentType, Type type) {
                 this.contentType = contentType;
                 this.type = type;
