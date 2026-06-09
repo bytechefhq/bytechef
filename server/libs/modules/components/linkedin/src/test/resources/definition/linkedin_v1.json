@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Create a post on LinkedIn.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linkedin_v1#create-post"
+    },
     "metadata": null,
     "name": "createPost",
     "outputDefinition": {
@@ -99,12 +102,12 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Organization URN",
+      "description": "Enter the organization number in the URN field. For example, 03262013 not urn:li:company:03262013.",
       "displayCondition": "author == 'ORGANIZATION'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": null,
+      "label": "Organization Number",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -635,7 +638,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete a post from LinkedIn.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linkedin_v1#delete-post"
+    },
     "metadata": null,
     "name": "deletePost",
     "outputDefinition": null,
@@ -762,12 +768,12 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "Organization URN",
+      "description": "Enter the organization number in the URN field. For example, 03262013 not urn:li:company:03262013.",
       "displayCondition": "author == 'ORGANIZATION'",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": null,
+      "label": "Organization Number",
       "languageId": null,
       "maxLength": null,
       "metadata": { },
@@ -1413,14 +1419,20 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linkedin_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://learn.microsoft.com/en-us/linkedin/marketing/overview?view=li-lms-2026-05"
+  },
   "description": "LinkedIn is a professional networking platform that enables users to connect with colleagues, discover job opportunities, and share industry-related content.",
   "icon": "path:assets/linkedin.svg",
   "inputs": null,
@@ -1435,7 +1447,10 @@
     "deprecated": null,
     "description": "Triggers when a new post is created in a specific organization.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/linkedin_v1#new-post"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newPost",
@@ -2903,12 +2918,12 @@
       "advancedOption": null,
       "controlType": "TEXT",
       "defaultValue": null,
-      "description": "URN of the organization to monitor for new posts.",
+      "description": "Number of the organization to monitor for new posts.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
-      "label": "Organization URN",
+      "label": "Organization Number",
       "languageId": null,
       "maxLength": null,
       "metadata": { },

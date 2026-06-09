@@ -21,49 +21,40 @@ import static com.bytechef.component.definition.Context.Encoder;
 import static com.bytechef.component.definition.Context.Http;
 import static com.bytechef.component.linkedin.constant.LinkedInConstants.URN;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition.BasePerformFunction;
-import com.bytechef.component.definition.ActionDefinition.PerformFunction;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Monika Kušter
  */
+@ExtendWith(MockContextSetupExtension.class)
 class LinkedInDeletePostActionTest {
 
     @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Encoder, Http.Executor>> encoderFunctionArgumentCaptor =
-        ArgumentCaptor.forClass(ContextFunction.class);
-    @SuppressWarnings("unchecked")
-    private final ArgumentCaptor<ContextFunction<Http, Http.Executor>> httpFunctionArgumentCaptor =
-        ArgumentCaptor.forClass(ContextFunction.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http mockedHttp = mock(Http.class);
+    private final ArgumentCaptor<ContextFunction<Encoder, Executor>> encoderFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(URN, "123"));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final Encoder mockedEncoder = mock(Encoder.class);
 
     @Test
-    void testPerform() throws Exception {
-        Optional<? extends BasePerformFunction> basePerformFunction = LinkedInDeletePostAction.ACTION_DEFINITION
-            .getPerform();
-
-        assertTrue(basePerformFunction.isPresent());
-
-        PerformFunction performFunction = (PerformFunction) basePerformFunction.get();
+    void testPerform(
+        Context mockedActionContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
 
         when(mockedActionContext.encoder(encoderFunctionArgumentCaptor.capture()))
             .thenAnswer(inv -> encoderFunctionArgumentCaptor.getValue()
@@ -71,17 +62,13 @@ class LinkedInDeletePostActionTest {
         when(mockedEncoder.base64UrlEncode(stringArgumentCaptor.capture()))
             .thenReturn("urn");
 
-        when(mockedActionContext.http(httpFunctionArgumentCaptor.capture()))
-            .thenAnswer(inv -> httpFunctionArgumentCaptor.getValue()
-                .apply(mockedHttp));
         when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
-        Object result = performFunction.apply(mockedParameters, null, mockedActionContext);
+        Object result = LinkedInDeletePostAction.perform(mockedParameters, null, mockedActionContext);
 
         assertNull(result);
         assertEquals(List.of("123", "/rest/posts/urn"), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
     }
 }
