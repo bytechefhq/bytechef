@@ -42,6 +42,7 @@ public class ElevenLabsCreateSpeechAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSpeech")
         .title("Create Speech")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech")
         .description("Converts text into speech using a voice of your choice and returns audio.")
         .properties(
             string(VOICE_ID)

@@ -56,6 +56,9 @@ public class ElevenLabsCreateRealtimeTranscriptAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRealtimeTranscript")
         .title("Create Realtime Transcript")
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-transcript")
         .description(
             "Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. " +
                 "Receives audio via WebSocket, forwards to ElevenLabs for transcription, " +
