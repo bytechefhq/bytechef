@@ -19,52 +19,57 @@ package com.bytechef.component.elevenlabs.action;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.FILE;
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.MODEL_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ElevenLabsCreateTranscriptActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final FileEntry mockedFileEntry = mock(FileEntry.class);
-    private final Parameters mockedParameters = mock(Parameters.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FILE, mockedFileEntry, MODEL_ID, "scribe_v1"));
     private final Map<String, Object> mockedResult = Map.of();
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedParameters.getRequiredFileEntry(FILE))
-            .thenReturn(mockedFileEntry);
-        when(mockedParameters.getRequiredString(MODEL_ID))
-            .thenReturn("scribe_v1");
+    void testPerform(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        when(mockedContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.header(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedResult);
 
@@ -72,10 +77,17 @@ class ElevenLabsCreateTranscriptActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(mockedResult, result);
+        assertEquals(
+            List.of("/speech-to-text", "Content-Type", "multipart/form-data"), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertEquals(Map.of(MODEL_ID, "scribe_v1", FILE, mockedFileEntry), body.getContent());
-        assertEquals(List.of("Content-Type", "multipart/form-data"), stringArgumentCaptor.getAllValues());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+        Map<String, Object> expectedBody = Map.of(MODEL_ID, "scribe_v1", FILE, mockedFileEntry);
+
+        assertEquals(Body.of(expectedBody, BodyContentType.FORM_DATA), bodyArgumentCaptor.getValue());
     }
 }
