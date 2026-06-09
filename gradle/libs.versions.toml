@@ -23,7 +23,7 @@ spring-cloud-aws = "4.0.2"
 spring-cloud-dependencies = "2025.1.1"
 spring-shell = "4.0.1"
 spring-vault = "4.0.2"
-springaicommunity-agent-claude = "0.19.0"
+markpollack-agent-claude = "0.19.0"
 markpollack-agent-judge = "0.11.0"
 markpollack-agent-utils = "0.8.0"
 springaicommunity-spring-ai-session = "0.4.2"
@@ -65,8 +65,8 @@ org-mapstruct-mapstruct-processor = { module = "org.mapstruct:mapstruct-processo
 org-openapitools-jackson-databind-nullable = "org.openapitools:jackson-databind-nullable:0.2.10"
 org-springaicommunity-agent-judge-core = { module = "io.github.markpollack:agent-judge-core", version.ref = "markpollack-agent-judge" }
 org-springaicommunity-agent-judge-llm = { module = "io.github.markpollack:agent-judge-llm", version.ref = "markpollack-agent-judge" }
-org-springaicommunity-agents-agent-claude = { module = "io.github.markpollack:agent-claude", version.ref = "springaicommunity-agent-claude" }
-org-springaicommunity-agents-agent-client-core = { module = "io.github.markpollack:agent-client-core", version.ref = "springaicommunity-agent-claude" }
+org-springaicommunity-agents-agent-claude = { module = "io.github.markpollack:agent-claude", version.ref = "markpollack-agent-claude" }
+org-springaicommunity-agents-agent-client-core = { module = "io.github.markpollack:agent-client-core", version.ref = "markpollack-agent-claude" }
 org-springaicommunity-spring-ai-agent-utils = { module = "org.springaicommunity:spring-ai-agent-utils", version.ref = "markpollack-agent-utils" }
 org-springaicommunity-spring-ai-session-jdbc = { module = "org.springaicommunity:spring-ai-session-jdbc", version.ref = "springaicommunity-spring-ai-session" }
 org-springaicommunity-spring-ai-session-management = { module = "org.springaicommunity:spring-ai-session-management", version.ref = "springaicommunity-spring-ai-session" }
