@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generate speech in real-time using ElevenLabs WebSocket-based text-to-speech API. Receives text via WebSocket, forwards to ElevenLabs for speech synthesis, and streams generated audio chunks back.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-speech"
+    },
     "metadata": null,
     "name": "createRealtimeSpeech",
     "outputDefinition": null,
@@ -192,7 +195,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. Receives audio via WebSocket, forwards to ElevenLabs for transcription, and streams transcription results back.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-transcript"
+    },
     "metadata": null,
     "name": "createRealtimeTranscript",
     "outputDefinition": null,
@@ -334,7 +340,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Turn text into sound effects for your videos, voice-overs or video games using the most advanced sound effects model in the world.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-sound-effect"
+    },
     "metadata": null,
     "name": "createSoundEffect",
     "outputDefinition": {
@@ -590,7 +599,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Converts text into speech using a voice of your choice and returns audio.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech"
+    },
     "metadata": null,
     "name": "createSpeech",
     "outputDefinition": {
@@ -871,7 +883,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Generate speech from text with precise character-level timing information for audio-text synchronization.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech-with-timing"
+    },
     "metadata": null,
     "name": "createSpeechWithTiming",
     "outputDefinition": {
@@ -1624,7 +1639,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Transcribe an audio or video file.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-transcript"
+    },
     "metadata": null,
     "name": "createTranscript",
     "outputDefinition": {
@@ -4146,14 +4164,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/elevenlabs_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://elevenlabs.io/docs/api-reference/introduction"
+  },
   "description": "ElevenLabs is an AI-powered voice synthesis company specializing in ultra-realistic text-to-speech and voice cloning technology.",
   "icon": "path:assets/elevenlabs.svg",
   "inputs": null,
