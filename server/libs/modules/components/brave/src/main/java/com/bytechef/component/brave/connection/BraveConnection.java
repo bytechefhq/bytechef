@@ -21,8 +21,11 @@ import static com.bytechef.component.definition.ComponentDsl.authorization;
 import static com.bytechef.component.definition.ComponentDsl.connection;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.bytechef.component.definition.Authorization.ApplyResponse;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Marko Krišković
@@ -36,8 +39,10 @@ public class BraveConnection {
                 .title("API Key")
                 .properties(
                     string(API_TOKEN)
-                        .label("API token")
-                        .required(true)))
+                        .label("API Token")
+                        .required(true))
+                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                    Map.of("X-Subscription-Token", List.of(connectionParameters.getString(API_TOKEN))))))
         .version(1)
         .help("", "https://docs.bytechef.io/reference/components/brave_v1#connection-setup");
 
