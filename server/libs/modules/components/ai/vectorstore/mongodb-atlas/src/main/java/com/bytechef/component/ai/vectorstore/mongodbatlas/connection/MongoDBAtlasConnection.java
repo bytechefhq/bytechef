@@ -21,7 +21,6 @@ import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoD
 import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.DATABASE_NAME;
 import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.INDEX_NAME;
 import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.INITIALIZE_SCHEMA;
-import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.METADATA_FIELDS;
 import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.NUM_CANDIDATES;
 import static com.bytechef.component.ai.vectorstore.mongodbatlas.constant.MongoDBAtlasConstants.PATH_NAME;
 import static com.bytechef.component.definition.Authorization.AuthorizationType.CUSTOM;
@@ -81,11 +80,6 @@ public class MongoDBAtlasConnection {
                         .label("Number of Candidates")
                         .description("The number of candidates to consider during approximate nearest neighbor search.")
                         .defaultValue(200)
-                        .required(false),
-                    string(METADATA_FIELDS)
-                        .label("Metadata Fields To Filter")
-                        .description(
-                            "A comma-separated list of metadata fields that can be used to filter search results.")
                         .required(false),
                     bool(INITIALIZE_SCHEMA)
                         .label("Initialize Schema")
