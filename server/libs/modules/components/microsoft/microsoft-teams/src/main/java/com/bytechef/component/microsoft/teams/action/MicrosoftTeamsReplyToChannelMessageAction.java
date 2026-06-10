@@ -45,10 +45,10 @@ import java.util.Map;
 /**
  * @author Nikolina Spehar
  */
-public class MicrosoftTeamsSendReplyToChannelMessageAction {
+public class MicrosoftTeamsReplyToChannelMessageAction {
 
-    public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendReplyToChannelMessage")
-        .title("Send Reply to Channel Message")
+    public static final ModifiableActionDefinition ACTION_DEFINITION = action("replyToChannelMessage")
+        .title("Reply to Channel Message")
         .description(
             "Sends a reply to a channel message. Sending attachments is supported with Message Text Format is set to " +
                 "\"html\".")
@@ -72,13 +72,13 @@ public class MicrosoftTeamsSendReplyToChannelMessageAction {
             CONTENT_PROPERTY,
             ATTACHMENTS_PROPERTY)
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
-        .perform(MicrosoftTeamsSendReplyToChannelMessageAction::perform)
+        .perform(MicrosoftTeamsReplyToChannelMessageAction::perform)
         .help(
             "",
-            "https://docs.bytechef.io/reference/components/microsoft-teams_v1#send-reply-to-message")
+            "https://docs.bytechef.io/reference/components/microsoft-teams_v1#reply-to-message")
         .processErrorResponse(MicrosoftUtils::processErrorResponse);
 
-    private MicrosoftTeamsSendReplyToChannelMessageAction() {
+    private MicrosoftTeamsReplyToChannelMessageAction() {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
