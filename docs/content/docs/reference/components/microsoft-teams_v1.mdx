@@ -393,6 +393,123 @@ Type: OBJECT
 
 
 
+### Send Reply to Channel Message
+Name: sendReplyToChannelMessage
+
+`Sends a reply to a channel message. Sending attachments is supported with Message Text Format is set to "html".`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| teamId | Team ID | STRING | ID of the team where the channel is located. | true |
+| channelId | Channel ID | STRING <details> <summary> Depends On </summary> teamId </details> | Channel of the message that will get a reply. | true |
+| messageId | Message ID | STRING | ID of the message that will get a reply. | true |
+| contentType | Message Text Format | STRING <details> <summary> Options </summary> <span>text</span>, <span>html</span> </details> |  | true |
+| content | Message Text | STRING |  | true |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [STRING\($attachment)] </details> | The attachments to send with the message. The file to attach must already be in SharePoint. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Reply to Channel Message",
+  "name" : "sendReplyToChannelMessage",
+  "parameters" : {
+    "teamId" : "",
+    "channelId" : "",
+    "messageId" : "",
+    "contentType" : "",
+    "content" : "",
+    "attachments" : [ "" ]
+  },
+  "type" : "microsoftTeams/v1/sendReplyToChannelMessage"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | STRING | Unique identifier of the message. |
+| replyToId | STRING | ID of the parent message if this is a reply. |
+| etag | STRING | Entity tag for versioning. |
+| messageType | STRING | Type of the message. |
+| createdDateTime | STRING | Timestamp when the message was created. |
+| lastModifiedDateTime | STRING | Timestamp when the message was last modified. |
+| lastEditedDateTime | STRING | Timestamp when the message was last edited. |
+| deletedDateTime | STRING | Timestamp when the message was deleted. |
+| subject | STRING | Subject/title of the message. |
+| summary | STRING | Summary of the message. |
+| chatId | STRING | ID of the chat. |
+| importance | STRING | Importance level of the message. |
+| locale | STRING | Locale of the message. |
+| webUrl | STRING | Web URL to access the message. |
+| policyViolation | STRING | Policy violation details if applicable. |
+| eventDetail | STRING | Event details associated with the message. |
+| from | OBJECT <details> <summary> Properties </summary> &#123;&#123;&#125;\(application), &#123;&#125;\(device), &#123;STRING\(@odata.type), STRING\(id), STRING\(displayName), STRING\(userIdentityType), STRING\(tenantId)&#125;\(user)&#125; </details> | Information about the sender. |
+| body | OBJECT <details> <summary> Properties </summary> &#123;STRING\(contentType), STRING\(content)&#125; </details> | Plaintext/HTML representation of the content of the chat message. |
+| channelIdentity | OBJECT <details> <summary> Properties </summary> &#123;STRING\(teamId), STRING\(channelId)&#125; </details> | Channel identity where the message was posted. |
+| attachments | ARRAY <details> <summary> Items </summary> [] </details> | List of attachments included in the message. |
+| mentions | ARRAY <details> <summary> Items </summary> [] </details> | List of mentions in the message. |
+| reactions | ARRAY <details> <summary> Items </summary> [] </details> | List of reactions to the message. |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : "",
+  "replyToId" : "",
+  "etag" : "",
+  "messageType" : "",
+  "createdDateTime" : "",
+  "lastModifiedDateTime" : "",
+  "lastEditedDateTime" : "",
+  "deletedDateTime" : "",
+  "subject" : "",
+  "summary" : "",
+  "chatId" : "",
+  "importance" : "",
+  "locale" : "",
+  "webUrl" : "",
+  "policyViolation" : "",
+  "eventDetail" : "",
+  "from" : {
+    "application" : { },
+    "device" : { },
+    "user" : {
+      "@odata.type" : "",
+      "id" : "",
+      "displayName" : "",
+      "userIdentityType" : "",
+      "tenantId" : ""
+    }
+  },
+  "body" : {
+    "contentType" : "",
+    "content" : ""
+  },
+  "channelIdentity" : {
+    "teamId" : "",
+    "channelId" : ""
+  },
+  "attachments" : [ ],
+  "mentions" : [ ],
+  "reactions" : [ ]
+}
+```
+
+
+
+
 
 ## Triggers
 
