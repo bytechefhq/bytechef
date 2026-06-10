@@ -192,6 +192,14 @@
         --surface-warning-secondary-hover: 55 97% 88%;
         --surface-warning-secondary-active: 53 98% 77%;
         --workflow-nodes-popover-component-menu-width: 330px;
+        --sidebar: var(--muted);
+        --sidebar-foreground: var(--foreground);
+        --sidebar-primary: var(--primary);
+        --sidebar-primary-foreground: var(--primary-foreground);
+        --sidebar-accent: var(--accent);
+        --sidebar-accent-foreground: var(--accent-foreground);
+        --sidebar-border: var(--border);
+        --sidebar-ring: var(--ring);
         --rdg-color-scheme: light;
     }
 
@@ -424,3 +432,4 @@
         margin-bottom: 0.25rem !important;
     }
 }
+

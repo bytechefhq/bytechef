@@ -37,7 +37,7 @@ import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-const DesktopSidebarBottomMenu = () => {
+export function AppSidebarFooter() {
     const application = useApplicationInfoStore((state) => state.application);
     const {account, logout} = useAuthenticationStore(
         useShallow((state) => ({
@@ -150,11 +150,23 @@ const DesktopSidebarBottomMenu = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                    <AvatarFallback className="bg-white">
-                        <User2Icon className="size-6" />
-                    </AvatarFallback>
-                </Avatar>
+                <button
+                    aria-label="User menu"
+                    className="flex w-full items-center gap-2 rounded-md py-2 text-left hover:bg-sidebar-accent"
+                    type="button"
+                >
+                    <Avatar className="shrink-0">
+                        <AvatarFallback className="bg-white">
+                            <User2Icon className="size-6" />
+                        </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex min-w-0 flex-col group-data-[collapsible=icon]:hidden">
+                        <span className="text-xs text-muted-foreground">Signed in as</span>
+
+                        <span className="truncate text-sm font-medium">{account?.email}</span>
+                    </div>
+                </button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start" className="w-72 space-y-2 p-2">
@@ -317,6 +329,4 @@ const DesktopSidebarBottomMenu = () => {
             </DropdownMenuContent>
         </DropdownMenu>
     );
-};
-
-export default DesktopSidebarBottomMenu;
+}
