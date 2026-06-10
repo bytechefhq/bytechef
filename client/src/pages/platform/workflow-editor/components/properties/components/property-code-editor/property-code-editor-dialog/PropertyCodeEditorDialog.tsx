@@ -9,6 +9,7 @@ import {usePropertyCodeEditorDialog} from '@/pages/platform/workflow-editor/comp
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
 import {Workflow} from '@/shared/middleware/platform/configuration';
+import {twMerge} from 'tailwind-merge';
 
 interface PropertyCodeEditorDialogProps {
     language: string;
@@ -48,7 +49,10 @@ const PropertyCodeEditorDialog = ({
                 </DialogHeader>
 
                 <DialogContent
-                    className="absolute top-12 bottom-4 left-16 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0"
+                    className={twMerge(
+                        'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0 transition-[left,width] duration-300 ease-in-out',
+                        copilotPanelOpen ? 'left-2 w-[calc(100vw-16px)]' : 'left-16 w-[calc(100vw-80px)]'
+                    )}
                     onFocusOutside={(event) => event.preventDefault()}
                     onPointerDownOutside={(event) => event.preventDefault()}
                 >
