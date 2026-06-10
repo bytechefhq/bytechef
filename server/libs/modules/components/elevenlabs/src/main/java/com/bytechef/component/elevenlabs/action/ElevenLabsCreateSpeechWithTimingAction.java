@@ -43,9 +43,7 @@ public class ElevenLabsCreateSpeechWithTimingAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createSpeechWithTiming")
         .title("Create Speech With Timing")
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech-with-timing")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-speech-with-timing")
         .description(
             "Generate speech from text with precise character-level timing information for audio-text synchronization.")
         .properties(
@@ -88,9 +86,8 @@ public class ElevenLabsCreateSpeechWithTimingAction {
     public static Map<String, Object> perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
-        return context
-            .http(http -> http.post(
-                "/text-to-speech/%s/with-timestamps".formatted(inputParameters.getRequiredString(VOICE_ID))))
+        return context.http(http -> http.post(
+            "/text-to-speech/%s/with-timestamps".formatted(inputParameters.getRequiredString(VOICE_ID))))
             .body(Body.of(Map.of(TEXT, inputParameters.getRequiredString(TEXT))))
             .configuration(responseType(ResponseType.JSON))
             .execute()

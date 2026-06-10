@@ -19,7 +19,7 @@ package com.bytechef.component.elevenlabs.util;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
-import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -37,8 +37,8 @@ public class ElevenLabsUtils {
     }
 
     public static List<Option<String>> getVoiceOptions(
-        Parameters inputParameters, Parameters connectionParameters, Map<String, String> stringStringMap, String s,
-        ActionContext context) {
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        String searchText, Context context) {
 
         Map<String, List<Map<String, Object>>> body = context.http(http -> http.get("/voices"))
             .configuration(responseType(Http.ResponseType.JSON))
@@ -53,5 +53,4 @@ public class ElevenLabsUtils {
 
         return voiceOptions;
     }
-
 }
