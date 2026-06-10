@@ -277,14 +277,14 @@ components:
             Prepare payload for signing: {clientId};{requestId};{timestamp};{uri};{body}
             <ul>
               <li>
-                Uri example: For full URL <b>https://example.com/MyProject/api/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>, {uri} value used for calculation is <b>/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>. Note that leading slash and all query parameters must be included!
+                Uri example: For full URL <b>https://example.com/MyProject/api/client/{clientId}/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>, {uri} value used for calculation is <b>/api/client/accounts/{IBAN}/transactions?dateFrom=2021-01-01&dateTo=2021-01-02</b>. Note that leading slash and all query parameters must be included!
               </li>
               <li>
                 If request body is not present, use empty string for {body} value.
               </li>
             </ul>
           </li>
-          <li>Using client secret sign the payload with HmacSHA256 algorithm.</li>
+          <li>Using client secret as UTF-8 string sign the payload with HmacSHA256 algorithm.</li>
           <li>Encode resulting signature in base64.</li>
         </ol>"
       required: true
@@ -445,7 +445,7 @@ components:
           example: "General error"
         hasMoreResults:
           type: "boolean"
-          description: "System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifier plus 1."
+          description: "System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifer plus 1."
           example: true
         data:
           type: "array"
