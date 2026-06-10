@@ -40,16 +40,28 @@ public class ElevenLabsUtils {
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
         String searchText, Context context) {
 
-        Map<String, List<Map<String, Object>>> body = context.http(http -> http.get("/voices"))
-            .configuration(responseType(Http.ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
-
+        String nextPageToken = null;
+        boolean hasMore;
         List<Option<String>> voiceOptions = new ArrayList<>();
 
-        for (Map<String, Object> voice : body.get("voices")) {
-            voiceOptions.add(option((String) voice.get("name"), (String) voice.get("voice_id")));
-        }
+        do {
+            Map<String, Object> body = context.http(http -> http.get("/voices"))
+                .queryParameters("next_page_token", nextPageToken, "page_size", 100)
+                .configuration(responseType(Http.ResponseType.JSON))
+                .execute()
+                .getBody(new TypeReference<>() {});
+
+            if (body.get("voices") instanceof List<?> voices) {
+                for (Object o : voices) {
+                    if (o instanceof Map<?, ?> voice) {
+                        voiceOptions.add(option((String) voice.get("name"), (String) voice.get("voice_id")));
+                    }
+                }
+            }
+
+            hasMore = (Boolean) body.getOrDefault("has_more", false);
+            nextPageToken = (String) body.get("next_page_token");
+        } while (hasMore);
 
         return voiceOptions;
     }
