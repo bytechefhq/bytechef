@@ -359,7 +359,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     ) : (
                         <span
                             className={twMerge(
-                                'font-semibold',
+                                'max-w-48 truncate font-semibold',
                                 isClusterElement && 'w-full truncate text-sm',
                                 isHorizontal && isRegularNode && 'w-full truncate'
                             )}
