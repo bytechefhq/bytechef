@@ -4,14 +4,12 @@ import {WorkflowExecution} from '@/shared/middleware/automation/workflow/executi
 import {useStopJobMutation} from '@/shared/mutations/platform/jobs.mutations';
 import {WorkflowExecutionKeys} from '@/shared/queries/automation/workflowExecutions.queries';
 import {useQueryClient} from '@tanstack/react-query';
-import {CellContext} from '@tanstack/react-table';
 import {CircleStopIcon, EllipsisVerticalIcon, ViewIcon} from 'lucide-react';
 import {toast} from 'sonner';
 
 import useWorkflowExecutionSheetStore from '../stores/useWorkflowExecutionSheetStore';
 
-/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecution, any>}) => {
+const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecution}) => {
     const queryClient = useQueryClient();
 
     const {setWorkflowExecutionId, setWorkflowExecutionSheetOpen} = useWorkflowExecutionSheetStore();
@@ -26,10 +24,10 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
         },
     });
 
-    const disabled = data.getValue()?.status !== 'STARTED';
+    const disabled = execution.job?.status !== 'STARTED';
 
     const handleViewClick = () => {
-        const id = data.row.original.id;
+        const id = execution.id;
 
         if (id != null) {
             setWorkflowExecutionId(id);
@@ -37,8 +35,12 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
         }
     };
 
-    const handleStopWorkflowExecutionClick = (id: number) => {
-        stopJobMutation.mutate(id);
+    const handleStopWorkflowExecutionClick = () => {
+        const jobId = execution.job?.id;
+
+        if (jobId != null) {
+            stopJobMutation.mutate(Number(jobId));
+        }
     };
 
     return (
@@ -59,7 +61,7 @@ const WorkflowExecutionsDropdownMenu = ({data}: {data: CellContext<WorkflowExecu
                 <DropdownMenuItem
                     className="dropdown-menu-item-destructive"
                     disabled={disabled}
-                    onClick={() => handleStopWorkflowExecutionClick(data.getValue()?.id)}
+                    onClick={handleStopWorkflowExecutionClick}
                 >
                     <CircleStopIcon /> Stop
                 </DropdownMenuItem>
