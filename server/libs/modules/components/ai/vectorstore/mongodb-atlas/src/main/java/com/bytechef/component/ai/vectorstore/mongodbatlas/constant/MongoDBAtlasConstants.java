@@ -26,8 +26,6 @@ import com.mongodb.MongoCredential;
 import com.mongodb.MongoDriverInformation;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
-import java.util.Arrays;
-import java.util.List;
 import org.springframework.ai.vectorstore.mongodb.atlas.MongoDBAtlasVectorStore;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoClientDatabaseFactory;
@@ -39,7 +37,6 @@ public class MongoDBAtlasConstants {
     public static final String DATABASE_NAME = "databaseName";
     public static final String INDEX_NAME = "indexName";
     public static final String INITIALIZE_SCHEMA = "initializeSchema";
-    public static final String METADATA_FIELDS = "metadataFields";
     public static final String MONGODB_ATLAS = "mongodbAtlas";
     public static final String NUM_CANDIDATES = "numCandidates";
     public static final String PATH_NAME = "pathName";
@@ -69,28 +66,22 @@ public class MongoDBAtlasConstants {
         MongoTemplate mongoTemplate = new MongoTemplate(
             new SimpleMongoClientDatabaseFactory(mongoClient, databaseName));
 
-        List<String> metadataFields = splitMetadataFields(connectionParameters.getString(METADATA_FIELDS));
-
-        return MongoDBAtlasVectorStore.builder(mongoTemplate, embeddingModel)
+        MongoDBAtlasVectorStore vectorStore = MongoDBAtlasVectorStore.builder(mongoTemplate, embeddingModel)
             .collectionName(connectionParameters.getString(COLLECTION_NAME, "vector_store"))
             .vectorIndexName(connectionParameters.getString(INDEX_NAME, "vector_index"))
             .pathName(connectionParameters.getString(PATH_NAME, "embedding"))
             .numCandidates(connectionParameters.getInteger(NUM_CANDIDATES, 200))
-            .metadataFieldsToFilter(metadataFields)
             .initializeSchema(connectionParameters.getBoolean(INITIALIZE_SCHEMA, false))
             .build();
-    };
 
-    private static List<String> splitMetadataFields(String metadataFields) {
-        if (metadataFields == null || metadataFields.isBlank()) {
-            return List.of();
+        try {
+            vectorStore.afterPropertiesSet();
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to initialize MongoDB Atlas vector store", e);
         }
 
-        return Arrays.stream(metadataFields.split(","))
-            .map(String::trim)
-            .filter(field -> !field.isEmpty())
-            .toList();
-    }
+        return vectorStore;
+    };
 
     private MongoDBAtlasConstants() {
     }
