@@ -26,6 +26,7 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     AudioLinesIcon,
     BlendIcon,
+    ChevronsUpDownIcon,
     DiamondIcon,
     HelpCircleIcon,
     PlusIcon,
@@ -37,7 +38,7 @@ import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
-const DesktopSidebarBottomMenu = () => {
+export function AppSidebarFooter() {
     const application = useApplicationInfoStore((state) => state.application);
     const {account, logout} = useAuthenticationStore(
         useShallow((state) => ({
@@ -150,11 +151,27 @@ const DesktopSidebarBottomMenu = () => {
     return (
         <DropdownMenu>
             <DropdownMenuTrigger asChild>
-                <Avatar className="cursor-pointer">
-                    <AvatarFallback className="bg-white">
-                        <User2Icon className="size-6" />
-                    </AvatarFallback>
-                </Avatar>
+                <button
+                    aria-label="User menu"
+                    className="flex h-16 w-full items-center gap-2 rounded-md px-0.5 py-2 text-left hover:bg-sidebar-accent"
+                    type="button"
+                >
+                    <Avatar className="shrink-0">
+                        <AvatarFallback className="bg-white">
+                            <User2Icon className="size-6" />
+                        </AvatarFallback>
+                    </Avatar>
+
+                    <div className="flex w-full min-w-0 items-center justify-between group-data-[collapsible=icon]:hidden">
+                        <div className="flex flex-1 flex-col">
+                            <span className="text-xs text-muted-foreground">Signed in as</span>
+
+                            <span className="truncate text-sm font-medium">{account?.email}</span>
+                        </div>
+
+                        <ChevronsUpDownIcon className="size-4" />
+                    </div>
+                </button>
             </DropdownMenuTrigger>
 
             <DropdownMenuContent align="start" className="w-72 space-y-2 p-2">
@@ -168,7 +185,7 @@ const DesktopSidebarBottomMenu = () => {
                     <div>
                         <div className="text-sm text-muted-foreground">Signed in as</div>
 
-                        <div>{account?.email}</div>
+                        <div className="text-sm">{account?.email}</div>
                     </div>
                 </div>
 
@@ -317,6 +334,4 @@ const DesktopSidebarBottomMenu = () => {
             </DropdownMenuContent>
         </DropdownMenu>
     );
-};
-
-export default DesktopSidebarBottomMenu;
+}

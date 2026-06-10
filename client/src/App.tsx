@@ -1,3 +1,4 @@
+import {SidebarInset, SidebarProvider} from '@/components/ui/sidebar';
 import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
@@ -6,9 +7,8 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
-import {MobileSidebar} from '@/shared/layout/MobileSidebar';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
-import {DesktopSidebar} from '@/shared/layout/desktop-sidebar/DesktopSidebar';
+import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -129,7 +129,6 @@ const platformNavigation = [
 ];
 
 function App() {
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [searchOpen, setSearchOpen] = useState(false);
 
     const {ai, edition} = useApplicationInfoStore(
@@ -296,17 +295,11 @@ function App() {
     }, [ff_2396]);
 
     return authenticated ? (
-        <div className="flex h-full">
-            <MobileSidebar
-                mobileMenuOpen={mobileMenuOpen}
-                navigation={navigation}
-                setMobileMenuOpen={setMobileMenuOpen}
-            />
+        <SidebarProvider className="h-full" defaultOpen={false}>
+            <AppSidebar navigation={navigation} />
 
-            <DesktopSidebar navigation={navigation} />
-
-            <div className="flex h-full min-w-0 flex-1 flex-col">
-                <MobileTopNavigation setMobileMenuOpen={setMobileMenuOpen} />
+            <SidebarInset className="flex h-full min-w-0 flex-col">
+                <MobileTopNavigation />
 
                 <div className="flex size-full">
                     <div className="flex h-full min-w-0 flex-1">
@@ -321,16 +314,16 @@ function App() {
                         </aside>
                     )}
                 </div>
-            </div>
+            </SidebarInset>
 
             <Toaster />
 
-            {ff_2396 && searchOpen && (
+            {ff_2396 && (
                 <Suspense fallback={null}>
                     <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
                 </Suspense>
             )}
-        </div>
+        </SidebarProvider>
     ) : (
         <Outlet />
     );
