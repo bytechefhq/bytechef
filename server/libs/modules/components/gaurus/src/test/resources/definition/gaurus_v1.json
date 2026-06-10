@@ -304,10 +304,10 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "data": "AccountResult[]",
           "code": "OK",
           "message": "",
-          "hasMoreResults": false
+          "hasMoreResults": false,
+          "data": "AccountResult[]"
         }
       },
       "outputSchema": {
@@ -466,10 +466,10 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "data": "AccountResult[]",
         "code": "OK",
         "message": "",
-        "hasMoreResults": false
+        "hasMoreResults": false,
+        "data": "AccountResult[]"
       }
     },
     "perform": { },
@@ -742,10 +742,10 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "data": "TransactionResult[]",
           "code": "OK",
           "message": "",
-          "hasMoreResults": true
+          "hasMoreResults": true,
+          "data": "TransactionResult[]"
         }
       },
       "outputSchema": {
@@ -904,10 +904,10 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "data": "TransactionResult[]",
         "code": "OK",
         "message": "",
-        "hasMoreResults": true
+        "hasMoreResults": true,
+        "data": "TransactionResult[]"
       }
     },
     "perform": { },
@@ -1721,8 +1721,8 @@
         "placeholder": null,
         "sampleOutput": {
           "data": [ {
-            "existingMails": [ "existing@example.com" ],
-            "newMails": [ "new@example.com" ]
+            "newMails": [ "new@example.com" ],
+            "existingMails": [ "existing@example.com" ]
           } ],
           "errors": [ ]
         }
@@ -1881,8 +1881,8 @@
       },
       "sampleOutput": {
         "data": [ {
-          "existingMails": [ "existing@example.com" ],
-          "newMails": [ "new@example.com" ]
+          "newMails": [ "new@example.com" ],
+          "existingMails": [ "existing@example.com" ]
         } ],
         "errors": [ ]
       }
