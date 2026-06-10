@@ -53,16 +53,14 @@ public class ElevenLabsCreateRealtimeTranscriptAction {
     private static final String AUDIO_FORMAT = "audioFormat";
     private static final String LANGUAGE_CODE = "languageCode";
     private static final String SAMPLE_RATE = "sampleRate";
+    public static final String INCLUDE_TIMESTAMPS = "includeTimestamps";
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createRealtimeTranscript")
         .title("Create Realtime Transcript")
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-transcript")
+        .help("", "https://docs.bytechef.io/reference/components/elevenlabs_v1#create-realtime-transcript")
         .description(
-            "Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. " +
-                "Receives audio via WebSocket, forwards to ElevenLabs for transcription, " +
-                "and streams transcription results back.")
+            "Transcribe audio in real-time using ElevenLabs WebSocket-based speech-to-text API. Receives audio via " +
+                "WebSocket, forwards to ElevenLabs for transcription, and streams transcription results back.")
         .properties(
             string(MODEL_ID)
                 .label("Model")
@@ -72,8 +70,8 @@ public class ElevenLabsCreateRealtimeTranscriptAction {
             string(LANGUAGE_CODE)
                 .label("Language Code")
                 .description(
-                    "The language code for transcription (e.g., 'en' for English). " +
-                        "If not specified, the language is auto-detected.")
+                    "The language code for transcription (e.g., 'en' for English). If not specified, the language " +
+                        "is auto-detected.")
                 .required(false),
             integer(SAMPLE_RATE)
                 .label("Sample Rate")
@@ -90,7 +88,7 @@ public class ElevenLabsCreateRealtimeTranscriptAction {
                     option("PCM μ-law, 8kHz", "ulaw_8000"))
                 .defaultValue("pcm_16000")
                 .required(false),
-            bool("includeTimestamps")
+            bool(INCLUDE_TIMESTAMPS)
                 .label("Include Timestamps")
                 .description("Whether to include word-level timestamps in the transcription.")
                 .defaultValue(false)
@@ -108,7 +106,7 @@ public class ElevenLabsCreateRealtimeTranscriptAction {
         String languageCode = inputParameters.getString(LANGUAGE_CODE);
         int sampleRate = inputParameters.getInteger(SAMPLE_RATE, 16000);
         String audioFormat = inputParameters.getString(AUDIO_FORMAT, "pcm_16000");
-        boolean includeTimestamps = inputParameters.getBoolean("includeTimestamps", false);
+        boolean includeTimestamps = inputParameters.getBoolean(INCLUDE_TIMESTAMPS, false);
 
         String websocketUrl = buildWebSocketUrl(modelId, languageCode, sampleRate, audioFormat, includeTimestamps);
 

@@ -20,6 +20,7 @@ import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.TEX
 import static com.bytechef.component.elevenlabs.constant.ElevenLabsConstants.VOICE_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -47,11 +48,11 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class ElevenLabsCreateSpeechWithTimingActionTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(VOICE_ID, "21m00Tcm4TlvDq8ikWAM", TEXT, "This is text that will be converted to speech."));
     private final Map<String, Object> mockedResult = Map.of();
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(

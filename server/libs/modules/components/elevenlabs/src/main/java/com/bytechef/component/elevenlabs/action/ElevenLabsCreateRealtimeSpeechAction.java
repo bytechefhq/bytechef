@@ -93,8 +93,8 @@ public class ElevenLabsCreateRealtimeSpeechAction {
             number(SIMILARITY_BOOST)
                 .label("Similarity Boost")
                 .description(
-                    "Voice similarity boost (0.0 to 1.0). Higher values make the voice " +
-                        "more closely match the original voice.")
+                    "Voice similarity boost (0.0 to 1.0). Higher values make the voice more closely match the " +
+                        "original voice.")
                 .defaultValue(0.8)
                 .minValue(0.0)
                 .maxValue(1.0)
