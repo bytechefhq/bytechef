@@ -36,7 +36,7 @@ public class BraveComponentHandler implements ComponentHandler {
         .title("Brave")
         .description(
             "Brave gives you access to the same powerful, independent search index that powers the privacy-first " +
-                "search engine trusted by millions")
+                "search engine trusted by millions.")
         .icon("path:assets/brave.svg")
         .categories(ComponentCategory.HELPERS)
         .connection(BraveConnection.CONNECTION_DEFINITION)

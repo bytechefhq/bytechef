@@ -26,7 +26,6 @@ import static com.bytechef.component.brave.constant.BraveConstants.RESULT_FILTER
 import static com.bytechef.component.brave.constant.BraveConstants.SAFESEARCH;
 import static com.bytechef.component.brave.constant.BraveConstants.SEARCH_LANG;
 import static com.bytechef.component.brave.constant.BraveConstants.SUMMARY;
-import static com.bytechef.component.definition.Authorization.API_TOKEN;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
@@ -41,8 +40,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Marko Krišković
@@ -297,10 +294,6 @@ public class BraveWebSearchAction {
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         return context
             .http(http -> http.get("/web/search"))
-            .headers(
-                Map.of("Accept", List.of("application/json"),
-                    "Accept-Encoding", List.of("gzip"),
-                    "X-Subscription-Token", List.of(connectionParameters.getString(API_TOKEN))))
             .queryParameters(
                 Q, inputParameters.getRequiredString(Q),
                 COUNT, inputParameters.getInteger(COUNT),
