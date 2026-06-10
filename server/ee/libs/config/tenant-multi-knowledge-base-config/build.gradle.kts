@@ -12,4 +12,9 @@ dependencies {
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-service"))
 
     implementation(project(":server:ee:libs:config:tenant-multi-pgvector-config"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework.boot:spring-boot-test")
 }
