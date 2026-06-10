@@ -1,0 +1,32 @@
+### How to find the Application
+
+- **Method 1: Via API**
+
+Use the `GET /o/openapi/openapi.json` endpoint to retrieve a list of all applications.
+
+- **Method 2: Via UI*
+
+Go to `[server]:[port]/o/api`, click on REST Applications and there you have a list of all applications.
+
+### How to find the Endpoint
+
+- **Method 1: Via API**
+
+Use the `GET /o/APPLICATION/openapi.json"` endpoint to retrieve a list of all endpoints in specific application.
+
+- **Method 2: Via UI*
+
+Go to `[server]:[port]/o/api`, choose the REST Application you want and there you have a list of all endpoints.
+If endpoint starts with a version, you need to remove that part. For example if endpoint is `/v1.0/accounts`, your need to use `/accounts`.
+
+### How to find the Context Name
+
+- **Method 1: Via UI*
+
+Go to `[server]:[port]/api/jsonws`, click on Context Name and there you have a list of all contexts.
+
+### How to find the Service ID
+
+- **Method 1: Via API**
+
+Use the `GET "/api/jsonws?contextName=CONTEXT_NAME&discover=""` endpoint to retrieve a list of all service IDs in specific context.
