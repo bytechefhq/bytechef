@@ -50,7 +50,7 @@ public class MongoDBInsertManyAction {
             array(DOCUMENTS)
                 .label("Documents")
                 .description("The documents to insert, each as a JSON object.")
-                .items(object().additionalProperties(object()))
+                .items(object())
                 .required(true))
         .output(
             outputSchema(
