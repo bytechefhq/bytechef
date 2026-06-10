@@ -5,7 +5,7 @@ type StyleType = NonNullable<React.ComponentProps<typeof Badge>['styleType']>;
 
 const STYLE_MAP: Record<string, StyleType> = {
     COMPLETED: 'success-outline',
-    FAILED: 'destructive-filled',
+    FAILED: 'destructive-outline',
 };
 
 const WorkflowExecutionBadge = ({status}: {status: string}) => {
