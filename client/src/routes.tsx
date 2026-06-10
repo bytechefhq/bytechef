@@ -1,4 +1,3 @@
-import App from '@/App';
 import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
@@ -27,9 +26,10 @@ import {EnvironmentKeys} from '@/shared/queries/platform/environments.queries';
 import {authenticationStore} from '@/shared/stores/useAuthenticationStore';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {QueryClient} from '@tanstack/react-query';
-import {lazy} from 'react';
+import {Suspense, lazy} from 'react';
 import {createBrowserRouter, redirect} from 'react-router-dom';
 
+const App = lazy(() => import('@/App'));
 const AccountProfile = lazy(() => import('@/pages/account/settings/AccountProfile'));
 const AiSkills = lazy(() => import('@/pages/automation/ai/skills/AiSkills'));
 const Appearance = lazy(() => import('@/pages/account/settings/Appearance'));
@@ -1028,7 +1028,11 @@ export const getRouter = (queryClient: QueryClient) =>
                     path: '/',
                 },
             ],
-            element: <App />,
+            element: (
+                <Suspense fallback={null}>
+                    <App />
+                </Suspense>
+            ),
             errorElement: <ErrorPage />,
             loader: async () => {
                 await loadEnvironments(queryClient);

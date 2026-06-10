@@ -1,4 +1,3 @@
-import GlobalSearchDialog from '@/components/GlobalSearch/GlobalSearchDialog';
 import {Toaster} from '@/components/ui/sonner';
 import useFetchInterceptor from '@/config/useFetchInterceptor';
 import {useUserGuiding} from '@/hooks/useUserGuiding';
@@ -40,6 +39,7 @@ import {Outlet, useLocation} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 const CopilotPanel = lazy(() => import('@/shared/components/copilot/CopilotPanel'));
+const GlobalSearchDialog = lazy(() => import('@/components/GlobalSearch/GlobalSearchDialog'));
 
 type NavigationType = {
     name: string;
@@ -329,7 +329,11 @@ function App() {
 
             <Toaster />
 
-            {ff_2396 && <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />}
+            {ff_2396 && (
+                <Suspense fallback={null}>
+                    <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
+                </Suspense>
+            )}
         </div>
     ) : (
         <Outlet />
