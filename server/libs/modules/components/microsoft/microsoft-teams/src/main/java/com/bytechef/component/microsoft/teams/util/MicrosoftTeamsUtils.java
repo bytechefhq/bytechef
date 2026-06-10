@@ -26,13 +26,20 @@ import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsCons
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.VALUE;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.WEB_DAV_URL;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.LAST_TIME_CHECKED;
 import static com.bytechef.microsoft.commons.MicrosoftUtils.getOptions;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.microsoft.commons.MicrosoftConstants;
+
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -159,5 +166,63 @@ public class MicrosoftTeamsUtils {
             .getBody(new TypeReference<>() {});
 
         return getOptions(context, body, DISPLAY_NAME, ID);
+    }
+
+    public static PollOutput includeRepliesPoll(
+        String url, String containsKey, Parameters closureParameters, Context context) {
+
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+
+        Map<String, Object> body = context
+            .http(http -> http.get(url))
+            .queryParameter("$expand", "replies")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        List<Map<?, ?>> maps = new ArrayList<>();
+
+        if (body.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
+            for (Object o : list) {
+                if (o instanceof Map<?, ?> map && map.containsKey(containsKey)) {
+                    ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) map.get("createdDateTime"));
+
+                    LocalDateTime createdDateTime = LocalDateTime.ofInstant(zonedCreatedDateTime.toInstant(), zoneId);
+
+                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(now)) {
+                        maps.add(map);
+                    }
+
+                    checkMessageReplies(map.get("replies"), maps, startDate, now);
+                }
+            }
+        }
+
+        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
+    }
+
+    private static void checkMessageReplies(
+        Object replies, List<Map<?, ?>> maps, LocalDateTime startDate, LocalDateTime now) {
+
+        if (replies instanceof List<?> repliesList) {
+            for (Object reply : repliesList) {
+                if (reply instanceof Map<?, ?> replyMap) {
+                    ZoneId zoneId = ZoneId.systemDefault();
+
+                    ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) replyMap.get("createdDateTime"));
+
+                    LocalDateTime createdDateTime = LocalDateTime.ofInstant(zonedCreatedDateTime.toInstant(), zoneId);
+
+                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(now)) {
+                        maps.add(replyMap);
+                    }
+                }
+            }
+        }
     }
 }
