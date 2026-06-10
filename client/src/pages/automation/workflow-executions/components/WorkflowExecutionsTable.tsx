@@ -1,6 +1,5 @@
 import Button from '@/components/Button/Button';
-import TablePagination from '@/components/TablePagination';
-import {Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow} from '@/components/ui/table';
+import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table';
 import WorkflowExecutionBadge from '@/shared/components/workflow-executions/WorkflowExecutionBadge';
 import {WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 import {ChevronDownIcon, ChevronUpIcon} from 'lucide-react';
@@ -221,26 +220,14 @@ const ExecutionRows = ({
 );
 
 interface WorkflowExecutionsTableProps {
-    onPaginationClick: (pageNumber: number) => void;
-    pageNumber: number;
-    pageSize: number;
-    totalElements: number;
-    totalPages: number;
     workflowExecutions: WorkflowExecution[];
 }
 
-const WorkflowExecutionsTable = ({
-    onPaginationClick,
-    pageNumber,
-    pageSize,
-    totalElements,
-    totalPages,
-    workflowExecutions,
-}: WorkflowExecutionsTableProps) => {
+const WorkflowExecutionsTable = ({workflowExecutions}: WorkflowExecutionsTableProps) => {
     const {expandedJobIds, handleRowClick, handleToggleExpand} = useWorkflowExecutionsTable();
 
     return (
-        <div className="w-full px-4 3xl:mx-auto 3xl:w-11/12">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-full">
             <Table>
                 <ExecutionTableHeader />
 
@@ -254,20 +241,6 @@ const WorkflowExecutionsTable = ({
                         seenJobIds={new Set()}
                     />
                 </TableBody>
-
-                <TableFooter className="bg-surface-neutral-primary">
-                    <TableRow className="hover:bg-surface-neutral-primary">
-                        <TableCell colSpan={columns.length}>
-                            <TablePagination
-                                onClick={onPaginationClick}
-                                pageNumber={pageNumber}
-                                pageSize={pageSize}
-                                totalElements={totalElements}
-                                totalPages={totalPages}
-                            />
-                        </TableCell>
-                    </TableRow>
-                </TableFooter>
             </Table>
         </div>
     );
