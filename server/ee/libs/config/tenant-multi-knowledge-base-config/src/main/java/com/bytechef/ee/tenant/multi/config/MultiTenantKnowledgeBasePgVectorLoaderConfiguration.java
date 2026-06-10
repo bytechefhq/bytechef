@@ -25,6 +25,14 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * during a normal startup and during the dedicated {@code liquibase} migration run, so per-tenant vector tables are
  * provisioned regardless of whether the Knowledge Base feature is enabled.
  *
+ * <p>
+ * Gated on the PgVector provider being configured ({@code bytechef.ai.vectorstore.provider=pgvector} plus a
+ * {@code bytechef.ai.vectorstore.pgvector.url}) because the loader depends on the {@code pgVectorJdbcTemplate} bean,
+ * which only exists under those same conditions (see {@code PgVectorJdbcConfiguration} and
+ * {@link MultiTenantPgVectorDataSourceConfiguration}). Deployments such as the {@code liquibase} migration run that do
+ * not configure a PgVector store therefore skip this loader instead of failing context startup with an unsatisfied
+ * dependency. There is nothing to provision when PgVector is not the configured vector store.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -32,6 +40,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 @ConditionalOnEEVersion
 @ConditionalOnMultiTenant
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore", name = "provider", havingValue = "pgvector")
+@ConditionalOnProperty(prefix = "bytechef.ai.vectorstore.pgvector", name = "url")
 @EnableConfigurationProperties(PgVectorStoreProperties.class)
 class MultiTenantKnowledgeBasePgVectorLoaderConfiguration {
 
