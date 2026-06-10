@@ -3,11 +3,13 @@ import ComboBox from '@/components/ComboBox/ComboBox';
 import DatePicker from '@/components/DatePicker/DatePicker';
 import EmptyList from '@/components/EmptyList';
 import PageLoader from '@/components/PageLoader';
+import TablePagination from '@/components/TablePagination';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsFilterTitle from '@/pages/automation/workflow-executions/components/WorkflowExecutionsFilterTitle';
 import {useWorkflowExecutions} from '@/pages/automation/workflow-executions/hooks/useWorkflowExecutions';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import Footer from '@/shared/layout/Footer';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {Project} from '@/shared/middleware/automation/configuration';
@@ -86,9 +88,24 @@ export const WorkflowExecutions = () => {
 
     return (
         <LayoutContainer
+            footer={
+                workflowExecutionPage?.content &&
+                workflowExecutionPage.content.length > 0 && (
+                    <Footer centerTitle className="border-t border-stroke-neutral-primary 3xl:w-full" position="main">
+                        <TablePagination
+                            onClick={handlePaginationClick}
+                            pageNumber={filterPageNumber ? filterPageNumber : 0}
+                            pageSize={workflowExecutionPage.size!}
+                            totalElements={workflowExecutionPage.totalElements!}
+                            totalPages={workflowExecutionPage.totalPages!}
+                        />
+                    </Footer>
+                )
+            }
             header={
                 <Header
                     centerTitle
+                    className="3xl:w-full"
                     position="main"
                     right={
                         <div className="flex items-center gap-2">
@@ -213,14 +230,7 @@ export const WorkflowExecutions = () => {
         >
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
-                    <WorkflowExecutionsTable
-                        onPaginationClick={handlePaginationClick}
-                        pageNumber={filterPageNumber ? filterPageNumber : 0}
-                        pageSize={workflowExecutionPage?.size ?? 0}
-                        totalElements={workflowExecutionPage?.totalElements ?? 0}
-                        totalPages={workflowExecutionPage?.totalPages ?? 0}
-                        workflowExecutions={workflowExecutions}
-                    />
+                    <WorkflowExecutionsTable workflowExecutions={workflowExecutions} />
                 ) : (
                     <EmptyList
                         icon={<ActivityIcon className="size-24 text-gray-300" />}
