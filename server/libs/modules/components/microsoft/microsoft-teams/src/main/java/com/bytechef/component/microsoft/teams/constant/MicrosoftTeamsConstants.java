@@ -45,7 +45,7 @@ public class MicrosoftTeamsConstants {
     public static final String DISPLAY_NAME = "displayName";
     public static final String E_TAG = "eTag";
     public static final String ID = "id";
-    public static final String LAST_TIME_CHECKED = "lastTimeChecked";
+    public static final String MESSAGE_ID = "messageId";
     public static final String NAME = "name";
     public static final String TEAM_ID = "teamId";
     public static final String VALUE = "value";

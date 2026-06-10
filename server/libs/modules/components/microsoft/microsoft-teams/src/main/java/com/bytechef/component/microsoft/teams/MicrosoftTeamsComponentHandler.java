@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsCreateChannelAction;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendChannelMessageAction;
 import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendDirectMessageAction;
+import com.bytechef.component.microsoft.teams.action.MicrosoftTeamsSendReplyToChannelMessageAction;
 import com.bytechef.component.microsoft.teams.connection.MicrosoftTeamsConnection;
 import com.bytechef.component.microsoft.teams.trigger.MicrosoftTeamsNewChannelMessageTrigger;
 import com.bytechef.component.microsoft.teams.trigger.MicrosoftTeamsNewDirectMessageTrigger;
@@ -51,11 +52,13 @@ public class MicrosoftTeamsComponentHandler implements ComponentHandler {
         .actions(
             MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION,
             MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION,
-            MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION)
+            MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION,
+            MicrosoftTeamsSendReplyToChannelMessageAction.ACTION_DEFINITION)
         .clusterElements(
             tool(MicrosoftTeamsCreateChannelAction.ACTION_DEFINITION),
             tool(MicrosoftTeamsSendChannelMessageAction.ACTION_DEFINITION),
-            tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION))
+            tool(MicrosoftTeamsSendDirectMessageAction.ACTION_DEFINITION),
+            tool(MicrosoftTeamsSendReplyToChannelMessageAction.ACTION_DEFINITION))
         .triggers(
             MicrosoftTeamsNewChannelMessageTrigger.TRIGGER_DEFINITION,
             MicrosoftTeamsNewDirectMessageTrigger.TRIGGER_DEFINITION)
