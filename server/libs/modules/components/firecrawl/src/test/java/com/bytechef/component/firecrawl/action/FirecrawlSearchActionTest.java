@@ -32,9 +32,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -51,14 +53,8 @@ class FirecrawlSearchActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            QUERY, "test query",
-            LIMIT, 5,
-            TBS, "qdr:h",
-            LOCATION, "San Francisco,California,United States",
-            COUNTRY, "US",
-            TIMEOUT, 5000,
-            IGNORE_INVALID_URLS, true));
+        Map.of(QUERY, "test query", LIMIT, 5, TBS, "qdr:h", LOCATION, "San Francisco,California,United States",
+            COUNTRY, "US", TIMEOUT, 5000, IGNORE_INVALID_URLS, true));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -77,29 +73,17 @@ class FirecrawlSearchActionTest {
         Object result = FirecrawlSearchAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of("success", true), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/search", stringArgumentCaptor.getValue());
 
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
+
         assertEquals(
-            Http.Body.of(
-                Map.of(
-                    QUERY, "test query",
-                    LIMIT, 5,
-                    TBS, "qdr:h",
-                    LOCATION, "San Francisco,California,United States",
-                    COUNTRY, "US",
-                    TIMEOUT, 5000,
-                    IGNORE_INVALID_URLS, true),
-                Http.BodyContentType.JSON),
+            Body.of(QUERY, "test query", LIMIT, 5, TBS, "qdr:h", LOCATION, "San Francisco,California,United States",
+                COUNTRY, "US", TIMEOUT, 5000, IGNORE_INVALID_URLS, true),
             bodyArgumentCaptor.getValue());
     }
 }

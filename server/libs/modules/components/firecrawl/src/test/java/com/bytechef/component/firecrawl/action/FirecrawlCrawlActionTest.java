@@ -29,9 +29,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -48,10 +50,7 @@ class FirecrawlCrawlActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            URL, "https://example.com",
-            LIMIT, 10,
-            SITEMAP, "include"));
+        Map.of(URL, "https://example.com", LIMIT, 10, SITEMAP, "include"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -70,25 +69,15 @@ class FirecrawlCrawlActionTest {
         Object result = FirecrawlCrawlAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of("success", true), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
 
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals("/crawl", stringArgumentCaptor.getValue());
         assertEquals(
-            Http.Body.of(
-                Map.of(
-                    URL, "https://example.com",
-                    LIMIT, 10,
-                    SITEMAP, "include",
-                    SCRAPE_OPTIONS, Map.of()),
-                Http.BodyContentType.JSON),
+            Body.of(URL, "https://example.com", LIMIT, 10, SITEMAP, "include", SCRAPE_OPTIONS, Map.of()),
             bodyArgumentCaptor.getValue());
     }
 }
