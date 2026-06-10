@@ -22,7 +22,10 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -60,8 +63,26 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
             @Override
             public Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
                 throws Exception {
+
+                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
+
+                String normalizedPath = path;
+                if (propertiesOptional.isPresent()) {
+                    List<? extends Property> properties = propertiesOptional.get();
+
+                    for (Property property : properties) {
+                        if (((PropertyType) property.getMetadata()
+                            .get("type")) == PropertyType.PATH) {
+                            normalizedPath = normalizedPath.replace(
+                                "{" + property.getName() + "}",
+                                URLEncoder.encode(inputParameters.getRequiredString(property.getName()),
+                                    StandardCharsets.UTF_8));
+                        }
+                    }
+                }
+
                 String endpoint =
-                    connectionParameters.getRequiredString("baseUri") + path;
+                    connectionParameters.getRequiredString("baseUri") + normalizedPath;
 
                 Context.Http.Executor httpExecutor = context.http(http -> http.get(endpoint));
 
@@ -72,15 +93,19 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
                     .truncatedTo(ChronoUnit.MILLIS));
 
                 String body = EMPTY_BODY;
-                String signature = getSignature(clientId, clientSecret, requestId, timestamp, path, body, context);
+                String signature =
+                    getSignature(clientId, clientSecret, requestId, timestamp, getRelativeUrl(endpoint), body, context);
 
                 context.log(log -> log.debug(
                     "Executing endpoint: {} with clientId: {}, requestId: {}, timestamp: {}, uri: {}, body: {}, signature {}",
                     endpoint, clientId, requestId, timestamp, path, body, signature));
 
                 Context.Http.Response response = httpExecutor
-                    .configuration(Context.Http
-                        .allowUnauthorizedCerts(connectionParameters.getBoolean("allowSelfSignedCert", false)))
+                    .configuration(
+                        Context.Http.allowUnauthorizedCerts(
+                            connectionParameters.getBoolean("allowSelfSignedCert", false))
+                            .responseType(
+                                Context.Http.ResponseType.JSON))
                     .headers(Map.of("clientId", List.of(clientId), "requestId",
                         List.of(requestId), "timestamp", List.of(timestamp),
                         "signature", List.of(signature)))
@@ -119,6 +144,16 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
         }
 
         return rawUuid.replaceFirst("(\\w{8})(\\w{4})(\\w{4})(\\w{4})(\\w{12})", "$1-$2-$3-$4-$5");
+    }
+
+    private static String getRelativeUrl(String uriString) {
+        try {
+            URI uri = new URI(uriString);
+
+            return uri.getPath();
+        } catch (Exception exception) {
+            throw new RuntimeException("Failed to compute HmacSHA256 signature", exception);
+        }
     }
 
 }
