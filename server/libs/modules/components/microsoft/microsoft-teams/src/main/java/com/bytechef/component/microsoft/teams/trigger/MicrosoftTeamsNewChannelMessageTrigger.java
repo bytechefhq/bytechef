@@ -16,10 +16,12 @@
 
 package com.bytechef.component.microsoft.teams.trigger;
 
+import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.INCLUDE_REPLIES;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 
@@ -56,6 +58,11 @@ public class MicrosoftTeamsNewChannelMessageTrigger {
                 .description("Channel to monitor for new messages.")
                 .optionsLookupDependsOn(TEAM_ID)
                 .options((OptionsFunction<String>) MicrosoftTeamsUtils::getChannelIdOptions)
+                .required(true),
+            bool(INCLUDE_REPLIES)
+                .label("Include Replies")
+                .description("Whether replies to a channel message will trigger the workflow.")
+                .defaultValue(true)
                 .required(true))
         .output(outputSchema(MESSAGE_OUTPUT_PROPERTY))
         .poll(MicrosoftTeamsNewChannelMessageTrigger::poll)
@@ -71,6 +78,10 @@ public class MicrosoftTeamsNewChannelMessageTrigger {
         String url = "/teams/%s/channels/%s/messages".formatted(
             inputParameters.getRequiredString(TEAM_ID),
             inputParameters.getRequiredString(CHANNEL_ID));
+
+        if (inputParameters.getRequiredBoolean(INCLUDE_REPLIES)) {
+            return MicrosoftTeamsUtils.includeRepliesPoll(url, "messageType", closureParameters, context);
+        }
 
         return MicrosoftTriggerUtils.poll(url, "messageType", closureParameters, context);
     }
