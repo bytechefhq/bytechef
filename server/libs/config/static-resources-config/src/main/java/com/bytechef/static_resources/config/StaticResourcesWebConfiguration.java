@@ -18,10 +18,12 @@ package com.bytechef.static_resources.config;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.config.ApplicationProperties.Resources;
+import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -43,9 +45,21 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+        // Content-hashed, immutable build artifacts under /assets — cache aggressively so repeat
+        // visits don't re-download them. New deploys change the hashed filenames, busting the cache.
+        ResourceHandlerRegistration assetsRegistration = registry.addResourceHandler("/assets/**");
+
+        assetsRegistration.addResourceLocations(resources.getWeb() + "assets/");
+        assetsRegistration.setCacheControl(
+            CacheControl.maxAge(Duration.ofDays(365))
+                .cachePublic()
+                .immutable());
+
+        // Everything else (index.html, icons, etc.) must always revalidate so a new deploy is picked up.
         ResourceHandlerRegistration resourceHandlerRegistration = registry.addResourceHandler("/**", "*");
 
         resourceHandlerRegistration.addResourceLocations(resources.getWeb());
+        resourceHandlerRegistration.setCacheControl(CacheControl.noCache());
 
         if (log.isInfoEnabled()) {
             log.debug("Serving static web content at {}", resources.getWeb());
