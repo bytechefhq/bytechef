@@ -9,6 +9,8 @@ import {
     BrushCleaningIcon,
     FocusIcon,
     InfoIcon,
+    LockIcon,
+    LockOpenIcon,
     RedoIcon,
     UndoIcon,
     ZoomInIcon,
@@ -36,7 +38,13 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
         }))
     );
 
-    const setResetWorkflowLayout = useWorkflowEditorStore((state) => state.setResetWorkflowLayout);
+    const {nodesLocked, setNodesLocked, setResetWorkflowLayout} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            nodesLocked: state.nodesLocked,
+            setNodesLocked: state.setNodesLocked,
+            setResetWorkflowLayout: state.setResetWorkflowLayout,
+        }))
+    );
 
     const {fitView, zoomIn, zoomOut} = useReactFlow();
     const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
@@ -60,6 +68,10 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
     const handleClear = useCallback(() => {
         setResetWorkflowLayout(true);
     }, [setResetWorkflowLayout]);
+
+    const handleToggleLock = useCallback(() => {
+        setNodesLocked(!nodesLocked);
+    }, [nodesLocked, setNodesLocked]);
 
     return (
         <Panel className="m-2 mb-3" position="bottom-left">
@@ -169,6 +181,31 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
                             Reset layout
                         </TooltipContent>
                     </Tooltip>
+
+                    {!readOnly && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <button
+                                    aria-label={nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                                    className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary"
+                                    onClick={handleToggleLock}
+                                >
+                                    {nodesLocked ? (
+                                        <LockIcon className="size-4 text-content-neutral-primary" />
+                                    ) : (
+                                        <LockOpenIcon className="size-4 text-content-neutral-primary" />
+                                    )}
+                                </button>
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                {nodesLocked ? 'Unlock node movement' : 'Lock node movement'}
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
                 </ButtonGroup>
 
                 {enableUndoRedo && !readOnly && (

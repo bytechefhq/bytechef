@@ -20,6 +20,9 @@ export interface WorkflowEditorI {
         mainClusterRootComponentDefinition: ComponentDefinition | undefined
     ) => void;
 
+    nodesLocked: boolean;
+    setNodesLocked: (nodesLocked: boolean) => void;
+
     nestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>;
     setNestedClusterRootsComponentDefinitions: (
         setNestedClusterRootsComponentDefinitions: Record<string, NestedClusterRootComponentDefinitionType>
@@ -87,6 +90,12 @@ const useWorkflowEditorStore = create<WorkflowEditorI>()(
             setMainClusterRootComponentDefinition: (mainClusterRootComponentDefinition) =>
                 set(() => ({
                     mainClusterRootComponentDefinition,
+                })),
+
+            nodesLocked: true,
+            setNodesLocked: (nodesLocked) =>
+                set(() => ({
+                    nodesLocked,
                 })),
 
             nestedClusterRootsComponentDefinitions: {},

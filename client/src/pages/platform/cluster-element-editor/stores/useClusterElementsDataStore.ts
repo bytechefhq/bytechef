@@ -26,6 +26,9 @@ interface ClusterElementsDataStoreI {
     canvasZoom: number;
     setCanvasZoom: (canvasZoom: number) => void;
 
+    nodesLocked: boolean;
+    setNodesLocked: (nodesLocked: boolean) => void;
+
     reset: () => void;
 }
 
@@ -72,6 +75,11 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                 set({canvasZoom});
             },
 
+            nodesLocked: true,
+            setNodesLocked: (nodesLocked) => {
+                set({nodesLocked});
+            },
+
             reset: () => {
                 set({
                     canvasZoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
@@ -80,6 +88,7 @@ const useClusterElementsDataStore = create<ClusterElementsDataStoreI>()(
                     isNodeDragging: false,
                     isPositionSaving: false,
                     nodes: [],
+                    nodesLocked: true,
                 });
             },
         }),

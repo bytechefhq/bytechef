@@ -7,9 +7,11 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {Background, BackgroundVariant, ReactFlow} from '@xyflow/react';
+import {useEffect} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
+import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import NodeActionsHint from './NodeActionsHint';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 
@@ -47,6 +49,13 @@ const WorkflowEditor = ({
         }))
     );
 
+    const {nodesLocked, setNodesLocked} = useWorkflowEditorStore(
+        useShallow((state) => ({
+            nodesLocked: state.nodesLocked,
+            setNodesLocked: state.setNodesLocked,
+        }))
+    );
+
     const {edgeTypes, handleNodeDragStart, handleNodeDragStop, handleNodesChange, nodeTypes, onDragOver, onDrop} =
         useWorkflowEditorCanvas({
             componentDefinitions,
@@ -55,6 +64,10 @@ const WorkflowEditor = ({
             readOnlyWorkflow,
             taskDispatcherDefinitions,
         });
+
+    useEffect(() => {
+        setNodesLocked(true);
+    }, [setNodesLocked]);
 
     return (
         <div className="flex h-full flex-1 flex-col rounded-lg bg-background">
@@ -67,7 +80,7 @@ const WorkflowEditor = ({
                 nodeTypes={nodeTypes}
                 nodes={nodes}
                 nodesConnectable={false}
-                nodesDraggable={!readOnlyWorkflow}
+                nodesDraggable={!readOnlyWorkflow && !nodesLocked}
                 onDragOver={onDragOver}
                 onDrop={onDrop}
                 onEdgesChange={onEdgesChange}
