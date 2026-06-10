@@ -17,6 +17,7 @@
 package com.bytechef.component.elevenlabs.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -52,6 +53,7 @@ class ElevenLabsUtilTest {
     private final Map<String, Object> response = Map.of("voices", List.of(
         Map.of("name", "testName1", "voice_id", "voice_id_1"),
         Map.of("name", "testName2", "voice_id", "voice_id_2")));
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -61,6 +63,8 @@ class ElevenLabsUtilTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(response);
@@ -75,6 +79,12 @@ class ElevenLabsUtilTest {
         assertEquals(expected, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/voices", stringArgumentCaptor.getValue());
+
+        Object[] queryParameters = {
+            "next_page_token", null, "page_size", 100
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
