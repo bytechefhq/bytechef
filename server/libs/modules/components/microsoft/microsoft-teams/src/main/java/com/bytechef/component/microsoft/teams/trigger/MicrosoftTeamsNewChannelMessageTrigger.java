@@ -79,7 +79,7 @@ public class MicrosoftTeamsNewChannelMessageTrigger {
             inputParameters.getRequiredString(TEAM_ID),
             inputParameters.getRequiredString(CHANNEL_ID));
 
-        if (inputParameters.getBoolean(INCLUDE_REPLIES)) {
+        if (inputParameters.getBoolean(INCLUDE_REPLIES, false)) {
             return MicrosoftTeamsUtils.includeRepliesPoll(url, "messageType", closureParameters, context);
         }
 
