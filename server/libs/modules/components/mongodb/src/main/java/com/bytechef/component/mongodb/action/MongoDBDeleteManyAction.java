@@ -47,7 +47,6 @@ public class MongoDBDeleteManyAction {
             object(FILTER)
                 .label("Filter")
                 .description("The query filter that selects the documents to delete, as a JSON object.")
-                .additionalProperties(object())
                 .required(true))
         .output(
             outputSchema(

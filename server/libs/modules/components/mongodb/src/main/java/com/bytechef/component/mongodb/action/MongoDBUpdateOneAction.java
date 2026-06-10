@@ -53,13 +53,11 @@ public class MongoDBUpdateOneAction {
             object(FILTER)
                 .label("Filter")
                 .description("The query filter that selects the document to update, as a JSON object.")
-                .additionalProperties(object())
                 .required(true),
             object(UPDATE)
                 .label("Update")
                 .description("The update to apply, as a JSON object using update operators, e.g. " +
                     "{\"$set\": {\"status\": \"active\"}}.")
-                .additionalProperties(object())
                 .required(true),
             bool(UPSERT)
                 .label("Upsert")

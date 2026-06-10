@@ -50,7 +50,7 @@ public class MongoDBAggregateAction {
                 .label("Pipeline")
                 .description("The aggregation pipeline, an ordered list of stages, each as a JSON object, e.g. " +
                     "{\"$match\": {\"active\": true}}.")
-                .items(object().additionalProperties(object()))
+                .items(object())
                 .required(true))
         .output(
             outputSchema(

@@ -46,7 +46,6 @@ public class MongoDBInsertOneAction {
             object(DOCUMENT)
                 .label("Document")
                 .description("The document to insert as a JSON object.")
-                .additionalProperties(object())
                 .required(true))
         .output(
             outputSchema(

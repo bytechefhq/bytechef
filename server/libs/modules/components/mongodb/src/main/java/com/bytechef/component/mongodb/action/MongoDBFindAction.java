@@ -53,7 +53,6 @@ public class MongoDBFindAction {
             object(FILTER)
                 .label("Filter")
                 .description("The query filter as a JSON object. Leave empty to match all documents.")
-                .additionalProperties(object())
                 .required(false),
             object(PROJECTION)
                 .label("Projection")
