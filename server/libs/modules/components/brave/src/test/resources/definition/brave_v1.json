@@ -5328,7 +5328,7 @@
     "authorizationRequired": null,
     "authorizations": [ {
       "acquire": null,
-      "apply": null,
+      "apply": { },
       "authorizationCallback": null,
       "authorizationUrl": null,
       "clientId": null,
@@ -5347,7 +5347,7 @@
         "exampleValue": null,
         "expressionEnabled": null,
         "hidden": null,
-        "label": "API token",
+        "label": "API Token",
         "languageId": null,
         "maxLength": null,
         "metadata": { },
@@ -5385,7 +5385,7 @@
     "body": "Brave Search API",
     "learnMoreUrl": "https://brave.com/search/api/"
   },
-  "description": "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions",
+  "description": "Brave gives you access to the same powerful, independent search index that powers the privacy-first search engine trusted by millions.",
   "icon": "path:assets/brave.svg",
   "inputs": null,
   "metadata": null,
