@@ -53,20 +53,15 @@ const TablePagination = ({onClick, pageNumber, pageSize, totalElements, totalPag
         ));
     }, [pageNumber, totalPages, onClick]);
 
+    const paginationStart = pageNumber * pageSize + 1;
+    const paginationEnd = Math.min(totalElements, (pageNumber + 1) * pageSize);
+
     return (
         <Pagination className="w-full">
             <PaginationContent className="w-full">
-                <div className="flex-1">
-                    <p className="text-sm text-gray-700">
-                        Showing
-                        <span className="px-1 font-medium">{pageNumber * pageSize + 1}</span>
-                        to
-                        <span className="px-1 font-medium">{Math.min(totalElements, (pageNumber + 1) * pageSize)}</span>
-                        of
-                        <span className="px-1 font-medium">{totalElements}</span>
-                        results
-                    </p>
-                </div>
+                <p className="flex-1 px-4 py-2.5 text-sm text-content-neutral-secondary">
+                    Showing {paginationStart} to {paginationEnd} of {totalElements} results
+                </p>
 
                 {totalPages > 1 && (
                     <>

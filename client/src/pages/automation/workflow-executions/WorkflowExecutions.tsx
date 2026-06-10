@@ -214,12 +214,12 @@ export const WorkflowExecutions = () => {
             <PageLoader errors={[workflowExecutionsError]} loading={workflowExecutionsIsLoading}>
                 {workflowExecutions && workflowExecutions.length > 0 ? (
                     <WorkflowExecutionsTable
-                        data={workflowExecutions}
                         onPaginationClick={handlePaginationClick}
                         pageNumber={filterPageNumber ? filterPageNumber : 0}
                         pageSize={workflowExecutionPage?.size ?? 0}
                         totalElements={workflowExecutionPage?.totalElements ?? 0}
                         totalPages={workflowExecutionPage?.totalPages ?? 0}
+                        workflowExecutions={workflowExecutions}
                     />
                 ) : (
                     <EmptyList
