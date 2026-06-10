@@ -29,9 +29,11 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
@@ -48,11 +50,7 @@ class FirecrawlMapActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(
-            URL, "https://example.com",
-            SEARCH, "blog",
-            LIMIT, 100,
-            TIMEOUT, 5000));
+        Map.of(URL, "https://example.com", SEARCH, "blog", LIMIT, 100, TIMEOUT, 5000));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -71,25 +69,15 @@ class FirecrawlMapActionTest {
         Object result = FirecrawlMapAction.perform(mockedParameters, null, mockedContext);
 
         assertEquals(Map.of("success", true), result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/map", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
-            Http.Body.of(
-                Map.of(
-                    URL, "https://example.com",
-                    SEARCH, "blog",
-                    LIMIT, 100,
-                    TIMEOUT, 5000),
-                Http.BodyContentType.JSON),
+            Body.of(URL, "https://example.com", SEARCH, "blog", LIMIT, 100, TIMEOUT, 5000),
             bodyArgumentCaptor.getValue());
     }
 }
