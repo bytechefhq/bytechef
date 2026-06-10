@@ -57,7 +57,7 @@ import org.mockito.MockedStatic;
  * @author Nikolina Spehar
  */
 @ExtendWith(MockContextSetupExtension.class)
-class MicrosoftTeamsSendReplyToChannelMessageActionTest {
+class MicrosoftTeamsReplyToChannelMessageActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Http.Body.class);
     private final ArgumentCaptor<Context> contextArgumentCaptor = forClass(Context.class);
@@ -90,7 +90,7 @@ class MicrosoftTeamsSendReplyToChannelMessageActionTest {
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(responseMap);
 
-            Object result = MicrosoftTeamsSendReplyToChannelMessageAction.perform(
+            Object result = MicrosoftTeamsReplyToChannelMessageAction.perform(
                 mockedParameters, mockedParameters, context);
 
             assertEquals(responseMap, result);
