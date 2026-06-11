@@ -12,6 +12,7 @@ import {
     formatDateTime,
     getSubflowChildJobs,
     hasExpandedSubflow,
+    wrapChildJob,
 } from '../utils/workflowExecutionsTable';
 import WorkflowExecutionsDropdownMenu from './WorkflowExecutionsDropdownMenu';
 
@@ -196,13 +197,7 @@ const ExecutionRows = ({
                                     <TableBody>
                                         <ExecutionRows
                                             depth={depth + 1}
-                                            executions={childJobs.map((childJob) => ({
-                                                id: execution.id,
-                                                job: childJob,
-                                                project: execution.project,
-                                                projectDeployment: execution.projectDeployment,
-                                                workflow: execution.workflow,
-                                            }))}
+                                            executions={childJobs.map((childJob) => wrapChildJob(childJob, execution))}
                                             expandedJobIds={expandedJobIds}
                                             onRowClick={onRowClick}
                                             onToggleExpand={onToggleExpand}

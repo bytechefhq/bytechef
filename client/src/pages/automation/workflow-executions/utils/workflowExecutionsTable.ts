@@ -1,8 +1,16 @@
-import {Job} from '@/shared/middleware/automation/workflow/execution';
+import {Job, WorkflowExecution} from '@/shared/middleware/automation/workflow/execution';
 
 export const MAX_SUBFLOW_DEPTH = 10;
 
 export const formatDateTime = (date: Date) => `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
+export const wrapChildJob = (childJob: Job, parentExecution: WorkflowExecution): WorkflowExecution => ({
+    id: childJob.id != null ? Number(childJob.id) : parentExecution.id,
+    job: childJob,
+    project: parentExecution.project,
+    projectDeployment: parentExecution.projectDeployment,
+    workflow: parentExecution.workflow,
+});
 
 export const getSubflowChildJobs = ({job, seenJobIds}: {job: Job; seenJobIds: Set<string>}): Job[] => {
     if (!job.taskExecutions) {
