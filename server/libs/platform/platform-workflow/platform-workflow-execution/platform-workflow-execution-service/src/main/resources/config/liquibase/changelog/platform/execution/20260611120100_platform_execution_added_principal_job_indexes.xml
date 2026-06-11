@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260611120100" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="principal_job_job_id_type_index"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="principal_job_job_id_type_index" tableName="principal_job">
+            <column name="job_id"/>
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+
+    <changeSet id="20260611120101" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_principal_job_principal_id_type"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_principal_job_principal_id_type" tableName="principal_job">
+            <column name="principal_id"/>
+            <column name="type"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

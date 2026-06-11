@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <changeSet id="20260611120000" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <indexExists indexName="idx_job_workflow_id_parent_task_execution_id"/>
+            </not>
+        </preConditions>
+
+        <createIndex indexName="idx_job_workflow_id_parent_task_execution_id" tableName="job">
+            <column name="workflow_id"/>
+            <column name="parent_task_execution_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
