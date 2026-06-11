@@ -15,7 +15,6 @@ import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/wo
 import {useGetProjectWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, UploadIcon, WorkflowIcon} from 'lucide-react';
 import {useRef, useState} from 'react';

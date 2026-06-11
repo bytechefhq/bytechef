@@ -53,8 +53,6 @@ const Projects = () => {
     });
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1041 = useFeatureFlagsStore()('ff-1041');
-    const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const categoryId = searchParams.get('categoryId');
     const tagId = searchParams.get('tagId');
@@ -110,27 +108,26 @@ const Projects = () => {
                         centerTitle={true}
                         position="main"
                         right={
-                            ff_2482 ? (
-                                <ButtonGroup>
-                                    <ProjectDialog
-                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                        project={undefined}
-                                        triggerNode={
-                                            <Button
-                                                aria-label="Create Project"
-                                                onSelect={(event) => event.preventDefault()}
-                                            >
-                                                New Project
-                                            </Button>
-                                        }
-                                    />
+                            <ButtonGroup>
+                                <ProjectDialog
+                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                    project={undefined}
+                                    triggerNode={
+                                        <Button
+                                            aria-label="Create Project"
+                                            onSelect={(event) => event.preventDefault()}
+                                        >
+                                            New Project
+                                        </Button>
+                                    }
+                                />
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button>
-                                                <ChevronDownIcon />
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>
+                                            <ChevronDownIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => navigate(`templates`)}>
@@ -138,20 +135,13 @@ const Projects = () => {
                                             From Template
                                         </DropdownMenuItem>
 
-                                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                                <UploadIcon className="mr-2 size-4" />
-                                                Import Project
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
-                            ) : (
-                                <ProjectDialog
-                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                    project={undefined}
-                                    triggerNode={<Button aria-label="Create Project" label="New Project" />}
-                                />
-                            )
+                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                            <UploadIcon className="mr-2 size-4" />
+                                            Import Project
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
                         }
                         title={<ProjectsFilterTitle categories={categories} filterData={filterData} tags={tags} />}
                     />
@@ -178,20 +168,19 @@ const Projects = () => {
                 ) : (
                     <EmptyList
                         button={
-                            ff_2482 ? (
-                                <ButtonGroup className="mx-auto">
-                                    <ProjectDialog
-                                        onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
-                                        project={undefined}
-                                        triggerNode={<Button aria-label="Create Project" label="Create Project" />}
-                                    />
+                            <ButtonGroup className="mx-auto">
+                                <ProjectDialog
+                                    onSuccess={(projectId) => projectId && setNewlyCreatedProjectId(projectId)}
+                                    project={undefined}
+                                    triggerNode={<Button aria-label="Create Project" label="Create Project" />}
+                                />
 
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button>
-                                                <ChevronDownIcon />
-                                            </Button>
-                                        </DropdownMenuTrigger>
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button>
+                                            <ChevronDownIcon />
+                                        </Button>
+                                    </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="end">
                                         <DropdownMenuItem onClick={() => navigate(`templates`)}>
@@ -199,17 +188,12 @@ const Projects = () => {
                                             From Template
                                         </DropdownMenuItem>
 
-                                            <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
-                                                <UploadIcon className="mr-2 size-4" /> Import Project
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </ButtonGroup>
-                            ) : (
-                                <ProjectDialog
-                                    triggerNode={<Button aria-label="Create Project" label="Create Project" />}
-                                />
-                            )
+                                        <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
+                                            <UploadIcon className="mr-2 size-4" /> Import Project
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </ButtonGroup>
                         }
                         icon={<FolderIcon className="size-24 text-gray-300" />}
                         message="Get started by creating a new project."

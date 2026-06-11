@@ -13,12 +13,10 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
 
 vi.mock('@/shared/stores/useApplicationInfoStore', () => ({
     useApplicationInfoStore: () => ({
+        analytics: {enabled: false, postHog: {apiKey: '', host: ''}},
         application: {edition: 'CE'},
+        featureFlags: {},
     }),
-}));
-
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482' || flag === 'ff-1041',
 }));
 
 // Mock the API queries
