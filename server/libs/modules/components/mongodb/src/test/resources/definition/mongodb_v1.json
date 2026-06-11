@@ -3446,6 +3446,7 @@
   "customActionHelp": null,
   "description": "MongoDB is a source-available, cross-platform, document-oriented database. Query, insert, update and delete documents in your collections.",
   "icon": "path:assets/mongodb.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mongodb",
   "resources": null,

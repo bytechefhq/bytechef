@@ -96,24 +96,25 @@ class MongoDBComponentHandlerIntTest {
             connectionParameters, null);
 
         assertEquals(1, documents.size());
-        assertEquals("Joe", documents.get(0)
-            .get("name"));
-        assertEquals(30, documents.get(0)
-            .get("age"));
+
+        Map<String, Object> document = documents.getFirst();
+
+        assertEquals("Joe", document.get("name"));
+        assertEquals(30, document.get("age"));
 
         // Round trip: the _id returned by find is the normalized hex string and matches insertOne's insertedId,
         // so it can be fed straight back into a filter.
-        Object foundId = documents.get(0)
-            .get("_id");
+        Object foundId = document.get("_id");
 
         assertEquals(insertedId, foundId);
 
-        List<Map<String, Object>> byId = MongoDBFindAction.perform(
+        List<Map<String, Object>> documentsById = MongoDBFindAction.perform(
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of("name", "Joe"))),
             connectionParameters, null);
 
-        assertEquals(insertedId, byId.get(0)
-            .get("_id"));
+        Map<String, Object> documentById = documentsById.getFirst();
+
+        assertEquals(insertedId, documentById.get("_id"));
     }
 
     @Test
@@ -128,10 +129,14 @@ class MongoDBComponentHandlerIntTest {
             connectionParameters, null);
 
         assertEquals(2, documents.size());
-        assertEquals("Ann", documents.get(0)
-            .get("name"));
-        assertEquals("Bob", documents.get(1)
-            .get("name"));
+
+        Map<String, Object> document1 = documents.get(0);
+
+        assertEquals("Ann", document1.get("name"));
+
+        Map<String, Object> document2 = documents.get(1);
+
+        assertEquals("Bob", document2.get("name"));
     }
 
     @Test
@@ -152,8 +157,9 @@ class MongoDBComponentHandlerIntTest {
             inputParameters(Map.of(COLLECTION, COLLECTION_NAME, FILTER, Map.of("name", "Bob"))),
             connectionParameters, null);
 
-        assertEquals(99, documents.get(0)
-            .get("age"));
+        Map<String, Object> document = documents.getFirst();
+
+        assertEquals(99, document.get("age"));
     }
 
     @Test
@@ -219,8 +225,10 @@ class MongoDBComponentHandlerIntTest {
             connectionParameters, null);
 
         assertEquals(1, documents.size());
-        assertEquals(55, documents.get(0)
-            .get("totalAge"));
+
+        Map<String, Object> document = documents.getFirst();
+
+        assertEquals(55, document.get("totalAge"));
     }
 
     private void insertPeople() {
