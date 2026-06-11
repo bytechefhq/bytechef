@@ -34,7 +34,7 @@ public class GaurusExternalUserRequestProperties {
             .description("External user company name.")
             .required(false)
             .exampleValue("Pero Perić d.o.o."),
-        string("oib").label("Oib")
+        string("oib").label("OIB")
             .description("External user OIB (Croatian personal identification number).")
             .required(false)
             .exampleValue("12345678901"),

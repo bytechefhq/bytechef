@@ -35,11 +35,11 @@ public class GaurusBankEntryRequestProperties {
             .exampleValue("erste"),
         array("ibans").items(string().description("List of IBANs."))
             .placeholder("Add to Ibans")
-            .label("Ibans")
+            .label("IBANs")
             .description("List of IBANs.")
             .required(false)
             .exampleValue("HR1210010051863000160"),
-        string("psuIdType").label("Psu Id Type")
+        string("psuIdType").label("PSU ID Type")
             .description("PSU ID type for the bank consent.")
             .required(false)
             .exampleValue("HRIdentificationNumber"));
