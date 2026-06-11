@@ -266,7 +266,7 @@ components:
       schema:
         type: string
         format: date-time
-        example: "2021-01-01T11:38:20.791Z"
+#        example: "2021-01-01T11:38:20.791Z"
     Signature:
       in: header
       name: signature
