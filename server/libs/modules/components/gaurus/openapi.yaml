@@ -65,6 +65,7 @@ paths:
           schema:
             type: string
             example: "HR1210010051863000160"
+            title: "IBAN"
         - in: query
           name: dateFrom
           description: "Oldest transaction execution date."
@@ -148,6 +149,7 @@ paths:
           application/json:
             schema:
               type: "array"
+              title: "External Users"
               items:
                 $ref: "#/components/schemas/ExternalUserRequest"
             example:
@@ -295,6 +297,7 @@ components:
           type: "string"
           description: "External user OIB (Croatian personal identification number)."
           example: "12345678901"
+          title: "OIB"
         mail:
           type: "string"
           description: "External user email address."
@@ -336,10 +339,12 @@ components:
             type: "string"
           description: "List of IBANs."
           example: [ "HR1210010051863000160" ]
+          title: "IBANs"
         psuIdType:
           type: "string"
           description: "PSU ID type for the bank consent."
           example: "HRIdentificationNumber"
+          title: "PSU ID Type"
     CreateExternalUsersResponse:
       type: "object"
       properties:
