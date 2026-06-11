@@ -44,7 +44,7 @@ public class GaurusMyResponseProperties {
             .exampleValue("General error"),
         bool("hasMoreResults").label("Has More Results")
             .description(
-                "System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifier plus 1.")
+                "System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifer plus 1.")
             .required(false)
             .exampleValue(true),
         array("data").items(object().description("List of objects related to the request."))
