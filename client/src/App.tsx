@@ -166,7 +166,6 @@ function App() {
 
     useFetchInterceptor();
 
-    const ff_732 = useFeatureFlagsStore()('ff-732');
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
     const ff_2445 = useFeatureFlagsStore()('ff-2445');
@@ -205,10 +204,6 @@ function App() {
 
         if (navItem.href === '/automation/knowledge-bases') {
             return ff_4000 && ai.knowledgeBase.enabled;
-        }
-
-        if (navItem.href === '/automation/approval-tasks') {
-            return ff_732;
         }
 
         if (navItem.href === '/automation/ai') {
