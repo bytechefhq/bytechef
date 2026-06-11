@@ -1,0 +1,341 @@
+---
+title: "Bank Connect"
+description: "Bank Connect API specification"
+---
+
+
+
+Type: gaurus/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### Gaurus HmacSHA256 Authorization
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client ID | STRING | Client Id generated at GAURUS | true |
+| clientSecret | Client Secret | STRING | The secret key for digital signing | true |
+| allowSelfSignedCert | Allow Self-Signed Certificates | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Allow secure connections to servers with self-signed certificates | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Deletes an external user.
+Name: deleteExternalUser
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| externalUserId | External User Id | INTEGER | External user identifier. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Deletes an external user.",
+  "name" : "deleteExternalUser",
+  "parameters" : {
+    "externalUserId" : 1
+  },
+  "type" : "gaurus/v1/deleteExternalUser"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Gets accounts for provided client id.
+Name: getAccounts
+
+`null`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Gets accounts for provided client id.",
+  "name" : "getAccounts",
+  "type" : "gaurus/v1/getAccounts"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{code=OK, data=AccountResult[], hasMoreResults=false, message=}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | STRING <details> <summary> Options </summary> <span>OK</span>, <span>VALIDATION_FAILED</span>, <span>DATA_UNAVAILABLE</span>, <span>CONSENT_EXPIRED</span>, <span>GENERAL_ERROR</span> </details> | Represents resulting code in case when the system has handled a request. |
+| message | STRING | The error message, present only if the "code" property is not "OK". |
+| hasMoreResults | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifer plus 1. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of objects related to the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : "",
+  "message" : "",
+  "hasMoreResults" : false,
+  "data" : [ { } ]
+}
+```
+
+
+
+
+### Gets transactions for provided IBAN and query parameters.
+Name: getAccountTransactions
+
+`General rules for query parameters: <ul> <li>If lastTransactionid is provided without date parameters system <strong>will not set default values for date range</strong> (only lastTransactionId will be used for data filtering).</li> <li>Max range between dateFrom and dateTo is 7 days. If provided date range is greater, dateFrom is set to the dateTo minus 7 days.</li> <li>If dateFrom and dateTo are not provided: <ul> <li>dateFrom is set to the current date minus 7 days</li> <li>dateTo is set to the current date</li> </ul> </li> <li>If dateFrom is provided and dateTo is not provided: <ol> <li>If dateFrom is set to future date, it is set to the current date.</li> <li>dateTo is set to dateFrom plus 1 day</li> </ol> </li> <li>If dateFrom is not provided and dateTo is provided: <ol> <li>If dateTo is set to future date, it is set to the current date.</li> <li>dateFrom is set to dateTo minus 1 day</li> </ol> </li> </ul>`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| iban | IBAN | STRING | Account IBAN. | true |
+| dateFrom | Date From | STRING | Oldest transaction execution date. | false |
+| dateTo | Date To | STRING | Newest transaction execution date. | false |
+| lastTransactionId | Last Transaction Id | INTEGER | If this parameter is specified, system will return transactions stored after the corresponding transaction. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Gets transactions for provided IBAN and query parameters.",
+  "name" : "getAccountTransactions",
+  "parameters" : {
+    "iban" : "",
+    "dateFrom" : "",
+    "dateTo" : "",
+    "lastTransactionId" : 1
+  },
+  "type" : "gaurus/v1/getAccountTransactions"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{code=OK, data=TransactionResult[], hasMoreResults=true, message=}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| code | STRING <details> <summary> Options </summary> <span>OK</span>, <span>VALIDATION_FAILED</span>, <span>DATA_UNAVAILABLE</span>, <span>CONSENT_EXPIRED</span>, <span>GENERAL_ERROR</span> </details> | Represents resulting code in case when the system has handled a request. |
+| message | STRING | The error message, present only if the "code" property is not "OK". |
+| hasMoreResults | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | System limits number of transactions in response. If there are more results related to the request, this flag is set to true. In that case client should initiate a new request with the value of lastTransactionId parameter set to the greatest received transaction identifer plus 1. |
+| data | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of objects related to the request. |
+
+
+
+
+#### Output Example
+```json
+{
+  "code" : "",
+  "message" : "",
+  "hasMoreResults" : false,
+  "data" : [ { } ]
+}
+```
+
+
+
+
+### Gets external users for provided client id.
+Name: getExternalUsers
+
+`null`
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Gets external users for provided client id.",
+  "name" : "getExternalUsers",
+  "type" : "gaurus/v1/getExternalUsers"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{data=[{name=Pero Perić d.o.o., bankEntries=[{ibans=[HR1210010051863000160], bankSlug=erste, consentJobStatus=PENDING}], id=42, oib=1.2345678901E10, mail=pero@example.com}], errors=[]}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of results (empty if the response is not valid). |
+| errors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(code), STRING\(description)&#125;] </details> | List of errors (empty if the response is valid). |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : [ { } ],
+  "errors" : [ {
+    "code" : "",
+    "description" : ""
+  } ]
+}
+```
+
+
+
+
+### Creates external users with bank consent jobs.
+Name: postExternalUsers
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| __items | External Users | ARRAY <details> <summary> Items </summary> [&#123;STRING\(name), STRING\(oib), STRING\(mail), [&#123;STRING\(bankSlug), [STRING]\(ibans), STRING\(psuIdType)&#125;]\(bankEntries)&#125;] </details> |  | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Creates external users with bank consent jobs.",
+  "name" : "postExternalUsers",
+  "parameters" : {
+    "__items" : [ {
+      "name" : "",
+      "oib" : "",
+      "mail" : "",
+      "bankEntries" : [ {
+        "bankSlug" : "",
+        "ibans" : [ "" ],
+        "psuIdType" : ""
+      } ]
+    } ]
+  },
+  "type" : "gaurus/v1/postExternalUsers"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{data=[{existingMails=[existing@example.com], newMails=[new@example.com]}], errors=[]}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| data | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of results (empty if the response is not valid). |
+| errors | ARRAY <details> <summary> Items </summary> [&#123;STRING\(code), STRING\(description)&#125;] </details> | List of errors (empty if the response is valid). |
+
+
+
+
+#### Output Example
+```json
+{
+  "data" : [ { } ],
+  "errors" : [ {
+    "code" : "",
+    "description" : ""
+  } ]
+}
+```
+
+
+
+
+### Updates an external user.
+Name: putExternalUser
+
+`null`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| externalUserId | External User Id | INTEGER | External user identifier. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Updates an external user.",
+  "name" : "putExternalUser",
+  "parameters" : {
+    "externalUserId" : 1
+  },
+  "type" : "gaurus/v1/putExternalUser"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+
+
