@@ -11,6 +11,10 @@ export function fetcher<TData, TVariables>(
             body: JSON.stringify({query: query.toString(), variables}),
         });
 
+        if (!res.ok) {
+            throw new Error(`GraphQL request failed with status ${res.status}`);
+        }
+
         const json = await res.json();
 
         if (json.errors) {
