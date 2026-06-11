@@ -36,7 +36,6 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.microsoft.commons.MicrosoftConstants;
-
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -175,7 +174,7 @@ public class MicrosoftTeamsUtils {
 
         LocalDateTime now = LocalDateTime.now(zoneId);
 
-        LocalDateTime startDate = closureParameters.getLocalDateTime(
+        LocalDateTime startDateTime = closureParameters.getLocalDateTime(
             LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
 
         Map<String, Object> body = context
@@ -188,17 +187,18 @@ public class MicrosoftTeamsUtils {
         List<Map<?, ?>> maps = new ArrayList<>();
 
         if (body.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
-            for (Object o : list) {
-                if (o instanceof Map<?, ?> map && map.containsKey(containsKey)) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map && map.containsKey(containsKey)) {
                     ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) map.get("createdDateTime"));
 
-                    LocalDateTime createdDateTime = LocalDateTime.ofInstant(zonedCreatedDateTime.toInstant(), zoneId);
+                    LocalDateTime createdLocalDateTime = LocalDateTime.ofInstant(
+                        zonedCreatedDateTime.toInstant(), zoneId);
 
-                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(now)) {
+                    if (createdLocalDateTime.isAfter(startDateTime) && createdLocalDateTime.isBefore(now)) {
                         maps.add(map);
                     }
 
-                    checkMessageReplies(map.get("replies"), maps, startDate, now);
+                    checkMessageReplies(map.get("replies"), maps, startDateTime, now);
                 }
             }
         }
@@ -214,11 +214,12 @@ public class MicrosoftTeamsUtils {
                 if (reply instanceof Map<?, ?> replyMap) {
                     ZoneId zoneId = ZoneId.systemDefault();
 
-                    ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) replyMap.get("createdDateTime"));
+                    ZonedDateTime createdZonedDateTime = ZonedDateTime.parse((String) replyMap.get("createdDateTime"));
 
-                    LocalDateTime createdDateTime = LocalDateTime.ofInstant(zonedCreatedDateTime.toInstant(), zoneId);
+                    LocalDateTime createdLocalDateTime = LocalDateTime.ofInstant(
+                        createdZonedDateTime.toInstant(), zoneId);
 
-                    if (createdDateTime.isAfter(startDate) && createdDateTime.isBefore(now)) {
+                    if (createdLocalDateTime.isAfter(startDate) && createdLocalDateTime.isBefore(now)) {
                         maps.add(replyMap);
                     }
                 }
