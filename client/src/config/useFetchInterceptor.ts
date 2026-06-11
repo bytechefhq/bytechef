@@ -14,6 +14,50 @@ export function clearActiveToasts() {
 
 const TOAST_SAFETY_TIMEOUT_MS = 30000;
 
+/*
+ * A 403 on a CSRF-protected endpoint (`/graphql`, `/internal/`) is almost always a transient CSRF
+ * token race rather than a real authorization failure — genuine auth failures return 401 here. The
+ * token is rotated whenever the session silently re-authenticates (e.g. remember-me kicking in after
+ * a session timeout), or the XSRF-TOKEN cookie has not been established yet, so a request already in
+ * flight can carry a stale/empty token and be rejected. We refresh the token and replay the request
+ * once before treating it as fatal. See https://github.com/bytechefhq/bytechef/issues/5189.
+ */
+function isCsrfProtectedUrl(url: string): boolean {
+    return url.includes('/graphql') || url.includes('/internal/');
+}
+
+function resolveUrl(input: RequestInfo | URL): string {
+    if (typeof input === 'string') {
+        return input;
+    }
+
+    if (input instanceof URL) {
+        return input.toString();
+    }
+
+    return input.url;
+}
+
+let csrfRefreshPromise: Promise<void> | null = null;
+
+/*
+ * Coalesce concurrent refreshes so a page that fires a batch of requests in parallel (e.g. the
+ * executions page) triggers a single `/api/account` round-trip rather than one per failed request. A
+ * plain GET re-establishes the XSRF-TOKEN cookie via the server's CookieCsrfFilter.
+ */
+function refreshCsrfToken(nativeFetch: typeof fetch, apiBasePath?: string): Promise<void> {
+    if (!csrfRefreshPromise) {
+        csrfRefreshPromise = nativeFetch((apiBasePath || '') + '/api/account', {method: 'GET'})
+            .then(() => undefined)
+            .catch(() => undefined)
+            .finally(() => {
+                csrfRefreshPromise = null;
+            });
+    }
+
+    return csrfRefreshPromise;
+}
+
 function showErrorToast(toastId: string, title: string, options?: {description?: string}) {
     if (activeToastIds.has(toastId)) {
         return;
@@ -45,6 +89,8 @@ export default function useFetchInterceptor() {
     callbacksRef.current = latestCallbacks;
 
     useEffect(() => {
+        const nativeFetch = window.fetch;
+
         const unregister = fetchIntercept.register({
             /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
             request(url: string, config: any): Promise<any[]> | any[] {
@@ -74,7 +120,7 @@ export default function useFetchInterceptor() {
             response: function (response: any) {
                 const {clearAuthentication, clearCurrentWorkspaceId, navigate} = callbacksRef.current;
 
-                if (response.status === 403 || response.status === 401) {
+                if (response.status === 401) {
                     clearAuthentication();
                     clearCurrentWorkspaceId();
 
@@ -82,6 +128,13 @@ export default function useFetchInterceptor() {
                         navigate('/login');
                     }
 
+                    return response;
+                }
+
+                // A 403 on a CSRF-protected endpoint is a transient token race handled by the
+                // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
+                // log out here, otherwise the recovered request would still flash an error.
+                if (response.status === 403 && isCsrfProtectedUrl(response.url)) {
                     return response;
                 }
 
@@ -129,8 +182,47 @@ export default function useFetchInterceptor() {
             },
         });
 
+        const interceptedFetch = window.fetch;
+
+        const csrfAwareFetch: typeof window.fetch = async (input, init) => {
+            const response = await interceptedFetch(input, init);
+
+            // A Request body may be a one-shot stream, so only replay calls made with a plain
+            // url + init (which is how every GraphQL and REST call is issued here).
+            if (response.status !== 403 || input instanceof Request) {
+                return response;
+            }
+
+            const url = resolveUrl(input);
+
+            if (!isCsrfProtectedUrl(url)) {
+                return response;
+            }
+
+            const {apiBasePath, clearAuthentication, clearCurrentWorkspaceId, navigate} = callbacksRef.current;
+
+            await refreshCsrfToken(nativeFetch, apiBasePath);
+
+            const retriedResponse = await interceptedFetch(input, init);
+
+            if (retriedResponse.status === 403) {
+                clearAuthentication();
+                clearCurrentWorkspaceId();
+
+                if (!url.endsWith('/api/account')) {
+                    navigate('/login');
+                }
+            }
+
+            return retriedResponse;
+        };
+
+        window.fetch = csrfAwareFetch;
+
         return () => {
             unregister();
+
+            window.fetch = nativeFetch;
         };
     }, []);
 }

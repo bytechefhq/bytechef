@@ -163,15 +163,31 @@ describe('useFetchInterceptor', () => {
             expect(hoisted.navigate).toHaveBeenCalledWith('/login');
         });
 
-        it('clears auth and navigates to login on 403', () => {
+        it('does not clear auth or navigate on a 403 for a csrf-protected url', () => {
             renderHook(() => useFetchInterceptor());
 
             const response = createMockResponse({status: 403, url: 'http://localhost/internal/api/test'});
 
+            const result = hoisted.registeredHandlers!.response(response);
+
+            expect(result).toBe(response);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('does not toast on a 403 for a csrf-protected url', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({status: 403, url: 'http://localhost/graphql'});
+
             hoisted.registeredHandlers!.response(response);
 
-            expect(hoisted.clearAuthentication).toHaveBeenCalled();
-            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
         });
 
         it('does not navigate to login for /api/account endpoint', () => {
@@ -462,6 +478,103 @@ describe('useFetchInterceptor', () => {
             });
 
             expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+    });
+
+    describe('csrf-aware fetch wrapper', () => {
+        let originalFetch: typeof window.fetch;
+
+        beforeEach(() => {
+            originalFetch = window.fetch;
+        });
+
+        afterEach(() => {
+            window.fetch = originalFetch;
+        });
+
+        it('refreshes the token and replays a graphql 403 once, returning the recovered response', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/graphql'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/graphql'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/graphql', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(innerFetch).toHaveBeenNthCalledWith(2, '/api/account', {method: 'GET'});
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('retries an internal REST 403 the same way', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/internal/api/test'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/internal/api/test'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/internal/api/test', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(3);
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('escalates to logout when the replay also returns 403', async () => {
+            const innerFetch = vi
+                .fn()
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/graphql'})
+                .mockResolvedValueOnce({status: 200, url: 'http://localhost/api/account'})
+                .mockResolvedValueOnce({status: 403, url: 'http://localhost/graphql'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/graphql', {method: 'POST'});
+
+            expect((result as Response).status).toBe(403);
+            expect(hoisted.clearAuthentication).toHaveBeenCalled();
+            expect(hoisted.clearCurrentWorkspaceId).toHaveBeenCalled();
+            expect(hoisted.navigate).toHaveBeenCalledWith('/login');
+        });
+
+        it('does not retry or escalate a 403 on a non-csrf-protected url', async () => {
+            const innerFetch = vi.fn().mockResolvedValueOnce({status: 403, url: 'http://localhost/api/public/test'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/api/public/test', {});
+
+            expect((result as Response).status).toBe(403);
+            expect(innerFetch).toHaveBeenCalledTimes(1);
+            expect(hoisted.clearAuthentication).not.toHaveBeenCalled();
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+
+        it('does not retry a non-403 response', async () => {
+            const innerFetch = vi.fn().mockResolvedValueOnce({status: 200, url: 'http://localhost/graphql'});
+
+            window.fetch = innerFetch as unknown as typeof window.fetch;
+
+            renderHook(() => useFetchInterceptor());
+
+            const result = await window.fetch('/graphql', {method: 'POST'});
+
+            expect((result as Response).status).toBe(200);
+            expect(innerFetch).toHaveBeenCalledTimes(1);
         });
     });
 });
