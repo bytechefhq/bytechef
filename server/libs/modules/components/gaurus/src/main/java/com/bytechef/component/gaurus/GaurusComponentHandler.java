@@ -19,7 +19,10 @@ package com.bytechef.component.gaurus;
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
@@ -39,6 +42,14 @@ import java.util.Map;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.Authorization.PASSWORD;
+import static com.bytechef.component.definition.Authorization.USERNAME;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.string;
 
 /**
  * This class will not be overwritten on the repeated calls of the generator.
@@ -116,6 +127,30 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
         });
 
         return modifiableActionDefinition;
+    }
+
+    @Override
+    public ModifiableConnectionDefinition modifyConnection(
+        ModifiableConnectionDefinition modifiableConnectionDefinition) {
+
+        return modifiableConnectionDefinition
+            .authorizations(
+                authorization(AuthorizationType.CUSTOM)
+                    .title("Gaurus HmacSHA256 Authorization")
+                    .properties(
+                        string(CLIENT_ID)
+                            .label("Client ID")
+                            .description("Client Id generated at GAURUS")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .description("The secret key for digital signing")
+                            .required(true),
+                        bool("allowSelfSignedCert")
+                            .label("Allow Self-Signed Certificates")
+                            .description("Allow secure connections to servers with self-signed certificates")
+                            .defaultValue(false)))
+            .version(1);
     }
 
     private static String getSignature(
