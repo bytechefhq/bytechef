@@ -263,7 +263,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 <div
                     className={twMerge(
-                        'relative flex items-center rounded-md border-gray-200 shadow-xs transition-colors',
+                        'relative flex items-center rounded-md border-gray-200 transition-colors',
                         error && 'border-rose-300 text-rose-900 ring-rose-300 focus-within:ring-rose-300',
                         isFocused && 'ring-2 ring-blue-500',
                         label && 'mt-1',

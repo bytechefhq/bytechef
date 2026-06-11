@@ -48,7 +48,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 aria-label={`${name} object properties`}
                 className={twMerge(
                     'space-y-4',
-                    label && !isContainerObject && 'ml-2 border-l border-l-border/50',
+                    label && !isContainerObject && 'ml-2 flex flex-col gap-4 border-l border-l-border/50',
                     arrayName && !isContainerObject && 'pl-2'
                 )}
                 role="list"
