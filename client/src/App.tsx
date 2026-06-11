@@ -18,7 +18,6 @@ import {useQueryClient} from '@tanstack/react-query';
 import {
     ActivityIcon,
     CircleIcon,
-    FileTextIcon,
     FolderIcon,
     Layers3Icon,
     LayoutTemplateIcon,
@@ -84,11 +83,6 @@ const automationNavigation: NavigationType[] = [
         href: '/automation/knowledge-bases',
         icon: VectorSquareIcon,
         name: 'Knowledge Base',
-    },
-    {
-        href: '/automation/asset-files',
-        icon: FileTextIcon,
-        name: 'Files',
     },
     {href: '/automation/chats', icon: MessagesSquareIcon, name: 'Chats'},
     {href: '/automation/approval-tasks', icon: CircleIcon, name: 'Approval Tasks'},
