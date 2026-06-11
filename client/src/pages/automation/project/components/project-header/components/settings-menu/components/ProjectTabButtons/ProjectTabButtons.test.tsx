@@ -5,11 +5,6 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query';
 import {MemoryRouter} from 'react-router-dom';
 import {afterEach, beforeEach, describe, expect, it, vi} from 'vitest';
 
-// Mock the feature flags store
-vi.mock('@/shared/stores/useFeatureFlagsStore', () => ({
-    useFeatureFlagsStore: () => (flag: string) => flag === 'ff-2482', // Enable ff_2482 for export functionality, disable others
-}));
-
 const createTestQueryClient = () =>
     new QueryClient({
         defaultOptions: {

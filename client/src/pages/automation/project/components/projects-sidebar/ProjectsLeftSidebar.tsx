@@ -23,7 +23,6 @@ import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/wo
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
 import {ProjectKeys, useGetWorkspaceProjectsQuery} from '@/shared/queries/automation/projects.queries';
 import {useGetWorkflowQuery} from '@/shared/queries/automation/workflows.queries';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon, LayoutTemplateIcon, LoaderCircleIcon, PlusIcon, UploadIcon} from 'lucide-react';
 import {RefObject, useEffect, useMemo, useRef, useState} from 'react';
@@ -58,9 +57,6 @@ const ProjectsLeftSidebar = ({
     const navigate = useNavigate();
 
     const {captureProjectWorkflowImported} = useAnalytics();
-
-    const ff_1041 = useFeatureFlagsStore()('ff-1041');
-    const ff_2482 = useFeatureFlagsStore()('ff-2482');
 
     const {data: eachProjectWorkflows, isLoading: projectWorkflowsLoading} = useGetProjectWorkflowsQuery(
         selectedProjectId,
@@ -167,61 +163,46 @@ const ProjectsLeftSidebar = ({
                                 setSelectedProjectId={setSelectedProjectId}
                             />
 
-                            {ff_2482 ? (
-                                <DropdownMenu>
-                                    <Tooltip>
-                                        <DropdownMenuTrigger asChild>
-                                            <TooltipTrigger asChild>
-                                                <Button
-                                                    aria-label="New project"
-                                                    className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                                    icon={<PlusIcon />}
-                                                    size="icon"
-                                                    variant="outline"
-                                                />
-                                            </TooltipTrigger>
-                                        </DropdownMenuTrigger>
+                            <DropdownMenu>
+                                <Tooltip>
+                                    <DropdownMenuTrigger asChild>
+                                        <TooltipTrigger asChild>
+                                            <Button
+                                                aria-label="New project"
+                                                className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
+                                                icon={<PlusIcon />}
+                                                size="icon"
+                                                variant="outline"
+                                            />
+                                        </TooltipTrigger>
+                                    </DropdownMenuTrigger>
 
-                                        <TooltipContent>New project</TooltipContent>
-                                    </Tooltip>
+                                    <TooltipContent>New project</TooltipContent>
+                                </Tooltip>
 
-                                    <DropdownMenuContent align="end">
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={() => setShowProjectDialog(true)}
-                                        >
-                                            <PlusIcon className="mr-2 size-4" />
-                                            From Scratch
-                                        </DropdownMenuItem>
+                                <DropdownMenuContent align="end">
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => setShowProjectDialog(true)}
+                                    >
+                                        <PlusIcon className="mr-2 size-4" />
+                                        From Scratch
+                                    </DropdownMenuItem>
 
                                     <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`templates`)}>
                                         <LayoutTemplateIcon className="mr-2 size-4" />
                                         From Template
                                     </DropdownMenuItem>
 
-                                        <DropdownMenuItem
-                                            className="cursor-pointer"
-                                            onClick={() => projectHiddenFileInputRef.current?.click()}
-                                        >
-                                            <UploadIcon className="mr-2 size-4" />
-                                            Import Project
-                                        </DropdownMenuItem>
-                                    </DropdownMenuContent>
-                                </DropdownMenu>
-                            ) : (
-                                <ProjectDialog
-                                    project={undefined}
-                                    triggerNode={
-                                        <Button
-                                            aria-label="New project"
-                                            className="data-[state=open]:border-stroke-brand-secondary data-[state=open]:bg-surface-brand-secondary data-[state=open]:text-content-brand-primary"
-                                            icon={<PlusIcon />}
-                                            size="icon"
-                                            variant="outline"
-                                        />
-                                    }
-                                />
-                            )}
+                                    <DropdownMenuItem
+                                        className="cursor-pointer"
+                                        onClick={() => projectHiddenFileInputRef.current?.click()}
+                                    >
+                                        <UploadIcon className="mr-2 size-4" />
+                                        Import Project
+                                    </DropdownMenuItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
                         </div>
                     )
                 )}
