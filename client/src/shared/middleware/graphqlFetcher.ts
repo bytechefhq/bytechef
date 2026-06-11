@@ -1,3 +1,5 @@
+import {getCookie} from '@/shared/util/cookie-utils';
+
 import {endpointUrl, fetchParams} from './config';
 
 export function fetcher<TData, TVariables>(
@@ -9,6 +11,10 @@ export function fetcher<TData, TVariables>(
             method: 'POST',
             ...fetchParams,
             body: JSON.stringify({query: query.toString(), variables}),
+            headers: {
+                ...fetchParams.headers,
+                'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
+            },
         });
 
         if (!res.ok) {
