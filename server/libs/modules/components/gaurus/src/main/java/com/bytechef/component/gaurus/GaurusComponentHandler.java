@@ -16,15 +16,19 @@
 
 package com.bytechef.component.gaurus;
 
+import static com.bytechef.component.definition.Authorization.CLIENT_ID;
+import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
+import static com.bytechef.component.definition.ComponentDsl.authorization;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.string;
+
 import com.bytechef.component.OpenApiComponentHandler;
 import com.bytechef.component.definition.ActionContext;
-import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Authorization;
+import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
-import com.bytechef.component.definition.ComponentDsl;
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableConnectionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Property;
 import com.google.auto.service.AutoService;
 import java.net.URI;
@@ -35,21 +39,12 @@ import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-
-import static com.bytechef.component.definition.Authorization.CLIENT_ID;
-import static com.bytechef.component.definition.Authorization.CLIENT_SECRET;
-import static com.bytechef.component.definition.Authorization.PASSWORD;
-import static com.bytechef.component.definition.Authorization.USERNAME;
-import static com.bytechef.component.definition.ComponentDsl.authorization;
-import static com.bytechef.component.definition.ComponentDsl.bool;
-import static com.bytechef.component.definition.ComponentDsl.string;
 
 /**
  * This class will not be overwritten on the repeated calls of the generator.
@@ -60,70 +55,63 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
 
     private static final String EMPTY_BODY = "";
+    public static final String ALLOW_SELF_SIGNED_CERT = "allowSelfSignedCert";
 
-    public ComponentDsl.ModifiableActionDefinition
-        modifyAction(ComponentDsl.ModifiableActionDefinition modifiableActionDefinition) {
-
+    public ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
         Optional<Map<String, Object>> metadata = modifiableActionDefinition.getMetadata();
 
         Map<String, Object> metadataMap = metadata.orElseGet(Collections::emptyMap);
 
         String path = (String) metadataMap.get("path");
 
-        modifiableActionDefinition.perform(new ActionDefinition.PerformFunction() {
-            @Override
-            public Object apply(Parameters inputParameters, Parameters connectionParameters, ActionContext context)
-                throws Exception {
+        modifiableActionDefinition.perform((PerformFunction) (inputParameters, connectionParameters, context) -> {
+            Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
 
-                Optional<List<? extends Property>> propertiesOptional = modifiableActionDefinition.getProperties();
+            String normalizedPath = path;
+            if (propertiesOptional.isPresent()) {
+                List<? extends Property> properties = propertiesOptional.get();
 
-                String normalizedPath = path;
-                if (propertiesOptional.isPresent()) {
-                    List<? extends Property> properties = propertiesOptional.get();
+                for (Property property : properties) {
+                    Map<String, Object> propertyMetadata = property.getMetadata();
 
-                    for (Property property : properties) {
-                        if (((PropertyType) property.getMetadata()
-                            .get("type")) == PropertyType.PATH) {
-                            normalizedPath = normalizedPath.replace(
-                                "{" + property.getName() + "}",
-                                URLEncoder.encode(inputParameters.getRequiredString(property.getName()),
-                                    StandardCharsets.UTF_8));
-                        }
+                    if (propertyMetadata.get("type") == PropertyType.PATH) {
+                        normalizedPath = normalizedPath.replace(
+                            "{" + property.getName() + "}",
+                            URLEncoder.encode(
+                                inputParameters.getRequiredString(property.getName()), StandardCharsets.UTF_8));
                     }
                 }
-
-                String endpoint =
-                    connectionParameters.getRequiredString("baseUri") + normalizedPath;
-
-                Context.Http.Executor httpExecutor = context.http(http -> http.get(endpoint));
-
-                String clientId = connectionParameters.getString("clientId");
-                String clientSecret = connectionParameters.getString("clientSecret");
-                String requestId = asUuid(context.getTraceId());
-                String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now()
-                    .truncatedTo(ChronoUnit.MILLIS));
-
-                String body = EMPTY_BODY;
-                String signature =
-                    getSignature(clientId, clientSecret, requestId, timestamp, getRelativeUrl(endpoint), body, context);
-
-                context.log(log -> log.debug(
-                    "Executing endpoint: {} with clientId: {}, requestId: {}, timestamp: {}, uri: {}, body: {}, signature {}",
-                    endpoint, clientId, requestId, timestamp, path, body, signature));
-
-                Context.Http.Response response = httpExecutor
-                    .configuration(
-                        Context.Http.allowUnauthorizedCerts(
-                            connectionParameters.getBoolean("allowSelfSignedCert", false))
-                            .responseType(
-                                Context.Http.ResponseType.JSON))
-                    .headers(Map.of("clientId", List.of(clientId), "requestId",
-                        List.of(requestId), "timestamp", List.of(timestamp),
-                        "signature", List.of(signature)))
-                    .execute();
-
-                return response.getBody();
             }
+
+            String endpoint = connectionParameters.getRequiredString("baseUri") + normalizedPath;
+            String clientId = connectionParameters.getRequiredString(CLIENT_ID);
+            String clientSecret = connectionParameters.getRequiredString(CLIENT_SECRET);
+            String requestId = asUuid(context.getTraceId());
+            String timestamp = DateTimeFormatter.ISO_INSTANT.format(Instant.now()
+                .truncatedTo(ChronoUnit.MILLIS));
+
+            String body = EMPTY_BODY;
+            String signature = getSignature(
+                clientId, clientSecret, requestId, timestamp, getRelativeUrl(endpoint), body, context);
+
+            context.log(log -> log.debug(
+                "Executing endpoint: {} with clientId: {}, requestId: {}, timestamp: {}, uri: {}, body: {}, signature {}",
+                endpoint, clientId, requestId, timestamp, path, body, signature));
+
+            Http.Response response = context.http(http -> http.get(endpoint))
+                .configuration(
+                    Http.allowUnauthorizedCerts(
+                        connectionParameters.getBoolean(ALLOW_SELF_SIGNED_CERT, false))
+                        .responseType(
+                            Http.ResponseType.JSON))
+                .headers(Map.of(
+                    "clientId", List.of(clientId),
+                    "requestId", List.of(requestId),
+                    "timestamp", List.of(timestamp),
+                    "signature", List.of(signature)))
+                .execute();
+
+            return response.getBody();
         });
 
         return modifiableActionDefinition;
@@ -146,7 +134,7 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
                             .label("Client Secret")
                             .description("The secret key for digital signing")
                             .required(true),
-                        bool("allowSelfSignedCert")
+                        bool(ALLOW_SELF_SIGNED_CERT)
                             .label("Allow Self-Signed Certificates")
                             .description("Allow secure connections to servers with self-signed certificates")
                             .defaultValue(false)))
@@ -166,8 +154,8 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
 
             mac.init(new SecretKeySpec(clientSecret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
 
-            return Base64.getEncoder()
-                .encodeToString(mac.doFinal(forSigning.getBytes(StandardCharsets.UTF_8)));
+            return context
+                .encoder(encoder -> encoder.base64Encode(mac.doFinal(forSigning.getBytes(StandardCharsets.UTF_8))));
         } catch (InvalidKeyException | NoSuchAlgorithmException exception) {
             throw new RuntimeException("Failed to compute HmacSHA256 signature", exception);
         }
@@ -190,5 +178,4 @@ public class GaurusComponentHandler extends AbstractGaurusComponentHandler {
             throw new RuntimeException("Failed to compute HmacSHA256 signature", exception);
         }
     }
-
 }
