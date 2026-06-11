@@ -110,7 +110,6 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     );
 
     const ff_1039 = useFeatureFlagsStore()('ff-1039');
-    const ff_1041 = useFeatureFlagsStore()('ff-1041');
     const ff_1042 = useFeatureFlagsStore()('ff-1042');
     const ff_2482 = useFeatureFlagsStore()('ff-2482');
     const ff_2939 = useFeatureFlagsStore()('ff-2939');
@@ -349,19 +348,17 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                         </DropdownMenuTrigger>
 
                                         <DropdownMenuContent align="end" className="p-0">
-                                            {ff_1041 && (
-                                                <DropdownMenuItem
-                                                    aria-label="Create Workflow from Template"
-                                                    className="dropdown-menu-item"
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
+                                            <DropdownMenuItem
+                                                aria-label="Create Workflow from Template"
+                                                className="dropdown-menu-item"
+                                                onClick={(event) => {
+                                                    event.stopPropagation();
 
-                                                        navigate(`./${project.id}/templates`);
-                                                    }}
-                                                >
-                                                    <LayoutTemplateIcon /> From Template
-                                                </DropdownMenuItem>
-                                            )}
+                                                    navigate(`./${project.id}/templates`);
+                                                }}
+                                            >
+                                                <LayoutTemplateIcon /> From Template
+                                            </DropdownMenuItem>
 
                                             <DropdownMenuItem
                                                 aria-label="Import Workflow"
