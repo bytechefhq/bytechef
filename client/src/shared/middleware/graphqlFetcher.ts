@@ -12,7 +12,10 @@ export function fetcher<TData, TVariables>(
         });
 
         if (!res.ok) {
-            throw new Error(`GraphQL request failed with status ${res.status}`);
+            const errorJson = await res.json().catch(() => null);
+            const serverMessage = errorJson?.errors?.[0]?.message;
+
+            throw new Error(serverMessage || `GraphQL request failed with status ${res.status}`);
         }
 
         const json = await res.json();
