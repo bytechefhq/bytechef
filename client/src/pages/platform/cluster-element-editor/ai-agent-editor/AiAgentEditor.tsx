@@ -9,6 +9,7 @@ import {DataPillPanelSkeleton} from '@/pages/platform/workflow-editor/components
 import WorkflowNodeDetailsPanel from '@/pages/platform/workflow-editor/components/WorkflowNodeDetailsPanel';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Suspense, lazy} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -35,10 +36,9 @@ export default function AiAgentEditor({
     workflowNodeOutputs,
 }: AiAgentEditorProps) {
     const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
-
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
     const dataPillPanelOpen = useDataPillPanelStore((state) => state.dataPillPanelOpen);
 
-    const ff_4545 = useFeatureFlagsStore()('ff-4545');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
     const ff_4572 = useFeatureFlagsStore()('ff-4572');
 
@@ -73,7 +73,7 @@ export default function AiAgentEditor({
                 onCopilotClick={onCopilotClick}
                 onEvalsClick={ff_4553 ? () => setEvalsPanelOpen(true) : undefined}
                 onToggleEditor={onToggleEditor}
-                showSkills={ff_4545}
+                showSkills={edition === EditionType.EE}
             />
 
             <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 overflow-hidden px-4 py-4">

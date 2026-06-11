@@ -19,6 +19,7 @@ import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCo
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
+import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -51,6 +52,7 @@ const ClusterElementsCanvasDialog = ({
     const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
 
     const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
+    const edition = useApplicationInfoStore((state) => state.application?.edition);
     const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
         useClusterElementsCanvasDialogStore(
             useShallow((state) => ({
@@ -65,7 +67,6 @@ const ClusterElementsCanvasDialog = ({
         (state) => state.workflowNodeDetailsPanelOpen
     );
     const ff_4070 = useFeatureFlagsStore()('ff-4070');
-    const ff_4545 = useFeatureFlagsStore()('ff-4545');
     const ff_4553 = useFeatureFlagsStore()('ff-4553');
 
     const {handleClose: handleEvalsClose} = useAiAgentEvals();
@@ -208,7 +209,7 @@ const ClusterElementsCanvasDialog = ({
                                 }
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}
-                                showSkills={ff_4545 && isAiAgentClusterRoot}
+                                showSkills={edition === EditionType.EE && isAiAgentClusterRoot}
                                 showTestButton={isAiAgentClusterRoot}
                                 showToggleEditor={
                                     isAiAgentClusterRoot || (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)

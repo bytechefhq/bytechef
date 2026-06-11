@@ -175,7 +175,6 @@ function App() {
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
     const ff_3955 = useFeatureFlagsStore()('ff-3955');
     const ff_4000 = useFeatureFlagsStore()('ff-4000');
-    const ff_4545 = useFeatureFlagsStore()('ff-4545');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -207,7 +206,7 @@ function App() {
         }
 
         if (navItem.href === '/automation/ai') {
-            return ff_4545 && edition === EditionType.EE;
+            return edition === EditionType.EE;
         }
 
         return true;
