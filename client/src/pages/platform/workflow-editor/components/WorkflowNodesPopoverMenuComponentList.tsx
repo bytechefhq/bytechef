@@ -74,7 +74,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
 
         const ff_732 = getFeatureFlag('ff-732');
         const ff_797 = getFeatureFlag('ff-797');
-        const ff_1652 = getFeatureFlag('ff-1652');
         const ff_3827 = getFeatureFlag('ff-3827');
         const ff_3839 = getFeatureFlag('ff-3839');
         const ff_4000 = getFeatureFlag('ff-4000');
@@ -92,7 +91,6 @@ const WorkflowNodesPopoverMenuComponentList = memo(
                     ({name}) =>
                         ((!ff_732 && name !== 'approval') || ff_732) &&
                         ((!ff_797 && name !== 'dataStream') || ff_797) &&
-                        ((!ff_1652 && name !== 'aiAgent') || ff_1652) &&
                         (((!ff_4000 || !knowledgeBaseEnabled) && name !== 'knowledgeBase') ||
                             (ff_4000 && knowledgeBaseEnabled))
                 );
@@ -104,7 +102,7 @@ const WorkflowNodesPopoverMenuComponentList = memo(
             }
 
             return actionComponents;
-        }, [componentsWithActions, clusterElementType, ff_732, ff_797, ff_1652, ff_4000, knowledgeBaseEnabled]);
+        }, [componentsWithActions, clusterElementType, ff_732, ff_797, ff_4000, knowledgeBaseEnabled]);
 
         const filteredTaskDispatcherDefinitions = useMemo(
             () =>
