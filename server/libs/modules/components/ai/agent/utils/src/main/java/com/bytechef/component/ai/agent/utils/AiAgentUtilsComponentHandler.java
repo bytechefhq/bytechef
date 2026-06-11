@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
+import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsAppendFilesToAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
@@ -60,6 +61,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             AiAgentUtilsBraveWebSearchTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsTodoWriteTool.CLUSTER_ELEMENT_DEFINITION,
             AiAgentUtilsTaskTool.CLUSTER_ELEMENT_DEFINITION,
+            tool(AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))));
@@ -74,6 +76,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             .icon("path:assets/agent-utils.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .actions(
+                AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))
