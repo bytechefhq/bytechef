@@ -194,15 +194,10 @@ const ProjectsLeftSidebar = ({
                                             From Scratch
                                         </DropdownMenuItem>
 
-                                        {ff_1041 && (
-                                            <DropdownMenuItem
-                                                className="cursor-pointer"
-                                                onClick={() => navigate(`templates`)}
-                                            >
-                                                <LayoutTemplateIcon className="mr-2 size-4" />
-                                                From Template
-                                            </DropdownMenuItem>
-                                        )}
+                                    <DropdownMenuItem className="cursor-pointer" onClick={() => navigate(`templates`)}>
+                                        <LayoutTemplateIcon className="mr-2 size-4" />
+                                        From Template
+                                    </DropdownMenuItem>
 
                                         <DropdownMenuItem
                                             className="cursor-pointer"
@@ -265,14 +260,12 @@ const ProjectsLeftSidebar = ({
                         </DropdownMenuTrigger>
 
                         <DropdownMenuContent align="end">
-                            {ff_1041 && (
-                                <DropdownMenuItem
-                                    className="cursor-pointer"
-                                    onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
-                                >
-                                    <LayoutTemplateIcon /> From Template
-                                </DropdownMenuItem>
-                            )}
+                            <DropdownMenuItem
+                                className="cursor-pointer"
+                                onClick={() => navigate(`./../../../${selectedProjectId}/templates`)}
+                            >
+                                <LayoutTemplateIcon /> From Template
+                            </DropdownMenuItem>
 
                             <DropdownMenuItem
                                 className="cursor-pointer"

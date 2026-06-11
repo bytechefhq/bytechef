@@ -41,8 +41,6 @@ const ProjectWorkflowList = ({
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
     const converterHiddenFileInputRef = useRef<HTMLInputElement>(null);
 
-    const ff_1041 = useFeatureFlagsStore()('ff-1041');
-
     const workflowComponentDefinitions: {
         [key: string]: ComponentDefinitionBasic | undefined;
     } = {};
@@ -185,18 +183,16 @@ const ProjectWorkflowList = ({
                                             </DropdownMenuTrigger>
 
                                             <DropdownMenuContent align="end" className="p-0">
-                                                {ff_1041 && (
-                                                    <DropdownMenuItem
-                                                        className="dropdown-menu-item"
-                                                        onClick={(event) => {
-                                                            event.stopPropagation();
+                                                <DropdownMenuItem
+                                                    className="dropdown-menu-item"
+                                                    onClick={(event) => {
+                                                        event.stopPropagation();
 
-                                                            navigate(`./${project.id}/templates`);
-                                                        }}
-                                                    >
-                                                        <LayoutTemplateIcon /> From Template
-                                                    </DropdownMenuItem>
-                                                )}
+                                                        navigate(`./${project.id}/templates`);
+                                                    }}
+                                                >
+                                                    <LayoutTemplateIcon /> From Template
+                                                </DropdownMenuItem>
 
                                                 <DropdownMenuItem
                                                     className="dropdown-menu-item"

@@ -132,13 +132,11 @@ const Projects = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end">
-                                            {ff_1041 && (
-                                                <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                                    <LayoutTemplateIcon className="mr-2 size-4" />
-                                                    From Template
-                                                </DropdownMenuItem>
-                                            )}
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                            <LayoutTemplateIcon className="mr-2 size-4" />
+                                            From Template
+                                        </DropdownMenuItem>
 
                                             <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                                                 <UploadIcon className="mr-2 size-4" />
@@ -195,13 +193,11 @@ const Projects = () => {
                                             </Button>
                                         </DropdownMenuTrigger>
 
-                                        <DropdownMenuContent align="end">
-                                            {ff_1041 && (
-                                                <DropdownMenuItem onClick={() => navigate(`templates`)}>
-                                                    <LayoutTemplateIcon className="mr-2 size-4" />
-                                                    From Template
-                                                </DropdownMenuItem>
-                                            )}
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => navigate(`templates`)}>
+                                            <LayoutTemplateIcon className="mr-2 size-4" />
+                                            From Template
+                                        </DropdownMenuItem>
 
                                             <DropdownMenuItem onClick={() => fileInputRef.current?.click()}>
                                                 <UploadIcon className="mr-2 size-4" /> Import Project
