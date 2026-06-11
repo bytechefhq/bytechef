@@ -657,6 +657,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     </div>
                 ) : (
                     <EditorContent
+                        className="shadow-none"
                         editor={editor}
                         onChange={(event) => setEditorValue((event.target as HTMLInputElement).value)}
                         value={editorValue}

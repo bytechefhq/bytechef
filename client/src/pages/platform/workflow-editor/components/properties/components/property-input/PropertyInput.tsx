@@ -128,7 +128,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             type === 'hidden' && 'border-0',
                             error && 'ring-rose-300',
                             trailingAction &&
-                                'flex h-9 items-center rounded-md border border-input shadow-xs focus-within:ring-2 focus-within:ring-blue-500'
+                                'flex h-9 items-center rounded-md border border-input focus-within:ring-2 focus-within:ring-blue-500'
                         )}
                     >
                         {type !== 'hidden' && leadingIcon && (

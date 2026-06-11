@@ -193,7 +193,7 @@ const ConnectionTab = ({
                 </div>
 
                 <Input
-                    className="bg-white"
+                    className="bg-white shadow-none"
                     defaultValue={workflowTask?.maxRetries ?? ''}
                     key={`${currentNode?.componentName}-${workflowTask?.type}_maxRetries`}
                     min={0}
