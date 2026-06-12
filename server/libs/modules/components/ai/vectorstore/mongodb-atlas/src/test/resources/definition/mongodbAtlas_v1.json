@@ -1215,6 +1215,7 @@
   "customActionHelp": null,
   "description": "MongoDB Atlas Vector Search combines document storage with vector similarity search, enabling storage and retrieval of high-dimensional embeddings for AI and machine learning applications.",
   "icon": "path:assets/mongodb-atlas.svg",
+  "inputs": null,
   "metadata": null,
   "name": "mongodbAtlas",
   "resources": null,

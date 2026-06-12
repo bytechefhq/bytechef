@@ -49,10 +49,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-/**
- * Integration tests for the MongoDB connector actions and trigger, exercised against a real MongoDB instance spun up
- * via Testcontainers.
- */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
 class MongoDBComponentHandlerIntTest {
@@ -62,7 +58,7 @@ class MongoDBComponentHandlerIntTest {
 
     @Container
     private static final MongoDBContainer MONGODB_CONTAINER = new MongoDBContainer(
-        DockerImageName.parse("mongo:8.0"));
+        DockerImageName.parse("mongo:8.2"));
 
     private Parameters connectionParameters;
 

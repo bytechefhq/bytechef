@@ -39,10 +39,6 @@ import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import org.testcontainers.utility.DockerImageName;
 
-/**
- * Integration test for {@link MongoDBNewDocumentTrigger} exercised against a real MongoDB instance spun up via
- * Testcontainers.
- */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Testcontainers
 class MongoDBNewDocumentTriggerIntTest {
@@ -52,7 +48,7 @@ class MongoDBNewDocumentTriggerIntTest {
 
     @Container
     private static final MongoDBContainer MONGODB_CONTAINER = new MongoDBContainer(
-        DockerImageName.parse("mongo:8.0"));
+        DockerImageName.parse("mongo:8.2"));
 
     private Parameters connectionParameters;
 
