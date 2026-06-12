@@ -26,6 +26,7 @@ interface WorkflowExecutionsTabsPanelProps {
     isEditorEnvironment?: boolean;
     job: Job;
     onEditSubflowClick?: (workflowUuid: string) => void;
+    onSeeExecutionsClick?: (job: Job) => void;
     selectedItem: TriggerExecution | TaskExecution | undefined;
     setActiveTab: (value: TabValueType) => void;
     setDialogOpen: (open: boolean) => void;
@@ -38,6 +39,7 @@ const WorkflowExecutionsTabsPanel = ({
     isEditorEnvironment = false,
     job,
     onEditSubflowClick,
+    onSeeExecutionsClick,
     selectedItem,
     setActiveTab,
     setDialogOpen,
@@ -90,6 +92,20 @@ const WorkflowExecutionsTabsPanel = ({
 
     const subflowWorkflowUuid = subflowTaskExecution?.workflowTask?.parameters?.workflowUuid as string | undefined;
 
+    const handleSeeExecutionsClick = useCallback(() => {
+        if (!subflowTaskExecution?.childJob) {
+            return;
+        }
+
+        onSeeExecutionsClick?.(subflowTaskExecution.childJob);
+    }, [onSeeExecutionsClick, subflowTaskExecution?.childJob]);
+
+    const handleEditSubflowClick = useCallback(() => {
+        if (subflowWorkflowUuid) {
+            onEditSubflowClick?.(subflowWorkflowUuid);
+        }
+    }, [onEditSubflowClick, subflowWorkflowUuid]);
+
     return (
         <Tabs
             className="flex h-full flex-col"
@@ -105,11 +121,21 @@ const WorkflowExecutionsTabsPanel = ({
 
                     <span className="text-xs text-muted-foreground">{`(${workflowNodeName})`}</span>
 
+                    {subflowTaskExecution?.childJob && onSeeExecutionsClick && (
+                        <Button
+                            className="ml-2"
+                            label="See Executions"
+                            onClick={handleSeeExecutionsClick}
+                            size="xxs"
+                            variant="default"
+                        />
+                    )}
+
                     {subflowWorkflowUuid && onEditSubflowClick && (
                         <Button
                             icon={<SquarePenIcon />}
                             label="Edit"
-                            onClick={() => onEditSubflowClick(subflowWorkflowUuid)}
+                            onClick={handleEditSubflowClick}
                             size="xxs"
                             variant="outline"
                         />
@@ -252,9 +278,7 @@ const WorkflowExecutionsTabsPanel = ({
                                     isEditorEnvironment={isEditorEnvironment}
                                     jobId={job.id}
                                     taskExecutionId={
-                                        selectedItem && 'workflowTask' in selectedItem
-                                            ? (selectedItem as TaskExecution).id
-                                            : undefined
+                                        selectedItem && 'workflowTask' in selectedItem ? selectedItem.id : undefined
                                     }
                                 />
                             )}
