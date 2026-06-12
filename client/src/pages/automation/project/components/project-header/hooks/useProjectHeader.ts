@@ -110,12 +110,38 @@ export const useProjectHeader = ({bottomResizablePanelRef, chatTrigger, projectI
         },
     });
 
-    const handleProjectWorkflowValueChange = (projectWorkflowId: number) => {
-        setWorkflowTestExecution(undefined);
-        setCurrentNode(undefined);
+    const handleProjectWorkflowValueChange = useCallback(
+        (projectWorkflowId: number) => {
+            setWorkflowTestExecution(undefined);
+            setCurrentNode(undefined);
 
-        navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${searchParams}`);
-    };
+            const newSearchParams = new URLSearchParams(searchParams.toString());
+
+            newSearchParams.delete('fromSubflow');
+            newSearchParams.delete('parentChain');
+            newSearchParams.delete('parentProjectWorkflowId');
+            newSearchParams.delete('restoreExecutionPanel');
+
+            navigate(`/automation/projects/${projectId}/project-workflows/${projectWorkflowId}?${newSearchParams}`);
+
+            if (!useWorkflowEditorStore.getState().workflowTestExecution) {
+                setShowBottomPanelOpen(false);
+
+                if (bottomResizablePanelRef.current) {
+                    bottomResizablePanelRef.current.resize(0);
+                }
+            }
+        },
+        [
+            bottomResizablePanelRef,
+            navigate,
+            projectId,
+            searchParams,
+            setCurrentNode,
+            setShowBottomPanelOpen,
+            setWorkflowTestExecution,
+        ]
+    );
 
     const handlePublishProjectSubmit = ({description, onSuccess}: {description?: string; onSuccess: () => void}) => {
         if (project) {

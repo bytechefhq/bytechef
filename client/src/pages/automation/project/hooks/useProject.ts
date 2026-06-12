@@ -183,15 +183,24 @@ export const useProject = () => {
             const matchingWorkflow = projectWorkflows?.find((workflow) => workflow.workflowUuid === workflowUuid);
 
             if (matchingWorkflow?.projectWorkflowId) {
+                if (String(matchingWorkflow.projectWorkflowId) === projectWorkflowId) {
+                    return;
+                }
+
                 const newSearchParams = new URLSearchParams(searchParams.toString());
 
-                const existingParentId = newSearchParams.get('parentProjectWorkflowId');
+                const fromSubflowParam = newSearchParams.get('fromSubflow');
 
-                if (existingParentId) {
-                    const existingChain = newSearchParams.get('parentChain');
-                    const newChain = existingChain ? `${existingChain},${existingParentId}` : existingParentId;
+                if (fromSubflowParam === 'true') {
+                    const existingParentChain = newSearchParams.get('parentChain');
+                    const existingParentProjectWorkflowId = newSearchParams.get('parentProjectWorkflowId');
+                    const newChain = existingParentChain
+                        ? `${existingParentChain},${existingParentProjectWorkflowId}`
+                        : existingParentProjectWorkflowId;
 
-                    newSearchParams.set('parentChain', newChain);
+                    if (newChain) {
+                        newSearchParams.set('parentChain', newChain);
+                    }
                 }
 
                 newSearchParams.set('fromSubflow', 'true');
