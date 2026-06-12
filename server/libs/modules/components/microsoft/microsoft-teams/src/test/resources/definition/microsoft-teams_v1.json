@@ -3925,10 +3925,10 @@
     "description": "Sends a reply to a channel message. Sending attachments is supported with Message Text Format is set to \"html\".",
     "help": {
       "body": "",
-      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-teams_v1#send-reply-to-message"
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/microsoft-teams_v1#reply-to-message"
     },
     "metadata": null,
-    "name": "sendReplyToChannelMessage",
+    "name": "replyToChannelMessage",
     "outputDefinition": {
       "output": null,
       "outputResponse": {
@@ -5619,7 +5619,7 @@
       "type": "ARRAY"
     } ],
     "resumePerform": null,
-    "title": "Send Reply to Channel Message",
+    "title": "Reply to Channel Message",
     "workflowNodeDescription": null
   } ],
   "clusterElements": [ {
@@ -9531,7 +9531,7 @@
     },
     "workflowNodeDescription": null
   }, {
-    "name": "sendReplyToChannelMessage",
+    "name": "replyToChannelMessage",
     "description": "Sends a reply to a channel message. Sending attachments is supported with Message Text Format is set to \"html\".",
     "element": { },
     "help": null,
@@ -11223,7 +11223,7 @@
       "required": false,
       "type": "ARRAY"
     } ],
-    "title": "Send Reply to Channel Message",
+    "title": "Reply to Channel Message",
     "type": {
       "name": "TOOLS",
       "key": "tools",
@@ -12931,6 +12931,30 @@
       "regex": null,
       "required": true,
       "type": "STRING"
+    }, {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": true,
+      "description": "Whether replies to a channel message will trigger the workflow.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Include Replies",
+      "metadata": { },
+      "name": "includeReplies",
+      "options": [ {
+        "description": null,
+        "label": "True",
+        "value": true
+      }, {
+        "description": null,
+        "label": "False",
+        "value": false
+      } ],
+      "placeholder": null,
+      "required": true,
+      "type": "BOOLEAN"
     } ],
     "title": "New Channel Message",
     "type": "POLLING",
