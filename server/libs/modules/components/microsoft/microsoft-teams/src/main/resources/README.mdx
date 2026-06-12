@@ -20,3 +20,41 @@ You can get your Channel ID from your Microsoft Teams:
 5. You'll get URL like: `https://teams.microsoft.com/l/channel/19%3abc8e04002356415884ba1769f437de36%40thread.tacv2/General?groupId=e95fd37a-caad-496e-8a89-762f0aa441bf&tenantId=43f519c0-e5a6-438f-808f-6491be63b3be`
 6. The **Channel ID** is the value after **/l/channel/**: `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
 7. Important notice is that string in the URL is URL encoded `19%3abc8e04002356415884ba1769f437de36%40thread.tacv2` so you will have to decode it to get `19:bc8e04002356415884ba1769f437de36@thread.tacv2`
+
+### How to find Chat ID
+
+1. Go to [Microsoft Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer)
+2. Sign in with your **Microsoft 365** account by clicking **Sign in to Graph Explorer**
+3. In the request bar, make sure `GET` is selected and enter: `https://graph.microsoft.com/v1.0/me/chats`
+4. Click **Run query**
+5. In the **Response preview panel** below, you will see a list of chats
+6. Find your chat in the value array and copy the **id** field:
+
+
+### How to find Message ID
+
+1. Go to [Microsoft Graph Explorer](https://developer.microsoft.com/en-us/graph/graph-explorer)
+2. Sign in with your **Microsoft 365 account** by clicking **Sign in to Graph Explorer**
+3. In the request bar, make sure **GET** is selected and enter: `https://graph.microsoft.com/v1.0/teams/{teamId}/channels/{channelId}/messages`
+   - Replace `{teamId}` with your Team ID (same as Group ID from the Channel link)
+   - Replace `{channelId}` with your Channel ID found using the steps above
+4. Click **Run query**
+5. In the **Response preview** panel below, you will see a list of messages
+6. Find your message in the `value` array and copy the `id` field:
+```json
+{
+  "value": [
+    {
+      "id": "1616990032035",
+      "messageType": "message",
+      "createdDateTime": "2021-03-29T04:13:52.035Z",
+      "body": {
+        "content": "Your message content here"
+      }
+    }
+  ]
+}
+```
+7. The **Channel Message ID** is the `id` value: `1616990032035`
+
+> **Note:** You can identify the right message by matching the `createdDateTime` or checking `body.content`. If you need a reply message ID specifically, add `/$expand=replies` to the request URL to include replies in the response, then find the reply's `id` inside the `replies` array of the parent message
