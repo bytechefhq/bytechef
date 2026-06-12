@@ -527,7 +527,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
             List<Object> outputsList = new ArrayList<>(triggerOutputValues);
 
             if (!outputsList.isEmpty()) {
-                value = outputsList.getFirst();
+                value = outputsList.getLast();
             }
         }
 
