@@ -14,5 +14,222 @@ Type: aiAgentUtils/v1
 
 
 
+## Actions
+
+
+### Append Files to AI Skill
+Name: appendFilesToAiSkill
+
+`Appends new files to an existing AI skill archive.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | ID | INTEGER | The ID of the AI skill to append files to. | true |
+| additionalFiles | Additional Files | ARRAY <details> <summary> Items </summary> [&#123;STRING\(path), STRING\(content)&#125;] </details> | Files to add to the skill archive. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Append Files to AI Skill",
+  "name" : "appendFilesToAiSkill",
+  "parameters" : {
+    "id" : 1,
+    "additionalFiles" : [ {
+      "path" : "",
+      "content" : ""
+    } ]
+  },
+  "type" : "aiAgentUtils/v1/appendFilesToAiSkill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : ""
+}
+```
+
+
+
+
+### Create AI Skill
+Name: createAiSkill
+
+`Creates a new AI skill from instructions.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the AI skill. | true |
+| description | Description | STRING | An optional description of the AI skill. | false |
+| instructions | Instructions | STRING | The instructions that define the main skill's behavior (SKILL.md). | true |
+| additionalFiles | Additional Files | ARRAY <details> <summary> Items </summary> [&#123;STRING\(path), STRING\(content)&#125;] </details> | Optional extra files to include in the skill archive. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create AI Skill",
+  "name" : "createAiSkill",
+  "parameters" : {
+    "name" : "",
+    "description" : "",
+    "instructions" : "",
+    "additionalFiles" : [ {
+      "path" : "",
+      "content" : ""
+    } ]
+  },
+  "type" : "aiAgentUtils/v1/createAiSkill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : ""
+}
+```
+
+
+
+
+### Delete AI Skill
+Name: deleteAiSkill
+
+`Deletes an existing AI skill by its ID.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | ID | INTEGER | The ID of the AI skill to delete. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete AI Skill",
+  "name" : "deleteAiSkill",
+  "parameters" : {
+    "id" : 1
+  },
+  "type" : "aiAgentUtils/v1/deleteAiSkill"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
+### Update AI Skill
+Name: updateAiSkill
+
+`Updates an AI skill. Provide name/description to rename the skill, or files to update archive contents.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| id | ID | INTEGER | The ID of the AI skill to update. | true |
+| name | Name | STRING | New name for the skill. Required when updating name or description. | false |
+| description | Description | STRING | New description for the skill. | false |
+| files | Files | ARRAY <details> <summary> Items </summary> [&#123;STRING\(path), STRING\(content)&#125;] </details> | File contents to update inside the skill archive. Each entry replaces the file at the given path | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Update AI Skill",
+  "name" : "updateAiSkill",
+  "parameters" : {
+    "id" : 1,
+    "name" : "",
+    "description" : "",
+    "files" : [ {
+      "path" : "",
+      "content" : ""
+    } ]
+  },
+  "type" : "aiAgentUtils/v1/updateAiSkill"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER |  |
+| name | STRING |  |
+| description | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "name" : "",
+  "description" : ""
+}
+```
+
+
+
+
 
 
