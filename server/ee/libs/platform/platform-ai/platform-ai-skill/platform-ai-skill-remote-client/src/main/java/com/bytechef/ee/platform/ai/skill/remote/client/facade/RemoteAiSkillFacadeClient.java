@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.ai.skill.remote.client.facade;
 
-import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Map;

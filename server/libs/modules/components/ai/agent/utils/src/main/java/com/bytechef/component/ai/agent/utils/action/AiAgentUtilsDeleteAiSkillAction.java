@@ -24,7 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 
 /**
  * @author Marko Kriskovic

@@ -33,7 +33,7 @@ import com.bytechef.component.definition.ActionDefinition.PerformFunction;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;

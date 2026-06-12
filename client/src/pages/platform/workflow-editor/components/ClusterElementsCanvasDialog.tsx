@@ -19,7 +19,6 @@ import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCo
 import {Source} from '@/shared/components/copilot/stores/useCopilotStore';
 import {ComponentDefinitionBasic, WorkflowNodeOutput} from '@/shared/middleware/platform/configuration';
 import {ProjectWorkflowKeys} from '@/shared/queries/automation/projectWorkflows.queries';
-import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {UpdateWorkflowMutationType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
@@ -52,7 +51,6 @@ const ClusterElementsCanvasDialog = ({
     const [isDataPillPanelVisible, setIsDataPillPanelVisible] = useState(false);
 
     const {evalsPanelOpen, setEvalsPanelOpen} = useAiAgentEvalsStore();
-    const edition = useApplicationInfoStore((state) => state.application?.edition);
     const {copilotPanelOpen, showAiAgentEditor, showDataStreamEditor, testingPanelOpen} =
         useClusterElementsCanvasDialogStore(
             useShallow((state) => ({
@@ -209,7 +207,7 @@ const ClusterElementsCanvasDialog = ({
                                 }
                                 onTestClick={handleTestClick}
                                 onToggleEditor={handleToggleEditor}
-                                showSkills={edition === EditionType.EE && isAiAgentClusterRoot}
+                                showSkills={isAiAgentClusterRoot}
                                 showTestButton={isAiAgentClusterRoot}
                                 showToggleEditor={
                                     isAiAgentClusterRoot || (isDataStreamClusterRoot && isDataStreamSimpleModeAvailable)
