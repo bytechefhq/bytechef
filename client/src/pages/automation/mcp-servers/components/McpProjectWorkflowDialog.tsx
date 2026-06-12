@@ -101,6 +101,10 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
 
     const {control, getValues, handleSubmit, reset, resetField, setValue} = form;
 
+    const selectedWorkflowIds = form.watch('selectedWorkflowIds');
+
+    const hasNoEligibleWorkflows = !!(currentProjectId && currentProjectVersion && eligibleWorkflows?.length === 0);
+
     const queryClient = useQueryClient();
 
     const onCreateSuccess = () => {
@@ -291,6 +295,13 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                             </>
                         )}
 
+                        {hasNoEligibleWorkflows && (
+                            <p className="text-sm text-content-neutral-secondary">
+                                No tool-eligible workflows found for this project version. Only workflows with a New
+                                Workflow Call trigger can be added to an MCP server.
+                            </p>
+                        )}
+
                         {eligibleWorkflows && eligibleWorkflows.length > 0 && (
                             <FormField
                                 control={control}
@@ -362,7 +373,11 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                                 <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button label={isEditMode ? 'Update' : 'Add'} type="submit" />
+                            <Button
+                                disabled={!selectedWorkflowIds || selectedWorkflowIds.length === 0}
+                                label={isEditMode ? 'Update' : 'Add'}
+                                type="submit"
+                            />
                         </DialogFooter>
                     </form>
                 </Form>
