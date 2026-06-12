@@ -1,0 +1,22 @@
+### Triggers: New Email vs New Email Batch
+
+The Microsoft Outlook 365 component provides two **polling** triggers for new emails: **New Email** and **New Email Batch**.
+
+Both triggers periodically poll your mailbox for new messages, but they differ in how they start workflows and what they output.
+
+#### New Email
+
+- Periodically polls your Inbox for messages received after the last check.
+- For each new email found, **starts a separate workflow run**.
+- For all new emails found in the same poll cycle, **starts their workflow runs at the same time**, so they execute in parallel (subject to your workspace concurrency limits).
+- Provides **a single email** as the trigger output for each run (depending on the configured format, e.g. simple or full).
+
+In other words, **one email = one workflow execution**.
+
+#### New Email Batch
+
+- Periodically polls your Inbox for messages received after the last check.
+- **Starts a single workflow run per poll**, regardless of how many new emails are found.
+- Provides a **list (array) of all new emails** since the last run as the trigger output.
+
+In other words, **many emails = one workflow execution with a list of messages**.
