@@ -17,27 +17,59 @@
 package com.bytechef.component.microsoft.teams.trigger;
 
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.CHANNEL_ID;
+import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.INCLUDE_REPLIES;
 import static com.bytechef.component.microsoft.teams.constant.MicrosoftTeamsConstants.TEAM_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mockStatic;
 
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
+import com.bytechef.component.microsoft.teams.util.MicrosoftTeamsUtils;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.microsoft.commons.MicrosoftTriggerUtils;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * @author Nikolina Spehar
  */
 class MicrosoftTeamsNewChannelMessageTriggerTest extends AbstractMicrosoftTeamsTriggerTest {
 
-    private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(TEAM_ID, "teamId", CHANNEL_ID, "channelId"));
+    @Test
+    void testPollRepliesIncluded() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TEAM_ID, "teamId", CHANNEL_ID, "channelId", INCLUDE_REPLIES, true));
+
+        try (MockedStatic<MicrosoftTeamsUtils> microsoftTeamsUtilsMockedStatic =
+            mockStatic(MicrosoftTeamsUtils.class)) {
+
+            microsoftTeamsUtilsMockedStatic.when(
+                () -> MicrosoftTeamsUtils.includeRepliesPoll(
+                    stringArgumentCaptor.capture(),
+                    stringArgumentCaptor.capture(),
+                    parametersArgumentCaptor.capture(),
+                    triggerContextArgumentCaptor.capture()))
+                .thenReturn(mockedPollOutput);
+
+            PollOutput result = MicrosoftTeamsNewChannelMessageTrigger.poll(
+                mockedParameters, null, mockedParameters, mockedTriggerContext);
+
+            assertEquals(mockedPollOutput, result);
+            assertEquals(mockedParameters, parametersArgumentCaptor.getValue());
+            assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
+            assertEquals(
+                List.of("/teams/teamId/channels/channelId/messages", "messageType"),
+                stringArgumentCaptor.getAllValues());
+        }
+    }
 
     @Test
-    void testPoll() {
+    void testPollRepliesNotIncluded() {
+        Parameters mockedParameters = MockParametersFactory.create(
+            Map.of(TEAM_ID, "teamId", CHANNEL_ID, "channelId", INCLUDE_REPLIES, false));
+
         microsoftTriggerUtilsMockedStatic.when(
             () -> MicrosoftTriggerUtils.poll(
                 stringArgumentCaptor.capture(),
