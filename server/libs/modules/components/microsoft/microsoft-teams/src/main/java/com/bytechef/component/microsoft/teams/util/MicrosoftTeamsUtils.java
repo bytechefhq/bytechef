@@ -35,7 +35,6 @@ import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.microsoft.commons.MicrosoftConstants;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -171,12 +170,25 @@ public class MicrosoftTeamsUtils {
         String url, String containsKey, Parameters closureParameters, Context context) {
 
         ZoneId zoneId = ZoneId.systemDefault();
-
         LocalDateTime now = LocalDateTime.now(zoneId);
+        LocalDateTime startDateTime = getStartDateTime(closureParameters, context, now);
 
-        LocalDateTime startDateTime = closureParameters.getLocalDateTime(
+        List<Map<?, ?>> messages = fetchMessages(url, context).stream()
+            .filter(item -> item instanceof Map<?, ?> map && map.containsKey(containsKey))
+            .map(item -> (Map<?, ?>) item)
+            .flatMap(map -> collectMessageWithReplies(map, startDateTime, now, zoneId)
+                .stream())
+            .toList();
+
+        return new PollOutput(messages, Map.of(LAST_TIME_CHECKED, now), false);
+    }
+
+    private static LocalDateTime getStartDateTime(Parameters closureParameters, Context context, LocalDateTime now) {
+        return closureParameters.getLocalDateTime(
             LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+    }
 
+    private static List<?> fetchMessages(String url, Context context) {
         Map<String, Object> body = context
             .http(http -> http.get(url))
             .queryParameter("$expand", "replies")
@@ -184,46 +196,47 @@ public class MicrosoftTeamsUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        List<Map<?, ?>> maps = new ArrayList<>();
-
-        if (body.get(MicrosoftConstants.VALUE) instanceof List<?> list) {
-            for (Object item : list) {
-                if (item instanceof Map<?, ?> map && map.containsKey(containsKey)) {
-                    ZonedDateTime zonedCreatedDateTime = ZonedDateTime.parse((String) map.get("createdDateTime"));
-
-                    LocalDateTime createdLocalDateTime = LocalDateTime.ofInstant(
-                        zonedCreatedDateTime.toInstant(), zoneId);
-
-                    if (createdLocalDateTime.isAfter(startDateTime) && createdLocalDateTime.isBefore(now)) {
-                        maps.add(map);
-                    }
-
-                    checkMessageReplies(map.get("replies"), maps, startDateTime, now);
-                }
-            }
-        }
-
-        return new PollOutput(maps, Map.of(LAST_TIME_CHECKED, now), false);
+        return body.get(VALUE) instanceof List<?> list ? list : List.of();
     }
 
-    private static void checkMessageReplies(
-        Object replies, List<Map<?, ?>> maps, LocalDateTime startDate, LocalDateTime now) {
+    private static List<Map<?, ?>> collectMessageWithReplies(
+        Map<?, ?> message, LocalDateTime startDateTime, LocalDateTime now, ZoneId zoneId) {
 
-        if (replies instanceof List<?> repliesList) {
-            for (Object reply : repliesList) {
-                if (reply instanceof Map<?, ?> replyMap) {
-                    ZoneId zoneId = ZoneId.systemDefault();
+        List<Map<?, ?>> result = new ArrayList<>();
 
-                    ZonedDateTime createdZonedDateTime = ZonedDateTime.parse((String) replyMap.get("createdDateTime"));
-
-                    LocalDateTime createdLocalDateTime = LocalDateTime.ofInstant(
-                        createdZonedDateTime.toInstant(), zoneId);
-
-                    if (createdLocalDateTime.isAfter(startDate) && createdLocalDateTime.isBefore(now)) {
-                        maps.add(replyMap);
-                    }
-                }
-            }
+        if (isWithinTimeRange(message, startDateTime, now, zoneId)) {
+            result.add(message);
         }
+
+        collectRepliesInRange(message.get("replies"), startDateTime, now, zoneId, result);
+
+        return result;
+    }
+
+    private static void collectRepliesInRange(
+        Object replies, LocalDateTime startDateTime, LocalDateTime now, ZoneId zoneId, List<Map<?, ?>> result) {
+
+        if (!(replies instanceof List<?> repliesList)) {
+            return;
+        }
+
+        repliesList.stream()
+            .filter(
+                reply -> reply instanceof Map<?, ?> replyMap && isWithinTimeRange(replyMap, startDateTime, now, zoneId))
+            .map(reply -> (Map<?, ?>) reply)
+            .forEach(result::add);
+    }
+
+    private static boolean isWithinTimeRange(
+        Map<?, ?> item, LocalDateTime startDateTime, LocalDateTime now, ZoneId zoneId) {
+
+        LocalDateTime createdAt = parseToLocalDateTime((String) item.get("createdDateTime"), zoneId);
+
+        return createdAt.isAfter(startDateTime) && createdAt.isBefore(now);
+    }
+
+    private static LocalDateTime parseToLocalDateTime(String dateTime, ZoneId zoneId) {
+        return LocalDateTime.ofInstant(ZonedDateTime.parse(dateTime)
+            .toInstant(), zoneId);
     }
 }
