@@ -567,10 +567,42 @@ This action does not produce any output.
 ## Triggers
 
 
+### New Email Batch
+Name: newEmailBatch
+
+`Periodically triggers a workflow run and outputs a list of all new emails received since the last check.`
+
+Type: POLLING
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| format | Format | STRING <details> <summary> Options </summary> <span title="Returns email message's from, to, subject, body and attachments.">SIMPLE</span>, <span title="Returns all properties of the email message.">FULL</span> </details> | The format to return the message in. | true |
+
+
+#### Output
+
+The output for this action is dynamic and may vary depending on the input parameters. To determine the exact structure of the output, you need to execute the action.
+
+#### JSON Example
+```json
+{
+  "label" : "New Email Batch",
+  "name" : "newEmailBatch",
+  "parameters" : {
+    "format" : ""
+  },
+  "type" : "microsoftOutlook365/v1/newEmailBatch"
+}
+```
+
+
+
 ### New Email
 Name: newEmail
 
-`Triggers when new email is received.`
+`Triggers a new workflow run for each new email received in your Inbox.`
 
 Type: POLLING
 
@@ -607,3 +639,29 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### Triggers: New Email vs New Email Batch
+
+The Microsoft Outlook 365 component provides two **polling** triggers for new emails: **New Email** and **New Email Batch**.
+
+Both triggers periodically poll your mailbox for new messages, but they differ in how they start workflows and what they output.
+
+#### New Email
+
+- Periodically polls your Inbox for messages received after the last check.
+- For each new email found, **starts a separate workflow run**.
+- For all new emails found in the same poll cycle, **starts their workflow runs at the same time**, so they execute in parallel (subject to your workspace concurrency limits).
+- Provides **a single email** as the trigger output for each run (depending on the configured format, e.g. simple or full).
+
+In other words, **one email = one workflow execution**.
+
+#### New Email Batch
+
+- Periodically polls your Inbox for messages received after the last check.
+- **Starts a single workflow run per poll**, regardless of how many new emails are found.
+- Provides a **list (array) of all new emails** since the last run as the trigger output.
+
+In other words, **many emails = one workflow execution with a list of messages**.
