@@ -24,20 +24,24 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_BYTES;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.CONTENT_TYPE;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.EMAIL_ADDRESS;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FORMAT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FROM;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SIMPLE_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.commons.util.EncodingUtils;
@@ -53,18 +57,28 @@ import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.FileEntry;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils.SimpleMessage;
+import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
+import com.bytechef.microsoft.commons.MicrosoftUtils;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 
 /**
  * @author Monika Kušter
@@ -82,6 +96,7 @@ class MicrosoftOutlook365UtilsTest {
     private final Context mockedContext = mock(Context.class);
     private final ArgumentCaptor<FileEntry> fileEntryArgumentCaptor = forClass(FileEntry.class);
     private final ArgumentCaptor<byte[]> bytesArgumentCaptor = forClass(byte[].class);
+    private final ArgumentCaptor<Object[]> queryArgumentCaptor = forClass(Object[].class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final ArgumentCaptor<InputStream> inputStreamArgumentCaptor = forClass(InputStream.class);
 
@@ -269,5 +284,70 @@ class MicrosoftOutlook365UtilsTest {
         ModifiableObjectProperty messageOutputProperty = MicrosoftOutlook365Utils.getMessageOutputProperty(Format.FULL);
 
         assertEquals(FULL_MESSAGE_OUTPUT_PROPERTY, messageOutputProperty);
+    }
+
+    @ExtendWith(MockContextSetupExtension.class)
+    @Test
+    void testGetPollOutput(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Map<String, String> firstMail = Map.of(ID, "abc", "receivedDateTime", "2024-01-01T14:28:23Z");
+
+        LocalDateTime endDate = LocalDateTime.of(2024, 1, 2, 0, 0, 0);
+
+        try (MockedStatic<LocalDateTime> localDateTimeMockedStatic = mockStatic(
+            LocalDateTime.class, Mockito.CALLS_REAL_METHODS);
+
+            MockedStatic<MicrosoftUtils> microsoftUtilsMockedStatic = mockStatic(MicrosoftUtils.class)) {
+
+            localDateTimeMockedStatic.when(() -> LocalDateTime.now(any(ZoneId.class)))
+                .thenReturn(endDate);
+
+            Map<String, String> secondMail = Map.of(ID, "cdf", "receivedDateTime", "2024-01-01T18:23:44Z");
+
+            microsoftUtilsMockedStatic
+                .when(() -> MicrosoftUtils.getItemsFromNextPage("link", mockedTriggerContext))
+                .thenReturn(List.of(secondMail));
+
+            when(mockedHttp.get(stringArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedExecutor.queryParameters(queryArgumentCaptor.capture()))
+                .thenReturn(mockedExecutor);
+            when(mockedResponse.getBody(any(TypeReference.class)))
+                .thenReturn(Map.of(VALUE, List.of(firstMail), ODATA_NEXT_LINK, "link"));
+
+            LocalDateTime startDate = LocalDateTime.of(2024, 1, 1, 0, 0, 0);
+            Parameters mockedClosureParameters = MockParametersFactory.create(Map.of(LAST_TIME_CHECKED, startDate));
+            Parameters mockedInputParameters = MockParametersFactory.create(Map.of(FORMAT, Format.FULL));
+
+            TriggerDefinition.PollOutput pollOutput = MicrosoftOutlook365Utils.getPollOutput(
+                mockedInputParameters, mockedClosureParameters, mockedTriggerContext);
+
+            TriggerDefinition.PollOutput expectedPollOutput = new TriggerDefinition.PollOutput(
+                List.of(firstMail, secondMail), Map.of(LAST_TIME_CHECKED, endDate), false);
+
+            assertEquals(expectedPollOutput, pollOutput);
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+            assertEquals("/me/mailFolders/Inbox/messages", stringArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
+
+            Object[] query = queryArgumentCaptor.getValue();
+
+            String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+                .withZone(ZoneId.systemDefault()));
+
+            Object[] objects = {
+                "$filter", "isRead eq false and receivedDateTime ge " + formattedStartDate,
+                "$orderby", "receivedDateTime asc"
+            };
+
+            assertArrayEquals(objects, query);
+        }
     }
 }
