@@ -39,11 +39,9 @@ class InfobipNewWhatsAppMessageTriggerTest extends AbstractInfobipTriggerTest {
             .thenReturn(mockedWebhookEnableOutput);
 
         WebhookEnableOutput webhookEnableOutput = InfobipNewWhatsAppMessageTrigger.webhookEnable(
-            mockedParameters, mockedParameters, "testWebhookUrl", "workflowExecutionId",
-            mockedTriggerContext);
+            mockedParameters, mockedParameters, "testWebhookUrl", "workflowExecutionId", mockedTriggerContext);
 
         assertEquals(mockedWebhookEnableOutput, webhookEnableOutput);
-
         assertEquals(List.of("123", "WHATSAPP", "testWebhookUrl"), stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
     }
@@ -51,13 +49,12 @@ class InfobipNewWhatsAppMessageTriggerTest extends AbstractInfobipTriggerTest {
     @Test
     void testWebhookDisable() {
         infobipUtilsMockedStatic
-            .when(() -> InfobipUtils.unsubscribeWebhook(
-                stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture()))
+            .when(() -> InfobipUtils.unsubscribeWebhook(stringArgumentCaptor.capture(),
+                triggerContextArgumentCaptor.capture()))
             .thenAnswer((Answer<Void>) invocation -> null);
 
         InfobipNewWhatsAppMessageTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, "workflowExecutionId",
-            mockedTriggerContext);
+            mockedParameters, mockedParameters, mockedParameters, "workflowExecutionId", mockedTriggerContext);
 
         assertEquals(List.of("abc"), stringArgumentCaptor.getAllValues());
         assertEquals(mockedTriggerContext, triggerContextArgumentCaptor.getValue());
