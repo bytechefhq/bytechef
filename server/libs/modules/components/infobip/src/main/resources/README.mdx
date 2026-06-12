@@ -1,0 +1,22 @@
+### Keywords
+
+Infobip **keywords** are specific words or phrases associated with a number that Infobip uses to decide **how to route incoming messages** and which actions to trigger.
+In ByteChef, the `Keyword` field (used, for example, in the **New WhatsApp Message** trigger) lets you take advantage of this mechanism.
+
+#### How keywords work
+
+- A keyword is typically a word or short code that appears in the incoming message (for example: `START`, `HELP`, `SALES`).
+- Infobip matches incoming messages against the configured keywords on a given number and can perform different actions based on which keyword was used.
+- ByteChef passes the configured keyword to Infobip when enabling the webhook, so only messages that match that keyword (according to Infobip’s rules and configuration) will be delivered to the webhook and can trigger your workflow.
+
+#### When to use a keyword
+
+Use a keyword when you want to:
+
+- Route only **specific** messages to this trigger (e.g. messages that start with `ORDER`).
+- Have **multiple workflows** that react differently to messages sent to the same number, based on the keyword.
+- Implement opt‑in / opt‑out flows or different “channels” (e.g. `NEWS`, `PROMO`, `SUPPORT`) on a single number.
+
+If you do **not** need keyword‑based routing and want to handle all incoming messages for a number with a single workflow, you can leave the keyword field empty (or follow your Infobip configuration strategy).
+
+For detailed information about how keywords work in Infobip, see the [official documentation](https://www.infobip.com/docs/numbers/keywords-and-actions#configure-keywords-keywords).
