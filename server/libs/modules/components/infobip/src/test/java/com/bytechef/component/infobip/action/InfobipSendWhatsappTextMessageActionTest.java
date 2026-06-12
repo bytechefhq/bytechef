@@ -29,9 +29,12 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -48,7 +51,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class InfobipSendWhatsappTextMessageActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         FROM, "123", TO, "456", TEXT, "text"));
     private final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
@@ -71,19 +74,13 @@ class InfobipSendWhatsappTextMessageActionTest {
             InfobipSendWhatsappTextMessageAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(Map.of(FROM, "123", TO, "456", CONTENT, Map.of(TEXT, "text")), body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/whatsapp/1/message/text", stringArgumentCaptor.getValue());
+        assertEquals(Body.of(FROM, "123", TO, "456", CONTENT, Map.of(TEXT, "text")), bodyArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

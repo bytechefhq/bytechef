@@ -32,9 +32,11 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -51,7 +53,7 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class InfobipSendSMSActionTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = forClass(Http.Body.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         SENDER, "123", TO, List.of("abc", "def"), TEXT, "text"));
     private final Map<String, Object> responseMap = Map.of("result", List.of("123", "abc"));
@@ -73,26 +75,18 @@ class InfobipSendSMSActionTest {
         Map<String, Object> result = InfobipSendSMSAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(responseMap, result);
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> expectedBody = Map.of(
-            MESSAGES, List.of(
-                Map.of(
-                    SENDER, "123",
-                    DESTINATIONS, List.of(Map.of(TO, "abc"), Map.of(TO, "def")),
-                    CONTENT, Map.of(TEXT, "text"))));
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(expectedBody, body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/sms/3/messages", stringArgumentCaptor.getValue());
+
+        assertEquals(
+            Body.of(MESSAGES, List.of(
+                Map.of(SENDER, "123",
+                    DESTINATIONS, List.of(Map.of(TO, "abc"), Map.of(TO, "def")), CONTENT, Map.of(TEXT, "text")))),
+            bodyArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

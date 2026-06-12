@@ -32,9 +32,12 @@ import static org.mockito.Mockito.when;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.Property.ValueProperty;
 import com.bytechef.component.definition.TriggerContext;
@@ -54,9 +57,9 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class InfobipUtilsTest {
 
-    private final ArgumentCaptor<Http.Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Http.Body.class);
-    private final Parameters mockedParameters =
-        MockParametersFactory.create(Map.of(FROM, "1234567890", TEMPLATE_NAME, "template"));
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final Parameters mockedParameters = MockParametersFactory.create(
+        Map.of(FROM, "1234567890", TEMPLATE_NAME, "template"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -66,9 +69,8 @@ class InfobipUtilsTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         List<Map<String, Object>> templates = List.of(
-            Map.of(
-                "name", "template",
-                "structure", Map.of("body", Map.of(TEXT, "Hello {{1}}! You have {{2}} new messages."))));
+            Map.of("name", "template", "structure",
+                Map.of("body", Map.of(TEXT, "Hello {{1}}! You have {{2}} new messages."))));
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
@@ -86,17 +88,14 @@ class InfobipUtilsTest {
                 .label("2")
                 .required(true));
 
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
         assertEquals(expectedProperties, properties);
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/whatsapp/2/senders/1234567890/templates", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -115,17 +114,13 @@ class InfobipUtilsTest {
             .thenReturn(Map.of("templates", templates));
 
         assertEquals(templates, InfobipUtils.getTemplates(anyString(), mockedContext));
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/whatsapp/2/senders//templates", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -134,39 +129,27 @@ class InfobipUtilsTest {
         ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
-        Map<String, Object> responseMap = Map.of(CONFIGURATION_KEY, "abc");
-
         when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
-            .thenReturn(responseMap);
+            .thenReturn(Map.of(CONFIGURATION_KEY, "abc"));
 
         WebhookEnableOutput webhookEnableOutput = InfobipUtils.getWebhookEnableOutput(
             "number", "SMS", null, "webhookUrl", mockedContext);
 
-        assertEquals(
-            new WebhookEnableOutput(Map.of(CONFIGURATION_KEY, "abc"), null),
-            webhookEnableOutput);
-
-        Http.Body body = bodyArgumentCaptor.getValue();
-
-        Map<String, Object> expectedBody = Map.of(
-            "channel", "SMS",
-            NUMBER, "number",
-            "forwarding", Map.of("type", "HTTP_FORWARD", "url", "webhookUrl"));
-
-        ContextFunction<Http, Http.Executor> capturedFunction = httpFunctionArgumentCaptor.getValue();
-
-        assertNotNull(capturedFunction);
-
-        Http.Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
-        Http.Configuration configuration = configurationBuilder.build();
-        Http.ResponseType responseType = configuration.getResponseType();
-
-        assertEquals(Http.ResponseType.Type.JSON, responseType.getType());
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(new WebhookEnableOutput(Map.of(CONFIGURATION_KEY, "abc"), null), webhookEnableOutput);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals("/resource-management/1/inbound-message-configurations", stringArgumentCaptor.getValue());
+        assertEquals(
+            Body.of("channel", "SMS", NUMBER, "number", "forwarding",
+                Map.of("type", "HTTP_FORWARD", "url", "webhookUrl")),
+            bodyArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }

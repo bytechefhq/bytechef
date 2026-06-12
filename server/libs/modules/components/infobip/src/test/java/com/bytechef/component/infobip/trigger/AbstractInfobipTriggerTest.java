@@ -18,6 +18,7 @@ package com.bytechef.component.infobip.trigger;
 
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 
@@ -38,13 +39,12 @@ import org.mockito.MockedStatic;
 abstract class AbstractInfobipTriggerTest {
 
     protected MockedStatic<InfobipUtils> infobipUtilsMockedStatic;
-    protected Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(NUMBER, "123", CONFIGURATION_KEY, "abc"));
+    protected Parameters mockedParameters =
+        MockParametersFactory.create(Map.of(NUMBER, "123", CONFIGURATION_KEY, "abc"));
     protected TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     protected WebhookEnableOutput mockedWebhookEnableOutput = mock(WebhookEnableOutput.class);
-    protected ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor =
-        ArgumentCaptor.forClass(TriggerContext.class);
+    protected ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    protected ArgumentCaptor<TriggerContext> triggerContextArgumentCaptor = forClass(TriggerContext.class);
 
     @BeforeEach
     void beforeEach() {
@@ -55,5 +55,4 @@ abstract class AbstractInfobipTriggerTest {
     void afterEach() {
         infobipUtilsMockedStatic.close();
     }
-
 }
