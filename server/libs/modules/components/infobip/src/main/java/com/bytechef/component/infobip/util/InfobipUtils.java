@@ -102,7 +102,9 @@ public class InfobipUtils {
         List<Option<String>> options = new ArrayList<>();
 
         for (Map<String, Object> map : getTemplates(inputParameters.getRequiredString(FROM), context)) {
-            options.add(option((String) map.get(NAME), (String) map.get(NAME)));
+            String name = (String) map.get(NAME);
+
+            options.add(option(name, name));
         }
 
         return options;
@@ -137,7 +139,6 @@ public class InfobipUtils {
     public static void unsubscribeWebhook(String configurationKey, TriggerContext triggerContext) {
         triggerContext.http(http -> http.delete(
             "/resource-management/1/inbound-message-configurations/%s".formatted(configurationKey)))
-            .configuration(Http.responseType(Http.ResponseType.JSON))
             .execute();
     }
 }

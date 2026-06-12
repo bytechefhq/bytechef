@@ -21,6 +21,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
+import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 
 /**
  * @author Monika Kušter
@@ -53,6 +54,13 @@ public class InfobipConstants {
     public static final String TEMPLATE_NAME = "templateName";
     public static final String TEXT = "text";
     public static final String TO = "to";
+
+    public static final ModifiableStringProperty KEYWORD_PROPERTY = string(KEYWORD)
+        .label("Keyword")
+        .description(
+            "Keywords are words at the beginning of the message text of the inbound message that are used " +
+                "to filter out specific messages received on a number.")
+        .required(false);
 
     public static final ModifiableObjectProperty WHATSAPP_MESSAGE_OUTPUT_PROPERTY = object()
         .properties(

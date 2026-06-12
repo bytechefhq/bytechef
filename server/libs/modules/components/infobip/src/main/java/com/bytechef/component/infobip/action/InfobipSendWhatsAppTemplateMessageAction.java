@@ -78,9 +78,7 @@ public class InfobipSendWhatsAppTemplateMessageAction {
                     .properties(
                         array("messages")
                             .items(WHATSAPP_MESSAGE_OUTPUT_PROPERTY))))
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/infobip_v1#send-whatsapp-template-message")
+        .help("", "https://docs.bytechef.io/reference/components/infobip_v1#send-whatsapp-template-message")
         .perform(InfobipSendWhatsAppTemplateMessageAction::perform);
 
     private InfobipSendWhatsAppTemplateMessageAction() {
