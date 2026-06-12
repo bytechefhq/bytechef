@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNEE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
@@ -35,6 +34,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.PRIOR
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.SERVICE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.USER_ID;
 import static com.bytechef.component.pagerduty.util.PagerDutyUtils.getRequestBody;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -65,8 +65,8 @@ public class PagerDutyCreateIncidentAction {
                 .description("A short description of the nature, symptoms, cause, or effect of the incident.")
                 .required(true),
             string(SERVICE)
-                .label("Service")
-                .description("The incident will be created on this service.")
+                .label("Service ID")
+                .description("The incident will be created on service with this ID.")
                 .options((OptionsFunction<String>) PagerDutyUtils::getServiceIdOptions)
                 .required(true),
             string(PRIORITY)
@@ -92,8 +92,8 @@ public class PagerDutyCreateIncidentAction {
                 .description("Assign the incident to these assignees.")
                 .options((OptionsFunction<String>) PagerDutyUtils::getUserIdOptions)
                 .items(
-                    string(ASSIGNEE)
-                        .label("Assignee")
+                    string(USER_ID)
+                        .label("User ID")
                         .description("Incident will be assigned to this user.")
                         .required(false))
                 .required(false),
@@ -107,7 +107,7 @@ public class PagerDutyCreateIncidentAction {
                 .options((OptionsFunction<String>) PagerDutyUtils::getIncidentTypeOptions)
                 .required(false),
             string(ESCALATION_POLICY)
-                .label("Escalation Policy")
+                .label("Escalation Policy ID")
                 .description(
                     "Delegate this incident to the specified escalation policy. Cannot be specified if an assignee " +
                         "is given.")

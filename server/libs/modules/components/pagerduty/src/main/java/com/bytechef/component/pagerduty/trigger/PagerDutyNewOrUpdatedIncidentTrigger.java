@@ -51,7 +51,7 @@ public class PagerDutyNewOrUpdatedIncidentTrigger {
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .properties(
             string(SERVICE)
-                .label("Service")
+                .label("Service ID")
                 .description("The service that will be watched for the trigger event.")
                 .options((OptionsFunction<String>) PagerDutyUtils::getServiceIdOptions)
                 .required(true))

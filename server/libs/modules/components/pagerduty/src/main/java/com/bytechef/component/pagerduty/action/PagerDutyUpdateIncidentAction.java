@@ -22,7 +22,6 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNEE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ESCALATION_POLICY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.FROM;
@@ -35,6 +34,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.RESOL
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.STATUS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.USER_ID;
 import static com.bytechef.component.pagerduty.util.PagerDutyUtils.getRequestBody;
 
 import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
@@ -82,8 +82,8 @@ public class PagerDutyUpdateIncidentAction {
                 .description("Assign the incident to these assignees.")
                 .options((OptionsFunction<String>) PagerDutyUtils::getUserIdOptions)
                 .items(
-                    string(ASSIGNEE)
-                        .label("Assignee")
+                    string(USER_ID)
+                        .label("User ID")
                         .description("Incident will be assigned to this user.")
                         .required(false))
                 .required(false),
@@ -111,7 +111,7 @@ public class PagerDutyUpdateIncidentAction {
                     option("Low", "low"))
                 .required(false),
             string(ESCALATION_POLICY)
-                .label("Escalation Policy")
+                .label("Escalation Policy ID")
                 .description(
                     "Delegate this incident to the specified escalation policy. Cannot be specified if an assignee " +
                         "is given.")

@@ -17,7 +17,6 @@
 package com.bytechef.component.pagerduty.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNEE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.BODY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
@@ -31,6 +30,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.SERVI
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.USER_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -264,7 +264,8 @@ class PagerDutyUtilsTest {
         expectedBodyContent.put(TYPE, "incident");
         expectedBodyContent.put(TITLE, "title");
         expectedBodyContent.put(BODY, Map.of(TYPE, "incident_body", DETAILS, "details"));
-        expectedBodyContent.put(ESCALATION_POLICY, Map.of(ID, "escalationPolicy", TYPE, "escalation_policy_reference"));
+        expectedBodyContent.put(ESCALATION_POLICY,
+            Map.of(ID, "escalationPolicy", TYPE, "escalation_policy_reference"));
         expectedBodyContent.put(PRIORITY, Map.of(ID, "priority", TYPE, "priority_reference"));
         expectedBodyContent.put(SERVICE, Map.of(ID, "service", TYPE, "service_reference"));
         expectedBodyContent.put(INCIDENT_KEY, "incidentKey");
@@ -273,8 +274,8 @@ class PagerDutyUtilsTest {
         expectedBodyContent.put(
             ASSIGNMENTS,
             List.of(
-                Map.of(ASSIGNEE, Map.of(ID, "assignee1", TYPE, "user_reference")),
-                Map.of(ASSIGNEE, Map.of(ID, "assignee2", TYPE, "user_reference"))));
+                Map.of(USER_ID, Map.of(ID, "assignee1", TYPE, "user_reference")),
+                Map.of(USER_ID, Map.of(ID, "assignee2", TYPE, "user_reference"))));
 
         return expectedBodyContent;
     }
