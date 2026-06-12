@@ -4,6 +4,7 @@ dependencies {
     implementation("org.springframework:spring-web")
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
+    implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))

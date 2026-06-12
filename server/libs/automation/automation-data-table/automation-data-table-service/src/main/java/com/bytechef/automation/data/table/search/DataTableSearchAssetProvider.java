@@ -16,9 +16,9 @@
 
 package com.bytechef.automation.data.table.search;
 
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Component;

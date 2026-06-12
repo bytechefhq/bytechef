@@ -1,15 +1,12 @@
 dependencies {
-    implementation("de.siegmar:fastcsv:2.2.2")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
-    implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework:spring-context")
-    implementation("org.springframework:spring-web")
     implementation("org.springframework.data:spring-data-jdbc")
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-api"))
+    implementation(project(":server:libs:platform:platform-data-table:platform-data-table-api"))
+    implementation(project(":server:libs:platform:platform-data-table:platform-data-table-service"))
     implementation(project(":server:libs:automation:automation-search:automation-search-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
-    implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
-    implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))
 
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.mockito:mockito-core")

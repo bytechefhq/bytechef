@@ -27,13 +27,13 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import static com.bytechef.platform.configuration.domain.Environment.DEVELOPMENT;
 
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
-import com.bytechef.automation.data.table.execution.domain.DataTableRow;
-import com.bytechef.automation.data.table.execution.service.DataTableRowService;
 import com.bytechef.component.datatable.util.DataTableUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ActionContextAware;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

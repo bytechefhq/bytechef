@@ -17,8 +17,8 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
-import com.bytechef.automation.data.table.configuration.service.DataTableTagService;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;

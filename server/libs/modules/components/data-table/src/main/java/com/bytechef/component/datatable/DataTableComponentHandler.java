@@ -20,9 +20,6 @@ import static com.bytechef.component.datatable.constant.DataTableConstants.DATA_
 import static com.bytechef.component.definition.ComponentDsl.component;
 import static com.bytechef.component.definition.ComponentDsl.tool;
 
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
-import com.bytechef.automation.data.table.configuration.service.DataTableWebhookService;
-import com.bytechef.automation.data.table.execution.service.DataTableRowService;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.datatable.action.DataTableClearTableAction;
 import com.bytechef.component.datatable.action.DataTableCreateRecordsAction;
@@ -37,6 +34,9 @@ import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
 import org.springframework.stereotype.Component;
 
 /**
