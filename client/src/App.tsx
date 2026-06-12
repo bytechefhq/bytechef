@@ -174,7 +174,6 @@ function App() {
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
     const ff_2894 = useFeatureFlagsStore()('ff-2894');
     const ff_3955 = useFeatureFlagsStore()('ff-3955');
-    const ff_4000 = useFeatureFlagsStore()('ff-4000');
 
     const filteredAutomationNavigation = automationNavigation.filter((navItem) => {
         if (
@@ -202,7 +201,7 @@ function App() {
         }
 
         if (navItem.href === '/automation/knowledge-bases') {
-            return ff_4000 && ai.knowledgeBase.enabled;
+            return ai.knowledgeBase.enabled;
         }
 
         if (navItem.href === '/automation/ai') {

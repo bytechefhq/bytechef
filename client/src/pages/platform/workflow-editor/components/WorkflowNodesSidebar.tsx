@@ -25,7 +25,6 @@ const WorkflowNodesSidebar = ({
     const getFeatureFlag = useFeatureFlagsStore();
 
     const ff_797 = getFeatureFlag('ff-797');
-    const ff_4000 = getFeatureFlag('ff-4000');
 
     const knowledgeBaseEnabled = useApplicationInfoStore((state) => state.ai.knowledgeBase.enabled);
 
@@ -39,12 +38,11 @@ const WorkflowNodesSidebar = ({
             .filter(
                 ({name}) =>
                     ((!ff_797 && name !== 'dataStream') || ff_797) &&
-                    (((!ff_4000 || !knowledgeBaseEnabled) && name !== 'knowledgeBase') ||
-                        (ff_4000 && knowledgeBaseEnabled))
+                    ((!knowledgeBaseEnabled && name !== 'knowledgeBase') || knowledgeBaseEnabled)
             );
 
         return actionComponents;
-    }, [componentsWithActions, ff_4000, ff_797, knowledgeBaseEnabled]);
+    }, [componentsWithActions, ff_797, knowledgeBaseEnabled]);
 
     const filteredTaskDispatcherDefinitions = useMemo(
         () =>
