@@ -37,7 +37,7 @@ Version: 1
 3. Expand **Developer Tools** and click on **API Keys**.
 4. Click on **Create api key**.
 5. Fill in the required fields.
-6. Select all needed Scopes.
+6. Select all needed scopes: `inbound-message:read`, `whatsapp:manage` and `numbers:manage`.
 7. Click on **CREATE**.
 8. You have your API key.
 
@@ -56,7 +56,7 @@ Version: 1
 ### Send SMS
 Name: sendSMS
 
-`Send a new SMS message`
+`Send a new SMS message to one or more recipients.`
 
 #### Properties
 
@@ -270,7 +270,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| number | Number | STRING |  | true |
+| number | Number | STRING | Number to monitor for new SMS messages. | true |
+| keyword | Keyword | STRING | Keywords are words at the beginning of the message text of the inbound message that are used to filter out specific messages received on a number. | false |
 
 
 #### Output
@@ -283,11 +284,15 @@ The output for this action is dynamic and may vary depending on the input parame
   "label" : "New SMS Message",
   "name" : "newSMS",
   "parameters" : {
-    "number" : ""
+    "number" : "",
+    "keyword" : ""
   },
   "type" : "infobip/v1/newSMS"
 }
 ```
+#### Keyword Property
+
+To learn more about `keyword` property, click [here](/reference/components/infobip_v1#keywords).
 
 
 
@@ -302,8 +307,8 @@ Type: DYNAMIC_WEBHOOK
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| number | Number | STRING |  | true |
-| keyword | Keyword | STRING |  | null |
+| number | Number | STRING | Number to monitor for new WhatsApp messages. | true |
+| keyword | Keyword | STRING | Keywords are words at the beginning of the message text of the inbound message that are used to filter out specific messages received on a number. | false |
 
 
 #### Output
@@ -322,6 +327,9 @@ The output for this action is dynamic and may vary depending on the input parame
   "type" : "infobip/v1/newWhatsappMessage"
 }
 ```
+#### Keyword Property
+
+To learn more about `keyword` property, click [here](/reference/components/infobip_v1#keywords).
 
 
 
@@ -333,3 +341,29 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### Keywords
+
+Infobip **keywords** are specific words or phrases associated with a number that Infobip uses to decide **how to route incoming messages** and which actions to trigger.
+In ByteChef, the `Keyword` field (used, for example, in the **New WhatsApp Message** trigger) lets you take advantage of this mechanism.
+
+#### How keywords work
+
+- A keyword is typically a word or short code that appears in the incoming message (for example: `START`, `HELP`, `SALES`).
+- Infobip matches incoming messages against the configured keywords on a given number and can perform different actions based on which keyword was used.
+- ByteChef passes the configured keyword to Infobip when enabling the webhook, so only messages that match that keyword (according to Infobip’s rules and configuration) will be delivered to the webhook and can trigger your workflow.
+
+#### When to use a keyword
+
+Use a keyword when you want to:
+
+- Route only **specific** messages to this trigger (e.g. messages that start with `ORDER`).
+- Have **multiple workflows** that react differently to messages sent to the same number, based on the keyword.
+- Implement opt‑in / opt‑out flows or different “channels” (e.g. `NEWS`, `PROMO`, `SUPPORT`) on a single number.
+
+If you do **not** need keyword‑based routing and want to handle all incoming messages for a number with a single workflow, you can leave the keyword field empty (or follow your Infobip configuration strategy).
+
+For detailed information about how keywords work in Infobip, see the [official documentation](https://www.infobip.com/docs/numbers/keywords-and-actions#configure-keywords-keywords).
