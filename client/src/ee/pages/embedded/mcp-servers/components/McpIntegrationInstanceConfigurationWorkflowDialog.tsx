@@ -104,6 +104,8 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
 
     const selectedWorkflowIds = form.watch('selectedWorkflowIds');
 
+    const hasNoEligibleWorkflows = !!(currentIntegrationInstanceConfigurationId && eligibleWorkflows?.length === 0);
+
     const queryClient = useQueryClient();
 
     const invalidateAndClose = () => {
@@ -294,6 +296,13 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                             </>
                         )}
 
+                        {hasNoEligibleWorkflows && (
+                            <p className="text-sm text-content-neutral-secondary">
+                                No tool-eligible workflows found for this integration instance configuration. Only
+                                workflows with a New Workflow Call trigger can be added to an MCP server.
+                            </p>
+                        )}
+
                         {eligibleWorkflows && eligibleWorkflows.length > 0 && (
                             <FormField
                                 control={control}
@@ -348,7 +357,11 @@ const McpIntegrationInstanceConfigurationWorkflowDialog = ({
                                 <Button label="Cancel" type="button" variant="outline" />
                             </DialogClose>
 
-                            <Button label={isEditMode ? 'Update' : 'Add'} type="submit" />
+                            <Button
+                                disabled={!selectedWorkflowIds || selectedWorkflowIds.length === 0}
+                                label={isEditMode ? 'Update' : 'Add'}
+                                type="submit"
+                            />
                         </DialogFooter>
                     </form>
                 </Form>
