@@ -8,9 +8,9 @@
 package com.bytechef.ee.automation.ai.tool;
 
 import com.bytechef.ee.automation.ai.tool.exception.SkillToolErrorType;
-import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.exception.ExecutionException;
+import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

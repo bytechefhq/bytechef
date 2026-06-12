@@ -199,10 +199,6 @@ function App() {
             return ai.knowledgeBase.enabled;
         }
 
-        if (navItem.href === '/automation/ai') {
-            return edition === EditionType.EE;
-        }
-
         return true;
     });
 

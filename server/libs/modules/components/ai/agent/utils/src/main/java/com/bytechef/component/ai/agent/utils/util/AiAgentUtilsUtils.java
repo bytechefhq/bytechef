@@ -20,14 +20,31 @@ import static com.bytechef.component.ai.agent.utils.constant.AiAgentUtilsConstan
 import static com.bytechef.component.definition.ComponentDsl.option;
 
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.ee.platform.ai.skill.domain.AiSkill;
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.domain.AiSkill;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * @author Marko Kriskovic
+ * @author Ivica Cardic
  */
 public class AiAgentUtilsUtils {
+
+    private static final Pattern PERFORM_FUNCTION_PATTERN = Pattern.compile(
+        "(?:function\\s+perform\\s*\\(|def\\s+perform\\s*[\\s(]|perform\\s*<-\\s*function\\s*\\(|\\bperform\\s*\\(Map)");
+    private static final String SCRIPTS_DIRECTORY = "scripts/";
+
+    public static boolean isScriptEntry(String entryName) {
+        String normalized = entryName.replace('\\', '/');
+
+        return normalized.startsWith(SCRIPTS_DIRECTORY) || normalized.contains("/" + SCRIPTS_DIRECTORY);
+    }
+
+    public static boolean hasPerformFunction(String content) {
+        return PERFORM_FUNCTION_PATTERN.matcher(content)
+            .find();
+    }
 
     public static ActionDefinition.OptionsFunction<Long> buildSkillOptions(AiSkillFacade aiSkillFacade) {
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> {

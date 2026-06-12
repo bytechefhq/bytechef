@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.agent.utils;
 
-import com.bytechef.ee.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import com.bytechef.test.jsonasssert.JsonFileAssert;
 import java.util.List;
 import org.junit.jupiter.api.Test;

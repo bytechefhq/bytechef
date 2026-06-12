@@ -8,7 +8,7 @@ dependencies {
 
     implementation(project(":server:ee:libs:ai:ai-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
-    implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
