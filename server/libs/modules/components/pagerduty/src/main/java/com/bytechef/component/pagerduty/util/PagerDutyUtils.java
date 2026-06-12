@@ -18,7 +18,6 @@ package com.bytechef.component.pagerduty.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
-import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNEE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.ASSIGNMENTS;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.BODY;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.DETAILS;
@@ -33,6 +32,7 @@ import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.SERVI
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TITLE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.TYPE;
 import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.URGENCY;
+import static com.bytechef.component.pagerduty.constant.PagerDutyConstants.USER_ID;
 
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http.ResponseType;
@@ -108,7 +108,7 @@ public class PagerDutyUtils {
         if (assignments != null) {
             for (String assignment : assignments) {
                 assignees.add(
-                    Map.of(ASSIGNEE, Map.of(ID, assignment, TYPE, "user_reference")));
+                    Map.of(USER_ID, Map.of(ID, assignment, TYPE, "user_reference")));
             }
 
             body.put(ASSIGNMENTS, assignees);

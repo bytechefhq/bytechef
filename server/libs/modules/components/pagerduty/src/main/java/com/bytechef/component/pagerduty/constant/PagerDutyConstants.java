@@ -30,7 +30,6 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 public class PagerDutyConstants {
 
     public static final String API_KEY = "api_key";
-    public static final String ASSIGNEE = "assignee";
     public static final String ASSIGNMENTS = "assignments";
     public static final String BODY = "body";
     public static final String CONTENT = "content";
@@ -49,6 +48,7 @@ public class PagerDutyConstants {
     public static final String STATUS = "status";
     public static final String TITLE = "title";
     public static final String TYPE = "type";
+    public static final String USER_ID = "userId";
     public static final String URGENCY = "urgency";
 
     public static final ModifiableObjectProperty INCIDENT_OBJECT = object()
