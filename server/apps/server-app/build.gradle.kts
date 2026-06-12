@@ -131,6 +131,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-connection:automation-connection-service"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-graphql"))
     implementation(project(":server:libs:automation:automation-data-table:automation-data-table-service"))
+    implementation(project(":server:libs:platform:platform-data-table:platform-data-table-service"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-graphql"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-service"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-file-storage:platform-knowledge-base-file-storage-impl"))

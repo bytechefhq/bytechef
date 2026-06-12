@@ -20,13 +20,14 @@ import static com.bytechef.commons.util.EncodingUtils.urlDecodeBase64FromString;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.automation.data.table.configuration.domain.DataTableInfo;
-import com.bytechef.automation.data.table.configuration.service.DataTableService;
-import com.bytechef.automation.data.table.domain.ColumnSpec;
-import com.bytechef.automation.data.table.domain.ColumnType;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
@@ -47,10 +48,15 @@ public class DataTableGraphQlController {
 
     private final DataTableService dataTableService;
     private final EnvironmentService environmentService;
+    private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
-    public DataTableGraphQlController(DataTableService dataTableService, EnvironmentService environmentService) {
+    public DataTableGraphQlController(
+        DataTableService dataTableService, EnvironmentService environmentService,
+        WorkspaceDataTableFacade workspaceDataTableFacade) {
+
         this.dataTableService = dataTableService;
         this.environmentService = environmentService;
+        this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @MutationMapping
@@ -64,7 +70,7 @@ public class DataTableGraphQlController {
             .map(ColumnInput::toSpec)
             .toList();
 
-        dataTableService.createTable(
+        workspaceDataTableFacade.createTable(
             input.baseName(), input.description(), columnSpecs, input.workspaceId(), environment.ordinal());
 
         return true;
@@ -88,7 +94,7 @@ public class DataTableGraphQlController {
     public List<DataTable> dataTables(@Argument Long environmentId, @Argument Long workspaceId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 
-        List<DataTableInfo> dataTableInfos = dataTableService.listTables(workspaceId, environment.ordinal());
+        List<DataTableInfo> dataTableInfos = workspaceDataTableFacade.listTables(workspaceId, environment.ordinal());
 
         return dataTableInfos.stream()
             .map(info -> {

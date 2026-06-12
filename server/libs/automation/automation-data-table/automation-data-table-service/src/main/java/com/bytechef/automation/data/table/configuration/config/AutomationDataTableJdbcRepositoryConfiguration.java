@@ -22,6 +22,10 @@ import org.springframework.data.jdbc.repository.config.AbstractJdbcConfiguration
 import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 
 /**
+ * Enables the workspace &harr; data-table relation repository. Distinct simple name from the platform-side
+ * {@code PlatformDataTableJdbcRepositoryConfiguration} to avoid bean-name collisions when both modules are
+ * component-scanned in the same Spring context.
+ *
  * @author Ivica Cardic
  */
 @AutoConfiguration(afterName = "org.springframework.boot.data.jdbc.autoconfigure.DataJdbcRepositoriesAutoConfiguration")

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <!--
+        Data table moved from automation to platform. Workspace scoping is reintroduced through the
+        workspace_data_table relation table (mirrors workspace_knowledge_base), replacing the inlined
+        data_table.workspace_id column.
+
+        - Changeset -1 always runs (fresh DB: never created; existing DB: previously dropped by the
+          now-removed 20260508000001 migration).
+        - Changesets -2/-3 only run on existing DBs where data_table.workspace_id is present; on fresh
+          DBs the columnExists precondition marks them as ran without executing.
+    -->
+
+    <changeSet id="20260612000001-1" author="Ivica Cardic">
+        <createTable tableName="workspace_data_table">
+            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="data_table_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="workspace_id" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_data_table"
+            baseColumnNames="data_table_id"
+            constraintName="fk_workspace_data_table_data_table"
+            referencedTableName="data_table"
+            referencedColumnNames="id"
+            onDelete="CASCADE"/>
+
+        <addForeignKeyConstraint
+            baseTableName="workspace_data_table"
+            baseColumnNames="workspace_id"
+            constraintName="fk_workspace_data_table_workspace"
+            referencedTableName="workspace"
+            referencedColumnNames="id"/>
+
+        <addUniqueConstraint
+            constraintName="uk_workspace_data_table_workspace_table"
+            tableName="workspace_data_table"
+            columnNames="workspace_id,data_table_id"/>
+    </changeSet>
+
+    <changeSet id="20260612000001-2" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="data_table" columnName="workspace_id"/>
+        </preConditions>
+
+        <sql>
+            INSERT INTO workspace_data_table
+                (data_table_id, workspace_id, created_date, created_by, last_modified_date, last_modified_by, version)
+            SELECT dt.id, dt.workspace_id, dt.created_date, dt.created_by, dt.last_modified_date, dt.last_modified_by, 0
+            FROM data_table dt
+            WHERE dt.workspace_id IS NOT NULL
+        </sql>
+    </changeSet>
+
+    <changeSet id="20260612000001-3" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <columnExists tableName="data_table" columnName="workspace_id"/>
+        </preConditions>
+
+        <dropForeignKeyConstraint baseTableName="data_table" constraintName="fk_data_table_workspace"/>
+
+        <dropColumn tableName="data_table" columnName="workspace_id"/>
+    </changeSet>
+</databaseChangeLog>
