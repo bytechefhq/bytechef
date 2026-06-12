@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD_PROPERTY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.util.InfobipUtils.getWebhookEnableOutput;
 import static com.bytechef.component.infobip.util.InfobipUtils.unsubscribeWebhook;
@@ -46,13 +47,11 @@ public class InfobipNewWhatsAppMessageTrigger {
         .properties(
             string(NUMBER)
                 .label("Number")
+                .description("Number to monitor for new WhatsApp messages.")
                 .required(true),
-            string(KEYWORD)
-                .label("Keyword"))
+            KEYWORD_PROPERTY)
         .output()
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/infobip_v1#new-whatsapp-message")
+        .help("", "https://docs.bytechef.io/reference/components/infobip_v1#new-whatsapp-message")
         .webhookEnable(InfobipNewWhatsAppMessageTrigger::webhookEnable)
         .webhookDisable(InfobipNewWhatsAppMessageTrigger::webhookDisable)
         .webhookRequest(InfobipNewWhatsAppMessageTrigger::dynamicWebhookRequest);

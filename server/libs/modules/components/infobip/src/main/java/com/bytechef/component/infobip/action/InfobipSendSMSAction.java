@@ -53,7 +53,7 @@ public class InfobipSendSMSAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("sendSMS")
         .title("Send SMS")
-        .description("Send a new SMS message")
+        .description("Send a new SMS message to one or more recipients.")
         .properties(
             string(SENDER)
                 .label("From")

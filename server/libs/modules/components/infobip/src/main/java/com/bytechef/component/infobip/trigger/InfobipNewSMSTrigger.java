@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.infobip.constant.InfobipConstants.CONFIGURATION_KEY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD;
+import static com.bytechef.component.infobip.constant.InfobipConstants.KEYWORD_PROPERTY;
 import static com.bytechef.component.infobip.constant.InfobipConstants.NUMBER;
 import static com.bytechef.component.infobip.util.InfobipUtils.getWebhookEnableOutput;
 import static com.bytechef.component.infobip.util.InfobipUtils.unsubscribeWebhook;
@@ -46,11 +47,11 @@ public class InfobipNewSMSTrigger {
         .properties(
             string(NUMBER)
                 .label("Number")
-                .required(true))
+                .description("Number to monitor for new SMS messages.")
+                .required(true),
+            KEYWORD_PROPERTY)
         .output()
-        .help(
-            "",
-            "https://docs.bytechef.io/reference/components/infobip_v1#new-sms-message")
+        .help("", "https://docs.bytechef.io/reference/components/infobip_v1#new-sms-message")
         .webhookEnable(InfobipNewSMSTrigger::webhookEnable)
         .webhookDisable(InfobipNewSMSTrigger::webhookDisable)
         .webhookRequest(InfobipNewSMSTrigger::webhookRequest);
