@@ -168,7 +168,6 @@ function App() {
 
     const ff_1023 = useFeatureFlagsStore()('ff-1023');
     const ff_1779 = useFeatureFlagsStore()('ff-1779');
-    const ff_2445 = useFeatureFlagsStore()('ff-2445');
     const ff_2446 = useFeatureFlagsStore()('ff-2446');
     const ff_2311 = useFeatureFlagsStore()('ff-2311');
     const ff_2396 = useFeatureFlagsStore()('ff-2396');
@@ -186,10 +185,6 @@ function App() {
 
         if (navItem.href === '/automation/api-platform') {
             return ff_1023;
-        }
-
-        if (navItem.href === '/automation/mcp-servers') {
-            return ff_2445;
         }
 
         if (navItem.href === '/automation/chat') {
