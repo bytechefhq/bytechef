@@ -75,7 +75,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     className={twMerge(
                         leadingIcon && 'relative rounded-md',
                         trailingAction &&
-                            'flex rounded-md border border-input focus-within:ring-2 focus-within:ring-blue-500'
+                            'flex rounded-md border border-input shadow-xs focus-within:ring-2 focus-within:ring-blue-500'
                     )}
                 >
                     {leadingIcon && (
