@@ -2537,6 +2537,10 @@ components:
           description: "If the property should be visible or not."
           type: "boolean"
           default: false
+        metadata:
+          description: "Key-value map of metadata."
+          type: "object"
+          additionalProperties: true
         name:
           description: "The property name."
           type: "string"
