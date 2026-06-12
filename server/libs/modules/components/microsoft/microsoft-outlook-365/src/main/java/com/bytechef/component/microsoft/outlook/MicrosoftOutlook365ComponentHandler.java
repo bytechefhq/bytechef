@@ -33,6 +33,7 @@ import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365ReplyT
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SearchEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SendEmailAction;
 import com.bytechef.component.microsoft.outlook.connection.MicrosoftOutlook365Connection;
+import com.bytechef.component.microsoft.outlook.trigger.MicrosoftOutlook365NewEmailBatchTrigger;
 import com.bytechef.component.microsoft.outlook.trigger.MicrosoftOutlook365NewEmailTrigger;
 import com.google.auto.service.AutoService;
 
@@ -76,7 +77,9 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             tool(MicrosoftOutlook365ReplyToEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION))
-        .triggers(MicrosoftOutlook365NewEmailTrigger.TRIGGER_DEFINITION)
+        .triggers(
+            MicrosoftOutlook365NewEmailBatchTrigger.TRIGGER_DEFINITION,
+            MicrosoftOutlook365NewEmailTrigger.TRIGGER_DEFINITION)
         .version(1);
 
     @Override

@@ -30,22 +30,30 @@ import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.FULL_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ID;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.NAME;
+import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.ODATA_NEXT_LINK;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SIMPLE_MESSAGE_OUTPUT_PROPERTY;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.SUBJECT;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.TO_RECIPIENTS;
 import static com.bytechef.component.microsoft.outlook.constant.MicrosoftOutlook365Constants.VALUE;
 import static com.bytechef.component.microsoft.outlook.definition.Format.SIMPLE;
+import static com.bytechef.microsoft.commons.MicrosoftConstants.LAST_TIME_CHECKED;
+import static com.bytechef.microsoft.commons.MicrosoftUtils.getItemsFromNextPage;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableObjectProperty;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.FileEntry;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TriggerContext;
+import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.microsoft.outlook.definition.Format;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -189,6 +197,55 @@ public class MicrosoftOutlook365Utils {
 
     public static ModifiableObjectProperty getMessageOutputProperty(Format format) {
         return format.equals(SIMPLE) ? SIMPLE_MESSAGE_OUTPUT_PROPERTY : FULL_MESSAGE_OUTPUT_PROPERTY;
+    }
+
+    public static PollOutput getPollOutput(
+        Parameters inputParameters, Parameters closureParameters, TriggerContext context) {
+
+        ZoneId zoneId = ZoneId.systemDefault();
+
+        LocalDateTime now = LocalDateTime.now(zoneId);
+
+        LocalDateTime startDate = closureParameters.getLocalDateTime(
+            LAST_TIME_CHECKED, context.isEditorEnvironment() ? now.minusHours(3) : now);
+
+        List<Map<?, ?>> emails = new ArrayList<>();
+
+        String formattedStartDate = startDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'")
+            .withZone(zoneId));
+
+        Map<String, Object> body = context
+            .http(http -> http.get("/me/mailFolders/Inbox/messages"))
+            .queryParameters(
+                "$filter", "isRead eq false and receivedDateTime ge " + formattedStartDate,
+                "$orderby", "receivedDateTime asc")
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+
+        if (body.get(VALUE) instanceof List<?> list) {
+            for (Object item : list) {
+                if (item instanceof Map<?, ?> map) {
+                    emails.add(map);
+                }
+            }
+        }
+
+        emails.addAll(getItemsFromNextPage((String) body.get(ODATA_NEXT_LINK), context));
+
+        Format format = inputParameters.getRequired(FORMAT, Format.class);
+
+        if (format.equals(SIMPLE)) {
+            List<SimpleMessage> simpleMessages = new ArrayList<>();
+
+            for (Map<?, ?> email : emails) {
+                simpleMessages.add(createSimpleMessage(context, email));
+            }
+
+            return new PollOutput(simpleMessages, Map.of(LAST_TIME_CHECKED, now), false);
+        } else {
+            return new PollOutput(emails, Map.of(LAST_TIME_CHECKED, now), false);
+        }
     }
 
     @SuppressFBWarnings("EI")

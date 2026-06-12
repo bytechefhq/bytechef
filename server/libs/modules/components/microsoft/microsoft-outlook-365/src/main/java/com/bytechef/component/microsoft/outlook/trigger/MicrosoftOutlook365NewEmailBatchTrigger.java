@@ -28,21 +28,27 @@ import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
 import com.bytechef.microsoft.commons.MicrosoftUtils;
 
 /**
+ *
+ * Polling trigger that returns a batch (list) of all new email messages since the last check. Use this when you want to
+ * process multiple emails together in a single workflow run.
+ *
  * @author Monika Kušter
  */
-public class MicrosoftOutlook365NewEmailTrigger {
+public class MicrosoftOutlook365NewEmailBatchTrigger {
 
-    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmail")
-        .title("New Email")
-        .description("Triggers a new workflow run for each new email received in your Inbox.")
-        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#new-email")
+    public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newEmailBatch")
+        .title("New Email Batch")
+        .description(
+            "Periodically triggers a workflow run and outputs a list of all new emails received since the last check.")
+        .help("", "https://docs.bytechef.io/reference/components/microsoft-outlook-365_v1#new-email-batch")
         .type(TriggerType.POLLING)
         .properties(FORMAT_PROPERTY)
-        .output(MicrosoftOutlook365Utils::getMessageOutput)
-        .poll(MicrosoftOutlook365NewEmailTrigger::poll)
-        .processErrorResponse(MicrosoftUtils::processErrorResponse);
+        .output(MicrosoftOutlook365Utils::getArrayMessageOutput)
+        .poll(MicrosoftOutlook365NewEmailBatchTrigger::poll)
+        .processErrorResponse(MicrosoftUtils::processErrorResponse)
+        .batch(true);
 
-    private MicrosoftOutlook365NewEmailTrigger() {
+    private MicrosoftOutlook365NewEmailBatchTrigger() {
     }
 
     protected static PollOutput poll(
