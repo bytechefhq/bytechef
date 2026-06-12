@@ -25,19 +25,16 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.microsoft.outlook.util.MicrosoftOutlook365Utils;
-import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
  * @author Monika Kušter
  */
-@ExtendWith(MockContextSetupExtension.class)
-class MicrosoftOutlook365NewEmailTriggerTest {
+class MicrosoftOutlook365NewEmailBatchTriggerTest {
 
     private final ArgumentCaptor<TriggerContext> contextArgumentCaptor = forClass(TriggerContext.class);
     private final TriggerContext mockedContext = mock(TriggerContext.class);
@@ -56,7 +53,7 @@ class MicrosoftOutlook365NewEmailTriggerTest {
                 contextArgumentCaptor.capture()))
                 .thenReturn(pollOutput);
 
-            PollOutput result = MicrosoftOutlook365NewEmailTrigger.poll(
+            PollOutput result = MicrosoftOutlook365NewEmailBatchTrigger.poll(
                 mockedParameters, mockedParameters, mockedParameters, mockedContext);
 
             assertEquals(pollOutput, result);
