@@ -10,20 +10,24 @@ import {
 } from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 type UseWorkflowExecutionsReturnType = {
     activeTab: TabValueType;
     deepestFailedExecution: {execution: TaskExecution | TriggerExecution; path: string[]} | null;
     dialogOpen: boolean;
+    handleBreadcrumbNavigate: (index: number) => void;
     handleExecutionClick: (taskExecution: TaskExecution | TriggerExecution) => void;
+    handleSeeExecutions: (childJob: Job) => void;
     isTriggerExecution: boolean;
     job?: Job;
     jobFailedWithNoExecutions: boolean;
     jobFailureError: ExecutionError;
+    rootJob?: Job;
     selectedExecution?: TaskExecution | TriggerExecution;
     setActiveTab: (activeTab: TabValueType) => void;
     setDialogOpen: (open: boolean) => void;
+    subflowStack: Array<{job: Job; label: string}>;
     taskExecutions: TaskExecution[];
     triggerExecution?: TriggerExecution;
 };
@@ -38,14 +42,17 @@ const useWorkflowExecutions = ({
     const [selectedExecution, setSelectedExecution] = useState<TaskExecution | TriggerExecution | undefined>(
         getInitialSelectedItem(workflowTestExecution)
     );
+    const [subflowStack, setSubflowStack] = useState<Array<{job: Job; label: string}>>([]);
 
     const {job, triggerExecution} = workflowTestExecution ?? {};
 
-    const currentWorkflowId = job?.workflowId;
+    const activeJob = subflowStack.length > 0 ? subflowStack[subflowStack.length - 1].job : job;
+
+    const currentWorkflowId = activeJob?.workflowId;
 
     const jobIdRef = useRef<string | undefined>(undefined);
 
-    const taskExecutions = useMemo(() => job?.taskExecutions || [], [job?.taskExecutions]);
+    const taskExecutions = useMemo(() => activeJob?.taskExecutions || [], [activeJob?.taskExecutions]);
 
     const deepestFailedExecution = useMemo(() => {
         if (triggerExecution) {
@@ -74,28 +81,40 @@ const useWorkflowExecutions = ({
         return null;
     }, [taskExecutions, triggerExecution]);
 
-    const jobFailedWithNoExecutions = !taskExecutions.length && job?.status === JobStatusEnum.Failed;
-    const jobFailureError = job?.error ?? {
+    const jobFailedWithNoExecutions = !taskExecutions.length && activeJob?.status === JobStatusEnum.Failed;
+
+    const jobFailureError = activeJob?.error ?? {
         message: 'Workflow execution failed before any executions were created.',
         stackTrace: [],
     };
 
-    const handleExecutionClick = (taskExecution: TaskExecution | TriggerExecution) => {
+    const handleBreadcrumbNavigate = useCallback((index: number) => {
+        setSubflowStack((prev) => prev.slice(0, index));
+    }, []);
+
+    const handleExecutionClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'output');
 
         setSelectedExecution(taskExecution);
-    };
+    }, []);
+
+    const handleSeeExecutions = useCallback((childJob: Job) => {
+        const label = childJob.label ?? 'Subflow';
+
+        setSubflowStack((prev) => [...prev, {job: childJob, label}]);
+    }, []);
 
     useEffect(() => {
         setSelectedExecution(getInitialSelectedItem(workflowTestExecution));
 
         setActiveTab('output');
+        setSubflowStack([]);
     }, [workflowTestExecution]);
 
     useEffect(() => {
         const errorItem = getErrorItem(workflowTestExecution);
 
-        if (!errorItem || !job) {
+        if (!errorItem || !activeJob) {
             useCopilotStore.getState().setWorkflowExecutionError(undefined);
 
             return;
@@ -107,53 +126,57 @@ const useWorkflowExecutions = ({
             useCopilotStore.getState().setWorkflowExecutionError({
                 errorMessage: error.message,
                 stackTrace: error.stackTrace,
-                title: title,
+                title,
                 workflowId: currentWorkflowId,
             });
-        } else if (jobFailedWithNoExecutions && job.error && currentWorkflowId) {
+        } else if (jobFailedWithNoExecutions && activeJob.error && currentWorkflowId) {
             useCopilotStore.getState().setWorkflowExecutionError({
-                errorMessage: job.error.message,
-                stackTrace: job.error.stackTrace,
+                errorMessage: activeJob.error.message,
+                stackTrace: activeJob.error.stackTrace,
                 title: 'Workflow',
                 workflowId: currentWorkflowId,
             });
         }
-    }, [workflowTestExecution, currentWorkflowId, jobFailedWithNoExecutions, job]);
+    }, [workflowTestExecution, currentWorkflowId, jobFailedWithNoExecutions, activeJob]);
 
     useEffect(() => {
-        if (!job?.id || job.id === jobIdRef.current) {
+        if (!activeJob?.id || activeJob.id === jobIdRef.current) {
             return;
         }
 
-        jobIdRef.current = job.id;
+        jobIdRef.current = activeJob.id;
 
-        const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
+        const hasNoTaskExecutions = !activeJob.taskExecutions || activeJob.taskExecutions.length === 0;
 
-        const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+        const jobFailedWithNoExecutions = hasNoTaskExecutions && activeJob.status === JobStatusEnum.Failed;
 
         const newActiveTab = jobFailedWithNoExecutions || deepestFailedExecution?.execution.error ? 'error' : 'output';
 
         setActiveTab(newActiveTab);
 
         const newSelectedExecution =
-            deepestFailedExecution?.execution || triggerExecution || job.taskExecutions?.[0] || undefined;
+            deepestFailedExecution?.execution || triggerExecution || activeJob.taskExecutions?.[0] || undefined;
 
         setSelectedExecution(newSelectedExecution);
-    }, [deepestFailedExecution, job, triggerExecution]);
+    }, [deepestFailedExecution, activeJob, triggerExecution]);
 
     return {
         activeTab,
         deepestFailedExecution,
         dialogOpen,
+        handleBreadcrumbNavigate,
         handleExecutionClick,
+        handleSeeExecutions,
         isTriggerExecution: selectedExecution?.id === triggerExecution?.id,
-        job,
+        job: activeJob,
         jobFailedWithNoExecutions,
         jobFailureError,
+        rootJob: job,
         selectedExecution,
         setActiveTab,
         setDialogOpen,
-        taskExecutions: job?.taskExecutions || [],
+        subflowStack,
+        taskExecutions,
         triggerExecution,
     };
 };
