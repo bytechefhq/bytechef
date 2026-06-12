@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
 import {InfoIcon, Undo2Icon, XIcon} from 'lucide-react';
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 
@@ -14,15 +14,7 @@ const SubflowBanner = ({className}: {className?: string}) => {
     const fromSubflowParam = searchParams.get('fromSubflow');
     const parentProjectWorkflowIdParam = searchParams.get('parentProjectWorkflowId');
 
-    useEffect(() => {
-        setDismissed(false);
-    }, [projectWorkflowId]);
-
-    if (fromSubflowParam !== 'true' || dismissed) {
-        return null;
-    }
-
-    const handleReturnClick = () => {
+    const handleReturnClick = useCallback(() => {
         if (projectId && parentProjectWorkflowIdParam) {
             const newSearchParams = new URLSearchParams(searchParams.toString());
 
@@ -43,6 +35,7 @@ const SubflowBanner = ({className}: {className?: string}) => {
             } else {
                 newSearchParams.delete('fromSubflow');
                 newSearchParams.delete('parentProjectWorkflowId');
+                newSearchParams.set('restoreExecutionPanel', 'true');
             }
 
             navigate(
@@ -51,7 +44,17 @@ const SubflowBanner = ({className}: {className?: string}) => {
         } else {
             navigate(-1);
         }
-    };
+    }, [navigate, parentProjectWorkflowIdParam, projectId, searchParams]);
+
+    const handleDismiss = useCallback(() => setDismissed(true), []);
+
+    useEffect(() => {
+        setDismissed(false);
+    }, [projectWorkflowId]);
+
+    if (fromSubflowParam !== 'true' || dismissed) {
+        return null;
+    }
 
     return (
         <div
@@ -79,7 +82,7 @@ const SubflowBanner = ({className}: {className?: string}) => {
                 <Button
                     className="active:text-content-primary opacity-50 hover:bg-transparent hover:opacity-100 active:bg-transparent"
                     icon={<XIcon />}
-                    onClick={() => setDismissed(true)}
+                    onClick={handleDismiss}
                     size="iconXs"
                     variant="ghost"
                 />
