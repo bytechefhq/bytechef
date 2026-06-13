@@ -52,7 +52,8 @@ public final class GeminiConstants {
         Arrays.stream(GoogleGenAiChatModel.ChatModel.values())
             .collect(
                 Collectors.toMap(
-                    GoogleGenAiChatModel.ChatModel::getValue, GoogleGenAiChatModel.ChatModel::getValue)));
+                    GoogleGenAiChatModel.ChatModel::getValue, GoogleGenAiChatModel.ChatModel::getValue,
+                    (existing, replacement) -> existing)));
     public static final ComponentDsl.ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
