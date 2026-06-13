@@ -1,20 +1,11 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.platform.connection.audit;
+package com.bytechef.ee.platform.connection.audit;
 
 /**
  * Audit event types emitted through {@link ConnectionAuditPublisher}.
@@ -32,13 +23,15 @@ package com.bytechef.platform.connection.audit;
  * annotations or {@link ConnectionAuditPublisher#publish} directly; this contract is convention-enforced rather than
  * type-checked, so changes must be applied at every emitter.
  *
+ * @version ee
+ *
  * @author Ivica Cardic
  */
 public enum ConnectionAuditEvent {
 
     /**
      * A new connection was persisted. Payload: {@code visibility} (final persisted {@code ResourceVisibility.name()},
-     * reflecting any CE force-WORKSPACE / Embedded force-PRIVATE rewrite).
+     * reflecting any CE/Embedded force-PRIVATE downgrade).
      */
     CONNECTION_CREATED(false),
 
@@ -57,9 +50,10 @@ public enum ConnectionAuditEvent {
      * A connection's reach was changed. Payload: {@code toVisibility} ({@code ResourceVisibility.name()}).
      *
      * <p>
-     * A single event type covers both directions — visibility moves freely between the rungs a resource type supports,
-     * so "which direction" is a property of the payload rather than of the event type. The enum is consumed by name,
-     * never by ordinal.
+     * Replaces the separate CONNECTION_PROMOTED / CONNECTION_DEMOTED pair, which encoded a one-way promote-from-private
+     * model that no longer exists — visibility now moves freely between the rungs a resource type supports, so "which
+     * direction" is a property of the payload rather than of the event type. Historical rows carrying the old names
+     * remain readable; the enum is consumed by name, never by ordinal.
      *
      * <p>
      * Marked {@code strictAudit} — this event can narrow reach, and a missing trail would obscure who lost access to a

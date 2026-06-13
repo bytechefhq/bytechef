@@ -32,10 +32,9 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.connection.audit.ConnectionAuditEvent;
-import com.bytechef.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
+import com.bytechef.platform.connection.event.ConnectionWorkflowPausedEvent;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import java.util.List;
@@ -45,6 +44,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -53,7 +53,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class ProjectDeploymentJobPrincipalAccessorTest {
 
     @Mock
-    private ConnectionAuditPublisher connectionAuditPublisher;
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
     private ConnectionService connectionService;
@@ -70,7 +70,7 @@ class ProjectDeploymentJobPrincipalAccessorTest {
     @Test
     void testValidateConnectionsForJobWhenAllActiveDoesNothing() {
         ProjectDeploymentJobPrincipalAccessor accessor = new ProjectDeploymentJobPrincipalAccessor(
-            connectionAuditPublisher, connectionService, projectDeploymentService, projectDeploymentWorkflowService,
+            applicationEventPublisher, connectionService, projectDeploymentService, projectDeploymentWorkflowService,
             projectWorkflowService);
 
         long jobPrincipalId = 1L;
@@ -100,14 +100,14 @@ class ProjectDeploymentJobPrincipalAccessorTest {
 
         assertThat(captor.getValue()).containsExactlyInAnyOrder(100L, 101L);
 
-        verify(connectionAuditPublisher, never()).publish(any(), any(Long.class), any());
+        verify(applicationEventPublisher, never()).publishEvent(any());
         verify(connectionService, never()).validateConnectionsActive(anyList());
     }
 
     @Test
     void testValidateConnectionsForJobWhenInactivePublishesAuditAndThrows() {
         ProjectDeploymentJobPrincipalAccessor accessor = new ProjectDeploymentJobPrincipalAccessor(
-            connectionAuditPublisher, connectionService, projectDeploymentService, projectDeploymentWorkflowService,
+            applicationEventPublisher, connectionService, projectDeploymentService, projectDeploymentWorkflowService,
             projectWorkflowService);
 
         long jobPrincipalId = 1L;
@@ -140,11 +140,12 @@ class ProjectDeploymentJobPrincipalAccessorTest {
         assertThatThrownBy(() -> accessor.validateConnectionsForJob(jobPrincipalId, workflowUuid))
             .isInstanceOf(ConfigurationException.class);
 
-        verify(connectionAuditPublisher).publish(
-            eq(ConnectionAuditEvent.WORKFLOW_PAUSED), eq(100L),
-            eq(Map.of(
-                "projectDeploymentId", jobPrincipalId,
-                "workflowId", workflowId,
-                "connectionStatus", "PENDING_REASSIGNMENT")));
+        verify(applicationEventPublisher).publishEvent(
+            eq(new ConnectionWorkflowPausedEvent(
+                100L,
+                Map.of(
+                    "projectDeploymentId", jobPrincipalId,
+                    "workflowId", workflowId,
+                    "connectionStatus", "PENDING_REASSIGNMENT"))));
     }
 }

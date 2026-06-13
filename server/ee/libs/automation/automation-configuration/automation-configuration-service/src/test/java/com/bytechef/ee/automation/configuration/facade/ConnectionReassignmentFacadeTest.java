@@ -29,9 +29,9 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade.AffectedWorkflow;
 import com.bytechef.ee.automation.configuration.facade.ConnectionReassignmentFacade.ConnectionReassignmentItem;
+import com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent;
+import com.bytechef.ee.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.exception.ConfigurationException;
-import com.bytechef.platform.connection.audit.ConnectionAuditEvent;
-import com.bytechef.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.service.ConnectionService;

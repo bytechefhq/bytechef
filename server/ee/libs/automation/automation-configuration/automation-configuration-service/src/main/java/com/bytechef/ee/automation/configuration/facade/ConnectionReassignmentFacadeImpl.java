@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_REASSIGNED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_REASSIGNED;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -18,12 +18,12 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO;
 import com.bytechef.ee.automation.configuration.dto.BulkReassignResultDTO.BulkReassignFailureDTO;
+import com.bytechef.ee.platform.audit.AuditCorrelation;
+import com.bytechef.ee.platform.connection.audit.AuditConnection;
+import com.bytechef.ee.platform.connection.audit.AuditConnection.AuditData;
+import com.bytechef.ee.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.connection.audit.AuditConnection;
-import com.bytechef.platform.connection.audit.AuditConnection.AuditData;
-import com.bytechef.platform.connection.audit.AuditCorrelation;
-import com.bytechef.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;

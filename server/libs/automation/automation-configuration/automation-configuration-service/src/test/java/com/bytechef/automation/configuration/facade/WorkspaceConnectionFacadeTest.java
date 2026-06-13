@@ -36,6 +36,8 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.event.ConnectionCreatedEvent;
+import com.bytechef.platform.connection.event.ConnectionDeletedEvent;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -54,6 +56,7 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
@@ -63,6 +66,9 @@ class WorkspaceConnectionFacadeTest {
 
     private static final long WORKSPACE_ID = 1L;
     private static final String CURRENT_USER = "admin@example.com";
+
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Mock
     private ConnectionFacade connectionFacade;
@@ -104,9 +110,9 @@ class WorkspaceConnectionFacadeTest {
         when(emptyProvider.getIfAvailable()).thenReturn(null);
 
         workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
-            connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, emptyProvider,
-            projectDeploymentWorkflowService, projectService, userService, workflowTestConfigurationService,
-            workspaceConnectionService, workspaceFacade);
+            applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
+            resourceVisibilityResolver, emptyProvider, projectDeploymentWorkflowService, projectService, userService,
+            workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
     }
 
     @Test
@@ -159,9 +165,9 @@ class WorkspaceConnectionFacadeTest {
             when(provider.getIfAvailable()).thenReturn(registry);
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
-                connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                projectDeploymentWorkflowService, projectService, userService, workflowTestConfigurationService,
-                workspaceConnectionService, workspaceFacade);
+                applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
+                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -184,6 +190,11 @@ class WorkspaceConnectionFacadeTest {
                 .tag("visibility", "WORKSPACE")
                 .counter()
                 .count()).isEqualTo(1.0);
+
+            // CE no longer audits directly — it publishes a plain domain event that an EE listener audits.
+            // The event carries the PERSISTED visibility (WORKSPACE here), matching the metric tag.
+            verify(applicationEventPublisher)
+                .publishEvent(new ConnectionCreatedEvent(42L, ResourceVisibility.WORKSPACE));
         }
     }
 
@@ -204,9 +215,9 @@ class WorkspaceConnectionFacadeTest {
             when(provider.getIfAvailable()).thenReturn(registry);
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
-                connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                projectDeploymentWorkflowService, projectService, userService, workflowTestConfigurationService,
-                workspaceConnectionService, workspaceFacade);
+                applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
+                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -246,9 +257,9 @@ class WorkspaceConnectionFacadeTest {
             when(provider.getIfAvailable()).thenReturn(registry);
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
-                connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver, provider,
-                projectDeploymentWorkflowService, projectService, userService, workflowTestConfigurationService,
-                workspaceConnectionService, workspaceFacade);
+                applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
+                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -323,6 +334,7 @@ class WorkspaceConnectionFacadeTest {
 
         verify(workspaceConnectionService, never()).deleteWorkspaceConnection(10L);
         verify(connectionFacade, never()).delete(10L);
+        verify(applicationEventPublisher, never()).publishEvent(any(ConnectionDeletedEvent.class));
     }
 
     @Test
@@ -342,6 +354,9 @@ class WorkspaceConnectionFacadeTest {
             .deleteWorkspaceConnection(10L);
         inOrder.verify(connectionFacade)
             .delete(10L);
+
+        // CE no longer audits directly — it publishes a plain domain event that an EE listener audits.
+        verify(applicationEventPublisher).publishEvent(new ConnectionDeletedEvent(10L));
     }
 
     /**
@@ -401,9 +416,9 @@ class WorkspaceConnectionFacadeTest {
                 });
 
             WorkspaceConnectionFacadeImpl workspaceFacadeWithRealChain = new WorkspaceConnectionFacadeImpl(
-                realConnectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver,
-                emptyProvider, projectDeploymentWorkflowService, projectService, userService,
-                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                applicationEventPublisher, realConnectionFacade, connectionLifecycleFacade, connectionService,
+                resourceVisibilityResolver, emptyProvider, projectDeploymentWorkflowService, projectService,
+                userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             ConnectionDTO requestDto = ConnectionDTO.builder()
                 .componentName("dummy")

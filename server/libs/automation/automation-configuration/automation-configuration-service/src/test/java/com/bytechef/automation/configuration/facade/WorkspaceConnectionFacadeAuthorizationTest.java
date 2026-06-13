@@ -43,6 +43,11 @@ class WorkspaceConnectionFacadeAuthorizationTest {
         assertAdminOnly("disconnectConnection");
     }
 
+    @Test
+    void testRegisterExistingRequiresAdmin() {
+        assertAdminOnly("registerExisting");
+    }
+
     private static void assertAdminOnly(String methodName) {
         PreAuthorize preAuthorize = findMethod(methodName).getAnnotation(PreAuthorize.class);
 

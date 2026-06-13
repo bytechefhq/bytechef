@@ -46,9 +46,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
-import com.bytechef.platform.connection.audit.ConnectionAuditEvent;
-import com.bytechef.platform.connection.audit.ConnectionAuditPublisher;
 import com.bytechef.platform.connection.domain.Connection;
+import com.bytechef.platform.connection.event.ConnectionWorkflowPausedEvent;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
@@ -72,6 +71,7 @@ import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -87,7 +87,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     private static final Logger log = LoggerFactory.getLogger(ProjectDeploymentFacadeImpl.class);
 
-    private final ConnectionAuditPublisher connectionAuditPublisher;
+    private final ApplicationEventPublisher applicationEventPublisher;
     private final ConnectionService connectionService;
     private final Evaluator evaluator;
     private final EnvironmentService environmentService;
@@ -109,7 +109,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @SuppressFBWarnings("EI")
     public ProjectDeploymentFacadeImpl(
-        ConnectionAuditPublisher connectionAuditPublisher, ConnectionService connectionService, Evaluator evaluator,
+        ApplicationEventPublisher applicationEventPublisher, ConnectionService connectionService, Evaluator evaluator,
         EnvironmentService environmentService, PrincipalJobFacade principalJobFacade,
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
         ProjectDeploymentService projectDeploymentService,
@@ -119,7 +119,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         TriggerLifecycleFacade triggerLifecycleFacade, ApplicationProperties applicationProperties,
         ComponentConnectionFacade componentConnectionFacade, WorkflowService workflowService) {
 
-        this.connectionAuditPublisher = connectionAuditPublisher;
+        this.applicationEventPublisher = applicationEventPublisher;
         this.connectionService = connectionService;
         this.evaluator = evaluator;
         this.environmentService = environmentService;
@@ -213,13 +213,14 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
         if (!inactiveConnections.isEmpty()) {
             for (Connection connection : inactiveConnections) {
-                connectionAuditPublisher.publish(
-                    ConnectionAuditEvent.WORKFLOW_PAUSED, connection.getId(),
-                    Map.of(
-                        "projectDeploymentId", id,
-                        "workflowId", workflowId,
-                        "connectionStatus", connection.getStatus()
-                            .name()));
+                applicationEventPublisher.publishEvent(
+                    new ConnectionWorkflowPausedEvent(
+                        connection.getId(),
+                        Map.of(
+                            "projectDeploymentId", id,
+                            "workflowId", workflowId,
+                            "connectionStatus", connection.getStatus()
+                                .name())));
             }
 
             connectionService.validateConnectionsActive(connectionIds);

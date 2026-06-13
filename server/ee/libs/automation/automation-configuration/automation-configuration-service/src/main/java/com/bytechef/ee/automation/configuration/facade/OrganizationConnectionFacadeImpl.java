@@ -7,14 +7,14 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_CREATED;
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_DELETED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_CREATED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_DELETED;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.platform.connection.audit.AuditConnection;
+import com.bytechef.ee.platform.connection.audit.AuditConnection.AuditData;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.connection.audit.AuditConnection;
-import com.bytechef.platform.connection.audit.AuditConnection.AuditData;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;

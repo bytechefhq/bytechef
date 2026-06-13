@@ -16,9 +16,6 @@
 
 package com.bytechef.automation.configuration.facade;
 
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_CREATED;
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_DELETED;
-
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
@@ -30,11 +27,13 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.audit.AuditConnection;
-import com.bytechef.platform.connection.audit.AuditConnection.AuditData;
+import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
+import com.bytechef.platform.connection.event.ConnectionCreatedEvent;
+import com.bytechef.platform.connection.event.ConnectionDeletedEvent;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
+import com.bytechef.platform.connection.service.ConnectionCredentialStoreType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
@@ -52,6 +51,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,6 +66,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     private static final Logger log = LoggerFactory.getLogger(WorkspaceConnectionFacadeImpl.class);
 
+    protected final ApplicationEventPublisher applicationEventPublisher;
     protected final ConnectionFacade connectionFacade;
     protected final ConnectionLifecycleFacade connectionLifecycleFacade;
     protected final ConnectionService connectionService;
@@ -82,13 +83,15 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         "CT_CONSTRUCTOR_THROW", "EI", "EI2"
     })
     public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ResourceVisibilityResolver resourceVisibilityResolver,
+        ApplicationEventPublisher applicationEventPublisher, ConnectionFacade connectionFacade,
+        ConnectionLifecycleFacade connectionLifecycleFacade, ConnectionService connectionService,
+        ResourceVisibilityResolver resourceVisibilityResolver,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         UserService userService, WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade) {
 
+        this.applicationEventPublisher = applicationEventPublisher;
         this.connectionFacade = connectionFacade;
         this.connectionLifecycleFacade = connectionLifecycleFacade;
         this.connectionService = connectionService;
@@ -115,14 +118,6 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
-    @AuditConnection(
-        event = CONNECTION_CREATED, connectionId = "#result",
-        data = @AuditData(
-            key = "visibility",
-            // Read the PERSISTED visibility, not the request body. ConnectionFacadeImpl.create()
-            // rewrites visibility to PRIVATE in CE and embedded paths; if we used
-            // #connectionDTO.visibility() here the audit record would disagree with the row in the DB.
-            value = "@connectionService.getConnection(#result).getVisibility().name()"))
     public long create(long workspaceId, ConnectionDTO connectionDTO) {
         ResourceVisibility requestedVisibility = connectionDTO.visibility();
 
@@ -150,11 +145,30 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
         incrementCreateCounter(connection.visibility());
 
+        // Plain CE domain event. Auditing is an EE-only concern: an EE @TransactionalEventListener
+        // translates this into an audit record after commit. CE only emits the signal.
+        applicationEventPublisher.publishEvent(new ConnectionCreatedEvent(connectionId, connection.visibility()));
+
         return connectionId;
     }
 
     @Override
-    @AuditConnection(event = CONNECTION_DELETED, connectionId = "#connectionId")
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
+    public long registerExisting(
+        long workspaceId, ConnectionDTO connectionDTO, ConnectionCredentialStoreType storeType, String credentialRef) {
+
+        Connection connection = connectionDTO.toConnection();
+
+        connection.setType(PlatformType.AUTOMATION);
+
+        Connection registered = connectionService.registerExisting(connection, storeType, credentialRef);
+
+        workspaceConnectionService.create(registered.getId(), workspaceId);
+
+        return registered.getId();
+    }
+
+    @Override
     public void delete(long connectionId) {
         // Cancel any pending OAuth refresh job before deleting any rows. If this fails, abort: a leftover
         // scheduled refresh that fires against a deleted connection wakes up the scheduler with no row to
@@ -165,6 +179,9 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         workspaceConnectionService.deleteWorkspaceConnection(connectionId);
 
         connectionFacade.delete(connectionId);
+
+        // Plain CE domain event; EE audits it after commit (see ConnectionCreatedEvent emission above).
+        applicationEventPublisher.publishEvent(new ConnectionDeletedEvent(connectionId));
     }
 
     @Override

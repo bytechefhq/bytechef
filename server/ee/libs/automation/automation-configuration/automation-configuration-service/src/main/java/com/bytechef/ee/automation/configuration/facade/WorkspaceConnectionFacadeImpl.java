@@ -7,9 +7,9 @@
 
 package com.bytechef.ee.automation.configuration.facade;
 
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_GRANTED;
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_REVOKED;
-import static com.bytechef.platform.connection.audit.ConnectionAuditEvent.CONNECTION_VISIBILITY_CHANGED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_GRANTED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_ACCESS_REVOKED;
+import static com.bytechef.ee.platform.connection.audit.ConnectionAuditEvent.CONNECTION_VISIBILITY_CHANGED;
 
 import com.bytechef.automation.configuration.domain.WorkspaceConnection;
 import com.bytechef.automation.configuration.facade.WorkspaceFacade;
@@ -19,12 +19,12 @@ import com.bytechef.automation.configuration.service.ResourceVisibilityResolver;
 import com.bytechef.automation.configuration.service.WorkspaceConnectionService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
+import com.bytechef.ee.platform.connection.audit.AuditConnection;
+import com.bytechef.ee.platform.connection.audit.AuditConnection.AuditData;
 import com.bytechef.ee.platform.resource.grant.service.ResourceGrantService;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
-import com.bytechef.platform.connection.audit.AuditConnection;
-import com.bytechef.platform.connection.audit.AuditConnection.AuditData;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
@@ -36,6 +36,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.List;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -66,8 +67,9 @@ public class WorkspaceConnectionFacadeImpl
         "CT_CONSTRUCTOR_THROW", "EI", "EI2"
     })
     public WorkspaceConnectionFacadeImpl(
-        ConnectionFacade connectionFacade, ConnectionLifecycleFacade connectionLifecycleFacade,
-        ConnectionService connectionService, ObjectProvider<MeterRegistry> meterRegistryProvider,
+        ApplicationEventPublisher applicationEventPublisher, ConnectionFacade connectionFacade,
+        ConnectionLifecycleFacade connectionLifecycleFacade, ConnectionService connectionService,
+        ObjectProvider<MeterRegistry> meterRegistryProvider,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ResourceGrantService resourceGrantService,
         ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
@@ -77,9 +79,9 @@ public class WorkspaceConnectionFacadeImpl
         WorkspaceUserService workspaceUserService) {
 
         super(
-            connectionFacade, connectionLifecycleFacade, connectionService, resourceVisibilityResolver,
-            meterRegistryProvider, projectDeploymentWorkflowService, projectService, userService,
-            workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+            applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
+            resourceVisibilityResolver, meterRegistryProvider, projectDeploymentWorkflowService, projectService,
+            userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
         this.resourceGrantService = resourceGrantService;
         this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;

@@ -1,20 +1,11 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.platform.connection.audit;
+package com.bytechef.ee.platform.connection.audit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -27,6 +18,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.audit.AuditCaptureFailedException;
+import com.bytechef.ee.platform.audit.AuditCorrelation;
 import java.lang.reflect.Method;
 import java.util.Map;
 import org.aspectj.lang.JoinPoint;
@@ -48,6 +41,8 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
  * Unit tests for {@link ConnectionAuditAspect}. Exercises the SpEL evaluation path directly by invoking the advice
  * method with a hand-built {@link JoinPoint}; this lets us verify {@code @beanName.method()} lookups work without
  * spinning up a Spring test context, and that SpEL failures do not propagate through to the audited method.
+ *
+ * @version ee
  *
  * @author Ivica Cardic
  */
