@@ -75,7 +75,7 @@ docker compose -f docker-compose.dev.server.yml up -d
 ## Architecture Overview
 
 ### Core Technology Stack
-- **Backend**: Java 25 with Spring Boot 4.0.6
+- **Backend**: Java 25 with Spring Boot 4.0.7
 - **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
