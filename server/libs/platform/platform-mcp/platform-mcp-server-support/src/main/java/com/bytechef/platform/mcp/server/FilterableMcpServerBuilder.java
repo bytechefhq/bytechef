@@ -22,19 +22,12 @@ import io.modelcontextprotocol.server.McpAsyncServerExchange;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
-import io.modelcontextprotocol.util.DefaultMcpUriTemplateManagerFactory;
-import io.modelcontextprotocol.util.McpUriTemplateManagerFactory;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.BiFunction;
 import java.util.function.Function;
-import reactor.core.publisher.Mono;
 
 /**
- * Builder for creating {@link FilterableMcpAsyncServer} instances with tool filtering support.
+ * Builder for creating {@link FilterableMcpAsyncServer} instances with per-session tool filtering support.
  *
  * @author Ivica Cardic
  */
@@ -46,26 +39,9 @@ public class FilterableMcpServerBuilder {
 
     private McpSchema.ServerCapabilities serverCapabilities;
 
-    private List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
-
-    private Map<String, McpServerFeatures.AsyncResourceSpecification> resources = new HashMap<>();
-
-    private Map<String, McpServerFeatures.AsyncResourceTemplateSpecification> resourceTemplates =
-        new HashMap<>();
-
-    private Map<String, McpServerFeatures.AsyncPromptSpecification> prompts = new HashMap<>();
-
-    private Map<McpSchema.CompleteReference, McpServerFeatures.AsyncCompletionSpecification> completions =
-        new HashMap<>();
-
-    private List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers =
-        new ArrayList<>();
-
     private String instructions;
 
     private Duration requestTimeout = Duration.ofSeconds(10);
-
-    private McpUriTemplateManagerFactory uriTemplateManagerFactory = new DefaultMcpUriTemplateManagerFactory();
 
     private boolean validateToolInputs;
 
@@ -88,52 +64,6 @@ public class FilterableMcpServerBuilder {
         return this;
     }
 
-    public FilterableMcpServerBuilder tools(List<McpServerFeatures.AsyncToolSpecification> tools) {
-        this.tools.addAll(tools);
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder resources(
-        Map<String, McpServerFeatures.AsyncResourceSpecification> resources) {
-
-        this.resources.putAll(resources);
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder resourceTemplates(
-        Map<String, McpServerFeatures.AsyncResourceTemplateSpecification> resourceTemplates) {
-
-        this.resourceTemplates.putAll(resourceTemplates);
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder prompts(
-        Map<String, McpServerFeatures.AsyncPromptSpecification> prompts) {
-
-        this.prompts.putAll(prompts);
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder completions(
-        Map<McpSchema.CompleteReference, McpServerFeatures.AsyncCompletionSpecification> completions) {
-
-        this.completions.putAll(completions);
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder rootsChangeConsumers(
-        List<BiFunction<McpAsyncServerExchange, List<McpSchema.Root>, Mono<Void>>> rootsChangeConsumers) {
-
-        this.rootsChangeConsumers.addAll(rootsChangeConsumers);
-
-        return this;
-    }
-
     public FilterableMcpServerBuilder instructions(String instructions) {
         this.instructions = instructions;
 
@@ -142,14 +72,6 @@ public class FilterableMcpServerBuilder {
 
     public FilterableMcpServerBuilder requestTimeout(Duration timeout) {
         this.requestTimeout = timeout;
-
-        return this;
-    }
-
-    public FilterableMcpServerBuilder uriTemplateManagerFactory(
-        McpUriTemplateManagerFactory uriTemplateManagerFactory) {
-
-        this.uriTemplateManagerFactory = uriTemplateManagerFactory;
 
         return this;
     }
@@ -170,8 +92,7 @@ public class FilterableMcpServerBuilder {
 
     public FilterableMcpAsyncServer build() {
         return new FilterableMcpAsyncServer(
-            transportProvider, McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions, tools,
-            resources, resourceTemplates, prompts, completions, rootsChangeConsumers, requestTimeout,
-            uriTemplateManagerFactory, McpJsonDefaults.getSchemaValidator(), validateToolInputs, toolFilter);
+            transportProvider, McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions,
+            requestTimeout, McpJsonDefaults.getSchemaValidator(), validateToolInputs, toolFilter);
     }
 }
