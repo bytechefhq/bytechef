@@ -8,7 +8,9 @@
 package com.bytechef.ee.platform.scheduler.aws.listener;
 
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SPLITTER;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
@@ -54,7 +56,10 @@ public class DynamicWebhookTriggerRefreshListener {
         this.workflowService = workflowService;
     }
 
-    @SqsListener(SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE)
+    @SqsListener(
+        queueNames = SCHEDULER_DYNAMIC_WEBHOOK_TRIGGER_REFRESH_QUEUE,
+        id = DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID,
+        factory = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY)
     public void onSchedule(String message) {
         String[] split = message.split(SPLITTER);
         String workflowExecutionId = split[0];

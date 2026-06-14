@@ -15,5 +15,6 @@ package com.bytechef.ee.platform.scheduler.aws.constant;
 public class AwsConnectionRefreshSchedulerConstants {
 
     public static final String CONNECTION_REFRESH = "ConnectionRefresh";
+    public static final String CONNECTION_REFRESH_LISTENER_ID = "connectionRefreshSqsListener";
     public static final String SCHEDULER_CONNECTION_REFRESH_QUEUE = "scheduler_connection_refresh_queue";
 }

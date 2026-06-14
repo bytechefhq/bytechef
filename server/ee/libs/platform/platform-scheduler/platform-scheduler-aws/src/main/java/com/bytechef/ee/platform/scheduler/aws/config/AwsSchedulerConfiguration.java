@@ -7,6 +7,12 @@
 
 package com.bytechef.ee.platform.scheduler.aws.config;
 
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.CONNECTION_REFRESH_LISTENER_ID;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.POLLING_TRIGGER_LISTENER_ID;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULE_TRIGGER_LISTENER_ID;
+
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.AwsConnectionRefreshScheduler;
@@ -20,15 +26,23 @@ import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.TriggerStateService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.awspring.cloud.sqs.config.SqsMessageListenerContainerFactory;
+import io.awspring.cloud.sqs.listener.MessageListenerContainer;
+import io.awspring.cloud.sqs.listener.MessageListenerContainerRegistry;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.event.EventListener;
 import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.providers.AwsRegionProvider;
 import software.amazon.awssdk.services.scheduler.SchedulerClient;
+import software.amazon.awssdk.services.sqs.SqsAsyncClient;
 
 /**
  * @version ee
@@ -43,12 +57,22 @@ public class AwsSchedulerConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(AwsSchedulerConfiguration.class);
 
-    private final ApplicationProperties applicationProperties;
+    private static final List<String> SCHEDULER_SQS_LISTENER_IDS = List.of(
+        POLLING_TRIGGER_LISTENER_ID, SCHEDULE_TRIGGER_LISTENER_ID, DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID,
+        CONNECTION_REFRESH_LISTENER_ID);
 
-    AwsSchedulerConfiguration(ApplicationProperties applicationProperties) {
+    private final ApplicationProperties applicationProperties;
+    private final MessageListenerContainerRegistry messageListenerContainerRegistry;
+
+    @SuppressFBWarnings("EI")
+    AwsSchedulerConfiguration(
+        ApplicationProperties applicationProperties,
+        MessageListenerContainerRegistry messageListenerContainerRegistry) {
+
         log.info("Scheduler provider type enabled: aws");
 
         this.applicationProperties = applicationProperties;
+        this.messageListenerContainerRegistry = messageListenerContainerRegistry;
     }
 
     @Bean
@@ -114,5 +138,34 @@ public class AwsSchedulerConfiguration {
     @Bean
     ScheduleTriggerListener scheduleListener(ApplicationEventPublisher eventPublisher) {
         return new ScheduleTriggerListener(eventPublisher);
+    }
+
+    @Bean(name = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY, autowireCandidate = false)
+    SqsMessageListenerContainerFactory<Object> schedulerSqsListenerContainerFactory(SqsAsyncClient sqsAsyncClient) {
+        SqsMessageListenerContainerFactory<Object> factory = new SqsMessageListenerContainerFactory<>();
+
+        factory.setSqsAsyncClient(sqsAsyncClient);
+        factory.configure(options -> options.autoStartup(false));
+
+        return factory;
+    }
+
+    @EventListener(ApplicationReadyEvent.class)
+    public void startSchedulerListeners() {
+        for (String listenerId : SCHEDULER_SQS_LISTENER_IDS) {
+            MessageListenerContainer<?> container = messageListenerContainerRegistry.getContainerById(listenerId);
+
+            if (container == null) {
+                log.warn("Scheduler SQS listener container not found: {}", listenerId);
+
+                continue;
+            }
+
+            if (!container.isRunning()) {
+                container.start();
+
+                log.info("Started scheduler SQS listener container: {}", listenerId);
+            }
+        }
     }
 }
