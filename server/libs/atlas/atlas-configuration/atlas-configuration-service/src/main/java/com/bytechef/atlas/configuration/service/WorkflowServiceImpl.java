@@ -149,6 +149,8 @@ public class WorkflowServiceImpl implements WorkflowService {
             }
         }
 
+        RuntimeException lookupException = null;
+
         for (WorkflowRepository workflowRepository : workflowRepositories) {
             try {
                 Optional<Workflow> workflowOptional = workflowRepository.findById(id);
@@ -162,9 +164,20 @@ public class WorkflowServiceImpl implements WorkflowService {
 
                     return Optional.of(workflow);
                 }
-            } catch (Exception e) {
-                log.error(e.getMessage(), e);
+            } catch (RuntimeException exception) {
+                // A repository may legitimately reject an id it cannot serve (e.g. a filesystem repository asked for
+                // a JDBC id), so keep probing the remaining repositories. But remember the failure: if no repository
+                // ends up holding the workflow, the lookup was inconclusive (e.g. a transient datasource error) rather
+                // than a confirmed miss, and must not be reported as "not found" - that would let callers such as the
+                // trigger coordinator treat a still-live workflow as orphaned and delete its schedule (#5202).
+                log.error(exception.getMessage(), exception);
+
+                lookupException = exception;
             }
+        }
+
+        if (lookupException != null) {
+            throw lookupException;
         }
 
         return Optional.empty();
