@@ -33,6 +33,7 @@ import org.jspecify.annotations.Nullable;
 import org.reactivestreams.FlowAdapters;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.StreamResponseSpec;
+import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.messages.AssistantMessage;
 import org.springframework.ai.chat.model.Generation;
 import reactor.core.publisher.Flux;
@@ -76,7 +77,7 @@ public interface ChatModel {
             inputParameters, context, messageFormatRequired);
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
-            chatModel, inputParameters, responseFormatRequired, context);
+            chatModel, inputParameters, responseFormatRequired, true, context);
 
         ChatClient.CallResponseSpec callResponseSpec = chatClientRequestSpec
             .messages(messages)
@@ -96,7 +97,7 @@ public interface ChatModel {
             inputParameters, context, true);
 
         ChatClient.ChatClientRequestSpec chatClientRequestSpec = createPrompt(
-            chatModel, inputParameters, true, context);
+            chatModel, inputParameters, true, false, context);
 
         StreamResponseSpec streamResponseSpec = chatClientRequestSpec
             .messages(messages)
@@ -135,7 +136,7 @@ public interface ChatModel {
 
     private ChatClient.ChatClientRequestSpec createPrompt(
         org.springframework.ai.chat.model.ChatModel chatModel, Parameters inputParameters,
-        boolean responseFormatRequired, ActionContext context) {
+        boolean responseFormatRequired, boolean validateStructuredOutput, ActionContext context) {
 
         ChatClient chatClient = ChatClient.create(chatModel);
         ResponseFormat responseFormat = ResponseFormat.TEXT;
@@ -151,7 +152,19 @@ public interface ChatModel {
             JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
                 inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
 
-            return chatClient.prompt(converter.getFormat());
+            ChatClient.ChatClientRequestSpec chatClientRequestSpec = chatClient.prompt(converter.getFormat());
+
+            // The StructuredOutputValidationAdvisor re-prompts the model (up to maxRepeatAttempts) when its output
+            // does not satisfy the response JSON schema. It does not support streaming, so it is attached only on the
+            // non-streaming call path (validateStructuredOutput == false for stream()).
+            if (validateStructuredOutput) {
+                chatClientRequestSpec = chatClientRequestSpec.advisors(
+                    StructuredOutputValidationAdvisor.builder()
+                        .outputJsonSchema(converter.getJsonSchema())
+                        .build());
+            }
+
+            return chatClientRequestSpec;
         }
     }
 

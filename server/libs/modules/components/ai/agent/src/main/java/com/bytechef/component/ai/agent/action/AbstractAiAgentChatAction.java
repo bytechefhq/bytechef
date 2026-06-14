@@ -68,6 +68,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -268,6 +269,31 @@ public abstract class AbstractAiAgentChatAction {
             inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
 
         return chatClient.prompt(converter.getFormat());
+    }
+
+    /**
+     * Attaches a {@link StructuredOutputValidationAdvisor} when a JSON response format is configured, re-prompting the
+     * model (up to maxRepeatAttempts) when its final answer does not satisfy the response JSON schema. The advisor does
+     * not support streaming, so only the non-streaming actions ({@code .call()}) invoke this; the streaming and
+     * realtime actions ({@code .stream()}) deliberately leave it off.
+     */
+    protected static void applyStructuredOutputValidation(
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec, Parameters inputParameters, ActionContext context) {
+
+        ResponseFormat responseFormat = inputParameters.getFromPath(
+            RESPONSE + "." + RESPONSE_FORMAT, ResponseFormat.class, ResponseFormat.TEXT);
+
+        if (responseFormat == ResponseFormat.TEXT) {
+            return;
+        }
+
+        JsonSchemaStructuredOutputConverter converter = new JsonSchemaStructuredOutputConverter(
+            inputParameters.getFromPath(RESPONSE + "." + RESPONSE_SCHEMA, String.class), context);
+
+        chatClientRequestSpec.advisors(
+            StructuredOutputValidationAdvisor.builder()
+                .outputJsonSchema(converter.getJsonSchema())
+                .build());
     }
 
     private static ToolCallback createSimulationAwareToolCallback(
