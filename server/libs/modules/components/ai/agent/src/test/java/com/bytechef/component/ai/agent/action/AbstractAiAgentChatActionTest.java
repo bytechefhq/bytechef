@@ -28,11 +28,13 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
@@ -42,6 +44,7 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -52,6 +55,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.DefaultChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.StructuredOutputValidationAdvisor;
 import org.springframework.ai.chat.client.advisor.ToolCallingAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
@@ -467,6 +471,67 @@ class AbstractAiAgentChatActionTest {
         assertThat(chatMemoryAdvisor.getOrder())
             .as("Spring AI default ordering must keep ChatMemoryAdvisor upstream of ToolCallingAdvisor")
             .isLessThan(toolCallingAdvisor.getOrder());
+    }
+
+    @Test
+    void testApplyStructuredOutputValidationAddsAdvisorForJsonResponseFormat() {
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of(
+                "response",
+                Map.of(
+                    "responseFormat", "JSON",
+                    "responseSchema", "{\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\"}}}")));
+
+        ActionContext context = mock(ActionContext.class);
+        Context.Json json = mock(Context.Json.class);
+
+        Map<String, Object> schemaMap = new LinkedHashMap<>();
+
+        schemaMap.put("type", "object");
+        schemaMap.put("properties", Map.of("answer", Map.of("type", "string")));
+
+        when(json.readMap(anyString(), eq(Object.class))).thenReturn(schemaMap);
+        when(json.write(any())).thenReturn(
+            "{\"type\":\"object\",\"properties\":{\"answer\":{\"type\":\"string\"}}," +
+                "\"required\":[\"answer\"],\"additionalProperties\":false}");
+        when(context.json(any())).thenAnswer(invocation -> {
+            Context.ContextFunction<Context.Json, Object> contextFunction = invocation.getArgument(0);
+
+            return contextFunction.apply(json);
+        });
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClient.builder(mock(ChatModel.class))
+            .build()
+            .prompt();
+
+        AbstractAiAgentChatAction.applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
+
+        List<Advisor> advisors =
+            ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
+
+        assertThat(advisors).anyMatch(StructuredOutputValidationAdvisor.class::isInstance);
+    }
+
+    @Test
+    void testApplyStructuredOutputValidationSkipsAdvisorForTextResponseFormat() {
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of("response", Map.of("responseFormat", "TEXT")));
+
+        ActionContext context = mock(ActionContext.class);
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = ChatClient.builder(mock(ChatModel.class))
+            .build()
+            .prompt();
+
+        AbstractAiAgentChatAction.applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
+
+        List<Advisor> advisors =
+            ((DefaultChatClient.DefaultChatClientRequestSpec) chatClientRequestSpec).getAdvisors();
+
+        assertThat(advisors).noneMatch(StructuredOutputValidationAdvisor.class::isInstance);
+
+        // No JSON schema is read for a TEXT response, so the converter (and therefore context.json) is never touched.
+        verifyNoInteractions(context);
     }
 
     private static Map<String, Object> buildModelElement() {

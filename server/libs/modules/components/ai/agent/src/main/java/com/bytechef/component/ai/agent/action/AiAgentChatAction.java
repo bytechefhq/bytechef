@@ -116,6 +116,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
+        applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
+
         ChatClient.CallResponseSpec call = chatClientRequestSpec.call();
 
         ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
