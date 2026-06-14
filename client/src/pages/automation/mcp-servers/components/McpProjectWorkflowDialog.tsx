@@ -374,7 +374,7 @@ const McpProjectWorkflowDialog = ({mcpProject, mcpServer, onClose, triggerNode}:
                             </DialogClose>
 
                             <Button
-                                disabled={!selectedWorkflowIds || selectedWorkflowIds.length === 0}
+                                disabled={hasNoEligibleWorkflows || !selectedWorkflowIds || selectedWorkflowIds.length === 0}
                                 label={isEditMode ? 'Update' : 'Add'}
                                 type="submit"
                             />
