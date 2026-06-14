@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.platform.scheduler.aws.listener;
 
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.POLLING_TRIGGER_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_POLLING_TRIGGER_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY;
 
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerPollEvent;
@@ -27,7 +29,10 @@ public class PollingTriggerListener {
         this.eventPublisher = eventPublisher;
     }
 
-    @SqsListener(SCHEDULER_POLLING_TRIGGER_QUEUE)
+    @SqsListener(
+        queueNames = SCHEDULER_POLLING_TRIGGER_QUEUE,
+        id = POLLING_TRIGGER_LISTENER_ID,
+        factory = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY)
     public void onSchedule(String message) {
         eventPublisher.publishEvent(new TriggerPollEvent(WorkflowExecutionId.parse(message)));
     }

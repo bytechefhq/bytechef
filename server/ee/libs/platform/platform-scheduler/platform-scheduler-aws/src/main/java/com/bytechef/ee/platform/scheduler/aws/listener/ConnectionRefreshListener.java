@@ -7,7 +7,9 @@
 
 package com.bytechef.ee.platform.scheduler.aws.listener;
 
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.CONNECTION_REFRESH_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.SCHEDULER_CONNECTION_REFRESH_QUEUE;
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.SPLITTER;
 
 import com.bytechef.platform.connection.facade.ConnectionFacade;
@@ -29,7 +31,10 @@ public class ConnectionRefreshListener {
         this.connectionFacade = connectionFacade;
     }
 
-    @SqsListener(SCHEDULER_CONNECTION_REFRESH_QUEUE)
+    @SqsListener(
+        queueNames = SCHEDULER_CONNECTION_REFRESH_QUEUE,
+        id = CONNECTION_REFRESH_LISTENER_ID,
+        factory = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY)
     public void onSchedule(String message) {
         String[] split = message.split(SPLITTER);
         String tenantId = split[0];
