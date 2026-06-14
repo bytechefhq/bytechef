@@ -162,9 +162,13 @@ public class AwsSchedulerConfiguration {
             }
 
             if (!container.isRunning()) {
-                container.start();
+                try {
+                    container.start();
 
-                log.info("Started scheduler SQS listener container: {}", listenerId);
+                    log.info("Started scheduler SQS listener container: {}", listenerId);
+                } catch (Exception e) {
+                    log.warn("Failed to start scheduler SQS listener container: {}", listenerId, e);
+                }
             }
         }
     }
