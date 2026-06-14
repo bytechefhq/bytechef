@@ -15,6 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -99,6 +100,25 @@ class AwsSchedulerConfigurationTest {
         mockContainer(CONNECTION_REFRESH_LISTENER_ID, false);
 
         assertDoesNotThrow(() -> awsSchedulerConfiguration.startSchedulerListeners());
+    }
+
+    @Test
+    void testStartSchedulerListenersContinuesWhenContainerFailsToStart() {
+        MessageListenerContainer<?> pollingContainer = mockContainer(POLLING_TRIGGER_LISTENER_ID, false);
+
+        doThrow(new RuntimeException("Transient SQS failure")).when(pollingContainer)
+            .start();
+
+        MessageListenerContainer<?> scheduleContainer = mockContainer(SCHEDULE_TRIGGER_LISTENER_ID, false);
+        MessageListenerContainer<?> dynamicWebhookContainer =
+            mockContainer(DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID, false);
+        MessageListenerContainer<?> connectionRefreshContainer = mockContainer(CONNECTION_REFRESH_LISTENER_ID, false);
+
+        assertDoesNotThrow(() -> awsSchedulerConfiguration.startSchedulerListeners());
+
+        verify(scheduleContainer).start();
+        verify(dynamicWebhookContainer).start();
+        verify(connectionRefreshContainer).start();
     }
 
     private MessageListenerContainer<?> mockContainer(String listenerId, boolean running) {
