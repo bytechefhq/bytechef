@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import McpProjectWorkflowDialog from './McpProjectWorkflowDialog';
+import {McpProjectItemType} from './mcp-project-workflow-list/hooks/useMcpProjectList';
 
 // ---------------------------------------------------------------------------
 // Hoisted mocks (must not reference outer-scope constants — vi.hoisted runs
@@ -82,6 +83,23 @@ describe('McpProjectWorkflowDialog', () => {
 
         expect(screen.getByText(/No tool-eligible workflows found/i)).toBeInTheDocument();
         expect(screen.getByRole('button', {name: 'Add'})).toBeDisabled();
+    });
+
+    it('keeps Update disabled in edit mode when the project version no longer has tool-eligible workflows', () => {
+        hoisted.eligibleResult.data = {toolEligibleProjectVersionWorkflows: []};
+
+        const mcpProject = {
+            id: 'mp1',
+            mcpProjectWorkflows: [{id: 'mpw1', workflow: {id: 'w1', label: 'Workflow One'}}],
+            mcpServerId: 's1',
+            project: {id: '10', name: 'Project'},
+            projectVersion: 2,
+        } as unknown as McpProjectItemType;
+
+        render(<McpProjectWorkflowDialog mcpProject={mcpProject} mcpServer={mcpServer} />);
+
+        expect(screen.getByText(/No tool-eligible workflows found/i)).toBeInTheDocument();
+        expect(screen.getByRole('button', {name: 'Update'})).toBeDisabled();
     });
 
     it('enables Add and submits once a tool-eligible workflow is selected', async () => {
