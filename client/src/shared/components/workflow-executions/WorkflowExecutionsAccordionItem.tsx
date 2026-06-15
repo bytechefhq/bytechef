@@ -9,7 +9,7 @@ import {
     TaskExecutionFromJSON,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {type ReactNode, useState} from 'react';
+import {type ReactNode, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 const ITERATIONS_PAGE_SIZE = 100;
@@ -34,13 +34,38 @@ const WorkflowExecutionsAccordionItem = ({
 }: WorkflowExecutionsAccordionItemProps) => {
     const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
 
+    const loadMoreIterationsRef = useRef<HTMLDivElement>(null);
+
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
     const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
     const hasIterations = taskExecution?.iterations && taskExecution.iterations.length > 0;
+    const remainingIterationCount = (taskExecution?.iterations?.length ?? 0) - visibleIterationCount;
+    const hasMoreIterations = remainingIterationCount > 0;
 
     const isExpandable = hasChildren || hasIterations;
     const isSelected = selectedExecutionId === execution.id;
+
+    useEffect(() => {
+        const sentinel = loadMoreIterationsRef.current;
+
+        if (!sentinel || !hasMoreIterations) {
+            return;
+        }
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0]?.isIntersecting) {
+                    setVisibleIterationCount((count) => count + ITERATIONS_PAGE_SIZE);
+                }
+            },
+            {rootMargin: '200px'}
+        );
+
+        observer.observe(sentinel);
+
+        return () => observer.disconnect();
+    }, [hasMoreIterations, visibleIterationCount]);
 
     if (!isExpandable) {
         return (
@@ -167,14 +192,13 @@ const WorkflowExecutionsAccordionItem = ({
                             );
                         })}
 
-                        {taskExecution.iterations && taskExecution.iterations.length > visibleIterationCount && (
-                            <button
-                                className="mt-1 w-full rounded-md border border-stroke-neutral-primary p-2 text-sm text-content-neutral-secondary hover:border-stroke-brand-primary"
-                                onClick={() => setVisibleIterationCount((count) => count + ITERATIONS_PAGE_SIZE)}
-                                type="button"
+                        {hasMoreIterations && (
+                            <div
+                                className="p-2 text-center text-sm text-content-neutral-secondary"
+                                ref={loadMoreIterationsRef}
                             >
-                                Show more ({taskExecution.iterations.length - visibleIterationCount} remaining)
-                            </button>
+                                {`Loading ${remainingIterationCount} more iterations...`}
+                            </div>
                         )}
                     </Accordion>
                 ) : (
