@@ -35,22 +35,24 @@ Version: 1
 
 ### Create API Token
 
-1. Go to your Zendesk dashboard.
-2. Click this icon.
-3. Click on **Apps and integrations**.
-4. Click on **API configuration**.
-5. Enable API token access.
-6. Click on **Save**.
-7. Click on **API tokens**.
-8. Click on **Add API token**.
-9. Enter description of the token.
-10. Click on **Save**.
-11. Click on **Copy**.
-12. Click on **Save**.
-13. Done 🚀
+1. Login to your Zendesk dashboard.
+2. Click on **Support**.
+3. Click on **Admin center**.
+4. Click on **Apps and integrations**.
+5. Click on **API configuration**.
+6. Enable **Allow password access for end users** and **Allow API token access**.
+7. Click on **Save**.
+8. Click on **API tokens**.
+9. Click on **Add API token**.
+10. Enter token name.
+11. Click on **Save**.
+12. Click on **Copy**.
+13. Click on **Save**.
+14. Done 🚀
+
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
-    <iframe src="https://www.guidejar.com/embed/0d895ef9-5822-426d-ad18-7837f1a54990?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+    <iframe src="https://www.guidejar.com/embed/04987993-f02f-4a65-9cab-fd9e9a393f67?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
 
 
@@ -204,6 +206,19 @@ Type: OBJECT
 }
 ```
 
+#### Finding Your Ticket ID
+
+1. Open the ticket in Zendesk
+2. Look at the URL in your browser's address bar.
+3. The ticket ID is the number that appears at the end of the URL, after `/tickets/`.
+
+**Example:**
+
+```
+https://bytechefsupport.zendesk.com/agent/tickets/4
+```
+
+In this example, the ticket ID is **4**.
 
 
 
@@ -434,6 +449,139 @@ Type: OBJECT
   "allow_channelback" : false,
   "allow_attachments" : false,
   "from_messaging_channel" : false
+}
+```
+
+
+
+
+### Create User
+Name: createUser
+
+`Creates a user.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| name | Name | STRING | The name of the user. | true |
+| email | Email | STRING | The email address of the user. | true |
+| role | Role | STRING <details> <summary> Options </summary> <span>admin</span>, <span>agent</span>, <span>end-user</span> </details> | The role that will be assigned to new user. | false |
+| skip_verify_email | Skip Verify Email | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether a verification mail will be sent to the new user. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Create User",
+  "name" : "createUser",
+  "parameters" : {
+    "name" : "",
+    "email" : "",
+    "role" : "",
+    "skip_verify_email" : false
+  },
+  "type" : "zendesk/v1/createUser"
+}
+```
+
+#### Output
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| id | INTEGER | Automatically assigned when the user is created |
+| url | STRING | The user's API url |
+| name | STRING | The user's name |
+| email | STRING | The user's primary email address. *Writeable on create only. On update, a secondary email is added. See Email Address |
+| created_at | STRING | The time the user was created |
+| updated_at | STRING | The time the user was last updated |
+| time_zone | STRING | The user's time zone. See Time Zone |
+| iana_time_zone | STRING | The time zone for the user |
+| phone | STRING | The user's primary phone number. See Phone Number below |
+| shared_phone_number | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the phone number is shared or not. See Phone Number below |
+| photo | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The user's profile picture represented as an Attachment object |
+| locale_id | INTEGER | The user's language identifier |
+| locale | STRING | The user's locale. A BCP-47 compliant tag for the locale. If both "locale" and "locale_id" are present on create or update, "locale_id" is ignored and only "locale" is used. |
+| organization_id | INTEGER | The id of the user's organization. If the user has more than one organization memberships, the id of the user's default organization. If updating, see Organization ID |
+| role | STRING | The user's role. Possible values are "end-user", "agent", or "admin" |
+| verified | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Any of the user's identities is verified. See User Identities |
+| last_active | STRING | Last time the user was active. |
+| external_id | STRING | A unique identifier from another system. The API treats the id as case insensitive. Example: "ian1" and "IAN1" are the same value. |
+| tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | The user's tags. Only present if your account has user tagging enabled |
+| alias | STRING | An alias displayed to end users |
+| active | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | false if the user has been deleted |
+| shared | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the user is shared from a different Zendesk Support instance. Shared users can be added to organizations but cannot be modified through update requests. Any attempt to update a shared user results in a 403 Forbidden error. Ticket sharing accounts only |
+| shared_agent | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the user is a shared agent from a different Zendesk Support instance. Ticket sharing accounts only |
+| last_login_at | STRING | Last time the user signed in to Zendesk Support or made an API request using an API token |
+| two_factor_auth_enabled | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If two factor authentication is enabled |
+| signature | STRING | The user's signature. Only agents and admins can have signatures |
+| details | STRING | Any details you want to store about the user, such as an address |
+| notes | STRING | Any notes you want to store about the user |
+| role_type | INTEGER | The user's role id. 0 for a custom agent, 1 for a light agent, 2 for a chat agent, 3 for a chat agent added to the Support account as a contributor (Chat Phase 4), 4 for an admin, and 5 for a billing admin |
+| custom_role_id | INTEGER | A custom role if the user is an agent on the Enterprise plan or above |
+| is_billing_admin | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the user is a billing admin. |
+| moderator | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Designates whether the user has forum moderation capabilities |
+| ticket_restriction | STRING | Specifies which tickets the user has access to. Possible values are: "organization", "groups", "assigned", "requested", null. "groups" and "assigned" are valid only for agents. If you pass an invalid value to an end user (for example, "groups"), they will be assigned to "requested", regardless of their previous access |
+| only_private_comments | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | true if the user can only create private comments |
+| restricted_agent | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the agent has any restrictions; false for admins and unrestricted agents, true for other agents |
+| suspended | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the agent is suspended. Tickets from suspended users are also suspended, and these users cannot sign in to the end user portal |
+| default_group_id | INTEGER | The id of the user's default group |
+| report_csv | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | This parameter is inert and has no effect. It may be deprecated in the future. Previously, this parameter determined whether a user could access a CSV report in a legacy Guide dashboard. This dashboard has been removed. See Announcing Guide legacy reporting upgrade to Explore |
+| user_fields | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Values of custom fields in the user's profile. See User Fields |
+| suspension_details | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Channel-level suspension state for the user. The value is null if the user has no active channel-level suspension |
+
+
+
+
+#### Output Example
+```json
+{
+  "id" : 1,
+  "url" : "",
+  "name" : "",
+  "email" : "",
+  "created_at" : "",
+  "updated_at" : "",
+  "time_zone" : "",
+  "iana_time_zone" : "",
+  "phone" : "",
+  "shared_phone_number" : false,
+  "photo" : { },
+  "locale_id" : 1,
+  "locale" : "",
+  "organization_id" : 1,
+  "role" : "",
+  "verified" : false,
+  "last_active" : "",
+  "external_id" : "",
+  "tags" : [ "" ],
+  "alias" : "",
+  "active" : false,
+  "shared" : false,
+  "shared_agent" : false,
+  "last_login_at" : "",
+  "two_factor_auth_enabled" : false,
+  "signature" : "",
+  "details" : "",
+  "notes" : "",
+  "role_type" : 1,
+  "custom_role_id" : 1,
+  "is_billing_admin" : false,
+  "moderator" : false,
+  "ticket_restriction" : "",
+  "only_private_comments" : false,
+  "restricted_agent" : false,
+  "suspended" : false,
+  "default_group_id" : 1,
+  "report_csv" : false,
+  "user_fields" : { },
+  "suspension_details" : { }
 }
 ```
 
