@@ -16,7 +16,9 @@
 
 package com.bytechef.platform.component.service;
 
+import static com.bytechef.component.definition.ComponentDsl.string;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -42,6 +44,7 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.Field;
+import com.bytechef.platform.component.domain.Property;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -305,6 +308,141 @@ class ClusterElementDefinitionServiceTest {
             COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, Map.of(), null);
 
         assertEquals(List.of(), result);
+    }
+
+    @Test
+    void testGetClusterElementDefinitionInjectsToolOverrideProperties() {
+        String clusterElementName = "openai";
+        ClusterElementType toolsType = new ClusterElementType("TOOLS", "tools", "Tools");
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            createMatchableClusterElementDefinition(clusterElementName, toolsType);
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementDefinition result = clusterElementDefinitionService.getClusterElementDefinition(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, "TOOLS");
+
+        List<String> propertyNames = result.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        assertEquals(List.of("toolName", "toolDescription"), propertyNames);
+        assertFalse(result.getProperties()
+            .get(0)
+            .getRequired());
+        assertFalse(result.getProperties()
+            .get(1)
+            .getRequired());
+        assertFalse(result.getProperties()
+            .get(0)
+            .getExpressionEnabled());
+        assertFalse(result.getProperties()
+            .get(1)
+            .getExpressionEnabled());
+        assertEquals(
+            com.bytechef.component.definition.Property.ControlType.TEXT_AREA,
+            ((com.bytechef.platform.component.domain.ValueProperty<?>) result.getProperties()
+                .get(1)).getControlType());
+    }
+
+    @Test
+    void testGetClusterElementDefinitionDoesNotInjectForNonToolsType() {
+        String clusterElementName = "openai";
+        ClusterElementType chatMemoryType = new ClusterElementType("CHAT_MEMORY", "chatMemory", "Chat Memory");
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            createMatchableClusterElementDefinition(clusterElementName, chatMemoryType);
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementDefinition result = clusterElementDefinitionService.getClusterElementDefinition(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, "CHAT_MEMORY");
+
+        List<String> propertyNames = result.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        assertFalse(propertyNames.contains("toolName"));
+        assertFalse(propertyNames.contains("toolDescription"));
+    }
+
+    @Test
+    void testGetClusterElementDefinitionDoesNotDuplicateExistingToolName() {
+        String clusterElementName = "openai";
+        ClusterElementType toolsType = new ClusterElementType("TOOLS", "tools", "Tools");
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn(clusterElementName);
+        when(elementDefinition.getType()).thenReturn(toolsType);
+        when(elementDefinition.getDescription()).thenReturn(Optional.empty());
+        when(elementDefinition.getHelp()).thenReturn(Optional.empty());
+        when(elementDefinition.getTitle()).thenReturn(Optional.of(clusterElementName));
+        when(elementDefinition.getProperties()).thenReturn(Optional.of(List.of(string("toolName"))));
+        when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementDefinition result = clusterElementDefinitionService.getClusterElementDefinition(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, "TOOLS");
+
+        List<String> propertyNames = result.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        assertEquals(1, propertyNames.stream()
+            .filter("toolName"::equals)
+            .count());
+        assertEquals(List.of("toolDescription", "toolName"), propertyNames);
+    }
+
+    @Test
+    void testGetClusterElementDefinitionDoesNotInjectWhenBothAlreadyDeclared() {
+        String clusterElementName = "httpClient";
+        ClusterElementType toolsType = new ClusterElementType("TOOLS", "tools", "Tools");
+
+        com.bytechef.component.definition.ClusterElementDefinition<?> elementDefinition =
+            mock(com.bytechef.component.definition.ClusterElementDefinition.class);
+
+        when(elementDefinition.getName()).thenReturn(clusterElementName);
+        when(elementDefinition.getType()).thenReturn(toolsType);
+        when(elementDefinition.getDescription()).thenReturn(Optional.empty());
+        when(elementDefinition.getHelp()).thenReturn(Optional.empty());
+        when(elementDefinition.getTitle()).thenReturn(Optional.of(clusterElementName));
+        when(elementDefinition.getProperties())
+            .thenReturn(Optional.of(List.of(string("toolName"), string("toolDescription"), string("uri"))));
+        when(elementDefinition.getOutputDefinition()).thenReturn(Optional.empty());
+
+        ComponentDefinition componentDefinition = createComponentDefinitionForMatch(List.of(elementDefinition));
+
+        when(componentDefinitionRegistry.getComponentDefinition(COMPONENT_NAME, COMPONENT_VERSION))
+            .thenReturn(componentDefinition);
+
+        ClusterElementDefinition result = clusterElementDefinitionService.getClusterElementDefinition(
+            COMPONENT_NAME, COMPONENT_VERSION, clusterElementName, "TOOLS");
+
+        List<String> propertyNames = result.getProperties()
+            .stream()
+            .map(Property::getName)
+            .toList();
+
+        // A tool that statically declares both override keys (e.g. HttpClientTool with required(true)) gets nothing
+        // injected; its own properties are returned unchanged, preserving order.
+        assertEquals(List.of("toolName", "toolDescription", "uri"), propertyNames);
     }
 
     private com.bytechef.component.definition.ClusterElementDefinition<?> createMatchableClusterElementDefinition(

@@ -15,6 +15,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))

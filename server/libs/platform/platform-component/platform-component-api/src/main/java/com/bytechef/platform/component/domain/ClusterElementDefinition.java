@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.SchemaUtils;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -81,6 +82,29 @@ public class ClusterElementDefinition {
         this.type = clusterElementDefinition.getType();
     }
 
+    private ClusterElementDefinition(
+        ClusterElementDefinition clusterElementDefinition, List<? extends Property> prependedProperties) {
+
+        this.componentName = clusterElementDefinition.componentName;
+        this.componentVersion = clusterElementDefinition.componentVersion;
+        this.description = clusterElementDefinition.description;
+        this.help = clusterElementDefinition.help;
+        this.icon = clusterElementDefinition.icon;
+        this.name = clusterElementDefinition.name;
+        this.outputDefined = clusterElementDefinition.outputDefined;
+        this.outputFunctionDefined = clusterElementDefinition.outputFunctionDefined;
+        this.outputResponse = clusterElementDefinition.outputResponse;
+        this.outputSchemaDefined = clusterElementDefinition.outputSchemaDefined;
+
+        List<Property> mergedProperties = new ArrayList<>(prependedProperties);
+
+        mergedProperties.addAll(clusterElementDefinition.properties);
+
+        this.properties = mergedProperties;
+        this.title = clusterElementDefinition.title;
+        this.type = clusterElementDefinition.type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (!(o instanceof ClusterElementDefinition that)) {
@@ -136,6 +160,10 @@ public class ClusterElementDefinition {
 
     public List<? extends Property> getProperties() {
         return Collections.unmodifiableList(properties);
+    }
+
+    public ClusterElementDefinition withPrependedProperties(List<? extends Property> prependedProperties) {
+        return new ClusterElementDefinition(this, prependedProperties);
     }
 
     public String getTitle() {
