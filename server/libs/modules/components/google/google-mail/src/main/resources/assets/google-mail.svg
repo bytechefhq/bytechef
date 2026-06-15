@@ -1,2 +1,17 @@
-<?xml version="1.0" encoding="UTF-8"?><svg id="a" xmlns="http://www.w3.org/2000/svg" width="176" height="140" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 176 140">
-<title>Gmail logo - Brandlogos.net</title><defs><linearGradient id="b" x1="157" y1="176.72" x2="157" y2="54.72" gradientTransform="translate(0 194.72) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#60d673"/><stop offset=".17" stop-color="#42c868"/><stop offset=".39" stop-color="#0ebc5f"/><stop offset=".62" stop-color="#00a9bb"/><stop offset=".86" stop-color="#3c90ff"/><stop offset="1" stop-color="#3186ff"/></linearGradient><linearGradient id="c" x1="0" y1="145.04" x2="176" y2="145.04" gradientTransform="translate(0 194.72) scale(1 -1)" gradientUnits="userSpaceOnUse"><stop offset=".08" stop-color="#ff63a0"/><stop offset=".3" stop-color="#fc413d"/><stop offset=".5" stop-color="#fc413d"/><stop offset=".65" stop-color="#fc413d"/><stop offset=".72" stop-color="#fc5c30"/><stop offset=".86" stop-color="#feb10c"/><stop offset=".91" stop-color="#fec700"/><stop offset=".96" stop-color="#ffdb0f"/></linearGradient></defs><path d="M138,18h38v110c0,6.63-5.37,12-12,12h-20c-3.31,0-6-2.69-6-6V18Z" style="fill:url(#b);"/><path d="M38,18H0v110c0,6.63,5.37,12,12,12h20c3.31,0,6-2.69,6-6V18Z" style="fill:#fc413d;"/><path d="M31.23,4.46C23.19-2.3,11.21-1.26,4.46,6.78-2.3,14.81-1.26,26.79,6.78,33.55l76.08,63.95c2.98,2.5,7.32,2.5,10.29,0l76.08-63.95c8.03-6.75,9.07-18.74,2.32-26.77-6.75-8.03-18.74-9.07-26.77-2.32l-56.78,47.72L31.23,4.46Z" style="fill:url(#c);"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" id="gmail">
+  <path fill="#FB413B" d="M6 6V19.5C6 19.7761 5.77614 20 5.5 20H2.5C1.94772 20 1.5 19.5523 1.5 19V6H6Z"></path>
+  <path fill="url(#paint0_linear_1_175)" d="M22.5 6V19C22.5 19.5523 22.0523 20 21.5 20H18.5C18.2239 20 18 19.7761 18 19.5V6H22.5Z"></path>
+  <path fill="url(#paint1_linear_1_175)" d="M18.8022 4.52777C19.7534 3.72816 21.1725 3.85101 21.9721 4.80219C22.7717 5.75337 22.6489 7.17248 21.6977 7.97211L12.6434 15.584C12.2714 15.8967 11.7284 15.8967 11.3564 15.584L2.30219 7.97211C1.35101 7.17248 1.22816 5.75337 2.02777 4.80219C2.8274 3.85101 4.24652 3.72816 5.1977 4.52777L11.9999 10.246L18.8022 4.52777Z"></path>
+  <defs>
+    <linearGradient id="paint0_linear_1_175" x1="20.25" x2="20.25" y1="6" y2="20.173" gradientUnits="userSpaceOnUse">
+      <stop offset=".408" stop-color="#3AC566"></stop>
+      <stop offset="1" stop-color="#338BFD"></stop>
+    </linearGradient>
+    <linearGradient id="paint1_linear_1_175" x1="22.5" x2="1.5" y1="10.063" y2="10.063" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FAD917"></stop>
+      <stop offset=".33" stop-color="#F74B47"></stop>
+      <stop offset=".66" stop-color="#F74B47"></stop>
+      <stop offset="1" stop-color="#FF64A0"></stop>
+    </linearGradient>
+  </defs>
+</svg>
