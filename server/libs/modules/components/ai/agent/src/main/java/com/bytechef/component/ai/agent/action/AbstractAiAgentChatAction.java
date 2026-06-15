@@ -375,19 +375,7 @@ public abstract class AbstractAiAgentChatAction {
             .ifPresent(advisors::add);
 
         // tool call
-        //
-        // Spring AI 2.0.0-RC1 orders ChatMemoryAdvisor (DEFAULT_CHAT_MEMORY_PRECEDENCE_ORDER, MIN+200) upstream
-        // of ToolCallingAdvisor (DEFAULT_ORDER, MIN+300), so memory wraps the whole tool-execution loop:
-        // persisted history is applied once before the loop and only the final assistant message is written back.
-        // ToolCallingAdvisor retains the intermediate (assistant-with-tool_calls, tool-result) pairs in its own
-        // in-loop history (conversationHistoryEnabled defaults to true), so the standard composition already emits
-        // well-formed tool-call sequences. This replaces the former custom ToolHistoryToolCallAdvisor +
-        // disableInternalConversationHistory() workaround, which was only required under the M-series ordering
-        // where ChatMemoryAdvisor sat downstream of the tool loop and therefore could not rehydrate it.
-        //
-        // Guard: ToolCallingAdvisor requires the model's ChatOptions to implement ToolCallingChatOptions.
-        // Models that predate Spring AI 2.0.0 (e.g. HuggingFace M1/M2) may not implement the interface,
-        // which would cause ToolCallingAdvisor to throw (RC1) or silently skip tool calls (2.0.0 final).
+
         if (chatModel.getOptions() instanceof ToolCallingChatOptions) {
             advisors.add(
                 ToolCallingAdvisor.builder()
