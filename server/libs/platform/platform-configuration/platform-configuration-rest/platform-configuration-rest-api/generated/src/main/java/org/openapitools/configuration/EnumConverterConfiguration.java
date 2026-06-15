@@ -1,5 +1,9 @@
 package org.openapitools.configuration;
 
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.UUID;
+
 import com.bytechef.platform.configuration.web.rest.model.AuthorizationTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.ControlTypeModel;
 import com.bytechef.platform.configuration.web.rest.model.CredentialStatusModel;

@@ -28,7 +28,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentProperty", description = "A resolved component input property the SDK renders.")
 @JsonTypeName("ComponentProperty")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:44:54.600950+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:08.161761+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ComponentPropertyModel {
 
   private String name;
