@@ -21,6 +21,7 @@ import PropertyInput from '@/pages/platform/workflow-editor/components/propertie
 import PropertyJsonSchemaBuilder from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilder';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import useProperty from '@/pages/platform/workflow-editor/components/properties/hooks/useProperty';
+import isDynamicPropertiesQueryEnabled from '@/pages/platform/workflow-editor/components/properties/isDynamicPropertiesQueryEnabled';
 import getInputHTMLType from '@/pages/platform/workflow-editor/utils/getInputHTMLType';
 import resolveExpressionValue from '@/pages/platform/workflow-editor/utils/resolveExpressionValue';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
@@ -907,11 +908,11 @@ const Property = ({
                     control={control}
                     controlPath={controlPath}
                     currentOperationName={operationName}
-                    enabled={
-                        !!clusterElementContext ||
-                        !!(currentNode?.connectionId && currentNode?.connections) ||
-                        currentNode?.connections?.length === 0
-                    }
+                    enabled={isDynamicPropertiesQueryEnabled({
+                        clusterElementContext: !!clusterElementContext,
+                        connectionId: currentNode?.connectionId,
+                        connections: currentNode?.connections,
+                    })}
                     formState={formState}
                     hideFromAi={hideFromAi}
                     lookupDependsOnPaths={propertiesDataSource?.propertiesLookupDependsOn}
