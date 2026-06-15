@@ -1,7 +1,9 @@
 import {
     GetWorkflowExecutionRequest,
+    GetWorkflowExecutionTaskExecutionRequest,
     GetWorkflowExecutionsPageRequest,
     Page,
+    TaskExecution,
     WorkflowExecution,
     WorkflowExecutionApi,
 } from '@/shared/middleware/automation/workflow/execution';
@@ -15,6 +17,12 @@ export const WorkflowExecutionKeys = {
         request,
     ],
     workflowExecution: (id: number) => [...WorkflowExecutionKeys.workflowExecutions, id],
+    workflowExecutionTaskExecution: (id: number, taskExecutionId: number) => [
+        ...WorkflowExecutionKeys.workflowExecutions,
+        id,
+        'taskExecution',
+        taskExecutionId,
+    ],
     workflowExecutions: ['automation_workflowExecutions'] as const,
 };
 
@@ -37,5 +45,17 @@ export const useGetProjectWorkflowExecutionQuery = (
         queryKey: WorkflowExecutionKeys.workflowExecution(request.id),
         queryFn: () => new WorkflowExecutionApi().getWorkflowExecution(request),
         enabled: enabled === undefined ? true : enabled,
+        refetchInterval,
+    });
+
+export const useGetWorkflowExecutionTaskExecutionQuery = (
+    request: GetWorkflowExecutionTaskExecutionRequest,
+    enabled: boolean,
+    refetchInterval?: number | false
+) =>
+    useQuery<TaskExecution, Error>({
+        queryKey: WorkflowExecutionKeys.workflowExecutionTaskExecution(request.id, request.taskExecutionId),
+        queryFn: () => new WorkflowExecutionApi().getWorkflowExecutionTaskExecution(request),
+        enabled,
         refetchInterval,
     });

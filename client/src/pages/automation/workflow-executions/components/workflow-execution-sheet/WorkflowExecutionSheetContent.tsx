@@ -8,6 +8,7 @@ import WorkflowExecutionsTabsPanel from '@/shared/components/workflow-executions
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import WorkflowTriggerExecutionItem from '@/shared/components/workflow-executions/WorkflowTriggerExecutionItem';
 import {ExecutionError, Job, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {useGetWorkflowExecutionTaskExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
 
 interface WorkflowExecutionSheetContentProps {
@@ -24,6 +25,7 @@ interface WorkflowExecutionSheetContentProps {
     setDialogOpen: (open: boolean) => void;
     taskExecutions: TaskExecution[];
     triggerExecution?: TriggerExecution;
+    workflowExecutionId: number;
 }
 
 const WorkflowExecutionSheetContent = ({
@@ -40,68 +42,83 @@ const WorkflowExecutionSheetContent = ({
     setDialogOpen,
     taskExecutions,
     triggerExecution,
-}: WorkflowExecutionSheetContentProps) => (
-    <div className="flex size-full flex-col">
-        <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
+    workflowExecutionId,
+}: WorkflowExecutionSheetContentProps) => {
+    const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
 
-        {jobFailedWithNoExecutions ? (
-            <div className="flex-1 p-4">
-                <WorkflowExecutionContent error={jobFailureError} />
-            </div>
-        ) : (
-            <ResizablePanelGroup orientation="horizontal">
-                <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
-                    <ScrollArea className="mb-4 h-full pr-4 pl-1">
-                        <Accordion
-                            className="ml-2 space-y-2"
-                            defaultValue={
-                                deepestFailedExecution?.path ||
-                                (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
-                            }
-                            type="multiple"
-                        >
-                            {triggerExecution && (
-                                <WorkflowExecutionsAccordionItem
-                                    defaultValue={deepestFailedExecution?.path}
-                                    execution={triggerExecution}
-                                    onExecutionClick={handleTaskClick}
-                                    selectedExecutionId={selectedItem?.id || ''}
-                                >
-                                    <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
-                                </WorkflowExecutionsAccordionItem>
-                            )}
+    const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
+        useGetWorkflowExecutionTaskExecutionQuery(
+            {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
+            isTaskSelected,
+            false
+        );
 
-                            {taskExecutions.map((taskExecution) => (
-                                <WorkflowExecutionsAccordionItem
-                                    defaultValue={deepestFailedExecution?.path}
-                                    execution={taskExecution}
-                                    key={taskExecution.id}
-                                    onExecutionClick={handleTaskClick}
-                                    selectedExecutionId={selectedItem?.id || ''}
-                                >
-                                    <WorkflowTaskExecutionItem taskExecution={taskExecution} />
-                                </WorkflowExecutionsAccordionItem>
-                            ))}
-                        </Accordion>
-                    </ScrollArea>
-                </ResizablePanel>
+    return (
+        <div className="flex size-full flex-col">
+            <WorkflowExecutionsHeader job={job} triggerExecution={triggerExecution} />
 
-                <ResizableHandle />
+            {jobFailedWithNoExecutions ? (
+                <div className="flex-1 p-4">
+                    <WorkflowExecutionContent error={jobFailureError} />
+                </div>
+            ) : (
+                <ResizablePanelGroup orientation="horizontal">
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                        <ScrollArea className="mb-4 h-full pr-4 pl-1">
+                            <Accordion
+                                className="ml-2 space-y-2"
+                                defaultValue={
+                                    deepestFailedExecution?.path ||
+                                    (isTriggerExecution ? [triggerExecution?.id || ''] : [selectedItem?.id || ''])
+                                }
+                                type="multiple"
+                            >
+                                {triggerExecution && (
+                                    <WorkflowExecutionsAccordionItem
+                                        defaultValue={deepestFailedExecution?.path}
+                                        execution={triggerExecution}
+                                        onExecutionClick={handleTaskClick}
+                                        selectedExecutionId={selectedItem?.id || ''}
+                                    >
+                                        <WorkflowTriggerExecutionItem triggerExecution={triggerExecution} />
+                                    </WorkflowExecutionsAccordionItem>
+                                )}
 
-                <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
-                    <WorkflowExecutionsTabsPanel
-                        activeTab={activeTab}
-                        dialogOpen={dialogOpen}
-                        job={job}
-                        selectedItem={selectedItem}
-                        setActiveTab={setActiveTab}
-                        setDialogOpen={setDialogOpen}
-                        triggerExecution={triggerExecution}
-                    />
-                </ResizablePanel>
-            </ResizablePanelGroup>
-        )}
-    </div>
-);
+                                {taskExecutions.map((taskExecution) => (
+                                    <WorkflowExecutionsAccordionItem
+                                        defaultValue={deepestFailedExecution?.path}
+                                        execution={taskExecution}
+                                        key={taskExecution.id}
+                                        onExecutionClick={handleTaskClick}
+                                        selectedExecutionId={selectedItem?.id || ''}
+                                    >
+                                        <WorkflowTaskExecutionItem taskExecution={taskExecution} />
+                                    </WorkflowExecutionsAccordionItem>
+                                ))}
+                            </Accordion>
+                        </ScrollArea>
+                    </ResizablePanel>
+
+                    <ResizableHandle />
+
+                    <ResizablePanel className="flex min-h-0 flex-col overflow-hidden" defaultSize={500}>
+                        <WorkflowExecutionsTabsPanel
+                            activeTab={activeTab}
+                            dialogOpen={dialogOpen}
+                            job={job}
+                            selectedItem={selectedItem}
+                            selectedItemDataLoading={isTaskSelected && selectedTaskExecutionLoading}
+                            selectedItemInput={selectedTaskExecution?.input}
+                            selectedItemOutput={selectedTaskExecution?.output}
+                            setActiveTab={setActiveTab}
+                            setDialogOpen={setDialogOpen}
+                            triggerExecution={triggerExecution}
+                        />
+                    </ResizablePanel>
+                </ResizablePanelGroup>
+            )}
+        </div>
+    );
+};
 
 export default WorkflowExecutionSheetContent;

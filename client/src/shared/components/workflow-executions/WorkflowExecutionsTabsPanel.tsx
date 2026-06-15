@@ -28,6 +28,9 @@ interface WorkflowExecutionsTabsPanelProps {
     onEditSubflowClick?: (workflowUuid: string) => void;
     onSeeExecutionsClick?: (job: Job) => void;
     selectedItem: TriggerExecution | TaskExecution | undefined;
+    selectedItemDataLoading?: boolean;
+    selectedItemInput?: TaskExecution['input'];
+    selectedItemOutput?: TaskExecution['output'];
     setActiveTab: (value: TabValueType) => void;
     setDialogOpen: (open: boolean) => void;
     triggerExecution?: TriggerExecution;
@@ -41,11 +44,17 @@ const WorkflowExecutionsTabsPanel = ({
     onEditSubflowClick,
     onSeeExecutionsClick,
     selectedItem,
+    selectedItemDataLoading,
+    selectedItemInput,
+    selectedItemOutput,
     setActiveTab,
     setDialogOpen,
     triggerExecution,
 }: WorkflowExecutionsTabsPanelProps) => {
     const ff_2896 = useFeatureFlagsStore()('ff-2896');
+
+    const resolvedInput = selectedItemInput !== undefined ? selectedItemInput : selectedItem?.input;
+    const resolvedOutput = selectedItemOutput !== undefined ? selectedItemOutput : selectedItem?.output;
 
     const handleValueChange = useCallback((value: string) => setActiveTab(value as TabValueType), [setActiveTab]);
 
@@ -238,8 +247,12 @@ const WorkflowExecutionsTabsPanel = ({
             <ScrollArea className="min-h-0 flex-1 pr-4 pb-4">
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
-                        {selectedItem?.input ? (
-                            <WorkflowExecutionContent input={selectedItem?.input} />
+                        {selectedItemDataLoading ? (
+                            <div className="flex items-center justify-center p-4">
+                                <span className="text-sm text-muted-foreground">Loading…</span>
+                            </div>
+                        ) : resolvedInput ? (
+                            <WorkflowExecutionContent input={resolvedInput} />
                         ) : (
                             <div className="flex items-center justify-center p-4">
                                 <span className="text-sm text-muted-foreground">No input data</span>
@@ -248,10 +261,14 @@ const WorkflowExecutionsTabsPanel = ({
                     </TabsContent>
 
                     <TabsContent className="p-3" value="output">
-                        {selectedItem?.output !== undefined ? (
+                        {selectedItemDataLoading ? (
+                            <div className="flex items-center justify-center p-4">
+                                <span className="text-sm text-muted-foreground">Loading…</span>
+                            </div>
+                        ) : resolvedOutput !== undefined ? (
                             <WorkflowExecutionContent
                                 jobInputs={isTriggerExecution ? job.inputs : undefined}
-                                output={isTriggerExecution ? undefined : selectedItem?.output}
+                                output={isTriggerExecution ? undefined : resolvedOutput}
                                 workflowTriggerName={
                                     isTriggerExecution ? triggerExecution?.workflowTrigger?.name : undefined
                                 }

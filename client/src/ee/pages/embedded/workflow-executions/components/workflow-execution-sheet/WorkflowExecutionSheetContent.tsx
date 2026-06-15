@@ -1,6 +1,7 @@
 import {Accordion} from '@/components/ui/accordion';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
+import {useGetWorkflowExecutionTaskExecutionQuery} from '@/ee/shared/queries/embedded/workflowExecutions.queries';
 import WorkflowExecutionContent from '@/shared/components/workflow-executions/WorkflowExecutionContent';
 import WorkflowExecutionsAccordionItem from '@/shared/components/workflow-executions/WorkflowExecutionsAccordionItem';
 import WorkflowExecutionsHeader from '@/shared/components/workflow-executions/WorkflowExecutionsHeader';
@@ -10,8 +11,13 @@ import WorkflowTriggerExecutionItem from '@/shared/components/workflow-execution
 import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {TabValueType} from '@/shared/types';
 import {useCallback, useState} from 'react';
+import {useShallow} from 'zustand/react/shallow';
+
+import useWorkflowExecutionSheetStore from '../../stores/useWorkflowExecutionSheetStore';
 
 const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; triggerExecution?: TriggerExecution}) => {
+    const workflowExecutionId = useWorkflowExecutionSheetStore(useShallow((state) => state.workflowExecutionId));
+
     const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
     const jobFailedWithNoExecutions = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
     const jobFailureError = job.error ?? {
@@ -33,6 +39,15 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
     }, []);
 
     const isTriggerExecution = selectedItem?.id === triggerExecution?.id;
+
+    const isTaskSelected = !!selectedItem && !isTriggerExecution && selectedItem.id !== undefined;
+
+    const {data: selectedTaskExecution, isLoading: selectedTaskExecutionLoading} =
+        useGetWorkflowExecutionTaskExecutionQuery(
+            {id: Number(workflowExecutionId), taskExecutionId: Number(selectedItem?.id)},
+            isTaskSelected,
+            false
+        );
 
     return (
         <div className="flex size-full flex-col">
@@ -85,6 +100,9 @@ const WorkflowExecutionSheetContent = ({job, triggerExecution}: {job: Job; trigg
                             dialogOpen={dialogOpen}
                             job={job}
                             selectedItem={selectedItem}
+                            selectedItemDataLoading={isTaskSelected && selectedTaskExecutionLoading}
+                            selectedItemInput={selectedTaskExecution?.input}
+                            selectedItemOutput={selectedTaskExecution?.output}
                             setActiveTab={setActiveTab}
                             setDialogOpen={setDialogOpen}
                             triggerExecution={triggerExecution}
