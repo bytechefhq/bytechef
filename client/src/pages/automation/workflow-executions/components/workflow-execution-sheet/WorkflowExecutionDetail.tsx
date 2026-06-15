@@ -59,6 +59,7 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                             setDialogOpen={setDialogOpen}
                             taskExecutions={taskExecutions}
                             triggerExecution={workflowExecution?.triggerExecution}
+                            workflowExecutionId={workflowExecutionId}
                         />
                     )}
                 </ResizablePanel>
