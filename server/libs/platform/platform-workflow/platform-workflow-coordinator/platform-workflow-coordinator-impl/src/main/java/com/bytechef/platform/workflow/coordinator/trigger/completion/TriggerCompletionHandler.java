@@ -107,15 +107,20 @@ public class TriggerCompletionHandler {
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
                             workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
                 }
-            } else {
-                if (triggerExecution.isBatch() && output instanceof Collection<?> collection && !collection.isEmpty()) {
+            } else if (triggerExecution.isBatch()) {
+                if (output instanceof Collection<?> collection && !collection.isEmpty()) {
                     triggerExecution.addJobId(
                         createJob(
                             workflowId,
                             MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
                             workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
                 }
-
+            } else {
+                triggerExecution.addJobId(
+                    createJob(
+                        workflowId,
+                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
+                        workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
             }
         }
 
