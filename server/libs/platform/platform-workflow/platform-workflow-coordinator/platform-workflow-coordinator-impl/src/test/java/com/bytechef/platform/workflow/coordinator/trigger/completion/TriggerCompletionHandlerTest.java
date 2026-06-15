@@ -118,6 +118,21 @@ class TriggerCompletionHandlerTest {
     }
 
     @Test
+    void testHandleDeserializedNullOutputCreatesSingleJobWithEmptyMap() {
+        stubName();
+        stubOutput(null);
+        stubCreateJob();
+
+        triggerCompletionHandler.handle(triggerExecution);
+
+        List<JobParametersDTO> jobParametersDTOs = captureCreatedJobs(1);
+
+        assertEquals(Map.of(), jobParametersDTOs.get(0)
+            .getInputs()
+            .get(TRIGGER_NAME));
+    }
+
+    @Test
     void testHandleNonBatchCollectionFansOutJobPerElement() {
         stubName();
         stubOutput(List.of("first", "second"));
