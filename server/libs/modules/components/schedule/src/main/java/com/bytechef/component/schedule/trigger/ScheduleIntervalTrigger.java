@@ -26,6 +26,7 @@ import static com.bytechef.component.definition.ComponentDsl.trigger;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.DATE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.FIRE_TIME;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.INTERVAL;
+import static com.bytechef.component.schedule.constant.ScheduleConstants.TIMEZONE;
 import static com.bytechef.component.schedule.constant.ScheduleConstants.TIME_UNIT;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableTriggerDefinition;
@@ -33,9 +34,9 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.ListenerEmitter;
 import com.bytechef.component.definition.TriggerDefinition.TriggerType;
+import com.bytechef.component.schedule.util.ScheduleUtils;
 import com.bytechef.platform.scheduler.TriggerScheduler;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import java.time.ZoneId;
 import java.util.Map;
 
 /**
@@ -65,6 +66,11 @@ public class ScheduleIntervalTrigger {
                     option("Hour", 2),
                     option("Day", 3),
                     option("Month", 4))
+                .required(true),
+            string(TIMEZONE)
+                .label("Timezone")
+                .description("The timezone at which the cron expression will be scheduled.")
+                .options(ScheduleUtils.getTimeZoneOptions())
                 .required(true))
         .output(
             outputSchema(
@@ -83,7 +89,11 @@ public class ScheduleIntervalTrigger {
                         integer(TIME_UNIT)
                             .description(
                                 "The unit of time (e.g., minute, hour, day, month) used in conjunction with the " +
-                                    "interval to schedule the trigger."))))
+                                    "interval to schedule the trigger."),
+                        string(TIMEZONE)
+                            .description(
+                                "The timezone used for scheduling the cron expression, ensuring the trigger fires at " +
+                                    "the correct local time."))))
         .listenerDisable(this::listenerDisable)
         .listenerEnable(this::listenerEnable);
 
@@ -106,7 +116,7 @@ public class ScheduleIntervalTrigger {
 
         int interval = inputParameters.getRequiredInteger(INTERVAL);
         int timeUnit = inputParameters.getRequiredInteger(TIME_UNIT);
-        ZoneId zoneId = ZoneId.systemDefault();
+        String timezone = inputParameters.getRequiredString(TIMEZONE);
 
         triggerScheduler.scheduleScheduleTrigger(
             switch (timeUnit) {
@@ -116,8 +126,8 @@ public class ScheduleIntervalTrigger {
                 case 4 -> "0 0 0 1 */%s ?".formatted(interval);
                 default -> throw new IllegalArgumentException("Unexpected time unit value.");
             },
-            zoneId.getId(),
-            Map.of(INTERVAL, interval, TIME_UNIT, timeUnit),
+            timezone,
+            Map.of(INTERVAL, interval, TIME_UNIT, timeUnit, TIMEZONE, timezone),
             WorkflowExecutionId.parse(workflowExecutionId));
     }
 }
