@@ -18,11 +18,10 @@ package com.bytechef.component.sendgrid.action;
 
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.ATTACHMENTS;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.CC;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.DYNAMIC_TEMPLATE_DATA;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.FROM;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.SUBJECT;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEXT;
+import static com.bytechef.component.sendgrid.constant.SendgridConstants.TEMPLATE_ID;
 import static com.bytechef.component.sendgrid.constant.SendgridConstants.TO;
-import static com.bytechef.component.sendgrid.constant.SendgridConstants.TYPE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -43,19 +42,18 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 
 /**
- * @author Luka Ljubić
+ * @author Marija Horvat
  */
 @ExtendWith(MockContextSetupExtension.class)
-class SendgridSendEmailActionTest {
+class SendgridSendDynamicTemplateActionTest {
 
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(
             FROM, "emailFrom@example.com",
             TO, List.of("to@example.com"),
             CC, List.of("cc@example.com"),
-            SUBJECT, "testSubject",
-            TEXT, "testText",
-            TYPE, "text/plain",
+            TEMPLATE_ID, "1",
+            DYNAMIC_TEMPLATE_DATA, Map.of("name", "test"),
             ATTACHMENTS, new ArrayList<>()));
     @SuppressWarnings("unchecked")
     private final ArgumentCaptor<List<FileEntry>> fileArgumentCaptor = forClass(List.class);
@@ -89,7 +87,8 @@ class SendgridSendEmailActionTest {
                     contextArgumentCaptor.capture(), mapArgumentCaptor.capture()))
                 .thenReturn(null);
 
-            Object result = SendgridSendEmailAction.perform(mockedParameters, null, mockedContext);
+            Object result = SendgridSendDynamicTemplateAction.perform(
+                mockedParameters, null, mockedContext);
 
             assertNull(result);
 
@@ -97,10 +96,11 @@ class SendgridSendEmailActionTest {
                 .getFirst());
 
             Map<String, Object> body = mapArgumentCaptor.getValue();
-            assertEquals(List.of(Map.of(TO, expectedTo, CC, expectedCc)), body.get("personalizations"));
+            assertEquals(
+                List.of(Map.of(TO, expectedTo, CC, expectedCc, DYNAMIC_TEMPLATE_DATA, Map.of("name", "test"))),
+                body.get("personalizations"));
             assertEquals(Map.of("email", "emailFrom@example.com"), body.get(FROM));
-            assertEquals("testSubject", body.get(SUBJECT));
-            assertEquals(List.of(Map.of(TYPE, "text/plain", "value", "testText")), body.get("content"));
+            assertEquals("1", body.get(TEMPLATE_ID));
         }
     }
 }
