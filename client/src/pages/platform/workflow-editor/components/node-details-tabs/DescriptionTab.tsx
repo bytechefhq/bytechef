@@ -207,7 +207,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                 <Label>Title</Label>
 
                 <Input
-                    className="bg-white"
+                    className="bg-white shadow-none"
                     defaultValue={workflowTaskOrTrigger?.label}
                     key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}-${workflowTaskOrTrigger?.label}_nodeTitle`}
                     name="nodeTitle"
@@ -219,7 +219,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                 <Label>Notes</Label>
 
                 <Textarea
-                    className="bg-white"
+                    className="bg-white shadow-none"
                     defaultValue={workflowTaskOrTrigger?.description}
                     key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}_nodeNotes`}
                     name="nodeNotes"
