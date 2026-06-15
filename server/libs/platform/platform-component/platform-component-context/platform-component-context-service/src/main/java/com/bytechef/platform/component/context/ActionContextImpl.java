@@ -60,8 +60,9 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     private final @Nullable Long jobPrincipalWorkflowId;
     private final @Nullable Long jobId;
     private final @Nullable LogFileStorageWriter logFileStorageWriter;
-    private @Nullable String jobResumeId;
-    private @Nullable Suspend suspend;
+    private volatile @Nullable String jobResumeId;
+    private volatile @Nullable Suspend suspend;
+    private final @Nullable ActionContextAware suspendTarget;
     private final @Nullable PlatformType type;
     private final @Nullable String publicUrl;
     private final long taskExecutionId;
@@ -104,6 +105,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.jobPrincipalWorkflowId = builder.jobPrincipalWorkflowId;
         this.jobId = builder.jobId;
         this.publicUrl = builder.publicUrl;
+        this.suspendTarget = builder.suspendTarget;
         this.type = builder.type;
         this.workflowId = builder.workflowId;
     }
@@ -156,6 +158,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         private @Nullable Long jobPrincipalWorkflowId;
         private @Nullable LogFileStorageWriter logFileStorageWriter;
         private @Nullable String publicUrl;
+        private @Nullable ActionContextAware suspendTarget;
         private long taskExecutionId;
         private @Nullable Tracer tracer;
         private final TempFileStorage tempFileStorage;
@@ -222,6 +225,12 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         Builder publicUrl(@Nullable String publicUrl) {
             this.publicUrl = publicUrl;
+
+            return this;
+        }
+
+        Builder suspendTarget(@Nullable ActionContextAware suspendTarget) {
+            this.suspendTarget = suspendTarget;
 
             return this;
         }
@@ -298,33 +307,59 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
     @Override
     @Nullable
     public String getResumeUrl() {
+        if (suspendTarget != null) {
+            return suspendTarget.getResumeUrl();
+        }
+
         if (publicUrl == null || jobId == null) {
             return null;
         }
 
-        if (this.jobResumeId == null) {
+        return publicUrl + "/job/resume/" + getOrCreateJobResumeId(jobId);
+    }
+
+    private synchronized String getOrCreateJobResumeId(long jobId) {
+        String currentJobResumeId = this.jobResumeId;
+
+        if (currentJobResumeId == null) {
             JobResumeId jobResumeId = JobResumeId.of(jobId);
 
-            this.jobResumeId = jobResumeId.toString();
+            currentJobResumeId = jobResumeId.toString();
+
+            this.jobResumeId = currentJobResumeId;
         }
 
-        return publicUrl + "/job/resume/" + this.jobResumeId;
+        return currentJobResumeId;
     }
 
     @Override
     @Nullable
     public String getJobResumeId() {
+        if (suspendTarget != null) {
+            return suspendTarget.getJobResumeId();
+        }
+
         return jobResumeId;
     }
 
     @Override
     @Nullable
     public Suspend getSuspend() {
+        if (suspendTarget != null) {
+            return suspendTarget.getSuspend();
+        }
+
         return suspend;
     }
 
     @Override
     public void suspend(Suspend suspend) {
+        if (suspendTarget != null) {
+            suspendTarget.suspend(suspend);
+
+            return;
+        }
+
         this.suspend = suspend;
     }
 
@@ -391,6 +426,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
             .logFileStorageWriter(logFileStorageWriter)
             .publicUrl(publicUrl)
+            .suspendTarget(suspendTarget == null ? this : suspendTarget)
             .taskExecutionId(taskExecutionId)
             .type(type)
             .workflowId(workflowId)

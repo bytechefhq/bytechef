@@ -18,8 +18,10 @@ package com.bytechef.platform.worker.task;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
+import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
@@ -27,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
@@ -58,22 +61,36 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
         ActionDefinition.SseEmitterHandler.SseEmitter emitter = createSseEmitter(jobId, tenantId);
         CountDownLatch latch = new CountDownLatch(1);
+        AtomicBoolean streamCompleted = new AtomicBoolean();
 
-        addListeners(emitter, latch, jobId, tenantId);
+        addListeners(emitter, latch, streamCompleted, jobId, tenantId);
 
         sseEmitterHandler.handle(emitter);
 
         awaitCompletion(emitter, latch);
 
-        return null;
+        Suspend suspend = null;
+
+        try {
+            if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+                suspend = suspendAwareSseEmitterHandler.getSuspendOrThrow(jobId);
+            }
+        } finally {
+            if (streamCompleted.get() && suspend == null) {
+                sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
+            }
+        }
+
+        return suspend;
     }
 
     private void addListeners(
-        ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch, long jobId, String tenantId) {
+        ActionDefinition.SseEmitterHandler.SseEmitter emitter, CountDownLatch latch, AtomicBoolean streamCompleted,
+        long jobId, String tenantId) {
 
         if (emitter instanceof SseEmitterAdapter sseEmitterAdapter) {
             sseEmitterAdapter.addCompletionListener(() -> {
-                sendEvent(jobId, SseStreamEvent.EVENT_TYPE_COMPLETE, null, tenantId);
+                streamCompleted.set(true);
 
                 latch.countDown();
             });
@@ -118,10 +135,17 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
     private ActionDefinition.SseEmitterHandler.SseEmitter createSseEmitter(long jobId, String tenantId) {
         SseEmitterAdapter emitter = new SseEmitterAdapter();
 
-        emitter.addEventListener(
-            payload -> sendEvent(jobId, SseStreamEvent.EVENT_TYPE_DATA, payload, tenantId));
+        emitter.addEventListener(payload -> sendDataEvent(jobId, payload, tenantId));
 
         return emitter;
+    }
+
+    private void sendDataEvent(long jobId, Object payload, String tenantId) {
+        SseStreamEvent sseStreamEvent = new SseStreamEvent(jobId, SseStreamEvent.EVENT_TYPE_DATA, payload);
+
+        sseStreamEvent.putMetadata(TenantContext.CURRENT_TENANT_ID, tenantId);
+
+        messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
     }
 
     private void sendEvent(long jobId, String eventType, @Nullable Object payload, String tenantId) {
@@ -132,9 +156,9 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
+            log.warn(
+                "Failed to publish SSE stream event (jobId={}, eventType={}) to broker route {}",
+                jobId, eventType, SseStreamMessageRoute.SSE_STREAM_EVENTS, exception);
         }
     }
 

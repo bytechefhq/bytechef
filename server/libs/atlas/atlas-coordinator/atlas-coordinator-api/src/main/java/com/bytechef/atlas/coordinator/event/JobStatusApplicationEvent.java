@@ -29,6 +29,7 @@ public class JobStatusApplicationEvent extends AbstractEvent implements Applicat
 
     private long jobId;
     private Status status;
+    private boolean suspended;
 
     private JobStatusApplicationEvent() {
     }
@@ -42,6 +43,18 @@ public class JobStatusApplicationEvent extends AbstractEvent implements Applicat
         this.status = status;
     }
 
+    /**
+     * The {@link Status#STOPPED} status of a job that stopped because a task suspended it, rather than because it was
+     * stopped.
+     */
+    public static JobStatusApplicationEvent suspended(long jobId) {
+        JobStatusApplicationEvent jobStatusApplicationEvent = new JobStatusApplicationEvent(jobId, Status.STOPPED);
+
+        jobStatusApplicationEvent.suspended = true;
+
+        return jobStatusApplicationEvent;
+    }
+
     public long getJobId() {
         return jobId;
     }
@@ -50,11 +63,16 @@ public class JobStatusApplicationEvent extends AbstractEvent implements Applicat
         return status;
     }
 
+    public boolean isSuspended() {
+        return suspended;
+    }
+
     @Override
     public String toString() {
         return "JobStatusApplicationEvent{" +
             "jobId=" + jobId +
             ", status=" + status +
+            ", suspended=" + suspended +
             ", createdDate=" + createDate +
             ", route=" + route +
             "} ";

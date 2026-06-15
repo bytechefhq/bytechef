@@ -1280,7 +1280,7 @@
   } ],
   "clusterElements": [ {
     "name": "askUserQuestionTool",
-    "description": "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions.",
+    "description": "Ask the user clarifying questions to gather preferences, clarify instructions, or get decisions. Requires the Chat Stream action; with the non-streaming Chat action the agent proceeds without asking.",
     "element": { },
     "help": null,
     "outputDefinition": null,

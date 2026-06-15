@@ -44,7 +44,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     protected final OutputDefinition outputSchemaFunction;
     protected final BasePerformFunction performFunction;
     protected final List<? extends Property> properties;
-    protected final ResumePerformFunction resumePerformFunction;
+    protected final BaseResumePerformFunction resumePerformFunction;
     protected final String title;
     protected final WorkflowNodeDescriptionFunction workflowNodeDescriptionFunction;
 
@@ -138,7 +138,7 @@ public abstract class AbstractActionDefinitionWrapper implements ActionDefinitio
     }
 
     @Override
-    public Optional<ResumePerformFunction> getResumePerform() {
+    public Optional<? extends BaseResumePerformFunction> getResumePerform() {
         return Optional.ofNullable(resumePerformFunction);
     }
 

@@ -16,10 +16,12 @@
 
 package com.bytechef.platform.component.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -27,12 +29,19 @@ import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.withSettings;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionContext.Suspend;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.LogEntryBufferAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -45,11 +54,13 @@ public class ActionDefinitionServiceTest {
     private ActionContext actionContext;
     private com.bytechef.component.definition.ActionDefinition actionDefinition;
     private ActionDefinitionServiceImpl actionDefinitionService;
+    private ContextFactory contextFactory;
 
     @BeforeEach
     void beforeEach() {
         ComponentDefinitionRegistry componentDefinitionRegistry = mock(ComponentDefinitionRegistry.class);
-        ContextFactory contextFactory = mock(ContextFactory.class);
+
+        contextFactory = mock(ContextFactory.class);
 
         actionDefinitionService = new ActionDefinitionServiceImpl(componentDefinitionRegistry, contextFactory);
 
@@ -107,5 +118,74 @@ public class ActionDefinitionServiceTest {
                 false, null, null, null, null));
 
         verify((LogEntryBufferAware) actionContext).flushLogEntries();
+    }
+
+    @Test
+    void testExecutePerformDispatchesAMultipleConnectionsResumePerform() {
+        Map<String, ComponentConnection> componentConnections = Map.of(
+            "model_1", new ComponentConnection("example", 1, 1L, Map.of(), null));
+        AtomicReference<Map<String, ComponentConnection>> receivedComponentConnections = new AtomicReference<>();
+        AtomicReference<Parameters> receivedExtensions = new AtomicReference<>();
+
+        MultipleConnectionsResumePerformFunction resumePerformFunction =
+            (inputParameters, connections, extensions, continueParameters, data, context) -> {
+                receivedComponentConnections.set(connections);
+                receivedExtensions.set(extensions);
+
+                return "resumed";
+            };
+
+        doReturn(Optional.of(resumePerformFunction)).when(actionDefinition)
+            .getResumePerform();
+
+        Object result = actionDefinitionService.executePerform(
+            "example", 1, "perform", null, null, 1L, 10L, "workflow1", Map.of(), componentConnections,
+            Map.of("clusterElements", Map.of()), null, false, null, Map.of("key", "value"), Map.of(), null);
+
+        assertThat(result).isEqualTo("resumed");
+        assertThat(receivedComponentConnections.get()).isSameAs(componentConnections);
+        assertThat(receivedExtensions.get()
+            .containsKey("clusterElements")).isTrue();
+    }
+
+    @Test
+    void testExecutePerformReturnsASuspendRaisedWhileResuming() {
+        ActionContextAware actionContextAware = mock(ActionContextAware.class);
+        AtomicReference<Suspend> suspendReference = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            suspendReference.set(invocation.getArgument(0));
+
+            return null;
+        }).when(actionContextAware)
+            .suspend(any());
+
+        when(actionContextAware.getSuspend()).thenAnswer(invocation -> suspendReference.get());
+        when(actionContextAware.getJobResumeId()).thenReturn("jobResumeId");
+        when(
+            contextFactory.createActionContext(
+                any(), anyInt(), any(), any(), any(), any(), any(), any(), any(), any(), any(), anyBoolean()))
+                    .thenReturn(actionContextAware);
+
+        MultipleConnectionsResumePerformFunction resumePerformFunction =
+            (inputParameters, connections, extensions, continueParameters, data, context) -> {
+                context.suspend(new Suspend(Map.of("pendingToolCallId", "call_2"), null));
+
+                return null;
+            };
+
+        doReturn(Optional.of(resumePerformFunction)).when(actionDefinition)
+            .getResumePerform();
+
+        Object result = actionDefinitionService.executePerform(
+            "example", 1, "perform", null, null, 1L, 10L, "workflow1", Map.of(), Map.of(), Map.of(), null, false,
+            null, Map.of("pendingToolCallId", "call_1"), Map.of(), null);
+
+        assertThat(result).isInstanceOf(Suspend.class);
+
+        Map<String, ?> continueParameters = ((Suspend) result).continueParameters();
+
+        assertThat(continueParameters.get("pendingToolCallId")).isEqualTo("call_2");
+        assertThat(continueParameters.get(MetadataConstants.JOB_RESUME_ID)).isEqualTo("jobResumeId");
     }
 }
