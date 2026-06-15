@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.automation.workflow.execution.facade.ProjectWorkflowExecutionFacade;
 import com.bytechef.automation.workflow.execution.web.rest.model.WorkflowExecutionModel;
+import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
@@ -52,6 +53,14 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 projectWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<TaskExecutionModel> getWorkflowExecutionTaskExecution(Long id, Long taskExecutionId) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(taskExecutionId),
+                TaskExecutionModel.class));
     }
 
     @Override
