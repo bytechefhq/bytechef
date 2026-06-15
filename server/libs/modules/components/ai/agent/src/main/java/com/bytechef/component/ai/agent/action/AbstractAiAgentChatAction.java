@@ -271,12 +271,6 @@ public abstract class AbstractAiAgentChatAction {
         return chatClient.prompt(converter.getFormat());
     }
 
-    /**
-     * Attaches a {@link StructuredOutputValidationAdvisor} when a JSON response format is configured, re-prompting the
-     * model (up to maxRepeatAttempts) when its final answer does not satisfy the response JSON schema. The advisor does
-     * not support streaming, so only the non-streaming actions ({@code .call()}) invoke this; the streaming and
-     * realtime actions ({@code .stream()}) deliberately leave it off.
-     */
     protected static void applyStructuredOutputValidation(
         ChatClient.ChatClientRequestSpec chatClientRequestSpec, Parameters inputParameters, ActionContext context) {
 
