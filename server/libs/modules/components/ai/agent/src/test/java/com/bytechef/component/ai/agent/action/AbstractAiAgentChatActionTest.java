@@ -61,7 +61,6 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
-import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 
 /**
@@ -400,9 +399,9 @@ class AbstractAiAgentChatActionTest {
         Parameters extensions = MockParametersFactory.create(
             Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
 
-        ChatModel chatModel = stubModelLookup();
-
-        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
+        // stubModelLookup() is invoked for its side effect of wiring the cluster-element model resolution;
+        // the returned ChatModel handle is no longer needed now that getOptions() is not stubbed.
+        stubModelLookup();
 
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
@@ -556,8 +555,6 @@ class AbstractAiAgentChatActionTest {
 
         ChatModel chatModel = mock(ChatModel.class);
 
-        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
-
         ActionContext actionContext = mock(ActionContext.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
@@ -601,8 +598,6 @@ class AbstractAiAgentChatActionTest {
         ActionContext actionContext = mock(ActionContext.class);
 
         ChatModel chatModel = mock(ChatModel.class);
-
-        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);

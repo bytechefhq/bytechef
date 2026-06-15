@@ -76,7 +76,6 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
-import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
@@ -376,12 +375,10 @@ public abstract class AbstractAiAgentChatAction {
 
         // tool call
 
-        if (chatModel.getOptions() instanceof ToolCallingChatOptions) {
-            advisors.add(
-                ToolCallingAdvisor.builder()
-                    .toolCallingManager(toolCallingManager)
-                    .build());
-        }
+        advisors.add(
+            ToolCallingAdvisor.builder()
+                .toolCallingManager(toolCallingManager)
+                .build());
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
