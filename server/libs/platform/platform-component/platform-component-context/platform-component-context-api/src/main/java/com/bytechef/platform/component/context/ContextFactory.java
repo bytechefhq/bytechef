@@ -47,6 +47,18 @@ public interface ContextFactory {
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
         ClusterElementResolverFunction clusterElementResolverFunction);
 
+    /**
+     * Creates a {@link ClusterElementContext} that, when {@code agentActionContext} is non-null, returns that agent
+     * {@link ActionContext} from {@link ClusterElementContext#toActionContext} instead of spawning a fresh one. This
+     * lets AI agent tools (which reach their {@link ActionContext} via {@code toActionContext}) run against the live
+     * agent execution so {@code suspend()}/{@code resume()} reach the agent. When {@code agentActionContext} is
+     * {@code null} this behaves exactly like the overload without it.
+     */
+    ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        @Nullable ActionContext agentActionContext);
+
     TriggerContext createTriggerContext(
         String componentName, int componentVersion, String triggerName, @Nullable Long jobPrincipalId,
         @Nullable String workflowUuid, @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,

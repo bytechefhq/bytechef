@@ -117,7 +117,8 @@ public class ContextFactoryImpl implements ContextFactory {
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment) {
 
         return createClusterElementContext(
-            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment, null);
+            componentName, componentVersion, clusterElementName, componentConnection, editorEnvironment,
+            (ClusterElementResolverFunction) null);
     }
 
     @Override
@@ -131,6 +132,23 @@ public class ContextFactoryImpl implements ContextFactory {
                 componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment))
             .clusterElementResolver(clusterElementResolver)
+            .componentConnection(componentConnection)
+            .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
+            .publicUrl(publicUrl)
+            .build();
+    }
+
+    @Override
+    public ClusterElementContext createClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        @Nullable ActionContext agentActionContext) {
+
+        return ClusterElementContextImpl
+            .builder(
+                componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
+                eventPublisher, getHttpClientExecutor(editorEnvironment), getTempFileStorage(editorEnvironment))
+            .agentActionContext(agentActionContext)
             .componentConnection(componentConnection)
             .logFileStorageWriter(getLogFileStorageWriter(editorEnvironment))
             .publicUrl(publicUrl)

@@ -94,7 +94,7 @@ public class WaitAfterTimeIntervalActionTest {
 
         ModifiableActionDefinition actionDefinition = WaitAfterTimeIntervalAction.ACTION_DEFINITION;
 
-        ResumePerformFunction resumePerformFunction = actionDefinition.getResumePerform()
+        ResumePerformFunction resumePerformFunction = (ResumePerformFunction) actionDefinition.getResumePerform()
             .orElseThrow();
 
         Parameters data = Mockito.mock(Parameters.class);

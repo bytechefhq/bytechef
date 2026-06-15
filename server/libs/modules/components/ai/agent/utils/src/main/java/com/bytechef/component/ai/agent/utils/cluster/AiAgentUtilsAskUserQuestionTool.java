@@ -30,6 +30,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
 import java.time.Instant;
@@ -92,7 +93,7 @@ public class AiAgentUtilsAskUserQuestionTool {
                     throw new IllegalStateException("ActionContext not available in ToolContext");
                 }
 
-                String resumeUrl = ((ActionContextAware) actionContext).generateResumeUrl();
+                String resumeUrl = ((ActionContextAware) actionContext).getResumeUrl();
 
                 sendQuestionEvent(toolContext, questions, resumeUrl);
 
@@ -105,13 +106,7 @@ public class AiAgentUtilsAskUserQuestionTool {
 
                 actionContext.suspend(new Suspend(continueParameters, expiresAt));
 
-                Map<String, String> placeholderAnswers = new HashMap<>();
-
-                for (AskUserQuestionTool.Question question : questions) {
-                    placeholderAnswers.put(question.question(), "");
-                }
-
-                return placeholderAnswers;
+                return Map.of();
             })
             .answersValidation(false)
             .build();
@@ -189,7 +184,7 @@ public class AiAgentUtilsAskUserQuestionTool {
             "Failed to deliver question event: neither SSE emitter nor buffered events queue is available");
     }
 
-    private static class ToolContextAwareToolCallback implements ToolCallback {
+    static class ToolContextAwareToolCallback implements ToolCallback {
 
         private final ToolCallback delegate;
 
@@ -216,7 +211,20 @@ public class AiAgentUtilsAskUserQuestionTool {
             }
 
             try {
-                return delegate.call(toolInput, toolContext);
+                String result = delegate.call(toolInput, toolContext);
+
+                if (toolContext != null) {
+                    Object actionContextObj = toolContext.getContext()
+                        .get(ACTION_CONTEXT);
+
+                    if (actionContextObj instanceof ActionContextAware actionContextAware
+                        && actionContextAware.getSuspend() != null) {
+
+                        return ToolSuspendConstants.SUSPENDED_SENTINEL;
+                    }
+                }
+
+                return result;
             } finally {
                 TOOL_CONTEXT_HOLDER.remove();
             }

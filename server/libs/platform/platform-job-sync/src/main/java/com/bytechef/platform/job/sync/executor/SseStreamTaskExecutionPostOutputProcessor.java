@@ -18,7 +18,10 @@ package com.bytechef.platform.job.sync.executor;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import com.github.benmanes.caffeine.cache.Cache;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -166,6 +169,15 @@ class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionPostOutp
             Thread thread = Thread.currentThread();
 
             thread.interrupt();
+        }
+
+        if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+            ActionContext.Suspend suspend = SuspendUtils.finalizeSuspend(
+                suspendAwareSseEmitterHandler.getActionContext());
+
+            if (suspend != null) {
+                return suspend;
+            }
         }
 
         return null;

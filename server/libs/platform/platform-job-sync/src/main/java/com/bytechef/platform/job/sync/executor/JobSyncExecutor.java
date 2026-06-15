@@ -178,10 +178,10 @@ public class JobSyncExecutor {
             taskFileStorage,
             List.of(
                 new CallableResponseTaskExecutionPostOutputProcessor(),
-                new SuspendTaskExecutionPostOutputProcessor(null),
-                new WebhookResponseTaskExecutionPostOutputProcessor(),
                 new SseStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
-                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges)));
+                new WebSocketStreamTaskExecutionPostOutputProcessor(sseStreamBridges),
+                new SuspendTaskExecutionPostOutputProcessor(null),
+                new WebhookResponseTaskExecutionPostOutputProcessor()));
 
         receive(
             memoryMessageBroker, TaskWorkerMessageRoute.CONTROL_EVENTS, event -> {

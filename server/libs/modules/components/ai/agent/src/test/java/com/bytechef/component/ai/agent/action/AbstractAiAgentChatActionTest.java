@@ -38,6 +38,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.ModelFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
@@ -127,7 +128,7 @@ class AbstractAiAgentChatActionTest {
 
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -163,7 +164,7 @@ class AbstractAiAgentChatActionTest {
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -201,7 +202,7 @@ class AbstractAiAgentChatActionTest {
         ComponentConnection componentConnection = new ComponentConnection(
             "testComponent", 1, 1L, Map.of(), null);
         Map<String, ComponentConnection> connectionParameters = Map.of("model_1", componentConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -264,7 +265,7 @@ class AbstractAiAgentChatActionTest {
         connectionParameters.put("checkForViolations_1", componentConnection);
         connectionParameters.put("sanitizeText_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -317,7 +318,7 @@ class AbstractAiAgentChatActionTest {
         connectionParameters.put("model_1", componentConnection);
         connectionParameters.put("checkForViolations_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -354,7 +355,7 @@ class AbstractAiAgentChatActionTest {
 
         connectionParameters.put("model_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -423,7 +424,7 @@ class AbstractAiAgentChatActionTest {
             "model_1", componentConnection,
             "chatMemory_1", componentConnection);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -555,7 +556,7 @@ class AbstractAiAgentChatActionTest {
 
         ChatModel chatModel = mock(ChatModel.class);
 
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
@@ -595,7 +596,7 @@ class AbstractAiAgentChatActionTest {
             "memoryComponent", 1, 2L, Map.of(), null);
 
         Map<String, ComponentConnection> connectionParameters = Map.of("memory_1", memoryConnection);
-        ActionContext actionContext = mock(ActionContext.class);
+        ActionContextAware actionContext = mock(ActionContextAware.class);
 
         ChatModel chatModel = mock(ChatModel.class);
 

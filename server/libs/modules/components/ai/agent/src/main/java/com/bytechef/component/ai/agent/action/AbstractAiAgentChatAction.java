@@ -29,10 +29,14 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.facade.AiAgentToolFacade;
+import com.bytechef.component.ai.agent.tool.ConversationResume;
+import com.bytechef.component.ai.agent.tool.ConversationState;
+import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.ContextLoggerAdvisor;
 import com.bytechef.component.ai.llm.converter.JsonSchemaStructuredOutputConverter;
@@ -40,7 +44,10 @@ import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.ai.agent.BaseToolFunction;
+import com.bytechef.platform.ai.constant.AiAgentToolContextKey;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.component.ComponentConnection;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
 import com.bytechef.platform.component.definition.ai.agent.GuardrailsFunction;
@@ -110,6 +117,16 @@ public abstract class AbstractAiAgentChatAction {
         Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
         @Nullable ToolExecutionListener toolExecutionListener, ActionContext context) throws Exception {
 
+        return getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, toolExecutionListener, context,
+            ModelUtils.getMessages(inputParameters, context));
+    }
+
+    protected ChatClient.ChatClientRequestSpec getChatClientRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        @Nullable ToolExecutionListener toolExecutionListener, ActionContext context,
+        List<org.springframework.ai.chat.messages.Message> messages) throws Exception {
+
         ClusterElementMap clusterElementMap = ClusterElementMap.of(extensions);
 
         ClusterElement modelClusterElement = clusterElementMap.getClusterElement(MODEL);
@@ -153,7 +170,7 @@ public abstract class AbstractAiAgentChatAction {
         return createPrompt(chatClient, inputParameters, context)
             .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context))
             .advisors(getConversationAdvisor(conversationId))
-            .messages(ModelUtils.getMessages(inputParameters, context))
+            .messages(messages)
             .tools(
                 getToolCallbacks(
                     clusterElementMap.getClusterElements(BaseToolFunction.TOOLS), connectionParameters,
@@ -253,6 +270,46 @@ public abstract class AbstractAiAgentChatAction {
                 return result;
             }
         };
+    }
+
+    protected Object resumeChat(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = buildPatchedRequestSpec(
+            inputParameters, connectionParameters, extensions, continueParameters, data, context);
+
+        return ModelUtils.getChatActionResult(chatClientRequestSpec.call(), inputParameters, context)
+            .response();
+    }
+
+    protected ChatClient.ChatClientRequestSpec buildPatchedRequestSpec(
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
+
+        ConversationState conversationState = continueParameters.get(
+            ToolSuspendConstants.CONVERSATION_STATE, ConversationState.class);
+
+        if (conversationState == null) {
+            throw new IllegalStateException(
+                "Resume continuation is missing the serialized conversation state (key '" +
+                    ToolSuspendConstants.CONVERSATION_STATE + "'). The agent's tool-calling loop cannot be " +
+                    "reconstructed; the suspend may have been recorded after a delegate tool-call failure.");
+        }
+
+        String pendingToolCallId = continueParameters.getRequiredString(
+            ToolSuspendConstants.PENDING_TOOL_CALL_ID);
+
+        List<org.springframework.ai.chat.messages.Message> conversation = ConversationResume.patchPendingToolResponse(
+            conversationState.toMessages(), pendingToolCallId,
+            JsonUtils.write(data.toMap()));
+
+        ChatClient.ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
+            inputParameters, connectionParameters, extensions, null, context, conversation);
+
+        chatClientRequestSpec.toolContext(Map.of(AiAgentToolContextKey.ACTION_CONTEXT, context));
+
+        return chatClientRequestSpec;
     }
 
     private static ChatClient.ChatClientRequestSpec createPrompt(
@@ -377,7 +434,8 @@ public abstract class AbstractAiAgentChatAction {
 
         advisors.add(
             ToolCallingAdvisor.builder()
-                .toolCallingManager(toolCallingManager)
+                .toolCallingManager(
+                    new SuspendableToolCallingManager(toolCallingManager, (ActionContextAware) context))
                 .build());
 
         clusterElementMap.fetchClusterElement(RAG)

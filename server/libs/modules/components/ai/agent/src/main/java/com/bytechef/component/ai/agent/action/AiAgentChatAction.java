@@ -35,6 +35,7 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
+import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,7 +77,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
                     (MultipleConnectionsOutputFunction) (
                         inputParameters, componentConnections, extensions, context) -> ModelUtils.output(
                             inputParameters, null, context))
-                .resumePerform(this::resumePerform));
+                .resumePerform(
+                    (MultipleConnectionsResumePerformFunction) this::resumePerform));
     }
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
@@ -93,10 +95,13 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     @SuppressWarnings("PMD.UnusedFormalParameter")
     protected ResumeResponse resumePerform(
-        Parameters inputParameters, Parameters connectionParameters, Parameters continueParameters, Parameters data,
-        ActionContext context) {
+        Parameters inputParameters, Map<String, ComponentConnection> connectionParameters, Parameters extensions,
+        Parameters continueParameters, Parameters data, ActionContext context) throws Exception {
 
-        return ResumeResponse.of(new HashMap<>(data.toMap()));
+        Object response = resumeChat(
+            inputParameters, connectionParameters, extensions, continueParameters, data, context);
+
+        return ResumeResponse.of(new HashMap<>(Map.of("response", response)));
     }
 
     @Nullable

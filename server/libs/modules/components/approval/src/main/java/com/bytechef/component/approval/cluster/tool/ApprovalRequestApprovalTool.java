@@ -24,25 +24,35 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.ComponentDsl.ModifiableClusterElementDefinition;
+import com.bytechef.component.definition.Property;
+import com.bytechef.platform.ai.constant.ToolSuspendConstants;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import java.util.List;
+import java.util.Optional;
 
 /**
- * Exposes {@link ApprovalRequestApprovalAction} as a {@link MultipleConnectionsToolFunction} cluster element so AI
- * agents can request human approval — including dispatching to approval-channel cluster elements when the agent passes
- * them through.
+ * Adapts the {@link ApprovalRequestApprovalAction} into a {@link MultipleConnectionsToolFunction} so the AI agent can
+ * invoke it as a tool. This adapter exists — rather than reusing the standard {@code ComponentDsl#tool(...)} helper —
+ * because the underlying action's perform is a {@link MultipleConnectionsPerformFunction} (it needs the full
+ * {@code componentConnections} map), and the generic helper would downcast it to the single-connection
+ * {@code PerformFunction}.
  *
  * <p>
- * The standard {@link ComponentDsl#tool(com.bytechef.component.definition.ActionDefinition)} helper does not fit here:
- * it casts the action's perform to a plain {@code PerformFunction}, but the underlying action registers a
- * {@link MultipleConnectionsPerformFunction}. The runtime dispatcher (in {@code ClusterElementDefinitionServiceImpl})
- * already understands {@code MultipleConnectionsToolFunction} and forwards the {@code componentConnections} map, so the
- * tool delegates straight to the action's perform via a real {@link ActionContext} obtained from
- * {@link ClusterElementContextAware#toActionContext}. That context supports {@code suspend(...)}, unlike the
- * {@code ActionContextAdapter} used by {@code AiAgentChatTool}.
+ * The {@link ClusterElementContextAware#toActionContext} cast at construction is load-bearing for the suspend protocol:
+ * it materializes the per-tool {@link ActionContext} that the action's perform writes its suspend onto, and that
+ * suspend is then observed by {@code SuspendableToolCallingManager} on the agent's {@code ActionContextAware} surface.
+ * An {@code ActionContextAdapter}-style passthrough does not work here because the suspend would land on a non-shared
+ * context invisible to the agent loop.
+ *
+ * <p>
+ * The tool returns {@link ToolSuspendConstants#SUSPENDED_SENTINEL} as its result and discards the action's actual
+ * return value: the agent loop is re-entered on resume with the human's answer patched into this tool call's response
+ * slot, so the action's synchronous return is meaningless.
+ * {@code SuspendableToolCallingManager.findSentinelToolResponseId} uses the sentinel string to locate the pending
+ * tool-call id at suspend time.
  *
  * @author Ivica Cardic
  */
@@ -56,19 +66,22 @@ public class ApprovalRequestApprovalTool {
             .getPerform()
             .orElseThrow();
 
+        Optional<List<? extends Property>> propertiesOptional = actionDefinition.getProperties();
+
         return ComponentDsl.<MultipleConnectionsToolFunction>clusterElement("requestApproval")
             .title("Request Approval")
             .description("Sends an approval request and waits for a human to approve or reject.")
             .type(TOOLS)
-            .properties(actionDefinition.getProperties()
-                .orElse(List.of()))
+            .properties(propertiesOptional.orElse(List.of()))
             .object(() -> (inputParameters, connectionParameters, extensions, componentConnections, context) -> {
                 ClusterElementContextAware clusterElementContextAware = (ClusterElementContextAware) context;
 
                 ActionContext actionContext = clusterElementContextAware.toActionContext(
                     APPROVAL, 1, "requestApproval", null);
 
-                return performFunction.apply(inputParameters, componentConnections, extensions, actionContext);
+                performFunction.apply(inputParameters, componentConnections, extensions, actionContext);
+
+                return ToolSuspendConstants.SUSPENDED_SENTINEL;
             });
     }
 

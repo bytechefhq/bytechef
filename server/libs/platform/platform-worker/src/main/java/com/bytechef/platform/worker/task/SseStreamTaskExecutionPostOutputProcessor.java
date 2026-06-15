@@ -18,8 +18,11 @@ package com.bytechef.platform.worker.task;
 
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.worker.task.handler.TaskExecutionPostOutputProcessor;
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.message.broker.MessageBroker;
+import com.bytechef.platform.component.definition.SuspendAwareSseEmitterHandler;
+import com.bytechef.platform.component.definition.SuspendUtils;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
@@ -64,6 +67,15 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
         sseEmitterHandler.handle(emitter);
 
         awaitCompletion(emitter, latch);
+
+        if (output instanceof SuspendAwareSseEmitterHandler suspendAwareSseEmitterHandler) {
+            ActionContext.Suspend suspend = SuspendUtils.finalizeSuspend(
+                suspendAwareSseEmitterHandler.getActionContext());
+
+            if (suspend != null) {
+                return suspend;
+            }
+        }
 
         return null;
     }
@@ -132,9 +144,11 @@ public class SseStreamTaskExecutionPostOutputProcessor implements TaskExecutionP
 
             messageBroker.send(SseStreamMessageRoute.SSE_STREAM_EVENTS, sseStreamEvent);
         } catch (Exception exception) {
-            if (log.isTraceEnabled()) {
-                log.trace(exception.getMessage(), exception);
-            }
+            // Broker outage / serialization failure drops the SSE event. Resume now depends critically on this
+            // delivery channel; a silently lost event leaves the user staring at a hung stream until SSE_TIMEOUT.
+            log.warn(
+                "Failed to publish SSE stream event (jobId={}, eventType={}) to broker route {}",
+                jobId, eventType, SseStreamMessageRoute.SSE_STREAM_EVENTS, exception);
         }
     }
 

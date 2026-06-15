@@ -39,6 +39,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 class ClusterElementContextImpl extends ContextImpl implements ClusterElementContextAware {
 
+    private final @Nullable ActionContext agentActionContext;
     private final CacheManager cacheManager;
     private final @Nullable ClusterElementResolverFunction clusterElementResolver;
     private final DataStorage dataStorage;
@@ -64,6 +65,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             builder.jobId, builder.taskExecutionId, builder.editorEnvironment, builder.httpClientExecutor,
             builder.tempFileStorage, builder.logFileStorageWriter);
 
+        this.agentActionContext = builder.agentActionContext;
         this.cacheManager = builder.cacheManager;
         this.clusterElementResolver = builder.clusterElementResolver;
         this.dataStorage = builder.dataStorage;
@@ -105,6 +107,13 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
     public ActionContext toActionContext(
         String componentName, int componentVersion, String actionName,
         @Nullable ComponentConnection componentConnection) {
+
+        // When this cluster-element context was created on the AI agent path, it carries the live agent
+        // ActionContext. Return it so tools that reach their context via toActionContext (e.g. requestApproval)
+        // run against the agent execution — this lets the tool's suspend()/resume() reach the live agent.
+        if (agentActionContext != null) {
+            return agentActionContext;
+        }
 
         return ActionContextImpl
             .builder(
@@ -291,6 +300,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
 
     static final class Builder {
 
+        private @Nullable ActionContext agentActionContext;
         private final CacheManager cacheManager;
         private final String clusterElementName;
         private @Nullable ClusterElementResolverFunction clusterElementResolver;
@@ -326,6 +336,12 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
             this.eventPublisher = eventPublisher;
             this.httpClientExecutor = httpClientExecutor;
             this.tempFileStorage = tempFileStorage;
+        }
+
+        Builder agentActionContext(@Nullable ActionContext agentActionContext) {
+            this.agentActionContext = agentActionContext;
+
+            return this;
         }
 
         Builder clusterElementResolver(@Nullable ClusterElementResolverFunction clusterElementResolver) {

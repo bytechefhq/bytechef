@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.service;
 
+import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -62,6 +63,16 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         @Nullable ComponentConnection componentConnection, boolean editorEnvironment);
 
+    /**
+     * Executes a single-connection tool cluster element, threading the supplied AI agent {@link ActionContext} through
+     * so the tool runs against the agent's context (enabling {@code suspend()}/{@code resume()} to reach the live agent
+     * execution). When {@code agentActionContext} is {@code null} this behaves exactly like the overload without it.
+     */
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        @Nullable ComponentConnection componentConnection, boolean editorEnvironment,
+        @Nullable ActionContext agentActionContext);
+
     Object executeTool(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment);
@@ -73,6 +84,16 @@ public interface ClusterElementDefinitionService extends OperationDefinitionServ
     Object executeApprovalChannel(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
         String formUrl, @Nullable ComponentConnection componentConnection, ActionContextAware actionContext);
+
+    /**
+     * Executes a multi-connection tool cluster element, threading the supplied AI agent {@link ActionContext} through
+     * so the tool runs against the agent's context (enabling {@code suspend()}/{@code resume()} to reach the live agent
+     * execution). When {@code agentActionContext} is {@code null} this behaves exactly like the overload without it.
+     */
+    Object executeTool(
+        String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters,
+        Map<String, ?> extensions, Map<String, ComponentConnection> componentConnections, boolean editorEnvironment,
+        @Nullable ActionContext agentActionContext);
 
     String executeWorkflowNodeDescription(
         String componentName, int componentVersion, String clusterElementName, Map<String, ?> inputParameters);

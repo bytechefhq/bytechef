@@ -132,7 +132,11 @@ public interface ActionDefinition {
      */
     Optional<List<? extends Property>> getProperties();
 
-    Optional<ResumePerformFunction> getResumePerform();
+    /**
+     *
+     * @return
+     */
+    Optional<? extends BaseResumePerformFunction> getResumePerform();
 
     /**
      *
@@ -167,6 +171,17 @@ public interface ActionDefinition {
      * of business processes, workflows, or other operations.
      */
     interface BasePerformFunction {
+
+    }
+
+    /**
+     * Represents the base interface for defining custom action resume execution logic. Implementations of this
+     * interface typically serve as a foundational contract for creating functional interfaces that require the
+     * resumption of a previously suspended action within a defined context, using parameters and configuration. <br>
+     * This interface is designed to be extended by more specific functional interfaces to enable the dynamic resumption
+     * of business processes, workflows, or other operations.
+     */
+    interface BaseResumePerformFunction {
 
     }
 
@@ -505,7 +520,7 @@ public interface ActionDefinition {
      * during workflow execution.
      */
     @FunctionalInterface
-    interface ResumePerformFunction {
+    interface ResumePerformFunction extends BaseResumePerformFunction {
 
         /**
          * Executes an action using the provided parameters and context. This method is designed for continuation or
