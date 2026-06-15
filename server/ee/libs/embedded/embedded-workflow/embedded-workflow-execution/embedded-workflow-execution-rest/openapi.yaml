@@ -107,6 +107,35 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/WorkflowExecution"
+  /workflow-executions/{id}/task-executions/{taskExecutionId}:
+    get:
+      description: "Get a single task execution's input and output by id."
+      summary: "Get a task execution by id"
+      tags:
+        - "workflow-execution"
+      operationId: "getWorkflowExecutionTaskExecution"
+      parameters:
+        - name: "id"
+          description: "The id of an execution."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+        - name: "taskExecutionId"
+          description: "The id of a task execution."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
+      responses:
+        "200":
+          description: "The task execution object."
+          content:
+            application/json:
+              schema:
+                $ref: "../../../../../../libs/platform/platform-workflow/platform-workflow-execution/platform-workflow-execution-rest/platform-workflow-execution-rest-impl/openapi.yaml#/components/schemas/TaskExecution"
 components:
   schemas:
     Page:
