@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Category,
-} from '../models/index';
 import {
+    type Category,
     CategoryFromJSON,
     CategoryToJSON,
-} from '../models/index';
+} from '../models/Category';
 
 /**
  * 

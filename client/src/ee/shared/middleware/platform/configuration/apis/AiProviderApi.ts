@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  AiProvider,
-  UpdateAiProviderRequest,
-} from '../models/index';
 import {
+    type AiProvider,
     AiProviderFromJSON,
     AiProviderToJSON,
+} from '../models/AiProvider';
+import {
+    type UpdateAiProviderRequest,
     UpdateAiProviderRequestFromJSON,
     UpdateAiProviderRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateAiProviderRequest';
 
 export interface DeleteAiProviderRequest {
     id: number;
@@ -79,7 +78,7 @@ export class AiProviderApi extends runtime.BaseAPI {
 
 
         let urlPath = `/ai-providers/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -143,8 +142,8 @@ export class AiProviderApi extends runtime.BaseAPI {
 
 
         let urlPath = `/ai-providers/{id}/enable/{enable}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{enable}', encodeURIComponent(String(requestParameters['enable'])));
 
         return {
             path: urlPath,
@@ -260,7 +259,7 @@ export class AiProviderApi extends runtime.BaseAPI {
 
 
         let urlPath = `/ai-providers/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

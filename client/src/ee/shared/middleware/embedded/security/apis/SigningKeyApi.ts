@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  CreateSigningKey200Response,
-  SigningKey,
-} from '../models/index';
 import {
+    type CreateSigningKey200Response,
     CreateSigningKey200ResponseFromJSON,
     CreateSigningKey200ResponseToJSON,
+} from '../models/CreateSigningKey200Response';
+import {
+    type SigningKey,
     SigningKeyFromJSON,
     SigningKeyToJSON,
-} from '../models/index';
+} from '../models/SigningKey';
 
 export interface CreateSigningKeyRequest {
     signingKey: Omit<SigningKey, 'createdBy'|'createdDate'|'id'|'keyId'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'>;
@@ -117,7 +116,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
 
 
         let urlPath = `/signing-keys/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -163,7 +162,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
 
 
         let urlPath = `/signing-keys/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -269,7 +268,7 @@ export class SigningKeyApi extends runtime.BaseAPI {
 
 
         let urlPath = `/signing-keys/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Option,
-} from '../models/index';
 import {
+    type Option,
     OptionFromJSON,
     OptionToJSON,
-} from '../models/index';
+} from '../models/Option';
 
 export interface GetClusterElementNodeOptionsRequest {
     id: string;
@@ -111,11 +108,11 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/options/{propertyName}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
-        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{propertyName}', encodeURIComponent(String(requestParameters['propertyName'])));
 
         return {
             path: urlPath,
@@ -195,9 +192,9 @@ export class WorkflowNodeOptionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/options/{propertyName}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{propertyName}', encodeURIComponent(String(requestParameters['propertyName'])));
 
         return {
             path: urlPath,

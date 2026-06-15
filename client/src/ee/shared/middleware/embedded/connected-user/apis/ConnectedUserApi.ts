@@ -12,21 +12,22 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ConnectedUser,
-  CredentialStatus,
-  Page,
-} from '../models/index';
 import {
+    type ConnectedUser,
     ConnectedUserFromJSON,
     ConnectedUserToJSON,
+} from '../models/ConnectedUser';
+import {
+    type CredentialStatus,
     CredentialStatusFromJSON,
     CredentialStatusToJSON,
+} from '../models/CredentialStatus';
+import {
+    type Page,
     PageFromJSON,
     PageToJSON,
-} from '../models/index';
+} from '../models/Page';
 
 export interface DeleteConnectedUserRequest {
     id: number;
@@ -73,7 +74,7 @@ export class ConnectedUserApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-users/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -126,8 +127,8 @@ export class ConnectedUserApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-users/{id}/enable/{enable}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{enable}', encodeURIComponent(String(requestParameters['enable'])));
 
         return {
             path: urlPath,
@@ -173,7 +174,7 @@ export class ConnectedUserApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-users/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

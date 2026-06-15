@@ -12,21 +12,22 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  CreateProjectWorkflow200Response,
-  DuplicateWorkflow200Response,
-  Workflow,
-} from '../models/index';
 import {
+    type CreateProjectWorkflow200Response,
     CreateProjectWorkflow200ResponseFromJSON,
     CreateProjectWorkflow200ResponseToJSON,
+} from '../models/CreateProjectWorkflow200Response';
+import {
+    type DuplicateWorkflow200Response,
     DuplicateWorkflow200ResponseFromJSON,
     DuplicateWorkflow200ResponseToJSON,
+} from '../models/DuplicateWorkflow200Response';
+import {
+    type Workflow,
     WorkflowFromJSON,
     WorkflowToJSON,
-} from '../models/index';
+} from '../models/Workflow';
 
 export interface CreateProjectWorkflowRequest {
     id: number;
@@ -96,7 +97,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/workflows`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -144,7 +145,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -197,8 +198,8 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/workflows/{workflowId}/duplicate`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,
@@ -256,8 +257,8 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/versions/{projectVersion}/workflows`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"projectVersion"}}`, encodeURIComponent(String(requestParameters['projectVersion'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{projectVersion}', encodeURIComponent(String(requestParameters['projectVersion'])));
 
         return {
             path: urlPath,
@@ -304,7 +305,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/by-project-workflow-id/{projectWorkflowId}`;
-        urlPath = urlPath.replace(`{${"projectWorkflowId"}}`, encodeURIComponent(String(requestParameters['projectWorkflowId'])));
+        urlPath = urlPath.replace('{projectWorkflowId}', encodeURIComponent(String(requestParameters['projectWorkflowId'])));
 
         return {
             path: urlPath,
@@ -351,7 +352,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/workflows`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -398,7 +399,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -493,7 +494,7 @@ export class WorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

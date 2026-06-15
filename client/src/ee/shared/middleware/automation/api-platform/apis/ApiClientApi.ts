@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ApiClient,
-  CreateApiClient200Response,
-} from '../models/index';
 import {
+    type ApiClient,
     ApiClientFromJSON,
     ApiClientToJSON,
+} from '../models/ApiClient';
+import {
+    type CreateApiClient200Response,
     CreateApiClient200ResponseFromJSON,
     CreateApiClient200ResponseToJSON,
-} from '../models/index';
+} from '../models/CreateApiClient200Response';
 
 export interface CreateApiClientRequest {
     apiClient: Omit<ApiClient, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'lastUsedDate'|'secretKey'>;
@@ -113,7 +112,7 @@ export class ApiClientApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-client/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -159,7 +158,7 @@ export class ApiClientApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-client/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -254,7 +253,7 @@ export class ApiClientApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-client/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

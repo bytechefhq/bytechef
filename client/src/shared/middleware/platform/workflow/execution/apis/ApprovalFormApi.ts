@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ApprovalForm,
-} from '../models/index';
 import {
+    type ApprovalForm,
     ApprovalFormFromJSON,
     ApprovalFormToJSON,
-} from '../models/index';
+} from '../models/ApprovalForm';
 
 export interface GetApprovalFormRequest {
     id: string;
@@ -48,7 +45,7 @@ export class ApprovalFormApi extends runtime.BaseAPI {
 
 
         let urlPath = `/approval-form/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

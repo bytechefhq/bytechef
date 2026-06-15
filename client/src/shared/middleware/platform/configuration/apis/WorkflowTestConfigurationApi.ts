@@ -12,24 +12,27 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  DeleteWorkflowTestConfigurationConnectionRequest,
-  SaveWorkflowTestConfigurationInputsRequest,
-  WorkflowTestConfiguration,
-  WorkflowTestConfigurationConnection,
-} from '../models/index';
 import {
+    type DeleteWorkflowTestConfigurationConnectionRequest,
     DeleteWorkflowTestConfigurationConnectionRequestFromJSON,
     DeleteWorkflowTestConfigurationConnectionRequestToJSON,
+} from '../models/DeleteWorkflowTestConfigurationConnectionRequest';
+import {
+    type SaveWorkflowTestConfigurationInputsRequest,
     SaveWorkflowTestConfigurationInputsRequestFromJSON,
     SaveWorkflowTestConfigurationInputsRequestToJSON,
+} from '../models/SaveWorkflowTestConfigurationInputsRequest';
+import {
+    type WorkflowTestConfiguration,
     WorkflowTestConfigurationFromJSON,
     WorkflowTestConfigurationToJSON,
+} from '../models/WorkflowTestConfiguration';
+import {
+    type WorkflowTestConfigurationConnection,
     WorkflowTestConfigurationConnectionFromJSON,
     WorkflowTestConfigurationConnectionToJSON,
-} from '../models/index';
+} from '../models/WorkflowTestConfigurationConnection';
 
 export interface DeleteWorkflowTestConfigurationConnectionOperationRequest {
     workflowId: string;
@@ -117,9 +120,9 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/{workflowConnectionKey}/connections`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"workflowConnectionKey"}}`, encodeURIComponent(String(requestParameters['workflowConnectionKey'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{workflowConnectionKey}', encodeURIComponent(String(requestParameters['workflowConnectionKey'])));
 
         return {
             path: urlPath,
@@ -177,7 +180,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-test-configurations/{workflowId}`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,
@@ -242,8 +245,8 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-test-configurations/{workflowId}/workflow-nodes/{workflowNodeName}/connections`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
         return {
             path: urlPath,
@@ -299,7 +302,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-test-configurations/{workflowId}`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,
@@ -367,7 +370,7 @@ export class WorkflowTestConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-test-configurations/{workflowId}/inputs`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,

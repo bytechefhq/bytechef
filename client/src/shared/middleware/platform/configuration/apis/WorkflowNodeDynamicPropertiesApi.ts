@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Property,
-} from '../models/index';
 import {
+    type Property,
     PropertyFromJSON,
     PropertyToJSON,
-} from '../models/index';
+} from '../models/Property';
 
 export interface GetClusterElementNodeDynamicPropertiesRequest {
     id: string;
@@ -105,11 +102,11 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/dynamic-properties/{propertyName}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
-        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{propertyName}', encodeURIComponent(String(requestParameters['propertyName'])));
 
         return {
             path: urlPath,
@@ -185,9 +182,9 @@ export class WorkflowNodeDynamicPropertiesApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/dynamic-properties/{propertyName}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"propertyName"}}`, encodeURIComponent(String(requestParameters['propertyName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{propertyName}', encodeURIComponent(String(requestParameters['propertyName'])));
 
         return {
             path: urlPath,

@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  StartWebhookTriggerTest200Response,
-} from '../models/index';
 import {
+    type StartWebhookTriggerTest200Response,
     StartWebhookTriggerTest200ResponseFromJSON,
     StartWebhookTriggerTest200ResponseToJSON,
-} from '../models/index';
+} from '../models/StartWebhookTriggerTest200Response';
 
 export interface StartWebhookTriggerTestRequest {
     workflowId: string;
@@ -65,7 +62,7 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
 
 
         let urlPath = `/webhooks/{workflowId}/test/start`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,
@@ -123,7 +120,7 @@ export class WebhookTriggerTestApi extends runtime.BaseAPI {
 
 
         let urlPath = `/webhooks/{workflowId}/test/stop`;
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
 
         return {
             path: urlPath,

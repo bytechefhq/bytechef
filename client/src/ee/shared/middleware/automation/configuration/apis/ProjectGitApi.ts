@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ProjectGitConfiguration,
-} from '../models/index';
 import {
+    type ProjectGitConfiguration,
     ProjectGitConfigurationFromJSON,
     ProjectGitConfigurationToJSON,
-} from '../models/index';
+} from '../models/ProjectGitConfiguration';
 
 export interface GetProjectGitConfigurationRequest {
     id: number;
@@ -65,7 +62,7 @@ export class ProjectGitApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/project-git-configuration`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -112,7 +109,7 @@ export class ProjectGitApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/git/remote-branches`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -159,7 +156,7 @@ export class ProjectGitApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/project-git-configurations`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -206,7 +203,7 @@ export class ProjectGitApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/git/pull`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -261,7 +258,7 @@ export class ProjectGitApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/project-git-configuration`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

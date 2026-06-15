@@ -12,21 +12,22 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ConnectedUserProjectWorkflow,
-  Environment,
-  PublishConnectedUserProjectWorkflowRequest,
-} from '../models/index';
 import {
+    type ConnectedUserProjectWorkflow,
     ConnectedUserProjectWorkflowFromJSON,
     ConnectedUserProjectWorkflowToJSON,
+} from '../models/ConnectedUserProjectWorkflow';
+import {
+    type Environment,
     EnvironmentFromJSON,
     EnvironmentToJSON,
+} from '../models/Environment';
+import {
+    type PublishConnectedUserProjectWorkflowRequest,
     PublishConnectedUserProjectWorkflowRequestFromJSON,
     PublishConnectedUserProjectWorkflowRequestToJSON,
-} from '../models/index';
+} from '../models/PublishConnectedUserProjectWorkflowRequest';
 
 export interface EnableConnectedUserProjectWorkflowRequest {
     workflowUuid: string;
@@ -78,8 +79,8 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-user-project-workflows/{workflowUuid}/enable/{enable}`;
-        urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
-        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
+        urlPath = urlPath.replace('{enable}', encodeURIComponent(String(requestParameters['enable'])));
 
         return {
             path: urlPath,
@@ -129,7 +130,7 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-user-project-workflows/{workflowUuid}`;
-        urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
 
         return {
             path: urlPath,
@@ -189,7 +190,7 @@ export class ConnectedUserProjectWorkflowApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-user-project-workflows/{workflowUuid}/publish`;
-        urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
 
         return {
             path: urlPath,

@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Page,
-  TriggerExecution,
-} from '../models/index';
 import {
+    type Page,
     PageFromJSON,
     PageToJSON,
+} from '../models/Page';
+import {
+    type TriggerExecution,
     TriggerExecutionFromJSON,
     TriggerExecutionToJSON,
-} from '../models/index';
+} from '../models/TriggerExecution';
 
 export interface GetTriggerExecutionRequest {
     id: number;
@@ -55,7 +54,7 @@ export class TriggerExecutionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/trigger-executions/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

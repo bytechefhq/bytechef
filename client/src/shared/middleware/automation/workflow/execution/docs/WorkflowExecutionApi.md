@@ -5,6 +5,7 @@ All URIs are relative to */api/automation/internal*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**getWorkflowExecution**](WorkflowExecutionApi.md#getworkflowexecution) | **GET** /workflow-executions/{id} | Get workflow executions by id |
+| [**getWorkflowExecutionTaskExecution**](WorkflowExecutionApi.md#getworkflowexecutiontaskexecution) | **GET** /workflow-executions/{id}/task-executions/{taskExecutionId} | Get a task execution by id |
 | [**getWorkflowExecutionsPage**](WorkflowExecutionApi.md#getworkflowexecutionspage) | **GET** /workspaces/{id}/workflow-executions | Get project workflow executions |
 
 
@@ -72,6 +73,76 @@ No authorization required
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | The execution object. |  -  |
+
+[[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
+
+
+## getWorkflowExecutionTaskExecution
+
+> TaskExecution getWorkflowExecutionTaskExecution(id, taskExecutionId)
+
+Get a task execution by id
+
+Get a single task execution\&#39;s input and output by id.
+
+### Example
+
+```ts
+import {
+  Configuration,
+  WorkflowExecutionApi,
+} from '';
+import type { GetWorkflowExecutionTaskExecutionRequest } from '';
+
+async function example() {
+  console.log("🚀 Testing  SDK...");
+  const api = new WorkflowExecutionApi();
+
+  const body = {
+    // number | The id of an execution.
+    id: 789,
+    // number | The id of a task execution.
+    taskExecutionId: 789,
+  } satisfies GetWorkflowExecutionTaskExecutionRequest;
+
+  try {
+    const data = await api.getWorkflowExecutionTaskExecution(body);
+    console.log(data);
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+// Run the test
+example().catch(console.error);
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of an execution. | [Defaults to `undefined`] |
+| **taskExecutionId** | `number` | The id of a task execution. | [Defaults to `undefined`] |
+
+### Return type
+
+[**TaskExecution**](TaskExecution.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: `application/json`
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | The task execution object. |  -  |
 
 [[Back to top]](#) [[Back to API list]](../README.md#api-endpoints) [[Back to Model list]](../README.md#models) [[Back to README]](../README.md)
 

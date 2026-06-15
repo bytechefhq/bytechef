@@ -20,6 +20,7 @@ Name | Type
 `lastIntegrationVersion` | number
 `multipleInstances` | boolean
 `name` | string
+`permissionExpression` | string
 
 ## Example
 
@@ -41,6 +42,7 @@ const example = {
   "lastIntegrationVersion": null,
   "multipleInstances": null,
   "name": null,
+  "permissionExpression": null,
 } satisfies IntegrationBasic
 
 console.log(example)

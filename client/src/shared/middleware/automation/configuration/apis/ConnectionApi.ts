@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Connection,
-  UpdateConnectionRequest,
-} from '../models/index';
 import {
+    type Connection,
     ConnectionFromJSON,
     ConnectionToJSON,
+} from '../models/Connection';
+import {
+    type UpdateConnectionRequest,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateConnectionRequest';
 
 export interface CreateConnectionRequest {
     connection: Connection;
@@ -125,7 +124,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -171,7 +170,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -234,7 +233,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/connections`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -290,7 +289,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

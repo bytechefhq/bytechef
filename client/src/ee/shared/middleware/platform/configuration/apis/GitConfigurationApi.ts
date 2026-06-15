@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  GitConfiguration,
-} from '../models/index';
 import {
+    type GitConfiguration,
     GitConfigurationFromJSON,
     GitConfigurationToJSON,
-} from '../models/index';
+} from '../models/GitConfiguration';
 
 export interface GetGitConfigurationRequest {
     id: number;
@@ -53,7 +50,7 @@ export class GitConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/git-configuration`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -109,7 +106,7 @@ export class GitConfigurationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/git-configuration`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
