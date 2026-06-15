@@ -90,38 +90,38 @@ public class TriggerCompletionHandler {
         String workflowId = getWorkflowId(workflowExecutionId);
         Map<String, ?> metadataMap = getMetadataMap(workflowExecutionId);
 
-        if (triggerExecution.getOutput() == null) {
+        Object output = triggerExecution.getOutput() == null
+            ? null
+            : triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
+
+        if (output == null) {
             triggerExecution.addJobId(
                 createJob(
                     workflowId,
                     MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), Map.of())),
                     workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
-        } else {
-            Object output = triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput());
-
-            if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
-                for (Object triggerOutputValue : triggerOutputValues) {
-                    triggerExecution.addJobId(
-                        createJob(
-                            workflowId,
-                            MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
-                            workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
-                }
-            } else if (triggerExecution.isBatch()) {
-                if (output instanceof Collection<?> collection && !collection.isEmpty()) {
-                    triggerExecution.addJobId(
-                        createJob(
-                            workflowId,
-                            MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
-                            workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
-                }
-            } else {
+        } else if (!triggerExecution.isBatch() && output instanceof Collection<?> triggerOutputValues) {
+            for (Object triggerOutputValue : triggerOutputValues) {
+                triggerExecution.addJobId(
+                    createJob(
+                        workflowId,
+                        MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), triggerOutputValue)),
+                        workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
+            }
+        } else if (triggerExecution.isBatch()) {
+            if (output instanceof Collection<?> collection && !collection.isEmpty()) {
                 triggerExecution.addJobId(
                     createJob(
                         workflowId,
                         MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
                         workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
             }
+        } else {
+            triggerExecution.addJobId(
+                createJob(
+                    workflowId,
+                    MapUtils.concat(inputMap, Map.of(triggerExecution.getName(), output)),
+                    workflowExecutionId.getJobPrincipalId(), metadataMap, workflowExecutionId.getType()));
         }
 
         triggerExecutionService.update(triggerExecution);
