@@ -523,7 +523,7 @@ const PropertyComboBox = ({
                         <Button
                             aria-expanded={open}
                             className={twMerge(
-                                'relative w-full justify-between font-normal whitespace-normal',
+                                'relative h-auto min-h-9 w-full justify-between font-normal whitespace-normal',
                                 showInputTypeSwitchButton && 'mt-0'
                             )}
                             disabled={
@@ -566,7 +566,7 @@ const PropertyComboBox = ({
                                     {currentOption ? (
                                         <span
                                             className={twMerge(
-                                                'flex w-full items-center font-normal',
+                                                'flex w-full items-center text-left font-normal',
                                                 leadingIcon && 'ml-9'
                                             )}
                                         >
