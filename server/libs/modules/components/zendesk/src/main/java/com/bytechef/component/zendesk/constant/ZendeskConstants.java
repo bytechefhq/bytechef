@@ -39,12 +39,15 @@ public class ZendeskConstants {
     public static final String NOTES = "notes";
     public static final String ORGANIZATION = "organization";
     public static final String PRIORITY = "priority";
+    public static final String ROLE = "role";
+    public static final String SKIP_VERIFY_EMAIL = "skip_verify_email";
     public static final String STATUS = "status";
     public static final String SUBDOMAIN = "subdomain";
     public static final String SUBJECT = "subject";
     public static final String TICKET = "ticket";
     public static final String TICKET_ID = "ticketId";
     public static final String TYPE = "type";
+    public static final String USER = "user";
     public static final String WEBHOOK = "webhook";
 
     public static final ModifiableObjectProperty TICKET_OBJECT_PROPERTY =
