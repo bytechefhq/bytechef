@@ -16,13 +16,11 @@
 
 package com.bytechef.component.zendesk.action;
 
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.BODY;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.COMMENT;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.PRIORITY;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.STATUS;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.SUBJECT;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET;
-import static com.bytechef.component.zendesk.constant.ZendeskConstants.TYPE;
+import static com.bytechef.component.zendesk.constant.ZendeskConstants.EMAIL;
+import static com.bytechef.component.zendesk.constant.ZendeskConstants.NAME;
+import static com.bytechef.component.zendesk.constant.ZendeskConstants.ROLE;
+import static com.bytechef.component.zendesk.constant.ZendeskConstants.SKIP_VERIFY_EMAIL;
+import static com.bytechef.component.zendesk.constant.ZendeskConstants.USER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -52,12 +50,12 @@ import org.mockito.ArgumentCaptor;
  * @author Nikolina Spehar
  */
 @ExtendWith(MockContextSetupExtension.class)
-class ZendeskCreateTicketActionTest {
+class ZendeskCreateUserActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
-        SUBJECT, "subject", PRIORITY, "priority", COMMENT, "comment", TYPE, "type", STATUS, "status"));
-    private final Map<String, Object> responseMap = Map.of(TICKET, Map.of());
+        NAME, "name", EMAIL, "email", ROLE, "role", SKIP_VERIFY_EMAIL, true));
+    private final Map<String, Object> responseMap = Map.of(USER, Map.of());
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -73,12 +71,12 @@ class ZendeskCreateTicketActionTest {
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
-        Map<String, Object> result = ZendeskCreateTicketAction.perform(
+        Map<String, Object> result = ZendeskCreateUserAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(Map.of(), result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-        assertEquals("/tickets", stringArgumentCaptor.getValue());
+        assertEquals("/users", stringArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
@@ -86,12 +84,11 @@ class ZendeskCreateTicketActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
 
         Map<String, Object> expectedBody = Map.of(
-            TICKET, Map.of(
-                COMMENT, Map.of(BODY, "comment"),
-                PRIORITY, "priority",
-                SUBJECT, "subject",
-                TYPE, "type",
-                STATUS, "status"));
+            USER, Map.of(
+                EMAIL, "email",
+                NAME, "name",
+                ROLE, "role",
+                SKIP_VERIFY_EMAIL, true));
 
         assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
