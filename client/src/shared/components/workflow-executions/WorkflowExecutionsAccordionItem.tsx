@@ -9,8 +9,10 @@ import {
     TaskExecutionFromJSON,
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
-import {type ReactNode} from 'react';
+import {type ReactNode, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
+
+const ITERATIONS_PAGE_SIZE = 100;
 
 const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
     'jobId' in execution;
@@ -30,6 +32,8 @@ const WorkflowExecutionsAccordionItem = ({
     onExecutionClick,
     selectedExecutionId,
 }: WorkflowExecutionsAccordionItemProps) => {
+    const [visibleIterationCount, setVisibleIterationCount] = useState(ITERATIONS_PAGE_SIZE);
+
     const taskExecution = isTaskExecution(execution) ? execution : undefined;
 
     const hasChildren = taskExecution?.children && taskExecution.children.length > 0;
@@ -80,7 +84,7 @@ const WorkflowExecutionsAccordionItem = ({
             >
                 {hasIterations ? (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
-                        {taskExecution.iterations?.map((iteration, index) => {
+                        {taskExecution.iterations?.slice(0, visibleIterationCount).map((iteration, index) => {
                             const iterationValue = `${taskExecution.id}-iteration-${index}`;
                             const currentIterationItem = taskExecution.input?.items?.[index];
                             const convertedIterationItems = (iteration as unknown[]).map((item) =>
@@ -162,6 +166,16 @@ const WorkflowExecutionsAccordionItem = ({
                                 </AccordionItem>
                             );
                         })}
+
+                        {taskExecution.iterations && taskExecution.iterations.length > visibleIterationCount && (
+                            <button
+                                className="mt-1 w-full rounded-md border border-stroke-neutral-primary p-2 text-sm text-content-neutral-secondary hover:border-stroke-brand-primary"
+                                onClick={() => setVisibleIterationCount((count) => count + ITERATIONS_PAGE_SIZE)}
+                                type="button"
+                            >
+                                Show more ({taskExecution.iterations.length - visibleIterationCount} remaining)
+                            </button>
+                        )}
                     </Accordion>
                 ) : (
                     <Accordion className="mt-2 space-y-2" defaultValue={defaultValue} type="multiple">
