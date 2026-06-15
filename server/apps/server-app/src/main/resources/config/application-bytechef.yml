@@ -110,6 +110,7 @@ bytechef:
       enabled: false
   sign-up:
     activation-required: false
+    enabled: true
   # Tenant support mode (single | multi - ee only) default: single
   tenant:
     mode: single
