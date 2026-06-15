@@ -22,6 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
+import com.bytechef.component.sendgrid.action.SendgridSendDynamicTemplateAction;
 import com.bytechef.component.sendgrid.action.SendgridSendEmailAction;
 import com.bytechef.component.sendgrid.connection.SendgridConnection;
 import com.google.auto.service.AutoService;
@@ -36,11 +37,17 @@ public class SendgridComponentHandler implements ComponentHandler {
         .title("Sendgrid")
         .description("Trusted for reliable email delivery at scale.")
         .customAction(true)
+        .customActionHelp("", "https://www.twilio.com/docs/sendgrid/api-reference")
         .connection(SendgridConnection.CONNECTION_DEFINITION)
         .icon("path:assets/sendgrid.svg")
         .categories(ComponentCategory.COMMUNICATION, ComponentCategory.MARKETING_AUTOMATION)
-        .actions(SendgridSendEmailAction.ACTION_DEFINITION)
-        .clusterElements(tool(SendgridSendEmailAction.ACTION_DEFINITION));
+        .actions(
+            SendgridSendEmailAction.ACTION_DEFINITION,
+            SendgridSendDynamicTemplateAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(SendgridSendEmailAction.ACTION_DEFINITION),
+            tool(SendgridSendDynamicTemplateAction.ACTION_DEFINITION))
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {
