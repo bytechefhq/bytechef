@@ -80,6 +80,7 @@ import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcher
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
+import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
     {
@@ -1140,18 +1141,6 @@ export default function useWorkflowNodeDetailsPanel({
 
         let updatedNode = {...currentNode};
 
-        const currentClusterElementConnectionId = workflowTestConfigurationConnections?.find(
-            (connection) => connection.workflowConnectionKey === currentNode?.workflowNodeName
-        )?.connectionId;
-
-        const currentMainRootElementConnectionId = workflowTestConfigurationConnections?.find(
-            (connection) =>
-                connection.workflowNodeName === rootClusterElementNodeData?.workflowNodeName &&
-                currentWorkflowNodeConnections.some(
-                    (curConnection) => curConnection.key === connection.workflowConnectionKey
-                )
-        )?.connectionId;
-
         if (currentNode.operationName && currentOperationName) {
             updatedNode = {
                 ...updatedNode,
@@ -1161,28 +1150,16 @@ export default function useWorkflowNodeDetailsPanel({
             };
         }
 
-        if (currentWorkflowNodeConnections.length) {
-            if (currentNode?.clusterElementType && currentNode?.clusterElementType !== undefined) {
-                updatedNode = {
-                    ...updatedNode,
-                    connectionId: currentClusterElementConnectionId,
-                    connections: currentWorkflowNodeConnections,
-                };
-            } else if (currentNode?.workflowNodeName === rootClusterElementNodeData?.workflowNodeName) {
-                updatedNode = {
-                    ...updatedNode,
-                    connectionId: currentMainRootElementConnectionId,
-                    connections: currentWorkflowNodeConnections,
-                };
-            } else {
-                updatedNode = {
-                    ...updatedNode,
-                    connectionId: workflowTestConfigurationConnections
-                        ? workflowTestConfigurationConnections[0]?.connectionId
-                        : undefined,
-                    connections: currentWorkflowNodeConnections,
-                };
-            }
+        const resolvedConnectionFields = resolveNodeConnectionFields(currentNode, currentWorkflowNodeConnections, {
+            rootClusterElementWorkflowNodeName: rootClusterElementNodeData?.workflowNodeName,
+            workflowTestConfigurationConnections,
+        });
+
+        if (resolvedConnectionFields) {
+            updatedNode = {
+                ...updatedNode,
+                ...resolvedConnectionFields,
+            };
         }
 
         if (!isEqual(updatedNode, currentNode)) {
