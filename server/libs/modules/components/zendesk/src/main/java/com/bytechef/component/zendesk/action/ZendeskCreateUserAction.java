@@ -16,6 +16,14 @@
 
 package com.bytechef.component.zendesk.action;
 
+import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
+import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.definition.TypeReference;
+
+import java.util.Map;
+
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
@@ -31,17 +39,10 @@ import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TICKET_OBJECT_PROPERTY;
 import static com.bytechef.component.zendesk.constant.ZendeskConstants.TYPE;
 
-import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
-import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.Context.Http.Body;
-import com.bytechef.component.definition.Parameters;
-import com.bytechef.component.definition.TypeReference;
-import java.util.Map;
-
 /**
  * @author Nikolina Spehar
  */
-public class ZendeskCreateTicketAction {
+public class ZendeskCreateUserAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createTicket")
         .title("Create Ticket")
@@ -85,10 +86,9 @@ public class ZendeskCreateTicketAction {
                     option("Closed", "closed"))
                 .required(false))
         .output(outputSchema(TICKET_OBJECT_PROPERTY))
-        .help("", "https://docs.bytechef.io/reference/components/zendesk_v1#create-ticket")
-        .perform(ZendeskCreateTicketAction::perform);
+        .perform(ZendeskCreateUserAction::perform);
 
-    private ZendeskCreateTicketAction() {
+    private ZendeskCreateUserAction() {
     }
 
     public static Map<String, Object> perform(

@@ -36,6 +36,8 @@ import java.util.Map;
 public class ZendeskConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/zendesk_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://%s.zendesk.com/api/v2".formatted(
             connectionParameters.getRequiredString(SUBDOMAIN)))
         .authorizations(
