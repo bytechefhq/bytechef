@@ -134,6 +134,35 @@ public class IntegrationWorkflowExecutionFacadeTest {
     }
 
     @Test
+    public void testGetWorkflowExecutionTaskExecutionAcceptsTaskInDescendantJob() {
+        Job childJob = new Job(10L);
+
+        childJob.setParentTaskExecutionId(99L);
+
+        TaskExecution parentTaskExecution = TaskExecution.builder()
+            .id(99L)
+            .jobId(5L)
+            .build();
+
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(jobService.getJob(10L))
+            .thenReturn(childJob);
+        when(taskExecutionService.getTaskExecution(99L))
+            .thenReturn(parentTaskExecution);
+        doReturn(Map.of("context", true))
+            .when(taskFileStorage)
+            .readContextValue(any());
+        when(taskFileStorage.readTaskExecutionOutput(any()))
+            .thenReturn("output-value");
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(5L, 1L);
+
+        assertThat(taskExecutionDTO.input())
+            .isEqualTo(Map.of("evaluated", true));
+    }
+
+    @Test
     public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
         when(taskExecutionService.getTaskExecution(1L))
             .thenReturn(taskExecution);
