@@ -125,7 +125,7 @@ const ComponentsFilter = ({
 
                             <Input
                                 aria-label="Find category"
-                                className="pr-7 pl-9 text-sm"
+                                className="pr-7 pl-9 shadow-none"
                                 onChange={(event) => setSearchValue(event.target.value)}
                                 onKeyDown={(event) => event.stopPropagation()}
                                 placeholder="Find category"
