@@ -58,16 +58,29 @@ interface ThreadPropsI {
   composerActions?: ReactNode;
   leadingComposerActions?: ReactNode;
   suggestions?: ThreadSuggestionI[];
+  /**
+   * When true, the thread root and sticky composer footer use the page background instead of the
+   * tinted `bg-surface-main` surface, so the panel blends into the surrounding page rather than
+   * sitting on a gray card. The footer stays opaque (`bg-background`, not transparent) because it is
+   * `sticky` and messages scroll behind it.
+   */
+  transparent?: boolean;
 }
 
 export const Thread: FC<ThreadPropsI> = ({
   composerActions,
   leadingComposerActions,
   suggestions,
+  transparent,
 }) => {
+  const surfaceClassName = transparent ? "bg-background" : "bg-surface-main";
+
   return (
     <ThreadPrimitive.Root
-      className="aui-root aui-thread-root bg-surface-main @container flex h-full flex-col"
+      className={cn(
+        "aui-root aui-thread-root @container flex h-full flex-col",
+        surfaceClassName,
+      )}
       style={{
         ["--thread-max-width" as string]: "44rem",
         ["--composer-radius" as string]: "24px",
@@ -93,7 +106,12 @@ export const Thread: FC<ThreadPropsI> = ({
             </ThreadPrimitive.Messages>
           </div>
 
-          <ThreadPrimitive.ViewportFooter className="aui-thread-viewport-footer bg-surface-main sticky bottom-0 mt-auto flex flex-col gap-4 overflow-visible rounded-t-(--composer-radius) pb-4 md:pb-6">
+          <ThreadPrimitive.ViewportFooter
+            className={cn(
+              "aui-thread-viewport-footer sticky bottom-0 mt-auto flex flex-col gap-4 overflow-visible rounded-t-(--composer-radius) pb-4 md:pb-6",
+              surfaceClassName,
+            )}
+          >
             <ThreadScrollToBottom />
             <Composer
               composerActions={composerActions}
