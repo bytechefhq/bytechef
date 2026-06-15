@@ -91,7 +91,7 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                             >
                                 <FullscreenIcon className="text-content-neutral-secondary" />
 
-                                <span>Open Response Template</span>
+                                <span>{`Open ${label || 'Response'} Template`}</span>
                             </Button>
 
                             {error && (
