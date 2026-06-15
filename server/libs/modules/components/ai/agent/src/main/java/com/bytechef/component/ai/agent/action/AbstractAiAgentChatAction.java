@@ -76,6 +76,7 @@ import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.chat.prompt.ChatOptions;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.augment.AugmentedToolCallbackProvider;
@@ -151,7 +152,7 @@ public abstract class AbstractAiAgentChatAction {
             .build();
 
         return createPrompt(chatClient, inputParameters, context)
-            .advisors(getAdvisors(clusterElementMap, connectionParameters, context))
+            .advisors(getAdvisors(clusterElementMap, connectionParameters, chatModel, context))
             .advisors(getConversationAdvisor(conversationId))
             .messages(ModelUtils.getMessages(inputParameters, context))
             .tools(
@@ -326,7 +327,7 @@ public abstract class AbstractAiAgentChatAction {
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
-        ActionContext context) {
+        ChatModel chatModel, ActionContext context) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -383,10 +384,16 @@ public abstract class AbstractAiAgentChatAction {
         // well-formed tool-call sequences. This replaces the former custom ToolHistoryToolCallAdvisor +
         // disableInternalConversationHistory() workaround, which was only required under the M-series ordering
         // where ChatMemoryAdvisor sat downstream of the tool loop and therefore could not rehydrate it.
-        advisors.add(
-            ToolCallingAdvisor.builder()
-                .toolCallingManager(toolCallingManager)
-                .build());
+        //
+        // Guard: ToolCallingAdvisor requires the model's ChatOptions to implement ToolCallingChatOptions.
+        // Models that predate Spring AI 2.0.0 (e.g. HuggingFace M1/M2) may not implement the interface,
+        // which would cause ToolCallingAdvisor to throw (RC1) or silently skip tool calls (2.0.0 final).
+        if (chatModel.getOptions() instanceof ToolCallingChatOptions) {
+            advisors.add(
+                ToolCallingAdvisor.builder()
+                    .toolCallingManager(toolCallingManager)
+                    .build());
+        }
 
         clusterElementMap.fetchClusterElement(RAG)
             .map(clusterElement -> getRagAdvisor(connectionParameters, clusterElement, context))
