@@ -51,9 +51,9 @@ public class AwsS3ListObjectsAction {
         .description("Get the list AWS S3 objects. Every object needs to have read permission in order to be seen.")
         .properties(
             string(PREFIX)
-                .label("Prefix")
-                .description("The prefix of an AWS S3 objects.")
-                .required(true))
+                .label("Key Prefix")
+                .description("The prefix of an AWS S3 object key.")
+                .required(false))
         .output(
             outputSchema(
                 array()
@@ -61,7 +61,7 @@ public class AwsS3ListObjectsAction {
                         object()
                             .properties(
                                 string("key"),
-                                string("suffix"),
+                                string("name"),
                                 string("uri")))))
         .perform(AwsS3ListObjectsAction::perform);
 
@@ -77,7 +77,7 @@ public class AwsS3ListObjectsAction {
         try (S3Client s3Client = AwsS3Utils.buildS3Client(connectionParameters)) {
             ListObjectsResponse response = s3Client.listObjects(ListObjectsRequest.builder()
                 .bucket(connectionParameters.getRequiredString(BUCKET_NAME))
-                .prefix(inputParameters.getRequiredString(PREFIX))
+                .prefix(inputParameters.getString(PREFIX))
                 .build());
 
             return response.contents()
@@ -96,7 +96,7 @@ public class AwsS3ListObjectsAction {
         @SuppressFBWarnings(
             value = "PATH_TRAVERSAL_IN",
             justification = "Paths.get() is only used to parse S3 key and extract filename; no file I/O is performed")
-        public String getSuffix() {
+        public String getName() {
             Path path = Paths.get(getKey());
 
             Path fileName = Validate.notNull(path.getFileName(), "fileName");
