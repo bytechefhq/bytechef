@@ -83,7 +83,7 @@ const AiSkillCreateWithAi = () => {
     return (
         <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col overflow-hidden">
             <CopilotRuntimeProvider source={Source.SKILLS}>
-                <Thread suggestions={SKILL_SUGGESTIONS} />
+                <Thread suggestions={SKILL_SUGGESTIONS} transparent />
             </CopilotRuntimeProvider>
         </div>
     );
