@@ -25,6 +25,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.zendesk.action.ZendeskCommentTicketAction;
 import com.bytechef.component.zendesk.action.ZendeskCreateOrganizationAction;
 import com.bytechef.component.zendesk.action.ZendeskCreateTicketAction;
+import com.bytechef.component.zendesk.action.ZendeskCreateUserAction;
 import com.bytechef.component.zendesk.connection.ZendeskConnection;
 import com.bytechef.component.zendesk.trigger.ZendeskNewTicketTrigger;
 import com.google.auto.service.AutoService;
@@ -49,11 +50,13 @@ public class ZendeskComponentHandler implements ComponentHandler {
         .actions(
             ZendeskCommentTicketAction.ACTION_DEFINITION,
             ZendeskCreateOrganizationAction.ACTION_DEFINITION,
-            ZendeskCreateTicketAction.ACTION_DEFINITION)
+            ZendeskCreateTicketAction.ACTION_DEFINITION,
+            ZendeskCreateUserAction.ACTION_DEFINITION)
         .clusterElements(
             tool(ZendeskCommentTicketAction.ACTION_DEFINITION),
             tool(ZendeskCreateOrganizationAction.ACTION_DEFINITION),
-            tool(ZendeskCreateTicketAction.ACTION_DEFINITION))
+            tool(ZendeskCreateTicketAction.ACTION_DEFINITION),
+            tool(ZendeskCreateUserAction.ACTION_DEFINITION))
         .triggers(ZendeskNewTicketTrigger.TRIGGER_DEFINITION);
 
     @Override
