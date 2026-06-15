@@ -10,7 +10,7 @@ import {
 } from '@/shared/middleware/platform/workflow/test';
 import {TabValueType} from '@/shared/types';
 import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
-import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 
 type UseWorkflowExecutionsReturnType = {
     activeTab: TabValueType;
@@ -88,21 +88,21 @@ const useWorkflowExecutions = ({
         stackTrace: [],
     };
 
-    const handleBreadcrumbNavigate = useCallback((index: number) => {
+    const handleBreadcrumbNavigate = (index: number) => {
         setSubflowStack((prev) => prev.slice(0, index));
-    }, []);
+    };
 
-    const handleExecutionClick = useCallback((taskExecution: TaskExecution | TriggerExecution) => {
+    const handleExecutionClick = (taskExecution: TaskExecution | TriggerExecution) => {
         setActiveTab(taskExecution.error ? 'error' : 'output');
 
         setSelectedExecution(taskExecution);
-    }, []);
+    };
 
-    const handleSeeExecutions = useCallback((childJob: Job) => {
+    const handleSeeExecutions = (childJob: Job) => {
         const label = childJob.label ?? 'Subflow';
 
         setSubflowStack((prev) => [...prev, {job: childJob, label}]);
-    }, []);
+    };
 
     useEffect(() => {
         setSelectedExecution(getInitialSelectedItem(workflowTestExecution));

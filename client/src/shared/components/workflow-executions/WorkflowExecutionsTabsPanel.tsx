@@ -92,18 +92,14 @@ const WorkflowExecutionsTabsPanel = ({
 
     const subflowWorkflowUuid = subflowTaskExecution?.workflowTask?.parameters?.workflowUuid as string | undefined;
 
-    const handleSeeExecutionsClick = useCallback(() => {
-        if (!subflowTaskExecution?.childJob) {
-            return;
-        }
+    const childJob = subflowTaskExecution?.childJob;
 
-        onSeeExecutionsClick?.(subflowTaskExecution.childJob);
-    }, [onSeeExecutionsClick, subflowTaskExecution?.childJob]);
+    const handleSeeExecutionsClick = useCallback(() => {
+        onSeeExecutionsClick?.(childJob!);
+    }, [onSeeExecutionsClick, childJob]);
 
     const handleEditSubflowClick = useCallback(() => {
-        if (subflowWorkflowUuid) {
-            onEditSubflowClick?.(subflowWorkflowUuid);
-        }
+        onEditSubflowClick?.(subflowWorkflowUuid!);
     }, [onEditSubflowClick, subflowWorkflowUuid]);
 
     return (
@@ -121,7 +117,7 @@ const WorkflowExecutionsTabsPanel = ({
 
                     <span className="text-xs text-muted-foreground">{`(${workflowNodeName})`}</span>
 
-                    {subflowTaskExecution?.childJob && onSeeExecutionsClick && (
+                    {childJob && onSeeExecutionsClick && (
                         <Button
                             className="ml-2"
                             label="See Executions"

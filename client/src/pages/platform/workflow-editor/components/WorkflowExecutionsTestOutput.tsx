@@ -37,7 +37,7 @@ const TruncatedLabel = ({className, label, style}: {className?: string; label: s
         }
     }, [label]);
 
-    const span = (
+    const labelSpan = (
         <span
             className={className}
             ref={labelRef}
@@ -48,12 +48,12 @@ const TruncatedLabel = ({className, label, style}: {className?: string; label: s
     );
 
     if (!isTruncated) {
-        return span;
+        return labelSpan;
     }
 
     return (
         <Tooltip>
-            <TooltipTrigger asChild>{span}</TooltipTrigger>
+            <TooltipTrigger asChild>{labelSpan}</TooltipTrigger>
 
             <TooltipContent>{label}</TooltipContent>
         </Tooltip>
@@ -141,8 +141,8 @@ const SubflowExecutionBreadcrumb = ({items, onBackClick}: {items: BreadcrumbEntr
                                     </DropdownMenuTrigger>
 
                                     <DropdownMenuContent align="start">
-                                        {middleItems.map((item, i) => (
-                                            <DropdownMenuItem key={i} onClick={item.onNavigate}>
+                                        {middleItems.map((item) => (
+                                            <DropdownMenuItem key={item.label} onClick={item.onNavigate}>
                                                 {item.label}
                                             </DropdownMenuItem>
                                         ))}
