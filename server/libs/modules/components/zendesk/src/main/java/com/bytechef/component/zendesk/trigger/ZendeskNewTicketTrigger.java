@@ -58,6 +58,7 @@ public class ZendeskNewTicketTrigger {
                 .label("Webhook Name")
                 .description("Name of the webhook.")
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/zendesk_v1#new-ticket")
         .output(
             outputSchema(
                 object()

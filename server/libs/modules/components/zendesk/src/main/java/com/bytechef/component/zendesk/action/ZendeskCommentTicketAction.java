@@ -56,6 +56,7 @@ public class ZendeskCommentTicketAction {
                 .description("A ticket comment.")
                 .required(true))
         .output(outputSchema(TICKET_OBJECT_PROPERTY))
+        .help("", "https://docs.bytechef.io/reference/components/zendesk_v1#add-comment-to-ticket")
         .perform(ZendeskCommentTicketAction::perform);
 
     private ZendeskCommentTicketAction() {

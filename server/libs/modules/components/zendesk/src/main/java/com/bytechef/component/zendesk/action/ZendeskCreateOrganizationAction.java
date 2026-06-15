@@ -68,6 +68,7 @@ public class ZendeskCreateOrganizationAction {
                 .label("Notes")
                 .description("Any notes you have about the organization.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/zendesk_v1#create-organization")
         .output(
             outputSchema(
                 object()

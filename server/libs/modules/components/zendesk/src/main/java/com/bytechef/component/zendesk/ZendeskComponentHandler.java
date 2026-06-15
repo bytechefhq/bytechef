@@ -37,6 +37,7 @@ public class ZendeskComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("zendesk")
         .title("Zendesk")
+        .version(1)
         .description(
             "Zendesk is a customer service and sales platform that helps businesses manage customer interactions " +
                 "across various channels.")
@@ -44,6 +45,7 @@ public class ZendeskComponentHandler implements ComponentHandler {
         .categories(ComponentCategory.SURVEYS_AND_FEEDBACK)
         .connection(ZendeskConnection.CONNECTION_DEFINITION)
         .customAction(true)
+        .customActionHelp("", "https://developer.zendesk.com/api-reference/")
         .actions(
             ZendeskCommentTicketAction.ACTION_DEFINITION,
             ZendeskCreateOrganizationAction.ACTION_DEFINITION,
