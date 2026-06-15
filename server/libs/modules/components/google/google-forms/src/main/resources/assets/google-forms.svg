@@ -1,1 +1,16 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="192" height="192" fill="none" viewBox="0 0 192 192"><rect width="102" height="50" x="70" y="121" fill="#969dff" rx="25"/><rect width="50" height="50" x="20" y="121" fill="#b8c0ff" rx="25"/><rect width="50" height="50" x="20" y="71" fill="#5746e3" rx="25"/><rect width="102" height="50" x="70" y="71" fill="#5746e3" rx="25"/><mask id="a" width="102" height="50" x="70" y="21" maskUnits="userSpaceOnUse" style="mask-type:alpha"><rect width="102" height="50" x="70" y="21" fill="#5f54f4" rx="25"/></mask><g mask="url(#a)"><rect width="102" height="50" x="70" y="21" fill="#7372fe" rx="25"/><g filter="url(#b)"><circle cx="56" cy="46" r="36" fill="#64afff"/></g></g><rect width="50" height="50" x="20" y="21" fill="#7372fe" rx="25"/><path stroke="#fff" stroke-linecap="round" stroke-width="12" d="M95 46h52"/><circle cx="45" cy="46" r="12" fill="#fff"/><defs><filter id="b" width="111.47" height="111.47" x=".27" y="-9.74" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse"><feFlood flood-opacity="0" result="BackgroundImageFix"/><feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape"/><feGaussianBlur result="effect1_foregroundBlur_37586_9489" stdDeviation="9.87"/></filter></defs></svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" id="google-forms">
+  <circle cx="6" cy="12" r="3" fill="#5746E4"></circle>
+  <circle cx="6" cy="18" r="3" fill="#B8C0FF"></circle>
+  <rect width="12" height="6" x="9" y="9" fill="#5746E4" rx="3"></rect>
+  <rect width="12" height="6" x="9" y="15" fill="#979DFF" rx="3"></rect>
+  <path fill="url(#paint0_linear_1_209)" fill-rule="evenodd" d="M18 3C19.6569 3 21 4.34315 21 6C21 7.65685 19.6569 9 18 9H12C10.3431 9 9 7.65685 9 6C9 4.34315 10.3431 3 12 3H18Z" clip-rule="evenodd"></path>
+  <path fill="#fff" d="M11.2002 6C11.2002 5.55817 11.5582 5.2002 12 5.2002H18C18.4418 5.2002 18.7998 5.55817 18.7998 6C18.7998 6.44183 18.4418 6.7998 18 6.7998H12C11.5582 6.7998 11.2002 6.44183 11.2002 6Z"></path>
+  <path fill="#7271FF" fill-rule="evenodd" d="M6 3C7.65685 3 9 4.34315 9 6C9 7.65685 7.65685 9 6 9C4.34315 9 3 7.65685 3 6C3 4.34315 4.34315 3 6 3Z" clip-rule="evenodd"></path>
+  <path fill="#fff" d="M4.59961 6C4.59961 5.2268 5.2268 4.59961 6 4.59961C6.77302 4.59982 7.39941 5.22693 7.39941 6C7.3992 6.77289 6.77289 7.3992 6 7.39941C5.22693 7.39941 4.59982 6.77302 4.59961 6Z"></path>
+  <defs>
+    <linearGradient id="paint0_linear_1_209" x1="21" x2="9" y1="6" y2="6" gradientUnits="userSpaceOnUse">
+      <stop offset=".612" stop-color="#7474FD"></stop>
+      <stop offset="1" stop-color="#67AEFF"></stop>
+    </linearGradient>
+  </defs>
+</svg>
