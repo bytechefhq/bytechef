@@ -61,6 +61,7 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.client.advisor.api.BaseChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
+import org.springframework.ai.model.tool.ToolCallingChatOptions;
 import org.springframework.ai.model.tool.ToolCallingManager;
 
 /**
@@ -399,7 +400,9 @@ class AbstractAiAgentChatActionTest {
         Parameters extensions = MockParametersFactory.create(
             Map.of("clusterElements", Map.of("model", modelElement, "chatMemory", chatMemoryElement)));
 
-        stubModelLookup();
+        ChatModel chatModel = stubModelLookup();
+
+        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
 
         ChatMemoryFunction chatMemoryFunction = mock(ChatMemoryFunction.class);
 
@@ -551,12 +554,16 @@ class AbstractAiAgentChatActionTest {
         ClusterElementMap clusterElementMap = ClusterElementMap.of(
             Map.of("clusterElements", Map.of("model", buildModelClusterElement())));
 
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
+
         ActionContext actionContext = mock(ActionContext.class);
 
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
-        List<Advisor> advisors = action.getAdvisors(clusterElementMap, Map.of(), actionContext);
+        List<Advisor> advisors = action.getAdvisors(clusterElementMap, Map.of(), chatModel, actionContext);
 
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
 
@@ -593,10 +600,14 @@ class AbstractAiAgentChatActionTest {
         Map<String, ComponentConnection> connectionParameters = Map.of("memory_1", memoryConnection);
         ActionContext actionContext = mock(ActionContext.class);
 
+        ChatModel chatModel = mock(ChatModel.class);
+
+        when(chatModel.getOptions()).thenReturn(mock(ToolCallingChatOptions.class));
+
         TestAiAgentChatAction action = new TestAiAgentChatAction(
             aiAgentToolFacade, clusterElementDefinitionService, toolCallingManager);
 
-        List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, actionContext);
+        List<Advisor> advisors = action.getAdvisors(clusterElementMap, connectionParameters, chatModel, actionContext);
 
         int chatMemoryIndex = advisors.indexOf(chatMemoryAdvisor);
         ToolCallingAdvisor toolCallAdvisor = findToolCallAdvisor(advisors);
@@ -629,13 +640,15 @@ class AbstractAiAgentChatActionTest {
         return element;
     }
 
-    private void stubModelLookup() throws Exception {
+    private ChatModel stubModelLookup() throws Exception {
         ModelFunction modelFunction = mock(ModelFunction.class);
         ChatModel chatModel = mock(ChatModel.class);
 
         when(clusterElementDefinitionService.<ModelFunction>getClusterElement(
             eq("testComponent"), eq(1), eq("testModel"))).thenReturn(modelFunction);
         when(modelFunction.apply(any(), any(), anyBoolean())).thenAnswer(invocation -> chatModel);
+
+        return chatModel;
     }
 
     private static ToolCallingAdvisor findToolCallAdvisor(List<Advisor> advisors) {
