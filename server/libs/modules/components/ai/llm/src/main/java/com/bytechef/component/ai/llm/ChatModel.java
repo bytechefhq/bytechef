@@ -154,9 +154,6 @@ public interface ChatModel {
 
             ChatClient.ChatClientRequestSpec chatClientRequestSpec = chatClient.prompt(converter.getFormat());
 
-            // The StructuredOutputValidationAdvisor re-prompts the model (up to maxRepeatAttempts) when its output
-            // does not satisfy the response JSON schema. It does not support streaming, so it is attached only on the
-            // non-streaming call path (validateStructuredOutput == false for stream()).
             if (validateStructuredOutput) {
                 chatClientRequestSpec = chatClientRequestSpec.advisors(
                     StructuredOutputValidationAdvisor.builder()
