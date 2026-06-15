@@ -1,5 +1,9 @@
 package org.openapitools.configuration;
 
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.UUID;
+
 import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 
 import org.springframework.context.annotation.Bean;

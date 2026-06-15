@@ -1,5 +1,9 @@
 package org.openapitools.configuration;
 
+import java.math.BigDecimal;
+import java.net.URI;
+import java.util.UUID;
+
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.HttpMethodModel;
 
 import org.springframework.context.annotation.Bean;

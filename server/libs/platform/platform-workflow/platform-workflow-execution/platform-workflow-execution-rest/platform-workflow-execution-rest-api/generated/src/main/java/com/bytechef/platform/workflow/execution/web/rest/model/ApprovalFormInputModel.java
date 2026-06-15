@@ -24,7 +24,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("ApprovalFormInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-06T14:23:01.978894+02:00[Europe/Zagreb]", comments = "Generator version: 7.21.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:12.031016+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ApprovalFormInputModel {
 
   private @Nullable String defaultValue;
