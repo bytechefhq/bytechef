@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.workflow.execution.facade.IntegrationWorkflowExe
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionBasicModel;
 import com.bytechef.ee.embedded.workflow.execution.web.rest.model.WorkflowExecutionModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.workflow.execution.web.rest.model.TaskExecutionModel;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.OffsetDateTime;
 import org.springframework.core.convert.ConversionService;
@@ -48,6 +49,14 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
         return ResponseEntity.ok(
             conversionService.convert(
                 integrationWorkflowExecutionFacade.getWorkflowExecution(id), WorkflowExecutionModel.class));
+    }
+
+    @Override
+    public ResponseEntity<TaskExecutionModel> getWorkflowExecutionTaskExecution(Long id, Long taskExecutionId) {
+        return ResponseEntity.ok(
+            conversionService.convert(
+                integrationWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(taskExecutionId),
+                TaskExecutionModel.class));
     }
 
     @Override
