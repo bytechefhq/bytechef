@@ -194,6 +194,7 @@ export const useProject = () => {
                 if (fromSubflowParam === 'true') {
                     const existingParentChain = newSearchParams.get('parentChain');
                     const existingParentProjectWorkflowId = newSearchParams.get('parentProjectWorkflowId');
+
                     const newChain = existingParentChain
                         ? `${existingParentChain},${existingParentProjectWorkflowId}`
                         : existingParentProjectWorkflowId;
