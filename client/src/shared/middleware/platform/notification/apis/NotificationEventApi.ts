@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  NotificationEvent,
-} from '../models/index';
 import {
+    type NotificationEvent,
     NotificationEventFromJSON,
     NotificationEventToJSON,
-} from '../models/index';
+} from '../models/NotificationEvent';
 
 /**
  * 

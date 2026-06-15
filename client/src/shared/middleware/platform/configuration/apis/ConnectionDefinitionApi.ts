@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ConnectionDefinition,
-  ConnectionDefinitionBasic,
-} from '../models/index';
 import {
+    type ConnectionDefinition,
     ConnectionDefinitionFromJSON,
     ConnectionDefinitionToJSON,
+} from '../models/ConnectionDefinition';
+import {
+    type ConnectionDefinitionBasic,
     ConnectionDefinitionBasicFromJSON,
     ConnectionDefinitionBasicToJSON,
-} from '../models/index';
+} from '../models/ConnectionDefinitionBasic';
 
 export interface GetComponentConnectionDefinitionRequest {
     componentName: string;
@@ -61,7 +60,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/connection-definition`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
 
         return {
             path: urlPath,
@@ -112,7 +111,7 @@ export class ConnectionDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/connection-definitions`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
 
         return {
             path: urlPath,

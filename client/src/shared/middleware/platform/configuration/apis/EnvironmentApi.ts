@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Environment,
-} from '../models/index';
 import {
+    type Environment,
     EnvironmentFromJSON,
     EnvironmentToJSON,
-} from '../models/index';
+} from '../models/Environment';
 
 /**
  * 

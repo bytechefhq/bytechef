@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Notification,
-} from '../models/index';
 import {
+    type Notification,
     NotificationFromJSON,
     NotificationToJSON,
-} from '../models/index';
+} from '../models/Notification';
 
 export interface CreateNotificationRequest {
     notification: Omit<Notification, 'id'|'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'|'notificationEvents'>;
@@ -106,7 +103,7 @@ export class NotificationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/notifications/{notificationId}`;
-        urlPath = urlPath.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId'])));
+        urlPath = urlPath.replace('{notificationId}', encodeURIComponent(String(requestParameters['notificationId'])));
 
         return {
             path: urlPath,
@@ -200,7 +197,7 @@ export class NotificationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/notifications/{notificationId}`;
-        urlPath = urlPath.replace(`{${"notificationId"}}`, encodeURIComponent(String(requestParameters['notificationId'])));
+        urlPath = urlPath.replace('{notificationId}', encodeURIComponent(String(requestParameters['notificationId'])));
 
         return {
             path: urlPath,

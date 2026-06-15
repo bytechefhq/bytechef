@@ -12,21 +12,22 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ComponentDefinition,
-  ComponentDefinitionBasic,
-  UnifiedApiCategory,
-} from '../models/index';
 import {
+    type ComponentDefinition,
     ComponentDefinitionFromJSON,
     ComponentDefinitionToJSON,
+} from '../models/ComponentDefinition';
+import {
+    type ComponentDefinitionBasic,
     ComponentDefinitionBasicFromJSON,
     ComponentDefinitionBasicToJSON,
+} from '../models/ComponentDefinitionBasic';
+import {
+    type UnifiedApiCategory,
     UnifiedApiCategoryFromJSON,
     UnifiedApiCategoryToJSON,
-} from '../models/index';
+} from '../models/UnifiedApiCategory';
 
 export interface GetComponentDefinitionRequest {
     componentName: string;
@@ -75,8 +76,8 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
-        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentVersion}', encodeURIComponent(String(requestParameters['componentVersion'])));
 
         return {
             path: urlPath,
@@ -123,7 +124,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/versions`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
 
         return {
             path: urlPath,
@@ -177,8 +178,8 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/connection-versions/{connectionVersion}`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
-        urlPath = urlPath.replace(`{${"connectionVersion"}}`, encodeURIComponent(String(requestParameters['connectionVersion'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{connectionVersion}', encodeURIComponent(String(requestParameters['connectionVersion'])));
 
         return {
             path: urlPath,
@@ -225,7 +226,7 @@ export class ComponentDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/unified-api/{category}/component-definitions`;
-        urlPath = urlPath.replace(`{${"category"}}`, encodeURIComponent(String(requestParameters['category'])));
+        urlPath = urlPath.replace('{category}', encodeURIComponent(String(requestParameters['category'])));
 
         return {
             path: urlPath,

@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  TriggerDefinition,
-  TriggerDefinitionBasic,
-} from '../models/index';
 import {
+    type TriggerDefinition,
     TriggerDefinitionFromJSON,
     TriggerDefinitionToJSON,
+} from '../models/TriggerDefinition';
+import {
+    type TriggerDefinitionBasic,
     TriggerDefinitionBasicFromJSON,
     TriggerDefinitionBasicToJSON,
-} from '../models/index';
+} from '../models/TriggerDefinitionBasic';
 
 export interface GetComponentTriggerDefinitionRequest {
     componentName: string;
@@ -72,9 +71,9 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions/{triggerName}`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
-        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
-        urlPath = urlPath.replace(`{${"triggerName"}}`, encodeURIComponent(String(requestParameters['triggerName'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentVersion}', encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace('{triggerName}', encodeURIComponent(String(requestParameters['triggerName'])));
 
         return {
             path: urlPath,
@@ -128,8 +127,8 @@ export class TriggerDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/trigger-definitions`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
-        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentVersion}', encodeURIComponent(String(requestParameters['componentVersion'])));
 
         return {
             path: urlPath,

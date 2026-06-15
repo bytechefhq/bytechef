@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  TriggerForm,
-} from '../models/index';
 import {
+    type TriggerForm,
     TriggerFormFromJSON,
     TriggerFormToJSON,
-} from '../models/index';
+} from '../models/TriggerForm';
 
 export interface GetTriggerFormRequest {
     id: string;
@@ -48,7 +45,7 @@ export class TriggerFormApi extends runtime.BaseAPI {
 
 
         let urlPath = `/trigger-form/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

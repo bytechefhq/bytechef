@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ApiCollection,
-} from '../models/index';
 import {
+    type ApiCollection,
     ApiCollectionFromJSON,
     ApiCollectionToJSON,
-} from '../models/index';
+} from '../models/ApiCollection';
 
 export interface CreateApiCollectionRequest {
     apiCollection: Omit<ApiCollection, 'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'|'projectDeploymentId'>;
@@ -117,7 +114,7 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-collections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -163,7 +160,7 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-collections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -222,7 +219,7 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/api-collections`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -278,7 +275,7 @@ export class ApiCollectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/api-collections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

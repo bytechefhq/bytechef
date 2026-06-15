@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Workspace,
-} from '../models/index';
 import {
+    type Workspace,
     WorkspaceFromJSON,
     WorkspaceToJSON,
-} from '../models/index';
+} from '../models/Workspace';
 
 export interface CreateWorkspaceRequest {
     workspace: Omit<Workspace, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
@@ -110,7 +107,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -156,7 +153,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -251,7 +248,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

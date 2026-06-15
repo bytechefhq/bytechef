@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  TaskDispatcherDefinition,
-  TaskDispatcherDefinitionBasic,
-} from '../models/index';
 import {
+    type TaskDispatcherDefinition,
     TaskDispatcherDefinitionFromJSON,
     TaskDispatcherDefinitionToJSON,
+} from '../models/TaskDispatcherDefinition';
+import {
+    type TaskDispatcherDefinitionBasic,
     TaskDispatcherDefinitionBasicFromJSON,
     TaskDispatcherDefinitionBasicToJSON,
-} from '../models/index';
+} from '../models/TaskDispatcherDefinitionBasic';
 
 export interface GetTaskDispatcherDefinitionRequest {
     taskDispatcherName: string;
@@ -63,8 +62,8 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/task-dispatcher-definitions/{taskDispatcherName}/{taskDispatcherVersion}`;
-        urlPath = urlPath.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName'])));
-        urlPath = urlPath.replace(`{${"taskDispatcherVersion"}}`, encodeURIComponent(String(requestParameters['taskDispatcherVersion'])));
+        urlPath = urlPath.replace('{taskDispatcherName}', encodeURIComponent(String(requestParameters['taskDispatcherName'])));
+        urlPath = urlPath.replace('{taskDispatcherVersion}', encodeURIComponent(String(requestParameters['taskDispatcherVersion'])));
 
         return {
             path: urlPath,
@@ -111,7 +110,7 @@ export class TaskDispatcherDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/task-dispatcher-definitions/{taskDispatcherName}/versions`;
-        urlPath = urlPath.replace(`{${"taskDispatcherName"}}`, encodeURIComponent(String(requestParameters['taskDispatcherName'])));
+        urlPath = urlPath.replace('{taskDispatcherName}', encodeURIComponent(String(requestParameters['taskDispatcherName'])));
 
         return {
             path: urlPath,

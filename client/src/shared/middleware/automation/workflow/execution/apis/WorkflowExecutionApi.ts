@@ -12,21 +12,30 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Page,
-  WorkflowExecution,
-} from '../models/index';
 import {
+    type Page,
     PageFromJSON,
     PageToJSON,
+} from '../models/Page';
+import {
+    type TaskExecution,
+    TaskExecutionFromJSON,
+    TaskExecutionToJSON,
+} from '../models/TaskExecution';
+import {
+    type WorkflowExecution,
     WorkflowExecutionFromJSON,
     WorkflowExecutionToJSON,
-} from '../models/index';
+} from '../models/WorkflowExecution';
 
 export interface GetWorkflowExecutionRequest {
     id: number;
+}
+
+export interface GetWorkflowExecutionTaskExecutionRequest {
+    id: number;
+    taskExecutionId: number;
 }
 
 export interface GetWorkflowExecutionsPageRequest {
@@ -64,7 +73,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-executions/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -91,6 +100,61 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
      */
     async getWorkflowExecution(requestParameters: GetWorkflowExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<WorkflowExecution> {
         const response = await this.getWorkflowExecutionRaw(requestParameters, initOverrides);
+        return await response.value();
+    }
+
+    /**
+     * Creates request options for getWorkflowExecutionTaskExecution without sending the request
+     */
+    async getWorkflowExecutionTaskExecutionRequestOpts(requestParameters: GetWorkflowExecutionTaskExecutionRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getWorkflowExecutionTaskExecution().'
+            );
+        }
+
+        if (requestParameters['taskExecutionId'] == null) {
+            throw new runtime.RequiredError(
+                'taskExecutionId',
+                'Required parameter "taskExecutionId" was null or undefined when calling getWorkflowExecutionTaskExecution().'
+            );
+        }
+
+        const queryParameters: any = {};
+
+        const headerParameters: runtime.HTTPHeaders = {};
+
+
+        let urlPath = `/workflow-executions/{id}/task-executions/{taskExecutionId}`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{taskExecutionId}', encodeURIComponent(String(requestParameters['taskExecutionId'])));
+
+        return {
+            path: urlPath,
+            method: 'GET',
+            headers: headerParameters,
+            query: queryParameters,
+        };
+    }
+
+    /**
+     * Get a single task execution\'s input and output by id.
+     * Get a task execution by id
+     */
+    async getWorkflowExecutionTaskExecutionRaw(requestParameters: GetWorkflowExecutionTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<TaskExecution>> {
+        const requestOptions = await this.getWorkflowExecutionTaskExecutionRequestOpts(requestParameters);
+        const response = await this.request(requestOptions, initOverrides);
+
+        return new runtime.JSONApiResponse(response, (jsonValue) => TaskExecutionFromJSON(jsonValue));
+    }
+
+    /**
+     * Get a single task execution\'s input and output by id.
+     * Get a task execution by id
+     */
+    async getWorkflowExecutionTaskExecution(requestParameters: GetWorkflowExecutionTaskExecutionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<TaskExecution> {
+        const response = await this.getWorkflowExecutionTaskExecutionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
@@ -147,7 +211,7 @@ export class WorkflowExecutionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/workflow-executions`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

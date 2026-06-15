@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Tag,
-  UpdateTagsRequest,
-} from '../models/index';
 import {
+    type Tag,
     TagFromJSON,
     TagToJSON,
+} from '../models/Tag';
+import {
+    type UpdateTagsRequest,
     UpdateTagsRequestFromJSON,
     UpdateTagsRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateTagsRequest';
 
 export interface UpdateConnectionTagsRequest {
     id: number;
@@ -100,7 +99,7 @@ export class ConnectionTagApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}/tags`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

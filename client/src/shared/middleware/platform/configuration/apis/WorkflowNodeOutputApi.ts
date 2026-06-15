@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  WorkflowNodeOutput,
-} from '../models/index';
 import {
+    type WorkflowNodeOutput,
     WorkflowNodeOutputFromJSON,
     WorkflowNodeOutputToJSON,
-} from '../models/index';
+} from '../models/WorkflowNodeOutput';
 
 export interface GetClusterElementOutputRequest {
     id: string;
@@ -96,10 +93,10 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/outputs`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
         return {
             path: urlPath,
@@ -161,7 +158,7 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/outputs`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -226,8 +223,8 @@ export class WorkflowNodeOutputApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/outputs`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
         return {
             path: urlPath,

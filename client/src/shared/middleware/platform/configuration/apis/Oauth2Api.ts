@@ -12,21 +12,22 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  GetOAuth2AuthorizationParametersRequest,
-  OAuth2AuthorizationParameters,
-  OAuth2Properties,
-} from '../models/index';
 import {
+    type GetOAuth2AuthorizationParametersRequest,
     GetOAuth2AuthorizationParametersRequestFromJSON,
     GetOAuth2AuthorizationParametersRequestToJSON,
+} from '../models/GetOAuth2AuthorizationParametersRequest';
+import {
+    type OAuth2AuthorizationParameters,
     OAuth2AuthorizationParametersFromJSON,
     OAuth2AuthorizationParametersToJSON,
+} from '../models/OAuth2AuthorizationParameters';
+import {
+    type OAuth2Properties,
     OAuth2PropertiesFromJSON,
     OAuth2PropertiesToJSON,
-} from '../models/index';
+} from '../models/OAuth2Properties';
 
 export interface GetOAuth2AuthorizationParametersOperationRequest {
     getOAuth2AuthorizationParametersRequest: GetOAuth2AuthorizationParametersRequest;

@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ClusterElementDefinition,
-  ClusterElementDefinitionBasic,
-} from '../models/index';
 import {
+    type ClusterElementDefinition,
     ClusterElementDefinitionFromJSON,
     ClusterElementDefinitionToJSON,
+} from '../models/ClusterElementDefinition';
+import {
+    type ClusterElementDefinitionBasic,
     ClusterElementDefinitionBasicFromJSON,
     ClusterElementDefinitionBasicToJSON,
-} from '../models/index';
+} from '../models/ClusterElementDefinitionBasic';
 
 export interface GetComponentClusterElementDefinitionRequest {
     componentName: string;
@@ -78,9 +77,9 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{componentName}/versions/{componentVersion}/cluster-element-definition/{clusterElementName}`;
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
-        urlPath = urlPath.replace(`{${"componentVersion"}}`, encodeURIComponent(String(requestParameters['componentVersion'])));
-        urlPath = urlPath.replace(`{${"clusterElementName"}}`, encodeURIComponent(String(requestParameters['clusterElementName'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{componentVersion}', encodeURIComponent(String(requestParameters['componentVersion'])));
+        urlPath = urlPath.replace('{clusterElementName}', encodeURIComponent(String(requestParameters['clusterElementName'])));
 
         return {
             path: urlPath,
@@ -141,9 +140,9 @@ export class ClusterElementDefinitionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/component-definitions/{rootComponentName}/versions/{rootComponentVersion}/cluster-element-definitions/{clusterElementType}`;
-        urlPath = urlPath.replace(`{${"rootComponentName"}}`, encodeURIComponent(String(requestParameters['rootComponentName'])));
-        urlPath = urlPath.replace(`{${"rootComponentVersion"}}`, encodeURIComponent(String(requestParameters['rootComponentVersion'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{rootComponentName}', encodeURIComponent(String(requestParameters['rootComponentName'])));
+        urlPath = urlPath.replace('{rootComponentVersion}', encodeURIComponent(String(requestParameters['rootComponentVersion'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
 
         return {
             path: urlPath,

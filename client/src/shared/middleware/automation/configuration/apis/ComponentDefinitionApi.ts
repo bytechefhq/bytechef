@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  ComponentDefinitionBasic,
-} from '../models/index';
 import {
+    type ComponentDefinitionBasic,
     ComponentDefinitionBasicFromJSON,
     ComponentDefinitionBasicToJSON,
-} from '../models/index';
+} from '../models/ComponentDefinitionBasic';
 
 export interface GetComponentDefinitionsRequest {
     actionDefinitions?: boolean;

@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Connection,
-  UpdateConnectionRequest,
-} from '../models/index';
 import {
+    type Connection,
     ConnectionFromJSON,
     ConnectionToJSON,
+} from '../models/Connection';
+import {
+    type UpdateConnectionRequest,
     UpdateConnectionRequestFromJSON,
     UpdateConnectionRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateConnectionRequest';
 
 export interface CreateConnectedUserProjectWorkflowConnectionRequest {
     connectedUserId: number;
@@ -99,8 +98,8 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-users/{connectedUserId}/workflows/{workflowUuid}/connections`;
-        urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
-        urlPath = urlPath.replace(`{${"workflowUuid"}}`, encodeURIComponent(String(requestParameters['workflowUuid'])));
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
 
         return {
             path: urlPath,
@@ -205,7 +204,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -262,8 +261,8 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connected-users/{connectedUserId}/components/{componentName}/connections`;
-        urlPath = urlPath.replace(`{${"connectedUserId"}}`, encodeURIComponent(String(requestParameters['connectedUserId'])));
-        urlPath = urlPath.replace(`{${"componentName"}}`, encodeURIComponent(String(requestParameters['componentName'])));
+        urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
+        urlPath = urlPath.replace('{componentName}', encodeURIComponent(String(requestParameters['componentName'])));
 
         return {
             path: urlPath,
@@ -310,7 +309,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -421,7 +420,7 @@ export class ConnectionApi extends runtime.BaseAPI {
 
 
         let urlPath = `/connections/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

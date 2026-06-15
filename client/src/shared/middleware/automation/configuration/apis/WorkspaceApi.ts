@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Workspace,
-} from '../models/index';
 import {
+    type Workspace,
     WorkspaceFromJSON,
     WorkspaceToJSON,
-} from '../models/index';
+} from '../models/Workspace';
 
 export interface GetUserWorkspacesRequest {
     id: number;
@@ -48,7 +45,7 @@ export class WorkspaceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/users/{id}/workspaces`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

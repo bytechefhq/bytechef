@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  IntegrationInstance,
-} from '../models/index';
 import {
+    type IntegrationInstance,
     IntegrationInstanceFromJSON,
     IntegrationInstanceToJSON,
-} from '../models/index';
+} from '../models/IntegrationInstance';
 
 export interface DeleteIntegrationInstanceRequest {
     id: number;
@@ -63,7 +60,7 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integration-instances/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -116,8 +113,8 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integration-instances/{id}/enable/{enable}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{enable}', encodeURIComponent(String(requestParameters['enable'])));
 
         return {
             path: urlPath,
@@ -177,9 +174,9 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integration-instances/{id}/workflows/{workflowId}/enable/{enable}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowId"}}`, encodeURIComponent(String(requestParameters['workflowId'])));
-        urlPath = urlPath.replace(`{${"enable"}}`, encodeURIComponent(String(requestParameters['enable'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowId}', encodeURIComponent(String(requestParameters['workflowId'])));
+        urlPath = urlPath.replace('{enable}', encodeURIComponent(String(requestParameters['enable'])));
 
         return {
             path: urlPath,
@@ -225,7 +222,7 @@ export class IntegrationInstanceApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integration-instances/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

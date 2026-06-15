@@ -12,24 +12,27 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Project,
-  ProjectStatus,
-  ProjectVersion,
-  PublishProjectRequest,
-} from '../models/index';
 import {
+    type Project,
     ProjectFromJSON,
     ProjectToJSON,
+} from '../models/Project';
+import {
+    type ProjectStatus,
     ProjectStatusFromJSON,
     ProjectStatusToJSON,
+} from '../models/ProjectStatus';
+import {
+    type ProjectVersion,
     ProjectVersionFromJSON,
     ProjectVersionToJSON,
+} from '../models/ProjectVersion';
+import {
+    type PublishProjectRequest,
     PublishProjectRequestFromJSON,
     PublishProjectRequestToJSON,
-} from '../models/index';
+} from '../models/PublishProjectRequest';
 
 export interface CreateProjectRequest {
     project: Project;
@@ -155,7 +158,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -201,7 +204,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/duplicate`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -248,7 +251,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/export`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -295,7 +298,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -342,7 +345,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/versions`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -413,7 +416,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{id}/projects`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -487,7 +490,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workspaces/{workspaceId}/projects/import`;
-        urlPath = urlPath.replace(`{${"workspaceId"}}`, encodeURIComponent(String(requestParameters['workspaceId'])));
+        urlPath = urlPath.replace('{workspaceId}', encodeURIComponent(String(requestParameters['workspaceId'])));
 
         return {
             path: urlPath,
@@ -541,7 +544,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}/publish`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -597,7 +600,7 @@ export class ProjectApi extends runtime.BaseAPI {
 
 
         let urlPath = `/projects/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

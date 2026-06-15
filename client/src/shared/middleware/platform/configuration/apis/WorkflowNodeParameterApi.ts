@@ -12,27 +12,32 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  DeleteClusterElementParameter200Response,
-  DeleteClusterElementParameterRequest,
-  GetClusterElementParameterDisplayConditions200Response,
-  UpdateClusterElementParameterRequest,
-  UpdateWorkflowNodeParameterRequest,
-} from '../models/index';
 import {
+    type DeleteClusterElementParameter200Response,
     DeleteClusterElementParameter200ResponseFromJSON,
     DeleteClusterElementParameter200ResponseToJSON,
+} from '../models/DeleteClusterElementParameter200Response';
+import {
+    type DeleteClusterElementParameterRequest,
     DeleteClusterElementParameterRequestFromJSON,
     DeleteClusterElementParameterRequestToJSON,
+} from '../models/DeleteClusterElementParameterRequest';
+import {
+    type GetClusterElementParameterDisplayConditions200Response,
     GetClusterElementParameterDisplayConditions200ResponseFromJSON,
     GetClusterElementParameterDisplayConditions200ResponseToJSON,
+} from '../models/GetClusterElementParameterDisplayConditions200Response';
+import {
+    type UpdateClusterElementParameterRequest,
     UpdateClusterElementParameterRequestFromJSON,
     UpdateClusterElementParameterRequestToJSON,
+} from '../models/UpdateClusterElementParameterRequest';
+import {
+    type UpdateWorkflowNodeParameterRequest,
     UpdateWorkflowNodeParameterRequestFromJSON,
     UpdateWorkflowNodeParameterRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateWorkflowNodeParameterRequest';
 
 export interface DeleteClusterElementParameterOperationRequest {
     id: string;
@@ -143,10 +148,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
         return {
             path: urlPath,
@@ -221,8 +226,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/parameters`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
         return {
             path: urlPath,
@@ -302,10 +307,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/display-conditions`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
         return {
             path: urlPath,
@@ -370,8 +375,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/display-conditions`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
         return {
             path: urlPath,
@@ -459,10 +464,10 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/cluster-elements/{clusterElementType}/{clusterElementWorkflowNodeName}/parameters`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
-        urlPath = urlPath.replace(`{${"clusterElementType"}}`, encodeURIComponent(String(requestParameters['clusterElementType'])));
-        urlPath = urlPath.replace(`{${"clusterElementWorkflowNodeName"}}`, encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{clusterElementType}', encodeURIComponent(String(requestParameters['clusterElementType'])));
+        urlPath = urlPath.replace('{clusterElementWorkflowNodeName}', encodeURIComponent(String(requestParameters['clusterElementWorkflowNodeName'])));
 
         return {
             path: urlPath,
@@ -537,8 +542,8 @@ export class WorkflowNodeParameterApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflows/{id}/workflow-nodes/{workflowNodeName}/parameters`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
-        urlPath = urlPath.replace(`{${"workflowNodeName"}}`, encodeURIComponent(String(requestParameters['workflowNodeName'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{workflowNodeName}', encodeURIComponent(String(requestParameters['workflowNodeName'])));
 
         return {
             path: urlPath,

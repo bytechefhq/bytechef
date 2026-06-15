@@ -12,18 +12,17 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Tag,
-  UpdateTagsRequest,
-} from '../models/index';
 import {
+    type Tag,
     TagFromJSON,
     TagToJSON,
+} from '../models/Tag';
+import {
+    type UpdateTagsRequest,
     UpdateTagsRequestFromJSON,
     UpdateTagsRequestToJSON,
-} from '../models/index';
+} from '../models/UpdateTagsRequest';
 
 export interface UpdateIntegrationInstanceConfigurationTagsRequest {
     id: number;
@@ -100,7 +99,7 @@ export class IntegrationInstanceConfigurationTagApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integration-instance-configurations/{id}/tags`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

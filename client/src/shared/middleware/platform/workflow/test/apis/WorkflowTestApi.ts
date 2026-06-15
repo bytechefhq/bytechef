@@ -12,7 +12,6 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
 
 export interface StopWorkflowTestRequest {
@@ -41,7 +40,7 @@ export class WorkflowTestApi extends runtime.BaseAPI {
 
 
         let urlPath = `/workflow-tests/{jobId}/stop`;
-        urlPath = urlPath.replace(`{${"jobId"}}`, encodeURIComponent(String(requestParameters['jobId'])));
+        urlPath = urlPath.replace('{jobId}', encodeURIComponent(String(requestParameters['jobId'])));
 
         return {
             path: urlPath,

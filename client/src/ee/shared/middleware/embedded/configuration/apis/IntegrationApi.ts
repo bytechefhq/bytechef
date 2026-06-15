@@ -12,27 +12,32 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  Integration,
-  IntegrationStatus,
-  IntegrationVersion,
-  PublishIntegrationRequest,
-  Workflow,
-} from '../models/index';
 import {
+    type Integration,
     IntegrationFromJSON,
     IntegrationToJSON,
+} from '../models/Integration';
+import {
+    type IntegrationStatus,
     IntegrationStatusFromJSON,
     IntegrationStatusToJSON,
+} from '../models/IntegrationStatus';
+import {
+    type IntegrationVersion,
     IntegrationVersionFromJSON,
     IntegrationVersionToJSON,
+} from '../models/IntegrationVersion';
+import {
+    type PublishIntegrationRequest,
     PublishIntegrationRequestFromJSON,
     PublishIntegrationRequestToJSON,
+} from '../models/PublishIntegrationRequest';
+import {
+    type Workflow,
     WorkflowFromJSON,
     WorkflowToJSON,
-} from '../models/index';
+} from '../models/Workflow';
 
 export interface CreateIntegrationRequest {
     integration: Integration;
@@ -157,7 +162,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}/workflows`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -209,7 +214,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -255,7 +260,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -302,7 +307,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}/versions`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -410,7 +415,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}/publish`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -466,7 +471,7 @@ export class IntegrationApi extends runtime.BaseAPI {
 
 
         let urlPath = `/integrations/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,

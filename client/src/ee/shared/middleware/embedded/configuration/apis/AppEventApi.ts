@@ -12,15 +12,12 @@
  * Do not edit the class manually.
  */
 
-
 import * as runtime from '../runtime';
-import type {
-  AppEvent,
-} from '../models/index';
 import {
+    type AppEvent,
     AppEventFromJSON,
     AppEventToJSON,
-} from '../models/index';
+} from '../models/AppEvent';
 
 export interface CreateAppEventRequest {
     appEvent: Omit<AppEvent, 'createdBy'|'createdDate'|'lastModifiedBy'|'lastModifiedDate'>;
@@ -114,7 +111,7 @@ export class AppEventApi extends runtime.BaseAPI {
 
 
         let urlPath = `/app-events/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -160,7 +157,7 @@ export class AppEventApi extends runtime.BaseAPI {
 
 
         let urlPath = `/app-events/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -255,7 +252,7 @@ export class AppEventApi extends runtime.BaseAPI {
 
 
         let urlPath = `/app-events/{id}`;
-        urlPath = urlPath.replace(`{${"id"}}`, encodeURIComponent(String(requestParameters['id'])));
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
