@@ -29,6 +29,17 @@ Version: 1
 
 
 
+## Connection Setup
+
+1. Open your Dashboard: https://app.sendgrid.com .
+2. Click on **Settings** and choose **API Keys**.
+3. Click on **Create API Key**.
+4. Enter **API Key Name**, choose **Full Access** permissions and click on **Create & View**.
+5. Copy your generated API key and use it in Bytechef.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/j8bbrczTQVTCLmgwjWZC?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
 
 
 
@@ -50,9 +61,9 @@ Name: sendEmail
 | from | From | STRING | Email address from which you want to send. | true |
 | to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email addresses which you want to send to. | true |
 | cc | CC | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email address which receives a copy. | false |
-| subject | Subject | STRING | Subject of your email | true |
-| text | Message Body | STRING | This is the message you want to send | true |
-| type | Message Type | STRING <details> <summary> Options </summary> <span>text/plain</span>, <span>text/html</span> </details> | Message type for your content | true |
+| subject | Subject | STRING | Subject of your email. | true |
+| text | Message Body | STRING | The message you want to send. | true |
+| type | Message Type | STRING <details> <summary> Options </summary> <span>text/plain</span>, <span>text/html</span> </details> | Message type for your content. | true |
 | attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments you want to include with the email. | false |
 
 #### Example JSON Structure
@@ -87,6 +98,57 @@ This action does not produce any output.
 
 
 
+### Send Dynamic Template
+Name: sendDynamicTemplate
+
+`Send an email using a dynamic template.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| from | From | STRING | Email address from which you want to send. | true |
+| to | To | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email addresses which you want to send to. | true |
+| cc | CC | ARRAY <details> <summary> Items </summary> [STRING] </details> | Email address which receives a copy. | false |
+| template_id | Template ID | STRING | Dynamic template ID. | true |
+| dynamic_template_data | Dynamic Template Data | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | Data passed to the SendGrid dynamic template. | false |
+| attachments | Attachments | ARRAY <details> <summary> Items </summary> [FILE_ENTRY] </details> | A list of attachments you want to include with the email. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Send Dynamic Template",
+  "name" : "sendDynamicTemplate",
+  "parameters" : {
+    "from" : "",
+    "to" : [ "" ],
+    "cc" : [ "" ],
+    "template_id" : "",
+    "dynamic_template_data" : { },
+    "attachments" : [ {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    } ]
+  },
+  "type" : "sendgrid/v1/sendDynamicTemplate"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+#### Find Template ID
+
+To find the Template ID, click [here](/reference/components/sendgrid_v1#how-to-find-template-id).
+
+
+
+
 
 
 ## What to do if your action is not listed here?
@@ -95,3 +157,16 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find Template ID
+
+- **Method 1: Via UI**
+
+To find a Template ID, open your dashboard. In the left bar choose Email API -> Dynamic Templates. Expand the template you want to use and there you will find Template ID.
+
+- **Method 2: Via API**
+
+Use the `GET /templates?generations=dynamic` endpoint to retrieve a list of all dynamic templates and their IDs.
