@@ -178,6 +178,11 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    public AiSkill createAiSkillFromInstructions(String name, @Nullable String description, String instructions) {
+        return createAiSkillFromInstructions(name, description, instructions, null);
+    }
+
+    @Override
     public void deleteAiSkill(long id) {
         AiSkill aiSkill = aiSkillService.getAiSkill(id);
 
