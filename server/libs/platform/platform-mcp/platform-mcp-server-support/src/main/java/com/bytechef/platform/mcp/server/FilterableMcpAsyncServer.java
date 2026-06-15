@@ -223,7 +223,7 @@ public class FilterableMcpAsyncServer {
 
             if (toolSpecification.isEmpty()) {
                 return Mono.error(McpError.builder(ErrorCodes.INVALID_PARAMS)
-                    .message("Unknown tool: invalid_tool_name")
+                    .message("Unknown tool: " + callToolRequest.name())
                     .data("Tool not found: " + callToolRequest.name())
                     .build());
             }
@@ -256,8 +256,8 @@ public class FilterableMcpAsyncServer {
         }
 
         if (result.structuredContent() == null) {
-            String message = "Response missing structured content which is expected when calling tool "
-                + "with non-empty outputSchema";
+            String message = "Tool (" + request.name() + ") response missing structured content which is expected "
+                + "when calling tool with non-empty outputSchema";
 
             log.warn(message);
 
