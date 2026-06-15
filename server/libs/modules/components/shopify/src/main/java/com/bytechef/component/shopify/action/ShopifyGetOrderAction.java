@@ -92,28 +92,44 @@ public class ShopifyGetOrderAction {
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
         String query = """
-            query GetOrder($id: ID!) {
-              order(id: $id) {
-                id
-                name
-                totalPriceSet {
-                  presentmentMoney {
-                    amount
-                  }
-                }
-                displayFulfillmentStatus
-                customer {
-                    email
-                    phone
-                }
-                lineItems(first: 10) {
-                  nodes {
+                query GetOrder($id: ID!) {
+                  order(id: $id) {
                     id
                     name
+                    createdAt
+                    closedAt
+                    cancelledAt
+                    test
+                    currentTotalPriceSet {
+                      presentmentMoney {
+                         amount
+                      }
+                    }
+                    totalPriceSet {
+                      presentmentMoney {
+                        amount
+                      }
+                    }
+                    displayFinancialStatus
+                    displayFulfillmentStatus
+                    customer {
+                        email
+                        phone
+                    }
+                    lineItems(first: 10) {
+                      nodes {
+                        id
+                        name
+                        quantity
+                        originalUnitPriceSet {
+                            presentmentMoney {
+                                amount
+                            }
+                        }
+                      }
+                    }
                   }
                 }
-              }
-            }
             """;
 
         Map<String, Object> variables = Map.of(ID, inputParameters.getRequiredString(ORDER_ID));
