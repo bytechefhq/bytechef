@@ -63,6 +63,7 @@ public class ProjectWorkflowExecutionFacadeTest {
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
     private TaskExecution taskExecution;
+    private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
 
     @BeforeEach
@@ -72,13 +73,14 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
+        taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
             mock(JobService.class), mock(PrincipalJobService.class), mock(ProjectFacade.class),
             mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
-            mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class), taskFileStorage,
+            mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
 
         ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
@@ -145,5 +147,23 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         verify(contextService).peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
         verify(taskFileStorage).readTaskExecutionOutput(any());
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionLoadsTaskData() {
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        doReturn(Map.of("context", true))
+            .when(taskFileStorage)
+            .readContextValue(any());
+        when(taskFileStorage.readTaskExecutionOutput(any()))
+            .thenReturn("output-value");
+
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(1L);
+
+        assertThat(taskExecutionDTO.input())
+            .isEqualTo(Map.of("evaluated", true));
+        assertThat(taskExecutionDTO.output())
+            .isEqualTo("output-value");
     }
 }
