@@ -1,39 +1,24 @@
 import Button from '@/components/Button/Button';
-import LoadingIcon from '@/components/LoadingIcon';
-import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {WorkflowReadOnlyProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import CopilotPanel from '@/shared/components/copilot/CopilotPanel';
-import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {SparklesIcon, WorkflowIcon} from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 
-import WorkflowExecutionSheetContent from './WorkflowExecutionSheetContent';
-import WorkflowExecutionSheetWorkflowPanel from './WorkflowExecutionSheetWorkflowPanel';
+import WorkflowExecutionDetail from './WorkflowExecutionDetail';
 import useWorkflowExecutionSheet from './hooks/useWorkflowExecutionSheet';
 
 const WorkflowExecutionSheet = () => {
     const {
-        activeTab,
         copilotEnabled,
         copilotPanelOpen,
-        deepestFailedExecution,
-        dialogOpen,
         handleCopilotClick,
         handleCopilotClose,
         handleOpenChange,
-        handleTaskClick,
-        isTriggerExecution,
-        jobFailedWithNoExecutions,
-        jobFailureError,
-        selectedItem,
-        setActiveTab,
-        setDialogOpen,
-        taskExecutions,
         workflowExecution,
+        workflowExecutionId,
         workflowExecutionLoading,
         workflowExecutionSheetOpen,
     } = useWorkflowExecutionSheet();
@@ -91,57 +76,10 @@ const WorkflowExecutionSheet = () => {
                         </div>
                     </header>
 
-                    {workflowExecutionLoading ? (
-                        <div className="flex size-full items-center justify-center">
-                            <LoadingIcon className="size-6" />
-                        </div>
-                    ) : (
-                        <div className="flex min-h-0 flex-1 p-3">
-                            <ResizablePanelGroup className="h-full" orientation="horizontal">
-                                <ResizablePanel
-                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
-                                    defaultSize={50}
-                                >
-                                    {workflowExecution?.job && (
-                                        <WorkflowExecutionSheetContent
-                                            activeTab={activeTab}
-                                            deepestFailedExecution={deepestFailedExecution}
-                                            dialogOpen={dialogOpen}
-                                            handleTaskClick={handleTaskClick}
-                                            isTriggerExecution={isTriggerExecution}
-                                            job={workflowExecution.job}
-                                            jobFailedWithNoExecutions={jobFailedWithNoExecutions}
-                                            jobFailureError={jobFailureError}
-                                            selectedItem={selectedItem}
-                                            setActiveTab={setActiveTab}
-                                            setDialogOpen={setDialogOpen}
-                                            taskExecutions={taskExecutions}
-                                            triggerExecution={workflowExecution?.triggerExecution}
-                                        />
-                                    )}
-                                </ResizablePanel>
-
-                                <ResizableHandle className="mx-2.5" withHandle />
-
-                                <ResizablePanel
-                                    className="flex min-h-0 w-1/2 flex-col overflow-hidden"
-                                    defaultSize={50}
-                                >
-                                    {workflowExecution && (
-                                        <WorkflowReadOnlyProvider
-                                            value={{
-                                                useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                            }}
-                                        >
-                                            <WorkflowExecutionSheetWorkflowPanel
-                                                workflowExecution={workflowExecution}
-                                            />
-                                        </WorkflowReadOnlyProvider>
-                                    )}
-                                </ResizablePanel>
-                            </ResizablePanelGroup>
-                        </div>
-                    )}
+                    <WorkflowExecutionDetail
+                        enabled={workflowExecutionSheetOpen}
+                        workflowExecutionId={workflowExecutionId}
+                    />
                 </div>
 
                 <CopilotPanel
