@@ -23,7 +23,8 @@ import org.springframework.data.repository.ListPagingAndSortingRepository;
  * @author Ivica Cardic
  */
 public interface PersistenceAuditEventRepository
-    extends ListCrudRepository<PersistentAuditEvent, Long>, ListPagingAndSortingRepository<PersistentAuditEvent, Long> {
+    extends ListCrudRepository<PersistentAuditEvent, Long>, ListPagingAndSortingRepository<PersistentAuditEvent, Long>,
+    CustomPersistenceAuditEventRepository {
 
     List<PersistentAuditEvent> findByPrincipal(String principal);
 

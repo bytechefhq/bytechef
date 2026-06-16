@@ -1,20 +1,11 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.platform.connection.audit;
+package com.bytechef.ee.platform.connection.audit;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -26,6 +17,8 @@ import java.lang.annotation.Target;
  * {@link ConnectionAuditEvent} after successful completion. SpEL expressions in {@link #connectionId()} and
  * {@link AuditData#value()} are evaluated against method parameters ({@code #paramName}) and the return value
  * ({@code #result}).
+ *
+ * @version ee
  *
  * @author Ivica Cardic
  */
@@ -49,7 +42,7 @@ public @interface AuditConnection {
     AuditData[] data() default {};
 
     /**
-     * When {@code true}, the aspect opens a correlation scope (see {@link AuditCorrelation}) around the method
+     * When {@code true}, the aspect opens a correlation scope (see {@code AuditCorrelation}) around the method
      * invocation. Nested audited calls picked up during the invocation inherit the correlation ID in their emitted
      * event data under the {@code correlationId} key, letting downstream consumers reassemble the parent/child
      * relationship. Defaults to {@code false}; enable only on "umbrella" facade methods (e.g. bulk-share replacement)

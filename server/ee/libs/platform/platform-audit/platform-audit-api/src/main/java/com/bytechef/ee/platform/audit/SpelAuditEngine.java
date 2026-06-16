@@ -1,39 +1,30 @@
 /*
  * Copyright 2025 ByteChef
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.platform.connection.audit;
+package com.bytechef.ee.platform.audit;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.Around;
-import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.context.event.EventListener;
 import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.core.DefaultParameterNameDiscoverer;
 import org.springframework.core.ParameterNameDiscoverer;
@@ -42,52 +33,53 @@ import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
-import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
- * Aspect that intercepts methods annotated with {@link AuditConnection} and publishes a connection audit event after
- * successful method completion. SpEL expressions in the annotation are evaluated against the method parameters and
- * return value.
+ * Shared SpEL audit machinery extracted from {@code ConnectionAuditAspect} and {@code AiHubAuditAspect}, which were
+ * ~95% duplicated. The two aspects keep their own {@code @annotation(x)} pointcuts (each must bind its concrete
+ * annotation type) and read their own annotation; everything below the annotation read delegates here.
  *
  * <p>
- * When {@link AuditConnection#establishCorrelation()} is {@code true}, the {@link #establishCorrelation} advice opens a
- * {@link AuditCorrelation} scope for the duration of the method invocation. Any nested audited methods that fire during
- * that scope inherit the same correlation ID in their emitted event data (see
- * {@link #evaluateAuditData(AuditConnection.AuditData[], EvaluationContext)}), letting consumers reassemble the
- * parent/child audit relationship without relying on temporal proximity.
+ * The engine owns: boot-time SpEL validation, the {@link EvaluationContext} construction, the audit-data evaluation
+ * (with the {@link AuditCorrelation} auto-attach), the {@code establishCorrelation} {@code @Around} body, and the
+ * {@code @AfterReturning} audit body (synchronous evaluation, {@code afterCommit}-deferred publish when a transaction
+ * is active, strict-audit rethrow, failure metrics). Each aspect builds a neutral
+ * {@link AuditSpec}/{@link AuditDataEntry} view of its own annotation plus a publish callback, and supplies its own
+ * metric counter names.
+ *
+ * <p>
+ * This is a plain collaborator (not a Spring bean): each aspect news one up from its own injected
+ * {@link ApplicationContext} + {@code ObjectProvider<MeterRegistry>}, which keeps the aspect constructor signature
+ * unchanged (the aspect unit tests construct the aspects directly) and avoids any extra {@code @ComponentScan} wiring
+ * in integration tests.
+ *
+ * @version ee
  *
  * @author Ivica Cardic
  */
-@Aspect
-@Component
 @SuppressFBWarnings({
     "CT_CONSTRUCTOR_THROW", "SPEL_INJECTION"
 })
-public class ConnectionAuditAspect {
+public class SpelAuditEngine {
 
-    private static final Logger log = LoggerFactory.getLogger(ConnectionAuditAspect.class);
+    private static final Logger log = LoggerFactory.getLogger(SpelAuditEngine.class);
 
     private final ApplicationContext applicationContext;
-    private final ConnectionAuditPublisher connectionAuditPublisher;
     private final ExpressionParser expressionParser = new SpelExpressionParser();
-    private final MeterRegistry meterRegistry;
+    private final @Nullable MeterRegistry meterRegistry;
     private final ParameterNameDiscoverer parameterNameDiscoverer = new DefaultParameterNameDiscoverer();
 
     @SuppressFBWarnings("EI")
-    public ConnectionAuditAspect(
-        ApplicationContext applicationContext, ConnectionAuditPublisher connectionAuditPublisher,
-        ObjectProvider<MeterRegistry> meterRegistryProvider) {
-
+    public SpelAuditEngine(ApplicationContext applicationContext, ObjectProvider<MeterRegistry> meterRegistryProvider) {
         this.applicationContext = applicationContext;
-        this.connectionAuditPublisher = connectionAuditPublisher;
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
     }
 
     /**
-     * Boot-time validation of every {@code @AuditConnection} SpEL expression in the context. Parse failures are logged
-     * at ERROR with the offending method so a typo like {@code "#conectionId"} surfaces at startup rather than as a
+     * Boot-time validation of every SpEL expression carried by {@code annotationType}-annotated methods in the context.
+     * Parse failures are logged at ERROR with the offending method so a typo surfaces at startup rather than as a
      * runtime audit miss the first time the method is invoked. Evaluation is not attempted here — that still runs
      * per-call against real args — but syntactic validity cannot regress unnoticed.
      *
@@ -99,9 +91,19 @@ public class ConnectionAuditAspect {
      * on the class does not trigger bean creation, costs a single pass over
      * {@link ApplicationContext#getBeanDefinitionNames()}, and reaches the same annotations AOP would intercept at
      * runtime.
+     *
+     * @param annotationType        the audit annotation to scan for
+     * @param expressionsOf         extracts every SpEL expression carried by an annotated method (connectionId slot
+     *                              plus each data value, or just the data values)
+     * @param aspectLabel           label for log lines (e.g.
+     *                              {@code "ConnectionAuditAspect"}/{@code "@AuditConnection"})
+     * @param validationSkippedName counter name for beans whose type could not be resolved at boot
+     * @param validationSkippedDesc description for the validation-skipped counter
      */
-    @EventListener(ContextRefreshedEvent.class)
-    public void validateAuditAnnotations() {
+    public <A extends Annotation> void validate(
+        Class<A> annotationType, Function<Method, List<String>> expressionsOf, String aspectLabel,
+        String validationSkippedName, String validationSkippedDesc) {
+
         int checked = 0;
         int failed = 0;
         int skipped = 0;
@@ -117,12 +119,12 @@ public class ConnectionAuditAspect {
                 // not startup, but we never pay the cold-start tax of eager instantiation to find it.
                 skipped++;
 
-                recordValidationSkipped();
+                recordValidationSkipped(validationSkippedName, validationSkippedDesc);
 
                 if (log.isDebugEnabled()) {
                     log.debug(
-                        "Skipping @AuditConnection validation for bean '{}': {}",
-                        beanName, typeLookup.getClass()
+                        "Skipping {} validation for bean '{}': {}",
+                        aspectLabel, beanName, typeLookup.getClass()
                             .getSimpleName(),
                         typeLookup);
                 }
@@ -144,7 +146,7 @@ public class ConnectionAuditAspect {
             }
 
             for (Method method : targetClass.getDeclaredMethods()) {
-                AuditConnection annotation = method.getAnnotation(AuditConnection.class);
+                A annotation = method.getAnnotation(annotationType);
 
                 if (annotation == null) {
                     continue;
@@ -152,47 +154,42 @@ public class ConnectionAuditAspect {
 
                 checked++;
 
-                failed += validateExpression(targetClass, method, "connectionId", annotation.connectionId());
-
-                for (AuditConnection.AuditData auditData : annotation.data()) {
-                    failed += validateExpression(targetClass, method, "data.value", auditData.value());
+                for (String expression : expressionsOf.apply(method)) {
+                    failed += validateExpression(targetClass, method, aspectLabel, expression);
                 }
             }
         }
 
         if (log.isInfoEnabled()) {
             log.info(
-                "ConnectionAuditAspect validated {} @AuditConnection-annotated method(s); "
-                    + "{} SpEL parse failure(s); {} bean(s) skipped due to resolution failure",
-                checked, failed, skipped);
+                "{} validated {} {}-annotated method(s); {} SpEL parse failure(s); "
+                    + "{} bean(s) skipped due to resolution failure",
+                aspectLabel, checked, "@" + annotationType.getSimpleName(), failed, skipped);
         }
     }
 
-    private int validateExpression(Class<?> targetClass, Method method, String slot, String expression) {
+    private int validateExpression(Class<?> targetClass, Method method, String aspectLabel, String expression) {
         try {
             expressionParser.parseExpression(expression);
 
             return 0;
         } catch (ParseException parseException) {
             log.error(
-                "@AuditConnection SpEL parse failure on {}#{} slot={} expression='{}'",
-                targetClass.getName(), method.getName(), slot, expression, parseException);
+                "{} SpEL parse failure on {}#{} expression='{}'",
+                aspectLabel, targetClass.getName(), method.getName(), expression, parseException);
 
             return 1;
         }
     }
 
     /**
-     * Opens a {@link AuditCorrelation} scope before the audited method runs when
-     * {@link AuditConnection#establishCorrelation()} is set. The @AfterReturning emit advice runs inside the scope, so
-     * both the parent method's audit event and any nested child events inherit the same correlation ID. Push/pop is in
-     * a try/finally so the ThreadLocal never leaks even if the method throws.
+     * Opens a {@link AuditCorrelation} scope before the audited method runs when {@code establish} is set. The
+     * {@code @AfterReturning} emit advice runs inside the scope, so both the parent method's audit event and any nested
+     * child events inherit the same correlation ID. Push/pop is in a try/finally so the ThreadLocal never leaks even if
+     * the method throws.
      */
-    @Around("@annotation(auditConnection)")
-    public Object establishCorrelation(ProceedingJoinPoint joinPoint, AuditConnection auditConnection)
-        throws Throwable {
-
-        if (!auditConnection.establishCorrelation()) {
+    public Object runWithCorrelation(ProceedingJoinPoint joinPoint, boolean establish) throws Throwable {
+        if (!establish) {
             return joinPoint.proceed();
         }
 
@@ -207,15 +204,12 @@ public class ConnectionAuditAspect {
 
     /**
      * Captures audit state at method-return time (when the result and SpEL context are still valid) but defers the
-     * actual {@link ConnectionAuditPublisher#publish} call to {@code afterCommit} when a transaction is active. This
-     * keeps the audit trail aligned with committed state — a {@code @Transactional} rollback triggered after the
-     * advised method returns (post-aspect listeners, optimistic-lock collision, nested-revoke failure in
-     * {@code setConnectionProjects}) will not emit a success event for a mutation the DB reverted. When no
-     * synchronization is active, we publish immediately — mirroring {@link ConnectionAuditPublisher}'s
-     * never-fail-the-business-transaction contract from the non-transactional path.
+     * actual publish call to {@code afterCommit} when a transaction is active. This keeps the audit trail aligned with
+     * committed state — a {@code @Transactional} rollback triggered after the advised method returns will not emit a
+     * success event for a mutation the DB reverted. When no synchronization is active, we publish immediately —
+     * mirroring the publisher's never-fail-the-business-transaction contract from the non-transactional path.
      */
-    @AfterReturning(pointcut = "@annotation(auditConnection)", returning = "result")
-    public void audit(JoinPoint joinPoint, AuditConnection auditConnection, Object result) {
+    public void audit(JoinPoint joinPoint, Object result, AuditSpec spec) {
         MethodSignature methodSignature = (MethodSignature) joinPoint.getSignature();
         Method method = methodSignature.getMethod();
         EvaluationContext evaluationContext = buildEvaluationContext(method, joinPoint.getArgs(), result);
@@ -225,34 +219,33 @@ public class ConnectionAuditAspect {
 
         // SpEL evaluation MUST run synchronously — args and result are live only until the advised
         // method returns. We only defer the publish step. Any evaluation failure is caught here and
-        // surfaced via bytechef_connection_audit_failed; emission will not be attempted.
+        // surfaced via the spec's failure counter; emission will not be attempted.
         try {
-            connectionId = evaluateConnectionId(auditConnection.connectionId(), evaluationContext);
-            data = evaluateAuditData(auditConnection.data(), evaluationContext);
+            if (spec.connectionIdExpression() != null) {
+                connectionId = evaluateConnectionId(spec.connectionIdExpression(), evaluationContext);
+            }
+
+            data = evaluateData(spec.dataEntries(), evaluationContext);
         } catch (Exception exception) {
             // Catch Exception (not Throwable): Error subtypes (OOM, StackOverflowError) must propagate
             // per the JVM contract — swallowing them here would let the advised method return success
             // while the JVM is in an unrecoverable state.
-            recordAuditFailure();
+            recordAuditFailure(spec.failureCounterName());
 
             log.error(
                 "Failed to evaluate audit event {} for method {} connectionId={}",
-                auditConnection.event(),
+                spec.eventName(),
                 joinPoint.getSignature()
                     .toShortString(),
                 connectionId, exception);
 
-            // Compliance-strict events (DELETE, DEMOTED, REASSIGNED, REVOKED) must not commit without
-            // an audit trail — rethrow so the surrounding @Transactional boundary rolls back the
-            // just-succeeded mutation. Non-strict events absorb the failure into the metric and allow
-            // the mutation to commit, preserving the original "audit must never break business" contract
-            // for non-compliance paths. The event's strictAudit flag is the single source of truth for
-            // this classification; adding a new privilege-narrowing event only requires setting it to
-            // true on the enum constant.
-            if (auditConnection.event()
-                .isStrictAudit()) {
+            // Compliance-strict events must not commit without an audit trail — rethrow so the
+            // surrounding @Transactional boundary rolls back the just-succeeded mutation. Non-strict
+            // events absorb the failure into the metric and allow the mutation to commit, preserving the
+            // original "audit must never break business" contract for non-compliance paths.
+            if (spec.strictAudit()) {
                 throw new AuditCaptureFailedException(
-                    "Strict audit capture failed for event " + auditConnection.event()
+                    "Strict audit capture failed for event " + spec.eventName()
                         + "; rolling back the mutation rather than committing without a trail",
                     exception);
             }
@@ -260,67 +253,65 @@ public class ConnectionAuditAspect {
             return;
         }
 
-        ConnectionAuditEvent eventType = auditConnection.event();
         String methodSignatureString = joinPoint.getSignature()
             .toShortString();
-        long resolvedConnectionId = connectionId;
+        Long resolvedConnectionId = connectionId;
         Map<String, Object> resolvedData = data;
 
         if (TransactionSynchronizationManager.isSynchronizationActive()) {
             TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
                 @Override
                 public void afterCommit() {
-                    publishSafely(eventType, resolvedConnectionId, resolvedData, methodSignatureString);
+                    publishSafely(spec, resolvedConnectionId, resolvedData, methodSignatureString);
                 }
             });
         } else {
-            publishSafely(eventType, resolvedConnectionId, resolvedData, methodSignatureString);
+            publishSafely(spec, resolvedConnectionId, resolvedData, methodSignatureString);
         }
     }
 
     /**
      * Publishes the captured audit event and absorbs any publisher failure — audit emission must never break the
      * just-succeeded mutation, and must never throw out of an {@code afterCommit} callback (Spring logs but ignores
-     * throws from there, which would otherwise be a silent-failure source). Drift is observable via the
-     * {@code bytechef_connection_audit_failed} counter.
+     * throws from there, which would otherwise be a silent-failure source). Drift is observable via the spec's failure
+     * counter.
      */
     private void publishSafely(
-        ConnectionAuditEvent eventType, long connectionId, Map<String, Object> data, String methodSignature) {
+        AuditSpec spec, @Nullable Long connectionId, Map<String, Object> data, String methodSignature) {
 
         try {
-            connectionAuditPublisher.publish(eventType, connectionId, data);
+            spec.publisher()
+                .accept(connectionId, data);
         } catch (Exception exception) {
             // Catch Exception (not Throwable): Error subtypes (OOM, StackOverflowError) must propagate
             // per the JVM contract. Even inside afterCommit, letting Error out lets Spring log+track
             // the catastrophic state rather than having us mask it with a metric increment.
-            recordAuditFailure();
+            recordAuditFailure(spec.failureCounterName());
 
             log.error(
                 "Failed to publish audit event {} for method {} connectionId={}",
-                eventType, methodSignature, connectionId, exception);
+                spec.eventName(), methodSignature, connectionId, exception);
         }
     }
 
-    private void recordAuditFailure() {
+    private void recordAuditFailure(String failureCounterName) {
         if (meterRegistry != null) {
-            Counter.builder("bytechef_connection_audit_failed")
+            Counter.builder(failureCounterName)
                 .register(meterRegistry)
                 .increment();
         }
     }
 
-    private void recordValidationSkipped() {
+    private void recordValidationSkipped(String validationSkippedName, String validationSkippedDesc) {
         if (meterRegistry != null) {
-            Counter.builder("bytechef_connection_audit_validation_skipped")
-                .description(
-                    "Beans whose @AuditConnection SpEL could not be validated at boot because the "
-                        + "bean failed to resolve during context refresh")
+            Counter.builder(validationSkippedName)
+                .description(validationSkippedDesc)
                 .register(meterRegistry)
                 .increment();
         }
     }
 
-    private EvaluationContext buildEvaluationContext(Method method, Object[] args, Object result) {
+    public EvaluationContext buildEvaluationContext(Method method, Object[] args, Object result) {
         StandardEvaluationContext context = new StandardEvaluationContext();
 
         // Enables `@beanName.method()` lookups in SpEL expressions (e.g. to read the persisted
@@ -352,21 +343,19 @@ public class ConnectionAuditAspect {
             "connectionId expression '%s' did not evaluate to a number, got: %s".formatted(expression, value));
     }
 
-    private Map<String, Object> evaluateAuditData(
-        AuditConnection.AuditData[] auditDataEntries, EvaluationContext evaluationContext) {
-
+    public Map<String, Object> evaluateData(List<AuditDataEntry> dataEntries, EvaluationContext evaluationContext) {
         Map<String, Object> data = new HashMap<>();
 
-        for (AuditConnection.AuditData entry : auditDataEntries) {
-            Object value = expressionParser.parseExpression(entry.value())
+        for (AuditDataEntry entry : dataEntries) {
+            Object value = expressionParser.parseExpression(entry.valueExpression())
                 .getValue(evaluationContext);
 
             data.put(entry.key(), value != null ? value.toString() : "null");
         }
 
-        // Auto-attach the active correlation ID when running inside a scope established by an
-        // umbrella method (AuditConnection.establishCorrelation=true). putIfAbsent so a caller can
-        // still override via an explicit @AuditData entry if the scope semantics don't fit.
+        // Auto-attach the active correlation ID when running inside a scope established by an umbrella
+        // method (establishCorrelation=true). putIfAbsent so a caller can still override via an explicit
+        // data entry if the scope semantics don't fit.
         String correlationId = AuditCorrelation.current();
 
         if (correlationId != null) {
@@ -374,5 +363,31 @@ public class ConnectionAuditAspect {
         }
 
         return data;
+    }
+
+    /**
+     * Neutral view of one {@code @AuditData} entry: an audit-payload key plus the SpEL expression that produces its
+     * value. Each aspect builds these from its own annotation's data entries.
+     *
+     * @version ee
+     */
+    public record AuditDataEntry(String key, String valueExpression) {
+    }
+
+    /**
+     * Neutral description of an audit emission, built by each aspect from its own annotation. Carries the data entries,
+     * an OPTIONAL connection-id SpEL expression ({@code AuditConnection} has one; {@code AuditAiHub} does not, so it is
+     * nullable), the event name, the strict-audit flag, the failure-counter name, and a publish callback. The publish
+     * callback receives the (nullable) resolved connection id and the evaluated data map, and calls the aspect's own
+     * publisher.
+     *
+     * @version ee
+     */
+    @SuppressFBWarnings({
+        "EI_EXPOSE_REP", "EI_EXPOSE_REP2"
+    })
+    public record AuditSpec(
+        List<AuditDataEntry> dataEntries, @Nullable String connectionIdExpression, String eventName,
+        boolean strictAudit, String failureCounterName, BiConsumer<@Nullable Long, Map<String, Object>> publisher) {
     }
 }
