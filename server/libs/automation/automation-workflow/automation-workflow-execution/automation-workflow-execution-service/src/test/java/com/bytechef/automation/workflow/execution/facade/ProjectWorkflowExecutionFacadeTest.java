@@ -17,6 +17,7 @@
 package com.bytechef.automation.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -31,6 +32,7 @@ import static org.mockito.Mockito.when;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -162,12 +164,23 @@ public class ProjectWorkflowExecutionFacadeTest {
         when(taskFileStorage.readTaskExecutionOutput(any()))
             .thenReturn("output-value");
 
-        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(1L);
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
 
         assertThat(taskExecutionDTO.input())
             .isEqualTo(Map.of("evaluated", true));
         assertThat(taskExecutionDTO.output())
             .isEqualTo("output-value");
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(jobService.getJob(10L))
+            .thenReturn(new Job(10L));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(999L, 1L))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test

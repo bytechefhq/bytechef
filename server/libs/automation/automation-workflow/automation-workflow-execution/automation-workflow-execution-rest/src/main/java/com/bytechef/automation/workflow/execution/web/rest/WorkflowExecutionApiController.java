@@ -59,7 +59,7 @@ public class WorkflowExecutionApiController implements WorkflowExecutionApi {
     public ResponseEntity<TaskExecutionModel> getWorkflowExecutionTaskExecution(Long id, Long taskExecutionId) {
         return ResponseEntity.ok(
             conversionService.convert(
-                projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(taskExecutionId),
+                projectWorkflowExecutionFacade.getWorkflowExecutionTaskExecution(id, taskExecutionId),
                 TaskExecutionModel.class));
     }
 

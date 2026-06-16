@@ -29,7 +29,7 @@ public interface ProjectWorkflowExecutionFacade {
 
     WorkflowExecutionDTO getWorkflowExecution(long id);
 
-    TaskExecutionDTO getWorkflowExecutionTaskExecution(long taskExecutionId);
+    TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId);
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Boolean embedded, Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate,

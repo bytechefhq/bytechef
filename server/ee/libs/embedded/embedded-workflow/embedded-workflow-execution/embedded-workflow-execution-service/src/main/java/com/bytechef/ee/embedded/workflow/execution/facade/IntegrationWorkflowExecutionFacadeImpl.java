@@ -168,8 +168,31 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
 
     @Override
     @Transactional(readOnly = true)
-    public TaskExecutionDTO getWorkflowExecutionTaskExecution(long taskExecutionId) {
-        return toTaskExecutionDTO(taskExecutionService.getTaskExecution(taskExecutionId), null, true);
+    public TaskExecutionDTO getWorkflowExecutionTaskExecution(long id, long taskExecutionId) {
+        TaskExecution taskExecution = taskExecutionService.getTaskExecution(taskExecutionId);
+
+        validateTaskExecutionBelongsToJob(id, taskExecution, taskExecutionId);
+
+        return toTaskExecutionDTO(taskExecution, null, true);
+    }
+
+    private void validateTaskExecutionBelongsToJob(long id, TaskExecution taskExecution, long taskExecutionId) {
+        long currentJobId = Objects.requireNonNull(taskExecution.getJobId());
+
+        while (currentJobId != id) {
+            Job job = jobService.getJob(currentJobId);
+
+            Long parentTaskExecutionId = job.getParentTaskExecutionId();
+
+            if (parentTaskExecutionId == null) {
+                throw new IllegalArgumentException(
+                    "Task execution " + taskExecutionId + " does not belong to workflow execution " + id);
+            }
+
+            TaskExecution parentTaskExecution = taskExecutionService.getTaskExecution(parentTaskExecutionId);
+
+            currentJobId = Objects.requireNonNull(parentTaskExecution.getJobId());
+        }
     }
 
     @Override
