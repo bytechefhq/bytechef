@@ -277,7 +277,7 @@ public class SpelEvaluator implements Evaluator {
                     try {
                         return expression.getValue(createEvaluationContext(context, formulaExpression));
                     } catch (SpelEvaluationException spelEvaluationException) {
-                        if (log.isDebugEnabled()) {
+                        if (log.isTraceEnabled()) {
                             log.debug(spelEvaluationException.getMessage());
                         }
 
