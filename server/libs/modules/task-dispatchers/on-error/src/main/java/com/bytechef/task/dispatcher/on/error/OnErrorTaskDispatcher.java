@@ -34,12 +34,12 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.evaluator.Evaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.Validate;
 import org.springframework.context.ApplicationEventPublisher;
+import tools.jackson.core.type.TypeReference;
 
 /**
  * @author Matija Petanjek
@@ -76,11 +76,9 @@ public class OnErrorTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
         List<WorkflowTask> subWorkflowTasks;
 
         if (taskExecution.getError() == null) {
-            subWorkflowTasks = MapUtils.getList(
-                taskExecution.getParameters(), MAIN_BRANCH, WorkflowTask.class, Collections.emptyList());
+            subWorkflowTasks = getSubWorkflowTasks(taskExecution, MAIN_BRANCH);
         } else {
-            subWorkflowTasks = MapUtils.getList(
-                taskExecution.getParameters(), ON_ERROR_BRANCH, WorkflowTask.class, Collections.emptyList());
+            subWorkflowTasks = getSubWorkflowTasks(taskExecution, ON_ERROR_BRANCH);
         }
 
         if (!subWorkflowTasks.isEmpty()) {
@@ -116,6 +114,15 @@ public class OnErrorTaskDispatcher implements TaskDispatcher<TaskExecution>, Tas
             eventPublisher.publishEvent(new TaskExecutionCompleteEvent(taskExecution));
         }
 
+    }
+
+    private static List<WorkflowTask> getSubWorkflowTasks(TaskExecution taskExecution, String branch) {
+        return MapUtils
+            .getList(
+                taskExecution.getParameters(), branch, new TypeReference<Map<String, ?>>() {}, List.of())
+            .stream()
+            .map(WorkflowTask::new)
+            .toList();
     }
 
     @Override
