@@ -1,15 +1,8 @@
 import LoadingDots from '@/components/LoadingDots';
 import {usePropertyCodeEditorDialogStore} from '@/pages/platform/workflow-editor/components/properties/components/property-code-editor/property-code-editor-dialog/stores/usePropertyCodeEditorDialogStore';
+import JsonView from '@/shared/components/JsonView';
 import {RefreshCwIcon} from 'lucide-react';
-import {Suspense, lazy} from 'react';
 import {useShallow} from 'zustand/react/shallow';
-
-const ReactJson = lazy(async () => {
-    const module = await import('react-json-view');
-    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
-
-    return {default: component} as typeof module;
-});
 
 const PropertyCodeEditorDialogExecutionOutput = () => {
     const {scriptIsRunning, scriptTestExecution} = usePropertyCodeEditorDialogStore(
@@ -49,14 +42,12 @@ const PropertyCodeEditorDialogExecutionOutput = () => {
 
             if (typeof unwrappedOutput === 'object' && unwrappedOutput !== null) {
                 return (
-                    <Suspense fallback={<LoadingDots />}>
-                        <ReactJson
-                            enableClipboard={false}
-                            sortKeys={true}
-                            src={unwrappedOutput as object}
-                            style={{fontSize: '12px'}}
-                        />
-                    </Suspense>
+                    <JsonView
+                        fallback={<LoadingDots />}
+                        sortKeys={true}
+                        src={unwrappedOutput as object}
+                        style={{fontSize: '12px'}}
+                    />
                 );
             }
 

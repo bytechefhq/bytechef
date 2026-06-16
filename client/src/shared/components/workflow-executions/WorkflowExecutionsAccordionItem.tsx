@@ -1,6 +1,7 @@
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
 import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
+import JsonView from '@/shared/components/JsonView';
 import ExecutionAccordionButton from '@/shared/components/workflow-executions/ExecutionAccordionButton';
 import WorkflowTaskExecutionItem from '@/shared/components/workflow-executions/WorkflowTaskExecutionItem';
 import {
@@ -9,7 +10,6 @@ import {
     TriggerExecution,
 } from '@/shared/middleware/automation/workflow/execution';
 import {type ReactNode} from 'react';
-import ReactJson from 'react-json-view';
 import {twMerge} from 'tailwind-merge';
 
 const isTaskExecution = (execution: TaskExecution | TriggerExecution): execution is TaskExecution =>
@@ -122,10 +122,7 @@ const WorkflowExecutionsAccordionItem = ({
                                                     <pre className="min-w-full bg-surface-neutral-primary p-4 text-xs text-content-neutral-primary">
                                                         {typeof currentIterationItem === 'object' &&
                                                         currentIterationItem !== null ? (
-                                                            <ReactJson
-                                                                enableClipboard={false}
-                                                                src={currentIterationItem}
-                                                            />
+                                                            <JsonView src={currentIterationItem as object} />
                                                         ) : (
                                                             String(currentIterationItem)
                                                         )}

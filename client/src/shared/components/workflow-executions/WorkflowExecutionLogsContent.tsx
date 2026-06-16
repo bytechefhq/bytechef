@@ -1,16 +1,10 @@
 import Badge from '@/components/Badge/Badge';
 import {ScrollArea, ScrollBar} from '@/components/ui/scroll-area';
+import JsonView from '@/shared/components/JsonView';
 import {LogEntry, LogLevel, useEditorJobFileLogsQuery, useJobFileLogsQuery} from '@/shared/middleware/graphql';
 import {AlertCircleIcon, AlertTriangleIcon, BugIcon, InfoIcon, MessageSquareIcon} from 'lucide-react';
-import {Suspense, lazy, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
-
-const ReactJson = lazy(async () => {
-    const module = await import('react-json-view');
-    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
-
-    return {default: component} as typeof module;
-});
 
 interface WorkflowExecutionLogsContentProps {
     isEditorEnvironment?: boolean;
@@ -74,9 +68,7 @@ const LogEntryMessage = ({message}: {message: string}) => {
     if (parsedJson) {
         return (
             <div className="flex-1 overflow-x-auto text-nowrap">
-                <Suspense fallback={<span className="text-sm">{message}</span>}>
-                    <ReactJson enableClipboard={false} name={false} src={parsedJson} />
-                </Suspense>
+                <JsonView fallback={<span className="text-sm">{message}</span>} name={false} src={parsedJson} />
             </div>
         );
     }

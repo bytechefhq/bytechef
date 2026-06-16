@@ -1,17 +1,11 @@
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
+import JsonView from '@/shared/components/JsonView';
 import {ExecutionError} from '@/shared/middleware/automation/workflow/execution';
 import {ChevronRightIcon} from 'lucide-react';
-import {Suspense, lazy, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 import {getFilteredOutput, hasValue} from './WorkflowExecutionsUtils';
-
-const ReactJson = lazy(async () => {
-    const module = await import('react-json-view');
-    const component = (module.default as unknown as Record<string, unknown>)?.default || module.default;
-
-    return {default: component} as typeof module;
-});
 
 interface WorkflowExecutionContentProps {
     error?: ExecutionError;
@@ -73,9 +67,7 @@ const WorkflowExecutionContent = ({
                 <div className="overflow-x-auto text-nowrap">
                     {hasValue(input) ? (
                         typeof input === 'object' ? (
-                            <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
-                                <ReactJson collapsed={false} enableClipboard={false} src={input as object} />
-                            </Suspense>
+                            <JsonView src={input as object} />
                         ) : (
                             <span className="text-sm">{input}</span>
                         )
@@ -96,9 +88,7 @@ const WorkflowExecutionContent = ({
             <div className="space-y-2 rounded-md">
                 <div className="overflow-x-auto text-nowrap">
                     {typeof filteredOutput === 'object' && filteredOutput !== null ? (
-                        <Suspense fallback={<div className="p-4 text-sm text-muted-foreground">Loading...</div>}>
-                            <ReactJson enableClipboard={false} src={filteredOutput as object} />
-                        </Suspense>
+                        <JsonView src={filteredOutput as object} />
                     ) : (
                         <span className="text-sm">{String(filteredOutput)}</span>
                     )}
