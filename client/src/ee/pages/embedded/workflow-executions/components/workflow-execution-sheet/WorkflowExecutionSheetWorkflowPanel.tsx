@@ -1,10 +1,11 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import PageLoader from '@/components/PageLoader';
 import {WorkflowExecution} from '@/ee/shared/middleware/embedded/workflow/execution';
 import {useGetWorkflowQuery} from '@/ee/shared/queries/embedded/workflows.queries';
 import {useWorkflowLayout} from '@/pages/platform/workflow-editor/hooks/useWorkflowLayout';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {ReactFlowProvider} from '@xyflow/react';
-import {lazy, useEffect, useState} from 'react';
+import {Suspense, lazy, useEffect, useState} from 'react';
 
 import useWorkflowExecutionSheetWorkflowPanel from '../../hooks/useWorkflowExecutionSheetWorkflowPanel';
 
@@ -54,12 +55,20 @@ const WorkflowExecutionSheetWorkflowPanel = ({workflowExecution}: {workflowExecu
                         loading={componentsIsLoading || taskDispatcherDefinitionsLoading || isWorkflowDetailsLoading}
                     >
                         {componentDefinitions && taskDispatcherDefinitions && workflow && (
-                            <WorkflowEditor
-                                componentDefinitions={componentDefinitions}
-                                customCanvasWidth={canvasWidth}
-                                readOnlyWorkflow={workflowDetails}
-                                taskDispatcherDefinitions={taskDispatcherDefinitions}
-                            />
+                            <Suspense
+                                fallback={
+                                    <div className="flex size-full items-center justify-center">
+                                        <LoadingIcon className="size-6" />
+                                    </div>
+                                }
+                            >
+                                <WorkflowEditor
+                                    componentDefinitions={componentDefinitions}
+                                    customCanvasWidth={canvasWidth}
+                                    readOnlyWorkflow={workflowDetails}
+                                    taskDispatcherDefinitions={taskDispatcherDefinitions}
+                                />
+                            </Suspense>
                         )}
                     </PageLoader>
                 </ReactFlowProvider>
