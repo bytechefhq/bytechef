@@ -16,25 +16,18 @@
 
 package com.bytechef.platform.webhook.rest;
 
-import com.bytechef.atlas.configuration.domain.Workflow;
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition.WebhookResponse;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
-import com.bytechef.platform.configuration.domain.WorkflowTrigger;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
 import com.bytechef.platform.webhook.rest.validator.RedirectValidator;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessor;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -67,34 +60,23 @@ public abstract class AbstractWebhookTriggerController {
 
     private static final Logger log = LoggerFactory.getLogger(AbstractWebhookTriggerController.class);
 
-    private final JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry;
     private String publicUrl;
     private final TempFileStorage tempFileStorage;
-    private final TriggerDefinitionService triggerDefinitionService;
-    private WebhookWorkflowExecutor webhookWorkflowExecutor;
-    private final WorkflowService workflowService;
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
 
     protected AbstractWebhookTriggerController(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TempFileStorage tempFileStorage,
-        TriggerDefinitionService triggerDefinitionService, WorkflowService workflowService) {
+        TempFileStorage tempFileStorage, WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
-        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.tempFileStorage = tempFileStorage;
-        this.triggerDefinitionService = triggerDefinitionService;
-        this.workflowService = workflowService;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
     protected AbstractWebhookTriggerController(
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, String publicUrl, TempFileStorage tempFileStorage,
-        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
-        WorkflowService workflowService) {
+        String publicUrl, TempFileStorage tempFileStorage, WebhookWorkflowExecutor webhookWorkflowExecutor) {
 
-        this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
         this.publicUrl = publicUrl;
         this.tempFileStorage = tempFileStorage;
-        this.triggerDefinitionService = triggerDefinitionService;
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
-        this.workflowService = workflowService;
     }
 
     protected ResponseEntity<Object> doProcessTrigger(
@@ -103,7 +85,7 @@ public abstract class AbstractWebhookTriggerController {
         throws IOException, ServletException {
 
         ResponseEntity<Object> responseEntity;
-        WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+        WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
 
         if (webhookRequest == null) {
             webhookRequest = WebhookRequestUtils.getWebhookRequest(
@@ -148,21 +130,6 @@ public abstract class AbstractWebhookTriggerController {
         return WebhookRequestUtils.getWebhookRequest(httpServletRequest, tempFileStorage, webhookTriggerFlags);
     }
 
-    protected WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
-        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
-
-        return triggerDefinitionService.getWebhookTriggerFlags(
-            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
-    }
-
-    protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor =
-            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
-
-        return !jobPrincipalAccessor.isWorkflowEnabled(
-            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
-    }
-
     private Object checkBody(Object body) {
         if (body instanceof Map) {
             walkThroughMap((Map<?, ?>) body);
@@ -178,30 +145,6 @@ public abstract class AbstractWebhookTriggerController {
         FileEntry fileEntry = new FileEntry((Map<String, ?>) map);
 
         return publicUrl + "/file-entries/%s/content".formatted(fileEntry.toId());
-    }
-
-    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
-        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
-
-        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
-
-        return WorkflowNodeType.ofType(workflowTrigger.getType());
-    }
-
-    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
-        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
-            workflowExecutionId.getType());
-
-        String workflowId;
-
-        if (workflowExecutionId.getJobPrincipalId() == -1) {
-            workflowId = jobPrincipalAccessor.getLastWorkflowId(workflowExecutionId.getWorkflowUuid());
-        } else {
-            workflowId = jobPrincipalAccessor.getWorkflowId(
-                workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
-        }
-
-        return workflowId;
     }
 
     @SuppressFBWarnings(

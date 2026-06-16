@@ -38,6 +38,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.memory.AsyncMessageBroker;
 import com.bytechef.message.event.MessageEvent;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
@@ -95,7 +96,7 @@ public class WebhookConfiguration {
         JobService jobService, List<TaskDispatcherPreSendProcessor> taskDispatcherPreSendProcessors,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, SubflowResolver subflowResolver,
         TaskExecutionService taskExecutionService, @Qualifier("taskExecutor") TaskExecutor taskExecutor,
-        TaskHandlerRegistry taskHandlerRegistry,
+        TaskHandlerRegistry taskHandlerRegistry, TriggerDefinitionService triggerDefinitionService,
         WebhookWorkflowSyncExecutor triggerSyncExecutor, WorkflowService workflowService) {
 
         AsyncMessageBroker asyncMessageBroker = new AsyncMessageBroker(environment);
@@ -116,7 +117,8 @@ public class WebhookConfiguration {
                     childJobPrincipalFactory, contextService, counterService, coordinatorEventPublisher, evaluator,
                     jobService, subflowResolver, taskExecutionService, taskFileStorage),
                 taskExecutionService, taskExecutor, taskHandlerRegistry, taskFileStorage, 300, workflowService),
-            principalJobFacade, sseStreamBridgeRegistry, triggerSyncExecutor, taskFileStorage);
+            principalJobFacade, sseStreamBridgeRegistry, triggerSyncExecutor, taskFileStorage,
+            triggerDefinitionService, workflowService);
     }
 
     private static ApplicationEventPublisher createEventPublisher(MessageBroker messageBroker) {

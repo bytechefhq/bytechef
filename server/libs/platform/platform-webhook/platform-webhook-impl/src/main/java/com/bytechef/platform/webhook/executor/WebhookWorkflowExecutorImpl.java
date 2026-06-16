@@ -16,6 +16,9 @@
 
 package com.bytechef.platform.webhook.executor;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -26,8 +29,12 @@ import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.component.domain.WebhookTriggerFlags;
+import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.configuration.domain.WorkflowTrigger;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
 import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry.Registration;
@@ -43,6 +50,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.Validate;
@@ -64,14 +72,17 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     private final PrincipalJobFacade principalJobFacade;
     private final SseStreamBridgeRegistry sseStreamBridgeRegistry;
     private final TaskFileStorage taskFileStorage;
+    private final TriggerDefinitionService triggerDefinitionService;
     private final WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor;
+    private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WebhookWorkflowExecutorImpl(
         ApplicationEventPublisher eventPublisher, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
         JobSyncExecutor jobSyncExecutor, PrincipalJobFacade principalJobFacade,
         SseStreamBridgeRegistry sseStreamBridgeRegistry, WebhookWorkflowSyncExecutor webhookWorkflowSyncExecutor,
-        TaskFileStorage taskFileStorage) {
+        TaskFileStorage taskFileStorage, TriggerDefinitionService triggerDefinitionService,
+        WorkflowService workflowService) {
 
         this.eventPublisher = eventPublisher;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
@@ -79,7 +90,9 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         this.principalJobFacade = principalJobFacade;
         this.sseStreamBridgeRegistry = sseStreamBridgeRegistry;
         this.taskFileStorage = taskFileStorage;
+        this.triggerDefinitionService = triggerDefinitionService;
         this.webhookWorkflowSyncExecutor = webhookWorkflowSyncExecutor;
+        this.workflowService = workflowService;
     }
 
     @Override
@@ -186,6 +199,58 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
         return outputs;
     }
 
+    @Override
+    public CompletableFuture<Void> executeStreaming(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
+
+        if (isWorkflowDisabled(workflowExecutionId)) {
+            sseStreamBridge.onError(new IllegalStateException("Workflow is disabled."));
+
+            return CompletableFuture.completedFuture(null);
+        }
+
+        CompletableFuture<Void> future = executeAsync(workflowExecutionId, webhookRequest, sseStreamBridge);
+
+        future.whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+                sseStreamBridge.onError(throwable);
+            } else {
+                sseStreamBridge.onComplete();
+            }
+        });
+
+        return future;
+    }
+
+    @Override
+    public WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
+        WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
+
+        return triggerDefinitionService.getWebhookTriggerFlags(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+    }
+
+    @Override
+    public boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
+
+        return workflow.getTasks(true)
+            .stream()
+            .map(WorkflowTask::getType)
+            .filter(Objects::nonNull)
+            .anyMatch(type -> type.toLowerCase()
+                .contains("stream"));
+    }
+
+    @Override
+    public boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
+        JobPrincipalAccessor jobPrincipalAccessor =
+            jobPrincipalAccessorRegistry.getJobPrincipalAccessor(workflowExecutionId.getType());
+
+        return !jobPrincipalAccessor.isWorkflowEnabled(
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
+    }
+
     /**
      * Runs a single sync job and, if a stream bridge is supplied, registers it with {@link JobSyncExecutor}'s SSE
      * bridge cache as part of the job-creation step so streaming task outputs (e.g. {@code openAi/v1/streamAsk}'s
@@ -274,9 +339,21 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
+    private WorkflowNodeType getComponentOperation(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
+
+        return WorkflowNodeType.ofType(workflowTrigger.getType());
+    }
+
     private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
         JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
             workflowExecutionId.getType());
+
+        if (workflowExecutionId.getJobPrincipalId() == -1) {
+            return jobPrincipalAccessor.getLastWorkflowId(workflowExecutionId.getWorkflowUuid());
+        }
 
         return jobPrincipalAccessor.getWorkflowId(
             workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());

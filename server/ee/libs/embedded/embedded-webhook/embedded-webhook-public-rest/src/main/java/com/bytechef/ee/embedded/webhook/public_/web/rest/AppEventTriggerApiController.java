@@ -28,7 +28,6 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -39,7 +38,6 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -78,17 +76,14 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
     public AppEventTriggerApiController(
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
         EnvironmentService environmentService, HttpServletRequest httpServletRequest,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, HttpServletResponse httpServletResponse,
+        HttpServletResponse httpServletResponse,
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService,
         IntegrationWorkflowService integrationWorkflowService, TempFileStorage tempFileStorage,
-        TriggerDefinitionService triggerDefinitionService, WebhookWorkflowExecutor webhookWorkflowExecutor,
-        WorkflowService workflowService) {
+        WebhookWorkflowExecutor webhookWorkflowExecutor, WorkflowService workflowService) {
 
-        super(
-            jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(), tempFileStorage,
-            triggerDefinitionService, webhookWorkflowExecutor, workflowService);
+        super(applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
 
         this.connectedUserService = connectedUserService;
         this.environmentService = environmentService;
