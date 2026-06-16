@@ -14,6 +14,7 @@ import {
     ClipboardPlusIcon,
     CopyIcon,
     RefreshCcwIcon,
+    ScissorsIcon,
     TextCursorInputIcon,
     Trash2Icon,
 } from 'lucide-react';
@@ -26,12 +27,14 @@ interface WorkflowNodeContextMenuProps {
     data: NodeDataType;
     hasSavedPosition: boolean;
     onCopy?: () => void;
+    onCut?: () => void;
     onDelete: () => void;
     onPaste?: () => void;
     onRename: () => void;
     onResetPosition: () => void;
     onSwitch: () => void;
     showCopyAction?: boolean;
+    showCutAction?: boolean;
     showDeleteAction?: boolean;
     showRenameAction?: boolean;
     showReplaceAction?: boolean;
@@ -43,12 +46,14 @@ const WorkflowNodeContextMenu = ({
     data,
     hasSavedPosition,
     onCopy,
+    onCut,
     onDelete,
     onPaste,
     onRename,
     onResetPosition,
     onSwitch,
     showCopyAction = false,
+    showCutAction = false,
     showDeleteAction = false,
     showRenameAction = false,
     showReplaceAction = false,
@@ -114,6 +119,13 @@ const WorkflowNodeContextMenu = ({
                         </>
                     ) : (
                         <>
+                            {showCutAction && (
+                                <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onCut}>
+                                    <ScissorsIcon className="size-4 shrink-0" />
+                                    Cut
+                                </ContextMenuItem>
+                            )}
+
                             {showReplaceAction && (
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>
                                     <ArrowLeftRightIcon className="size-4 shrink-0" />
@@ -130,7 +142,7 @@ const WorkflowNodeContextMenu = ({
 
                             {showCopyAction && PasteMenuItem}
 
-                            {(showReplaceAction || showCopyAction || canPaste) &&
+                            {(showCutAction || showReplaceAction || showCopyAction || canPaste) &&
                                 (showRenameAction || hasSavedPosition) && <ContextMenuSeparator className="m-0" />}
 
                             {showRenameAction && (
