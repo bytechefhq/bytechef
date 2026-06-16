@@ -50,6 +50,7 @@ import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
 import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,6 +63,7 @@ public class ProjectWorkflowExecutionFacadeTest {
     private ContextService contextService;
     private Evaluator evaluator;
     private ProjectWorkflowExecutionFacadeImpl facade;
+    private JobService jobService;
     private TaskExecution taskExecution;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
@@ -73,12 +75,13 @@ public class ProjectWorkflowExecutionFacadeTest {
 
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
+        jobService = mock(JobService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
 
         facade = new ProjectWorkflowExecutionFacadeImpl(
             componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
-            mock(JobService.class), mock(PrincipalJobService.class), mock(ProjectFacade.class),
+            jobService, mock(PrincipalJobService.class), mock(ProjectFacade.class),
             mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
@@ -165,5 +168,18 @@ public class ProjectWorkflowExecutionFacadeTest {
             .isEqualTo(Map.of("evaluated", true));
         assertThat(taskExecutionDTO.output())
             .isEqualTo("output-value");
+    }
+
+    @Test
+    public void testGetSubflowJobTaskExecutionsSkipsTaskLoadWhenNoChildJobs() {
+        when(jobService.getChildJobIds(33911L))
+            .thenReturn(List.of());
+
+        List<TaskExecutionDTO> taskExecutionDTOs = facade.getSubflowJobTaskExecutions(33911L);
+
+        assertThat(taskExecutionDTOs)
+            .isEmpty();
+
+        verify(taskExecutionService, never()).getJobTaskExecutions(anyLong());
     }
 }

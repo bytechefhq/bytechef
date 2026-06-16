@@ -337,7 +337,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Validate.notNull(job.getId(), "id"),
                 projectOptional.get(),
                 jobProjectDeployment,
-                new JobDTO(job, outputs, getJobTaskExecutions(job.getId(), false)),
+                new JobDTO(job, outputs, getSubflowJobTaskExecutions(job.getId())),
                 workflowOptional.get(),
                 getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
         }
@@ -375,6 +375,26 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData));
 
         return buildHierarchy(taskExecutionDTOs);
+    }
+
+    List<TaskExecutionDTO> getSubflowJobTaskExecutions(long jobId) {
+        List<Long> childJobIds = jobService.getChildJobIds(jobId);
+
+        if (childJobIds.isEmpty()) {
+            return List.of();
+        }
+
+        return jobService.getJobs(childJobIds)
+            .stream()
+            .filter(childJob -> childJob.getParentTaskExecutionId() != null)
+            .map(childJob -> toTaskExecutionDTO(
+                taskExecutionService.getTaskExecution(childJob.getParentTaskExecutionId()), asSubflowJobDTO(childJob),
+                false))
+            .toList();
+    }
+
+    private JobDTO asSubflowJobDTO(Job job) {
+        return new JobDTO(job, null, getSubflowJobTaskExecutions(Objects.requireNonNull(job.getId())));
     }
 
     TaskExecutionDTO toTaskExecutionDTO(TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData) {
