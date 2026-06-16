@@ -1,5 +1,7 @@
 import {type CSSProperties, type ReactNode, Suspense, lazy, useMemo} from 'react';
 
+const LARGE_PAYLOAD_CHARS = 100_000;
+
 const ReactJson = lazy(async () => {
     const module = await import('react-json-view');
 
@@ -8,16 +10,70 @@ const ReactJson = lazy(async () => {
     return {default: component} as typeof module;
 });
 
-const LARGE_PAYLOAD_CHARS = 100_000;
+const exceedsCharBudget = (src: unknown, limit: number): boolean => {
+    let remaining = limit;
 
-export const getJsonViewCollapsed = (src: object): boolean | number => {
-    try {
-        return JSON.stringify(src).length > LARGE_PAYLOAD_CHARS ? 1 : false;
-    } catch {
-        // Circular or otherwise non-serializable structures: collapse to stay responsive.
-        return 1;
-    }
+    const seen = new WeakSet<object>();
+
+    const visit = (value: unknown): boolean => {
+        if (value === null) {
+            remaining -= 4;
+
+            return remaining <= 0;
+        }
+
+        const valueType = typeof value;
+
+        if (valueType === 'string') {
+            remaining -= (value as string).length + 2;
+
+            return remaining <= 0;
+        }
+
+        if (valueType === 'number' || valueType === 'boolean') {
+            remaining -= String(value).length;
+
+            return remaining <= 0;
+        }
+
+        if (valueType !== 'object') {
+            return false;
+        }
+
+        if (seen.has(value as object)) {
+            return true;
+        }
+
+        seen.add(value as object);
+
+        if (Array.isArray(value)) {
+            for (const item of value) {
+                remaining -= 1;
+
+                if (visit(item)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+            remaining -= key.length + 4;
+
+            if (remaining <= 0 || visit(entry)) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    return visit(src);
 };
+
+export const getJsonViewCollapsed = (src: object): boolean | number =>
+    exceedsCharBudget(src, LARGE_PAYLOAD_CHARS) ? 1 : false;
 
 interface JsonViewProps {
     collapseStringsAfterLength?: number;
@@ -34,7 +90,7 @@ const JsonView = ({
     collapseStringsAfterLength = 10000,
     collapsed,
     enableClipboard = false,
-    fallback = <div className="p-4 text-sm text-muted-foreground">Loading...</div>,
+    fallback = <span className="block p-4 text-sm text-muted-foreground">Loading...</span>,
     name,
     sortKeys,
     src,
