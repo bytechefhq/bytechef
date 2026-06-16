@@ -642,6 +642,9 @@ describe('useOAuth2', () => {
 
         const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
+        // Closing the popup returns focus to this window, which is what starts the abandon countdown.
+        const hasFocusSpy = vi.spyOn(document, 'hasFocus').mockReturnValue(true);
+
         const {result} = renderHook(() => useOAuth2(defaultProps));
 
         act(() => {
@@ -656,14 +659,45 @@ describe('useOAuth2', () => {
             vi.advanceTimersByTime(300);
         });
 
-        // Advance past the 120-second grace period so the hook treats the popup as abandoned
+        // Advance past the grace period so the hook treats the popup as abandoned
         act(() => {
-            vi.advanceTimersByTime(121_000);
+            vi.advanceTimersByTime(2_500);
         });
 
         expect(result.current.loading).toBe(false);
         expect(consoleWarnSpy).toHaveBeenCalledWith('Warning: Popup was closed before completing authentication.');
 
+        hasFocusSpy.mockRestore();
+        consoleWarnSpy.mockRestore();
+        vi.useRealTimers();
+    });
+
+    it('should keep loading while the popup is in front even if it reports closed (COOP false positive)', () => {
+        vi.useFakeTimers();
+
+        const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+        // While the user authenticates, the popup holds focus, so this window does not.
+        const hasFocusSpy = vi.spyOn(document, 'hasFocus').mockReturnValue(false);
+
+        const {result} = renderHook(() => useOAuth2(defaultProps));
+
+        act(() => {
+            result.current.getAuth();
+        });
+
+        // A COOP provider can make the still-open popup report closed during cross-origin navigation.
+        (mockWindow as unknown as {closed: boolean}).closed = true;
+
+        // Advance well beyond the grace period; without focus the hook must not abandon the flow.
+        act(() => {
+            vi.advanceTimersByTime(60_000);
+        });
+
+        expect(result.current.loading).toBe(true);
+        expect(consoleWarnSpy).not.toHaveBeenCalled();
+
+        hasFocusSpy.mockRestore();
         consoleWarnSpy.mockRestore();
         vi.useRealTimers();
     });

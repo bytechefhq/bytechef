@@ -20,7 +20,7 @@ export interface CodePayloadI {
 const POPUP_HEIGHT = 800;
 const POPUP_WIDTH = 600;
 
-const POPUP_CLOSED_GRACE_PERIOD_MS = 120_000;
+const POPUP_CLOSED_GRACE_PERIOD_MS = 2_000;
 
 // https://medium.com/@dazcyril/generating-cryptographic-random-state-in-javascript-in-the-browser-c538b3daae50
 const generateState = () => {
@@ -299,7 +299,7 @@ const useOAuth2 = ({
                 // Cross-origin access may throw; keep popupAppearsClosed as false
             }
 
-            if (popupAppearsClosed) {
+            if (popupAppearsClosed && document.hasFocus()) {
                 if (!popupClosedAt) {
                     popupClosedAt = Date.now();
                 }
