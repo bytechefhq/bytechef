@@ -104,6 +104,18 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     }
 
     @Override
+    public WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
+        Workflow workflow = workflowService.getWorkflow(getWorkflowId(workflowExecutionId));
+
+        WorkflowTrigger workflowTrigger = WorkflowTrigger.of(workflowExecutionId.getTriggerName(), workflow);
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTrigger.getType());
+
+        return triggerDefinitionService.getWebhookTriggerFlags(
+            workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation());
+    }
+
+    @Override
     public boolean isWorkflowEnabled(WorkflowExecutionId workflowExecutionId) {
         Cache cache = Objects.requireNonNull(cacheManager.getCache(WORKFLOW_ENABLED_CACHE));
 
@@ -258,6 +270,18 @@ public class WebhookTriggerTestFacadeImpl implements WebhookTriggerTestFacade {
     private String getWebhookUrl(WorkflowExecutionId workflowExecutionId, long environmentId) {
         return "%s/test/environments/%s".formatted(webhookUrl, environmentId)
             .replace("{id}", workflowExecutionId.toString());
+    }
+
+    private String getWorkflowId(WorkflowExecutionId workflowExecutionId) {
+        JobPrincipalAccessor jobPrincipalAccessor = jobPrincipalAccessorRegistry.getJobPrincipalAccessor(
+            workflowExecutionId.getType());
+
+        if (workflowExecutionId.getJobPrincipalId() == -1) {
+            return jobPrincipalAccessor.getLastWorkflowId(workflowExecutionId.getWorkflowUuid());
+        }
+
+        return jobPrincipalAccessor.getWorkflowId(
+            workflowExecutionId.getJobPrincipalId(), workflowExecutionId.getWorkflowUuid());
     }
 
     private String getWorkflowUuid(String workflowId, PlatformType type) {
