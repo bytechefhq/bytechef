@@ -23,8 +23,8 @@ import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
-import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
-import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
+import com.bytechef.platform.file.storage.TempFileStorage;
+import com.bytechef.platform.webhook.rest.util.WebhookRequestUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -47,23 +47,20 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @ConditionalOnCoordinator
-public class WebhookTriggerTestController extends AbstractWebhookTriggerController {
+public class WebhookTriggerTestController {
 
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
+    private final TempFileStorage tempFileStorage = new TempFileStorageImpl();
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
-    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
     @SuppressFBWarnings("EI")
     public WebhookTriggerTestController(
-        WebhookTriggerTestFacade webhookTriggerTestFacade, WebhookWorkflowExecutor webhookWorkflowExecutor,
+        WebhookTriggerTestFacade webhookTriggerTestFacade,
         WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
-        super(new TempFileStorageImpl(), webhookWorkflowExecutor);
-
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
-        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
@@ -88,10 +85,11 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
-            WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(
+            WebhookTriggerFlags webhookTriggerFlags = webhookTriggerTestFacade.getWebhookTriggerFlags(
                 workflowExecutionId);
 
-            WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
+            WebhookRequest webhookRequest = WebhookRequestUtils.getWebhookRequest(
+                httpServletRequest, tempFileStorage, webhookTriggerFlags);
 
             if (log.isDebugEnabled()) {
                 log.debug(
