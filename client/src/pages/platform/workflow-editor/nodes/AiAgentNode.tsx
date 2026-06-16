@@ -161,12 +161,19 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         [incrementLayoutResetCounter, invalidateWorkflowQueries, updateWorkflowMutation]
     );
 
-    const handleCopyNode = useCallback(() => {
-        setTimeout(() => {
-            setCopiedNode({...data, label: nodeLabel ?? data.label});
-            setCopiedWorkflowId(workflow.id);
-        }, 200);
+    const saveNodeToClipboard = useCallback(() => {
+        setCopiedNode({...data, label: nodeLabel ?? data.label});
+        setCopiedWorkflowId(workflow.id);
     }, [data, nodeLabel, setCopiedNode, setCopiedWorkflowId, workflow.id]);
+
+    const handleCopyNode = useCallback(() => {
+        setTimeout(saveNodeToClipboard, 200);
+    }, [saveNodeToClipboard]);
+
+    const handleCutNode = useCallback(() => {
+        setTimeout(saveNodeToClipboard, 200);
+        handleDeleteNodeClick(data);
+    }, [handleDeleteNodeClick, saveNodeToClipboard, data]);
 
     const handleDelete = useCallback(() => handleDeleteNodeClick(data), [data, handleDeleteNodeClick]);
 
@@ -297,12 +304,14 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             data={data}
             hasSavedPosition={!!hasSavedNodePosition}
             onCopy={handleCopyNode}
+            onCut={handleCutNode}
             onDelete={handleDelete}
             onPaste={handlePasteNode}
             onRename={handleStartRename}
             onResetPosition={handleResetPosition}
             onSwitch={handleSwitch}
             showCopyAction
+            showCutAction
             showDeleteAction
             showRenameAction
         >
