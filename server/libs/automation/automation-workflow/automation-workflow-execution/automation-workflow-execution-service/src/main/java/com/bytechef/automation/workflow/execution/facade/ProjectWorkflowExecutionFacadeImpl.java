@@ -24,6 +24,7 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.domain.Context;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.Job.Status;
+import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
@@ -136,7 +137,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             ? null
             : taskFileStorage.readJobOutputs(job.getOutputs());
 
-        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id));
+        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, true));
 
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
@@ -330,7 +331,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 Validate.notNull(job.getId(), "id"),
                 projectOptional.get(),
                 jobProjectDeployment,
-                new JobDTO(job, outputs, getJobTaskExecutions(job.getId())),
+                new JobDTO(job, outputs, getJobTaskExecutions(job.getId(), false)),
                 workflowOptional.get(),
                 getTriggerExecutionDTO(deploymentId, triggerExecution, job)));
         }
@@ -356,7 +357,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return new DefinitionResult(taskDispatcherDefinition.getTitle(), taskDispatcherDefinition.getIcon());
     }
 
-    private List<TaskExecutionDTO> getJobTaskExecutions(long jobId) {
+    private List<TaskExecutionDTO> getJobTaskExecutions(long jobId, boolean includeTaskData) {
         List<Long> childJobIds = jobService.getChildJobIds(jobId);
         Map<Long, Job> childJobMap = jobService.getJobs(childJobIds)
             .stream()
@@ -364,33 +365,43 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
-            taskExecution -> {
-                Map<String, ?> context = taskFileStorage.readContextValue(
-                    contextService.peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION));
-
-                DefinitionResult definitionResult = getDefinition(taskExecution.getType());
-                WorkflowTask workflowTask = taskExecution.getWorkflowTask();
-                Object output = taskExecution.getOutput() == null
-                    ? null
-                    : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
-
-                return new TaskExecutionDTO(
-                    taskExecution, definitionResult.title(), definitionResult.icon(),
-                    workflowTask.evaluateParameters(context, evaluator), output,
-                    asJobDTO(childJobMap.get(taskExecution.getId())));
-            });
+            taskExecution -> toTaskExecutionDTO(
+                taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData));
 
         return buildHierarchy(taskExecutionDTOs);
     }
 
-    private JobDTO asJobDTO(Job job) {
+    TaskExecutionDTO toTaskExecutionDTO(TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData) {
+        DefinitionResult definitionResult = getDefinition(taskExecution.getType());
+
+        Map<String, ?> input = null;
+        Object output = null;
+
+        if (includeTaskData) {
+            Map<String, ?> context = taskFileStorage.readContextValue(
+                contextService.peek(Objects.requireNonNull(taskExecution.getId()), Context.Classname.TASK_EXECUTION));
+            WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+            input = workflowTask.evaluateParameters(context, evaluator);
+            output = taskExecution.getOutput() == null
+                ? null
+                : taskFileStorage.readTaskExecutionOutput(taskExecution.getOutput());
+        }
+
+        return new TaskExecutionDTO(
+            taskExecution, definitionResult.title(), definitionResult.icon(), input, output, childJob);
+    }
+
+    private JobDTO asJobDTO(Job job, boolean includeTaskData) {
         if (job == null) {
             return null;
         }
 
-        return new JobDTO(
-            job, CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs),
-            getJobTaskExecutions(job.getId()));
+        Map<String, ?> outputs = includeTaskData
+            ? CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs)
+            : null;
+
+        return new JobDTO(job, outputs, getJobTaskExecutions(Objects.requireNonNull(job.getId()), includeTaskData));
     }
 
     private TriggerExecutionDTO getTriggerExecutionDTO(
