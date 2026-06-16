@@ -777,12 +777,19 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         setRenamingNodeName(data.name);
     }, [data.name, nodeLabel, setRenameValue, setRenamingNodeName]);
 
-    const handleCopyNode = useCallback(() => {
-        setTimeout(() => {
-            setCopiedNode({...data, label: nodeLabel ?? data.label});
-            setCopiedWorkflowId(workflow.id);
-        }, 200);
+    const saveNodeToClipboard = useCallback(() => {
+        setCopiedNode({...data, label: nodeLabel ?? data.label});
+        setCopiedWorkflowId(workflow.id);
     }, [data, nodeLabel, setCopiedNode, setCopiedWorkflowId, workflow.id]);
+
+    const handleCopyNode = useCallback(() => {
+        setTimeout(saveNodeToClipboard, 200);
+    }, [saveNodeToClipboard]);
+
+    const handleCutNode = useCallback(() => {
+        setTimeout(saveNodeToClipboard, 200);
+        handleDeleteNodeClick(data);
+    }, [handleDeleteNodeClick, saveNodeToClipboard, data]);
 
     const handlePasteNode = useCallback(() => {
         const taskDispatcherContext = data.taskDispatcher ? undefined : getContextFromTaskNodeData(data, 1);
@@ -860,12 +867,14 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 data={data}
                 hasSavedPosition={!!hasSavedNodePosition}
                 onCopy={handleCopyNode}
+                onCut={handleCutNode}
                 onDelete={handleDelete}
                 onPaste={handlePasteNode}
                 onRename={handleStartRename}
                 onResetPosition={handleResetPosition}
                 onSwitch={handleSwitch}
                 showCopyAction
+                showCutAction
                 showDeleteAction
                 showRenameAction
             >
