@@ -145,7 +145,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
     public WorkflowExecutionDTO getWorkflowExecution(long id) {
         Job job = jobService.getJob(id);
 
-        JobDTO jobDTO = asJobDTO(job, false);
+        JobDTO jobDTO = toJobDTO(job, false);
         long integrationInstanceId = principalJobService.getJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.EMBEDDED);
 
@@ -157,8 +157,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             integrationService.getWorkflowIntegration(jobDTO.workflowId()),
             integrationInstanceConfigurationService.getIntegrationInstanceConfiguration(
                 integrationInstance.getIntegrationInstanceConfigurationId()),
-            integrationInstance,
-            jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
+            integrationInstance, jobDTO, workflowService.getWorkflow(jobDTO.workflowId()),
             getTriggerExecutionDTO(
                 integrationInstanceId,
                 OptionalUtils.orElse(
@@ -433,7 +432,7 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> toTaskExecutionDTO(
-                taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData,
+                taskExecution, toJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData,
                 definitionResultCache));
 
         return buildHierarchy(taskExecutionDTOs);
@@ -467,18 +466,6 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
             taskExecution, definitionResult.title(), definitionResult.icon(), input, output, childJob);
     }
 
-    private JobDTO asJobDTO(Job job, boolean includeTaskData) {
-        if (job == null) {
-            return null;
-        }
-
-        Map<String, ?> outputs = includeTaskData
-            ? CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs)
-            : null;
-
-        return new JobDTO(job, outputs, getJobTaskExecutions(Objects.requireNonNull(job.getId()), includeTaskData));
-    }
-
     private List<String> getWorkflowIds(Integration integration) {
         return integrationWorkflowService.getWorkflowIds(integration.getId(), integration.getLastIntegrationVersion());
     }
@@ -502,6 +489,18 @@ public class IntegrationWorkflowExecutionFacadeImpl implements IntegrationWorkfl
         }
 
         return triggerExecutionDTO;
+    }
+
+    private JobDTO toJobDTO(Job job, boolean includeTaskData) {
+        if (job == null) {
+            return null;
+        }
+
+        Map<String, ?> outputs = includeTaskData
+            ? CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs)
+            : null;
+
+        return new JobDTO(job, outputs, getJobTaskExecutions(Objects.requireNonNull(job.getId()), includeTaskData));
     }
 
     record DefinitionResult(String title, String icon) {
