@@ -310,7 +310,9 @@ export default function pasteNode({
 
     const existingLabels = nodes.map((node) => node.data?.label).filter((label): label is string => !!label);
 
-    const finalLabel = getNextAvailableName(copiedNode.label ?? '', existingLabels);
+    const finalLabel = existingLabels.includes(copiedNode.label ?? '')
+        ? getNextAvailableName(copiedNode.label ?? '', existingLabels)
+        : (copiedNode.label ?? '');
 
     let cleanedMetadata = undefined;
 
