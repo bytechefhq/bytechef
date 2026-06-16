@@ -20,7 +20,6 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
 import com.bytechef.ee.embedded.webhook.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.configuration.service.EnvironmentService;
@@ -31,7 +30,6 @@ import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -60,6 +58,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     private final HttpServletResponse httpServletResponse;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationWorkflowService integrationWorkflowService;
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowService workflowService;
     private final EnvironmentService environmentService;
 
@@ -67,20 +66,18 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
     public RequestTriggerApiController(
         ApplicationProperties applicationProperties, ConnectedUserService connectedUserService,
         EnvironmentService environmentService, HttpServletRequest httpServletRequest,
-        HttpServletResponse httpServletResponse, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        TempFileStorage tempFileStorage, TriggerDefinitionService triggerDefinitionService,
+        HttpServletResponse httpServletResponse, TempFileStorage tempFileStorage,
         WebhookWorkflowExecutor webhookWorkflowExecutor, IntegrationInstanceService integrationInstanceService,
         IntegrationWorkflowService integrationWorkflowService, WorkflowService workflowService) {
 
-        super(
-            jobPrincipalAccessorRegistry, applicationProperties.getPublicUrl(), tempFileStorage,
-            triggerDefinitionService, webhookWorkflowExecutor, workflowService);
+        super(applicationProperties.getPublicUrl(), tempFileStorage, webhookWorkflowExecutor);
 
         this.connectedUserService = connectedUserService;
         this.httpServletRequest = httpServletRequest;
         this.httpServletResponse = httpServletResponse;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationWorkflowService = integrationWorkflowService;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowService = workflowService;
         this.environmentService = environmentService;
     }
@@ -104,7 +101,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
 
         ResponseEntity<Object> responseEntity;
 
-        if (isWorkflowDisabled(workflowExecutionId)) {
+        if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
             responseEntity = ResponseEntity.ok()
                 .build();
         } else {

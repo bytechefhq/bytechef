@@ -16,18 +16,16 @@
 
 package com.bytechef.platform.configuration.web.rest;
 
-import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.component.definition.TriggerDefinition.WebhookValidateResponse;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
-import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeTestOutputFacade;
 import com.bytechef.platform.configuration.web.rest.file.storage.TempFileStorageImpl;
+import com.bytechef.platform.webhook.executor.WebhookWorkflowExecutor;
 import com.bytechef.platform.webhook.rest.AbstractWebhookTriggerController;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
-import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,16 +52,18 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
     private static final Logger log = LoggerFactory.getLogger(WebhookTriggerTestController.class);
 
     private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final WebhookWorkflowExecutor webhookWorkflowExecutor;
     private final WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade;
 
+    @SuppressFBWarnings("EI")
     public WebhookTriggerTestController(
-        TriggerDefinitionService triggerDefinitionService, JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry,
-        WebhookTriggerTestFacade webhookTriggerTestFacade, WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade,
-        WorkflowService workflowService) {
+        WebhookTriggerTestFacade webhookTriggerTestFacade, WebhookWorkflowExecutor webhookWorkflowExecutor,
+        WorkflowNodeTestOutputFacade workflowNodeTestOutputFacade) {
 
-        super(jobPrincipalAccessorRegistry, new TempFileStorageImpl(), triggerDefinitionService, workflowService);
+        super(new TempFileStorageImpl(), webhookWorkflowExecutor);
 
         this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+        this.webhookWorkflowExecutor = webhookWorkflowExecutor;
         this.workflowNodeTestOutputFacade = workflowNodeTestOutputFacade;
     }
 
@@ -88,7 +88,8 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
 
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             ResponseEntity<?> responseEntity;
-            WebhookTriggerFlags webhookTriggerFlags = getWebhookTriggerFlags(workflowExecutionId);
+            WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(
+                workflowExecutionId);
 
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
@@ -99,7 +100,7 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
             }
 
             if (Objects.equals(httpServletRequest.getMethod(), RequestMethod.HEAD.name()) ||
-                isWorkflowDisabled(workflowExecutionId)) {
+                !webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId)) {
 
                 if (webhookTriggerFlags.workflowSyncOnEnableValidation()) {
                     responseEntity = doValidateOnEnable(workflowExecutionId, webhookRequest, environmentId);
@@ -117,11 +118,6 @@ public class WebhookTriggerTestController extends AbstractWebhookTriggerControll
 
             return responseEntity;
         });
-    }
-
-    @Override
-    protected boolean isWorkflowDisabled(WorkflowExecutionId workflowExecutionId) {
-        return !webhookTriggerTestFacade.isWorkflowEnabled(workflowExecutionId);
     }
 
     private ResponseEntity<?> doValidateOnEnable(
