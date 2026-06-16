@@ -368,7 +368,11 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         return workflowExecutionDTOs;
     }
 
-    private DefinitionResult getDefinition(String type) {
+    private DefinitionResult getDefinition(String type, Map<String, DefinitionResult> definitionResultCache) {
+        return definitionResultCache.computeIfAbsent(type, this::resolveDefinition);
+    }
+
+    private DefinitionResult resolveDefinition(String type) {
         WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
 
         if (componentDefinitionService.hasComponentDefinition(
@@ -392,10 +396,13 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .stream()
             .collect(Collectors.toMap(Job::getParentTaskExecutionId, Function.identity()));
 
+        Map<String, DefinitionResult> definitionResultCache = new HashMap<>();
+
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> toTaskExecutionDTO(
-                taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData));
+                taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData,
+                definitionResultCache));
 
         return buildHierarchy(taskExecutionDTOs);
     }
@@ -421,7 +428,14 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
     }
 
     TaskExecutionDTO toTaskExecutionDTO(TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData) {
-        DefinitionResult definitionResult = getDefinition(taskExecution.getType());
+        return toTaskExecutionDTO(taskExecution, childJob, includeTaskData, new HashMap<>());
+    }
+
+    private TaskExecutionDTO toTaskExecutionDTO(
+        TaskExecution taskExecution, JobDTO childJob, boolean includeTaskData,
+        Map<String, DefinitionResult> definitionResultCache) {
+
+        DefinitionResult definitionResult = getDefinition(taskExecution.getType(), definitionResultCache);
 
         Map<String, ?> input = null;
         Object output = null;
@@ -459,7 +473,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         TriggerExecutionDTO triggerExecutionDTO = null;
 
         if (projectDeploymentId != null && triggerExecution != null) {
-            DefinitionResult definitionResult = getDefinition(triggerExecution.getType());
+            DefinitionResult definitionResult = resolveDefinition(triggerExecution.getType());
 
             WorkflowTrigger workflowTrigger = triggerExecution.getWorkflowTrigger();
 
