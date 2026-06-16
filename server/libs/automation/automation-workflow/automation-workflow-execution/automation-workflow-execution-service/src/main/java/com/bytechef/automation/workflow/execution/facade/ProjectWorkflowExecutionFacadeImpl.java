@@ -401,7 +401,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
         List<TaskExecutionDTO> taskExecutionDTOs = CollectionUtils.map(
             taskExecutionService.getJobTaskExecutions(jobId),
             taskExecution -> toTaskExecutionDTO(
-                taskExecution, asJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData,
+                taskExecution, toJobDTO(childJobMap.get(taskExecution.getId()), includeTaskData), includeTaskData,
                 definitionResultCache));
 
         return buildHierarchy(taskExecutionDTOs);
@@ -418,12 +418,52 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             .stream()
             .filter(childJob -> childJob.getParentTaskExecutionId() != null)
             .map(childJob -> toTaskExecutionDTO(
-                taskExecutionService.getTaskExecution(childJob.getParentTaskExecutionId()), asSubflowJobDTO(childJob),
+                taskExecutionService.getTaskExecution(childJob.getParentTaskExecutionId()), toSubflowJobDTO(childJob),
                 false))
             .toList();
     }
 
-    private JobDTO asSubflowJobDTO(Job job) {
+    private TriggerExecutionDTO getTriggerExecutionDTO(
+        Number projectDeploymentId, TriggerExecution triggerExecution, Job job) {
+
+        TriggerExecutionDTO triggerExecutionDTO = null;
+
+        if (projectDeploymentId != null && triggerExecution != null) {
+            DefinitionResult definitionResult = resolveDefinition(triggerExecution.getType());
+
+            WorkflowTrigger workflowTrigger = triggerExecution.getWorkflowTrigger();
+
+            Map<String, ?> workflowTriggerParameters = workflowTrigger.getParameters();
+
+            Map<String, Object> inputs = job.getInputs()
+                .entrySet()
+                .stream()
+                .filter(input -> !workflowTriggerParameters.containsKey(input.getKey()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+
+            triggerExecutionDTO = new TriggerExecutionDTO(
+                triggerExecution, definitionResult.title(), definitionResult.icon(),
+                workflowTrigger.evaluateParameters(inputs, evaluator),
+                triggerExecution.getOutput() == null ? null
+                    : triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
+        }
+
+        return triggerExecutionDTO;
+    }
+
+    private JobDTO toJobDTO(Job job, boolean includeTaskData) {
+        if (job == null) {
+            return null;
+        }
+
+        Map<String, ?> outputs = includeTaskData
+            ? CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs)
+            : null;
+
+        return new JobDTO(job, outputs, getJobTaskExecutions(Objects.requireNonNull(job.getId()), includeTaskData));
+    }
+
+    private JobDTO toSubflowJobDTO(Job job) {
         return new JobDTO(job, null, getSubflowJobTaskExecutions(Objects.requireNonNull(job.getId())));
     }
 
@@ -453,46 +493,6 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
 
         return new TaskExecutionDTO(
             taskExecution, definitionResult.title(), definitionResult.icon(), input, output, childJob);
-    }
-
-    private JobDTO asJobDTO(Job job, boolean includeTaskData) {
-        if (job == null) {
-            return null;
-        }
-
-        Map<String, ?> outputs = includeTaskData
-            ? CollectionUtils.asMap(job.getOutputs(), taskFileStorage::readJobOutputs)
-            : null;
-
-        return new JobDTO(job, outputs, getJobTaskExecutions(Objects.requireNonNull(job.getId()), includeTaskData));
-    }
-
-    private TriggerExecutionDTO getTriggerExecutionDTO(
-        Number projectDeploymentId, TriggerExecution triggerExecution, Job job) {
-
-        TriggerExecutionDTO triggerExecutionDTO = null;
-
-        if (projectDeploymentId != null && triggerExecution != null) {
-            DefinitionResult definitionResult = resolveDefinition(triggerExecution.getType());
-
-            WorkflowTrigger workflowTrigger = triggerExecution.getWorkflowTrigger();
-
-            Map<String, ?> workflowTriggerParameters = workflowTrigger.getParameters();
-
-            Map<String, Object> inputs = job.getInputs()
-                .entrySet()
-                .stream()
-                .filter(input -> !workflowTriggerParameters.containsKey(input.getKey()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-
-            triggerExecutionDTO = new TriggerExecutionDTO(
-                triggerExecution, definitionResult.title(), definitionResult.icon(),
-                workflowTrigger.evaluateParameters(inputs, evaluator),
-                triggerExecution.getOutput() == null ? null
-                    : triggerFileStorage.readTriggerExecutionOutput(triggerExecution.getOutput()));
-        }
-
-        return triggerExecutionDTO;
     }
 
     record DefinitionResult(String title, String icon) {
