@@ -8,6 +8,7 @@
 package com.bytechef.ee.embedded.workflow.execution.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -21,6 +22,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
@@ -56,6 +58,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
     private ContextService contextService;
     private Evaluator evaluator;
     private IntegrationWorkflowExecutionFacadeImpl facade;
+    private JobService jobService;
     private TaskExecution taskExecution;
     private TaskExecutionService taskExecutionService;
     private TaskFileStorage taskFileStorage;
@@ -67,6 +70,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
 
         contextService = mock(ContextService.class);
         evaluator = mock(Evaluator.class);
+        jobService = mock(JobService.class);
         taskExecutionService = mock(TaskExecutionService.class);
         taskFileStorage = mock(TaskFileStorage.class);
 
@@ -75,7 +79,7 @@ public class IntegrationWorkflowExecutionFacadeTest {
             mock(PrincipalJobService.class), mock(IntegrationInstanceConfigurationService.class),
             mock(IntegrationInstanceService.class), mock(IntegrationInstanceConfigurationWorkflowService.class),
             mock(IntegrationService.class), mock(IntegrationWorkflowFacade.class),
-            mock(IntegrationWorkflowService.class), mock(JobService.class),
+            mock(IntegrationWorkflowService.class), jobService,
             mock(TaskDispatcherDefinitionService.class), taskExecutionService, taskFileStorage,
             mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
 
@@ -121,12 +125,23 @@ public class IntegrationWorkflowExecutionFacadeTest {
         when(taskFileStorage.readTaskExecutionOutput(any()))
             .thenReturn("output-value");
 
-        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(1L);
+        TaskExecutionDTO taskExecutionDTO = facade.getWorkflowExecutionTaskExecution(10L, 1L);
 
         assertThat(taskExecutionDTO.input())
             .isEqualTo(Map.of("evaluated", true));
         assertThat(taskExecutionDTO.output())
             .isEqualTo("output-value");
+    }
+
+    @Test
+    public void testGetWorkflowExecutionTaskExecutionRejectsTaskFromAnotherWorkflowExecution() {
+        when(taskExecutionService.getTaskExecution(1L))
+            .thenReturn(taskExecution);
+        when(jobService.getJob(10L))
+            .thenReturn(new Job(10L));
+
+        assertThatThrownBy(() -> facade.getWorkflowExecutionTaskExecution(999L, 1L))
+            .isInstanceOf(IllegalArgumentException.class);
     }
 
     @Test
