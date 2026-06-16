@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.workflow.execution.facade;
 
 import com.bytechef.atlas.execution.domain.Job.Status;
 import com.bytechef.ee.embedded.workflow.execution.dto.WorkflowExecutionDTO;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
 import java.time.Instant;
 import org.springframework.data.domain.Page;
 
@@ -20,6 +21,8 @@ import org.springframework.data.domain.Page;
 public interface IntegrationWorkflowExecutionFacade {
 
     WorkflowExecutionDTO getWorkflowExecution(long id);
+
+    TaskExecutionDTO getWorkflowExecutionTaskExecution(long taskExecutionId);
 
     Page<WorkflowExecutionDTO> getWorkflowExecutions(
         Long environmentId, Status jobStatus, Instant jobStartDate, Instant jobEndDate, Long projectId,
