@@ -95,20 +95,22 @@ const ComboBox: FC<ComboBoxProps> = ({
                 </Button>
             </PopoverTrigger>
 
-            <PopoverPrimitive.Content
-                align="start"
-                className="z-50 w-72 min-w-combo-box-popper-anchor-width rounded-md border bg-popover p-0 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
-            >
-                <Command>
-                    <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
+            <PopoverPrimitive.Portal>
+                <PopoverPrimitive.Content
+                    align="start"
+                    className="z-50 w-72 min-w-combo-box-popper-anchor-width rounded-md border bg-popover p-0 text-popover-foreground shadow-md outline-hidden data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95"
+                >
+                    <Command>
+                        <CommandInput className="h-9 border-none ring-0" placeholder="Search..." />
 
-                    <CommandList>
-                        <CommandEmpty>{emptyMessage ?? 'No item found.'}</CommandEmpty>
+                        <CommandList>
+                            <CommandEmpty>{emptyMessage ?? 'No item found.'}</CommandEmpty>
 
-                        <CommandGroup>{commandItems}</CommandGroup>
-                    </CommandList>
-                </Command>
-            </PopoverPrimitive.Content>
+                            <CommandGroup>{commandItems}</CommandGroup>
+                        </CommandList>
+                    </Command>
+                </PopoverPrimitive.Content>
+            </PopoverPrimitive.Portal>
         </Popover>
     );
 };
