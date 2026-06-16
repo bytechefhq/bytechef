@@ -137,7 +137,7 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
             ? null
             : taskFileStorage.readJobOutputs(job.getOutputs());
 
-        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, true));
+        JobDTO jobDTO = new JobDTO(job, outputs, getJobTaskExecutions(id, false));
 
         Optional<Long> projectDeploymentIdOptional = principalJobService.fetchJobPrincipalId(
             Validate.notNull(job.getId(), ""), PlatformType.AUTOMATION);
@@ -153,6 +153,12 @@ public class ProjectWorkflowExecutionFacadeImpl implements ProjectWorkflowExecut
                 triggerExecutionService.fetchJobTriggerExecution(Validate.notNull(job.getId(), "id"))
                     .orElse(null),
                 job));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public TaskExecutionDTO getWorkflowExecutionTaskExecution(long taskExecutionId) {
+        return toTaskExecutionDTO(taskExecutionService.getTaskExecution(taskExecutionId), null, true);
     }
 
     @Override
