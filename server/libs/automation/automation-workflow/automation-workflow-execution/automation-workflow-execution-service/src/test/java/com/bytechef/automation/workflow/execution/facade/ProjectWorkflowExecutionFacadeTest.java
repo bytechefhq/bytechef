@@ -16,7 +16,42 @@
 
 package com.bytechef.automation.workflow.execution.facade;
 
-import org.junit.jupiter.api.Disabled;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
+import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.execution.domain.Context;
+import com.bytechef.atlas.execution.domain.TaskExecution;
+import com.bytechef.atlas.execution.service.ContextService;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
+import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.automation.configuration.facade.ProjectFacade;
+import com.bytechef.automation.configuration.service.ProjectDeploymentService;
+import com.bytechef.automation.configuration.service.ProjectService;
+import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.evaluator.Evaluator;
+import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.file.storage.TriggerFileStorage;
+import com.bytechef.platform.workflow.execution.dto.TaskExecutionDTO;
+import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.service.TriggerExecutionService;
+import com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -24,15 +59,91 @@ import org.junit.jupiter.api.Test;
  */
 public class ProjectWorkflowExecutionFacadeTest {
 
-    @Disabled
-    @Test
-    public void testGetExecution() {
-        // TODO
+    private ContextService contextService;
+    private Evaluator evaluator;
+    private ProjectWorkflowExecutionFacadeImpl facade;
+    private TaskExecution taskExecution;
+    private TaskFileStorage taskFileStorage;
+
+    @BeforeEach
+    @SuppressWarnings("unchecked")
+    public void setUp() {
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+
+        contextService = mock(ContextService.class);
+        evaluator = mock(Evaluator.class);
+        taskFileStorage = mock(TaskFileStorage.class);
+
+        facade = new ProjectWorkflowExecutionFacadeImpl(
+            componentDefinitionService, contextService, evaluator, mock(EnvironmentService.class),
+            mock(JobService.class), mock(PrincipalJobService.class), mock(ProjectFacade.class),
+            mock(ProjectDeploymentService.class), mock(ProjectService.class), mock(ProjectWorkflowService.class),
+            mock(TaskDispatcherDefinitionService.class), mock(TaskExecutionService.class), taskFileStorage,
+            mock(TriggerExecutionService.class), mock(TriggerFileStorage.class), mock(WorkflowService.class));
+
+        ComponentDefinition componentDefinition = mock(ComponentDefinition.class);
+
+        lenient()
+            .when(componentDefinition.getTitle())
+            .thenReturn("Title");
+        lenient()
+            .when(componentDefinition.getIcon())
+            .thenReturn("icon");
+        lenient()
+            .when(componentDefinitionService.hasComponentDefinition(anyString(), any()))
+            .thenReturn(true);
+        lenient()
+            .when(componentDefinitionService.getComponentDefinition(anyString(), any()))
+            .thenReturn(componentDefinition);
+
+        WorkflowTask workflowTask = mock(WorkflowTask.class);
+
+        lenient()
+            .when(workflowTask.getType())
+            .thenReturn("myComponent/v1/myAction");
+        lenient()
+            .when(workflowTask.evaluateParameters(any(), any()))
+            .thenReturn((Map) Map.of("evaluated", true));
+
+        taskExecution = TaskExecution.builder()
+            .id(1L)
+            .jobId(10L)
+            .output(mock(FileEntry.class))
+            .workflowTask(workflowTask)
+            .build();
     }
 
-    @Disabled
     @Test
-    public void testGetExecutions() {
-        // TODO
+    public void testToTaskExecutionDTODoesNotLoadTaskDataForList() {
+        TaskExecutionDTO taskExecutionDTO = facade.toTaskExecutionDTO(taskExecution, null, false);
+
+        assertThat(taskExecutionDTO.input())
+            .isNull();
+        assertThat(taskExecutionDTO.output())
+            .isNull();
+
+        verify(contextService, never()).peek(anyLong(), any());
+        verify(taskFileStorage, never()).readContextValue(any());
+        verify(taskFileStorage, never()).readTaskExecutionOutput(any());
+        verifyNoInteractions(evaluator);
+    }
+
+    @Test
+    public void testToTaskExecutionDTOLoadsTaskDataForDetail() {
+        doReturn(Map.of("context", true))
+            .when(taskFileStorage)
+            .readContextValue(any());
+        when(taskFileStorage.readTaskExecutionOutput(any()))
+            .thenReturn("output-value");
+
+        TaskExecutionDTO taskExecutionDTO = facade.toTaskExecutionDTO(taskExecution, null, true);
+
+        assertThat(taskExecutionDTO.input())
+            .isEqualTo(Map.of("evaluated", true));
+        assertThat(taskExecutionDTO.output())
+            .isEqualTo("output-value");
+
+        verify(contextService).peek(taskExecution.getId(), Context.Classname.TASK_EXECUTION);
+        verify(taskFileStorage).readTaskExecutionOutput(any());
     }
 }
