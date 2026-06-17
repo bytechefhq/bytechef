@@ -62,12 +62,12 @@ public class SnowflakeInsertRowAction {
         value = "SQL_INJECTION_SPRING_JDBC",
         justification = "Identifiers are quoted and string values are escaped; input from workflow creator, not end user")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        List<Map.Entry<String, ?>> sortedEntries = new ArrayList<>(
-            inputParameters.getRequiredMap(VALUES)
-                .entrySet())
-                    .stream()
-                    .sorted(Map.Entry.comparingByKey())
-                    .collect(Collectors.toList());
+        Map<String, ?> valuesMap = inputParameters.getRequiredMap(VALUES);
+
+        List<Map.Entry<String, ?>> sortedEntries = new ArrayList<>(valuesMap.entrySet())
+            .stream()
+            .sorted(Map.Entry.comparingByKey())
+            .collect(Collectors.toList());
 
         String columns = sortedEntries.stream()
             .map(entry -> SnowflakeUtils.quoteIdentifier(entry.getKey()))
