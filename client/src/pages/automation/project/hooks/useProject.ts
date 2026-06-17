@@ -3,7 +3,10 @@ import {Type} from '@/pages/automation/projects/Projects';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {RequestI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
-import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
+import useWorkflowDataStore, {
+    clearWorkflowHistory,
+    setWorkflowWithoutHistory,
+} from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import useWorkflowTestChatStore from '@/pages/platform/workflow-editor/stores/useWorkflowTestChatStore';
@@ -38,10 +41,9 @@ import {useNavigate, useParams, useSearchParams} from 'react-router-dom';
 import {useShallow} from 'zustand/react/shallow';
 
 export const useProject = () => {
-    const {setIsWorkflowLoaded, setWorkflow, workflow} = useWorkflowDataStore(
+    const {setIsWorkflowLoaded, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setIsWorkflowLoaded: state.setIsWorkflowLoaded,
-            setWorkflow: state.setWorkflow,
             workflow: state.workflow,
         }))
     );
@@ -269,7 +271,7 @@ export const useProject = () => {
         // Reset state when the component unmounts
         return () => {
             setCopilotPanelOpen(false);
-            setWorkflow({});
+            setWorkflowWithoutHistory({}, {clearHistory: true});
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -324,21 +326,23 @@ export const useProject = () => {
         }
     }, [projectLeftSidebarOpen]);
 
-    // Reset loading state when workflow ID changes
+    // Reset loading state and undo history when workflow ID changes
     useEffect(() => {
         setIsWorkflowLoaded(false);
+
+        clearWorkflowHistory();
     }, [projectWorkflowId, setIsWorkflowLoaded]);
 
-    // Use useEffect to handle workflow updates with proper synchronization
+    // Handle workflow updates with proper synchronization
     useEffect(() => {
         if (currentWorkflow && !isWorkflowLoading) {
             const timeoutId = setTimeout(() => {
-                setWorkflow({...currentWorkflow});
+                setWorkflowWithoutHistory({...currentWorkflow});
             }, 0);
 
             return () => clearTimeout(timeoutId);
         }
-    }, [currentWorkflow, isWorkflowLoading, setWorkflow]);
+    }, [currentWorkflow, isWorkflowLoading]);
 
     return {
         bottomResizablePanelRef,

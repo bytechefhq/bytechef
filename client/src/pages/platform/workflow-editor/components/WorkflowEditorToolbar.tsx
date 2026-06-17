@@ -1,20 +1,32 @@
+import Button from '@/components/Button/Button';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {NodeDataType} from '@/shared/types';
 import {Panel, useReactFlow} from '@xyflow/react';
-import {ArrowRightIcon, BrushCleaningIcon, FocusIcon, InfoIcon, ZoomInIcon, ZoomOutIcon} from 'lucide-react';
+import {
+    ArrowRightIcon,
+    BrushCleaningIcon,
+    FocusIcon,
+    InfoIcon,
+    Redo2Icon,
+    Undo2Icon,
+    ZoomInIcon,
+    ZoomOutIcon,
+} from 'lucide-react';
 import {useCallback} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
+import useWorkflowUndoRedo from '../hooks/useWorkflowUndoRedo';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 
 interface WorkflowEditorToolbarPropsI {
+    enableUndoRedo?: boolean;
     readOnly?: boolean;
 }
 
-const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) => {
+const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: WorkflowEditorToolbarPropsI) => {
     const nodes = useWorkflowDataStore((state) => state.nodes);
 
     const {layoutDirection, setLayoutDirection} = useLayoutDirectionStore(
@@ -27,6 +39,7 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
     const setResetWorkflowLayout = useWorkflowEditorStore((state) => state.setResetWorkflowLayout);
 
     const {fitView, zoomIn, zoomOut} = useReactFlow();
+    const {canRedo, canUndo, redo, undo} = useWorkflowUndoRedo();
 
     const taskCount = nodes.filter(
         (node) => node.type === 'workflow' && !(node.data as NodeDataType).taskDispatcher
@@ -58,9 +71,12 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button className="flex cursor-default items-center rounded outline-hidden">
-                                <InfoIcon className="size-4 text-content-neutral-primary" />
-                            </button>
+                            <Button
+                                className="size-auto cursor-default rounded p-0 hover:bg-transparent active:bg-transparent"
+                                icon={<InfoIcon className="text-content-neutral-primary" />}
+                                size="iconXs"
+                                variant="ghost"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent
@@ -72,15 +88,52 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
                     </Tooltip>
                 </div>
 
+                {enableUndoRedo && (
+                    <ButtonGroup>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    disabled={readOnly || !canUndo}
+                                    icon={<Undo2Icon />}
+                                    onClick={undo}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Undo
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    disabled={readOnly || !canRedo}
+                                    icon={<Redo2Icon />}
+                                    onClick={redo}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Redo
+                            </TooltipContent>
+                        </Tooltip>
+                    </ButtonGroup>
+                )}
+
                 <ButtonGroup>
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button
-                                className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary"
-                                onClick={handleZoomIn}
-                            >
-                                <ZoomInIcon className="size-4 text-content-neutral-primary" />
-                            </button>
+                            <Button icon={<ZoomInIcon />} onClick={handleZoomIn} size="icon" variant="outline" />
                         </TooltipTrigger>
 
                         <TooltipContent
@@ -93,12 +146,7 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button
-                                className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary"
-                                onClick={handleZoomOut}
-                            >
-                                <ZoomOutIcon className="size-4 text-content-neutral-primary" />
-                            </button>
+                            <Button icon={<ZoomOutIcon />} onClick={handleZoomOut} size="icon" variant="outline" />
                         </TooltipTrigger>
 
                         <TooltipContent
@@ -111,12 +159,7 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button
-                                className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary"
-                                onClick={handleFitView}
-                            >
-                                <FocusIcon className="size-4 text-content-neutral-primary" />
-                            </button>
+                            <Button icon={<FocusIcon />} onClick={handleFitView} size="icon" variant="outline" />
                         </TooltipTrigger>
 
                         <TooltipContent
@@ -129,15 +172,17 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button
-                                className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary"
+                            <Button
+                                icon={
+                                    <ArrowRightIcon
+                                        className="text-content-neutral-primary transition-transform duration-200"
+                                        style={layoutDirection === 'LR' ? {transform: 'rotate(90deg)'} : undefined}
+                                    />
+                                }
                                 onClick={handleToggleLayout}
-                            >
-                                <ArrowRightIcon
-                                    className="size-4 text-content-neutral-primary transition-transform duration-200"
-                                    style={layoutDirection === 'LR' ? {transform: 'rotate(90deg)'} : undefined}
-                                />
-                            </button>
+                                size="icon"
+                                variant="outline"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent
@@ -150,13 +195,13 @@ const WorkflowEditorToolbar = ({readOnly = false}: WorkflowEditorToolbarPropsI) 
 
                     <Tooltip>
                         <TooltipTrigger asChild>
-                            <button
-                                className="flex size-9 items-center justify-center rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary hover:bg-slate-50 active:bg-surface-neutral-secondary disabled:cursor-not-allowed disabled:opacity-50"
+                            <Button
                                 disabled={readOnly}
+                                icon={<BrushCleaningIcon />}
                                 onClick={handleClear}
-                            >
-                                <BrushCleaningIcon className="size-4 text-content-neutral-primary" />
-                            </button>
+                                size="icon"
+                                variant="outline"
+                            />
                         </TooltipTrigger>
 
                         <TooltipContent

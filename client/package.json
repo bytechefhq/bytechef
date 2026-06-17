@@ -145,6 +145,7 @@
         "vite-plugin-svgr": "^5.2.0",
         "whatwg-fetch": "^3.6.20",
         "zod": "^4.4.3",
+        "zundo": "^2.3.0",
         "zustand": "^5.0.14"
     },
     "devDependencies": {

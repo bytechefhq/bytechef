@@ -3,7 +3,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {BranchCaseType, NodeDataType, UpdateWorkflowMutationType} from '@/shared/types';
 import {Node} from '@xyflow/react';
 
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
 import {
     consumePendingDefinition,
     isWorkflowMutating,
@@ -316,12 +316,15 @@ function firePositionMutation({
             onError: () => {
                 setNodes(previousNodes);
 
-                useWorkflowDataStore.setState((state) => ({
-                    workflow: {
-                        ...state.workflow,
-                        definition: previousDefinition,
-                    },
-                }));
+                // Reverting a failed position save must not become an undo step.
+                runWithoutHistory(() => {
+                    useWorkflowDataStore.setState((state) => ({
+                        workflow: {
+                            ...state.workflow,
+                            definition: previousDefinition,
+                        },
+                    }));
+                });
             },
             onSettled: () => {
                 setWorkflowMutating(workflowId, false);

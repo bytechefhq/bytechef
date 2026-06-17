@@ -13,6 +13,7 @@ vi.mock('../stores/useWorkflowDataStore', () => ({
     default: {
         getState: () => mockWorkflowState,
     },
+    setWorkflowWithoutHistory: (workflow: unknown) => mockWorkflowState.setWorkflow(workflow),
 }));
 
 vi.mock('../stores/useWorkflowNodeDetailsPanelStore', () => ({
