@@ -51,6 +51,7 @@ public class SnowflakeDeleteRowAction {
                 .description("Condition that will be checked in the column. Example: column1=5")
                 .required(true))
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
+        .help("", "https://docs.bytechef.io/reference/components/snowflake_v1#delete-row")
         .perform(SnowflakeDeleteRowAction::perform);
 
     private SnowflakeDeleteRowAction() {

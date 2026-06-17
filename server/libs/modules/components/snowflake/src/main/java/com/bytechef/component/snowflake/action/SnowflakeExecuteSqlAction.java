@@ -43,6 +43,7 @@ public class SnowflakeExecuteSqlAction {
                 .controlType(ControlType.TEXT_AREA)
                 .required(true))
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
+        .help("", "https://docs.bytechef.io/reference/components/snowflake_v1#execute-sql")
         .perform(SnowflakeExecuteSqlAction::perform);
 
     private SnowflakeExecuteSqlAction() {
