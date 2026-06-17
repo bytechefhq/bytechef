@@ -16,6 +16,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
+ * Pins the {@link PreAuthorize} annotations on every {@link AdminWorkspaceFacadeImpl} method. The coarse
+ * {@code ROLE_ADMIN} gate was moved off {@code WorkspaceApiController} onto this facade so it protects every caller; it
+ * is load-bearing because {@code WorkspaceService.getWorkspaces()} is an intentionally unguarded trusted-caller method
+ * and {@code WorkspaceService.getWorkspace(id)} only requires workspace VIEWER. Runtime enforcement of the expression
+ * is proven generically by {@code PreAuthorizeProxyEnforcementIntTest}.
+ *
  * @version ee
  *
  * @author Ivica Cardic
