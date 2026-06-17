@@ -16,6 +16,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
+ * Pins the {@link PreAuthorize} annotation on the EE {@link CustomComponentFacadeImpl#save} mutation. The guard was
+ * moved off {@code CustomComponentApiController} onto the facade so it protects every caller of the facade, not just
+ * the REST entry point; this reflection test catches a refactor that silently drops it.
+ *
+ * <p>
+ * Runtime enforcement of the expression by Spring Security is proven generically by
+ * {@code PreAuthorizeProxyEnforcementIntTest}.
+ *
  * @version ee
  *
  * @author Ivica Cardic
