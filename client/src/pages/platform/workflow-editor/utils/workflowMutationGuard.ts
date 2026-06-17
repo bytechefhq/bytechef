@@ -18,7 +18,7 @@
 
 import {UpdateWorkflowMutationType} from '@/shared/types';
 
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {runWithoutHistory} from '../stores/useWorkflowDataStore';
 
 const mutatingWorkflows = new Set<string>();
 
@@ -99,12 +99,16 @@ export function drainPendingDefinitionMutation({
 
     const currentWorkflow = useWorkflowDataStore.getState().workflow;
 
-    useWorkflowDataStore.setState((state) => ({
-        workflow: {
-            ...state.workflow,
-            definition: pendingDefinition,
-        },
-    }));
+    // The pending definition was already recorded as an undo step when the user
+    // made the change; re-applying it on drain must not record a duplicate.
+    runWithoutHistory(() => {
+        useWorkflowDataStore.setState((state) => ({
+            workflow: {
+                ...state.workflow,
+                definition: pendingDefinition,
+            },
+        }));
+    });
 
     setWorkflowMutating(workflowId, true);
 

@@ -16,7 +16,7 @@ import {
 } from '@/shared/types';
 import {QueryClient} from '@tanstack/react-query';
 
-import useWorkflowDataStore, {WorkflowDataType} from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {WorkflowDataType, setWorkflowWithoutHistory} from '../stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
 import findAndRemoveClusterElement from './findAndRemoveClusterElement';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
@@ -369,8 +369,8 @@ export default function handleDeleteTask({
         },
         {
             onError: () => {
-                // Rollback optimistic update on failure
-                useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
+                // Rollback optimistic update on failure (not an undo step)
+                setWorkflowWithoutHistory(previousWorkflow);
 
                 invalidateWorkflowQueries();
             },

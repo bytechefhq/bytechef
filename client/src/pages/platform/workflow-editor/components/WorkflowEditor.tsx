@@ -25,6 +25,7 @@ type ConditionalWorkflowEditorPropsType =
 type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
+    enableUndoRedo?: boolean;
     leftSidebarOpen?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 };
@@ -32,6 +33,7 @@ type WorkflowEditorPropsType = {
 const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
+    enableUndoRedo,
     leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -80,7 +82,7 @@ const WorkflowEditor = ({
             >
                 <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
 
-                <WorkflowEditorToolbar readOnly={!!readOnlyWorkflow} />
+                <WorkflowEditorToolbar enableUndoRedo={enableUndoRedo} readOnly={!!readOnlyWorkflow} />
             </ReactFlow>
         </div>
     );

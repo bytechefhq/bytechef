@@ -9,7 +9,7 @@ import {
 } from '@/shared/types';
 
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
-import useWorkflowDataStore from '../stores/useWorkflowDataStore';
+import useWorkflowDataStore, {setWorkflowWithoutHistory} from '../stores/useWorkflowDataStore';
 import {flattenDefinitionTasks} from './flattenDefinitionTasks';
 import getRecursivelyUpdatedTasks from './getRecursivelyUpdatedTasks';
 import {getTask} from './getTask';
@@ -345,7 +345,7 @@ function executeWorkflowMutation({
             onError: (error) => {
                 console.error('Failed to save workflow definition:', error);
 
-                useWorkflowDataStore.getState().setWorkflow(previousWorkflow);
+                setWorkflowWithoutHistory(previousWorkflow);
             },
             onSettled: () => {
                 setWorkflowMutating(workflow.id!, false);

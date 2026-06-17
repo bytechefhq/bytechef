@@ -42,6 +42,7 @@ const WorkflowRightSidebar = lazy(() => import('./components/WorkflowRightSideba
 const WorkflowNodesSidebar = lazy(() => import('./components/WorkflowNodesSidebar'));
 
 interface WorkflowEditorLayoutProps {
+    enableUndoRedo?: boolean;
     includeComponents?: string[];
     leftSidebarOpen?: boolean;
     onEditSubflowClick?: (workflowUuid: string) => void;
@@ -52,6 +53,7 @@ interface WorkflowEditorLayoutProps {
 }
 
 const WorkflowEditorLayout = ({
+    enableUndoRedo,
     includeComponents,
     leftSidebarOpen,
     onEditSubflowClick,
@@ -201,6 +203,7 @@ const WorkflowEditorLayout = ({
                     <Suspense>
                         <WorkflowEditor
                             componentDefinitions={componentDefinitions}
+                            enableUndoRedo={enableUndoRedo}
                             leftSidebarOpen={leftSidebarOpen}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
                         />

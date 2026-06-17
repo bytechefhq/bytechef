@@ -109,6 +109,7 @@ const Project = () => {
                             >
                                 {projectId && (
                                     <WorkflowEditorLayout
+                                        enableUndoRedo={true}
                                         leftSidebarOpen={projectLeftSidebarOpen}
                                         onEditSubflowClick={handleEditSubflowClick}
                                         runDisabled={runDisabled}
