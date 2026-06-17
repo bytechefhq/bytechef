@@ -21,6 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Authorization is enforced on {@link AiProviderFacade}, not here.
+ *
  * @version ee
  *
  * @author Ivica Cardic
