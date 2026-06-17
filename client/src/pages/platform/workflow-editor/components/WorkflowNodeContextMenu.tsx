@@ -115,7 +115,9 @@ const WorkflowNodeContextMenu = ({
             <ContextMenu onOpenChange={handleOpenChange}>
                 <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
-                <ContextMenuContent className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}>
+                <ContextMenuContent
+                    className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}
+                >
                     {data.trigger ? (
                         <>
                             <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>
