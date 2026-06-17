@@ -34,7 +34,7 @@ public interface JobFacade {
 
     void resumeJob(long id);
 
-    void resumeJob(long id, long tsdkExdcutionId, @Nullable Map<String, ?> data);
+    void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data);
 
     void stopJob(long id);
 }
