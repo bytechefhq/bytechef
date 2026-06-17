@@ -33,6 +33,7 @@ import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.snowflake.util.SnowflakeUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -51,6 +52,7 @@ public class SnowflakeInsertRowAction {
             TABLE_PROPERTY,
             VALUES_DYNAMIC_PROPERTY)
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
+        .help("", "https://docs.bytechef.io/reference/components/snowflake_v1#insert-row")
         .perform(SnowflakeInsertRowAction::perform);
 
     private SnowflakeInsertRowAction() {
@@ -60,12 +62,12 @@ public class SnowflakeInsertRowAction {
         value = "SQL_INJECTION_SPRING_JDBC",
         justification = "Identifiers are quoted and string values are escaped; input from workflow creator, not end user")
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        List<Map.Entry<String, Object>> sortedEntries = inputParameters.getRequiredMap(VALUES)
-            .entrySet()
-            .stream()
-            .map(entry -> Map.entry(entry.getKey(), entry.getValue()))
-            .sorted(Map.Entry.comparingByKey())
-            .toList();
+        List<Map.Entry<String, ?>> sortedEntries = new ArrayList<>(
+            inputParameters.getRequiredMap(VALUES)
+                .entrySet())
+                    .stream()
+                    .sorted(Map.Entry.comparingByKey())
+                    .collect(Collectors.toList());
 
         String columns = sortedEntries.stream()
             .map(entry -> SnowflakeUtils.quoteIdentifier(entry.getKey()))

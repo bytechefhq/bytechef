@@ -37,34 +37,40 @@ import java.util.Map;
 public class SnowflakeConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/snowflake_v1#connection-setup")
         .baseUri((connectionParameters, context) -> "https://%s.snowflakecomputing.com/api/v2"
             .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
         .authorizations(
-            authorization(AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
-                .properties(
-                    string(ACCOUNT_IDENTIFIER)
-                        .label("Account Identifier")
-                        .description("Account identifier of your account.")
-                        .required(true),
-                    string(CLIENT_ID)
-                        .label("Client ID")
-                        .description("Snowflake OAuth Client ID.")
-                        .required(true),
-                    string(CLIENT_SECRET)
-                        .label("Client Secret")
-                        .description("Snowflake OAuth Client Secret.")
-                        .required(true))
-                .authorizationUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize"
-                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
-                .scopes((connection, context) -> Map.of("refresh_token", true))
-                .tokenUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
-                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
-                .refreshUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
-                    .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
-                .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of(
-                        "Accept", List.of("application/json"),
-                        AUTHORIZATION, List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
+            authorization(
+                AuthorizationType.OAUTH2_AUTHORIZATION_CODE)
+                    .properties(
+                        string(ACCOUNT_IDENTIFIER)
+                            .label("Account Identifier")
+                            .description("Account identifier of your account.")
+                            .required(true),
+                        string(CLIENT_ID)
+                            .label("Client ID")
+                            .description("Snowflake OAuth Client ID.")
+                            .required(true),
+                        string(CLIENT_SECRET)
+                            .label("Client Secret")
+                            .description("Snowflake OAuth Client Secret.")
+                            .required(true))
+                    .authorizationUrl(
+                        (connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/authorize"
+                            .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                    .scopes((connection, context) -> Map.of("refresh_token", true))
+                    .tokenUrl((connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
+                        .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                    .refreshUrl(
+                        (connectionParameters, context) -> "https://%s.snowflakecomputing.com/oauth/token-request"
+                            .formatted(connectionParameters.getRequiredString(ACCOUNT_IDENTIFIER)))
+                    .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
+                        Map.of(
+                            "Accept", List.of("application/json"),
+                            AUTHORIZATION,
+                            List.of("Bearer " + connectionParameters.getRequiredString(ACCESS_TOKEN))))));
 
     private SnowflakeConnection() {
     }

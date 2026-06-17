@@ -58,6 +58,7 @@ public class SnowflakeUpdateRowAction {
                 .required(true),
             VALUES_DYNAMIC_PROPERTY)
         .output(outputSchema(SQL_STATEMENT_RESPONSE))
+        .help("", "https://docs.bytechef.io/reference/components/snowflake_v1#update-row")
         .perform(SnowflakeUpdateRowAction::perform);
 
     private SnowflakeUpdateRowAction() {

@@ -37,12 +37,16 @@ public class SnowflakeComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("snowflake")
         .title("Snowflake")
+        .version(1)
         .description(
             "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data " +
-                "insights—all within a secure and scalable AI Data Cloud.")
+                "insights-all within a secure and scalable AI Data Cloud.")
         .icon("path:assets/snowflake.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(SnowflakeConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp(
+            "", "https://docs.snowflake.com/en/developer-guide/snowflake-rest-api/snowflake-rest-api")
         .actions(
             SnowflakeDeleteRowAction.ACTION_DEFINITION,
             SnowflakeExecuteSqlAction.ACTION_DEFINITION,
