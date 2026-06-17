@@ -199,8 +199,9 @@ public class OllamaChatAction {
 
             Map<String, ?> response = inputParameters.getRequiredMap(RESPONSE);
 
-            if (!response.get(RESPONSE_FORMAT)
-                .equals(ChatModel.ResponseFormat.TEXT.name())) {
+            Object responseFormat = response.get(RESPONSE_FORMAT);
+
+            if (!responseFormat.equals(ChatModel.ResponseFormat.TEXT.name())) {
                 ollamaChatOptionsBuilder.outputSchema((String) response.get(RESPONSE_SCHEMA));
             }
 
