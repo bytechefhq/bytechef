@@ -19,6 +19,7 @@ import {
     Trash2Icon,
 } from 'lucide-react';
 import {ReactNode, useCallback, useMemo, useState} from 'react';
+import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 interface WorkflowNodeContextMenuProps {
@@ -59,12 +60,22 @@ const WorkflowNodeContextMenu = ({
     showReplaceAction = false,
 }: WorkflowNodeContextMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [menuReady, setMenuReady] = useState(false);
 
     const copiedNode = useWorkflowEditorStore(useShallow((state) => state.copiedNode));
 
     const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
 
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
+
+    const handleOpenChange = useCallback((open: boolean) => {
+        if (open) {
+            setMenuReady(false);
+            setTimeout(() => setMenuReady(true), 200);
+        } else {
+            setMenuReady(false);
+        }
+    }, []);
 
     const PasteMenuItem = useMemo(() => {
         if (!canPaste || !copiedNode) {
@@ -101,10 +112,10 @@ const WorkflowNodeContextMenu = ({
 
     return (
         <>
-            <ContextMenu>
+            <ContextMenu onOpenChange={handleOpenChange}>
                 <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
 
-                <ContextMenuContent className="w-workflow-node-context-menu-width p-0">
+                <ContextMenuContent className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}>
                     {data.trigger ? (
                         <>
                             <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onSwitch}>

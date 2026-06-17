@@ -31,6 +31,7 @@ export default function WorkflowEdge({
     targetY,
 }: EdgeProps) {
     const [isDropzoneActive, setDropzoneActive] = useState<boolean>(false);
+    const [menuReady, setMenuReady] = useState<boolean>(false);
 
     const {edges, nodes, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
@@ -183,6 +184,15 @@ export default function WorkflowEdge({
 
     const handleClick = (event: MouseEvent) => event.stopPropagation();
 
+    const handleOpenChange = useCallback((open: boolean) => {
+        if (open) {
+            setMenuReady(false);
+            setTimeout(() => setMenuReady(true), 200);
+        } else {
+            setMenuReady(false);
+        }
+    }, []);
+
     useEffect(() => {
         const handleGlobalDragEnd = () => {
             setDropzoneActive(false);
@@ -236,7 +246,7 @@ export default function WorkflowEdge({
                         zIndex: isDropzoneActive ? 40 : 'auto',
                     }}
                 >
-                    <ContextMenu>
+                    <ContextMenu onOpenChange={handleOpenChange}>
                         <ContextMenuTrigger asChild disabled={!canPaste}>
                             <div>
                                 <WorkflowNodesPopoverMenu
@@ -268,7 +278,7 @@ export default function WorkflowEdge({
                             </div>
                         </ContextMenuTrigger>
 
-                        <ContextMenuContent className="w-workflow-node-context-menu-width p-0">
+                        <ContextMenuContent className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}>
                             <ContextMenuItem
                                 className="dropdown-menu-item flex w-full flex-col items-start gap-1"
                                 disabled={!canPaste}
