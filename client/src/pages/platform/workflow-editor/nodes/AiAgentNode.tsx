@@ -9,7 +9,7 @@ import {NodeDataType} from '@/shared/types';
 import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon, PinOffIcon, TrashIcon} from 'lucide-react';
+import {CheckIcon, ComponentIcon} from 'lucide-react';
 import {ChangeEvent, FocusEvent, KeyboardEvent, memo, useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
@@ -295,7 +295,6 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         [copiedNode, copiedWorkflowId, workflow.id]
     );
 
-    const suppressHover = isRenaming;
     const isHorizontal = layoutDirection === 'LR';
 
     return (
@@ -323,34 +322,6 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 data-nodetype="clusterRoot"
                 key={id}
             >
-                <div
-                    className={twMerge(
-                        'invisible absolute top-0 left-workflow-node-popover-hover pr-4',
-                        !suppressHover && 'group-hover:visible'
-                    )}
-                >
-                    <div className="flex flex-col gap-1">
-                        <Button
-                            className="opacity-100"
-                            icon={<TrashIcon />}
-                            onClick={() => handleDeleteNodeClick(data)}
-                            size="iconSm"
-                            title="Delete a node"
-                            variant="destructiveGhost"
-                        />
-
-                        {hasSavedNodePosition && (
-                            <Button
-                                icon={<PinOffIcon />}
-                                onClick={() => handleRemoveNodePosition(data.name)}
-                                size="iconSm"
-                                title="Remove saved node position"
-                                variant="ghost"
-                            />
-                        )}
-                    </div>
-                </div>
-
                 <HoverCard
                     key={id}
                     onOpenChange={(open) => {
