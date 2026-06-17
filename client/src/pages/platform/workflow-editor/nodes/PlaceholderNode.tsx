@@ -138,7 +138,9 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             </ContextMenuTrigger>
 
-            <ContextMenuContent className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}>
+            <ContextMenuContent
+                className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}
+            >
                 <ContextMenuItem
                     className="dropdown-menu-item flex w-full flex-col items-start gap-1"
                     disabled={!canPaste}
