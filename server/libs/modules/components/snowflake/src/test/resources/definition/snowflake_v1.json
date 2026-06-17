@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Delete row from the table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/snowflake_v1#delete-row"
+    },
     "metadata": null,
     "name": "deleteRow",
     "outputDefinition": {
@@ -1253,7 +1256,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Execute SQL statement.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/snowflake_v1#execute-sql"
+    },
     "metadata": null,
     "name": "executeSql",
     "outputDefinition": {
@@ -2425,7 +2431,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Insert row into the table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/snowflake_v1#insert-row"
+    },
     "metadata": null,
     "name": "insertRow",
     "outputDefinition": {
@@ -3665,7 +3674,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update row from the table.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/snowflake_v1#update-row"
+    },
     "metadata": null,
     "name": "updateRow",
     "outputDefinition": {
@@ -9938,15 +9950,21 @@
       "type": "OAUTH2_AUTHORIZATION_CODE"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/snowflake_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
-  "description": "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data insights—all within a secure and scalable AI Data Cloud.",
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.snowflake.com/en/developer-guide/snowflake-rest-api/snowflake-rest-api"
+  },
+  "description": "Snowflake enables organizations to collaborate, build AI-powered data apps, and unlock data insights-all within a secure and scalable AI Data Cloud.",
   "icon": "path:assets/snowflake.svg",
   "inputs": null,
   "metadata": null,
