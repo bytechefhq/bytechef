@@ -18,16 +18,17 @@ package com.bytechef.component.ai.llm.ollama.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_SCHEMA;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
@@ -41,7 +42,6 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.F16KV;
-import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.FORMAT;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.F_16_KV_PROPERTY;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.KEEP_ALIVE;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.KEEP_ALIVE_PROPERTY;
@@ -97,6 +97,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import java.util.Map;
 import org.springframework.ai.ollama.OllamaChatModel;
 import org.springframework.ai.ollama.api.OllamaApi;
 import org.springframework.ai.ollama.api.OllamaChatOptions;
@@ -111,11 +112,9 @@ public class OllamaChatAction {
         .description("Ask anything you want.")
         .properties(
             CHAT_MODEL_PROPERTY,
-            FORMAT_PROPERTY,
             PROMPT_PROPERTY,
             SYSTEM_PROMPT_PROPERTY,
             ATTACHMENTS_PROPERTY,
-            MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             KEEP_ALIVE_PROPERTY,
             MAX_TOKENS_PROPERTY,
@@ -155,54 +154,61 @@ public class OllamaChatAction {
     public static final ChatModel CHAT_MODEL =
         (inputParameters, connectionParameters, responseFormatRequired) -> {
 
-        String url = connectionParameters.getString(URL);
+            String url = connectionParameters.getString(URL);
 
-        OllamaApi ollamaApi = url.isEmpty() ? OllamaApi.builder()
-            .build()
-            : OllamaApi.builder()
-                .baseUrl(url)
+            OllamaApi ollamaApi = (url == null || url.isEmpty())
+                ? OllamaApi.builder()
+                    .build()
+                : OllamaApi.builder()
+                    .baseUrl(url)
+                    .build();
+
+            OllamaChatOptions.Builder ollamaChatOptionsBuilder = OllamaChatOptions.builder()
+                .model(inputParameters.getRequiredString(MODEL))
+                .temperature(inputParameters.getDouble(TEMPERATURE))
+                .topP(inputParameters.getDouble(TOP_P))
+                .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
+                .topK(inputParameters.getInteger(TOP_K))
+                .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
+                .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
+                .seed(inputParameters.getInteger(SEED))
+                .keepAlive(inputParameters.getString(KEEP_ALIVE))
+                .f16KV(inputParameters.getBoolean(F16KV))
+                .logitsAll(inputParameters.getBoolean(LOGTS_ALL))
+                .useMMap(inputParameters.getBoolean(USE_MMAP))
+                .lowVRAM(inputParameters.getBoolean(LOW_VRAM))
+                .mainGPU(inputParameters.getInteger(MAIN_GPU))
+                .mirostat(inputParameters.getInteger(MIROSTAT))
+                .mirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
+                .mirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
+                .numBatch(inputParameters.getInteger(NUM_BATCH))
+                .numCtx(inputParameters.getInteger(NUM_CTX))
+                .numGPU(inputParameters.getInteger(NUM_GPU))
+                .numKeep(inputParameters.getInteger(NUM_KEEP))
+                .numThread(inputParameters.getInteger(NUM_THREAD))
+                .numPredict(inputParameters.getInteger(MAX_TOKENS))
+                .penalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
+                .repeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
+                .repeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
+                .tfsZ(inputParameters.getFloat(TFSZ))
+                .truncate(inputParameters.getBoolean(TRUNCATE))
+                .typicalP(inputParameters.getFloat(TYPICAL_P))
+                .useMLock(inputParameters.getBoolean(USE_MLOCK))
+                .useNUMA(inputParameters.getBoolean(USE_NUMA))
+                .vocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
+
+            Map<String, ?> response = inputParameters.getRequiredMap(RESPONSE);
+
+            if (!response.get(RESPONSE_FORMAT)
+                .equals(ChatModel.ResponseFormat.TEXT.name())) {
+                ollamaChatOptionsBuilder.outputSchema((String) response.get(RESPONSE_SCHEMA));
+            }
+
+            return OllamaChatModel.builder()
+                .ollamaApi(ollamaApi)
+                .options(ollamaChatOptionsBuilder.build())
                 .build();
-
-        return OllamaChatModel.builder()
-            .ollamaApi(ollamaApi)
-            .options(
-                OllamaChatOptions.builder()
-                    .model(inputParameters.getRequiredString(MODEL))
-                    .temperature(inputParameters.getDouble(TEMPERATURE))
-                    .topP(inputParameters.getDouble(TOP_P))
-                    .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
-                    .topK(inputParameters.getInteger(TOP_K))
-                    .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
-                    .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
-                    .seed(inputParameters.getInteger(SEED))
-                    .format(inputParameters.getString(FORMAT))
-                    .keepAlive(inputParameters.getString(KEEP_ALIVE))
-                    .f16KV(inputParameters.getBoolean(F16KV))
-                    .logitsAll(inputParameters.getBoolean(LOGTS_ALL))
-                    .useMMap(inputParameters.getBoolean(USE_MMAP))
-                    .lowVRAM(inputParameters.getBoolean(LOW_VRAM))
-                    .mainGPU(inputParameters.getInteger(MAIN_GPU))
-                    .mirostat(inputParameters.getInteger(MIROSTAT))
-                    .mirostatEta(inputParameters.getFloat(MIROSTAT_ETA))
-                    .mirostatTau(inputParameters.getFloat(MIROSTAT_TAU))
-                    .numBatch(inputParameters.getInteger(NUM_BATCH))
-                    .numCtx(inputParameters.getInteger(NUM_CTX))
-                    .numGPU(inputParameters.getInteger(NUM_GPU))
-                    .numKeep(inputParameters.getInteger(NUM_KEEP))
-                    .numThread(inputParameters.getInteger(NUM_THREAD))
-                    .numPredict(inputParameters.getInteger(MAX_TOKENS))
-                    .penalizeNewline(inputParameters.getBoolean(PENALIZE_NEW_LINE))
-                    .repeatLastN(inputParameters.getInteger(REPEAT_LAST_N))
-                    .repeatPenalty(inputParameters.getDouble(REPEAT_PENALTY))
-                    .tfsZ(inputParameters.getFloat(TFSZ))
-                    .truncate(inputParameters.getBoolean(TRUNCATE))
-                    .typicalP(inputParameters.getFloat(TYPICAL_P))
-                    .useMLock(inputParameters.getBoolean(USE_MLOCK))
-                    .useNUMA(inputParameters.getBoolean(USE_NUMA))
-                    .vocabOnly(inputParameters.getBoolean(VOCAB_ONLY))
-                    .build())
-            .build();
-    };
+        };
 
     private OllamaChatAction() {
     }
