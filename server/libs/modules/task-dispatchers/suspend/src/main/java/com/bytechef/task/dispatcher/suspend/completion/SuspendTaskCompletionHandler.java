@@ -26,6 +26,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionContext.Suspend;
 import com.bytechef.file.storage.domain.FileEntry;
@@ -72,7 +73,7 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
     public boolean canHandle(TaskExecution taskExecution) {
         Map<String, ?> metadata = taskExecution.getMetadata();
 
-        return taskExecution.getParentId() == null && metadata.containsKey(MetadataConstants.JOB_RESUME_ID);
+        return metadata.containsKey(MetadataConstants.JOB_RESUME_ID);
     }
 
     @Override
@@ -98,19 +99,14 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
         long jobId = Objects.requireNonNull(job.getId());
 
         String name = taskExecution.getName();
-        FileEntry output = taskExecution.getOutput();
+        FileEntry outputFileEntry = taskExecution.getOutput();
 
         Map<String, Object> newContext = new HashMap<>(
-            taskFileStorage.readContextValue(
-                contextService.peek(jobId, Context.Classname.JOB)));
+            taskFileStorage.readContextValue(contextService.peek(jobId, Context.Classname.JOB)));
 
-        if (name != null) {
-            if (output == null) {
-                newContext.put(name, null);
-            } else {
-                newContext.put(name, taskFileStorage.readTaskExecutionOutput(output));
-            }
-        }
+        Object output = taskFileStorage.readTaskExecutionOutput(outputFileEntry);
+
+        newContext.put(name, output);
 
         contextService.push(
             jobId, Context.Classname.JOB, taskFileStorage.storeContextValue(jobId, Context.Classname.JOB, newContext));
@@ -119,13 +115,16 @@ public class SuspendTaskCompletionHandler implements TaskCompletionHandler {
 
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
 
-        Suspend suspend = MapUtils.get(taskExecution.getMetadata(), MetadataConstants.SUSPEND, Suspend.class);
+        Suspend suspend = ConvertUtils.convertValue(output, Suspend.class);
 
         taskStateService.save(jobResumeId, suspend);
 
         Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
         jobMetadata.put(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
+        jobMetadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, taskExecution.getId());
+
+        job = jobService.getJob(job.getId());
 
         job.setMetadata(jobMetadata);
 

@@ -266,7 +266,7 @@ public class ApprovalRequestApprovalAction {
 
         ActionContextAware actionContextAware = (ActionContextAware) context;
 
-        String resumeUrl = actionContextAware.generateResumeUrl();
+        String resumeUrl = actionContextAware.getResumeUrl();
 
         if (resumeUrl == null) {
             throw new IllegalStateException(

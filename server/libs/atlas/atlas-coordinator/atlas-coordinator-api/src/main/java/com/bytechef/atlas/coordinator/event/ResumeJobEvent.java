@@ -27,6 +27,7 @@ import org.jspecify.annotations.Nullable;
 public class ResumeJobEvent extends AbstractEvent {
 
     private long jobId;
+    private Long taskExecutionId;
     private @Nullable Map<String, ?> data;
 
     private ResumeJobEvent() {
@@ -37,18 +38,27 @@ public class ResumeJobEvent extends AbstractEvent {
     }
 
     public ResumeJobEvent(long jobId, @Nullable Map<String, ?> data) {
+        this(jobId, null, data);
+    }
+
+    public ResumeJobEvent(long jobId, Long taskExecutionId, @Nullable Map<String, ?> data) {
         super(TaskCoordinatorMessageRoute.JOB_RESUME_EVENTS);
 
         this.jobId = jobId;
+        this.taskExecutionId = taskExecutionId;
         this.data = data == null ? null : Collections.unmodifiableMap(data);
+    }
+
+    public @Nullable Map<String, ?> getData() {
+        return data == null ? null : Collections.unmodifiableMap(data);
     }
 
     public long getJobId() {
         return jobId;
     }
 
-    public @Nullable Map<String, ?> getData() {
-        return data == null ? null : Collections.unmodifiableMap(data);
+    public @Nullable Long getTaskExecutionId() {
+        return taskExecutionId;
     }
 
     @Override

@@ -31,6 +31,7 @@ public class MetadataConstants {
     public static final String JOB_RESUME_ID = "jobResumeId";
     public static final String RESUME_DATA = "__resumeData";
     public static final String SUSPEND = "suspend";
+    public static final String TASK_EXECUTION_RESUME_ID = "taskExecutionResumeId";
     public static final String TYPE = "type";
     public static final String WORKFLOW_ID = "workflowId";
 }

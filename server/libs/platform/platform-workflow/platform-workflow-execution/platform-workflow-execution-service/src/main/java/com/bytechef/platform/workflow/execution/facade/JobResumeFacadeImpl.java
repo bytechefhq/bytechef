@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.execution.facade;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
@@ -85,7 +86,9 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 return JobResumeOutcome.INVALID_ID;
             }
 
-            jobFacade.resumeJob(jobResumeId.getJobId(), data);
+            jobFacade.resumeJob(
+                jobResumeId.getJobId(), MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
+                data);
 
             applicationEventPublisher.publishEvent(new JobResumedEvent(id));
 

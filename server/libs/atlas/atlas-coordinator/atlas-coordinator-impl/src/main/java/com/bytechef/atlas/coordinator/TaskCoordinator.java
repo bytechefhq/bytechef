@@ -128,24 +128,30 @@ public class TaskCoordinator {
 
         Map<String, ?> data = resumeJobEvent.getData();
 
-        if (data != null) {
-            Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
+        if (resumeJobEvent.getTaskExecutionId() == null) {
+            try {
+                jobExecutor.execute(job);
+            } catch (Exception exception) {
+                handleJobExecutionException(job, exception);
+            }
+        } else {
+            TaskExecution taskExecution = taskExecutionService.getTaskExecution(resumeJobEvent.getTaskExecutionId());
 
-            jobMetadata.put(MetadataConstants.RESUME_DATA, data);
+            if (data != null) {
+                Map<String, Object> jobMetadata = new HashMap<>(job.getMetadata());
 
-            job.setMetadata(jobMetadata);
+                jobMetadata.put(MetadataConstants.RESUME_DATA, data);
 
-            jobService.update(job);
+                job.setMetadata(jobMetadata);
+
+                jobService.update(job);
+            }
+
+            taskDispatcher.dispatch(taskExecution);
         }
 
         if (log.isDebugEnabled()) {
             log.debug("Job id={} resumed", resumeJobEvent.getJobId());
-        }
-
-        try {
-            jobExecutor.execute(job);
-        } catch (Exception exception) {
-            handleJobExecutionException(job, exception);
         }
     }
 

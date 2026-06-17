@@ -79,7 +79,7 @@ public interface ActionContextAware extends ActionContext, JobContextAware {
      * @return the resume URL, or null if publicUrl or jobId is not available
      */
     @Nullable
-    String generateResumeUrl();
+    String getResumeUrl();
 
     /**
      * Retrieves the unique identifier associated with the job principal.

@@ -191,8 +191,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         errorTypeClass = ActionDefinitionErrorType.class,
         errorTypeField = "EXECUTE_PERFORM")
     public Object executePerform(
-        @ComponentNameParam String componentName, int componentVersion, String actionName,
-        Long jobPrincipalId,
+        @ComponentNameParam String componentName, int componentVersion, String actionName, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, Long jobId, @Nullable Long taskExecutionId, String workflowId,
         Map<String, ?> inputParameters, @ConnectionParam Map<String, ComponentConnection> componentConnections,
         Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type,
@@ -518,9 +517,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     private Object executeResumePerform(
         com.bytechef.component.definition.ActionDefinition actionDefinition,
-        ResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters,
-        Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
-        @Nullable Instant suspendExpiresAt,
+        ResumePerformFunction resumePerformFunction, Map<String, ?> inputParameters, Map<String, ?> continueParameters,
+        @Nullable Map<String, ?> resumeData, @Nullable Instant suspendExpiresAt,
         @Nullable ComponentConnection componentConnection, ActionContext context) {
 
         try {
@@ -578,7 +576,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
             if (suspend != null) {
                 Optional<BeforeSuspendConsumer> beforeSuspendOptional = actionDefinition.getBeforeSuspend();
 
-                String resumeUrl = actionContextAware.generateResumeUrl();
+                String resumeUrl = actionContextAware.getResumeUrl();
                 String jobResumeId = actionContextAware.getJobResumeId();
 
                 if (beforeSuspendOptional.isPresent()) {
