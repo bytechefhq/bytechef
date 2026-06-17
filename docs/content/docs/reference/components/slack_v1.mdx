@@ -421,7 +421,7 @@ In the output of the Slack actions you will find `ts` property, that is timestam
 9. Enable workflow.
 10. Select Connection.
 11. Click on **Save**.
-12. Enable deployment.
+12. CAUTION - to verify the webhook URL leave deployment disabled!
 13. Click on here to expand deployment.
 14. Click this icon to get webhook URL.
 15. Navigate to [link](https://api.slack.com/apps) and select your app.
@@ -437,4 +437,21 @@ In the output of the Slack actions you will find `ts` property, that is timestam
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
     <iframe src="https://www.guidejar.com/embed/c766204a-48a4-4793-b433-7bf10e703b03?type=1&controls=on " width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
+</div>
+
+### Add Integration To Desired Channel
+
+For a workflow to be triggered by channel events, the integration or bot must first be added as a member of that channel. Slack only dispatches events to applications that are active participants in the channel — if the bot is not a member, no events from that channel will be received, and the workflow will not trigger.
+
+1. Login into your Slack workspace.
+2. Click three dots.
+3. Click on **Channel details**.
+4. Click on **Open channel details**.
+5. Click on **Integrations**.
+6. Click on **Add an App**.
+7. Find your Slack app and click on **Add**.
+8. Done 🚀.
+
+<div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
+    <iframe src="https://www.guidejar.com/embed/86a2cc77-3a2d-4a26-836e-68e37be713b1?type=1&controls=on" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowFullScreen frameBorder="0"></iframe>
 </div>
