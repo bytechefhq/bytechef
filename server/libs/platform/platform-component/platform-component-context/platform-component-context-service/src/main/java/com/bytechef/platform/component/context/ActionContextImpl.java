@@ -297,14 +297,16 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     @Override
     @Nullable
-    public String generateResumeUrl() {
+    public String getResumeUrl() {
         if (publicUrl == null || jobId == null) {
             return null;
         }
 
-        JobResumeId jobResumeId = JobResumeId.of(jobId);
+        if (this.jobResumeId == null) {
+            JobResumeId jobResumeId = JobResumeId.of(jobId);
 
-        this.jobResumeId = jobResumeId.toString();
+            this.jobResumeId = jobResumeId.toString();
+        }
 
         return publicUrl + "/job/resume/" + this.jobResumeId;
     }

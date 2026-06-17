@@ -17,19 +17,18 @@
 package com.bytechef.task.dispatcher.suspend.config;
 
 import com.bytechef.atlas.coordinator.task.completion.TaskCompletionHandlerFactory;
-import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherResolverFactory;
 import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.platform.workflow.execution.service.TaskStateService;
-import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcher;
 import com.bytechef.task.dispatcher.suspend.SuspendTaskDispatcherPreSendProcessor;
 import com.bytechef.task.dispatcher.suspend.completion.SuspendTaskCompletionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 
 /**
  * @author Ivica Cardic
@@ -58,6 +57,7 @@ public class SuspendTaskDispatcherConfiguration {
     }
 
     @Bean("suspendTaskCompletionHandlerFactory")
+    @Order(1)
     TaskCompletionHandlerFactory suspendTaskCompletionHandlerFactory() {
         return (taskCompletionHandler, taskDispatcher) -> new SuspendTaskCompletionHandler(
             contextService, eventPublisher, jobService, taskExecutionService, taskFileStorage, taskStateService);
@@ -66,10 +66,5 @@ public class SuspendTaskDispatcherConfiguration {
     @Bean
     SuspendTaskDispatcherPreSendProcessor suspendTaskDispatcherPreSendProcessor() {
         return new SuspendTaskDispatcherPreSendProcessor(jobService, taskStateService);
-    }
-
-    @Bean("suspendTaskDispatcherResolverFactory_v1")
-    TaskDispatcherResolverFactory suspendTaskDispatcherResolverFactory() {
-        return (taskDispatcher) -> new SuspendTaskDispatcher(eventPublisher, jobService, taskExecutionService);
     }
 }

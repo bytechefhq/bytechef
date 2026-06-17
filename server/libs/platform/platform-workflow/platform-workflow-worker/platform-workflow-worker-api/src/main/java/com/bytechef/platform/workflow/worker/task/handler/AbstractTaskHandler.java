@@ -121,6 +121,8 @@ public abstract class AbstractTaskHandler implements TaskHandler<Object> {
 
         if (expiresAtValue instanceof Number expiresAtNumber) {
             return Instant.ofEpochMilli(expiresAtNumber.longValue());
+        } else if (expiresAtValue instanceof String expiresAtString) {
+            return Instant.parse(expiresAtString);
         }
 
         return null;

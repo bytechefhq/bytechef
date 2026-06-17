@@ -150,8 +150,8 @@ public class JobFacadeImpl implements JobFacade {
     }
 
     @Override
-    public void resumeJob(long id, @Nullable Map<String, ?> data) {
-        eventPublisher.publishEvent(new ResumeJobEvent(id, data));
+    public void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data) {
+        eventPublisher.publishEvent(new ResumeJobEvent(id, taskExecutionId, data));
     }
 
     @Override

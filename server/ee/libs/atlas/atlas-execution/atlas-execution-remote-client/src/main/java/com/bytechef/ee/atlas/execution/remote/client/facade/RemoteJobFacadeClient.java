@@ -56,7 +56,7 @@ public class RemoteJobFacadeClient implements JobFacade {
     }
 
     @Override
-    public void resumeJob(long id, @Nullable Map<String, ?> data) {
+    public void resumeJob(long id, long taskExecutionId, @Nullable Map<String, ?> data) {
         throw new UnsupportedOperationException();
     }
 
