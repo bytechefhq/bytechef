@@ -20,6 +20,9 @@ import org.springframework.stereotype.Controller;
 /**
  * GraphQL controller for fetching Authorities (roles).
  *
+ * <p>
+ * Authorization is enforced on {@link AuthorityFacade}, not here.
+ *
  * @version ee
  *
  * @author Ivica Cardic

@@ -24,6 +24,9 @@ import org.springframework.stereotype.Controller;
 /**
  * GraphQL controller for managing Identity Providers (OIDC SSO configuration).
  *
+ * <p>
+ * Authorization is enforced on {@link IdentityProviderFacade}, not here.
+ *
  * @version ee
  *
  * @author Ivica Cardic

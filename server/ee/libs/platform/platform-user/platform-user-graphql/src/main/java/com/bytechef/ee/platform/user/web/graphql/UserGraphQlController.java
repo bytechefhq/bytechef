@@ -25,6 +25,9 @@ import org.springframework.stereotype.Controller;
 /**
  * GraphQL controller for managing Users.
  *
+ * <p>
+ * Authorization is enforced on {@link UserManagementFacade}, not here.
+ *
  * @version ee
  *
  * @author Ivica Cardic
