@@ -19,6 +19,7 @@ import styles from './NodeTypes.module.css';
 
 const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [isDropzoneActive, setDropzoneActive] = useState(false);
+    const [menuReady, setMenuReady] = useState(false);
 
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
@@ -72,6 +73,15 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
 
+    const handleOpenChange = useCallback((open: boolean) => {
+        if (open) {
+            setMenuReady(false);
+            setTimeout(() => setMenuReady(true), 200);
+        } else {
+            setMenuReady(false);
+        }
+    }, []);
+
     const handleDragEnter = () => setDropzoneActive(true);
 
     const handleDragLeave = () => setDropzoneActive(false);
@@ -81,7 +91,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleDrop = () => setDropzoneActive(false);
 
     return (
-        <ContextMenu>
+        <ContextMenu onOpenChange={handleOpenChange}>
             <ContextMenuTrigger asChild disabled={!canPaste || isClusterElement}>
                 <div>
                     <WorkflowNodesPopoverMenu
@@ -128,7 +138,7 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 </div>
             </ContextMenuTrigger>
 
-            <ContextMenuContent className="w-workflow-node-context-menu-width p-0">
+            <ContextMenuContent className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}>
                 <ContextMenuItem
                     className="dropdown-menu-item flex w-full flex-col items-start gap-1"
                     disabled={!canPaste}
