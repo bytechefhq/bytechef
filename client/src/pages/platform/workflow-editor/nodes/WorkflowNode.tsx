@@ -12,7 +12,7 @@ import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {ArrowLeftRightIcon, CheckIcon, ComponentIcon, PinOffIcon, Trash2Icon} from 'lucide-react';
+import {CheckIcon, ComponentIcon} from 'lucide-react';
 import {KeyboardEvent, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -47,14 +47,10 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     data: NodeDataType;
     effectiveDirection: EffectiveDirectionType;
     filteredClusterElementTypes: ReturnType<typeof getFilteredClusterElementTypes>;
-    handleDeleteNodeClick: (data: NodeDataType) => void;
     handleNodeClick: () => void;
-    handleRemoveNodePosition: (nodeName: string) => void;
-    handleRemoveSavedClusterElementPosition: (clickedNodeName: string) => void;
     handleRenameKeyDown: (event: KeyboardEvent<HTMLInputElement>) => void;
     handleRenameSubmit: (newLabel: string) => void;
     hasSavedClusterElementPosition: NodePositionType;
-    hasSavedNodePosition: false | NodePositionType;
     id: string;
     isClusterElement: string | undefined;
     isHorizontal: boolean;
@@ -71,7 +67,6 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     renameValue: string;
     setRenameValue: (value: string) => void;
     setSwitchPopoverOpen: (open: boolean) => void;
-    suppressHover: boolean;
     switchPopoverOpen: boolean;
     workflowNodeDetailsPanelOpen: boolean;
 }
@@ -83,14 +78,10 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             data,
             effectiveDirection,
             filteredClusterElementTypes,
-            handleDeleteNodeClick,
             handleNodeClick,
-            handleRemoveNodePosition,
-            handleRemoveSavedClusterElementPosition,
             handleRenameKeyDown,
             handleRenameSubmit,
             hasSavedClusterElementPosition,
-            hasSavedNodePosition,
             id,
             isClusterElement,
             isHorizontal,
@@ -107,7 +98,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             renameValue,
             setRenameValue,
             setSwitchPopoverOpen,
-            suppressHover,
             switchPopoverOpen,
             workflowNodeDetailsPanelOpen,
             ...rest
@@ -119,7 +109,6 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             {...rest}
             className={twMerge(
                 'relative flex min-w-60 cursor-pointer justify-center',
-                !suppressHover && 'group',
                 !data.taskDispatcher && 'items-center',
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
                 isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
@@ -129,103 +118,33 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
         >
-            {!isMainRootClusterElement && !isClusterElement && (
-                <div className="invisible absolute top-0 left-workflow-node-popover-hover pr-4 group-hover:visible">
-                    {data.trigger ? (
-                        <WorkflowNodesPopoverMenu
-                            hideActionComponents
-                            hideClusterElementComponents
-                            hideTaskDispatchers
-                            onOpenChange={setSwitchPopoverOpen}
-                            open={switchPopoverOpen}
-                            sourceNodeId={id}
-                        >
-                            <Button
-                                icon={<ArrowLeftRightIcon />}
-                                size="iconSm"
-                                title="Change trigger component"
-                                variant="outline"
-                            />
-                        </WorkflowNodesPopoverMenu>
-                    ) : (
-                        <div className="flex flex-col gap-1">
-                            <Button
-                                className="opacity-100"
-                                icon={<Trash2Icon />}
-                                onClick={() => handleDeleteNodeClick(data)}
-                                size="iconSm"
-                                title="Delete a node"
-                                variant="destructiveGhost"
-                            />
-
-                            {hasSavedNodePosition && (
-                                <Button
-                                    icon={<PinOffIcon />}
-                                    onClick={() => handleRemoveNodePosition(data.name)}
-                                    size="iconSm"
-                                    title="Remove saved node position"
-                                    variant="ghost"
-                                />
-                            )}
-                        </div>
-                    )}
-                </div>
+            {!isMainRootClusterElement && !isClusterElement && data.trigger && (
+                <WorkflowNodesPopoverMenu
+                    hideActionComponents
+                    hideClusterElementComponents
+                    hideTaskDispatchers
+                    onOpenChange={setSwitchPopoverOpen}
+                    open={switchPopoverOpen}
+                    sourceNodeId={id}
+                >
+                    <div />
+                </WorkflowNodesPopoverMenu>
             )}
 
-            {isClusterElement && (
-                <div
-                    className={twMerge(
-                        'invisible absolute left-[-80px] z-50 flex gap-1 pr-8 group-hover:visible',
-                        data.multipleClusterElementsNode &&
-                            !hasSavedClusterElementPosition &&
-                            'left-workflow-node-popover-hover'
-                    )}
+            {isClusterElement && !data.multipleClusterElementsNode && (
+                <WorkflowNodesPopoverMenu
+                    clusterElementType={data.clusterElementType}
+                    hideActionComponents={!!data.clusterElementType}
+                    hideClusterElementComponents={!data.clusterElementType}
+                    hideTaskDispatchers={!!data.clusterElementType}
+                    hideTriggerComponents
+                    onOpenChange={setSwitchPopoverOpen}
+                    open={switchPopoverOpen}
+                    sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
+                    sourceNodeName={data.workflowNodeName}
                 >
-                    <Button
-                        className={twMerge(
-                            'opacity-100',
-                            !data.multipleClusterElementsNode && hasSavedClusterElementPosition && 'self-center'
-                        )}
-                        icon={<Trash2Icon />}
-                        onClick={() => handleDeleteNodeClick(data)}
-                        size="iconSm"
-                        title="Delete a node"
-                        variant="destructiveGhost"
-                    />
-
-                    <div className="flex flex-col gap-1">
-                        {!data.multipleClusterElementsNode && (
-                            <WorkflowNodesPopoverMenu
-                                clusterElementType={data.clusterElementType}
-                                hideActionComponents={!!data.clusterElementType}
-                                hideClusterElementComponents={!data.clusterElementType}
-                                hideTaskDispatchers={!!data.clusterElementType}
-                                hideTriggerComponents
-                                onOpenChange={setSwitchPopoverOpen}
-                                open={switchPopoverOpen}
-                                sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
-                                sourceNodeName={data.workflowNodeName}
-                            >
-                                <Button
-                                    icon={<ArrowLeftRightIcon />}
-                                    size="iconSm"
-                                    title={`Change ${data.clusterElementType} component`}
-                                    variant="outline"
-                                />
-                            </WorkflowNodesPopoverMenu>
-                        )}
-
-                        {hasSavedClusterElementPosition && (
-                            <Button
-                                icon={<PinOffIcon />}
-                                onClick={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
-                                size="iconSm"
-                                title="Remove saved node position"
-                                variant="ghost"
-                            />
-                        )}
-                    </div>
-                </div>
+                    <div />
+                </WorkflowNodesPopoverMenu>
             )}
 
             <HoverCard
@@ -813,8 +732,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isRenaming = renamingNodeName === data.name;
 
-    const suppressHover = isRenaming || switchPopoverOpen;
-
     const canPaste = !!copiedNode && copiedWorkflowId === workflow.id;
 
     const nodeDescription =
@@ -831,14 +748,10 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         data,
         effectiveDirection,
         filteredClusterElementTypes,
-        handleDeleteNodeClick,
         handleNodeClick,
-        handleRemoveNodePosition,
-        handleRemoveSavedClusterElementPosition,
         handleRenameKeyDown,
         handleRenameSubmit,
         hasSavedClusterElementPosition,
-        hasSavedNodePosition,
         id,
         isClusterElement,
         isHorizontal,
@@ -855,7 +768,6 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         renameValue,
         setRenameValue,
         setSwitchPopoverOpen,
-        suppressHover,
         switchPopoverOpen,
         workflowNodeDetailsPanelOpen,
     } satisfies WorkflowNodeContentProps;
