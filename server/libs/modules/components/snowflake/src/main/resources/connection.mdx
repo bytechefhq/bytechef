@@ -42,5 +42,13 @@ https://docs.snowflake.com/sql-reference/functions/system_show_oauth_client_secr
 2. Click on **Worksheets**.
 3. Click on **+** to create SQL worksheet.
 4. Paste this into worksheet, just change NAME to the name of your security integration:
-        select system$show_oauth_client_secrets(NAME)
+        `SELECT SYSTEM$SHOW_OAUTH_CLIENT_SECRETS('BYTECHEF');`
 5. Run SQL worksheet.
+
+### Role Has Been Blocked Error
+
+1. Navigate to your Snowflake dashboard.
+2. Click on **Worksheets**.
+3. Click on **+** to create SQL worksheet.
+4. Paste this into worksheet, just change NAME to the name of your security integration:
+```ALTER ACCOUNT SET OAUTH_ADD_PRIVILEGED_ROLES_TO_BLOCKED_LIST = FALSE;```
