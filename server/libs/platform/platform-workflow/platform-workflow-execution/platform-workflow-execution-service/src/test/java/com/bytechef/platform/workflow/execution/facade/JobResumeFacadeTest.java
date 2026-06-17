@@ -28,11 +28,13 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
 import com.bytechef.tenant.TenantContext;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,6 +43,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -49,6 +53,7 @@ import org.springframework.context.ApplicationEventPublisher;
 public class JobResumeFacadeTest {
 
     private static final long JOB_ID = 42L;
+    private static final long TASK_EXECUTION_ID = 7L;
 
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
@@ -61,6 +66,13 @@ public class JobResumeFacadeTest {
 
     private JobResumeFacadeImpl jobResumeFacade;
 
+    static {
+        ObjectMapper objectMapper = JsonMapper.builder()
+            .build();
+
+        MapUtils.setObjectMapper(objectMapper);
+    }
+
     @BeforeEach
     void setUp() {
         jobResumeFacade = new JobResumeFacadeImpl(applicationEventPublisher, jobFacade, jobService);
@@ -72,7 +84,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyMap());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -88,7 +100,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.GONE);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyMap());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -104,7 +116,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyMap());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -121,7 +133,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyMap());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -141,7 +153,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.INVALID_ID);
 
-        verify(jobFacade, never()).resumeJob(anyLong(), anyMap());
+        verify(jobFacade, never()).resumeJob(anyLong(), anyLong(), anyMap());
         verify(applicationEventPublisher, never()).publishEvent(any());
     }
 
@@ -159,7 +171,7 @@ public class JobResumeFacadeTest {
 
         assertThat(outcome).isEqualTo(JobResumeOutcome.OK);
 
-        verify(jobFacade).resumeJob(JOB_ID, data);
+        verify(jobFacade).resumeJob(JOB_ID, TASK_EXECUTION_ID, data);
         verify(applicationEventPublisher).publishEvent(any(JobResumedEvent.class));
     }
 
@@ -169,7 +181,12 @@ public class JobResumeFacadeTest {
         job.setStatus(status);
 
         if (storedJobResumeIdString != null) {
-            job.setMetadata(Map.of(MetadataConstants.JOB_RESUME_ID, storedJobResumeIdString));
+            Map<String, Object> metadata = new HashMap<>();
+
+            metadata.put(MetadataConstants.JOB_RESUME_ID, storedJobResumeIdString);
+            metadata.put(MetadataConstants.TASK_EXECUTION_RESUME_ID, TASK_EXECUTION_ID);
+
+            job.setMetadata(metadata);
         }
 
         return job;

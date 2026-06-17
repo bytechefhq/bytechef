@@ -72,8 +72,6 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         assertSame(suspend, result);
         assertTrue(taskExecution.getMetadata()
             .containsKey(MetadataConstants.JOB_RESUME_ID));
-        assertTrue(taskExecution.getMetadata()
-            .containsKey(MetadataConstants.SUSPEND));
 
         verify(triggerScheduler).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
     }
@@ -97,8 +95,6 @@ class SuspendTaskExecutionPostOutputProcessorTest {
         assertSame(suspend, result);
         assertTrue(taskExecution.getMetadata()
             .containsKey(MetadataConstants.JOB_RESUME_ID));
-        assertTrue(taskExecution.getMetadata()
-            .containsKey(MetadataConstants.SUSPEND));
 
         verify(triggerScheduler, never()).scheduleOneTimeTask(any(Instant.class), anyMap(), anyLong());
     }

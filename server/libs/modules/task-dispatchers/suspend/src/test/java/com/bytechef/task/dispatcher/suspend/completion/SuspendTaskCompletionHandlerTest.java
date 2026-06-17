@@ -36,6 +36,7 @@ import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.atlas.file.storage.TaskFileStorageImpl;
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
@@ -73,6 +74,7 @@ class SuspendTaskCompletionHandlerTest {
         ObjectMapper objectMapper = JsonMapper.builder()
             .build();
 
+        ConvertUtils.setObjectMapper(objectMapper);
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);
     }
@@ -89,17 +91,6 @@ class SuspendTaskCompletionHandlerTest {
         taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend);
 
         assertTrue(suspendTaskCompletionHandler.canHandle(taskExecution));
-    }
-
-    @Test
-    void testCanHandleReturnsFalseWhenHasParentId() {
-        TaskExecution taskExecution = TaskExecution.builder()
-            .build();
-
-        taskExecution.setParentId(1L);
-        taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, "someId");
-
-        assertFalse(suspendTaskCompletionHandler.canHandle(taskExecution));
     }
 
     @Test
@@ -124,7 +115,7 @@ class SuspendTaskCompletionHandlerTest {
         taskExecution.setId(1L);
         taskExecution.setJobId(100L);
         taskExecution.putMetadata(MetadataConstants.JOB_RESUME_ID, jobResumeIdString);
-        taskExecution.putMetadata(MetadataConstants.SUSPEND, suspend);
+        taskExecution.setOutput(taskFileStorage.storeTaskExecutionOutput(100L, 1L, suspend));
 
         when(taskExecutionService.update(any(TaskExecution.class)))
             .thenReturn(taskExecution);
@@ -135,6 +126,8 @@ class SuspendTaskCompletionHandlerTest {
         job.setMetadata(Map.of());
 
         when(jobService.getTaskExecutionJob(1L))
+            .thenReturn(job);
+        when(jobService.getJob(100L))
             .thenReturn(job);
 
         FileEntry contextFileEntry = taskFileStorage.storeContextValue(
