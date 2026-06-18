@@ -428,7 +428,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             styles.handleVisible,
                             effectiveDirection === 'LR'
                                 ? '-left-px rounded-l-xs rounded-r-none'
-                                : '-top-px rounded-t-xs rounded-b-none',
+                                : 'rounded-t-xs rounded-b-none',
                             data.trigger && 'hidden'
                         )}
                         isConnectable={false}
