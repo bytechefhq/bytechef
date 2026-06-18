@@ -76,6 +76,7 @@ public class MailerLiteSubscriberUnsubscribedTrigger {
                                 string("updated_at"),
                                 array("fields"),
                                 array("groups")))))
+        .help("", "https://docs.bytechef.io/reference/components/mailerlite_v1#subscriber-unsubscribed")
         .webhookEnable(MailerLiteSubscriberUnsubscribedTrigger::webhookEnable)
         .webhookDisable(MailerLiteSubscriberUnsubscribedTrigger::webhookDisable)
         .webhookRequest(MailerLiteSubscriberUnsubscribedTrigger::webhookRequest);

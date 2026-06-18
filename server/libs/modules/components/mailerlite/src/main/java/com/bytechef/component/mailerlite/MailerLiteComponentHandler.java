@@ -17,6 +17,7 @@
 package com.bytechef.component.mailerlite;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
@@ -38,16 +39,23 @@ public class MailerLiteComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("mailerLite")
         .title("MailerLite")
+        .version(1)
         .description(
             "MailerLite is an intuitive email marketing platform that offers automation, landing pages, and " +
                 "subscriber management for businesses and creators.")
         .icon("path:assets/mailerlite.svg")
         .categories(ComponentCategory.MARKETING_AUTOMATION)
         .connection(MailerLiteConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://developers.mailerlite.com/getting-started#mailerlite-api")
         .actions(
             MailerLiteAddSubscriberToGroupAction.ACTION_DEFINITION,
             MailerLiteCreateOrUpdateSubscriberAction.ACTION_DEFINITION,
             MailerLiteRemoveSubscriberFromGroupAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(MailerLiteAddSubscriberToGroupAction.ACTION_DEFINITION),
+            tool(MailerLiteCreateOrUpdateSubscriberAction.ACTION_DEFINITION),
+            tool(MailerLiteRemoveSubscriberFromGroupAction.ACTION_DEFINITION))
         .triggers(
             MailerLiteSubscriberAddedToGroupTrigger.TRIGGER_DEFINITION,
             MailerLiteSubscriberCreatedTrigger.TRIGGER_DEFINITION,
