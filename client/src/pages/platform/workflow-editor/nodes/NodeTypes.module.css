@@ -11,9 +11,9 @@
 
     .handleVisible {
         @apply -z-10;
-        @apply h-2;
-        @apply w-2;
-        @apply border-0;
+        @apply h-1.5!;
+        @apply w-2!;
+        @apply border-0!;
         @apply bg-stroke-neutral-tertiary!;
     }
 }

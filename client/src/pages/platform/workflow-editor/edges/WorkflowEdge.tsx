@@ -200,7 +200,7 @@ export default function WorkflowEdge({
     return (
         <>
             <BaseEdge
-                className="fill-none stroke-gray-300 stroke-2"
+                className="fill-none stroke-stroke-neutral-tertiary stroke-2"
                 id={id}
                 markerEnd={markerEnd}
                 path={edgePath}
