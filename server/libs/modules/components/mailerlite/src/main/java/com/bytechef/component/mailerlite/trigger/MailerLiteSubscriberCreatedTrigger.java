@@ -80,6 +80,7 @@ public class MailerLiteSubscriberCreatedTrigger {
                                 array("groups"),
                                 string("account_id")
                                     .description("ID of the account that subscriber subscribed to.")))))
+        .help("", "https://docs.bytechef.io/reference/components/mailerlite_v1#subscriber-created")
         .webhookEnable(MailerLiteSubscriberCreatedTrigger::webhookEnable)
         .webhookDisable(MailerLiteSubscriberCreatedTrigger::webhookDisable)
         .webhookRequest(MailerLiteSubscriberCreatedTrigger::webhookRequest);

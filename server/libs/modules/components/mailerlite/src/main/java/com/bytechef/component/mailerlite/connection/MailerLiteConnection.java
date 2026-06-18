@@ -31,6 +31,8 @@ public class MailerLiteConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://connect.mailerlite.com/api")
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/mailerlite_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .properties(

@@ -57,6 +57,9 @@ public class MailerLiteCreateOrUpdateSubscriberAction {
                 .description("ID of the group to which you want to add the subscriber to.")
                 .options((OptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(false))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/mailerlite_v1#create-or-update-subscriber")
         .output(
             outputSchema(
                 object()

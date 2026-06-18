@@ -76,6 +76,9 @@ public class MailerLiteSubscriberAddedToGroupTrigger {
                                 string("updated_at"),
                                 array("fields"),
                                 array("groups")))))
+        .help(
+            "",
+            "https://docs.bytechef.io/reference/components/mailerlite_v1#subscriber-added-to-the-group")
         .webhookEnable(MailerLiteSubscriberAddedToGroupTrigger::webhookEnable)
         .webhookDisable(MailerLiteSubscriberAddedToGroupTrigger::webhookDisable)
         .webhookRequest(MailerLiteSubscriberAddedToGroupTrigger::webhookRequest);

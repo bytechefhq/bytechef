@@ -56,6 +56,7 @@ public class MailerLiteAddSubscriberToGroupAction {
                 .description("ID of the group to which the user will be added.")
                 .options((OptionsFunction<String>) MailerLiteUtils::getGroupIdOptions)
                 .required(true))
+        .help("", "https://docs.bytechef.io/reference/components/mailerlite_v1#add-subscriber-to-group")
         .output(
             outputSchema(
                 object()
