@@ -31,6 +31,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -176,6 +177,11 @@ public class PolyglotEngine {
         Class<?> valueClass = value.getClass();
 
         if (valueClass.isArray()) {
+            if (value instanceof byte[] bytes) {
+                return Base64.getEncoder()
+                    .encodeToString(bytes);
+            }
+
             return ProxyArray.fromArray((Object[]) value);
         } else if (value instanceof Boolean bool) {
             return bool;
