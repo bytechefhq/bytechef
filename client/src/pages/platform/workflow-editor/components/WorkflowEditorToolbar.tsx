@@ -9,8 +9,8 @@ import {
     BrushCleaningIcon,
     FocusIcon,
     InfoIcon,
-    Redo2Icon,
-    Undo2Icon,
+    RedoIcon,
+    UndoIcon,
     ZoomInIcon,
     ZoomOutIcon,
 } from 'lucide-react';
@@ -39,7 +39,7 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
     const setResetWorkflowLayout = useWorkflowEditorStore((state) => state.setResetWorkflowLayout);
 
     const {fitView, zoomIn, zoomOut} = useReactFlow();
-    const {canRedo, canUndo, redo, undo} = useWorkflowUndoRedo();
+    const {canRedo, canUndo, handleRedo, handleUndo} = useWorkflowUndoRedo();
 
     const taskCount = nodes.filter(
         (node) => node.type === 'workflow' && !(node.data as NodeDataType).taskDispatcher
@@ -87,48 +87,6 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
                         </TooltipContent>
                     </Tooltip>
                 </div>
-
-                {enableUndoRedo && (
-                    <ButtonGroup>
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    disabled={readOnly || !canUndo}
-                                    icon={<Undo2Icon />}
-                                    onClick={undo}
-                                    size="icon"
-                                    variant="outline"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent
-                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
-                                side="top"
-                            >
-                                Undo
-                            </TooltipContent>
-                        </Tooltip>
-
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Button
-                                    disabled={readOnly || !canRedo}
-                                    icon={<Redo2Icon />}
-                                    onClick={redo}
-                                    size="icon"
-                                    variant="outline"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent
-                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
-                                side="top"
-                            >
-                                Redo
-                            </TooltipContent>
-                        </Tooltip>
-                    </ButtonGroup>
-                )}
 
                 <ButtonGroup>
                     <Tooltip>
@@ -212,6 +170,48 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
                         </TooltipContent>
                     </Tooltip>
                 </ButtonGroup>
+
+                {enableUndoRedo && !readOnly && (
+                    <ButtonGroup>
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    disabled={!canUndo}
+                                    icon={<UndoIcon />}
+                                    onClick={handleUndo}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Undo
+                            </TooltipContent>
+                        </Tooltip>
+
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    disabled={!canRedo}
+                                    icon={<RedoIcon />}
+                                    onClick={handleRedo}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Redo
+                            </TooltipContent>
+                        </Tooltip>
+                    </ButtonGroup>
+                )}
             </div>
         </Panel>
     );
