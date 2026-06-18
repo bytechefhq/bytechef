@@ -68,14 +68,14 @@ const WorkflowNodeContextMenu = ({
 
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
 
-    const handleOpenChange = useCallback((open: boolean) => {
+    const handleOpenChange = (open: boolean) => {
         if (open) {
             setMenuReady(false);
             setTimeout(() => setMenuReady(true), 200);
         } else {
             setMenuReady(false);
         }
-    }, []);
+    };
 
     const PasteMenuItem = useMemo(() => {
         if (!canPaste || !copiedNode) {
