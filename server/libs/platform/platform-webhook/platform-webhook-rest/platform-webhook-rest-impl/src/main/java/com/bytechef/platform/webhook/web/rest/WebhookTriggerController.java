@@ -160,7 +160,7 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
                 workflowExecutionId);
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            webhookWorkflowExecutor.executeStreaming(workflowExecutionId, webhookRequest, bridge);
+            webhookWorkflowExecutor.stream(workflowExecutionId, webhookRequest, bridge);
 
             return emitter;
         });

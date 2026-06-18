@@ -29,12 +29,6 @@ import org.jspecify.annotations.Nullable;
  * workflows asynchronously, synchronously, or with SSE streaming support. Additionally, includes validation
  * capabilities for webhook requests during execution or enablement processes.
  *
- * <p>
- * Also exposes the transport-agnostic orchestration helpers (formerly the {@code WebhookWorkflowExecutionFacade}) that
- * callers across transports (HTTP/SSE controller, AI copilot webhook bridge) compose to drive a webhook-triggered run:
- * {@link #executeStreaming}, {@link #getWebhookTriggerFlags}, {@link #hasStreamingTask}, and
- * {@link #isWorkflowDisabled}.
- *
  * @author Ivica Cardic
  */
 public interface WebhookWorkflowExecutor {
@@ -96,26 +90,19 @@ public interface WebhookWorkflowExecutor {
      * @param sseStreamBridge     the transport-specific event sink (SSE emitter wrap, AG-UI bridge, etc.)
      * @return a future that completes when the workflow run finishes or errors
      */
-    CompletableFuture<Void> executeStreaming(
+    CompletableFuture<Void> stream(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge);
 
     /**
      * Returns the trigger flags associated with the workflow's webhook trigger. Cached lookup — the underlying
      * {@code TriggerDefinitionService} call is the same one the controller already uses to decide between sync and
-     * async dispatch on the HTTP path. The copilot bridge consumes this to pick between
-     * {@link #executeSync(WorkflowExecutionId, WebhookRequest)} and
-     * {@link #executeStreaming(WorkflowExecutionId, WebhookRequest, SseStreamBridge)}.
+     * async dispatch on the HTTP path.
      */
     WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId);
 
     /**
      * Returns {@code true} when the workflow contains at least one task whose action streams output (e.g.
-     * {@code openAi/v1/streamAsk}, {@code aiAgent/v1/streamChat}). The copilot bridge consults this flag BEFORE looking
-     * at the trigger's {@code workflowSyncExecution} property: a chat workflow whose trigger demands sync semantics for
-     * HTTP transport (so embedded chat clients keep working) but contains a streaming AI task needs the bridge to route
-     * through {@link #executeStreaming} so per-token deltas flow to the AG-UI client. Otherwise the streaming task's
-     * events would land in JobSyncExecutor's in-process bridge cache — unreachable from EE worker processes — and the
-     * user would see a blank assistant reply.
+     * {@code openAi/v1/streamAsk}, {@code aiAgent/v1/streamChat}).
      */
     boolean hasStreamingTask(WorkflowExecutionId workflowExecutionId);
 

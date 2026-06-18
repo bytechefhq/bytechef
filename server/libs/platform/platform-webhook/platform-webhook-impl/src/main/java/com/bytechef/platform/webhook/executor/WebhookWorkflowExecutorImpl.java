@@ -200,7 +200,7 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
-    public CompletableFuture<Void> executeStreaming(
+    public CompletableFuture<Void> stream(
         WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
 
         if (isWorkflowDisabled(workflowExecutionId)) {
