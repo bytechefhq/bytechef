@@ -46,6 +46,7 @@ public class FileStorageComponentHandler implements ComponentHandler {
             FileStorageDownloadAction.ACTION_DEFINITION)
         .clusterElements(
             tool(FileStorageReadStringAction.ACTION_DEFINITION),
+            tool(FileStorageReadBytesAction.ACTION_DEFINITION),
             tool(FileStorageWriteAction.ACTION_DEFINITION));
 
     @Override
