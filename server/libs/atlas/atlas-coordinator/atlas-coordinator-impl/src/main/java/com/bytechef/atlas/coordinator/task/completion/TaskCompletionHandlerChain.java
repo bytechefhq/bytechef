@@ -32,6 +32,10 @@ public class TaskCompletionHandlerChain implements TaskCompletionHandler {
     @Override
     public void handle(TaskExecution taskExecution) {
         for (TaskCompletionHandler taskCompletionHandler : taskCompletionHandlers) {
+            if (taskExecution.isHandled()) {
+                return;
+            }
+
             if (taskCompletionHandler.canHandle(taskExecution)) {
                 taskCompletionHandler.handle(taskExecution);
             }
