@@ -30,7 +30,7 @@ import com.bytechef.component.definition.Parameters;
 /**
  * @author Ivica Cardic
  */
-public class FileStorageReadAction {
+public class FileStorageReadStringAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("read")
         .title("Read from File as String")
@@ -41,7 +41,7 @@ public class FileStorageReadAction {
                 .description("The file object which contains content of the file to read from.")
                 .required(true))
         .output(outputSchema(string().description("File content.")), sampleOutput("Sample content"))
-        .perform(FileStorageReadAction::perform);
+        .perform(FileStorageReadStringAction::perform);
 
     protected static String perform(
         Parameters inputParameters, Parameters connectionParameters, Context context) {

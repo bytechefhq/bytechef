@@ -23,7 +23,8 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.component.file.storage.action.FileStorageDownloadAction;
-import com.bytechef.component.file.storage.action.FileStorageReadAction;
+import com.bytechef.component.file.storage.action.FileStorageReadBytesAction;
+import com.bytechef.component.file.storage.action.FileStorageReadStringAction;
 import com.bytechef.component.file.storage.action.FileStorageWriteAction;
 import com.google.auto.service.AutoService;
 
@@ -39,11 +40,12 @@ public class FileStorageComponentHandler implements ComponentHandler {
         .icon("path:assets/file-storage.svg")
         .categories(ComponentCategory.FILE_STORAGE, ComponentCategory.HELPERS)
         .actions(
-            FileStorageReadAction.ACTION_DEFINITION,
+            FileStorageReadStringAction.ACTION_DEFINITION,
+            FileStorageReadBytesAction.ACTION_DEFINITION,
             FileStorageWriteAction.ACTION_DEFINITION,
             FileStorageDownloadAction.ACTION_DEFINITION)
         .clusterElements(
-            tool(FileStorageReadAction.ACTION_DEFINITION),
+            tool(FileStorageReadStringAction.ACTION_DEFINITION),
             tool(FileStorageWriteAction.ACTION_DEFINITION));
 
     @Override
