@@ -60,6 +60,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class PolyglotEngine {
 
+    private static final Base64.Encoder ENCODER = Base64.getEncoder();
     private static final ReentrantLock LOCK = new ReentrantLock();
 
     private static Engine engine;
@@ -178,8 +179,7 @@ public class PolyglotEngine {
 
         if (valueClass.isArray()) {
             if (value instanceof byte[] bytes) {
-                return Base64.getEncoder()
-                    .encodeToString(bytes);
+                return ENCODER.encodeToString(bytes);
             }
 
             return ProxyArray.fromArray((Object[]) value);
