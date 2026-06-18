@@ -30,7 +30,7 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-public class FileStorageReadActionTest {
+public class FileStorageReadStringActionTest {
 
     private static final ActionContext context = Mockito.mock(ActionContext.class);
 
@@ -43,7 +43,7 @@ public class FileStorageReadActionTest {
         Mockito.when(parameters.getRequiredFileEntry(Mockito.eq(FILE_ENTRY)))
             .thenReturn(fileEntry);
 
-        FileStorageReadAction.perform(parameters, parameters, context);
+        FileStorageReadStringAction.perform(parameters, parameters, context);
 
         ArgumentCaptor<FileEntry> fileEntryArgumentCaptor =
             ArgumentCaptor.forClass(FileEntry.class);
