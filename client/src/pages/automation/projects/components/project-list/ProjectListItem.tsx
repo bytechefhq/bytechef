@@ -301,7 +301,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center gap-2">
                                 <CollapsibleTrigger
-                                    className="group flex items-center text-xs font-semibold text-muted-foreground"
+                                    className="group flex min-w-28 items-center text-xs font-semibold text-muted-foreground"
                                     ref={workflowsCollapsibleTriggerRef}
                                 >
                                     <div className="mr-1">
@@ -374,7 +374,8 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                             </DropdownMenuItem>
 
                                             <DropdownMenuItem
-                                                className="cursor-pointer"
+                                                aria-label="Import n8n Workflow"
+                                                className="dropdown-menu-item"
                                                 onClick={() => {
                                                     if (converterHiddenFileInputRef.current) {
                                                         converterHiddenFileInputRef.current.click();
