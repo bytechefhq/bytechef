@@ -26,14 +26,14 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 /**
- * @author Ivica Cardic
+ * @author Marko Kriskovic
  */
-public class FileStorageReadStringActionTest {
+public class FileStorageReadBytesActionTest {
 
     private static final ActionContext context = Mockito.mock(ActionContext.class);
 
     @Test
-    public void testPerformRead() throws Exception {
+    public void testPerformReadBytes() throws Exception {
         Context.File file = Mockito.mock(Context.File.class);
         FileEntry fileEntry = Mockito.mock(FileEntry.class);
         Parameters parameters = Mockito.mock(Parameters.class);
@@ -47,9 +47,9 @@ public class FileStorageReadStringActionTest {
                 return function.apply(file);
             });
 
-        FileStorageReadStringAction.perform(parameters, parameters, context);
+        FileStorageReadBytesAction.perform(parameters, parameters, context);
 
         Mockito.verify(file)
-            .readToString(fileEntry);
+            .readAllBytes(fileEntry);
     }
 }
