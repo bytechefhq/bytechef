@@ -225,6 +225,24 @@ describe('useFetchInterceptor', () => {
             });
         });
 
+        it('skips toast for approval-form read errors handled inline', async () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({
+                jsonData: {detail: 'Approval form is no longer available.', title: 'Not Found'},
+                status: 404,
+                url: 'http://localhost/internal/approval-form/abc123',
+            });
+
+            hoisted.registeredHandlers!.response(response);
+
+            await act(async () => {
+                await new Promise((resolve) => setTimeout(resolve, 0));
+            });
+
+            expect(hoisted.toastError).not.toHaveBeenCalled();
+        });
+
         it('skips toast for AdminUserDTO with errorKey 100', async () => {
             renderHook(() => useFetchInterceptor());
 

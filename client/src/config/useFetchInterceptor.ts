@@ -26,6 +26,16 @@ function isCsrfProtectedUrl(url: string): boolean {
     return url.includes('/graphql') || url.includes('/internal/');
 }
 
+/*
+ * Some reads render their own error state inline and own the failure UX. The approval-form read,
+ * for instance, shows a "Form no longer available" panel (see ApprovalForm.tsx) whenever its fetch
+ * fails, so a global error toast on top of it is redundant and confusing. Suppress the toast for
+ * those endpoints.
+ */
+function handlesErrorInline(url: string): boolean {
+    return url.includes('/approval-form/');
+}
+
 function resolveUrl(input: RequestInfo | URL): string {
     if (typeof input === 'string') {
         return input;
@@ -135,6 +145,12 @@ export default function useFetchInterceptor() {
                 // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
                 // log out here, otherwise the recovered request would still flash an error.
                 if (response.status === 403 && isCsrfProtectedUrl(response.url)) {
+                    return response;
+                }
+
+                // Endpoints that surface their own error state inline shouldn't also flash a
+                // global toast.
+                if ((response.status < 200 || response.status > 299) && handlesErrorInline(response.url)) {
                     return response;
                 }
 
