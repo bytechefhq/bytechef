@@ -73,14 +73,14 @@ const PlaceholderNode = ({data, id}: {data: NodeDataType; id: string}) => {
         pasteNode({nodeIndex, taskDispatcherContext, updateWorkflowMutation});
     }, [id, nodeIndex, nodes, updateWorkflowMutation]);
 
-    const handleOpenChange = useCallback((open: boolean) => {
+    const handleOpenChange = (open: boolean) => {
         if (open) {
             setMenuReady(false);
             setTimeout(() => setMenuReady(true), 200);
         } else {
             setMenuReady(false);
         }
-    }, []);
+    };
 
     const handleDragEnter = () => setDropzoneActive(true);
 

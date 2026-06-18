@@ -184,14 +184,14 @@ export default function WorkflowEdge({
 
     const handleClick = (event: MouseEvent) => event.stopPropagation();
 
-    const handleOpenChange = useCallback((open: boolean) => {
+    const handleOpenChange = (open: boolean) => {
         if (open) {
             setMenuReady(false);
             setTimeout(() => setMenuReady(true), 200);
         } else {
             setMenuReady(false);
         }
-    }, []);
+    };
 
     useEffect(() => {
         const handleGlobalDragEnd = () => {
