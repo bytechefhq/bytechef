@@ -33,7 +33,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.Logger;
@@ -157,26 +156,11 @@ public class WebhookTriggerController extends AbstractWebhookTriggerController {
         return TenantContext.callWithTenantId(workflowExecutionId.getTenantId(), () -> {
             WebhookSseStreamBridge bridge = new WebhookSseStreamBridge(emitter);
 
-            if (webhookWorkflowExecutor.isWorkflowDisabled(workflowExecutionId)) {
-                bridge.onError(new IllegalStateException("Workflow is disabled."));
-
-                return emitter;
-            }
-
-            WebhookTriggerFlags webhookTriggerFlags =
-                webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
+            WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(
+                workflowExecutionId);
             WebhookRequest webhookRequest = getWebhookRequest(httpServletRequest, webhookTriggerFlags);
 
-            CompletableFuture<Void> future = webhookWorkflowExecutor.executeAsync(
-                workflowExecutionId, webhookRequest, bridge);
-
-            future.whenComplete((unused, throwable) -> {
-                if (throwable != null) {
-                    bridge.onError(throwable);
-                } else {
-                    bridge.onComplete();
-                }
-            });
+            webhookWorkflowExecutor.executeStreaming(workflowExecutionId, webhookRequest, bridge);
 
             return emitter;
         });

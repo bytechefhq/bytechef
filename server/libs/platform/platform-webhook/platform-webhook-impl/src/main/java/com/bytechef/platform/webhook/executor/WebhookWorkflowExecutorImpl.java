@@ -200,6 +200,29 @@ public class WebhookWorkflowExecutorImpl implements WebhookWorkflowExecutor {
     }
 
     @Override
+    public CompletableFuture<Void> executeStreaming(
+        WorkflowExecutionId workflowExecutionId, WebhookRequest webhookRequest, SseStreamBridge sseStreamBridge) {
+
+        if (isWorkflowDisabled(workflowExecutionId)) {
+            sseStreamBridge.onError(new IllegalStateException("Workflow is disabled."));
+
+            return CompletableFuture.completedFuture(null);
+        }
+
+        CompletableFuture<Void> future = executeAsync(workflowExecutionId, webhookRequest, sseStreamBridge);
+
+        future.whenComplete((unused, throwable) -> {
+            if (throwable != null) {
+                sseStreamBridge.onError(throwable);
+            } else {
+                sseStreamBridge.onComplete();
+            }
+        });
+
+        return future;
+    }
+
+    @Override
     public WebhookTriggerFlags getWebhookTriggerFlags(WorkflowExecutionId workflowExecutionId) {
         WorkflowNodeType workflowNodeType = getComponentOperation(workflowExecutionId);
 
