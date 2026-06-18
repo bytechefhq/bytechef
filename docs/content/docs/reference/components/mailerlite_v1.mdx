@@ -124,6 +124,13 @@ Type: OBJECT
 }
 ```
 
+#### Find Subscriber ID
+
+To find the Subscriber ID, click [here](/reference/components/mailerlite_v1#how-to-find-the-subscriber-id).
+
+#### Find Group ID
+
+To find the Group ID, click [here](/reference/components/mailerlite_v1#how-to-find-the-group-id).
 
 
 
@@ -190,6 +197,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Group ID
+
+To find the Group ID, click [here](/reference/components/mailerlite_v1#how-to-find-the-group-id).
 
 
 
@@ -224,6 +234,13 @@ This action does not produce any output.
 
 
 
+#### Find Subscriber ID
+
+To find the Subscriber ID, click [here](/reference/components/mailerlite_v1#how-to-find-the-subscriber-id).
+
+#### Find Group ID
+
+To find the Group ID, click [here](/reference/components/mailerlite_v1#how-to-find-the-group-id).
 
 
 
@@ -338,3 +355,54 @@ Type: OBJECT
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Subscriber ID
+
+1. Login into your MailerLite account.
+2. Click on **Subscribers** in left side panel.
+4. Find subscriber you want to find ID of and click on it.
+5. In the URL from your browser's address bar.
+6. Copy the value that appears after `subscribers/`.
+
+#### Example
+
+   Given the URL:
+   ```text
+   https://dashboard.mailerlite.com/subscribers/190607012343580336
+   ```
+
+   The Subscriber ID is:
+   ```text
+   190607012343580336
+   ```
+
+### How to find the Group ID
+
+1. Login into your MailerLite account.
+2. Click on **Subscribers** in left side panel.
+3. Click on **Groups** tab.
+4. Find group you want to find ID of and click on **View group**.
+5. Copy the URL from your browser's address bar.
+6. Find the `group` query parameter in the URL.
+7. Copy the value that appears after `group=`.
+
+#### Example
+
+   Given the URL:
+   ```text
+   https://dashboard.mailerlite.com/subscribers?...&group=150651902266180716
+   ```
+
+   The Group ID is:
+   ```text
+   150651902266180716
+   ```
