@@ -310,6 +310,7 @@ public final class KnowledgeBaseVectorStore {
                     Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst().getMetadata());
 
                     inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
+                    inheritedMetadata.remove("distance");
 
                     if (!inheritedMetadata.isEmpty()) {
                         loadMetadata.putAll(inheritedMetadata);

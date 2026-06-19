@@ -27,7 +27,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
@@ -81,17 +81,17 @@ public final class KnowledgeBaseOptionsUtils {
     }
 
     public static ClusterElementDefinition.OptionsFunction<Long> documentChunkOptions(
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService) {
+        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
 
         return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkService);
+            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
     }
 
     public static ActionDefinition.OptionsFunction<Long> documentChunkActionOptions(
-        KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService) {
+        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
 
         return (inputParameters, connectionParameters, dependencyPaths, searchText, context) ->
-            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkService);
+            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
     }
 
     private static List<Option<Long>> buildKnowledgeBaseOptions(
@@ -160,7 +160,7 @@ public final class KnowledgeBaseOptionsUtils {
     }
 
     private static List<Option<Long>> buildDocumentChunkOptions(
-        Parameters inputParameters, KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService) {
+        Parameters inputParameters, KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
 
         Long knowledgeBaseDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
 
@@ -171,12 +171,16 @@ public final class KnowledgeBaseOptionsUtils {
         List<Option<Long>> options = new ArrayList<>();
 
         List<KnowledgeBaseDocumentChunk> chunks =
-            knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(knowledgeBaseDocumentId);
+            knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(knowledgeBaseDocumentId);
 
         for (int i = 0; i < chunks.size(); i++) {
-            options.add(option("Chunk #" + (i + 1), chunks.get(i)
-                .getId()
-                .longValue()));
+            KnowledgeBaseDocumentChunk chunk = chunks.get(i);
+            String textContent = chunk.getTextContent();
+            String label = (textContent != null && !textContent.isBlank())
+                ? (textContent.length() > 50 ? textContent.substring(0, 50) + "..." : textContent)
+                : "Chunk #" + (i + 1);
+
+            options.add(option(label, chunk.getId().longValue()));
         }
 
         return options;
