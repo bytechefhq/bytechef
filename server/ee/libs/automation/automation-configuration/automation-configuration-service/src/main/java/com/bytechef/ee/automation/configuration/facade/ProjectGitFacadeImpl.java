@@ -28,6 +28,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -72,6 +73,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
 
     @Override
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')")
     public void pullProjectFromGit(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -126,6 +128,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')")
     public List<String> getRemoteBranches(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -136,6 +139,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PUSH')")
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 

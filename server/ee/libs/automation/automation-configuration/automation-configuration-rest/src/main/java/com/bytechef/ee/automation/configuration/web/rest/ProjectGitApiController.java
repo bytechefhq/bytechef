@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -46,6 +47,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'PROJECT_SETTINGS')")
     public ResponseEntity<ProjectGitConfigurationModel> getProjectGitConfiguration(Long id) {
         return projectGitConfigurationService.fetchProjectGitConfiguration(id)
             .map(projectGitConfiguration -> conversionService.convert(
@@ -55,6 +57,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'WorkspaceRole', 'VIEWER')")
     public ResponseEntity<List<ProjectGitConfigurationModel>> getWorkspaceProjectGitConfigurations(Long id) {
         return ResponseEntity.ok(
             projectGitConfigurationService.getWorkspaceProjectGitConfigurations(id)
@@ -65,11 +68,13 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'DEPLOYMENT_PULL')")
     public ResponseEntity<List<String>> getProjectRemoteBranches(Long id) {
         return ResponseEntity.ok(projectGitFacade.getRemoteBranches(id));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'DEPLOYMENT_PULL')")
     public ResponseEntity<Void> pullProjectFromGit(Long id) {
         projectGitFacade.pullProjectFromGit(id);
 
@@ -77,6 +82,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'PROJECT_SETTINGS')")
     public ResponseEntity<Void> updateProjectGitConfiguration(
         Long id, ProjectGitConfigurationModel projectGitConfigurationModel) {
 
