@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SEARCH_PROPERTIES;
 import static com.bytechef.component.definition.ComponentDsl.action;
@@ -69,7 +69,7 @@ public abstract class AbstractSearchAction {
                 Stream
                     .of(
                         Stream.of(QUERY_PROPERTY), properties.stream(),
-                        Stream.of(METADATA_PROPERTY), SEARCH_PROPERTIES.stream())
+                        Stream.of(METADATA_FILTER_PROPERTY), SEARCH_PROPERTIES.stream())
                     .flatMap(stream -> stream)
                     .toList())
             .output()

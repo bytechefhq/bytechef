@@ -18,7 +18,6 @@ package com.bytechef.component.ai.vectorstore.knowledgebase;
 
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
 import static com.bytechef.component.definition.ComponentDsl.component;
-import static com.bytechef.component.definition.ComponentDsl.tool;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
@@ -29,7 +28,7 @@ import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseS
 import com.bytechef.component.ai.vectorstore.knowledgebase.action.KnowledgeBaseUpdateAction;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseSearchTool;
 import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseUpdateTool;
-import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;

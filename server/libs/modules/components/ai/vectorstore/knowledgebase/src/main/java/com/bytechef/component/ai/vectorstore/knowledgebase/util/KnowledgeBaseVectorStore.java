@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
+package com.bytechef.component.ai.vectorstore.knowledgebase.util;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
@@ -33,7 +33,6 @@ import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstant
 import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
-import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -49,7 +48,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -214,7 +213,7 @@ public final class KnowledgeBaseVectorStore {
                     metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
 
                     Map<String, Object> userMetadata = inputParameters.getMap(
-                        METADATA, new TypeReference<>() {});
+                        ADDITIONAL_METADATA, new TypeReference<>() {});
 
                     metadata.putAll(userMetadata);
 
@@ -270,12 +269,12 @@ public final class KnowledgeBaseVectorStore {
             Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
             Long knowledgeBaseId, DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
-            List<Map<String, Object>> metadata = inputParameters.getList(METADATA, new TypeReference<>() {});
+            List<Map<String, Object>> metadata = inputParameters.getList(METADATA_FILTER, new TypeReference<>() {});
 
             Map<String, Object> deleteParametersMap = new HashMap<>();
 
             deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            deleteParametersMap.put(METADATA, metadata);
+            deleteParametersMap.put(METADATA_FILTER, metadata);
 
             delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
 
@@ -337,14 +336,14 @@ public final class KnowledgeBaseVectorStore {
             Map<String, Object> deleteParametersMap = new HashMap<>();
 
             deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            deleteParametersMap.put(METADATA, metadataFilters);
+            deleteParametersMap.put(ADDITIONAL_METADATA, metadataFilters);
 
             delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
 
             Map<String, Object> loadParametersMap = new HashMap<>();
 
             loadParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            loadParametersMap.put(METADATA, loadMetadata);
+            loadParametersMap.put(ADDITIONAL_METADATA, loadMetadata);
 
             load(ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel,
                 documentReader, documentTransformers);
