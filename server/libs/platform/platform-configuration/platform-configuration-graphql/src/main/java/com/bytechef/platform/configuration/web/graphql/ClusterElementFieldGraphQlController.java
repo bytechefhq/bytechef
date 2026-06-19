@@ -24,6 +24,7 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -45,6 +46,7 @@ class ClusterElementFieldGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("#connectionId == null or hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_USE')")
     public List<Field> clusterElementFields(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument @Nullable Long connectionId, @Argument @Nullable Map<String, ?> inputParameters) {

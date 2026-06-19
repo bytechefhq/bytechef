@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -39,6 +40,7 @@ class ClusterElementDynamicPropertiesGraphQlController {
     }
 
     @QueryMapping
+    @PreAuthorize("#connectionId == null or hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_USE')")
     public List<Property> clusterElementDynamicProperties(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument String propertyName, @Argument Long connectionId, @Argument Map<String, ?> inputParameters,
