@@ -17,6 +17,9 @@
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;
@@ -29,6 +32,7 @@ import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstant
 import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
@@ -44,6 +48,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -243,6 +248,58 @@ public final class KnowledgeBaseVectorStore {
 
                 throw exception;
             }
+        }
+
+        @Override
+        public void update(
+            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
+            DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+
+            Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+            Long knowledgeBaseDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
+            Long knowledgeBaseDocumentChunkId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
+
+            Map<String, Object> deleteFilter = new HashMap<>();
+
+            if (knowledgeBaseDocumentChunkId != null) {
+                deleteFilter.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
+            } else if (knowledgeBaseDocumentId != null) {
+                deleteFilter.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
+            }
+
+            List<Map<String, Object>> metadataFilters = deleteFilter.isEmpty() ? List.of() : List.of(deleteFilter);
+
+            Map<String, Object> deleteParametersMap = new HashMap<>();
+
+            deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
+            deleteParametersMap.put(METADATA, metadataFilters);
+
+            delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
+
+            List<Map<String, Object>> additionalMetadata = inputParameters.getList(
+                ADDITIONAL_METADATA, new TypeReference<>() {});
+
+            List<Map<String, Object>> loadMetadata = new ArrayList<>();
+
+            Map<String, Object> inheritedMetadata = new HashMap<>(deleteFilter);
+
+            inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
+
+            if (!inheritedMetadata.isEmpty()) {
+                loadMetadata.add(inheritedMetadata);
+            }
+
+            if (additionalMetadata != null) {
+                loadMetadata.addAll(additionalMetadata);
+            }
+
+            Map<String, Object> loadParametersMap = new HashMap<>();
+
+            loadParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
+            loadParametersMap.put(METADATA, loadMetadata);
+
+            load(ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel,
+                documentReader, documentTransformers);
         }
 
         @Override

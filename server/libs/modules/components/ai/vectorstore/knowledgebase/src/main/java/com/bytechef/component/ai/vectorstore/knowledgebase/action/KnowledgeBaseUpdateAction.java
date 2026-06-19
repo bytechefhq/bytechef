@@ -16,21 +16,31 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.CONTENT;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
+import static com.bytechef.component.definition.ComponentDsl.array;
+import static com.bytechef.component.definition.ComponentDsl.bool;
+import static com.bytechef.component.definition.ComponentDsl.date;
+import static com.bytechef.component.definition.ComponentDsl.dateTime;
 import static com.bytechef.component.definition.ComponentDsl.integer;
-import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.component.definition.ComponentDsl.number;
+import static com.bytechef.component.definition.ComponentDsl.object;
+import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.ComponentDsl.time;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.UPDATE;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentReaderFunction.DOCUMENT_READER;
 import static com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransformerFunction.DOCUMENT_TRANSFORMER;
 
 import com.bytechef.component.ai.vectorstore.VectorStore;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseOptionsUtils;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
-import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -43,15 +53,13 @@ import com.bytechef.platform.component.definition.ai.vectorstore.DocumentTransfo
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
-import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 
@@ -70,45 +78,69 @@ public final class KnowledgeBaseUpdateAction {
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
 
-        VectorStore deleteVectorStore = createVectorStore(vectorStore);
-        VectorStore loadVectorStore = createVectorStore(
+        VectorStore updateVectorStore = createVectorStore(
             knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
             knowledgeBaseService, vectorStore);
 
         return action(UPDATE)
             .title("Update Documents")
             .description(
-                "Updates documents in the knowledge base by deleting existing ones matching the metadata filter " +
-                    "and loading new ones.")
+                "Updates documents in the knowledge base by deleting existing ones matching the selected " +
+                    "document or chunk and loading new ones.")
             .properties(
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to update documents in.")
-                    .options(getKnowledgeBaseOptions(knowledgeBaseService))
+                    .options(KnowledgeBaseOptionsUtils.knowledgeBaseActionOptions(knowledgeBaseService))
                     .required(true),
-                METADATA_PROPERTY)
+                integer(KNOWLEDGE_BASE_DOCUMENT_ID)
+                    .label("Document")
+                    .description("The document to update in the knowledge base.")
+                    .options(KnowledgeBaseOptionsUtils.documentActionOptions(knowledgeBaseDocumentService))
+                    .optionsLookupDependsOn(KNOWLEDGE_BASE_ID)
+                    .required(false),
+                integer(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID)
+                    .label("Document Chunk")
+                    .description(
+                        "The specific chunk to update. If not selected, all chunks of the selected document " +
+                            "will be replaced.")
+                    .options(KnowledgeBaseOptionsUtils.documentChunkActionOptions(knowledgeBaseDocumentChunkService))
+                    .optionsLookupDependsOn(KNOWLEDGE_BASE_DOCUMENT_ID)
+                    .required(false),
+                array(ADDITIONAL_METADATA)
+                    .label("Additional Metadata")
+                    .description("Additional metadata key-value pairs to add to the stored documents.")
+                    .items(object().additionalProperties(string(), integer(), number(), bool(), dateTime(), date(),
+                        time()))
+                    .required(false),
+                string(CONTENT)
+                    .label("Content")
+                    .description(
+                        "The text content to update the knowledge base with. If not provided, uses the configured " +
+                            "document reader.")
+                    .required(false))
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
-                    inputParameters, componentConnections, extensions, context, deleteVectorStore, loadVectorStore,
-                    clusterElementDefinitionService));
+                    inputParameters, componentConnections, extensions, context, updateVectorStore, clusterElementDefinitionService));
     }
 
     private static Object perform(
         Parameters inputParameters, Map<String, ComponentConnection> componentConnections, Parameters extensions,
-        ActionContext context, VectorStore deleteVectorStore, VectorStore loadVectorStore,
+        ActionContext context, VectorStore updateVectorStore,
         ClusterElementDefinitionService clusterElementDefinitionService) {
 
-        ComponentConnection vectorStoreComponentConnection = componentConnections.get(KNOWLEDGE_BASE);
+        String content = inputParameters.getString(CONTENT);
 
-        deleteVectorStore.delete(inputParameters, ParametersFactory.create(Map.of()), null);
+        DocumentReader documentReader = content != null
+            ? () -> List.of(new Document(content))
+            : getDocumentReader(extensions, componentConnections, context, clusterElementDefinitionService);
 
-        loadVectorStore.load(
-            inputParameters,
-            ParametersFactory.create(
-                vectorStoreComponentConnection == null ? Map.of() : vectorStoreComponentConnection.getParameters()),
-            null,
-            getDocumentReader(extensions, componentConnections, context, clusterElementDefinitionService),
-            getDocumentTransformers(extensions, componentConnections, clusterElementDefinitionService));
+        List<DocumentTransformer> documentTransformers = content != null
+            ? List.of()
+            : getDocumentTransformers(extensions, componentConnections, clusterElementDefinitionService);
+
+        updateVectorStore.update(inputParameters, ParametersFactory.create(Map.of()), null,
+            documentReader, documentTransformers);
 
         return null;
     }
@@ -170,27 +202,4 @@ public final class KnowledgeBaseUpdateAction {
             .toList();
     }
 
-    private static ActionDefinition.OptionsFunction<Long> getKnowledgeBaseOptions(
-        KnowledgeBaseService knowledgeBaseService) {
-
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> {
-            List<Option<Long>> options = new ArrayList<>();
-
-            List<KnowledgeBase> knowledgeBases = knowledgeBaseService.getKnowledgeBases();
-
-            for (KnowledgeBase knowledgeBase : knowledgeBases) {
-                String knowledgeBaseName = knowledgeBase.getName();
-
-                String knowledgeBaseNameLowerCase = knowledgeBaseName.toLowerCase(Locale.ROOT);
-
-                if (searchText == null || knowledgeBaseNameLowerCase.contains(searchText.toLowerCase(Locale.ROOT))) {
-                    Long knowledgeBaseId = knowledgeBase.getId();
-
-                    options.add(option(knowledgeBaseName, knowledgeBaseId.longValue()));
-                }
-            }
-
-            return options;
-        };
-    }
 }
