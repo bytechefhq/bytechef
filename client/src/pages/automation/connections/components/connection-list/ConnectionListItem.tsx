@@ -30,13 +30,10 @@ import {
     useUpdateConnectionMutation,
 } from '@/shared/mutations/automation/connections.mutations';
 import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
-import {
-    ComponentDefinitionKeys,
-    useGetConnectionComponentDefinitionQuery,
-} from '@/shared/queries/platform/componentDefinitions.queries';
+import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ComponentIcon, EditIcon, EllipsisVerticalIcon, Link2OffIcon, Trash2Icon} from 'lucide-react';
-import {memo, useState} from 'react';
+import {memo, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 
 import TagList from '../../../../../shared/components/TagList';
@@ -51,11 +48,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     const [showEditDialog, setShowEditDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [showDisconnectDialog, setShowDisconnectDialog] = useState(false);
-
-    const {data: componentDefinition} = useGetConnectionComponentDefinitionQuery({
-        componentName: connection.componentName,
-        connectionVersion: connection.connectionVersion,
-    });
 
     const queryClient = useQueryClient();
 
@@ -109,6 +101,11 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         },
     });
 
+    const componentDefinition = useMemo(
+        () => componentDefinitions.find((definition) => definition.name === connection.componentName),
+        [componentDefinitions, connection.componentName]
+    );
+
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
             deleteConnectionMutation.mutate(connection.id);
@@ -121,10 +118,6 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         }
     };
 
-    if (!componentDefinition) {
-        return <></>;
-    }
-
     return (
         <li key={connection.id}>
             <>
@@ -133,11 +126,15 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex items-center gap-2">
-                                    <LazyLoadSVG
-                                        className="size-5 flex-none"
-                                        preloader={<ComponentIcon />}
-                                        src={componentDefinition.icon!}
-                                    />
+                                    {componentDefinition?.icon ? (
+                                        <LazyLoadSVG
+                                            className="size-5 flex-none"
+                                            preloader={<ComponentIcon />}
+                                            src={componentDefinition.icon}
+                                        />
+                                    ) : (
+                                        <ComponentIcon className="size-5 flex-none" />
+                                    )}
 
                                     <span className="text-base font-semibold">{connection.name}</span>
                                 </div>
