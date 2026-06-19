@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +49,13 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
+        dataTableService.addColumn(dataTableService.getBaseNameById(dataTableId), columnSpec, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
     public void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
 
@@ -59,7 +67,20 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void dropTable(long dataTableId, long environmentId) {
+        dataTableService.dropTable(dataTableService.getBaseNameById(dataTableId), environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void duplicateTable(long dataTableId, String newBaseName, long environmentId) {
+        dataTableService.duplicateTable(dataTableService.getBaseNameById(dataTableId), newBaseName, environmentId);
+    }
+
+    @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
 
@@ -72,5 +93,24 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
         return dataTableInfos.stream()
             .filter(dataTableInfo -> dataTableInfo.id() != null && dataTableIds.contains(dataTableInfo.id()))
             .toList();
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void removeColumn(long dataTableId, String columnName, long environmentId) {
+        dataTableService.removeColumn(dataTableService.getBaseNameById(dataTableId), columnName, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId) {
+        dataTableService.renameColumn(
+            dataTableService.getBaseNameById(dataTableId), fromColumnName, newName, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void renameTable(long dataTableId, String newBaseName, long environmentId) {
+        dataTableService.renameTable(dataTableService.getBaseNameById(dataTableId), newBaseName, environmentId);
     }
 }

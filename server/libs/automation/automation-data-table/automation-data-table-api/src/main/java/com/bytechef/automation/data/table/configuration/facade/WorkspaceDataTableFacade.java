@@ -28,8 +28,20 @@ import java.util.List;
  */
 public interface WorkspaceDataTableFacade {
 
+    void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId);
+
     void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId);
 
+    void dropTable(long dataTableId, long environmentId);
+
+    void duplicateTable(long dataTableId, String newBaseName, long environmentId);
+
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
+
+    void removeColumn(long dataTableId, String columnName, long environmentId);
+
+    void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId);
+
+    void renameTable(long dataTableId, String newBaseName, long environmentId);
 }

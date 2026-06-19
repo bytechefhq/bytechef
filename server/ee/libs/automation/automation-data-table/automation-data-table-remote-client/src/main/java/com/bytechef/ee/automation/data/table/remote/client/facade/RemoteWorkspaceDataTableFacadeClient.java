@@ -24,6 +24,11 @@ import org.springframework.stereotype.Component;
 public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableFacade {
 
     @Override
+    public void addColumn(long dataTableId, ColumnSpec columnSpec, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void createTable(
         String baseName, String description, List<ColumnSpec> columnSpecs, long workspaceId, long environmentId) {
 
@@ -31,7 +36,32 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
+    public void dropTable(long dataTableId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void duplicateTable(long dataTableId, String newBaseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void removeColumn(long dataTableId, String columnName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void renameTable(long dataTableId, String newBaseName, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

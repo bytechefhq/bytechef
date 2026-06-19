@@ -25,7 +25,6 @@ import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
-import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -34,7 +33,6 @@ import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -47,21 +45,17 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class DataTableGraphQlController {
 
-    private final DataTableService dataTableService;
     private final EnvironmentService environmentService;
     private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     public DataTableGraphQlController(
-        DataTableService dataTableService, EnvironmentService environmentService,
-        WorkspaceDataTableFacade workspaceDataTableFacade) {
+        EnvironmentService environmentService, WorkspaceDataTableFacade workspaceDataTableFacade) {
 
-        this.dataTableService = dataTableService;
         this.environmentService = environmentService;
         this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.workspaceId, 'WorkspaceRole', 'EDITOR')")
     public boolean createDataTable(@Argument CreateDataTableInput input) {
         Long environmentId = input.environmentId();
 
@@ -79,22 +73,16 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean addDataTableColumn(@Argument AddColumnInput input) {
-        Long environmentId = input.environmentId();
+        Environment environment = environmentService.getEnvironment(input.environmentId());
 
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        ColumnInput columnInput = input.column();
-
-        dataTableService.addColumn(baseName, columnInput.toSpec(), environment.ordinal());
+        workspaceDataTableFacade.addColumn(input.tableId(), input.column()
+            .toSpec(), environment.ordinal());
 
         return true;
     }
 
     @QueryMapping
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
     public List<DataTable> dataTables(@Argument Long environmentId, @Argument Long workspaceId) {
         Environment environment = environmentService.getEnvironment(environmentId);
 
@@ -117,68 +105,48 @@ public class DataTableGraphQlController {
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean dropDataTable(@Argument RemoveTableInput input) {
-        Long environmentId = input.environmentId();
+        Environment environment = environmentService.getEnvironment(input.environmentId());
 
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableService.dropTable(baseName, environment.ordinal());
+        workspaceDataTableFacade.dropTable(input.tableId(), environment.ordinal());
 
         return true;
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean duplicateDataTable(@Argument DuplicateDataTableInput input) {
-        Long environmentId = input.environmentId();
+        Environment environment = environmentService.getEnvironment(input.environmentId());
 
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableService.duplicateTable(baseName, input.newBaseName(), environment.ordinal());
+        workspaceDataTableFacade.duplicateTable(input.tableId(), input.newBaseName(), environment.ordinal());
 
         return true;
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean removeDataTableColumn(@Argument RemoveColumnInput input) {
-        Long environmentId = input.environmentId();
-
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
+        Environment environment = environmentService.getEnvironment(input.environmentId());
         String columnName = new String(urlDecodeBase64FromString(input.columnId()), UTF_8);
 
-        dataTableService.removeColumn(baseName, columnName, environment.ordinal());
+        workspaceDataTableFacade.removeColumn(input.tableId(), columnName, environment.ordinal());
 
         return true;
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean renameDataTableColumn(@Argument RenameColumnInput input) {
-        Long environmentId = input.environmentId();
-
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
+        Environment environment = environmentService.getEnvironment(input.environmentId());
         String fromColumnName = new String(urlDecodeBase64FromString(input.columnId()), UTF_8);
 
-        dataTableService.renameColumn(baseName, fromColumnName, input.newName(), environment.ordinal());
+        workspaceDataTableFacade.renameColumn(input.tableId(), fromColumnName, input.newName(), environment.ordinal());
 
         return true;
     }
 
     @MutationMapping
-    @PreAuthorize("hasPermission(#input.tableId, 'DataTable:ResourceRole', 'EDITOR')")
     public boolean renameDataTable(@Argument RenameDataTableInput input) {
-        Long environmentId = input.environmentId();
+        Environment environment = environmentService.getEnvironment(input.environmentId());
 
-        Environment environment = environmentService.getEnvironment(environmentId);
-        String baseName = dataTableService.getBaseNameById(input.tableId());
-
-        dataTableService.renameTable(baseName, input.newBaseName(), environment.ordinal());
+        workspaceDataTableFacade.renameTable(input.tableId(), input.newBaseName(), environment.ordinal());
 
         return true;
     }
