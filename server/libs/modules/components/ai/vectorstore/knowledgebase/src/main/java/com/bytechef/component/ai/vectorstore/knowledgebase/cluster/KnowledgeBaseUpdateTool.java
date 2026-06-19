@@ -42,6 +42,7 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.agent.MultipleConnectionsToolFunction;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
@@ -60,6 +61,7 @@ public class KnowledgeBaseUpdateTool {
 
     public static ClusterElementDefinition<MultipleConnectionsToolFunction> of(
         org.springframework.ai.vectorstore.VectorStore vectorStore,
+        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService) {
@@ -95,7 +97,7 @@ public class KnowledgeBaseUpdateTool {
                     .description(
                         "The specific chunk to update. If not selected, all chunks of the selected document " +
                             "will be replaced.")
-                    .options(KnowledgeBaseOptionsUtils.documentChunkOptions(knowledgeBaseDocumentChunkService))
+                    .options(KnowledgeBaseOptionsUtils.documentChunkOptions(knowledgeBaseDocumentChunkFacade))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_DOCUMENT_ID)
                     .required(false),
                 object(ADDITIONAL_METADATA)

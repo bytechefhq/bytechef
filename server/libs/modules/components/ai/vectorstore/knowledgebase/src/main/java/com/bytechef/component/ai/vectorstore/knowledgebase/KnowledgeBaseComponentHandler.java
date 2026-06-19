@@ -35,6 +35,7 @@ import com.bytechef.component.definition.ComponentDefinition;
 import com.bytechef.platform.component.definition.AbstractComponentDefinitionWrapper;
 import com.bytechef.platform.component.definition.VectorStoreComponentDefinition;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
@@ -60,6 +61,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
     public KnowledgeBaseComponentHandler(
         ClusterElementDefinitionService clusterElementDefinitionService,
+        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
@@ -68,8 +70,9 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
         this.componentDefinition =
             new KnowledgeBaseVectorStoreComponentDefinitionImpl(
-                clusterElementDefinitionService, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                knowledgeBaseDocumentTagService, knowledgeBaseFileStorage, knowledgeBaseService, vectorStore);
+                clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
+                knowledgeBaseDocumentService, knowledgeBaseDocumentTagService, knowledgeBaseFileStorage,
+                knowledgeBaseService, vectorStore);
     }
 
     @Override
@@ -82,6 +85,7 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
 
         public KnowledgeBaseVectorStoreComponentDefinitionImpl(
             ClusterElementDefinitionService clusterElementDefinitionService,
+            KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
             KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
             KnowledgeBaseDocumentService knowledgeBaseDocumentService,
             KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
@@ -104,14 +108,15 @@ public class KnowledgeBaseComponentHandler implements ComponentHandler {
                         KnowledgeBaseSearchAction.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseUpdateAction.of(
-                            vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkService,
-                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService))
+                            vectorStore, clusterElementDefinitionService, knowledgeBaseDocumentChunkFacade,
+                            knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService, knowledgeBaseFileStorage,
+                            knowledgeBaseService))
                     .clusterElements(
                         KnowledgeBaseSearchTool.of(
                             vectorStore, knowledgeBaseService, knowledgeBaseDocumentTagService),
                         KnowledgeBaseUpdateTool.of(
-                            vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
-                            knowledgeBaseFileStorage, knowledgeBaseService),
+                            vectorStore, knowledgeBaseDocumentChunkFacade, knowledgeBaseDocumentChunkService,
+                            knowledgeBaseDocumentService, knowledgeBaseFileStorage, knowledgeBaseService),
                         KnowledgeBaseVectorStore.of(
                             vectorStore, knowledgeBaseDocumentChunkService, knowledgeBaseDocumentService,
                             knowledgeBaseFileStorage, knowledgeBaseService, knowledgeBaseDocumentTagService)));
