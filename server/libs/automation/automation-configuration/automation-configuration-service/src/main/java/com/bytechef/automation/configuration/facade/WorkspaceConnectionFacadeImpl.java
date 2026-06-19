@@ -39,6 +39,7 @@ import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -169,6 +170,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     }
 
     @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_DELETE')")
     public void delete(long connectionId) {
         // Cancel any pending OAuth refresh job before deleting any rows. If this fails, abort: a leftover
         // scheduled refresh that fires against a deleted connection wakes up the scheduler with no row to
@@ -196,6 +198,26 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_VIEW')")
+    public ConnectionDTO getConnection(long connectionId) {
+        return connectionFacade.getConnection(connectionId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_EDIT')")
+    public void update(long connectionId, String name, List<Tag> tags, int version) {
+        connectionFacade.update(connectionId, name, tags, version);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_EDIT')")
+    public void updateTags(long connectionId, List<Tag> tags) {
+        connectionFacade.update(connectionId, tags);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceScope', 'CONNECTION_VIEW')")
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 

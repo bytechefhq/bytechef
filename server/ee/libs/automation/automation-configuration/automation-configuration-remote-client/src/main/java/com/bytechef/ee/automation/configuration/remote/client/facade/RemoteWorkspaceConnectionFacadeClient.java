@@ -12,6 +12,7 @@ import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 import org.springframework.stereotype.Component;
 
@@ -47,6 +48,11 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
+    public ConnectionDTO getConnection(long connectionId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long connectionEnvironment,
         Long tagId) {
@@ -56,6 +62,17 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
 
     @Override
     public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
+    public void update(long connectionId, String name, List<Tag> tags, int version) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateTags(long connectionId, List<Tag> tags) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public ResourceVisibility promoteToWorkspace(long workspaceId, long connectionId) {
         throw new UnsupportedOperationException();
     }
 

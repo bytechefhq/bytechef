@@ -18,6 +18,7 @@ package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.credential.store.CredentialStoreType;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
 
 /**
@@ -39,6 +40,12 @@ public interface WorkspaceConnectionFacade {
 
     void disconnectConnection(long connectionId);
 
+    ConnectionDTO getConnection(long connectionId);
+
     List<ConnectionDTO> getConnections(
         long workspaceId, String componentName, Integer connectionVersion, Long environmentId, Long tagId);
+
+    void update(long connectionId, String name, List<Tag> tags, int version);
+
+    void updateTags(long connectionId, List<Tag> tags);
 }

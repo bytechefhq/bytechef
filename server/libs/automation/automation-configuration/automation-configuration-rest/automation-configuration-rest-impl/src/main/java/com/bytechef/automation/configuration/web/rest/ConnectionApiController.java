@@ -23,7 +23,6 @@ import com.bytechef.automation.configuration.web.rest.model.RegisterExistingConn
 import com.bytechef.automation.configuration.web.rest.model.UpdateConnectionRequestModel;
 import com.bytechef.commons.util.ObfuscateUtils;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
-import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.credential.store.CredentialStoreType;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -44,16 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class ConnectionApiController implements ConnectionApi {
 
-    private final ConnectionFacade connectionFacade;
     private final ConversionService conversionService;
     private final WorkspaceConnectionFacade workspaceConnectionFacade;
 
     @SuppressFBWarnings("EI")
     public ConnectionApiController(
-        ConnectionFacade connectionFacade, ConversionService conversionService,
-        WorkspaceConnectionFacade workspaceConnectionFacade) {
+        ConversionService conversionService, WorkspaceConnectionFacade workspaceConnectionFacade) {
 
-        this.connectionFacade = connectionFacade;
         this.conversionService = conversionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
     }
@@ -109,7 +105,6 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_DELETE')")
     public ResponseEntity<Void> deleteConnection(Long id) {
         workspaceConnectionFacade.delete(id);
 
@@ -118,13 +113,12 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_VIEW')")
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
-        return ResponseEntity.ok(toConnectionModel(connectionFacade.getConnection(Validate.notNull(id, "id"))));
+        return ResponseEntity.ok(
+            toConnectionModel(workspaceConnectionFacade.getConnection(Validate.notNull(id, "id"))));
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'WorkspaceScope', 'CONNECTION_VIEW')")
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
         Long id, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
@@ -137,7 +131,6 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_EDIT')")
     public ResponseEntity<Void> updateConnection(
         Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
         List<Tag> list = updateConnectionRequestModel.getTags()
@@ -145,7 +138,7 @@ public class ConnectionApiController implements ConnectionApi {
             .map(tagModel -> conversionService.convert(tagModel, Tag.class))
             .toList();
 
-        connectionFacade.update(
+        workspaceConnectionFacade.update(
             id, updateConnectionRequestModel.getName(), list,
             Objects.requireNonNull(updateConnectionRequestModel.getVersion()));
 
