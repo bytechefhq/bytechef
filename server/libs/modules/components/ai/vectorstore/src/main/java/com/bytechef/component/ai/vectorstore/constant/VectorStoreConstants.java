@@ -48,7 +48,8 @@ public class VectorStoreConstants {
 
     public static final Property METADATA_FILTER_PROPERTY = array(METADATA_FILTER)
         .label("Metadata Filter")
-        .description("List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.")
+        .description(
+            "List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.")
         .items(
             object()
                 .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time()))

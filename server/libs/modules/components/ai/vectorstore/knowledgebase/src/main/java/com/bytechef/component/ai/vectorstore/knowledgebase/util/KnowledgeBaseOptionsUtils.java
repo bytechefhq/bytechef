@@ -48,50 +48,55 @@ public final class KnowledgeBaseOptionsUtils {
     public static ClusterElementDefinition.OptionsFunction<Long> knowledgeBaseOptions(
         KnowledgeBaseService knowledgeBaseService) {
 
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
+        return (
+            inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+            context) -> buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
     }
 
     public static ActionDefinition.OptionsFunction<Long> knowledgeBaseActionOptions(
         KnowledgeBaseService knowledgeBaseService) {
 
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) ->
-            buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
+        return (
+            inputParameters, connectionParameters, dependencyPaths, searchText,
+            context) -> buildKnowledgeBaseOptions(searchText, knowledgeBaseService);
     }
 
     public static ClusterElementDefinition.OptionsFunction<String> tagOptions(
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            buildTagOptions(inputParameters, searchText, knowledgeBaseDocumentTagService);
+        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) -> buildTagOptions(
+            inputParameters, searchText, knowledgeBaseDocumentTagService);
     }
 
     public static ClusterElementDefinition.OptionsFunction<Long> documentOptions(
         KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
 
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            buildDocumentOptions(inputParameters, searchText, knowledgeBaseDocumentService);
+        return (
+            inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+            context) -> buildDocumentOptions(inputParameters, searchText, knowledgeBaseDocumentService);
     }
 
     public static ActionDefinition.OptionsFunction<Long> documentActionOptions(
         KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
 
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) ->
-            buildDocumentOptions(inputParameters, searchText, knowledgeBaseDocumentService);
+        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) -> buildDocumentOptions(
+            inputParameters, searchText, knowledgeBaseDocumentService);
     }
 
     public static ClusterElementDefinition.OptionsFunction<Long> documentChunkOptions(
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
 
-        return (inputParameters, connectionParameters, lookupDependsOnPaths, searchText, context) ->
-            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
+        return (
+            inputParameters, connectionParameters, lookupDependsOnPaths, searchText,
+            context) -> buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
     }
 
     public static ActionDefinition.OptionsFunction<Long> documentChunkActionOptions(
         KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
 
-        return (inputParameters, connectionParameters, dependencyPaths, searchText, context) ->
-            buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
+        return (
+            inputParameters, connectionParameters, dependencyPaths, searchText,
+            context) -> buildDocumentChunkOptions(inputParameters, knowledgeBaseDocumentChunkFacade);
     }
 
     private static List<Option<Long>> buildKnowledgeBaseOptions(
@@ -180,7 +185,8 @@ public final class KnowledgeBaseOptionsUtils {
                 ? (textContent.length() > 50 ? textContent.substring(0, 50) + "..." : textContent)
                 : "Chunk #" + (i + 1);
 
-            options.add(option(label, chunk.getId().longValue()));
+            options.add(option(label, chunk.getId()
+                .longValue()));
         }
 
         return options;
