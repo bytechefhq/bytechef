@@ -119,13 +119,23 @@ public final class KnowledgeBaseVectorStore {
             knowledgeBaseService, vectorStore);
     }
 
-    private static String deriveDocumentName(List<Document> documents) {
+    private static String deriveDocumentName(List<Document> documents, Parameters inputParameters) {
         if (!documents.isEmpty()) {
-            Document document = documents.getFirst();
+            Document document = documents.getLast();
 
             Map<String, Object> metadata = document.getMetadata();
 
             Object filename = metadata.get("filename");
+
+            if (filename != null) {
+                return filename.toString();
+            }
+        }
+
+        Map<String, Object> additionalMetadata = inputParameters.getMap(ADDITIONAL_METADATA, new TypeReference<>() {});
+
+        if (additionalMetadata != null) {
+            Object filename = additionalMetadata.get("filename");
 
             if (filename != null) {
                 return filename.toString();
@@ -184,11 +194,19 @@ public final class KnowledgeBaseVectorStore {
                 documents = documentTransformer.transform(documents);
             }
 
-            KnowledgeBaseDocument knowledgeBaseDocument = new KnowledgeBaseDocument();
+            Long existingDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
 
-            knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBaseId);
-            knowledgeBaseDocument.setName(deriveDocumentName(documents));
-            knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
+            KnowledgeBaseDocument knowledgeBaseDocument;
+
+            if (existingDocumentId != null) {
+                knowledgeBaseDocument = knowledgeBaseDocumentService.getKnowledgeBaseDocument(existingDocumentId);
+                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
+            } else {
+                knowledgeBaseDocument = new KnowledgeBaseDocument();
+                knowledgeBaseDocument.setKnowledgeBaseId(knowledgeBaseId);
+                knowledgeBaseDocument.setName(deriveDocumentName(documents, inputParameters));
+                knowledgeBaseDocument.setStatus(KnowledgeBaseDocument.STATUS_PROCESSING);
+            }
 
             knowledgeBaseDocument = knowledgeBaseDocumentService.saveKnowledgeBaseDocument(knowledgeBaseDocument);
 
@@ -310,7 +328,6 @@ public final class KnowledgeBaseVectorStore {
                     Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst().getMetadata());
 
                     inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
-                    inheritedMetadata.remove("distance");
 
                     if (!inheritedMetadata.isEmpty()) {
                         loadMetadata.putAll(inheritedMetadata);
@@ -322,6 +339,16 @@ public final class KnowledgeBaseVectorStore {
 
             if (additionalMetadata != null && !additionalMetadata.isEmpty()) {
                 loadMetadata.putAll(additionalMetadata);
+            }
+
+            if (knowledgeBaseDocumentChunkId != null) {
+                knowledgeBaseDocumentChunkService.deleteKnowledgeBaseDocumentChunk(knowledgeBaseDocumentChunkId);
+            } else if (knowledgeBaseDocumentId != null) {
+                List<KnowledgeBaseDocumentChunk> existingChunks =
+                    knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(
+                        knowledgeBaseDocumentId);
+
+                knowledgeBaseDocumentChunkService.deleteKnowledgeBaseDocumentChunks(existingChunks);
             }
 
             Map<String, Object> deleteFilter = new HashMap<>();
@@ -337,7 +364,7 @@ public final class KnowledgeBaseVectorStore {
             Map<String, Object> deleteParametersMap = new HashMap<>();
 
             deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
-            deleteParametersMap.put(ADDITIONAL_METADATA, metadataFilters);
+            deleteParametersMap.put(METADATA_FILTER, metadataFilters);
 
             delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
 
@@ -345,6 +372,10 @@ public final class KnowledgeBaseVectorStore {
 
             loadParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
             loadParametersMap.put(ADDITIONAL_METADATA, loadMetadata);
+
+            if (knowledgeBaseDocumentId != null) {
+                loadParametersMap.put(KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
+            }
 
             load(ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel,
                 documentReader, documentTransformers);
