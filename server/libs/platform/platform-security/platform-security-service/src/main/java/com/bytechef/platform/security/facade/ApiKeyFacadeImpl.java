@@ -22,6 +22,7 @@ import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,6 +43,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public ApiKey create(ApiKey apiKey, PlatformType type) {
         User user = userService.getCurrentUser();
 
@@ -52,26 +54,31 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')")
     public void delete(long id) {
         apiKeyService.delete(id);
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public java.util.List<ApiKey> getAdminApiKeys(long environmentId) {
         return apiKeyService.getApiKeys(environmentId, null);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')")
     public ApiKey getApiKey(long id) {
         return apiKeyService.getApiKey(id);
     }
 
     @Override
+    @PreAuthorize("isAuthenticated()")
     public java.util.List<ApiKey> getApiKeys(long environmentId, PlatformType type) {
         return apiKeyService.getApiKeys(environmentId, type);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#apiKey.id, 'ApiKey:ResourceOwner', 'SELF')")
     public ApiKey update(ApiKey apiKey) {
         return apiKeyService.update(apiKey);
     }
