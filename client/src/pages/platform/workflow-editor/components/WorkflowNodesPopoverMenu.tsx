@@ -1,4 +1,4 @@
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Popover, PopoverAnchor, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDefinition, ComponentDefinitionApi} from '@/shared/middleware/platform/configuration';
 import {ComponentDefinitionKeys} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ClickedDefinitionType} from '@/shared/types';
@@ -162,9 +162,13 @@ const WorkflowNodesPopoverMenu = ({
             onOpenChange={handlePopoverOpenChange}
             open={popoverOpen}
         >
-            <PopoverTrigger asChild onClick={handleStopPropagation}>
-                {children}
-            </PopoverTrigger>
+            {children ? (
+                <PopoverTrigger asChild onClick={handleStopPropagation}>
+                    {children}
+                </PopoverTrigger>
+            ) : (
+                <PopoverAnchor />
+            )}
 
             <PopoverContent
                 align="start"
