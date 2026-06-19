@@ -22,7 +22,6 @@ import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.Knowl
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
-import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
@@ -92,11 +91,10 @@ public class KnowledgeBaseUpdateTool {
                     .options(KnowledgeBaseOptionsUtils.documentChunkOptions(knowledgeBaseDocumentChunkService))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_DOCUMENT_ID)
                     .required(false),
-                array(ADDITIONAL_METADATA)
+                object(ADDITIONAL_METADATA)
                     .label("Additional Metadata")
                     .description("Additional metadata key-value pairs to add to the stored documents.")
-                    .items(object().additionalProperties(string(), integer(), number(), bool(), dateTime(), date(),
-                        time()))
+                    .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
                     .required(false),
                 string(CONTENT)
                     .label("Content")

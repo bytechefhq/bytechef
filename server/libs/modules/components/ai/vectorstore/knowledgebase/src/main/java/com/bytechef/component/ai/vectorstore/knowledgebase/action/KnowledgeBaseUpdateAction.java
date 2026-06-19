@@ -16,9 +16,11 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.CONTENT;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
@@ -88,6 +90,10 @@ public final class KnowledgeBaseUpdateAction {
                 "Updates documents in the knowledge base by deleting existing ones matching the selected " +
                     "document or chunk and loading new ones.")
             .properties(
+                bool(IS_MULTIPLE)
+                    .label("Update Multiple")
+                    .description("Whether to update multiple documents or chunks.")
+                    .required(true),
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to update documents in.")
@@ -98,6 +104,7 @@ public final class KnowledgeBaseUpdateAction {
                     .description("The document to update in the knowledge base.")
                     .options(KnowledgeBaseOptionsUtils.documentActionOptions(knowledgeBaseDocumentService))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_ID)
+                    .displayCondition(IS_MULTIPLE + "== false")
                     .required(false),
                 integer(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID)
                     .label("Document Chunk")
@@ -106,12 +113,20 @@ public final class KnowledgeBaseUpdateAction {
                             "will be replaced.")
                     .options(KnowledgeBaseOptionsUtils.documentChunkActionOptions(knowledgeBaseDocumentChunkService))
                     .optionsLookupDependsOn(KNOWLEDGE_BASE_DOCUMENT_ID)
+                    .displayCondition(IS_MULTIPLE + "== false")
                     .required(false),
-                array(ADDITIONAL_METADATA)
+                object(ADDITIONAL_METADATA)
+                    .label("Additional Metadata")
+                    .description("Additional metadata key-value pairs to add to the stored documents.")
+                    .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
+                    .displayCondition(IS_MULTIPLE + "== false")
+                    .required(false),
+                array(METADATA)
                     .label("Additional Metadata")
                     .description("Additional metadata key-value pairs to add to the stored documents.")
                     .items(object().additionalProperties(string(), integer(), number(), bool(), dateTime(), date(),
                         time()))
+                    .displayCondition(IS_MULTIPLE + "== true")
                     .required(false),
                 string(CONTENT)
                     .label("Content")

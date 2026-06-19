@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
@@ -89,7 +90,7 @@ public final class KnowledgeBaseLoadAction {
                     .description("The knowledge base to load documents into.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
-                METADATA_PROPERTY)
+                ADDITIONAL_METADATA_PROPERTY)
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions,
                 context) -> perform(
