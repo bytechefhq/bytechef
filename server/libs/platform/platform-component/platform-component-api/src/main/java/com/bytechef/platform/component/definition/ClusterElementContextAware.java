@@ -21,6 +21,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.ComponentConnection;
 import java.util.Map;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Extends the functionality of the {@link ClusterElementContext} and {@link JobContextAware} interfaces to provide
@@ -43,6 +44,20 @@ public interface ClusterElementContextAware extends ClusterElementContext, JobCo
      */
     <T> T resolveClusterElement(
         ClusterElementType clusterElementType, ClusterElementFunction<T> clusterElementFunction);
+
+    /**
+     * Converts the given component details and cluster element information to a nested {@link ClusterElementContext}
+     * suitable for invoking a nested cluster element (e.g. a document reader) from within another cluster element.
+     *
+     * @param componentName       the name of the nested cluster element's component
+     * @param componentVersion    the version of the nested cluster element's component
+     * @param clusterElementName  the name of the nested cluster element
+     * @param componentConnection the connection for the nested cluster element, or null if none
+     * @return a {@link ClusterElementContext} bound to the nested cluster element
+     */
+    ClusterElementContext toClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection);
 
     /**
      * Represents a functional interface for applying operations to a specific cluster element in a cluster processing

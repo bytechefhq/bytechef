@@ -17,6 +17,7 @@
 package com.bytechef.platform.component.context;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ClusterElementContextAware;
@@ -108,6 +109,28 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         return ActionContextImpl
             .builder(
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
+                eventPublisher, httpClientExecutor, tempFileStorage)
+            .componentConnection(componentConnection)
+            .environmentId(environmentId)
+            .jobId(jobId)
+            .jobPrincipalId(jobPrincipalId)
+            .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+            .logFileStorageWriter(logFileStorageWriter)
+            .publicUrl(publicUrl)
+            .taskExecutionId(taskExecutionId)
+            .type(type)
+            .workflowId(workflowId)
+            .build();
+    }
+
+    @Override
+    public ClusterElementContext toClusterElementContext(
+        String componentName, int componentVersion, String clusterElementName,
+        @Nullable ComponentConnection componentConnection) {
+
+        return ClusterElementContextImpl
+            .builder(
+                componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
                 eventPublisher, httpClientExecutor, tempFileStorage)
             .componentConnection(componentConnection)
             .environmentId(environmentId)

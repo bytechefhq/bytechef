@@ -21,7 +21,11 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.constant;
  */
 public final class KnowledgeBaseVectorStoreConstants {
 
+    public static final String ADDITIONAL_METADATA = "additionalMetadata";
+    public static final String CONTENT = "content";
     public static final String KNOWLEDGE_BASE = "knowledgeBase";
+    public static final String KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID = "knowledgeBaseDocumentChunkId";
+    public static final String KNOWLEDGE_BASE_DOCUMENT_ID = "knowledgeBaseDocumentId";
     public static final String KNOWLEDGE_BASE_ID = "knowledgeBaseId";
     public static final String QUERY = "query";
     public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
