@@ -18,7 +18,7 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SEARCH_PROPERTIES;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.TAG_NAMES;

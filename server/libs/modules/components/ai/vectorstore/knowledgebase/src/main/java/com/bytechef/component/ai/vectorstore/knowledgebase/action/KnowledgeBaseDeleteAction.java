@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.component.definition.ComponentDsl.integer;
@@ -59,7 +59,7 @@ public final class KnowledgeBaseDeleteAction {
                     .description("The knowledge base to delete documents from.")
                     .options(getKnowledgeBaseOptions(knowledgeBaseService))
                     .required(true),
-                METADATA_PROPERTY)
+                METADATA_FILTER_PROPERTY)
             .perform((MultipleConnectionsPerformFunction) (
                 inputParameters, componentConnections, extensions, context) -> perform(
                     inputParameters, kbVectorStore));

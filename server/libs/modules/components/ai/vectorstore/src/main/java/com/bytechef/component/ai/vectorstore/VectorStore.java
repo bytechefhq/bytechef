@@ -16,7 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.SIMILARITY_THRESHOLD;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.TOP_K;
@@ -58,7 +59,7 @@ public interface VectorStore {
         }
 
         List<Map<String, Object>> metadataList = inputParameters.getList(
-            METADATA, new TypeReference<>() {});
+            ADDITIONAL_METADATA, new TypeReference<>() {});
 
         if (!metadataList.isEmpty()) {
             Map<String, Object> additionalMetadata = new HashMap<>();
@@ -88,7 +89,7 @@ public interface VectorStore {
             inputParameters, connectionParameters, embeddingModel);
 
         List<Map<String, Object>> metadataFilters = inputParameters.getList(
-            METADATA, new TypeReference<>() {});
+            METADATA_FILTER, new TypeReference<>() {});
 
         Optional<Filter.Expression> filterExpression = Optional.empty();
         if (metadataFilters != null && !metadataFilters.isEmpty()) {
@@ -106,7 +107,7 @@ public interface VectorStore {
             inputParameters, connectionParameters, embeddingModel);
 
         List<Map<String, Object>> metadata = inputParameters.getList(
-            METADATA, new TypeReference<>() {});
+            METADATA_FILTER, new TypeReference<>() {});
 
         Optional<Filter.Expression> filterExpression = Optional.empty();
         if (metadata != null && !metadata.isEmpty()) {

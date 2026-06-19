@@ -16,9 +16,9 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.CONTENT;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE;
@@ -118,14 +118,17 @@ public final class KnowledgeBaseUpdateAction {
                 object(ADDITIONAL_METADATA)
                     .label("Additional Metadata")
                     .description("Additional metadata key-value pairs to add to the stored documents.")
-                    .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
+                    .additionalProperties(
+                        string(), integer(), number(), bool(), dateTime(), date(), time())
                     .displayCondition(IS_MULTIPLE + "== false")
                     .required(false),
-                array(METADATA)
-                    .label("Additional Metadata")
-                    .description("Additional metadata key-value pairs to add to the stored documents.")
-                    .items(object().additionalProperties(string(), integer(), number(), bool(), dateTime(), date(),
-                        time()))
+                array(METADATA_FILTER)
+                    .label("Metadata Filter")
+                    .description("List of metadata key-value pairs to filter by. Entries within a group are AND-ed; groups are OR-ed.")
+                    .items(
+                        object()
+                            .additionalProperties(
+                                string(), integer(), number(), bool(), dateTime(), date(), time()))
                     .displayCondition(IS_MULTIPLE + "== true")
                     .required(false),
                 string(CONTENT)

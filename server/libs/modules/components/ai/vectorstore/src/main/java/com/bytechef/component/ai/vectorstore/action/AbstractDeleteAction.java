@@ -16,7 +16,7 @@
 
 package com.bytechef.component.ai.vectorstore.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER_PROPERTY;
 import static com.bytechef.component.definition.ComponentDsl.action;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.DELETE;
 
@@ -64,7 +64,7 @@ public abstract class AbstractDeleteAction {
             .title("Delete Documents")
             .description("Delete documents from the vector store by metadata")
             .properties(
-                Stream.of(Stream.of(METADATA_PROPERTY), properties.stream())
+                Stream.of(Stream.of(METADATA_FILTER_PROPERTY), properties.stream())
                     .flatMap(stream -> stream)
                     .toList())
             .perform((MultipleConnectionsPerformFunction) deleteAction::perform);

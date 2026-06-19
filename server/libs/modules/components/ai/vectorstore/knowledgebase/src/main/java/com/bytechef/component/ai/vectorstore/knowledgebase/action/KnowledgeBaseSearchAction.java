@@ -16,8 +16,8 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.action;
 
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
-import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_PROPERTY;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER_PROPERTY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.QUERY;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.SIMILARITY_THRESHOLD;
@@ -31,7 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.platform.component.definition.VectorStoreComponentDefinition.SEARCH;
 
-import com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStoreWrapper;
+import com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStoreWrapper;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -93,7 +93,7 @@ public final class KnowledgeBaseSearchAction {
                     .items(string())
                     .options(getTagOptions(knowledgeBaseDocumentTagService))
                     .required(false),
-                METADATA_PROPERTY,
+                METADATA_FILTER_PROPERTY,
                 integer(TOP_K)
                     .label("Top K")
                     .description("Maximum number of results to return.")
@@ -116,7 +116,7 @@ public final class KnowledgeBaseSearchAction {
         Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
         String query = inputParameters.getString(QUERY);
         List<String> tagNames = inputParameters.getList(TAG_NAMES, String.class);
-        List<Map<String, Object>> metadataFilters = inputParameters.getList(METADATA, new TypeReference<>() {});
+        List<Map<String, Object>> metadataFilters = inputParameters.getList(METADATA_FILTER, new TypeReference<>() {});
         int topK = inputParameters.getInteger(TOP_K, 10);
         double similarityThreshold = inputParameters.getDouble(SIMILARITY_THRESHOLD, 0.0);
 

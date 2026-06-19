@@ -16,12 +16,15 @@
 
 package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
-import static com.bytechef.component.ai.vectorstore.knowledgebase.cluster.KnowledgeBaseVectorStore.createVectorStore;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.CONTENT;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
+import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
 import static com.bytechef.component.definition.ComponentDsl.dateTime;
@@ -72,6 +75,10 @@ public class KnowledgeBaseUpdateTool {
                     "document or chunk and loading new text content.")
             .type(TOOLS)
             .properties(
+                bool(IS_MULTIPLE)
+                    .label("Update Multiple")
+                    .description("Whether to update multiple documents or chunks.")
+                    .required(true),
                 integer(KNOWLEDGE_BASE_ID)
                     .label("Knowledge Base")
                     .description("The knowledge base to update documents in.")
@@ -94,7 +101,18 @@ public class KnowledgeBaseUpdateTool {
                 object(ADDITIONAL_METADATA)
                     .label("Additional Metadata")
                     .description("Additional metadata key-value pairs to add to the stored documents.")
-                    .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time())
+                    .additionalProperties(
+                        string(), integer(), number(), bool(), dateTime(), date(), time())
+                    .displayCondition(IS_MULTIPLE + "== false")
+                    .required(false),
+                array(METADATA_FILTER)
+                    .label("Metadata Filter")
+                    .description("List of metadata key-value pairs to filter by. Entries within a group are AND-ed; groups are OR-ed.")
+                    .items(
+                        object()
+                            .additionalProperties(
+                                string(), integer(), number(), bool(), dateTime(), date(), time()))
+                    .displayCondition(IS_MULTIPLE + "== true")
                     .required(false),
                 string(CONTENT)
                     .label("Content")

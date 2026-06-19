@@ -35,7 +35,6 @@ import java.util.List;
 public class VectorStoreConstants {
 
     public static final String ADDITIONAL_METADATA = "additionalMetadata";
-    public static final String METADATA = "metadata";
     public static final String METADATA_FILTER = "metadataFilter";
     public static final String QUERY = "query";
     public static final String SIMILARITY_THRESHOLD = "similarityThreshold";
@@ -50,14 +49,6 @@ public class VectorStoreConstants {
     public static final Property METADATA_FILTER_PROPERTY = array(METADATA_FILTER)
         .label("Metadata Filter")
         .description("List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.")
-        .items(
-            object()
-                .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time()))
-        .required(false);
-
-    public static final Property METADATA_PROPERTY = array(METADATA)
-        .label("Metadata")
-        .description("List of metadata key-value pairs to filter by.")
         .items(
             object()
                 .additionalProperties(string(), integer(), number(), bool(), dateTime(), date(), time()))
