@@ -3,6 +3,7 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
+import {CLUSTER_ROOT_NODE_LABEL_WIDTH} from '@/shared/constants';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
@@ -318,6 +319,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             <div
                 className={twMerge(
                     'group relative flex min-w-60 cursor-pointer items-center justify-center',
+                    !isHorizontal && 'justify-start',
                     !hasIcons && 'min-w-0'
                 )}
                 data-nodetype="clusterRoot"
@@ -373,7 +375,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             {memoizedIconsList.iconsToShow.length > 0 && (
                                 <ul
                                     className={twMerge(
-                                        'mt-2 flex min-w-52 items-center justify-start',
+                                        'mt-2 flex min-w-52 items-center justify-center',
                                         !hasIcons && 'hidden'
                                     )}
                                 >
@@ -474,9 +476,10 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
                 <div
                     className={twMerge(
-                        'ml-2 flex w-full min-w-max flex-col items-start',
+                        'ml-2 flex w-full flex-col items-start',
                         isHorizontal && 'absolute top-full ml-0 w-auto max-w-[150px] min-w-0 items-center text-center'
                     )}
+                    style={isHorizontal ? undefined : {maxWidth: CLUSTER_ROOT_NODE_LABEL_WIDTH}}
                 >
                     {isRenaming ? (
                         <div className="z-10 flex max-h-7 items-center rounded-md border-2 bg-surface-neutral-primary p-1">
@@ -499,17 +502,22 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                             />
                         </div>
                     ) : (
-                        <span className={twMerge('font-semibold', isHorizontal && 'w-full truncate')}>{nodeLabel}</span>
+                        <span className={twMerge('w-full truncate font-semibold', isHorizontal && 'text-center')}>
+                            {nodeLabel}
+                        </span>
                     )}
 
                     {data.operationName && (
-                        <pre className={twMerge('text-sm', isHorizontal && 'w-full truncate')}>
+                        <pre className={twMerge('w-full truncate text-sm', isHorizontal && 'text-center')}>
                             {data.operationName}
                         </pre>
                     )}
 
                     <span
-                        className={twMerge('text-sm text-content-neutral-secondary', isHorizontal && 'w-full truncate')}
+                        className={twMerge(
+                            'w-full truncate text-sm text-content-neutral-secondary',
+                            isHorizontal && 'text-center'
+                        )}
                     >
                         {data.workflowNodeName}
                     </span>

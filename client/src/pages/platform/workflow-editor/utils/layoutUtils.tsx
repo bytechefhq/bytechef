@@ -1,5 +1,6 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
+    CLUSTER_ROOT_NODE_WIDTH,
     CONDITION_CASE_FALSE,
     CONDITION_CASE_TRUE,
     DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM,
@@ -123,16 +124,50 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
     }
 
     if (node.type === 'clusterRoot') {
-        const hasClusterElements =
-            node.data.clusterElements &&
-            Object.entries(node.data.clusterElements).some(
-                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-            );
-
-        return hasClusterElements ? 240 : 72;
+        return nodeHasConfiguredClusterElements(node) ? 240 : 72;
     }
 
     return 72;
+}
+
+export function nodeHasConfiguredClusterElements(node: Node): boolean {
+    return (
+        !!node.data.clusterElements &&
+        Object.entries(node.data.clusterElements as Record<string, unknown>).some(
+            ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+        )
+    );
+}
+
+export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
+    const height = calculateNodeHeight(node);
+
+    if (direction === 'LR') {
+        const isGhostNode =
+            node.type === 'taskDispatcherTopGhostNode' ||
+            node.type === 'taskDispatcherBottomGhostNode' ||
+            node.type === 'taskDispatcherLeftGhostNode';
+
+        let width = 120;
+
+        if (node.type === 'taskDispatcherTopGhostNode') {
+            width = 0;
+        } else if (isGhostNode) {
+            width = PLACEHOLDER_NODE_HEIGHT;
+        } else if (node.type === 'placeholder') {
+            width = height;
+        } else if (node.type === 'clusterRoot') {
+            width = nodeHasConfiguredClusterElements(node) ? 292 : 120;
+        }
+
+        return {height: NODE_WIDTH, width};
+    }
+
+    if (node.type === 'clusterRoot' && nodeHasConfiguredClusterElements(node)) {
+        return {height, width: CLUSTER_ROOT_NODE_WIDTH};
+    }
+
+    return {height, width: NODE_WIDTH};
 }
 
 export const convertTaskToNode = (
@@ -572,38 +607,7 @@ export const getLayoutElements = async ({
     });
 
     nodes.forEach((node) => {
-        let height = calculateNodeHeight(node);
-        let width = NODE_WIDTH;
-
-        const isGhostNode =
-            node.type === 'taskDispatcherTopGhostNode' ||
-            node.type === 'taskDispatcherBottomGhostNode' ||
-            node.type === 'taskDispatcherLeftGhostNode';
-
-        if (effectiveDirection === 'LR') {
-            if (node.type === 'taskDispatcherTopGhostNode') {
-                width = 0;
-            } else if (isGhostNode) {
-                width = PLACEHOLDER_NODE_HEIGHT;
-            } else if (node.type === 'placeholder') {
-                width = height;
-            } else if (node.type === 'clusterRoot') {
-                const nodeHasClusterElements =
-                    node.data.clusterElements &&
-                    Object.entries(node.data.clusterElements).some(
-                        ([, value]) =>
-                            value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-                    );
-
-                width = nodeHasClusterElements ? 292 : 120;
-            } else {
-                width = 120;
-            }
-
-            height = NODE_WIDTH;
-        }
-
-        dagreGraph.setNode(node.id, {height, width});
+        dagreGraph.setNode(node.id, getDagreNodeSize(node, effectiveDirection));
     });
 
     edges.forEach((edge) => {
@@ -690,7 +694,7 @@ export const getLayoutElements = async ({
     alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
     separateOverlappingConditionChildren(allNodes, edges, crossAxis);
     separateOverlappingOnErrorChildren(allNodes, edges, crossAxis);
-    pullSimpleConditionChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis});
+    pullSimpleConditionChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis, nodesep});
     pullSimpleOnErrorChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis});
     positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
     positionOnErrorCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
