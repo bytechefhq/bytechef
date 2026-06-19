@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))

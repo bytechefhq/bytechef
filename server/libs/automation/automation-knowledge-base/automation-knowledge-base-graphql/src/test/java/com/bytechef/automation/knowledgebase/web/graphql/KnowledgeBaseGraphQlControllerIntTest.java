@@ -36,13 +36,17 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.graphql.test.autoconfigure.GraphQlTest;
 import org.springframework.graphql.test.tester.GraphQlTester;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
- * Integration tests for {@link KnowledgeBaseGraphQlController}.
+ * Integration tests for {@link KnowledgeBaseGraphQlController}. {@link WithMockUser} supplies an authenticated context
+ * so the {@code @PreAuthorize} resource-role checks proceed (the test config's permissive PermissionEvaluator then
+ * allows them); without it method security raises {@code AuthenticationCredentialsNotFoundException}.
  *
  * @author Ivica Cardic
  */
+@WithMockUser
 @ContextConfiguration(classes = {
     AutomationKnowledgeBaseGraphQlTestConfiguration.class,
     KnowledgeBaseGraphQlController.class,

@@ -33,6 +33,7 @@ import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 @Controller
@@ -68,26 +69,30 @@ class KnowledgeBaseGraphQlController {
     }
 
     @QueryMapping
-    List<KnowledgeBase> knowledgeBases(@Argument Long environmentId, @Argument Long workspaceId) {
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<KnowledgeBase> knowledgeBases(@Argument Long environmentId, @Argument Long workspaceId) {
         environmentService.getEnvironment(environmentId);
 
         return workspaceKnowledgeBaseFacade.getWorkspaceKnowledgeBases(workspaceId, environmentId);
     }
 
     @QueryMapping
-    KnowledgeBase knowledgeBase(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    public KnowledgeBase knowledgeBase(@Argument Long id) {
         return knowledgeBaseService.getKnowledgeBase(id);
     }
 
     @QueryMapping
-    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
         @Argument Long id, @Argument String query, @Argument String metadataFilters) {
 
         return knowledgeBaseFacade.searchKnowledgeBase(id, query, metadataFilters);
     }
 
     @MutationMapping
-    KnowledgeBase createKnowledgeBase(
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
+    public KnowledgeBase createKnowledgeBase(
         @Argument KnowledgeBase knowledgeBase, @Argument Long environmentId, @Argument Long workspaceId) {
 
         environmentService.getEnvironment(environmentId);
@@ -96,12 +101,14 @@ class KnowledgeBaseGraphQlController {
     }
 
     @MutationMapping
-    KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    public KnowledgeBase updateKnowledgeBase(@Argument Long id, @Argument KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(id, knowledgeBase);
     }
 
     @MutationMapping
-    boolean deleteKnowledgeBase(@Argument Long id) {
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    public boolean deleteKnowledgeBase(@Argument Long id) {
         workspaceKnowledgeBaseFacade.deleteWorkspaceKnowledgeBase(id);
 
         return true;
