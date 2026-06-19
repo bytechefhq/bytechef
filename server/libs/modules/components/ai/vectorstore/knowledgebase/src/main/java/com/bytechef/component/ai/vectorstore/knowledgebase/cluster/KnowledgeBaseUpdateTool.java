@@ -18,12 +18,12 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.ADDITIONAL_METADATA;
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA_FILTER;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
-import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.CONTENT;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.util.KnowledgeBaseVectorStore.createVectorStore;
 import static com.bytechef.component.definition.ComponentDsl.array;
 import static com.bytechef.component.definition.ComponentDsl.bool;
 import static com.bytechef.component.definition.ComponentDsl.date;
@@ -109,7 +109,8 @@ public class KnowledgeBaseUpdateTool {
                     .required(false),
                 array(METADATA_FILTER)
                     .label("Metadata Filter")
-                    .description("List of metadata key-value pairs to filter by. Entries within a group are AND-ed; groups are OR-ed.")
+                    .description(
+                        "List of metadata key-value pairs to filter by. Entries within a group are AND-ed; groups are OR-ed.")
                     .items(
                         object()
                             .additionalProperties(

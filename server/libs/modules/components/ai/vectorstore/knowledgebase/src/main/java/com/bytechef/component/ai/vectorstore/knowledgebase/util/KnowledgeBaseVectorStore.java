@@ -48,7 +48,6 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -325,7 +324,8 @@ public final class KnowledgeBaseVectorStore {
                         .build());
 
                 if (!existingDocuments.isEmpty()) {
-                    Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst().getMetadata());
+                    Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst()
+                        .getMetadata());
 
                     inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
 
