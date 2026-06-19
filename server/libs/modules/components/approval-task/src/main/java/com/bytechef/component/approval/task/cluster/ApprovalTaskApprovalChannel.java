@@ -45,7 +45,7 @@ public class ApprovalTaskApprovalChannel {
         String jobResumeId = formUrl.substring(formUrl.lastIndexOf('/') + 1);
 
         ApprovalTask approvalTask = ApprovalTask.builder()
-            .name(inputParameters.getString("formTitle"))
+            .name(inputParameters.getString("formTitle", "ApprovalTask"))
             .description(inputParameters.getString("formDescription"))
             .jobResumeId(jobResumeId)
             .status(ApprovalTask.Status.OPEN)
