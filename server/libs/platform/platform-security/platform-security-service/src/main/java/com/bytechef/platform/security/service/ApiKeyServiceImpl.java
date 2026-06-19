@@ -25,6 +25,7 @@ import com.bytechef.tenant.domain.TenantKey;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +97,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
     public ApiKey getApiKey(String secretKey, long environmentId) {
         return apiKeyRepository.findBySecretKeyAndEnvironment(secretKey, (int) environmentId)
             .orElseThrow(() -> new IllegalArgumentException("Api key not found for the specified environment."));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(long id) {
+        return apiKeyRepository.findById(id);
     }
 
     @Override
