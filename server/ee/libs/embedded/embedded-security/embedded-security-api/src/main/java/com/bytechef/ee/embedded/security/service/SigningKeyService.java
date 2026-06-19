@@ -11,6 +11,7 @@ import com.bytechef.ee.embedded.security.domain.SigningKey;
 import com.bytechef.platform.constant.PlatformType;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
@@ -22,6 +23,8 @@ public interface SigningKeyService {
     String create(SigningKey signingKey);
 
     void delete(long id);
+
+    Optional<SigningKey> fetchSigningKey(long id);
 
     PublicKey getPublicKey(String keyId, long environmentId);
 
