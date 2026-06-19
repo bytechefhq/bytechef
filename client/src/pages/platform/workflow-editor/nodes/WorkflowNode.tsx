@@ -126,9 +126,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     onOpenChange={setSwitchPopoverOpen}
                     open={switchPopoverOpen}
                     sourceNodeId={id}
-                >
-                    <div />
-                </WorkflowNodesPopoverMenu>
+                />
             )}
 
             {isClusterElement && !data.multipleClusterElementsNode && (
@@ -142,9 +140,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     open={switchPopoverOpen}
                     sourceNodeId={data.clusterElementType && parentClusterRootId ? parentClusterRootId : id}
                     sourceNodeName={data.workflowNodeName}
-                >
-                    <div />
-                </WorkflowNodesPopoverMenu>
+                />
             )}
 
             <HoverCard
