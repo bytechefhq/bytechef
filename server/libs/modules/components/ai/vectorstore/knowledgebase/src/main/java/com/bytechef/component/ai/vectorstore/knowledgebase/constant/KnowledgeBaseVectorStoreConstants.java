@@ -21,6 +21,7 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.constant;
  */
 public final class KnowledgeBaseVectorStoreConstants {
 
+    public static final String IS_MULTIPLE = "updateMultiple";
     public static final String ADDITIONAL_METADATA = "additionalMetadata";
     public static final String CONTENT = "content";
     public static final String KNOWLEDGE_BASE = "knowledgeBase";

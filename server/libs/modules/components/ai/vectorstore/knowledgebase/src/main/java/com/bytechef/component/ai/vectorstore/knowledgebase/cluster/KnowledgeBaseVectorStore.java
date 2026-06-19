@@ -18,6 +18,7 @@ package com.bytechef.component.ai.vectorstore.knowledgebase.cluster;
 
 import static com.bytechef.component.ai.vectorstore.constant.VectorStoreConstants.METADATA;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.ADDITIONAL_METADATA;
+import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.IS_MULTIPLE;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_DOCUMENT_ID;
 import static com.bytechef.component.ai.vectorstore.knowledgebase.constant.KnowledgeBaseVectorStoreConstants.KNOWLEDGE_BASE_ID;
@@ -56,6 +57,9 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.document.DocumentReader;
 import org.springframework.ai.document.DocumentTransformer;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.vectorstore.SearchRequest;
+import org.springframework.ai.vectorstore.filter.Filter;
+import org.springframework.ai.vectorstore.filter.FilterExpressionBuilder;
 
 /**
  * Knowledge Base VectorStore cluster element for AI agent integration.
@@ -209,14 +213,10 @@ public final class KnowledgeBaseVectorStore {
                     metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
                     metadata.put(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId);
 
-                    List<Map<String, Object>> userMetadataList = inputParameters.getList(
+                    Map<String, Object> userMetadata = inputParameters.getMap(
                         METADATA, new TypeReference<>() {});
 
-                    if (userMetadataList != null) {
-                        for (Map<String, Object> userMetadataEntry : userMetadataList) {
-                            metadata.putAll(userMetadataEntry);
-                        }
-                    }
+                    metadata.putAll(userMetadata);
 
                     String text = document.getText();
 
@@ -256,8 +256,73 @@ public final class KnowledgeBaseVectorStore {
             DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
 
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
+
+            if (Boolean.TRUE.equals(inputParameters.getBoolean(IS_MULTIPLE))) {
+                updateMultiple(inputParameters, connectionParameters, embeddingModel, knowledgeBaseId,
+                    documentReader, documentTransformers);
+            } else {
+                updateSingle(inputParameters, connectionParameters, embeddingModel, knowledgeBaseId,
+                    documentReader, documentTransformers);
+            }
+        }
+
+        private void updateMultiple(
+            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
+            Long knowledgeBaseId, DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+
+            List<Map<String, Object>> metadata = inputParameters.getList(METADATA, new TypeReference<>() {});
+
+            Map<String, Object> deleteParametersMap = new HashMap<>();
+
+            deleteParametersMap.put(KNOWLEDGE_BASE_ID, knowledgeBaseId);
+            deleteParametersMap.put(METADATA, metadata);
+
+            delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
+
+            load(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel,
+                documentReader, documentTransformers);
+        }
+
+        private void updateSingle(
+            Parameters inputParameters, Parameters connectionParameters, EmbeddingModel embeddingModel,
+            Long knowledgeBaseId, DocumentReader documentReader, List<DocumentTransformer> documentTransformers) {
+
             Long knowledgeBaseDocumentId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_ID);
             Long knowledgeBaseDocumentChunkId = inputParameters.getLong(KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
+
+            Map<String, Object> loadMetadata = new HashMap<>();
+
+            if (knowledgeBaseDocumentChunkId != null) {
+                FilterExpressionBuilder filterBuilder = new FilterExpressionBuilder();
+
+                Filter.Expression chunkFilter = filterBuilder
+                    .eq(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID, knowledgeBaseDocumentChunkId)
+                    .build();
+
+                List<Document> existingDocuments = new KnowledgeBaseVectorStoreWrapper(vectorStore, knowledgeBaseId)
+                    .similaritySearch(SearchRequest.builder()
+                        .query(" ")
+                        .topK(1)
+                        .similarityThreshold(0.0)
+                        .filterExpression(chunkFilter)
+                        .build());
+
+                if (!existingDocuments.isEmpty()) {
+                    Map<String, Object> inheritedMetadata = new HashMap<>(existingDocuments.getFirst().getMetadata());
+
+                    inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
+
+                    if (!inheritedMetadata.isEmpty()) {
+                        loadMetadata.putAll(inheritedMetadata);
+                    }
+                }
+            }
+
+            Map<String, Object> additionalMetadata = inputParameters.getMap(ADDITIONAL_METADATA, Object.class);
+
+            if (additionalMetadata != null && !additionalMetadata.isEmpty()) {
+                loadMetadata.putAll(additionalMetadata);
+            }
 
             Map<String, Object> deleteFilter = new HashMap<>();
 
@@ -275,23 +340,6 @@ public final class KnowledgeBaseVectorStore {
             deleteParametersMap.put(METADATA, metadataFilters);
 
             delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
-
-            List<Map<String, Object>> additionalMetadata = inputParameters.getList(
-                ADDITIONAL_METADATA, new TypeReference<>() {});
-
-            List<Map<String, Object>> loadMetadata = new ArrayList<>();
-
-            Map<String, Object> inheritedMetadata = new HashMap<>(deleteFilter);
-
-            inheritedMetadata.remove(METADATA_KNOWLEDGE_BASE_DOCUMENT_CHUNK_ID);
-
-            if (!inheritedMetadata.isEmpty()) {
-                loadMetadata.add(inheritedMetadata);
-            }
-
-            if (additionalMetadata != null) {
-                loadMetadata.addAll(additionalMetadata);
-            }
 
             Map<String, Object> loadParametersMap = new HashMap<>();
 
