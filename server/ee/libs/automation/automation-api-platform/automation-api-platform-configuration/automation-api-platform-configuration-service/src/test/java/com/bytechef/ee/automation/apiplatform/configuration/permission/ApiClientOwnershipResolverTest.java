@@ -17,7 +17,6 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 /**
  * @author Ivica Cardic
@@ -25,8 +24,8 @@ import org.mockito.Mockito;
  */
 class ApiClientOwnershipResolverTest {
 
-    private final ApiClientService apiClientService = Mockito.mock(ApiClientService.class);
-    private final UserService userService = Mockito.mock(UserService.class);
+    private final ApiClientService apiClientService = mock(ApiClientService.class);
+    private final UserService userService = mock(UserService.class);
     private final ApiClientOwnershipResolver resolver = new ApiClientOwnershipResolver(apiClientService, userService);
 
     @Test

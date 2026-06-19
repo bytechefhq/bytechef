@@ -26,13 +26,12 @@ import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
 class ConnectionOwnershipResolverTest {
 
     private final WorkspaceConnectionRepository workspaceConnectionRepository =
-        Mockito.mock(WorkspaceConnectionRepository.class);
-    private final UserService userService = Mockito.mock(UserService.class);
+        mock(WorkspaceConnectionRepository.class);
+    private final UserService userService = mock(UserService.class);
 
     private final ConnectionOwnershipResolver resolver =
         new ConnectionOwnershipResolver(workspaceConnectionRepository, userService);
