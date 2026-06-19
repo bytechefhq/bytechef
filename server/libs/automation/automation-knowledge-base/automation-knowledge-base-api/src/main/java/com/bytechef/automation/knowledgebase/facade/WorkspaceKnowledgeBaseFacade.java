@@ -17,6 +17,7 @@
 package com.bytechef.automation.knowledgebase.facade;
 
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import java.util.List;
 import org.jspecify.annotations.Nullable;
 
@@ -38,6 +39,21 @@ public interface WorkspaceKnowledgeBaseFacade {
      * @return a list of {@code KnowledgeBase} objects associated with the workspace and environment
      */
     List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId);
+
+    /**
+     * Retrieves a single knowledge base by id, authorized against the caller's role in the owning workspace.
+     */
+    KnowledgeBase getKnowledgeBase(Long knowledgeBaseId);
+
+    /**
+     * Updates a knowledge base, authorized against the caller's role in the owning workspace.
+     */
+    KnowledgeBase updateKnowledgeBase(Long knowledgeBaseId, KnowledgeBase knowledgeBase);
+
+    /**
+     * Semantic search within a knowledge base, authorized against the caller's role in the owning workspace.
+     */
+    List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(Long knowledgeBaseId, String query, String metadataFilters);
 
     /**
      * Creates a new knowledge base and assigns it to the specified workspace.

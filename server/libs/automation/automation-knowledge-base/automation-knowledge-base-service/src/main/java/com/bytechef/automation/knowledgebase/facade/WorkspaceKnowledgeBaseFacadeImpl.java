@@ -21,7 +21,9 @@ import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseServi
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,23 +48,26 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
+    private final KnowledgeBaseFacade knowledgeBaseFacade;
     private final KnowledgeBaseService knowledgeBaseService;
     private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
-        WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFacade knowledgeBaseFacade,
+        KnowledgeBaseService knowledgeBaseService, WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
+        this.knowledgeBaseFacade = knowledgeBaseFacade;
         this.knowledgeBaseService = knowledgeBaseService;
         this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
     public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
         List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
             workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
@@ -74,6 +80,29 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    public KnowledgeBase getKnowledgeBase(Long knowledgeBaseId) {
+        return knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    public KnowledgeBase updateKnowledgeBase(Long knowledgeBaseId, KnowledgeBase knowledgeBase) {
+        return knowledgeBaseService.updateKnowledgeBase(knowledgeBaseId, knowledgeBase);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
+        Long knowledgeBaseId, String query, String metadataFilters) {
+
+        return knowledgeBaseFacade.searchKnowledgeBase(knowledgeBaseId, query, metadataFilters);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
     public KnowledgeBase createWorkspaceKnowledgeBase(
         KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
 
@@ -141,6 +170,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')")
     public void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId) {
         List<KnowledgeBaseDocument> documents = knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId);
 
