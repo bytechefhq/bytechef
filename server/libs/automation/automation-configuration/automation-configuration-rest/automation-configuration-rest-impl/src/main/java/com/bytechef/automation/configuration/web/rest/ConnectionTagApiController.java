@@ -26,6 +26,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -56,6 +57,7 @@ public class ConnectionTagApiController implements ConnectionTagApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_EDIT')")
     public ResponseEntity<Void> updateConnectionTags(Long id, UpdateTagsRequestModel updateTagsRequestModel) {
         List<Tag> tags = updateTagsRequestModel.getTags()
             .stream()

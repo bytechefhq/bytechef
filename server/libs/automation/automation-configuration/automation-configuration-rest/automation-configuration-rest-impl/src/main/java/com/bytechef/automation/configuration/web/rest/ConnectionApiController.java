@@ -109,6 +109,7 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_DELETE')")
     public ResponseEntity<Void> deleteConnection(Long id) {
         workspaceConnectionFacade.delete(id);
 
@@ -117,11 +118,13 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_VIEW')")
     public ResponseEntity<ConnectionModel> getConnection(Long id) {
         return ResponseEntity.ok(toConnectionModel(connectionFacade.getConnection(Validate.notNull(id, "id"))));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'WorkspaceScope', 'CONNECTION_VIEW')")
     public ResponseEntity<List<ConnectionModel>> getWorkspaceConnections(
         Long id, String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
 
@@ -134,6 +137,7 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Connection:ResourceScope', 'CONNECTION_EDIT')")
     public ResponseEntity<Void> updateConnection(
         Long id, UpdateConnectionRequestModel updateConnectionRequestModel) {
         List<Tag> list = updateConnectionRequestModel.getTags()
