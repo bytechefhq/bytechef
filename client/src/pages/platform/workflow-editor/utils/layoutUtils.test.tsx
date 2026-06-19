@@ -1,4 +1,11 @@
-import {CLUSTER_ELEMENT_NODE_WIDTH, NODE_HEIGHT, PLACEHOLDER_NODE_HEIGHT, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {
+    CLUSTER_ELEMENT_NODE_WIDTH,
+    CLUSTER_ROOT_NODE_WIDTH,
+    NODE_HEIGHT,
+    NODE_WIDTH,
+    PLACEHOLDER_NODE_HEIGHT,
+    ROOT_CLUSTER_WIDTH,
+} from '@/shared/constants';
 import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {
     BranchChildTasksType,
@@ -21,6 +28,7 @@ import {
     calculateNodeHeight,
     collectTaskDispatcherData,
     getClusterElementsLayoutElements,
+    getDagreNodeSize,
 } from './layoutUtils';
 
 // Type for test tasks with potentially malformed parameters
@@ -84,6 +92,41 @@ describe('calculateNodeHeight', () => {
         const node: Node = {data: {}, id: 'placeholder_1', position: {x: 0, y: 0}, type: 'placeholder'};
 
         expect(calculateNodeHeight(node)).toBe(PLACEHOLDER_NODE_HEIGHT);
+    });
+});
+
+describe('getDagreNodeSize', () => {
+    const regularNode: Node = {data: {}, id: 'logger_1', position: {x: 0, y: 0}, type: 'workflow'};
+
+    const clusterRootWithElements: Node = {
+        data: {clusterElements: {channel: {name: 'slack'}}, clusterRoot: true},
+        id: 'approval_1',
+        position: {x: 0, y: 0},
+        type: 'clusterRoot',
+    };
+
+    const clusterRootWithoutElements: Node = {
+        data: {clusterElements: {channel: null}, clusterRoot: true},
+        id: 'approval_2',
+        position: {x: 0, y: 0},
+        type: 'clusterRoot',
+    };
+
+    it('should reserve NODE_WIDTH for a regular node in TB', () => {
+        expect(getDagreNodeSize(regularNode, 'TB').width).toBe(NODE_WIDTH);
+    });
+
+    it('should reserve the cluster-root width for a configured cluster root in TB', () => {
+        expect(getDagreNodeSize(clusterRootWithElements, 'TB').width).toBe(CLUSTER_ROOT_NODE_WIDTH);
+        expect(CLUSTER_ROOT_NODE_WIDTH).toBeGreaterThan(NODE_WIDTH);
+    });
+
+    it('should reserve NODE_WIDTH for an unconfigured cluster root in TB', () => {
+        expect(getDagreNodeSize(clusterRootWithoutElements, 'TB').width).toBe(NODE_WIDTH);
+    });
+
+    it('should preserve the LR cluster-root width reservation (292)', () => {
+        expect(getDagreNodeSize(clusterRootWithElements, 'LR').width).toBe(292);
     });
 });
 

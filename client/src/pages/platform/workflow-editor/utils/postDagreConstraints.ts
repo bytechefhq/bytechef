@@ -1,5 +1,6 @@
 import {
     CLUSTER_ELEMENT_NODE_WIDTH,
+    CLUSTER_ROOT_NODE_WIDTH,
     LayoutDirectionType,
     NODE_HEIGHT,
     NODE_WIDTH,
@@ -300,22 +301,23 @@ export function alignBranchCaseChildren(
                 [crossAxis]: targetCross,
             };
 
-            // Walk the chain from the first child and align subsequent nodes
-            alignCaseChainNodes(allNodes, edges, targetNode, targetCross, crossAxis);
+            // Walk the chain from the first child and align subsequent nodes by handle column
+            alignCaseChainNodes(
+                allNodes,
+                edges,
+                targetNode,
+                targetCross + getNodeHandleOffset(targetNode, crossAxis),
+                crossAxis
+            );
         }
     });
 }
 
-/**
- * Walks a chain from a starting node and aligns each subsequent workflow node
- * to the same cross-axis position. For task dispatcher nodes, shifts all
- * descendants by the same delta and jumps to the bottom ghost's target.
- */
 function alignCaseChainNodes(
     allNodes: Node[],
     edges: Edge[],
     startNode: Node,
-    targetCross: number,
+    handleColumn: number,
     crossAxis: 'x' | 'y'
 ): void {
     let currentNodeId = startNode.id;
@@ -361,11 +363,12 @@ function alignCaseChainNodes(
             continue;
         }
 
-        const shiftCross = targetCross - nextNode.position[crossAxis];
+        const nodeTargetCross = handleColumn - getNodeHandleOffset(nextNode, crossAxis);
+        const shiftCross = nodeTargetCross - nextNode.position[crossAxis];
 
         if (Math.abs(shiftCross) > 0.5) {
             if (nextData.taskDispatcher && nextData.taskDispatcherId) {
-                nextNode.position = {...nextNode.position, [crossAxis]: targetCross};
+                nextNode.position = {...nextNode.position, [crossAxis]: nodeTargetCross};
 
                 const descendantIds = new Set<string>();
 
@@ -380,7 +383,7 @@ function alignCaseChainNodes(
                     }
                 });
             } else {
-                nextNode.position = {...nextNode.position, [crossAxis]: targetCross};
+                nextNode.position = {...nextNode.position, [crossAxis]: nodeTargetCross};
             }
         }
 
@@ -931,24 +934,58 @@ function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: No
     return false;
 }
 
-/**
- * Pulls condition branch children inward toward conditionCaseOffset when dagre
- * placed them farther from center than necessary. Only applies to conditions
- * where BOTH branches contain only simple (non-task-dispatcher) nodes, since
- * branches with nested dispatchers need their dagre-assigned space.
- * Only pulls inward, never pushes outward.
- */
+function hasConfiguredClusterElements(node: Node): boolean {
+    const data = node.data as NodeDataType;
+
+    return (
+        !!data.clusterElements &&
+        Object.entries(data.clusterElements as Record<string, unknown>).some(
+            ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+        )
+    );
+}
+
+function getNodeCrossSize(node: Node, crossAxis: 'x' | 'y'): number {
+    if (crossAxis === 'y') {
+        return NODE_HEIGHT;
+    }
+
+    return node.type === 'clusterRoot' && hasConfiguredClusterElements(node) ? CLUSTER_ROOT_NODE_WIDTH : NODE_WIDTH;
+}
+
+const REGULAR_NODE_HANDLE_OFFSET = 36;
+const CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET = 120;
+
+function getNodeHandleOffset(node: Node, crossAxis: 'x' | 'y'): number {
+    if (crossAxis !== 'x') {
+        return REGULAR_NODE_HANDLE_OFFSET;
+    }
+
+    return node.type === 'clusterRoot' && hasConfiguredClusterElements(node)
+        ? CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET
+        : REGULAR_NODE_HANDLE_OFFSET;
+}
+
+export function getConditionBranchCaseOffset(
+    branchCrossSizes: number[],
+    defaultOffset: number,
+    nodesep: number
+): number {
+    return branchCrossSizes.reduce((offset, crossSize) => Math.max(offset, (crossSize + nodesep) / 2), defaultOffset);
+}
+
 export function pullSimpleConditionChildrenInward(
     allNodes: Node[],
     edges: Edge[],
     options: {
         conditionCaseOffset: number;
         crossAxis: 'x' | 'y';
+        nodesep: number;
     }
 ): void {
-    const {conditionCaseOffset, crossAxis} = options;
+    const {conditionCaseOffset, crossAxis, nodesep} = options;
 
-    const simpleConditions = new Set<string>();
+    const simpleConditionOffsets = new Map<string, number>();
 
     allNodes.forEach((conditionNode) => {
         const conditionData = conditionNode.data as NodeDataType;
@@ -974,7 +1011,15 @@ export function pullSimpleConditionChildrenInward(
         );
 
         if (allBranchesSimple && branchStartEdges.length === 2) {
-            simpleConditions.add(conditionId);
+            const branchCrossSizes = branchStartEdges
+                .map((startEdge) => allNodes.find((node) => node.id === startEdge.target))
+                .filter((node): node is Node => !!node)
+                .map((node) => getNodeCrossSize(node, crossAxis));
+
+            simpleConditionOffsets.set(
+                conditionId,
+                getConditionBranchCaseOffset(branchCrossSizes, conditionCaseOffset, nodesep)
+            );
         }
     });
 
@@ -998,9 +1043,11 @@ export function pullSimpleConditionChildrenInward(
 
         const sourceData = sourceNode.data as NodeDataType;
 
-        if (!sourceData.conditionId || !simpleConditions.has(sourceData.conditionId)) {
+        if (!sourceData.conditionId || !simpleConditionOffsets.has(sourceData.conditionId)) {
             return;
         }
+
+        const branchOffset = simpleConditionOffsets.get(sourceData.conditionId)!;
 
         const targetNode = allNodes.find((node) => node.id === edge.target);
 
@@ -1016,21 +1063,29 @@ export function pullSimpleConditionChildrenInward(
 
         const conditionCross = conditionNode.position[crossAxis];
 
-        const expectedCross = isLeftCase ? conditionCross - conditionCaseOffset : conditionCross + conditionCaseOffset;
+        const handleColumn =
+            (isLeftCase ? conditionCross - branchOffset : conditionCross + branchOffset) + REGULAR_NODE_HANDLE_OFFSET;
+        const targetNodeCross = handleColumn - getNodeHandleOffset(targetNode, crossAxis);
         const currentCross = targetNode.position[crossAxis];
 
-        const isFartherThanExpected = isLeftCase ? currentCross < expectedCross : currentCross > expectedCross;
+        const isFartherThanExpected = isLeftCase ? currentCross < targetNodeCross : currentCross > targetNodeCross;
 
-        if (!isFartherThanExpected) {
+        const needsWidthExpansion = branchOffset > conditionCaseOffset;
+
+        if (!isFartherThanExpected && !needsWidthExpansion) {
+            return;
+        }
+
+        if (currentCross === targetNodeCross) {
             return;
         }
 
         targetNode.position = {
             ...targetNode.position,
-            [crossAxis]: expectedCross,
+            [crossAxis]: targetNodeCross,
         };
 
-        alignCaseChainNodes(allNodes, edges, targetNode, expectedCross, crossAxis);
+        alignCaseChainNodes(allNodes, edges, targetNode, handleColumn, crossAxis);
     });
 }
 
@@ -1115,10 +1170,13 @@ export function pullSimpleOnErrorChildrenInward(
 
         const onErrorCross = onErrorDispatcherNode.position[crossAxis];
 
-        const expectedCross = isLeftCase ? onErrorCross - conditionCaseOffset : onErrorCross + conditionCaseOffset;
+        const handleColumn =
+            (isLeftCase ? onErrorCross - conditionCaseOffset : onErrorCross + conditionCaseOffset) +
+            REGULAR_NODE_HANDLE_OFFSET;
+        const targetNodeCross = handleColumn - getNodeHandleOffset(targetNode, crossAxis);
         const currentCross = targetNode.position[crossAxis];
 
-        const isFartherThanExpected = isLeftCase ? currentCross < expectedCross : currentCross > expectedCross;
+        const isFartherThanExpected = isLeftCase ? currentCross < targetNodeCross : currentCross > targetNodeCross;
 
         if (!isFartherThanExpected) {
             return;
@@ -1126,10 +1184,10 @@ export function pullSimpleOnErrorChildrenInward(
 
         targetNode.position = {
             ...targetNode.position,
-            [crossAxis]: expectedCross,
+            [crossAxis]: targetNodeCross,
         };
 
-        alignCaseChainNodes(allNodes, edges, targetNode, expectedCross, crossAxis);
+        alignCaseChainNodes(allNodes, edges, targetNode, handleColumn, crossAxis);
     });
 }
 

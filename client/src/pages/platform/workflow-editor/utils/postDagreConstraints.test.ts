@@ -1,4 +1,4 @@
-import {NODE_WIDTH} from '@/shared/constants';
+import {CLUSTER_ROOT_NODE_WIDTH, NODE_WIDTH} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
@@ -18,6 +18,7 @@ import {
     constrainConditionGhostsCrossAxis,
     constrainLeftGhostPositions,
     containsNodePosition,
+    getConditionBranchCaseOffset,
     positionConditionCasePlaceholders,
     pullSimpleConditionChildrenInward,
     separateOverlappingConditionChildren,
@@ -4118,6 +4119,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
+            nodesep: 50,
         });
 
         expect(leftNode.position.x).toBe(500 - CONDITION_CASE_OFFSET);
@@ -4137,6 +4139,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
+            nodesep: 50,
         });
 
         expect(leftNode.position.x).toBe(expectedLeft);
@@ -4215,6 +4218,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
+            nodesep: 50,
         });
 
         const expectedLeft = 500 - CONDITION_CASE_OFFSET;
@@ -4222,6 +4226,114 @@ describe('alignConditionCaseChildren', () => {
         expect(scriptNode.position.x).toBe(expectedLeft);
         expect(loggerLeft.position.x).toBe(expectedLeft);
         expect(rightNode.position.x).toBe(500 + CONDITION_CASE_OFFSET);
+    });
+
+    const CLUSTER_ROOT_HANDLE_OFFSET = 120;
+    const REGULAR_HANDLE_OFFSET = 36;
+
+    function makeConditionWithClusterRootBranch(conditionX: number) {
+        const conditionNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: conditionX, y: 100},
+            type: 'workflow',
+        };
+        const topGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-top-ghost',
+            position: {x: conditionX, y: 150},
+            type: 'taskDispatcherTopGhostNode',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: conditionX, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const clusterRootNode: Node = {
+            data: {clusterElements: {channel: {name: 'slack'}}, clusterRoot: true, componentName: 'approval'},
+            id: 'approval_1',
+            position: {x: 100, y: 250},
+            type: 'clusterRoot',
+        };
+        const clusterChainChild: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_true',
+            position: {x: 100, y: 350},
+            type: 'workflow',
+        };
+        const rightNode: Node = {
+            data: {componentName: 'logger'},
+            id: 'logger_false',
+            position: {x: 900, y: 250},
+            type: 'workflow',
+        };
+
+        const allNodes = [conditionNode, topGhost, bottomGhost, clusterRootNode, clusterChainChild, rightNode];
+        const edges: Edge[] = [
+            {
+                id: 'topGhost=>approval',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-left',
+                target: 'approval_1',
+            },
+            {id: 'approval=>loggerTrue', source: 'approval_1', target: 'logger_true'},
+            {id: 'loggerTrue=>bottomGhost', source: 'logger_true', target: 'condition_1-condition-bottom-ghost'},
+            {
+                id: 'topGhost=>loggerFalse',
+                source: 'condition_1-condition-top-ghost',
+                sourceHandle: 'condition_1-condition-top-ghost-right',
+                target: 'logger_false',
+            },
+            {id: 'loggerFalse=>bottomGhost', source: 'logger_false', target: 'condition_1-condition-bottom-ghost'},
+        ];
+
+        return {allNodes, clusterChainChild, clusterRootNode, conditionNode, edges, rightNode};
+    }
+
+    it('should align a cluster-root branch child handle with its chain successor (straight down-edge)', () => {
+        const {allNodes, clusterChainChild, clusterRootNode, edges} = makeConditionWithClusterRootBranch(500);
+
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+            nodesep: 50,
+        });
+
+        const clusterHandle = clusterRootNode.position.x + CLUSTER_ROOT_HANDLE_OFFSET;
+        const childHandle = clusterChainChild.position.x + REGULAR_HANDLE_OFFSET;
+
+        expect(clusterHandle).toBe(childHandle);
+    });
+
+    it('should keep a cluster-root branch symmetric around the condition handle', () => {
+        const {allNodes, clusterRootNode, conditionNode, edges, rightNode} = makeConditionWithClusterRootBranch(500);
+
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+            nodesep: 50,
+        });
+
+        const leftHandle = clusterRootNode.position.x + CLUSTER_ROOT_HANDLE_OFFSET;
+        const rightHandle = rightNode.position.x + REGULAR_HANDLE_OFFSET;
+        const conditionHandle = conditionNode.position.x + REGULAR_HANDLE_OFFSET;
+
+        expect((leftHandle + rightHandle) / 2).toBe(conditionHandle);
+    });
+
+    it('should place a cluster-root branch child so its box clears the opposite branch', () => {
+        const {allNodes, clusterRootNode, edges, rightNode} = makeConditionWithClusterRootBranch(500);
+
+        pullSimpleConditionChildrenInward(allNodes, edges, {
+            conditionCaseOffset: CONDITION_CASE_OFFSET,
+            crossAxis: 'x',
+            nodesep: 50,
+        });
+
+        const clusterRootRight = clusterRootNode.position.x + CLUSTER_ROOT_NODE_WIDTH;
+
+        expect(rightNode.position.x).toBeGreaterThanOrEqual(clusterRootRight);
     });
 
     it('should skip conditions where a branch contains a task dispatcher', () => {
@@ -4291,6 +4403,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
+            nodesep: 50,
         });
 
         expect(scriptNode.position.x).toBe(100);
@@ -4358,6 +4471,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
+            nodesep: 50,
         });
 
         expect(loopNode.position.x).toBe(100);
@@ -4425,6 +4539,7 @@ describe('alignConditionCaseChildren', () => {
         pullSimpleConditionChildrenInward(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'y',
+            nodesep: 50,
         });
 
         expect(leftNode.position.y).toBe(500 - CONDITION_CASE_OFFSET);
@@ -4928,5 +5043,25 @@ describe('edge-walk cycle safety', () => {
         // Reaching this assertion at all proves the loop terminated. The body still
         // ran, so the first chain node was centered onto the dispatcher's axis.
         expect(nodeA.position.x).toBe(0);
+    });
+});
+
+describe('getConditionBranchCaseOffset', () => {
+    const nodesep = 50;
+    const defaultOffset = (NODE_WIDTH + nodesep) / 2; // 145
+
+    it('returns the default offset when both branch children are regular-width', () => {
+        expect(getConditionBranchCaseOffset([NODE_WIDTH, NODE_WIDTH], defaultOffset, nodesep)).toBe(defaultOffset);
+    });
+
+    it('never returns less than the default offset for narrow children', () => {
+        expect(getConditionBranchCaseOffset([72, 72], defaultOffset, nodesep)).toBe(defaultOffset);
+    });
+
+    it('expands the offset so a wide cluster-root branch child cannot overlap the sibling branch', () => {
+        const offset = getConditionBranchCaseOffset([CLUSTER_ROOT_NODE_WIDTH, NODE_WIDTH], defaultOffset, nodesep);
+
+        expect(2 * offset - CLUSTER_ROOT_NODE_WIDTH).toBeGreaterThanOrEqual(nodesep);
+        expect(offset).toBeGreaterThan(defaultOffset);
     });
 });
