@@ -6,6 +6,9 @@ import {
     ReactFlow,
     ReactFlowProvider,
     type Viewport,
+    useReactFlow,
+    useStore,
+    useUpdateNodeInternals,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
@@ -16,6 +19,43 @@ import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
+
+const SETTLE_FRAMES = 22;
+
+export const RemeasureClusterNodes = () => {
+    const updateNodeInternals = useUpdateNodeInternals();
+    const {getNodes} = useReactFlow();
+    const nodeCount = useStore((state) => state.nodes.length);
+
+    useEffect(() => {
+        const remeasure = () => {
+            for (const node of getNodes()) {
+                updateNodeInternals(node.id);
+            }
+        };
+
+        remeasure();
+
+        let frame = 0;
+        let rafId = 0;
+
+        const tick = () => {
+            remeasure();
+
+            frame += 1;
+
+            if (frame < SETTLE_FRAMES) {
+                rafId = requestAnimationFrame(tick);
+            }
+        };
+
+        rafId = requestAnimationFrame(tick);
+
+        return () => cancelAnimationFrame(rafId);
+    }, [nodeCount, getNodes, updateNodeInternals]);
+
+    return null;
+};
 
 const ClusterElementsWorkflowEditor = () => {
     const {onEdgesChange, setCanvasZoom} = useClusterElementsDataStore(
@@ -38,6 +78,8 @@ const ClusterElementsWorkflowEditor = () => {
     return (
         <div className="size-full">
             <ReactFlowProvider>
+                <RemeasureClusterNodes />
+
                 <ReactFlow
                     defaultViewport={{x: 0, y: 0, zoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM}}
                     edgeTypes={clusterElementsEdgeTypes}
