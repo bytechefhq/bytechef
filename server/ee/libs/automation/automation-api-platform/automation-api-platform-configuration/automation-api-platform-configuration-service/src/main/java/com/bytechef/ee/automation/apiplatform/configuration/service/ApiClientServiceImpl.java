@@ -10,6 +10,8 @@ package com.bytechef.ee.automation.apiplatform.configuration.service;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import com.bytechef.ee.automation.apiplatform.configuration.repository.ApiClientRepository;
+import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;
@@ -73,7 +75,25 @@ public class ApiClientServiceImpl implements ApiClientService {
     @Override
     @Transactional(readOnly = true)
     public List<ApiClient> getApiClients() {
-        return apiClientRepository.findAll();
+        List<ApiClient> apiClients = apiClientRepository.findAll();
+
+        // Owner-isolation (EE): a non-admin caller sees only the API clients they created. Tenant admins see all.
+        // This mirrors the per-id ApiClient:ResourceOwner gating; a listing cannot be expressed as a single
+        // hasPermission gate, so it is filtered here.
+        if (SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)) {
+            return apiClients;
+        }
+
+        String currentUserLogin = SecurityUtils.fetchCurrentUserLogin()
+            .orElse(null);
+
+        if (currentUserLogin == null) {
+            return List.of();
+        }
+
+        return apiClients.stream()
+            .filter(apiClient -> currentUserLogin.equals(apiClient.getCreatedBy()))
+            .toList();
     }
 
     @Override
