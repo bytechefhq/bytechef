@@ -29,7 +29,6 @@ import com.bytechef.platform.user.dto.PasswordChangeDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
 import com.bytechef.platform.user.exception.TotpLockedException;
-import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.PersistentTokenService;
 import com.bytechef.platform.user.service.UserService;
@@ -153,10 +152,8 @@ public class AccountController {
     @PostMapping("/send-activation-email")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void sendActivationEmail(@RequestBody String email) {
-        User user = userService.fetchUserByEmail(email)
-            .orElseThrow(UserNotFoundException::new);
-
-        mailService.sendActivationEmail(user);
+        userService.fetchUserByEmail(email)
+            .ifPresent(mailService::sendActivationEmail);
     }
 
     /**
