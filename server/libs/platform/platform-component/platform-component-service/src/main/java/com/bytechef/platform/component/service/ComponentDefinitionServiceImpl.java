@@ -36,6 +36,7 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.TriggerDefinition;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
+import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -63,15 +64,18 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
+    private final List<ComponentVisibilityProvider> componentVisibilityProviders;
 
     @SuppressFBWarnings("EI2")
     public ComponentDefinitionServiceImpl(
         List<ComponentDefinitionFilter> componentDefinitionFilters,
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
+        List<ComponentVisibilityProvider> componentVisibilityProviders) {
 
         this.componentDefinitionFilters = componentDefinitionFilters;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+        this.componentVisibilityProviders = componentVisibilityProviders;
     }
 
     @Override
@@ -173,6 +177,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         List<ComponentDefinition> components = getComponentDefinitions()
             .stream()
             .filter(componentDefinitionFilter::filter)
+            .filter(componentDefinition -> isComponentVisible(componentDefinition.getName()))
             .filter(
                 filter(
                     actionDefinitions, clusterElementDefinitions, connectionDefinitions, triggerDefinitions, include))
@@ -200,6 +205,7 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
         return getComponentDefinitions()
             .stream()
             .filter(componentDefinitionFilter::filter)
+            .filter(componentDefinition -> isComponentVisible(componentDefinition.getName()))
             .filter(componentDefinition -> hasMatchingComponent(componentDefinition, lowerCaseQuery) ||
                 hasMatchingAction(componentDefinition.getActions(), lowerCaseQuery) ||
                 hasMatchingTrigger(componentDefinition.getTriggers(), lowerCaseQuery))
@@ -243,6 +249,11 @@ public class ComponentDefinitionServiceImpl implements ComponentDefinitionServic
     @Override
     public boolean hasComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.hasComponentDefinition(name, version);
+    }
+
+    private boolean isComponentVisible(String componentName) {
+        return componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isVisible(componentName));
     }
 
     private static Predicate<ComponentDefinition> filter(

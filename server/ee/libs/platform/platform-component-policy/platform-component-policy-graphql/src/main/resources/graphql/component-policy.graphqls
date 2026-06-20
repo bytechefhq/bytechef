@@ -1,0 +1,23 @@
+type ComponentPolicy {
+    name: String!
+    title: String
+    description: String
+    icon: String
+    version: Int!
+    enabled: Boolean!
+}
+
+extend type Query {
+    """
+    Lists every registry component with its tenant-wide visibility flag. Components with no policy row are reported
+    enabled. Admin-only.
+    """
+    componentPolicies: [ComponentPolicy!]!
+}
+
+extend type Mutation {
+    """
+    Enables or disables a component tenant-wide. Admin-only.
+    """
+    updateComponentPolicy(name: String!, enabled: Boolean!): ComponentPolicy!
+}

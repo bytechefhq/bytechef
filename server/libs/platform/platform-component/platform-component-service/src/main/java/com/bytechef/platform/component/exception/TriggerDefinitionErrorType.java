@@ -37,6 +37,7 @@ public class TriggerDefinitionErrorType extends AbstractErrorType {
         107);
     public static final TriggerDefinitionErrorType DYNAMIC_WEBHOOK_ENABLE_FAILED = new TriggerDefinitionErrorType(108);
     public static final TriggerDefinitionErrorType TRIGGER_TEST_FAILED = new TriggerDefinitionErrorType(109);
+    public static final TriggerDefinitionErrorType COMPONENT_DISABLED = new TriggerDefinitionErrorType(110);
 
     private TriggerDefinitionErrorType(int errorKey) {
         super(TriggerDefinition.class, errorKey);

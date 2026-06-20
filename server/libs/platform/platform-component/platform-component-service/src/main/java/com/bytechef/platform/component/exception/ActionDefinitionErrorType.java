@@ -31,6 +31,7 @@ public class ActionDefinitionErrorType extends AbstractErrorType {
     public static final ActionDefinitionErrorType EXECUTE_OUTPUT = new ActionDefinitionErrorType(103);
     public static final ActionDefinitionErrorType EXECUTE_PERFORM = new ActionDefinitionErrorType(104);
     public static final ActionDefinitionErrorType EXECUTE_PROCESS_ERROR_RESPONSE = new ActionDefinitionErrorType(105);
+    public static final ActionDefinitionErrorType COMPONENT_DISABLED = new ActionDefinitionErrorType(106);
 
     private ActionDefinitionErrorType(int errorKey) {
         super(ActionDefinition.class, errorKey);

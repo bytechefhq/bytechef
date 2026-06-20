@@ -75,7 +75,7 @@ class ClusterElementDefinitionServiceTest {
     @BeforeEach
     void setUp() {
         clusterElementDefinitionService = new ClusterElementDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory);
+            componentDefinitionRegistry, contextFactory, List.of());
     }
 
     @Test

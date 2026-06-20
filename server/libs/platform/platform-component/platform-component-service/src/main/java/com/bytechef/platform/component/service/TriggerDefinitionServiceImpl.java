@@ -65,6 +65,7 @@ import com.bytechef.platform.component.exception.ComponentErrorType;
 import com.bytechef.platform.component.exception.TriggerDefinitionErrorType;
 import com.bytechef.platform.component.trigger.TriggerOutput;
 import com.bytechef.platform.component.trigger.WebhookRequest;
+import com.bytechef.platform.component.visibility.ComponentVisibilityProvider;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.PropertyUtils;
@@ -72,6 +73,7 @@ import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.event.TriggerListenerEvent;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -100,14 +102,18 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
     private final ContextFactory contextFactory;
     private final ApplicationEventPublisher eventPublisher;
+    private final List<ComponentVisibilityProvider> componentVisibilityProviders;
 
+    @SuppressFBWarnings("EI2")
     public TriggerDefinitionServiceImpl(
         @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory,
-        ApplicationEventPublisher eventPublisher) {
+        ApplicationEventPublisher eventPublisher,
+        List<ComponentVisibilityProvider> componentVisibilityProviders) {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
         this.eventPublisher = eventPublisher;
+        this.componentVisibilityProviders = componentVisibilityProviders;
     }
 
     @Override
@@ -259,6 +265,8 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Map<String, ?> inputParameters, @Nullable Object triggerState, @Nullable WebhookRequest webhookRequest,
         @ConnectionParam @Nullable ComponentConnection componentConnection, @Nullable Long environmentId,
         PlatformType type, boolean editorEnvironment) {
+
+        checkComponentVisible(componentName);
 
         TriggerContext triggerContext = contextFactory.createTriggerContext(
             componentName, componentVersion, triggerName, jobPrincipalId, workflowUuid, componentConnection,
@@ -889,6 +897,17 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         return new WrapResult(
             ParametersFactory.create(inputParameters), ParametersFactory.create(componentConnection),
             getLookupDependsOnPathsMap(lookupDependsOnPaths));
+    }
+
+    private void checkComponentVisible(String componentName) {
+        boolean visible = componentVisibilityProviders.stream()
+            .allMatch(componentVisibilityProvider -> componentVisibilityProvider.isVisible(componentName));
+
+        if (!visible) {
+            throw new ConfigurationException(
+                "Component '%s' is disabled by an administrator and cannot be executed.".formatted(componentName),
+                TriggerDefinitionErrorType.COMPONENT_DISABLED);
+        }
     }
 
     private record WrapResult(

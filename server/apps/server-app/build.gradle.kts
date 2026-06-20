@@ -369,6 +369,8 @@ dependencies {
     implementation(project(":server:ee:libs:licence:licence-web"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-service"))
     implementation(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-file-storage:platform-code-workflow-file-storage-impl"))
+    implementation(project(":server:ee:libs:platform:platform-component-policy:platform-component-policy-graphql"))
+    implementation(project(":server:ee:libs:platform:platform-component-policy:platform-component-policy-service"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-graphql"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-rest"))
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-service"))
