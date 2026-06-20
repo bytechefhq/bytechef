@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.search;
+package com.bytechef.automation.configuration.search;
 
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.automation.search.SearchResult;
@@ -22,7 +22,7 @@ import com.bytechef.automation.search.SearchResult;
 /**
  * @author Ivica Cardic
  */
-public record ConnectionSearchResult(Long id, String name) implements SearchResult<Long> {
+public record ConnectionSearchResult(Long id, String name, Long workspaceId) implements SearchResult<Long> {
 
     @Override
     public String description() {

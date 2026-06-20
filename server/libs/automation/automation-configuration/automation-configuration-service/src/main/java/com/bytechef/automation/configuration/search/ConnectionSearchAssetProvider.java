@@ -14,26 +14,38 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.connection.search;
+package com.bytechef.automation.configuration.search;
 
+import com.bytechef.automation.configuration.domain.WorkspaceConnection;
+import com.bytechef.automation.configuration.repository.WorkspaceConnectionRepository;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.stereotype.Component;
 
 /**
+ * Workspace-scoped connection search. Lives in automation (not {@code platform-connection-service}) because the
+ * connection &rarr; workspace mapping is the automation {@code workspace_connection} relation; the result's
+ * {@code workspaceId} lets the search aggregator drop connections from workspaces the caller cannot access.
+ *
  * @author Ivica Cardic
  */
 @Component
 class ConnectionSearchAssetProvider implements SearchAssetProvider {
 
     private final ConnectionService connectionService;
+    private final WorkspaceConnectionRepository workspaceConnectionRepository;
 
-    ConnectionSearchAssetProvider(ConnectionService connectionService) {
+    @SuppressFBWarnings("EI")
+    ConnectionSearchAssetProvider(
+        ConnectionService connectionService, WorkspaceConnectionRepository workspaceConnectionRepository) {
+
         this.connectionService = connectionService;
+        this.workspaceConnectionRepository = workspaceConnectionRepository;
     }
 
     @Override
@@ -44,7 +56,12 @@ class ConnectionSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .filter(connection -> containsIgnoreCase(connection.getName(), queryLower))
             .limit(limit)
-            .map(connection -> new ConnectionSearchResult(connection.getId(), connection.getName()))
+            .map(
+                connection -> new ConnectionSearchResult(
+                    connection.getId(), connection.getName(),
+                    workspaceConnectionRepository.findByConnectionId(connection.getId())
+                        .map(WorkspaceConnection::getWorkspaceId)
+                        .orElse(null)))
             .toList();
     }
 
