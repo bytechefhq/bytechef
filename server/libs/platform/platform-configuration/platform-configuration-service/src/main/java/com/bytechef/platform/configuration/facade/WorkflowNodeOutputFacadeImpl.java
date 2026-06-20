@@ -61,6 +61,7 @@ import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.expression.EvaluationException;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -112,6 +113,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     @Nullable
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public ClusterElementOutputDTO getClusterElementOutput(
         String workflowId, String workflowNodeName, String clusterElementType, String clusterElementWorkflowNodeName,
         long environmentId) {
@@ -135,6 +137,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     @Nullable
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public WorkflowNodeOutputDTO getWorkflowNodeOutput(String workflowId, String workflowNodeName, long environmentId) {
         WorkflowNodeOutputDTO workflowNodeOutputDTO = null;
         Workflow workflow = workflowService.getWorkflow(workflowId);
@@ -167,6 +170,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE)
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public List<WorkflowNodeOutputDTO> getPreviousWorkflowNodeOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId) {
 
@@ -175,6 +179,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
 
     @Override
     @Cacheable(value = PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE)
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public Map<String, ?> getPreviousWorkflowNodeSampleOutputs(
         String workflowId, String lastWorkflowNodeName, long environmentId) {
 
@@ -182,6 +187,7 @@ public class WorkflowNodeOutputFacadeImpl implements WorkflowNodeOutputFacade {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public void checkWorkflowCache(String workflowId, String lastWorkflowNodeName, long environmentId) {
         boolean dynamicOutputDefined = false;
         Workflow workflow = workflowService.getWorkflow(workflowId);

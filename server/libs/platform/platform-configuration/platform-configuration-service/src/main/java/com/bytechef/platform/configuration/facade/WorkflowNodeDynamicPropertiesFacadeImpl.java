@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -82,6 +83,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @Override
     @SuppressWarnings("unchecked")
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public List<Property> getClusterElementDynamicProperties(
         String workflowId, String workflowNodeName, String clusterElementTypeName,
         String clusterElementWorkflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
@@ -167,6 +169,7 @@ public class WorkflowNodeDynamicPropertiesFacadeImpl implements WorkflowNodeDyna
 
     @Override
     @SuppressWarnings("unchecked")
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public List<? extends BaseProperty> getWorkflowNodeDynamicProperties(
         String workflowId, String workflowNodeName, String propertyName, List<String> lookupDependsOnPaths,
         long environmentId) {

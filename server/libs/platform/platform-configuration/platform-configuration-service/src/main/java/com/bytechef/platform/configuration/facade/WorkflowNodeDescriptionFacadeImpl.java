@@ -31,6 +31,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -67,6 +68,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public String getClusterElementWorkflowNodeDescription(
         String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
 
@@ -86,6 +88,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(
