@@ -1,5 +1,6 @@
 extend type Query {
     workspaceMcpServers(workspaceId: ID!): [McpServer]
+    workspaceMcpServerTags(workspaceId: ID!): [Tag]
 }
 
 extend type Mutation {

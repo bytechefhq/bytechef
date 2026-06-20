@@ -18,11 +18,14 @@ package com.bytechef.automation.ai.mcp.facade;
 
 import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
+import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -40,15 +43,17 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
+    private final TagService tagService;
     private final WorkspaceMcpServerService workspaceMcpServerService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceMcpServerFacadeImpl(
-        McpServerFacade mcpServerFacade, McpServerService mcpServerService,
+        McpServerFacade mcpServerFacade, McpServerService mcpServerService, TagService tagService,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
         this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
+        this.tagService = tagService;
         this.workspaceMcpServerService = workspaceMcpServerService;
     }
 
@@ -61,6 +66,24 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
         return workspaceMcpServers.stream()
             .map(workspaceMcpServer -> mcpServerService.getMcpServer(workspaceMcpServer.getMcpServerId()))
             .toList();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getWorkspaceMcpServerTags(Long workspaceId) {
+        List<Long> tagIds = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId)
+            .stream()
+            .map(workspaceMcpServer -> mcpServerService.getMcpServer(workspaceMcpServer.getMcpServerId()))
+            .flatMap(mcpServer -> CollectionUtils.stream(mcpServer.getTagIds()))
+            .distinct()
+            .toList();
+
+        if (tagIds.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(tagIds);
     }
 
     @Override

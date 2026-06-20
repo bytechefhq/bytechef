@@ -1,6 +1,0 @@
-query mcpServerTags($type: PlatformType!) {
-    mcpServerTags(type: $type) {
-        id
-        name
-    }
-}
