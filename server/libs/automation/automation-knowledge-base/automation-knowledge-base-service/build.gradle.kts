@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-execution:atlas-execution-api"))
     implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:automation:automation-knowledge-base:automation-knowledge-base-api"))
+    implementation(project(":server:libs:automation:automation-search:automation-search-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-api"))
     implementation(project(":server:libs:platform:platform-knowledge-base:platform-knowledge-base-service"))
     implementation(project(":server:libs:config:app-config"))

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.knowledgebase.search;
 
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
@@ -22,6 +22,7 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -29,6 +30,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
+ * Workspace-scoped knowledge-base-document search; lives in automation so it can resolve the owning knowledge base's
+ * workspace (the {@code workspace_knowledge_base} relation) and stamp {@code workspaceId} on its results.
+ *
  * @author Ivica Cardic
  */
 @Component
@@ -37,12 +41,16 @@ class KnowledgeBaseDocumentSearchAssetProvider implements SearchAssetProvider {
 
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseWorkspaceResolver knowledgeBaseWorkspaceResolver;
 
+    @SuppressFBWarnings("EI")
     KnowledgeBaseDocumentSearchAssetProvider(
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService) {
+        KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseService knowledgeBaseService,
+        KnowledgeBaseWorkspaceResolver knowledgeBaseWorkspaceResolver) {
 
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeBaseWorkspaceResolver = knowledgeBaseWorkspaceResolver;
     }
 
     @Override
@@ -56,12 +64,13 @@ class KnowledgeBaseDocumentSearchAssetProvider implements SearchAssetProvider {
         for (KnowledgeBase knowledgeBase : knowledgeBases) {
             List<KnowledgeBaseDocument> documents =
                 knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBase.getId());
+            Long workspaceId = knowledgeBaseWorkspaceResolver.getWorkspaceId(knowledgeBase.getId());
 
             for (KnowledgeBaseDocument document : documents) {
                 if (containsIgnoreCase(document.getName(), queryLower)) {
                     results.add(
                         new KnowledgeBaseDocumentSearchResult(
-                            document.getId(), knowledgeBase.getId(), document.getName()));
+                            document.getId(), knowledgeBase.getId(), document.getName(), workspaceId));
 
                     if (results.size() >= limit) {
                         return results;

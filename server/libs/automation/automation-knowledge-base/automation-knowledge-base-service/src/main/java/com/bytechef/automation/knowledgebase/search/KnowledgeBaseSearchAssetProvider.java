@@ -14,17 +14,22 @@
  * limitations under the License.
  */
 
-package com.bytechef.platform.knowledgebase.search;
+package com.bytechef.automation.knowledgebase.search;
 
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
 /**
+ * Workspace-scoped knowledge-base search; lives in automation (not {@code platform-knowledge-base-service}) so it can
+ * resolve the knowledge-base &rarr; workspace mapping (the {@code workspace_knowledge_base} relation) and stamp
+ * {@code workspaceId} on its results.
+ *
  * @author Ivica Cardic
  */
 @Component
@@ -32,9 +37,14 @@ import org.springframework.stereotype.Component;
 class KnowledgeBaseSearchAssetProvider implements SearchAssetProvider {
 
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseWorkspaceResolver knowledgeBaseWorkspaceResolver;
 
-    KnowledgeBaseSearchAssetProvider(KnowledgeBaseService knowledgeBaseService) {
+    @SuppressFBWarnings("EI")
+    KnowledgeBaseSearchAssetProvider(
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseWorkspaceResolver knowledgeBaseWorkspaceResolver) {
+
         this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeBaseWorkspaceResolver = knowledgeBaseWorkspaceResolver;
     }
 
     @Override
@@ -49,7 +59,8 @@ class KnowledgeBaseSearchAssetProvider implements SearchAssetProvider {
             .limit(limit)
             .map(
                 knowledgeBase -> new KnowledgeBaseSearchResult(
-                    knowledgeBase.getId(), knowledgeBase.getName(), knowledgeBase.getDescription()))
+                    knowledgeBase.getId(), knowledgeBase.getName(), knowledgeBase.getDescription(),
+                    knowledgeBaseWorkspaceResolver.getWorkspaceId(knowledgeBase.getId())))
             .toList();
     }
 
