@@ -44,6 +44,18 @@ class ConnectedUserFacadeAuthorizationTest {
         assertAdmin("enableConnectedUser", long.class, boolean.class);
     }
 
+    @Test
+    void testGetConnectedUserEntityRequiresTenantAdmin() {
+        assertAdmin("getConnectedUserEntity", long.class);
+    }
+
+    @Test
+    void testGetConnectedUserEntitiesRequiresTenantAdmin() {
+        assertAdmin(
+            "getConnectedUserEntities", Long.class, String.class, java.time.LocalDate.class, java.time.LocalDate.class,
+            Long.class, int.class);
+    }
+
     private static void assertAdmin(String methodName, Class<?>... parameterTypes) {
         Method method;
 

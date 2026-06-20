@@ -139,6 +139,26 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             integrationInstanceConfigurations, integrations));
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    public ConnectedUser getConnectedUserEntity(long id) {
+        return connectedUserService.getConnectedUser(id);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    public Page<ConnectedUser> getConnectedUserEntities(
+        Long environmentId, String name, LocalDate createDateFrom, LocalDate createDateTo, Long integrationId,
+        int pageNumber) {
+
+        Environment environment = environmentId == null ? null : environmentService.getEnvironment(environmentId);
+
+        return connectedUserService.getConnectedUsers(
+            environment, name, createDateFrom, createDateTo, integrationId, pageNumber);
+    }
+
     private ConnectedUserDTO createConnectedUserDTO(
         ConnectedUser connectedUser, List<IntegrationInstance> integrationInstances,
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations, List<Integration> integrations) {
