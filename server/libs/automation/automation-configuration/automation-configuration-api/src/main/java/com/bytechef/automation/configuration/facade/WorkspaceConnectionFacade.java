@@ -33,6 +33,8 @@ public interface WorkspaceConnectionFacade {
 
     long create(long workspaceId, ConnectionDTO connectionDTO);
 
+    List<Tag> getConnectionTags(long workspaceId);
+
     long registerExisting(
         long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef);
 

@@ -44,6 +44,7 @@ import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -89,6 +90,9 @@ class WorkspaceConnectionFacadeTest {
     private ProjectService projectService;
 
     @Mock
+    private TagService tagService;
+
+    @Mock
     private UserService userService;
 
     @Mock
@@ -111,8 +115,8 @@ class WorkspaceConnectionFacadeTest {
 
         workspaceConnectionFacade = new WorkspaceConnectionFacadeImpl(
             applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
-            resourceVisibilityResolver, emptyProvider, projectDeploymentWorkflowService, projectService, userService,
-            workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+            resourceVisibilityResolver, emptyProvider, projectDeploymentWorkflowService, projectService, tagService,
+            userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
     }
 
     @Test
@@ -166,8 +170,8 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
-                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
-                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, tagService,
+                userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -216,8 +220,8 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
-                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
-                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, tagService,
+                userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -258,8 +262,8 @@ class WorkspaceConnectionFacadeTest {
 
             WorkspaceConnectionFacadeImpl facadeWithMetrics = new WorkspaceConnectionFacadeImpl(
                 applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
-                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, userService,
-                workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                resourceVisibilityResolver, provider, projectDeploymentWorkflowService, projectService, tagService,
+                userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             stubCurrentUserIsWorkspaceMember(securityUtils);
 
@@ -385,8 +389,7 @@ class WorkspaceConnectionFacadeTest {
                 mock(com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry.class);
             com.bytechef.platform.oauth2.service.OAuth2Service oAuth2Service =
                 mock(com.bytechef.platform.oauth2.service.OAuth2Service.class);
-            com.bytechef.platform.tag.service.TagService tagService =
-                mock(com.bytechef.platform.tag.service.TagService.class);
+            TagService localTagService = mock(TagService.class);
             WorkflowTestConfigurationService testConfigService = mock(WorkflowTestConfigurationService.class);
 
             @SuppressWarnings("unchecked")
@@ -397,7 +400,7 @@ class WorkspaceConnectionFacadeTest {
             com.bytechef.platform.connection.facade.ConnectionFacadeImpl realConnectionFacade =
                 new com.bytechef.platform.connection.facade.ConnectionFacadeImpl(
                     connectionDefinitionService, realDepConnectionService, "CE", jobPrincipalAccessorRegistry,
-                    oAuth2Service, tagService, testConfigService, emptyProvider);
+                    oAuth2Service, localTagService, testConfigService, emptyProvider);
 
             // Capture the Connection passed to the persistence layer — that's the moment of truth.
             // The real ConnectionFacadeImpl.create call path writes connection.setVisibility(WORKSPACE)
@@ -418,7 +421,7 @@ class WorkspaceConnectionFacadeTest {
             WorkspaceConnectionFacadeImpl workspaceFacadeWithRealChain = new WorkspaceConnectionFacadeImpl(
                 applicationEventPublisher, realConnectionFacade, connectionLifecycleFacade, connectionService,
                 resourceVisibilityResolver, emptyProvider, projectDeploymentWorkflowService, projectService,
-                userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+                tagService, userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
             ConnectionDTO requestDto = ConnectionDTO.builder()
                 .componentName("dummy")

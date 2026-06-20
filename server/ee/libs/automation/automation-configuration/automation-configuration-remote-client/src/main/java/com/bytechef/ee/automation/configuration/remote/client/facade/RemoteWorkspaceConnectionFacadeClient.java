@@ -31,6 +31,11 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
+    public List<Tag> getConnectionTags(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public long registerExisting(
         long workspaceId, ConnectionDTO connectionDTO, CredentialStoreType storeType, String credentialRef) {
 
@@ -61,7 +66,6 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
-    public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
     public void update(long connectionId, String name, List<Tag> tags, int version) {
         throw new UnsupportedOperationException();
     }
@@ -72,7 +76,7 @@ public class RemoteWorkspaceConnectionFacadeClient implements WorkspaceConnectio
     }
 
     @Override
-    public ResourceVisibility promoteToWorkspace(long workspaceId, long connectionId) {
+    public void setConnectionVisibility(long workspaceId, long connectionId, ResourceVisibility visibility) {
         throw new UnsupportedOperationException();
     }
 

@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:59.729452+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:41:00.939229+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connection-tag", description = "The Automation Connection Tag Internal API")
 public interface ConnectionTagApi {
@@ -43,17 +43,18 @@ public interface ConnectionTagApi {
         return Optional.empty();
     }
 
-    String PATH_GET_CONNECTION_TAGS = "/connections/tags";
+    String PATH_GET_CONNECTION_TAGS = "/workspaces/{id}/connection-tags";
     /**
-     * GET /connections/tags : Get connection tags
-     * Get connection tags.
+     * GET /workspaces/{id}/connection-tags : Get connection tags
+     * Get connection tags for a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The list of connection tags. (status code 200)
      */
     @Operation(
         operationId = "getConnectionTags",
         summary = "Get connection tags",
-        description = "Get connection tags.",
+        description = "Get connection tags for a workspace.",
         tags = { "connection-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of connection tags.", content = {
@@ -67,7 +68,7 @@ public interface ConnectionTagApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getConnectionTags(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

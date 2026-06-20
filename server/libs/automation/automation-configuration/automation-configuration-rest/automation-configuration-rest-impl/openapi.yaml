@@ -122,13 +122,21 @@ paths:
                 format: int64
         "400":
           description: "Read-only store rejected the write, or secret not found at credentialRef."
-  /connections/tags:
+  /workspaces/{id}/connection-tags:
     get:
-      description: "Get connection tags."
+      description: "Get connection tags for a workspace."
       summary: "Get connection tags"
       tags:
         - "connection-tag"
       operationId: "getConnectionTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of connection tags."

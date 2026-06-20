@@ -40,6 +40,7 @@ import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.tag.domain.Tag;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
@@ -47,6 +48,7 @@ import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -75,6 +77,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     protected final MeterRegistry meterRegistry;
     protected final ProjectDeploymentWorkflowService projectDeploymentWorkflowService;
     protected final ProjectService projectService;
+    protected final TagService tagService;
     protected final UserService userService;
     protected final WorkflowTestConfigurationService workflowTestConfigurationService;
     protected final WorkspaceConnectionService workspaceConnectionService;
@@ -89,7 +92,8 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         ResourceVisibilityResolver resourceVisibilityResolver,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
-        UserService userService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        TagService tagService, UserService userService,
+        WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade) {
 
         this.applicationEventPublisher = applicationEventPublisher;
@@ -100,6 +104,7 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
         this.meterRegistry = meterRegistryProvider.getIfAvailable();
         this.projectDeploymentWorkflowService = projectDeploymentWorkflowService;
         this.projectService = projectService;
+        this.tagService = tagService;
         this.userService = userService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
         this.workspaceConnectionService = workspaceConnectionService;
@@ -201,6 +206,22 @@ public class WorkspaceConnectionFacadeImpl implements WorkspaceConnectionFacade 
     @PreAuthorize("hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_VIEW')")
     public ConnectionDTO getConnection(long connectionId) {
         return connectionFacade.getConnection(connectionId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getConnectionTags(long workspaceId) {
+        List<Long> connectionIds = CollectionUtils.map(
+            workspaceConnectionService.getWorkspaceConnections(workspaceId), WorkspaceConnection::getConnectionId);
+
+        List<Connection> connections = connectionService.getConnections(connectionIds);
+
+        return tagService.getTags(
+            connections.stream()
+                .map(Connection::getTagIds)
+                .flatMap(Collection::stream)
+                .toList());
     }
 
     @Override
