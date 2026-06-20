@@ -17,6 +17,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +42,7 @@ public class IntegrationTagFacadeImpl implements IntegrationTagFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public List<Tag> getIntegrationTags() {
         List<Integration> integrations = integrationService.getIntegrations();
 
@@ -53,6 +55,7 @@ public class IntegrationTagFacadeImpl implements IntegrationTagFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void updateIntegrationTags(long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 
