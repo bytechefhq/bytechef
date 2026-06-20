@@ -41,6 +41,8 @@ public interface WorkspaceDataTableFacade {
 
     void duplicateTable(long dataTableId, String newBaseName, long environmentId);
 
+    List<Tag> getDataTableTags(long workspaceId);
+
     List<DataTableInfo> listTables(long workspaceId, long environmentId);
 
     void removeColumn(long dataTableId, String columnName, long environmentId);

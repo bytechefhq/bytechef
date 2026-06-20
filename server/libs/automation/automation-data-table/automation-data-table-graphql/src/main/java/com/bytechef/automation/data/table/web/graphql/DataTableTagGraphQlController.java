@@ -54,9 +54,8 @@ public class DataTableTagGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("isAuthenticated()")
-    public List<Tag> dataTableTags() {
-        return dataTableTagService.getAllTags();
+    public List<Tag> dataTableTags(@Argument Long workspaceId) {
+        return workspaceDataTableFacade.getDataTableTags(workspaceId);
     }
 
     @QueryMapping

@@ -42,6 +42,11 @@ class WorkspaceDataTableFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetDataTableTagsRequiresWorkspaceViewer() {
+        assertExpression("getDataTableTags", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+    }
+
+    @Test
     void testAddColumnRequiresTableEditor() {
         assertExpression("addColumn", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
     }

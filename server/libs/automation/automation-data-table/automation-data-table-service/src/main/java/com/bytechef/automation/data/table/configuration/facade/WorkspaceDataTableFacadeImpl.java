@@ -96,6 +96,19 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @Override
     @Transactional(readOnly = true)
     @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getDataTableTags(long workspaceId) {
+        List<Long> dataTableIds = workspaceDataTableService.getWorkspaceDataTables(workspaceId)
+            .stream()
+            .map(WorkspaceDataTable::getDataTableId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        return dataTableTagService.getTags(dataTableIds);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
     public List<DataTableInfo> listTables(long workspaceId, long environmentId) {
         List<DataTableInfo> dataTableInfos = dataTableService.listTables(environmentId);
 
