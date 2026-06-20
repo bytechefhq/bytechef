@@ -25,6 +25,8 @@ import {useShallow} from 'zustand/react/shallow';
 const Project = () => {
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId!);
     const {workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             workflow: state.workflow,
@@ -107,6 +109,7 @@ const Project = () => {
                                 value={{
                                     ConnectionKeys: ConnectionKeys,
                                     cancelWorkflowQueries,
+                                    connectionTagsQueryKey: ConnectionKeys.connectionTags(currentWorkspaceId!),
                                     deleteClusterElementParameterMutation,
                                     deleteWorkflowNodeParameterMutation,
                                     invalidateWorkflowQueries,
@@ -115,7 +118,7 @@ const Project = () => {
                                     updateWorkflowNodeParameterMutation,
                                     useCreateConnectionMutation: useCreateConnectionMutation,
                                     useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
-                                    useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                                    useGetConnectionTagsQuery: () => connectionTagsQueryResult,
                                     useGetConnectionsQuery,
                                     webhookTriggerTestApi: new WebhookTriggerTestApi(),
                                 }}

@@ -36,6 +36,7 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
 
     const {
         ConnectionKeys,
+        connectionTagsQueryKey,
         useCreateConnectionMutation,
         useGetComponentDefinitionsQuery,
         useGetConnectionTagsQuery,
@@ -124,6 +125,7 @@ const usePropertyCodeEditorDialogRightPanelConnectionsSelect = ({
         componentDefinition,
         componentDefinitions,
         connectionId,
+        connectionTagsQueryKey,
         connections,
         handleValueChange,
         setShowNewConnectionDialog,

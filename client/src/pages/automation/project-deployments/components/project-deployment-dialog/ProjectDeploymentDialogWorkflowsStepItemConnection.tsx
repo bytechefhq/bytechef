@@ -44,6 +44,8 @@ const DeploymentConnectionFormField = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId!);
+
     const deploymentEnvironmentId = useWatch({control, name: 'environmentId'}) ?? currentEnvironmentId;
 
     const {data: componentDefinition, isPending: isComponentDefinitionPending} = useGetComponentDefinitionQuery({
@@ -125,7 +127,7 @@ const DeploymentConnectionFormField = ({
                                         componentDefinition={componentDefinition}
                                         componentDefinitions={componentDefinitions!}
                                         connection={{environmentId: deploymentEnvironmentId} as Connection}
-                                        connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                                        connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId!)}
                                         connectionsQueryKey={ConnectionKeys.connections}
                                         onClose={() => {}}
                                         triggerNode={
@@ -138,7 +140,7 @@ const DeploymentConnectionFormField = ({
                                             />
                                         }
                                         useCreateConnectionMutation={useCreateConnectionMutation}
-                                        useGetConnectionTagsQuery={useGetConnectionTagsQuery}
+                                        useGetConnectionTagsQuery={() => connectionTagsQueryResult}
                                     />
                                 )}
                             </div>

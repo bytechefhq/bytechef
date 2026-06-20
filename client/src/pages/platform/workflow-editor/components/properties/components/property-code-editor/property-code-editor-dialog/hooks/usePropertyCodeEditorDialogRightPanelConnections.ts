@@ -44,6 +44,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
 
     const {
         ConnectionKeys,
+        connectionTagsQueryKey,
         updateWorkflowMutation,
         useCreateConnectionMutation,
         useGetComponentDefinitionsQuery,
@@ -260,6 +261,7 @@ export const usePropertyCodeEditorDialogRightPanelConnections = ({
         ConnectionKeys,
         componentConnections,
         componentDefinitions,
+        connectionTagsQueryKey,
         handleCloseConnectionNote,
         handleOnRemoveClick,
         handleOnSubmit,

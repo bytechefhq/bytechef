@@ -11,7 +11,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {GetComponentDefinitionsRequestI} from '@/shared/queries/platform/componentDefinitions.queries';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {UseMutationResult, UseQueryResult} from '@tanstack/react-query';
+import {QueryKey, UseMutationResult, UseQueryResult} from '@tanstack/react-query';
 import {ReactNode, createContext, useContext} from 'react';
 
 export interface CreateConnectionMutationProps {
@@ -47,7 +47,6 @@ export interface ConnectionI {
 
 export interface ConnectionKeysI {
     connection: (id: number) => (string | number)[];
-    connectionTags: string[];
     connections: string[];
     filteredConnections: (filters: RequestI) => (string | RequestI)[];
 }
@@ -88,6 +87,7 @@ export interface WorkflowReadOnlyStateI {
 
 export interface WorkflowEditorStateI extends WorkflowReadOnlyStateI {
     ConnectionKeys: ConnectionKeysI;
+    connectionTagsQueryKey: QueryKey;
     cancelWorkflowQueries: () => void;
     deleteClusterElementParameterMutation: UseMutationResult<
         DeleteClusterElementParameter200Response,

@@ -181,11 +181,11 @@ describe('PropertyMentionsInput', () => {
                 value={{
                     ConnectionKeys: {
                         connection: () => [],
-                        connectionTags: [],
                         connections: [],
                         filteredConnections: () => [],
                     },
                     cancelWorkflowQueries: () => {},
+                    connectionTagsQueryKey: [],
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -297,11 +297,11 @@ describe('PropertyMentionsInput', () => {
                 value={{
                     ConnectionKeys: {
                         connection: () => [],
-                        connectionTags: [],
                         connections: [],
                         filteredConnections: () => [],
                     },
                     cancelWorkflowQueries: () => {},
+                    connectionTagsQueryKey: [],
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -397,11 +397,11 @@ describe('PropertyMentionsInput', () => {
                 value={{
                     ConnectionKeys: {
                         connection: () => [],
-                        connectionTags: [],
                         connections: [],
                         filteredConnections: () => [],
                     },
                     cancelWorkflowQueries: () => {},
+                    connectionTagsQueryKey: [],
                     deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                         DeleteClusterElementParameter200Response,
                         Error,
@@ -476,11 +476,11 @@ describe('PropertyMentionsInput', () => {
         const providerValue = {
             ConnectionKeys: {
                 connection: () => [],
-                connectionTags: [],
                 connections: [],
                 filteredConnections: () => [],
             },
             cancelWorkflowQueries: () => {},
+            connectionTagsQueryKey: [],
             deleteClusterElementParameterMutation: dummyMutation as unknown as UseMutationResult<
                 DeleteClusterElementParameter200Response,
                 Error,

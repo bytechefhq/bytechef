@@ -4,18 +4,18 @@ All URIs are relative to */api/automation/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getConnectionTags**](ConnectionTagApi.md#getconnectiontags) | **GET** /connections/tags | Get connection tags |
+| [**getConnectionTags**](ConnectionTagApi.md#getconnectiontags) | **GET** /workspaces/{id}/connection-tags | Get connection tags |
 | [**updateConnectionTags**](ConnectionTagApi.md#updateconnectiontags) | **PUT** /connections/{id}/tags | Updates tags of an existing connection |
 
 
 
 ## getConnectionTags
 
-> Array&lt;Tag&gt; getConnectionTags()
+> Array&lt;Tag&gt; getConnectionTags(id)
 
 Get connection tags
 
-Get connection tags.
+Get connection tags for a workspace.
 
 ### Example
 
@@ -30,8 +30,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new ConnectionTagApi();
 
+  const body = {
+    // number | The id of a workspace.
+    id: 789,
+  } satisfies GetConnectionTagsRequest;
+
   try {
-    const data = await api.getConnectionTags();
+    const data = await api.getConnectionTags(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -44,7 +49,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 
 ### Return type
 

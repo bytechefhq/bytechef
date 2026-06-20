@@ -11,7 +11,7 @@ import {useQuery} from '@tanstack/react-query';
 
 export const ConnectionKeys = {
     connection: (id: number) => [...ConnectionKeys.connections, id],
-    connectionTags: ['automation_connectionTags'],
+    connectionTags: (id: number) => ['automation_connectionTags', id] as const,
     connections: ['automation_connections'],
     filteredConnections: (filters: {
         id?: number;
@@ -21,10 +21,10 @@ export const ConnectionKeys = {
     }) => [...ConnectionKeys.connections, filters],
 };
 
-export const useGetConnectionTagsQuery = () =>
+export const useGetConnectionTagsQuery = (id: number) =>
     useQuery<Tag[], Error>({
-        queryKey: ConnectionKeys.connectionTags,
-        queryFn: () => new ConnectionTagApi().getConnectionTags(),
+        queryKey: ConnectionKeys.connectionTags(id),
+        queryFn: () => new ConnectionTagApi().getConnectionTags({id}),
     });
 
 export const useGetWorkspaceConnectionsQuery = (request: GetWorkspaceConnectionsRequest, enabled?: boolean) =>

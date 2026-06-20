@@ -64,6 +64,8 @@ const EmbeddableWorkflowEditorInner = ({
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId!);
+
     const {setIsWorkflowLoaded, setWorkflow, workflow} = useWorkflowDataStore(
         useShallow((state) => ({
             setIsWorkflowLoaded: state.setIsWorkflowLoaded,
@@ -205,6 +207,7 @@ const EmbeddableWorkflowEditorInner = ({
                 value={{
                     ConnectionKeys: ConnectionKeys,
                     cancelWorkflowQueries,
+                    connectionTagsQueryKey: ConnectionKeys.connectionTags(currentWorkspaceId!),
                     deleteClusterElementParameterMutation,
                     deleteWorkflowNodeParameterMutation,
                     invalidateWorkflowQueries,
@@ -213,7 +216,7 @@ const EmbeddableWorkflowEditorInner = ({
                     updateWorkflowNodeParameterMutation,
                     useCreateConnectionMutation: useCreateConnectionMutation,
                     useGetComponentDefinitionsQuery: embeddedUseGetComponentDefinitionsQuery,
-                    useGetConnectionTagsQuery: useGetConnectionTagsQuery,
+                    useGetConnectionTagsQuery: () => connectionTagsQueryResult,
                     useGetConnectionsQuery: embeddedUseGetConnectionsQuery,
                     webhookTriggerTestApi: new WebhookTriggerTestApi(),
                 }}

@@ -25,6 +25,7 @@ const PropertyCodeEditorDialogRightPanelConnectionsSelect = ({
         componentDefinition,
         componentDefinitions,
         connectionId,
+        connectionTagsQueryKey,
         connections,
         handleValueChange,
         setShowNewConnectionDialog,
@@ -82,7 +83,7 @@ const PropertyCodeEditorDialogRightPanelConnectionsSelect = ({
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
                     componentDefinitions={componentDefinitions}
-                    connectionTagsQueryKey={ConnectionKeys!.connectionTags}
+                    connectionTagsQueryKey={connectionTagsQueryKey}
                     connectionsQueryKey={ConnectionKeys!.connections}
                     onClose={() => setShowNewConnectionDialog(false)}
                     useCreateConnectionMutation={useCreateConnectionMutation}
