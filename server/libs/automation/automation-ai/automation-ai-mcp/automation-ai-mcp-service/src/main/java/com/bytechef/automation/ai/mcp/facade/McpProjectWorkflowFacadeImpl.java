@@ -20,6 +20,7 @@ import com.bytechef.automation.ai.mcp.domain.McpProjectWorkflow;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'EDITOR')")
     public void deleteMcpProjectWorkflow(long mcpProjectWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(mcpProjectWorkflowId)
             .orElseThrow(
