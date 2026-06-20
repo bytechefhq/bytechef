@@ -31,6 +31,7 @@ import java.util.Objects;
 import java.util.stream.Stream;
 import org.apache.commons.lang3.Validate;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,6 +71,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void enableConnectedUser(long id, boolean enable) {
         List<IntegrationInstance> integrationInstances = integrationInstanceService
             .getConnectedUserIntegrationInstances(id);
@@ -86,6 +88,7 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public ConnectedUserDTO getConnectedUser(long id) {
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(id);
 
@@ -103,9 +106,9 @@ public class ConnectedUserFacadeImpl implements ConnectedUserFacade {
             connectedUser, integrationInstances, integrationInstanceConfigurations, integrations);
     }
 
-    // TODO Add paging and filtering
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public Page<ConnectedUserDTO> getConnectedUsers(
         Long environmentId, String search, CredentialStatus credentialStatus, LocalDate createDateFrom,
         LocalDate createDateTo, Long integrationId, int pageNumber) {
