@@ -66,10 +66,17 @@ public class FilesystemWriteFileAction {
 
         String fileName = inputParameters.getRequiredString(FILENAME);
 
+        if (fileName.indexOf('\0') >= 0) {
+            throw new IllegalArgumentException("Invalid file path");
+        }
+
+        Path path = Path.of(fileName)
+            .normalize();
+
         try (InputStream inputStream = context.file(
             file -> file.getInputStream(inputParameters.getRequiredFileEntry(FILE_ENTRY)))) {
 
-            return Map.of("bytes", Files.copy(inputStream, Path.of(fileName), StandardCopyOption.REPLACE_EXISTING));
+            return Map.of("bytes", Files.copy(inputStream, path, StandardCopyOption.REPLACE_EXISTING));
         }
     }
 }

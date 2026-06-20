@@ -19,6 +19,7 @@ package com.bytechef.component.filesystem.action;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILENAME;
 import static com.bytechef.component.filesystem.constant.FilesystemConstants.FILE_ENTRY;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.FileEntry;
@@ -35,10 +36,22 @@ import org.mockito.Mockito;
 /**
  * @author Ivica Cardic
  */
-@Disabled
 class FilesystemWriteFileActionTest {
 
     @Test
+    void testRejectsNullByteInFilename() {
+        Parameters parameters = Mockito.mock(Parameters.class);
+
+        Mockito.when(parameters.getRequiredString(Mockito.eq(FILENAME)))
+            .thenReturn("/tmp/evil\0.txt");
+
+        assertThatThrownBy(
+            () -> FilesystemWriteFileAction.perform(parameters, parameters, Mockito.mock(ActionContext.class)))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    @Disabled
     @SuppressFBWarnings("OBL")
     void testPerformWriteFile() throws IOException {
         ActionContext context = Mockito.mock(ActionContext.class);

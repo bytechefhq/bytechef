@@ -190,9 +190,21 @@ public class JGitWorkflowOperations implements GitWorkflowOperations {
                 }
 
                 for (WorkflowResource workflowResource : workflowResources) {
-                    File workflowFile = new File(repositoryDir, Objects.requireNonNull(workflowResource.getFilename()));
+                    String filename = Objects.requireNonNull(workflowResource.getFilename());
 
-                    Path path = workflowFile.toPath();
+                    if (filename.indexOf('\0') >= 0) {
+                        throw new IllegalArgumentException("Invalid workflow filename");
+                    }
+
+                    Path repositoryPath = repositoryDir.toPath()
+                        .toAbsolutePath()
+                        .normalize();
+                    Path path = repositoryPath.resolve(filename)
+                        .normalize();
+
+                    if (!path.startsWith(repositoryPath)) {
+                        throw new IllegalArgumentException("Invalid workflow filename: " + filename);
+                    }
 
                     Files.copy(
                         workflowResource.getInputStream(), path, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
