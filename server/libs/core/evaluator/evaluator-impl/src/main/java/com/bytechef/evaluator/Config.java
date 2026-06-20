@@ -32,6 +32,8 @@ import org.springframework.expression.spel.SpelMessage;
  */
 class Config implements MethodExecutor {
 
+    private static final String ALLOWED_PREFIXES_PROPERTY = "bytechef.workflow.config.allowed-prefixes";
+
     private final transient Environment environment;
 
     public Config(Environment environment) {
@@ -41,6 +43,12 @@ class Config implements MethodExecutor {
     @Override
     public TypedValue execute(EvaluationContext context, Object target, Object... arguments) throws AccessException {
         String propertyName = (String) arguments[0];
+
+        if (!isAllowed(propertyName)) {
+            throw new SpelEvaluationException(
+                SpelMessage.PROPERTY_OR_FIELD_NOT_READABLE, propertyName, Environment.class);
+        }
+
         String value = environment.getProperty(propertyName);
 
         if (value == null) {
@@ -49,5 +57,19 @@ class Config implements MethodExecutor {
         }
 
         return new TypedValue(value);
+    }
+
+    private boolean isAllowed(String propertyName) {
+        String[] prefixes = environment.getProperty(ALLOWED_PREFIXES_PROPERTY, String[].class, new String[0]);
+
+        for (String prefix : prefixes) {
+            String trimmedPrefix = prefix.trim();
+
+            if (!trimmedPrefix.isEmpty() && propertyName.startsWith(trimmedPrefix)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
