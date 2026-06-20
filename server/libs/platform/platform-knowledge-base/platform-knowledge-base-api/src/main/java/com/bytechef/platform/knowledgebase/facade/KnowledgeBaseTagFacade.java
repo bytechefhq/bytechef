@@ -35,6 +35,14 @@ public interface KnowledgeBaseTagFacade {
     List<Tag> getAllTags();
 
     /**
+     * Retrieves the distinct tags assigned to the given knowledge bases.
+     *
+     * @param knowledgeBaseIds the ids of the knowledge bases whose tags are to be retrieved
+     * @return a list of Tag objects assigned to the given knowledge bases
+     */
+    List<Tag> getTags(List<Long> knowledgeBaseIds);
+
+    /**
      * Retrieves a mapping from knowledgebase ID to list of tags assigned to that knowledgeBase.
      *
      * @return a map where keys are knowledgebase IDs and values are lists of Tag objects assigned to each knowledgebase

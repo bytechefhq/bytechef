@@ -37,6 +37,11 @@ class WorkspaceKnowledgeBaseFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetKnowledgeBaseTagsRequiresWorkspaceViewer() {
+        assertExpression("getKnowledgeBaseTags", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+    }
+
+    @Test
     void testGetKnowledgeBaseRequiresResourceViewer() {
         assertExpression("getKnowledgeBase", "hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')");
     }

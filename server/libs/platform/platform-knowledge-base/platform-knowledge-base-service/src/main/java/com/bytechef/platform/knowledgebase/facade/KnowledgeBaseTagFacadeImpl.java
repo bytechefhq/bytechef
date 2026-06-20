@@ -69,6 +69,32 @@ public class KnowledgeBaseTagFacadeImpl implements KnowledgeBaseTagFacade {
     }
 
     @Override
+    public List<Tag> getTags(List<Long> knowledgeBaseIds) {
+        Set<Long> ids = new HashSet<>();
+
+        for (Long knowledgeBaseId : knowledgeBaseIds) {
+            KnowledgeBase knowledgeBase = knowledgeBaseRepository.findById(knowledgeBaseId)
+                .orElse(null);
+
+            if (knowledgeBase == null) {
+                continue;
+            }
+
+            List<Long> tagIds = knowledgeBase.getTagIds();
+
+            if (tagIds != null) {
+                ids.addAll(tagIds);
+            }
+        }
+
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+
+        return tagService.getTags(new ArrayList<>(ids));
+    }
+
+    @Override
     public Map<Long, List<Tag>> getTagsByKnowledgeBaseId() {
         Map<Long, List<Tag>> map = new HashMap<>();
 

@@ -24,8 +24,10 @@ import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
+import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -50,19 +52,35 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
     private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseService knowledgeBaseService, WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagFacade knowledgeBaseTagFacade,
+        WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseFacade = knowledgeBaseFacade;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
         this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getKnowledgeBaseTags(long workspaceId) {
+        List<Long> knowledgeBaseIds = workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
+            .stream()
+            .map(WorkspaceKnowledgeBase::getKnowledgeBaseId)
+            .filter(Objects::nonNull)
+            .toList();
+
+        return knowledgeBaseTagFacade.getTags(knowledgeBaseIds);
     }
 
     @Override
