@@ -75,6 +75,15 @@ public interface McpServerService {
     McpServer getMcpServer(long mcpServerId);
 
     /**
+     * Returns the MCP server's secret key. The secret authenticates inbound MCP traffic, so this is restricted to
+     * tenant admins (a workspace member who can otherwise view the server must not read the secret).
+     *
+     * @param mcpServerId the unique identifier of the MCP server
+     * @return the secret key
+     */
+    String getMcpServerSecretKey(long mcpServerId);
+
+    /**
      * Retrieves an MCP server by its secret key.
      *
      * @param secretKey the secret key used to identify the MCP server

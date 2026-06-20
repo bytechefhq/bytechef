@@ -42,6 +42,12 @@ class McpServerAuthorizationTest {
     }
 
     @Test
+    void testGetSecretKeyRequiresTenantAdmin() {
+        assertExpression(
+            McpServerServiceImpl.class, "getMcpServerSecretKey", "hasPermission('Tenant', 'ADMIN')", long.class);
+    }
+
+    @Test
     void testUpdateRequiresEditor() {
         assertExpression(
             McpServerServiceImpl.class, "update", "hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')",

@@ -35,7 +35,6 @@ import org.springframework.graphql.data.method.annotation.BatchMapping;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.graphql.data.method.annotation.SchemaMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -62,14 +61,14 @@ public class McpServerGraphQlController {
     }
 
     /**
-     * The MCP server secret key authenticates inbound MCP traffic; only tenant admins may read it. Declaring an
-     * explicit field resolver (instead of the default {@code getSecretKey()} getter) lets us gate the field so a
-     * non-admin who can otherwise view the server (workspace VIEWER) is denied the secret rather than seeing it.
+     * The MCP server secret key authenticates inbound MCP traffic; only tenant admins may read it. The explicit field
+     * resolver (instead of the default {@code getSecretKey()} getter) delegates to the admin-gated service method, so a
+     * non-admin who can otherwise view the server (workspace VIEWER) is denied the secret. The authorization lives on
+     * {@code McpServerService.getMcpServerSecretKey}, not here.
      */
     @SchemaMapping(typeName = "McpServer", field = "secretKey")
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public String secretKey(McpServer mcpServer) {
-        return mcpServer.getSecretKey();
+        return mcpServerService.getMcpServerSecretKey(mcpServer.getId());
     }
 
     @QueryMapping

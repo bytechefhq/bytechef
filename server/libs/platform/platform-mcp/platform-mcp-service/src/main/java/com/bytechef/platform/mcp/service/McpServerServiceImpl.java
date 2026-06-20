@@ -59,6 +59,15 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    public String getMcpServerSecretKey(long mcpServerId) {
+        return mcpServerRepository.findById(mcpServerId)
+            .map(McpServer::getSecretKey)
+            .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
+    }
+
+    @Override
     public McpServer getMcpServer(String secretKey) {
         return mcpServerRepository.findBySecretKey(secretKey)
             .orElseThrow(() -> new IllegalArgumentException("MCP server with secret key " + secretKey + " not found"));
