@@ -1,0 +1,10 @@
+query ComponentPolicies {
+    componentPolicies {
+        name
+        title
+        description
+        icon
+        version
+        enabled
+    }
+}

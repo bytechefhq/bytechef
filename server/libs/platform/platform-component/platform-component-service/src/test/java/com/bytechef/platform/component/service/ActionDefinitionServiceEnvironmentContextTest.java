@@ -30,6 +30,7 @@ import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -54,7 +55,7 @@ class ActionDefinitionServiceEnvironmentContextTest {
         ContextFactory contextFactory = mock(ContextFactory.class);
 
         ActionDefinitionServiceImpl service = new ActionDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory);
+            componentDefinitionRegistry, contextFactory, List.of());
 
         AtomicReference<Environment> capturedEnvironment = new AtomicReference<>();
 
