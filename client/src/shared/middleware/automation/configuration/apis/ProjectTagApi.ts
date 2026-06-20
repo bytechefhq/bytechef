@@ -24,6 +24,10 @@ import {
     UpdateTagsRequestToJSON,
 } from '../models/UpdateTagsRequest';
 
+export interface GetProjectTagsRequest {
+    id: number;
+}
+
 export interface UpdateProjectTagsRequest {
     id: number;
     updateTagsRequest: UpdateTagsRequest;
@@ -37,13 +41,20 @@ export class ProjectTagApi extends runtime.BaseAPI {
     /**
      * Creates request options for getProjectTags without sending the request
      */
-    async getProjectTagsRequestOpts(): Promise<runtime.RequestOpts> {
+    async getProjectTagsRequestOpts(requestParameters: GetProjectTagsRequest): Promise<runtime.RequestOpts> {
+        if (requestParameters['id'] == null) {
+            throw new runtime.RequiredError(
+                'id',
+                'Required parameter "id" was null or undefined when calling getProjectTags().'
+            );
+        }
+
         const queryParameters: any = {};
 
         const headerParameters: runtime.HTTPHeaders = {};
 
-
-        let urlPath = `/projects/tags`;
+        let urlPath = `/workspaces/{id}/project-tags`;
+        urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 
         return {
             path: urlPath,
@@ -54,22 +65,22 @@ export class ProjectTagApi extends runtime.BaseAPI {
     }
 
     /**
-     * Get project tags.
-     * Get project tags.
+     * Get project tags for a workspace.
+     * Get project tags
      */
-    async getProjectTagsRaw(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
-        const requestOptions = await this.getProjectTagsRequestOpts();
+    async getProjectTagsRaw(requestParameters: GetProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<Array<Tag>>> {
+        const requestOptions = await this.getProjectTagsRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         return new runtime.JSONApiResponse(response, (jsonValue) => jsonValue.map(TagFromJSON));
     }
 
     /**
-     * Get project tags.
-     * Get project tags.
+     * Get project tags for a workspace.
+     * Get project tags
      */
-    async getProjectTags(initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
-        const response = await this.getProjectTagsRaw(initOverrides);
+    async getProjectTags(requestParameters: GetProjectTagsRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<Array<Tag>> {
+        const response = await this.getProjectTagsRaw(requestParameters, initOverrides);
         return await response.value();
     }
 

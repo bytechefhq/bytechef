@@ -95,7 +95,7 @@ const Projects = () => {
             }),
         }) > 0;
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetProjectTagsQuery(currentWorkspaceId!);
 
     const {data: taskDispatcherDefinitions} = useGetTaskDispatcherDefinitionsQuery();
 

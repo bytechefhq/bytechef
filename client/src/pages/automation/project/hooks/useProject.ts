@@ -110,7 +110,7 @@ export const useProject = () => {
 
     const {data: categories} = useGetProjectCategoriesQuery();
 
-    const {data: tags} = useGetProjectTagsQuery();
+    const {data: tags} = useGetProjectTagsQuery(currentWorkspaceId!);
 
     const queryClient = useQueryClient();
 
