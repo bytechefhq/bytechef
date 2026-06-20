@@ -39,11 +39,14 @@ class DataTableSearchAssetProvider implements SearchAssetProvider {
     public List<DataTableSearchResult> search(String query, int limit) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
+        // Mirrors the hardcoded workspaceId=1L of the underlying query; stamping it on the result lets the search
+        // aggregator drop these for callers not in workspace 1 (closes the cross-workspace leak; the hardcoded
+        // single-workspace query remains a separate functional limitation).
         return dataTableService.listTables(1L)
             .stream()
             .filter(table -> containsIgnoreCase(table.baseName(), queryLower))
             .limit(limit)
-            .map(table -> new DataTableSearchResult(table.id(), table.baseName()))
+            .map(table -> new DataTableSearchResult(table.id(), table.baseName(), 1L))
             .toList();
     }
 

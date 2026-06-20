@@ -46,7 +46,7 @@ class AssetFileSearchAssetProvider implements SearchAssetProvider {
             .stream()
             .filter(assetFile -> containsIgnoreCase(assetFile.getName(), queryLower))
             .limit(limit)
-            .map(assetFile -> new AssetFileSearchResult(assetFile.getId(), assetFile.getName()))
+            .map(assetFile -> new AssetFileSearchResult(assetFile.getId(), assetFile.getName(), 1L))
             .toList();
     }
 
