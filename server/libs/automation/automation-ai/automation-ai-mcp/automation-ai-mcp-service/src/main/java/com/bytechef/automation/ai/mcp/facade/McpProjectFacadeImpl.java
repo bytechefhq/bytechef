@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +68,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -107,6 +109,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
     public void deleteMcpProject(long mcpProjectId) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -132,6 +135,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
     public McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -190,6 +194,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
     public McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId) {
         // Resolve the source first so a forged mcpProjectId or stale id surfaces a typed IllegalArgumentException
         // before we try to provision the deployment for the clone — failing fast keeps the rollback surface small.

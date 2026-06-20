@@ -21,6 +21,7 @@ import com.bytechef.automation.ai.mcp.repository.McpProjectRepository;
 import com.bytechef.commons.util.OptionalUtils;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,6 +62,7 @@ public class McpProjectServiceImpl implements McpProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'VIEWER')")
     public Optional<McpProject> fetchMcpProject(long mcpProjectId) {
         return mcpProjectRepository.findById(mcpProjectId);
     }
@@ -71,6 +73,7 @@ public class McpProjectServiceImpl implements McpProjectService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'VIEWER')")
     public List<McpProject> getMcpServerMcpProjects(long mcpServerId) {
         return mcpProjectRepository.findAllByMcpServerId(mcpServerId);
     }
