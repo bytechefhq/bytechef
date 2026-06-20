@@ -1,4 +1,5 @@
 dependencies {
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-api"))
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-eval:platform-ai-agent-eval-file-storage:platform-ai-agent-eval-file-storage-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))

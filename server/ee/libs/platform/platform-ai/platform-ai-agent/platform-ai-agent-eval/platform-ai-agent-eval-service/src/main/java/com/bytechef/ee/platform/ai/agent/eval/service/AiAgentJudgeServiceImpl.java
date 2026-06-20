@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.agent.eval.service;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentJudge;
 import com.bytechef.ee.platform.ai.agent.eval.repository.AiAgentJudgeRepository;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,11 +37,13 @@ class AgentJudgeServiceImpl implements AiAgentJudgeService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentJudge createAiAgentJudge(AiAgentJudge agentJudge) {
         return agentJudgeRepository.save(agentJudge);
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void deleteAiAgentJudge(long id) {
         agentJudgeRepository.deleteById(id);
     }
@@ -66,6 +69,7 @@ class AgentJudgeServiceImpl implements AiAgentJudgeService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentJudge updateAiAgentJudge(AiAgentJudge agentJudge) {
         return agentJudgeRepository.save(agentJudge);
     }

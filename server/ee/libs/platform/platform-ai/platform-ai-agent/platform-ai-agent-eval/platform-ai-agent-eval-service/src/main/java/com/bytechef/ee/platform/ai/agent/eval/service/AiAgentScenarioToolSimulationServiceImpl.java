@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.agent.eval.service;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentScenarioToolSimulation;
 import com.bytechef.ee.platform.ai.agent.eval.repository.AiAgentScenarioToolSimulationRepository;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentScenarioToolSimulation createAiAgentScenarioToolSimulation(
         AiAgentScenarioToolSimulation toolSimulation) {
 
@@ -45,6 +47,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void deleteAiAgentScenarioToolSimulation(long id) {
         agentScenarioToolSimulationRepository.deleteById(id);
     }
@@ -64,6 +67,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentScenarioToolSimulation updateAiAgentScenarioToolSimulation(
         AiAgentScenarioToolSimulation toolSimulation) {
 

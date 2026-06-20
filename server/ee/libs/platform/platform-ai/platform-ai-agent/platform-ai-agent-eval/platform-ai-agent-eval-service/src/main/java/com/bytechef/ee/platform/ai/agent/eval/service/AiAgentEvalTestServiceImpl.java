@@ -20,6 +20,7 @@ import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentEvalTest;
 import com.bytechef.ee.platform.ai.agent.eval.repository.AiAgentEvalTestRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,11 +38,13 @@ class AgentEvalTestServiceImpl implements AiAgentEvalTestService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentEvalTest createAiAgentEvalTest(AiAgentEvalTest aiAgentEvalTest) {
         return agentEvalTestRepository.save(aiAgentEvalTest);
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void deleteAiAgentEvalTest(long id) {
         agentEvalTestRepository.deleteById(id);
     }
@@ -73,6 +76,7 @@ class AgentEvalTestServiceImpl implements AiAgentEvalTestService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentEvalTest updateAiAgentEvalTest(AiAgentEvalTest aiAgentEvalTest) {
         return agentEvalTestRepository.save(aiAgentEvalTest);
     }

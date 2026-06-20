@@ -19,6 +19,7 @@ package com.bytechef.ee.platform.ai.agent.eval.service;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentEvalScenario;
 import com.bytechef.ee.platform.ai.agent.eval.repository.AiAgentEvalScenarioRepository;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentEvalScenario createAiAgentEvalScenario(AiAgentEvalScenario aiAgentEvalScenario) {
         int maxTurns = aiAgentEvalScenario.getMaxTurns();
 
@@ -47,6 +49,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void deleteAiAgentEvalScenario(long id) {
         agentEvalScenarioRepository.deleteById(id);
     }
@@ -65,6 +68,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public AiAgentEvalScenario updateAiAgentEvalScenario(AiAgentEvalScenario aiAgentEvalScenario) {
         int maxTurns = aiAgentEvalScenario.getMaxTurns();
 
