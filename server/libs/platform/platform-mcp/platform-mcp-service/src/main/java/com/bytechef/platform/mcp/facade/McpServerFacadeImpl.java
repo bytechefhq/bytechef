@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -82,6 +83,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')")
     public void deleteMcpServer(long mcpServerId) {
         for (McpComponent mcpComponent : mcpComponentService.getMcpServerMcpComponents(mcpServerId)) {
             mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())
@@ -154,6 +156,7 @@ public class McpServerFacadeImpl implements McpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')")
     public List<Tag> updateMcpServerTags(long id, List<Tag> tags) {
         List<Tag> validatedTags = checkTags(tags);
 

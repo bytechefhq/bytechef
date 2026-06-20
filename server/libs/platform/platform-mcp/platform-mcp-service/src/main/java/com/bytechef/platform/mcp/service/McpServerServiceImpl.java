@@ -22,6 +22,7 @@ import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.repository.McpServerRepository;
 import java.util.Comparator;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'VIEWER')")
     public McpServer getMcpServer(long mcpServerId) {
         return mcpServerRepository.findById(mcpServerId)
             .orElseThrow(() -> new IllegalArgumentException("MCP server with id " + mcpServerId + " not found"));
@@ -128,6 +130,7 @@ public class McpServerServiceImpl implements McpServerService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')")
     public McpServer update(long id, String name, Boolean enabled) {
         McpServer existingMcpServer = getMcpServer(id);
 

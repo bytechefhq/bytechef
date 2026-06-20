@@ -25,6 +25,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -53,6 +54,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
     public List<McpServer> getWorkspaceMcpServers(Long workspaceId) {
         List<WorkspaceMcpServer> workspaceMcpServers = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId);
 
@@ -62,6 +64,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
     public McpServer createWorkspaceMcpServer(
         String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId) {
 
@@ -73,6 +76,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')")
     public void deleteWorkspaceMcpServer(Long mcpServerId) {
         workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
 
