@@ -135,7 +135,8 @@ public class AppEventTriggerApiController extends AbstractWebhookTriggerControll
                     appEventTriggerName);
 
                 try {
-                    doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse);
+                    doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse)
+                        .join();
                 } catch (IOException | ServletException e) {
                     throw new RuntimeException(e);
                 }

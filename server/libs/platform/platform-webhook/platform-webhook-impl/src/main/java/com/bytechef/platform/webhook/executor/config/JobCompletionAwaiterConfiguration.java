@@ -18,9 +18,10 @@ package com.bytechef.platform.webhook.executor.config;
 
 import static com.bytechef.tenant.TenantContext.CURRENT_TENANT_ID;
 
+import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.message.broker.config.MessageBrokerConfigurer;
 import com.bytechef.platform.webhook.event.SseStreamEvent;
-import com.bytechef.platform.webhook.executor.SseStreamBridgeRegistry;
+import com.bytechef.platform.webhook.executor.JobCompletionAwaiterImpl;
 import com.bytechef.platform.webhook.message.route.SseStreamMessageRoute;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -28,33 +29,40 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * Consumes the {@code SSE_STREAM_EVENTS} broker route and relays each event to the node-local
- * {@link SseStreamBridgeRegistry}, which holds the live SSE emitters for webhook requests this node is serving. This is
- * the consumer side of the SSE stream, so it must run wherever the webhook HTTP request (and its bridge) lives — not
- * gated on the coordinator, which in a distributed topology is a different process that only publishes onto the route.
+ * Wires {@link JobCompletionAwaiterImpl} to the {@code SSE_STREAM_EVENTS} broker route so its per-job futures are
+ * completed by the same broker-published job-status signal the SSE streaming endpoint consumes. Like
+ * {@code SseStreamMessageBrokerConfigurerConfiguration}, this is the consumer side of the route: it must run wherever
+ * {@code await} is called (the node serving the webhook request), which in a distributed topology is not the
+ * coordinator, so the listener is not coordinator-gated.
  *
  * @author Ivica Cardic
  */
 @Configuration
-public class SseStreamMessageBrokerConfigurerConfiguration {
+public class JobCompletionAwaiterConfiguration {
 
     @Bean
-    MessageBrokerConfigurer<?> sseStreamMessageBrokerConfigurer(SseStreamBridgeRegistry sseStreamBridgeRegistry) {
-        SseStreamDelegate sseStreamDelegate = new SseStreamDelegate(sseStreamBridgeRegistry);
+    JobCompletionAwaiterImpl jobCompletionAwaiter(JobService jobService) {
+        return new JobCompletionAwaiterImpl(jobService);
+    }
+
+    @Bean
+    MessageBrokerConfigurer<?> jobCompletionAwaiterMessageBrokerConfigurer(
+        JobCompletionAwaiterImpl jobCompletionAwaiter) {
+
+        JobCompletionAwaiterDelegate delegate = new JobCompletionAwaiterDelegate(jobCompletionAwaiter);
 
         return (listenerEndpointRegistrar, messageBrokerListenerRegistrar) -> messageBrokerListenerRegistrar
             .registerListenerEndpoint(
-                listenerEndpointRegistrar, SseStreamMessageRoute.SSE_STREAM_EVENTS, 1, sseStreamDelegate,
-                "onSseStreamEvent");
+                listenerEndpointRegistrar, SseStreamMessageRoute.SSE_STREAM_EVENTS, 1, delegate, "onSseStreamEvent");
     }
 
-    private record SseStreamDelegate(SseStreamBridgeRegistry sseStreamBridgeRegistry) {
+    private record JobCompletionAwaiterDelegate(JobCompletionAwaiterImpl jobCompletionAwaiter) {
 
         @SuppressFBWarnings("UPM")
         public void onSseStreamEvent(SseStreamEvent sseStreamEvent) {
             TenantContext.runWithTenantId(
                 (String) sseStreamEvent.getMetadata(CURRENT_TENANT_ID),
-                () -> sseStreamBridgeRegistry.onSseStreamEvent(sseStreamEvent));
+                () -> jobCompletionAwaiter.onSseStreamEvent(sseStreamEvent));
         }
     }
 }

@@ -197,7 +197,8 @@ public class ApiPlatformHandlerController extends AbstractWebhookTriggerControll
             WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
                 PlatformType.AUTOMATION, apiCollection.getProjectDeploymentId(), workflowUuid, triggerName);
 
-            return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse);
+            return doProcessTrigger(workflowExecutionId, webhookRequest, httpServletRequest, httpServletResponse)
+                .join();
         });
     }
 

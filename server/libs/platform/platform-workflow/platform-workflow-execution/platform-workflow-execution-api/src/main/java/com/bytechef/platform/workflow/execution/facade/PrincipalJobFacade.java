@@ -41,5 +41,9 @@ public interface PrincipalJobFacade {
      */
     long createPrincipalLinkedJob(long referenceJobId, JobParametersDTO jobParametersDTO, PlatformType platformType);
 
-    Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);
+    /**
+     * Creates a persisted job row without dispatching it to the coordinator. Used to record a job (e.g. a failed
+     * trigger) in history; the job is not executed.
+     */
+    Job createJobWithoutDispatch(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type);
 }

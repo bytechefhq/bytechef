@@ -48,10 +48,10 @@ public class RemotePrincipalJobFacadeController {
 
     @RequestMapping(
         method = RequestMethod.POST,
-        value = "/create-sync-job")
+        value = "/create-job-without-dispatch")
     public ResponseEntity<Job> create(@Valid @RequestBody CreateJobRequest createJobRequest) {
         return ResponseEntity.ok(
-            principalJobFacade.createSyncJob(
+            principalJobFacade.createJobWithoutDispatch(
                 createJobRequest.jobParameters, createJobRequest.jobPrincipalId,
                 createJobRequest.type));
     }

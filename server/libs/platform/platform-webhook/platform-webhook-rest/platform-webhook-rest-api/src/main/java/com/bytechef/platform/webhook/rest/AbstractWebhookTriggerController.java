@@ -34,9 +34,11 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,12 +87,11 @@ public abstract class AbstractWebhookTriggerController {
         this.webhookWorkflowExecutor = webhookWorkflowExecutor;
     }
 
-    protected ResponseEntity<Object> doProcessTrigger(
+    protected CompletableFuture<ResponseEntity<Object>> doProcessTrigger(
         WorkflowExecutionId workflowExecutionId, @Nullable WebhookRequest webhookRequest,
         HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse)
         throws IOException, ServletException {
 
-        ResponseEntity<Object> responseEntity;
         WebhookTriggerFlags webhookTriggerFlags = webhookWorkflowExecutor.getWebhookTriggerFlags(workflowExecutionId);
 
         if (webhookRequest == null) {
@@ -108,16 +109,27 @@ public abstract class AbstractWebhookTriggerController {
         }
 
         if (webhookTriggerFlags.workflowSyncExecution()) {
-            Object outputs = webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest);
+            // The job runs on the distributed coordinator; the future completes when it reaches a terminal status,
+            // so the controller can stay non-blocking (async-servlet) while the workflow runs.
+            return webhookWorkflowExecutor.executeSync(workflowExecutionId, webhookRequest)
+                .thenApply(outputs -> {
+                    if (outputs instanceof Map<?, ?> responseMap &&
+                        responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
 
-            if (outputs instanceof Map<?, ?> responseMap &&
-                responseMap.containsKey(MetadataConstants.WEBHOOK_RESPONSE)) {
+                        try {
+                            return processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
+                        } catch (IOException ioException) {
+                            throw new UncheckedIOException(ioException);
+                        }
+                    }
 
-                responseEntity = processWebhookResponse(httpServletRequest, httpServletResponse, responseMap);
-            } else {
-                responseEntity = ResponseEntity.ok(outputs);
-            }
-        } else if (webhookTriggerFlags.workflowSyncValidation()) {
+                    return ResponseEntity.ok(outputs);
+                });
+        }
+
+        ResponseEntity<Object> responseEntity;
+
+        if (webhookTriggerFlags.workflowSyncValidation()) {
             responseEntity = validateAndExecuteAsync(workflowExecutionId, webhookRequest);
         } else {
             webhookWorkflowExecutor.executeAsync(workflowExecutionId, webhookRequest);
@@ -126,7 +138,7 @@ public abstract class AbstractWebhookTriggerController {
                 .build();
         }
 
-        return responseEntity;
+        return CompletableFuture.completedFuture(responseEntity);
     }
 
     protected WebhookRequest getWebhookRequest(

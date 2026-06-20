@@ -85,7 +85,7 @@ public class TriggerErrorHandler {
         String workflowId, Map<String, ?> inputMap, long jobPrincipalId, Map<String, ?> metadataMap, PlatformType type,
         Instant startDate, Instant endDate) {
 
-        Job job = principalJobFacade.createSyncJob(
+        Job job = principalJobFacade.createJobWithoutDispatch(
             new JobParametersDTO(workflowId, inputMap, metadataMap), jobPrincipalId, type);
 
         job.setEndDate(endDate);

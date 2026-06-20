@@ -110,7 +110,8 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
                 .build();
         } else {
             try {
-                responseEntity = doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse);
+                responseEntity = doProcessTrigger(workflowExecutionId, null, httpServletRequest, httpServletResponse)
+                    .join();
             } catch (IOException | ServletException e) {
                 throw new RuntimeException(e);
             }

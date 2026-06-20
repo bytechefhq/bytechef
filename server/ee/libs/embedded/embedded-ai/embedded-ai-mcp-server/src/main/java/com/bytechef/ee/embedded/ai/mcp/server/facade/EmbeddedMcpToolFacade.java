@@ -51,14 +51,16 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -74,7 +76,7 @@ import org.springframework.ai.tool.function.FunctionToolCallback;
 
 /**
  * Tool facade for the embedded MCP server. Handles both component-level tools (direct action execution) and integration
- * workflow tools (workflow-based execution via JobSyncExecutor). Connection resolution is per-connected-user via
+ * workflow tools (workflow-based execution on the coordinator). Connection resolution is per-connected-user via
  * {@link IntegrationInstanceService}.
  *
  * @version ee
@@ -94,7 +96,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
     private final IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationService integrationService;
-    private final JobSyncExecutor jobSyncExecutor;
+    private final JobCompletionAwaiter jobCompletionAwaiter;
     private final McpComponentService mcpComponentService;
     private final McpIntegrationInstanceToolService mcpIntegrationInstanceToolService;
     private final IntegrationInstanceWorkflowService integrationInstanceWorkflowService;
@@ -115,7 +117,8 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationInstanceService integrationInstanceService,
         IntegrationInstanceWorkflowService integrationInstanceWorkflowService, IntegrationService integrationService,
-        JobSyncExecutor jobSyncExecutor, JwtTokenService jwtTokenService, McpComponentService mcpComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, JwtTokenService jwtTokenService,
+        McpComponentService mcpComponentService,
         McpIntegrationInstanceConfigurationWorkflowService mcpIntegrationInstanceConfigurationWorkflowService,
         McpIntegrationInstanceToolService mcpIntegrationInstanceToolService,
         McpServerService mcpServerService, PrincipalJobFacade principalJobFacade, String publicUrl,
@@ -132,7 +135,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
         this.integrationInstanceConfigurationWorkflowService = integrationInstanceConfigurationWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationService = integrationService;
-        this.jobSyncExecutor = jobSyncExecutor;
+        this.jobCompletionAwaiter = jobCompletionAwaiter;
         this.mcpComponentService = mcpComponentService;
         this.integrationInstanceWorkflowService = integrationInstanceWorkflowService;
         this.mcpIntegrationInstanceToolService = mcpIntegrationInstanceToolService;
@@ -366,11 +369,14 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
 
             inputs.put(triggerName, triggerInputs);
 
-            Job job = jobSyncExecutor.execute(
+            long jobId = principalJobFacade.createJob(
                 new JobParametersDTO(integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs),
-                jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, integrationInstanceId, PlatformType.EMBEDDED),
-                true, taskExecutionCompleteEvent -> {});
+                integrationInstanceId, PlatformType.EMBEDDED);
+
+            Job job = jobCompletionAwaiter.await(jobId, Duration.ofSeconds(300))
+                .join();
+
+            JobExecutionErrors.checkForError(job, taskExecutionService);
 
             if (job.getOutputs() == null) {
                 return null;

@@ -54,11 +54,11 @@ public class RemotePrincipalJobFacadeClient implements PrincipalJobFacade {
     }
 
     @Override
-    public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+    public Job createJobWithoutDispatch(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
         return loadBalancedRestClient.post(
             uriBuilder -> uriBuilder
                 .host(EXECUTION_APP)
-                .path(PRINCIPAL_JOB_FACADE + "/create-sync-job")
+                .path(PRINCIPAL_JOB_FACADE + "/create-job-without-dispatch")
                 .build(),
             new CreateJobRequest(jobParametersDTO, jobPrincipalId, type), Job.class);
     }

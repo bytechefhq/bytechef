@@ -26,4 +26,6 @@ dependencies {
     implementation(project(":server:libs:modules:task-dispatchers:map"))
     implementation(project(":server:libs:modules:task-dispatchers:parallel"))
     implementation(project(":server:libs:modules:task-dispatchers:subflow"))
+
+    testImplementation(project(":server:libs:platform:platform-coordinator"))
 }

@@ -45,14 +45,16 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
-import com.bytechef.platform.job.sync.executor.JobSyncExecutor;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
+import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,7 +77,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
     private final ClusterElementDefinitionFacade clusterElementDefinitionFacade;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
-    private final JobSyncExecutor jobSyncExecutor;
+    private final JobCompletionAwaiter jobCompletionAwaiter;
     private final McpComponentService mcpComponentService;
     private final McpProjectWorkflowService mcpProjectWorkflowService;
     private final McpServerService mcpServerService;
@@ -89,7 +91,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
     public AutomationMcpToolFacade(
         ClusterElementDefinitionFacade clusterElementDefinitionFacade,
         ClusterElementDefinitionService clusterElementDefinitionService, Evaluator evaluator,
-        JobSyncExecutor jobSyncExecutor, McpComponentService mcpComponentService,
+        JobCompletionAwaiter jobCompletionAwaiter, McpComponentService mcpComponentService,
         McpProjectWorkflowService mcpProjectWorkflowService, McpServerService mcpServerService,
         PrincipalJobFacade principalJobFacade, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         TaskExecutionService taskExecutionService, TaskFileStorage taskFileStorage, WorkflowService workflowService) {
@@ -98,7 +100,7 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
         this.clusterElementDefinitionFacade = clusterElementDefinitionFacade;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
-        this.jobSyncExecutor = jobSyncExecutor;
+        this.jobCompletionAwaiter = jobCompletionAwaiter;
         this.mcpComponentService = mcpComponentService;
         this.mcpProjectWorkflowService = mcpProjectWorkflowService;
         this.mcpServerService = mcpServerService;
@@ -230,11 +232,14 @@ public class AutomationMcpToolFacade extends AbstractToolFacade {
 
             inputs.put(triggerName, resolvedTriggerInputs);
 
-            Job job = jobSyncExecutor.execute(
+            long jobId = principalJobFacade.createJob(
                 new JobParametersDTO(projectDeploymentWorkflow.getWorkflowId(), inputs),
-                jobParameters -> principalJobFacade.createSyncJob(
-                    jobParameters, projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION),
-                true, taskExecutionCompleteEvent -> {});
+                projectDeploymentWorkflow.getProjectDeploymentId(), PlatformType.AUTOMATION);
+
+            Job job = jobCompletionAwaiter.await(jobId, Duration.ofSeconds(300))
+                .join();
+
+            JobExecutionErrors.checkForError(job, taskExecutionService);
 
             if (job.getOutputs() == null) {
                 return null;
