@@ -53,6 +53,7 @@ export class ProjectTagApi extends runtime.BaseAPI {
 
         const headerParameters: runtime.HTTPHeaders = {};
 
+
         let urlPath = `/workspaces/{id}/project-tags`;
         urlPath = urlPath.replace('{id}', encodeURIComponent(String(requestParameters['id'])));
 

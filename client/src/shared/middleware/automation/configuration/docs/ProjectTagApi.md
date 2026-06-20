@@ -4,18 +4,18 @@ All URIs are relative to */api/automation/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getProjectTags**](ProjectTagApi.md#getprojecttags) | **GET** /projects/tags | Get project tags. |
+| [**getProjectTags**](ProjectTagApi.md#getprojecttags) | **GET** /workspaces/{id}/project-tags | Get project tags |
 | [**updateProjectTags**](ProjectTagApi.md#updateprojecttags) | **PUT** /projects/{id}/tags | Updates tags of an existing project. |
 
 
 
 ## getProjectTags
 
-> Array&lt;Tag&gt; getProjectTags()
+> Array&lt;Tag&gt; getProjectTags(id)
 
-Get project tags.
+Get project tags
 
-Get project tags.
+Get project tags for a workspace.
 
 ### Example
 
@@ -30,8 +30,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new ProjectTagApi();
 
+  const body = {
+    // number | The id of a workspace.
+    id: 789,
+  } satisfies GetProjectTagsRequest;
+
   try {
-    const data = await api.getProjectTags();
+    const data = await api.getProjectTags(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -44,7 +49,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 
 ### Return type
 

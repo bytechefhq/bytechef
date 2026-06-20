@@ -27,7 +27,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "RegisterExistingConnectionRequest", description = "Contains all required information to register a connection backed by an externally-provisioned credential.")
 @JsonTypeName("RegisterExistingConnectionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:59.729452+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-20T17:20:22.562695+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class RegisterExistingConnectionRequestModel {
 
   private String componentName;

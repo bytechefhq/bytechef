@@ -4,18 +4,18 @@ All URIs are relative to */api/automation/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**getProjectDeploymentTags**](ProjectDeploymentTagApi.md#getprojectdeploymenttags) | **GET** /project-deployments/tags | Get project deployment tags |
+| [**getProjectDeploymentTags**](ProjectDeploymentTagApi.md#getprojectdeploymenttags) | **GET** /workspaces/{id}/project-deployment-tags | Get project deployment tags |
 | [**updateProjectDeploymentTags**](ProjectDeploymentTagApi.md#updateprojectdeploymenttags) | **PUT** /project-deployments/{id}/tags | Updates tags of an existing project deployment |
 
 
 
 ## getProjectDeploymentTags
 
-> Array&lt;Tag&gt; getProjectDeploymentTags()
+> Array&lt;Tag&gt; getProjectDeploymentTags(id)
 
 Get project deployment tags
 
-Get project deployment tags.
+Get project deployment tags for a workspace.
 
 ### Example
 
@@ -30,8 +30,13 @@ async function example() {
   console.log("🚀 Testing  SDK...");
   const api = new ProjectDeploymentTagApi();
 
+  const body = {
+    // number | The id of a workspace.
+    id: 789,
+  } satisfies GetProjectDeploymentTagsRequest;
+
   try {
-    const data = await api.getProjectDeploymentTags();
+    const data = await api.getProjectDeploymentTags(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -44,7 +49,10 @@ example().catch(console.error);
 
 ### Parameters
 
-This endpoint does not need any parameter.
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **id** | `number` | The id of a workspace. | [Defaults to `undefined`] |
 
 ### Return type
 
