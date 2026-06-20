@@ -180,7 +180,7 @@ const ProjectDeploymentDialog = ({
             queryKey: ProjectDeploymentKeys.projectDeployments,
         });
         queryClient.invalidateQueries({
-            queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
+            queryKey: ProjectDeploymentTagKeys.projectDeploymentTags(currentWorkspaceId!),
         });
         queryClient.invalidateQueries({
             queryKey: ProjectKeys.filteredProjects({id: currentWorkspaceId!}),

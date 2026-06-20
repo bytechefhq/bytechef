@@ -3,11 +3,11 @@ import {ProjectDeploymentTagApi, Tag} from '@/shared/middleware/automation/confi
 import {useQuery} from '@tanstack/react-query';
 
 export const ProjectDeploymentTagKeys = {
-    projectDeploymentTags: ['projectDeploymentTags'] as const,
+    projectDeploymentTags: (id: number) => ['projectDeploymentTags', id] as const,
 };
 
-export const useGetProjectDeploymentTagsQuery = () =>
+export const useGetProjectDeploymentTagsQuery = (id: number) =>
     useQuery<Tag[], Error>({
-        queryKey: ProjectDeploymentTagKeys.projectDeploymentTags,
-        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags(),
+        queryKey: ProjectDeploymentTagKeys.projectDeploymentTags(id),
+        queryFn: () => new ProjectDeploymentTagApi().getProjectDeploymentTags({id}),
     });
