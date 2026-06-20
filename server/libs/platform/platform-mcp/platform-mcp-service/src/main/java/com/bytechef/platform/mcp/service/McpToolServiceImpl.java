@@ -41,6 +41,7 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpTool.mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')")
     public McpTool create(McpTool mcpTool) {
         return mcpToolRepository.save(mcpTool);
     }
@@ -65,11 +66,13 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpToolId, 'McpTool:ResourceRole', 'VIEWER')")
     public Optional<McpTool> fetchMcpTool(long mcpToolId) {
         return mcpToolRepository.findById(mcpToolId);
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public List<McpTool> getMcpTools() {
         return mcpToolRepository.findAll();
     }

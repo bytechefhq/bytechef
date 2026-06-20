@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacadeImpl;
+import com.bytechef.platform.mcp.service.McpComponentServiceImpl;
 import com.bytechef.platform.mcp.service.McpServerServiceImpl;
 import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import java.lang.reflect.Method;
@@ -92,6 +93,37 @@ class McpServerAuthorizationTest {
         assertExpression(
             McpServerFacadeImpl.class, "deleteMcpComponent",
             "hasPermission(#mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')", long.class);
+    }
+
+    @Test
+    void testCreateMcpComponentServiceRequiresServerEditor() {
+        assertExpression(
+            McpComponentServiceImpl.class, "create",
+            "hasPermission(#mcpComponent.mcpServerId, 'McpServer:ResourceRole', 'EDITOR')", McpComponent.class);
+    }
+
+    @Test
+    void testGetMcpComponentsRequiresTenantAdmin() {
+        assertExpression(McpComponentServiceImpl.class, "getMcpComponents", "hasPermission('Tenant', 'ADMIN')");
+    }
+
+    @Test
+    void testCreateMcpToolRequiresComponentEditor() {
+        assertExpression(
+            McpToolServiceImpl.class, "create",
+            "hasPermission(#mcpTool.mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')", McpTool.class);
+    }
+
+    @Test
+    void testFetchMcpToolRequiresViewer() {
+        assertExpression(
+            McpToolServiceImpl.class, "fetchMcpTool", "hasPermission(#mcpToolId, 'McpTool:ResourceRole', 'VIEWER')",
+            long.class);
+    }
+
+    @Test
+    void testGetMcpToolsRequiresTenantAdmin() {
+        assertExpression(McpToolServiceImpl.class, "getMcpTools", "hasPermission('Tenant', 'ADMIN')");
     }
 
     @Test
