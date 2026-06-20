@@ -1,6 +1,5 @@
 extend type Query {
     mcpServer(id: ID): McpServer
-    mcpServers(type: PlatformType!, orderBy: McpServerOrderBy): [McpServer]
 }
 
 extend type Mutation {

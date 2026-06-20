@@ -76,12 +76,6 @@ public class McpServerGraphQlController {
         return mcpServerService.getMcpServer(id);
     }
 
-    @QueryMapping
-    public List<McpServer>
-        mcpServers(@Argument PlatformType type, @Argument McpServerService.McpServerOrderBy orderBy) {
-        return mcpServerService.getMcpServers(type, orderBy);
-    }
-
     @MutationMapping
     public McpServer createMcpServer(@Argument McpServerInput input) {
         return mcpServerService.create(
