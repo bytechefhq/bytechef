@@ -23,6 +23,7 @@ import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
@@ -39,18 +40,25 @@ public class ApprovalFormFacadeImpl implements ApprovalFormFacade {
 
     private static final String ENVIRONMENT_ID_METADATA_KEY = "environmentId";
 
+    private final ApprovalTokens approvalTokens;
     private final JobService jobService;
     private final TaskExecutionService taskExecutionService;
 
     @SuppressFBWarnings("EI")
-    public ApprovalFormFacadeImpl(JobService jobService, TaskExecutionService taskExecutionService) {
+    public ApprovalFormFacadeImpl(
+        ApprovalTokens approvalTokens, JobService jobService, TaskExecutionService taskExecutionService) {
+
+        this.approvalTokens = approvalTokens;
         this.jobService = jobService;
         this.taskExecutionService = taskExecutionService;
     }
 
     @Override
     public Map<String, ?> getApprovalForm(String id) {
-        JobResumeId jobResumeId = JobResumeId.parse(id);
+        String innerToken = approvalTokens.resolveInnerToken(id)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid approval form token"));
+
+        JobResumeId jobResumeId = JobResumeId.parse(innerToken);
 
         return TenantContext.callWithTenantId(jobResumeId.getTenantId(), () -> {
             Job job = jobService.getJob(jobResumeId.getJobId());

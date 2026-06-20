@@ -23,6 +23,7 @@ import com.bytechef.commons.util.MapUtils;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
@@ -45,14 +46,17 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     private static final Logger log = LoggerFactory.getLogger(JobResumeFacadeImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final ApprovalTokens approvalTokens;
     private final JobFacade jobFacade;
     private final JobService jobService;
 
     @SuppressFBWarnings("EI")
     public JobResumeFacadeImpl(
-        ApplicationEventPublisher applicationEventPublisher, JobFacade jobFacade, JobService jobService) {
+        ApplicationEventPublisher applicationEventPublisher, ApprovalTokens approvalTokens, JobFacade jobFacade,
+        JobService jobService) {
 
         this.applicationEventPublisher = applicationEventPublisher;
+        this.approvalTokens = approvalTokens;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
     }
@@ -65,10 +69,19 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
     @Override
     @SuppressFBWarnings("CRLF_INJECTION_LOGS")
     public JobResumeOutcome resumeJobStreaming(String id, Map<String, Object> data, LongConsumer jobIdConsumer) {
+        String innerToken = approvalTokens.resolveInnerToken(id)
+            .orElse(null);
+
+        if (innerToken == null) {
+            log.warn("Rejected resume token: {}", id.replaceAll("[\\r\\n]", ""));
+
+            return JobResumeOutcome.INVALID_ID;
+        }
+
         JobResumeId jobResumeId;
 
         try {
-            jobResumeId = JobResumeId.parse(id);
+            jobResumeId = JobResumeId.parse(innerToken);
         } catch (IllegalArgumentException illegalArgumentException) {
             log.warn("Invalid resume id: {}", id.replaceAll("[\\r\\n]", ""));
 
@@ -98,7 +111,7 @@ public class JobResumeFacadeImpl implements JobResumeFacade {
                 jobResumeId.getJobId(), MapUtils.getLong(job.getMetadata(), MetadataConstants.TASK_EXECUTION_RESUME_ID),
                 data);
 
-            applicationEventPublisher.publishEvent(new JobResumedEvent(id));
+            applicationEventPublisher.publishEvent(new JobResumedEvent(innerToken));
 
             return JobResumeOutcome.OK;
         });

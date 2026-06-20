@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-file-storage:platform-file-storage-impl"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
 
     testImplementation(project(":server:libs:config:jackson-config"))
     testImplementation(project(":server:libs:test:test-support"))

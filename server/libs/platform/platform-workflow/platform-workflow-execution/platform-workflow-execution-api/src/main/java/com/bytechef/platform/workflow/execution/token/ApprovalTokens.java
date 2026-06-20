@@ -69,4 +69,24 @@ public interface ApprovalTokens {
      * signed token must be rejected.
      */
     boolean isSignedTokenRequired();
+
+    /**
+     * Resolves a request-supplied token to its inner token string, encapsulating the migration policy: a valid signed
+     * token is unwrapped; a token that <em>looks</em> signed but fails verification (tampered/expired) is rejected; an
+     * unsigned token is accepted as a legacy inner token only while signing is not required. Returns
+     * {@link Optional#empty()} when the token must be rejected.
+     */
+    default Optional<String> resolveInnerToken(String token) {
+        Optional<String> verified = parseSignedToken(token);
+
+        if (verified.isPresent()) {
+            return verified;
+        }
+
+        if (looksLikeSignedToken(token) || isSignedTokenRequired()) {
+            return Optional.empty();
+        }
+
+        return Optional.ofNullable(token);
+    }
 }

@@ -19,14 +19,17 @@ package com.bytechef.platform.webhook.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.workflow.execution.ApprovalId;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 /**
  * @author Ivica Cardic
@@ -38,10 +41,12 @@ import org.springframework.web.bind.annotation.RestController;
 @Deprecated
 public class ApprovalController {
 
+    private final ApprovalTokens approvalTokens;
     private final JobFacade jobFacade;
 
     @SuppressFBWarnings("EI")
-    public ApprovalController(JobFacade jobFacade) {
+    public ApprovalController(ApprovalTokens approvalTokens, JobFacade jobFacade) {
+        this.approvalTokens = approvalTokens;
         this.jobFacade = jobFacade;
     }
 
@@ -55,7 +60,10 @@ public class ApprovalController {
         RequestMethod.GET, RequestMethod.POST
     }, value = "/approvals/{id}")
     public ResponseEntity<Void> approve(@PathVariable String id) {
-        ApprovalId approvalId = ApprovalId.parse(id);
+        String innerToken = approvalTokens.resolveInnerToken(id)
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Invalid approval token"));
+
+        ApprovalId approvalId = ApprovalId.parse(innerToken);
 
         return TenantContext.callWithTenantId(approvalId.getTenantId(), () -> {
             jobFacade.resumeApproval(approvalId.getJobId(), approvalId.getUuidAsString(), approvalId.isApproved());

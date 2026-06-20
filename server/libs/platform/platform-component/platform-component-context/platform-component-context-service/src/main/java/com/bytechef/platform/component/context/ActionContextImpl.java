@@ -31,6 +31,7 @@ import com.bytechef.platform.data.storage.domain.DataStorageScope;
 import com.bytechef.platform.file.storage.TempFileStorage;
 import com.bytechef.platform.workflow.execution.ApprovalId;
 import com.bytechef.platform.workflow.execution.JobResumeId;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.tracing.TraceContext;
 import io.micrometer.tracing.Tracer;
@@ -57,6 +58,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
     private final String actionName;
     private @Nullable Approval approval;
+    private final @Nullable ApprovalTokens approvalTokens;
     private final CacheManager cacheManager;
     private final Data data;
     private final DataStorage dataStorage;
@@ -93,6 +95,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             builder.tempFileStorage, builder.logFileStorageWriter);
 
         this.actionName = builder.actionName;
+        this.approvalTokens = builder.approvalTokens;
         this.cacheManager = builder.cacheManager;
         this.dataStorage = builder.dataStorage;
         this.editorEnvironment = builder.editorEnvironment;
@@ -104,7 +107,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         this.tracer = builder.tracer;
 
         if (builder.jobId != null && builder.publicUrl != null) {
-            this.approval = new ApprovalImpl(builder.jobId, builder.publicUrl);
+            this.approval = new ApprovalImpl(builder.jobId, builder.publicUrl, builder.approvalTokens);
         }
 
         this.data = new DataImpl(
@@ -128,11 +131,11 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
         String componentName, int componentVersion, String actionName, boolean editorEnvironment,
         CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
         HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-        @Nullable JobService jobService) {
+        @Nullable JobService jobService, @Nullable ApprovalTokens approvalTokens) {
 
         return new Builder(
             componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage, eventPublisher,
-            httpClientExecutor, tempFileStorage, jobService);
+            httpClientExecutor, tempFileStorage, jobService, approvalTokens);
     }
 
     @Override
@@ -142,7 +145,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
 
         return builder(
             componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
-            eventPublisher, httpClientExecutor, tempFileStorage, jobService)
+            eventPublisher, httpClientExecutor, tempFileStorage, jobService, approvalTokens)
                 .componentConnection(componentConnection)
                 .environmentId(environmentId)
                 .jobId(jobId)
@@ -156,9 +159,19 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
                 .build();
     }
 
+    private String toResumeToken(String innerToken) {
+        if (approvalTokens == null) {
+            return innerToken;
+        }
+
+        return approvalTokens.toSignedTokenIfConfigured(innerToken)
+            .orElse(innerToken);
+    }
+
     static final class Builder {
 
         private final String actionName;
+        private final @Nullable ApprovalTokens approvalTokens;
         private final CacheManager cacheManager;
         private @Nullable ComponentConnection componentConnection;
         private final String componentName;
@@ -184,7 +197,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             String componentName, int componentVersion, String actionName, boolean editorEnvironment,
             CacheManager cacheManager, DataStorage dataStorage, ApplicationEventPublisher eventPublisher,
             HttpClientExecutor httpClientExecutor, TempFileStorage tempFileStorage,
-            @Nullable JobService jobService) {
+            @Nullable JobService jobService, @Nullable ApprovalTokens approvalTokens) {
 
             this.componentName = componentName;
             this.componentVersion = componentVersion;
@@ -196,6 +209,7 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             this.httpClientExecutor = httpClientExecutor;
             this.tempFileStorage = tempFileStorage;
             this.jobService = jobService;
+            this.approvalTokens = approvalTokens;
         }
 
         Builder componentConnection(@Nullable ComponentConnection componentConnection) {
@@ -328,7 +342,9 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             this.jobResumeId = jobResumeId.toString();
         }
 
-        return publicUrl + "/job/resume/" + this.jobResumeId;
+        // The stored JOB_RESUME_ID metadata (getJobResumeId) stays the unsigned inner value for the stored-uuid match;
+        // only the URL carries the HMAC-signed wrapper.
+        return publicUrl + "/job/resume/" + toResumeToken(this.jobResumeId);
     }
 
     @Override
@@ -490,15 +506,27 @@ class ActionContextImpl extends ContextImpl implements ActionContext, ActionCont
             .build();
     }
 
-    private record ApprovalImpl(long jobId, String publicUrl) implements Approval {
+    private record ApprovalImpl(long jobId, String publicUrl, @Nullable ApprovalTokens approvalTokens)
+        implements Approval {
 
         @Override
         public Links generateLinks() {
             String url = "%s/approvals/%s";
 
             return new Links(
-                url.formatted(publicUrl, ApprovalId.of(jobId, true)),
-                url.formatted(publicUrl, ApprovalId.of(jobId, false)));
+                url.formatted(publicUrl, toApprovalToken(ApprovalId.of(jobId, true))),
+                url.formatted(publicUrl, toApprovalToken(ApprovalId.of(jobId, false))));
+        }
+
+        private String toApprovalToken(ApprovalId approvalId) {
+            String innerToken = approvalId.toString();
+
+            if (approvalTokens == null) {
+                return innerToken;
+            }
+
+            return approvalTokens.toSignedTokenIfConfigured(innerToken)
+                .orElse(innerToken);
         }
     }
 

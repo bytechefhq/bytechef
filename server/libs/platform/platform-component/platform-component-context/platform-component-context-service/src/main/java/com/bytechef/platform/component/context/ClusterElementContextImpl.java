@@ -123,7 +123,7 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         return ActionContextImpl
             .builder(
                 componentName, componentVersion, actionName, editorEnvironment, cacheManager, dataStorage,
-                eventPublisher, httpClientExecutor, tempFileStorage, null)
+                eventPublisher, httpClientExecutor, tempFileStorage, null, null)
             .componentConnection(componentConnection)
             .environmentId(environmentId)
             .jobId(jobId)

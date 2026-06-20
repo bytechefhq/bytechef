@@ -1,6 +1,7 @@
 dependencies {
     api (project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service"))
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework:spring-context")

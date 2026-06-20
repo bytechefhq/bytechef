@@ -33,8 +33,12 @@ import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.event.JobResumedEvent;
 import com.bytechef.platform.workflow.execution.facade.JobResumeFacade.JobResumeOutcome;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokensImpl;
 import com.bytechef.tenant.TenantContext;
+import java.time.Clock;
+import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +79,11 @@ public class JobResumeFacadeTest {
 
     @BeforeEach
     void setUp() {
-        jobResumeFacade = new JobResumeFacadeImpl(applicationEventPublisher, jobFacade, jobService);
+        // Unconfigured (no secret, not required) -> resolveInnerToken passes the legacy token through unchanged.
+        ApprovalTokensImpl approvalTokens = new ApprovalTokensImpl(
+            Clock.systemUTC(), null, List.of(), Duration.ofDays(30), Duration.ofSeconds(60), false);
+
+        jobResumeFacade = new JobResumeFacadeImpl(applicationEventPublisher, approvalTokens, jobFacade, jobService);
     }
 
     @Test
