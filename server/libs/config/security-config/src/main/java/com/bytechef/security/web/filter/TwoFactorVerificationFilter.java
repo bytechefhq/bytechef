@@ -16,6 +16,7 @@
 
 package com.bytechef.security.web.filter;
 
+import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.web.authentication.TwoFactorAuthentication;
 import jakarta.servlet.FilterChain;
@@ -91,7 +92,15 @@ public class TwoFactorVerificationFilter extends OncePerRequestFilter {
             return;
         }
 
-        boolean valid = userService.verifyTotpCode(userDetails.getUsername(), code);
+        boolean valid;
+
+        try {
+            valid = userService.verifyTotpCode(userDetails.getUsername(), code);
+        } catch (TotpLockedException e) {
+            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
+
+            return;
+        }
 
         if (valid) {
             securityContext.setAuthentication(twoFactorAuthentication.getPrimary());

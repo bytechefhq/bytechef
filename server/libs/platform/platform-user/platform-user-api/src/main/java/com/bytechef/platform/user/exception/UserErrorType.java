@@ -31,6 +31,7 @@ public class UserErrorType extends AbstractErrorType {
     public static final UserErrorType INVALID_PASSWORD = new UserErrorType(104);
     public static final UserErrorType USER_ALREADY_EXISTS = new UserErrorType(105);
     public static final UserErrorType INVALID_EMAIL = new UserErrorType(106);
+    public static final UserErrorType TOTP_LOCKED = new UserErrorType(107);
 
     private UserErrorType(int errorKey) {
         super(User.class, errorKey);

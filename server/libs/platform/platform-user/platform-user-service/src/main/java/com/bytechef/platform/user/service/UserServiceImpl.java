@@ -30,6 +30,7 @@ import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.InvalidEmailException;
 import com.bytechef.platform.user.exception.InvalidPasswordException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
+import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
@@ -41,6 +42,7 @@ import dev.samstevens.totp.secret.DefaultSecretGenerator;
 import dev.samstevens.totp.secret.SecretGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.CacheManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -81,12 +84,16 @@ public class UserServiceImpl implements UserService {
     private final DefaultCodeVerifier totpCodeVerifier;
     private final UserAuditPublisher userAuditPublisher;
     private final UserRepository userRepository;
+    private final int maxFailedTotpAttempts;
+    private final Duration totpLockoutDuration;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public UserServiceImpl(
         AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
         PersistentTokenRepository persistentTokenRepository, UserAuditPublisher userAuditPublisher,
-        UserRepository userRepository) {
+        UserRepository userRepository,
+        @Value("${bytechef.security.mfa.max-failed-attempts:5}") int maxFailedTotpAttempts,
+        @Value("${bytechef.security.mfa.lockout-duration:PT15M}") Duration totpLockoutDuration) {
 
         this.authorityRepository = authorityRepository;
         this.cacheManager = cacheManager;
@@ -94,6 +101,8 @@ public class UserServiceImpl implements UserService {
         this.persistentTokenRepository = persistentTokenRepository;
         this.userAuditPublisher = userAuditPublisher;
         this.userRepository = userRepository;
+        this.maxFailedTotpAttempts = maxFailedTotpAttempts;
+        this.totpLockoutDuration = totpLockoutDuration;
 
         totpCodeVerifier = new DefaultCodeVerifier(new DefaultCodeGenerator(), new SystemTimeProvider());
 
@@ -667,23 +676,45 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public boolean verifyTotpCode(String login, String code) {
-        if (code == null || code.isBlank()) {
+        User user = userRepository.findByLogin(login)
+            .orElse(null);
+
+        if (user == null || user.getTotpSecret() == null) {
             return false;
         }
 
-        return userRepository.findByLogin(login)
-            .map(user -> {
-                String secret = user.getTotpSecret();
+        Instant lockoutUntil = user.getTotpLockoutUntil();
 
-                if (secret == null) {
-                    return false;
-                }
+        if (lockoutUntil != null && Instant.now()
+            .isBefore(lockoutUntil)) {
 
-                return totpCodeVerifier.isValidCode(secret, code);
-            })
-            .orElse(false);
+            throw new TotpLockedException();
+        }
+
+        if (code == null || code.isBlank() || !totpCodeVerifier.isValidCode(user.getTotpSecret(), code)) {
+            int attempts = user.getFailedTotpAttempts() + 1;
+
+            user.setFailedTotpAttempts(attempts);
+
+            if (attempts >= maxFailedTotpAttempts) {
+                user.setTotpLockoutUntil(
+                    Instant.now()
+                        .plus(totpLockoutDuration));
+            }
+
+            userRepository.save(user);
+
+            return false;
+        }
+
+        user.setFailedTotpAttempts(0);
+        user.setTotpLockoutUntil(null);
+
+        userRepository.save(user);
+
+        return true;
     }
 
     /**

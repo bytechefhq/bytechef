@@ -28,6 +28,7 @@ import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.dto.PasswordChangeDTO;
 import com.bytechef.platform.user.exception.EmailAlreadyUsedException;
 import com.bytechef.platform.user.exception.LoginAlreadyUsedException;
+import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.PersistentTokenService;
@@ -289,7 +290,14 @@ public class AccountController {
             .orElseThrow(() -> new AccountResourceException(
                 "User could not be found", AccountErrorType.USER_NOT_FOUND));
 
-        boolean valid = userService.verifyTotpCode(user.getLogin(), mfaVerifyRequest.code());
+        boolean valid;
+
+        try {
+            valid = userService.verifyTotpCode(user.getLogin(), mfaVerifyRequest.code());
+        } catch (TotpLockedException exception) {
+            throw new AccountResourceException(
+                "Too many failed verification attempts. Try again later.", AccountErrorType.TOTP_LOCKED);
+        }
 
         if (!valid) {
             throw new AccountResourceException("Invalid TOTP code", AccountErrorType.INVALID_TOTP_CODE);
@@ -309,7 +317,14 @@ public class AccountController {
             throw new AccountResourceException("Invalid password", AccountErrorType.INVALID_PASSWORD);
         }
 
-        boolean valid = userService.verifyTotpCode(user.getLogin(), mfaDisableRequest.code());
+        boolean valid;
+
+        try {
+            valid = userService.verifyTotpCode(user.getLogin(), mfaDisableRequest.code());
+        } catch (TotpLockedException exception) {
+            throw new AccountResourceException(
+                "Too many failed verification attempts. Try again later.", AccountErrorType.TOTP_LOCKED);
+        }
 
         if (!valid) {
             throw new AccountResourceException("Invalid TOTP code", AccountErrorType.INVALID_TOTP_CODE);
