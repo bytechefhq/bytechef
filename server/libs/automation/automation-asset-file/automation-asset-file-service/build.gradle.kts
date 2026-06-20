@@ -11,6 +11,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot")
     implementation("org.springframework.boot:spring-boot-autoconfigure")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:file-storage:file-storage-api"))
     implementation(project(":server:libs:platform:platform-tag:platform-tag-api"))

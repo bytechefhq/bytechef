@@ -28,6 +28,8 @@ import org.springframework.data.repository.query.Param;
  */
 public interface AssetFileRepository extends ListCrudRepository<AssetFile, Long> {
 
+    List<AssetFile> findAllByWorkspaceId(Long workspaceId);
+
     @Query("""
         SELECT * FROM asset_file
         WHERE workspace_id = :workspaceId AND environment = :environment

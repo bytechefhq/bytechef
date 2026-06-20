@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,10 +49,11 @@ public class AssetFileTagServiceImpl implements AssetFileTagService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getAllTags() {
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getAllTags(long workspaceId) {
         Set<Long> tagIdSet = new HashSet<>();
 
-        for (AssetFile assetFile : assetFileRepository.findAll()) {
+        for (AssetFile assetFile : assetFileRepository.findAllByWorkspaceId(workspaceId)) {
             List<Long> tagIds = assetFile.getTagIds();
 
             if (tagIds != null) {

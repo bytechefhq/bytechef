@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.assetfile.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -79,5 +80,22 @@ class AssetFileTagServiceTest {
         when(assetFileRepository.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.updateTags(99L, List.of())).isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void testGetAllTagsScopesToWorkspace() {
+        AssetFile assetFile = new AssetFile();
+
+        assetFile.setWorkspaceId(5L);
+        assetFile.setTagIds(List.of(10L, 11L));
+
+        when(assetFileRepository.findAllByWorkspaceId(5L)).thenReturn(List.of(assetFile));
+        when(tagService.getTags(any())).thenReturn(List.of(new Tag("a"), new Tag("b")));
+
+        List<Tag> tags = service.getAllTags(5L);
+
+        assertThat(tags).hasSize(2);
+
+        verify(assetFileRepository).findAllByWorkspaceId(5L);
     }
 }

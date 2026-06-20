@@ -28,11 +28,12 @@ import java.util.Map;
 public interface AssetFileTagService {
 
     /**
-     * Retrieves a list of all tags.
+     * Retrieves the distinct tags assigned to the asset files of the given workspace.
      *
-     * @return a list of Tag objects representing all available tags
+     * @param workspaceId the id of the workspace whose asset file tags are to be retrieved
+     * @return a list of Tag objects assigned to the workspace's asset files
      */
-    List<Tag> getAllTags();
+    List<Tag> getAllTags(long workspaceId);
 
     /**
      * Retrieves a mapping from workspace file name to list of tags assigned to that file.

@@ -91,7 +91,7 @@ public class AssetFileGraphQlController {
 
     @QueryMapping
     public List<Tag> assetFileTags(@Argument Long workspaceId) {
-        return assetFileTagService.getAllTags();
+        return assetFileTagService.getAllTags(workspaceId);
     }
 
     @QueryMapping
