@@ -13,9 +13,12 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 /**
@@ -28,12 +31,16 @@ class ApiEndpointSearchAssetProvider implements SearchAssetProvider {
 
     private final ApiCollectionEndpointService apiCollectionEndpointService;
     private final ApiCollectionService apiCollectionService;
+    private final ApiPlatformWorkspaceResolver apiPlatformWorkspaceResolver;
 
+    @SuppressFBWarnings("EI")
     ApiEndpointSearchAssetProvider(
-        ApiCollectionEndpointService apiCollectionEndpointService, ApiCollectionService apiCollectionService) {
+        ApiCollectionEndpointService apiCollectionEndpointService, ApiCollectionService apiCollectionService,
+        ApiPlatformWorkspaceResolver apiPlatformWorkspaceResolver) {
 
         this.apiCollectionEndpointService = apiCollectionEndpointService;
         this.apiCollectionService = apiCollectionService;
+        this.apiPlatformWorkspaceResolver = apiPlatformWorkspaceResolver;
     }
 
     @Override
@@ -46,10 +53,19 @@ class ApiEndpointSearchAssetProvider implements SearchAssetProvider {
             return List.of();
         }
 
+        Map<Long, Long> workspaceIdByProjectDeploymentId =
+            apiPlatformWorkspaceResolver.getWorkspaceIdsByProjectDeploymentId(
+                apiCollections.stream()
+                    .map(ApiCollection::getProjectDeploymentId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .toList());
+
         List<ApiEndpointSearchResult> results = new ArrayList<>();
 
         for (ApiCollection apiCollection : apiCollections) {
             List<ApiCollectionEndpoint> endpoints = apiCollectionEndpointService.getApiEndpoints(apiCollection.getId());
+            Long workspaceId = workspaceIdByProjectDeploymentId.get(apiCollection.getProjectDeploymentId());
 
             for (ApiCollectionEndpoint endpoint : endpoints) {
                 if (containsIgnoreCase(endpoint.getName(), queryLower) ||
@@ -60,7 +76,8 @@ class ApiEndpointSearchAssetProvider implements SearchAssetProvider {
                             endpoint.getId(),
                             apiCollection.getId(),
                             endpoint.getName(),
-                            endpoint.getPath()));
+                            endpoint.getPath(),
+                            workspaceId));
 
                     if (results.size() >= limit) {
                         return results;

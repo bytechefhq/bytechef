@@ -9,9 +9,13 @@ package com.bytechef.ee.automation.apiplatform.configuration.search;
 
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchAssetType;
+import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Objects;
 import org.springframework.stereotype.Component;
 
 /**
@@ -23,24 +27,41 @@ import org.springframework.stereotype.Component;
 class ApiCollectionSearchAssetProvider implements SearchAssetProvider {
 
     private final ApiCollectionService apiCollectionService;
+    private final ApiPlatformWorkspaceResolver apiPlatformWorkspaceResolver;
 
-    ApiCollectionSearchAssetProvider(ApiCollectionService apiCollectionService) {
+    @SuppressFBWarnings("EI")
+    ApiCollectionSearchAssetProvider(
+        ApiCollectionService apiCollectionService, ApiPlatformWorkspaceResolver apiPlatformWorkspaceResolver) {
+
         this.apiCollectionService = apiCollectionService;
+        this.apiPlatformWorkspaceResolver = apiPlatformWorkspaceResolver;
     }
 
     @Override
     public List<ApiCollectionSearchResult> search(String query, int limit) {
         String queryLower = query.toLowerCase(Locale.ROOT);
 
-        return apiCollectionService.getApiCollections(null, null, null, null)
+        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(null, null, null, null)
             .stream()
             .filter(
                 apiCollection -> containsIgnoreCase(apiCollection.getName(), queryLower) ||
                     containsIgnoreCase(apiCollection.getDescription(), queryLower))
             .limit(limit)
+            .toList();
+
+        Map<Long, Long> workspaceIdByProjectDeploymentId =
+            apiPlatformWorkspaceResolver.getWorkspaceIdsByProjectDeploymentId(
+                apiCollections.stream()
+                    .map(ApiCollection::getProjectDeploymentId)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .toList());
+
+        return apiCollections.stream()
             .map(
                 apiCollection -> new ApiCollectionSearchResult(
-                    apiCollection.getId(), apiCollection.getName(), apiCollection.getDescription()))
+                    apiCollection.getId(), apiCollection.getName(), apiCollection.getDescription(),
+                    workspaceIdByProjectDeploymentId.get(apiCollection.getProjectDeploymentId())))
             .toList();
     }
 
