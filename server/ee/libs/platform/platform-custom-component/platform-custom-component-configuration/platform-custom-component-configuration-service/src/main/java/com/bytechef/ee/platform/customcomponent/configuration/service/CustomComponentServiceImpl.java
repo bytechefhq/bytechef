@@ -13,10 +13,12 @@ import com.bytechef.ee.platform.customcomponent.configuration.audit.CustomCompon
 import com.bytechef.ee.platform.customcomponent.configuration.domain.CustomComponent;
 import com.bytechef.ee.platform.customcomponent.configuration.repository.CustomComponentRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -65,6 +67,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void enableCustomComponent(long id, boolean enable) {
         CustomComponent customComponent = getCustomComponent(id);
 
@@ -86,6 +89,7 @@ public class CustomComponentServiceImpl implements CustomComponentService {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public CustomComponent getCustomComponent(long id) {
         return OptionalUtils.get(customComponentRepository.findById(id));
     }

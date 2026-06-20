@@ -16,6 +16,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -41,6 +42,7 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')")
     public Optional<GitConfigurationDTO> fetchGitConfiguration(long workspaceId) {
         return propertyService.fetchProperty(GIT_CONFIGURATION, Scope.WORKSPACE, workspaceId)
             .map(property -> ConvertUtils.convertValue(property.getValue(), GitConfigurationDTO.class));
@@ -54,6 +56,7 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')")
     public void save(GitConfigurationDTO gitConfigurationDTO, long workspaceId) {
         fetchGitConfiguration(workspaceId).ifPresentOrElse(
             curGitConfigurationDTO -> {
