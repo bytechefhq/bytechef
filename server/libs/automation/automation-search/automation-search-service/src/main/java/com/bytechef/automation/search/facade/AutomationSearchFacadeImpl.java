@@ -16,12 +16,18 @@
 
 package com.bytechef.automation.search.facade;
 
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.search.SearchAssetProvider;
 import com.bytechef.automation.search.SearchResult;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,9 +39,16 @@ import org.springframework.transaction.annotation.Transactional;
 public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
 
     private final List<SearchAssetProvider> providers;
+    private final UserService userService;
+    private final WorkspaceFacade workspaceFacade;
 
-    public AutomationSearchFacadeImpl(List<SearchAssetProvider> searchAssetProviders) {
+    @SuppressFBWarnings("EI")
+    public AutomationSearchFacadeImpl(
+        List<SearchAssetProvider> searchAssetProviders, UserService userService, WorkspaceFacade workspaceFacade) {
+
         this.providers = List.copyOf(searchAssetProviders);
+        this.userService = userService;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -44,6 +57,10 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
         List<CompletableFuture<List<SearchResult<?>>>> futures = new ArrayList<>();
 
         String currentTenantId = TenantContext.getCurrentTenantId();
+
+        // Resolve the caller's accessible workspaces in this (authenticated) thread; the provider fan-out runs on a
+        // pool that does not carry the SecurityContext.
+        Set<Long> accessibleWorkspaceIds = getAccessibleWorkspaceIds();
 
         for (SearchAssetProvider provider : providers) {
             CompletableFuture<List<SearchResult<?>>> future = CompletableFuture.supplyAsync(
@@ -59,6 +76,23 @@ public class AutomationSearchFacadeImpl implements AutomationSearchFacade {
         return futures.stream()
             .flatMap(future -> future.join()
                 .stream())
+            .filter(searchResult -> isAccessible(searchResult, accessibleWorkspaceIds))
             .toList();
+    }
+
+    private Set<Long> getAccessibleWorkspaceIds() {
+        return workspaceFacade.getUserWorkspaces(userService.getCurrentUser()
+            .getId())
+            .stream()
+            .map(Workspace::getId)
+            .collect(Collectors.toSet());
+    }
+
+    private static boolean isAccessible(SearchResult<?> searchResult, Set<Long> accessibleWorkspaceIds) {
+        Long workspaceId = searchResult.workspaceId();
+
+        // A null workspaceId means the provider has not been workspace-scoped yet (passed through unchanged during the
+        // incremental rollout) or the result is workspace-independent.
+        return workspaceId == null || accessibleWorkspaceIds.contains(workspaceId);
     }
 }
