@@ -1,6 +1,6 @@
 extend type Query {
     mcpProject(id: ID): McpProject
-    mcpProjects: [McpProject]
+    mcpProjects(workspaceId: ID!): [McpProject]
     mcpProjectsByServerId(mcpServerId: ID): [McpProject]
 }
 

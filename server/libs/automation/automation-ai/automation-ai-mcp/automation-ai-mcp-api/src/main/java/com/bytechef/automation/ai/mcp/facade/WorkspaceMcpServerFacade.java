@@ -16,6 +16,7 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
@@ -46,6 +47,14 @@ public interface WorkspaceMcpServerFacade {
      * @return a list of {@code Tag} objects assigned to the workspace's MCP servers
      */
     List<Tag> getWorkspaceMcpServerTags(Long workspaceId);
+
+    /**
+     * Retrieves the MCP projects belonging to the MCP servers of the specified workspace.
+     *
+     * @param workspaceId the unique identifier of the workspace whose MCP projects are to be retrieved
+     * @return a list of {@code McpProject} objects belonging to the workspace's MCP servers
+     */
+    List<McpProject> getWorkspaceMcpProjects(Long workspaceId);
 
     /**
      * Creates a new MCP server and assigns it to the specified workspace.

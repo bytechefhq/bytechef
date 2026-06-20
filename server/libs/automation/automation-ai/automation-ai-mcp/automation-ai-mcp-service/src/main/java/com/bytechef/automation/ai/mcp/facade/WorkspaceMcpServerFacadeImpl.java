@@ -16,7 +16,9 @@
 
 package com.bytechef.automation.ai.mcp.facade;
 
+import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.domain.WorkspaceMcpServer;
+import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -28,6 +30,8 @@ import com.bytechef.platform.tag.domain.Tag;
 import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +45,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
+    private final McpProjectService mcpProjectService;
     private final McpServerFacade mcpServerFacade;
     private final McpServerService mcpServerService;
     private final TagService tagService;
@@ -48,13 +53,29 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @SuppressFBWarnings("EI")
     public WorkspaceMcpServerFacadeImpl(
-        McpServerFacade mcpServerFacade, McpServerService mcpServerService, TagService tagService,
-        WorkspaceMcpServerService workspaceMcpServerService) {
+        McpProjectService mcpProjectService, McpServerFacade mcpServerFacade, McpServerService mcpServerService,
+        TagService tagService, WorkspaceMcpServerService workspaceMcpServerService) {
 
+        this.mcpProjectService = mcpProjectService;
         this.mcpServerFacade = mcpServerFacade;
         this.mcpServerService = mcpServerService;
         this.tagService = tagService;
         this.workspaceMcpServerService = workspaceMcpServerService;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<McpProject> getWorkspaceMcpProjects(Long workspaceId) {
+        Set<Long> mcpServerIds = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId)
+            .stream()
+            .map(WorkspaceMcpServer::getMcpServerId)
+            .collect(Collectors.toSet());
+
+        return mcpServerIds.stream()
+            .flatMap(mcpServerId -> mcpProjectService.getMcpServerMcpProjects(mcpServerId)
+                .stream())
+            .toList();
     }
 
     @Override

@@ -42,6 +42,11 @@ class WorkspaceMcpServerFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetWorkspaceMcpProjectsRequiresViewer() {
+        assertExpression("getWorkspaceMcpProjects", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+    }
+
+    @Test
     void testCreateRequiresEditor() {
         assertExpression("createWorkspaceMcpServer", "hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')");
     }

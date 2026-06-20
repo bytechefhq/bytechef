@@ -24,6 +24,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.domain.McpProject;
 import com.bytechef.automation.ai.mcp.facade.McpProjectFacade;
+import com.bytechef.automation.ai.mcp.facade.WorkspaceMcpServerFacade;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlConfigurationSharedMocks;
 import com.bytechef.automation.ai.mcp.web.graphql.config.AutomationMcpGraphQlTestConfiguration;
@@ -66,6 +67,9 @@ class McpProjectGraphQlControllerIntTest {
 
     @Autowired
     private ProjectDeploymentService projectDeploymentService;
+
+    @Autowired
+    private WorkspaceMcpServerFacade workspaceMcpServerFacade;
 
     @Test
     void testGetMcpProjectById() {
@@ -130,13 +134,13 @@ class McpProjectGraphQlControllerIntTest {
             createMockMcpProject(1L, 123L, 1L),
             createMockMcpProject(2L, 456L, 2L));
 
-        when(mcpProjectService.getMcpProjects()).thenReturn(mockProjects);
+        when(workspaceMcpServerFacade.getWorkspaceMcpProjects(10L)).thenReturn(mockProjects);
 
         // When & Then
         this.graphQlTester
             .document("""
                 query {
-                    mcpProjects {
+                    mcpProjects(workspaceId: "10") {
                         id
                         projectDeploymentId
                         mcpServerId
@@ -148,7 +152,7 @@ class McpProjectGraphQlControllerIntTest {
             .entityList(Object.class)
             .hasSize(2);
 
-        verify(mcpProjectService).getMcpProjects();
+        verify(workspaceMcpServerFacade).getWorkspaceMcpProjects(10L);
     }
 
     @Test

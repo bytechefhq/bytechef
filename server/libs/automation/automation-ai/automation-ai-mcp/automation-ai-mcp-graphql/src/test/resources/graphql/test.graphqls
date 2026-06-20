@@ -19,7 +19,7 @@ type Query {
 
     # McpProject queries
     mcpProject(id: ID): McpProject
-    mcpProjects: [McpProject]
+    mcpProjects(workspaceId: ID!): [McpProject]
     mcpProjectsByServerId(mcpServerId: ID): [McpProject]
 
     # McpProjectWorkflow queries

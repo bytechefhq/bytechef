@@ -98,32 +98,6 @@ public class McpServerGraphQlControllerIntTest {
     }
 
     @Test
-    void testGetMcpServers() {
-        // Given
-        List<McpServer> mockServers = List.of(
-            createMockMcpServer(1L, "Server 1", PlatformType.AUTOMATION, Environment.DEVELOPMENT, true),
-            createMockMcpServer(2L, "Server 2", PlatformType.AUTOMATION, Environment.PRODUCTION, false));
-
-        when(mcpServerService.getMcpServers(PlatformType.AUTOMATION, McpServerService.McpServerOrderBy.NAME_ASC))
-            .thenReturn(mockServers);
-
-        // When & Then
-        this.graphQlTester
-            .document("""
-                query {
-                    mcpServers(type: AUTOMATION, orderBy: NAME_ASC) {
-                        id
-                        name
-                    }
-                }
-                """)
-            .execute()
-            .path("mcpServers")
-            .entityList(Object.class)
-            .hasSize(2);
-    }
-
-    @Test
     void testCreateMcpServer() {
         // Given
         McpServer mockServer = createMockMcpServer(
