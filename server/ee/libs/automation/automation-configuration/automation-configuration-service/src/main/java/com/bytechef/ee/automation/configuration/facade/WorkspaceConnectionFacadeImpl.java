@@ -30,6 +30,7 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.security.domain.ResourceVisibility;
 import com.bytechef.platform.security.domain.ResourceVisibilityPolicyRegistry;
+import com.bytechef.platform.tag.service.TagService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.execution.facade.ConnectionLifecycleFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -69,19 +70,19 @@ public class WorkspaceConnectionFacadeImpl
     public WorkspaceConnectionFacadeImpl(
         ApplicationEventPublisher applicationEventPublisher, ConnectionFacade connectionFacade,
         ConnectionLifecycleFacade connectionLifecycleFacade, ConnectionService connectionService,
+        ResourceVisibilityResolver resourceVisibilityResolver,
         ObjectProvider<MeterRegistry> meterRegistryProvider,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService, ProjectService projectService,
         ResourceGrantService resourceGrantService,
-        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry,
-        ResourceVisibilityResolver resourceVisibilityResolver, UserService userService,
-        WorkflowTestConfigurationService workflowTestConfigurationService,
+        ResourceVisibilityPolicyRegistry resourceVisibilityPolicyRegistry, TagService tagService,
+        UserService userService, WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkspaceConnectionService workspaceConnectionService, WorkspaceFacade workspaceFacade,
         WorkspaceUserService workspaceUserService) {
 
         super(
             applicationEventPublisher, connectionFacade, connectionLifecycleFacade, connectionService,
             resourceVisibilityResolver, meterRegistryProvider, projectDeploymentWorkflowService, projectService,
-            userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
+            tagService, userService, workflowTestConfigurationService, workspaceConnectionService, workspaceFacade);
 
         this.resourceGrantService = resourceGrantService;
         this.resourceVisibilityPolicyRegistry = resourceVisibilityPolicyRegistry;
