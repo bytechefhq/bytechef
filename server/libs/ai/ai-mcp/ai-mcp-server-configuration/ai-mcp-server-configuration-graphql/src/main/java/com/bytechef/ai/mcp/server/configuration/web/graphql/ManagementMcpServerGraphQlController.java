@@ -16,67 +16,35 @@
 
 package com.bytechef.ai.mcp.server.configuration.web.graphql;
 
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.service.PropertyService;
-import com.bytechef.tenant.domain.TenantKey;
+import com.bytechef.ai.mcp.server.configuration.service.ManagementMcpServerService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
 import org.springframework.stereotype.Controller;
 
 /**
- * GraphQL controller for managing MCP Server configuration. Provides read/write access to platform-level property
- * "mcp.server.key".
+ * GraphQL controller for managing MCP Server configuration. Delegates to {@link ManagementMcpServerService}, where the
+ * tenant-admin authorization for the secret-exposing platform MCP URL lives.
  *
  * @author Ivica Cardic
  */
 @Controller
 class ManagementMcpServerGraphQlController {
 
-    private static final String MCP_SERVER_PROPERTY_KEY = "mcp.server";
-
-    private final PropertyService propertyService;
-    private final String publicUrl;
+    private final ManagementMcpServerService managementMcpServerService;
 
     @SuppressFBWarnings("EI")
-    ManagementMcpServerGraphQlController(ApplicationProperties applicationProperties, PropertyService propertyService) {
-        this.propertyService = propertyService;
-        this.publicUrl = applicationProperties.getPublicUrl();
+    ManagementMcpServerGraphQlController(ManagementMcpServerService managementMcpServerService) {
+        this.managementMcpServerService = managementMcpServerService;
     }
 
     @QueryMapping
     String managementMcpServerUrl() {
-        Optional<Property> propertyOptional = propertyService.fetchProperty(
-            MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
-        String secretKey;
-
-        if (propertyOptional.isPresent()) {
-            Property property = propertyOptional.get();
-
-            secretKey = (String) property.get("secretKey");
-        } else {
-            secretKey = String.valueOf(TenantKey.of());
-
-            propertyService.save(
-                MCP_SERVER_PROPERTY_KEY, Map.of("secretKey", secretKey), Property.Scope.PLATFORM, null);
-        }
-
-        return getManagementMcpServerUrl(secretKey);
+        return managementMcpServerService.getManagementMcpServerUrl();
     }
 
     @MutationMapping
     String updateManagementMcpServerUrl() {
-        String secretKey = String.valueOf(TenantKey.of());
-
-        propertyService.save(MCP_SERVER_PROPERTY_KEY, Map.of("secretKey", secretKey), Property.Scope.PLATFORM, null);
-
-        return getManagementMcpServerUrl(secretKey);
-    }
-
-    private String getManagementMcpServerUrl(String secretKey) {
-        return publicUrl + "/api/management/" + secretKey + "/mcp";
+        return managementMcpServerService.updateManagementMcpServerUrl();
     }
 }
