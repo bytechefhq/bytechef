@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:59.729452+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:38:17.284258+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "project-deployment-tag", description = "The Automation Project Deployment Tag Internal API")
 public interface ProjectDeploymentTagApi {
@@ -43,17 +43,18 @@ public interface ProjectDeploymentTagApi {
         return Optional.empty();
     }
 
-    String PATH_GET_PROJECT_DEPLOYMENT_TAGS = "/project-deployments/tags";
+    String PATH_GET_PROJECT_DEPLOYMENT_TAGS = "/workspaces/{id}/project-deployment-tags";
     /**
-     * GET /project-deployments/tags : Get project deployment tags
-     * Get project deployment tags.
+     * GET /workspaces/{id}/project-deployment-tags : Get project deployment tags
+     * Get project deployment tags for a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The list of project deployment tags. (status code 200)
      */
     @Operation(
         operationId = "getProjectDeploymentTags",
         summary = "Get project deployment tags",
-        description = "Get project deployment tags.",
+        description = "Get project deployment tags for a workspace.",
         tags = { "project-deployment-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of project deployment tags.", content = {
@@ -67,7 +68,7 @@ public interface ProjectDeploymentTagApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getProjectDeploymentTags(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

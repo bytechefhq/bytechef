@@ -339,14 +339,12 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             tagService.getTags(projectDeployment.getTagIds()));
     }
 
-    // NOTE: getProjectDeploymentTags() returns tags across all deployments globally and is consumed by the
-    // (non-admin) workspace deployment page for filtering, so it cannot carry a blanket gate. Closing its
-    // cross-workspace exposure requires server-side workspace-scoping (a workspaceId arg + filter) -- a T22
-    // residual rather than a @PreAuthorize gate.
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getProjectDeploymentTags() {
-        List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments();
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getProjectDeploymentTags(long workspaceId) {
+        List<ProjectDeployment> projectDeployments =
+            projectDeploymentService.getProjectDeployments(null, null, null, null, workspaceId);
 
         return tagService.getTags(
             projectDeployments.stream()

@@ -83,6 +83,13 @@ class ProjectDeploymentFacadeAuthorizationTest {
     }
 
     @Test
+    void testGetProjectDeploymentTagsRequiresWorkspaceViewer() {
+        assertExpression(
+            "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')",
+            "getProjectDeploymentTags", long.class);
+    }
+
+    @Test
     void testGetWorkspaceProjectDeploymentsRequiresWorkspaceViewer() {
         assertExpression(
             "hasPermission(#id, 'WorkspaceRole', 'VIEWER')",

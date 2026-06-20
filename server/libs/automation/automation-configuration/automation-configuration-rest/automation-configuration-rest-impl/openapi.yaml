@@ -246,13 +246,21 @@ paths:
               schema:
                 type: integer
                 format: int64
-  /project-deployments/tags:
+  /workspaces/{id}/project-deployment-tags:
     get:
-      description: "Get project deployment tags."
+      description: "Get project deployment tags for a workspace."
       summary: "Get project deployment tags"
       tags:
-      - "project-deployment-tag"
+        - "project-deployment-tag"
       operationId: "getProjectDeploymentTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of project deployment tags."

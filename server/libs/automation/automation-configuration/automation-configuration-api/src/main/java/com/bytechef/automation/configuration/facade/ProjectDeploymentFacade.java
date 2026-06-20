@@ -50,7 +50,7 @@ public interface ProjectDeploymentFacade {
 
     ProjectDeploymentDTO getProjectDeployment(long id);
 
-    List<Tag> getProjectDeploymentTags();
+    List<Tag> getProjectDeploymentTags(long workspaceId);
 
     List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields);
