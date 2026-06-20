@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.workflow.execution.JobResumeId;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
+import com.bytechef.platform.workflow.execution.token.ApprovalTokens;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,29 +38,40 @@ import org.springframework.util.Assert;
 public class ApprovalTaskFacadeImpl implements ApprovalTaskFacade {
 
     private final ApprovalTaskService approvalTaskService;
+    private final ApprovalTokens approvalTokens;
     private final PrincipalJobService principalJobService;
     private final ProjectDeploymentService projectDeploymentService;
 
     @SuppressFBWarnings("EI")
     public ApprovalTaskFacadeImpl(
-        ApprovalTaskService approvalTaskService, PrincipalJobService principalJobService,
+        ApprovalTaskService approvalTaskService, ApprovalTokens approvalTokens, PrincipalJobService principalJobService,
         ProjectDeploymentService projectDeploymentService) {
 
         this.approvalTaskService = approvalTaskService;
+        this.approvalTokens = approvalTokens;
         this.principalJobService = principalJobService;
         this.projectDeploymentService = projectDeploymentService;
     }
 
     @Override
     public ApprovalTask createApprovalTask(ApprovalTask approvalTask) {
-        approvalTask.setEnvironment(getEnvironment(approvalTask.getJobResumeId()));
+        String innerToken = resolveInnerToken(approvalTask.getJobResumeId());
+
+        approvalTask.setJobResumeId(innerToken);
+
+        approvalTask.setEnvironment(getEnvironment(innerToken));
 
         return approvalTaskService.create(approvalTask);
     }
 
-    private Environment getEnvironment(String jobResumeIdString) {
+    private String resolveInnerToken(String jobResumeIdString) {
         Assert.notNull(jobResumeIdString, "'jobResumeId' must not be null");
 
+        return approvalTokens.resolveInnerToken(jobResumeIdString)
+            .orElseThrow(() -> new IllegalArgumentException("Invalid or expired approval token"));
+    }
+
+    private Environment getEnvironment(String jobResumeIdString) {
         JobResumeId jobResumeId = JobResumeId.parse(jobResumeIdString);
 
         long projectDeploymentId = principalJobService.getJobPrincipalId(

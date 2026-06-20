@@ -272,6 +272,7 @@ include("server:libs:platform:platform-workflow:platform-workflow-execution:plat
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-api")
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-rest:platform-workflow-execution-rest-impl")
 include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-service")
+include("server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-token-service")
 
 include("server:libs:modules:components:accelo")
 include("server:libs:modules:components:active-campaign")
