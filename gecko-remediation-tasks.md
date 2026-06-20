@@ -161,11 +161,13 @@ Companion to `gecko-security-report.md`. The 455 findings are consolidated into 
 
 ## Phase 3 — Remaining hardening
 
-- [ ] **T26. Auth & session hardening** _(~6 findings)_
+- [x] **T26. Auth & session hardening** _(~6 findings)_
   Rate-limit/lockout TOTP verification (`TwoFactorVerificationFilter`, `UserServiceImpl` `/api/mfa/verify`); constrain the `EMBED_INIT` postMessage origin before storing the JWT (`useWorkflowBuilder.ts`); restrict the `config()` SpEL function to an allowlist/prefix (`bytechef/evaluator/Config.java`); make the activation-email endpoint non-enumerable (`AccountController`).
+  **Done** (Phase 3 spec/plan `docs/superpowers/{specs,plans}/2026-06-20-phase3-security-hardening*`): TOTP now has a DB-persisted lockout (`failed_totp_attempts`/`totp_lockout_until`, enforced in `UserServiceImpl.verifyTotpCode`, 429 at both call sites; defaults 5 attempts / 15m via `bytechef.security.mfa.*`); `config()` is deny-all unless the property name matches `bytechef.workflow.config.allowed-prefixes`; activation-email always returns 204. The `EMBED_INIT` origin allowlist (`VITE_EMBEDDED_PARENT_ORIGINS` + `event.source`/`isAllowedOrigin` gate) was already present — verified, no change (residual: unset allowlist = open dev fallback).
 
-- [ ] **T27. Output encoding, file-path safety & shared-state isolation** _(~15 findings)_
+- [x] **T27. Output encoding, file-path safety & shared-state isolation** _(~15 findings)_
   Sanitize `Content-Disposition` headers (CRLF) in project/workflow/api-collection export (`ProjectApiController`, `AbstractWorkflowApiController`, `ApiCollectionApiController`); sanitize TipTap HTML (`PropertyMentionsInputEditor.tsx`); canonicalize/jail file paths in write/storage actions (`FilesystemWriteFileAction`, `FileDataStorageServiceImpl`, `JGitWorkflowOperations`, `AwsFileStorageServiceImpl`); bind chat-memory/agent state per user/tenant instead of sharing static instances (`InMemoryChatMemory`, `LangchainAgent`, `SpringAIAgent`/`CopilotConfiguration`, Chat-memory get/delete actions across Jdbc/Mongo/Cosmos/Cassandra).
+  **Done**: shared `StringUtils.toContentDispositionHeaderValue` (strip control chars + RFC 5987) at all three export sites; `FilesystemWriteFileAction` rejects NUL + normalizes; `JGitWorkflowOperations` jails workflow writes under the repo dir. TipTap XSS was already mitigated (`buildPropertyMentionsContent` sanitizes the RICH_TEXT render path) — verified, no change. Chat-memory: `InMemoryChatMemory` was building its `MessageWindowChatMemory` in a `static final` field (capturing the tenant-scoped holder once at class-load → cross-tenant leak); now built per-`apply()`. Audit of the other backends (Jdbc/Mongo/Cassandra/Redis/Neo4j) + agents found no other static capture — all build per-invocation and key by globally-unique `conversationId`; `FileDataStorageServiceImpl`/`AwsFileStorageServiceImpl` do no filesystem path resolution (`../`-safe). _Note: `ProjectTagApiControllerIntTest` is broken on this branch (pre-existing, unrelated — `getProjectTags()` signature drift from the tag workspace-scoping work)._
 
 ---
 
