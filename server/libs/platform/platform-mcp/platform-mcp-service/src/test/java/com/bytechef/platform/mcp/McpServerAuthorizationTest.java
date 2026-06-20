@@ -18,8 +18,11 @@ package com.bytechef.platform.mcp;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.platform.mcp.domain.McpComponent;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.facade.McpServerFacadeImpl;
 import com.bytechef.platform.mcp.service.McpServerServiceImpl;
+import com.bytechef.platform.mcp.service.McpToolServiceImpl;
 import java.lang.reflect.Method;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -66,6 +69,43 @@ class McpServerAuthorizationTest {
         assertExpression(
             McpServerFacadeImpl.class, "updateMcpServerTags",
             "hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')", long.class, java.util.List.class);
+    }
+
+    @Test
+    void testCreateMcpComponentRequiresServerEditor() {
+        assertExpression(
+            McpServerFacadeImpl.class, "create",
+            "hasPermission(#mcpComponent.mcpServerId, 'McpServer:ResourceRole', 'EDITOR')",
+            McpComponent.class, java.util.List.class);
+    }
+
+    @Test
+    void testUpdateMcpComponentRequiresEditor() {
+        assertExpression(
+            McpServerFacadeImpl.class, "update",
+            "hasPermission(#mcpComponent.id, 'McpComponent:ResourceRole', 'EDITOR')",
+            McpComponent.class, java.util.List.class);
+    }
+
+    @Test
+    void testDeleteMcpComponentRequiresEditor() {
+        assertExpression(
+            McpServerFacadeImpl.class, "deleteMcpComponent",
+            "hasPermission(#mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')", long.class);
+    }
+
+    @Test
+    void testUpdateMcpToolRequiresEditor() {
+        assertExpression(
+            McpToolServiceImpl.class, "update", "hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')",
+            McpTool.class);
+    }
+
+    @Test
+    void testDeleteMcpToolRequiresEditor() {
+        assertExpression(
+            McpToolServiceImpl.class, "delete", "hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')",
+            McpTool.class);
     }
 
     private static void assertExpression(

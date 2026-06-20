@@ -21,6 +21,7 @@ import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.repository.McpToolRepository;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,6 +46,7 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')")
     public McpTool update(McpTool mcpTool) {
         McpTool currentMcpTool = OptionalUtils.get(mcpToolRepository.findById(mcpTool.getId()));
 
@@ -57,6 +59,7 @@ public class McpToolServiceImpl implements McpToolService {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')")
     public void delete(McpTool mcpTool) {
         mcpToolRepository.delete(mcpTool);
     }
