@@ -272,7 +272,7 @@ public class ProjectApiControllerIntTest {
                 .expectStatus()
                 .isOk()
                 .expectHeader()
-                .valueEquals("Content-Disposition", "attachment; filename=\"name.zip\"")
+                .valueEquals("Content-Disposition", "attachment; filename=\"name.zip\"; filename*=UTF-8''name.zip")
                 .expectBody(byte[].class)
                 .isEqualTo(mockProjectData);
         } catch (Exception exception) {

@@ -92,4 +92,48 @@ public class StringUtils {
     public static @Nullable String asString(@Nullable Object value) {
         return value == null ? null : value.toString();
     }
+
+    /**
+     * Builds a safe {@code Content-Disposition} response header value for the given file name. Control characters
+     * (including CR and LF, which would otherwise enable header/response splitting) are stripped, an ASCII fallback
+     * {@code filename} is provided for legacy clients, and a percent-encoded RFC 5987 {@code filename*} carries the
+     * full UTF-8 name for modern clients.
+     *
+     * @param filename the proposed file name; may be null (treated as empty)
+     * @return a complete {@code attachment; filename="..."; filename*=UTF-8''...} header value
+     */
+    public static String toContentDispositionHeaderValue(String filename) {
+        String sanitized = filename == null ? "" : filename.replaceAll("\\p{Cntrl}", "");
+
+        String asciiFallback = sanitized.replaceAll("[^\\x20-\\x7E]", "_")
+            .replace("\"", "_")
+            .replace("\\", "_");
+
+        return "attachment; filename=\"" + asciiFallback + "\"; filename*=UTF-8''" + rfc5987Encode(sanitized);
+    }
+
+    private static String rfc5987Encode(String value) {
+        byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        StringBuilder stringBuilder = new StringBuilder();
+
+        for (byte aByte : bytes) {
+            int unsignedByte = aByte & 0xFF;
+
+            boolean attrChar = (unsignedByte >= 'A' && unsignedByte <= 'Z') ||
+                (unsignedByte >= 'a' && unsignedByte <= 'z') ||
+                (unsignedByte >= '0' && unsignedByte <= '9') ||
+                "!#$&+-.^_`|~".indexOf(unsignedByte) >= 0;
+
+            if (attrChar) {
+                stringBuilder.append((char) unsignedByte);
+            } else {
+                stringBuilder.append('%');
+                stringBuilder.append(Character.toUpperCase(Character.forDigit((unsignedByte >> 4) & 0xF, 16)));
+                stringBuilder.append(Character.toUpperCase(Character.forDigit(unsignedByte & 0xF, 16)));
+            }
+        }
+
+        return stringBuilder.toString();
+    }
 }

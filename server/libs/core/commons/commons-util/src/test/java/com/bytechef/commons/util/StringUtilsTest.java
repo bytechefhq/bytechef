@@ -28,6 +28,30 @@ import org.junit.jupiter.api.Test;
 class StringUtilsTest {
 
     @Test
+    void testToContentDispositionHeaderValueStripsCrlf() {
+        String header = StringUtils.toContentDispositionHeaderValue("evil\r\nSet-Cookie: x.zip");
+
+        assertThat(header)
+            .doesNotContain("\r")
+            .doesNotContain("\n")
+            .startsWith("attachment;");
+    }
+
+    @Test
+    void testToContentDispositionHeaderValueEncodesUnicode() {
+        String header = StringUtils.toContentDispositionHeaderValue("résumé.zip");
+
+        assertThat(header).contains("filename*=UTF-8''");
+    }
+
+    @Test
+    void testToContentDispositionHeaderValueHandlesNull() {
+        String header = StringUtils.toContentDispositionHeaderValue(null);
+
+        assertThat(header).isEqualTo("attachment; filename=\"\"; filename*=UTF-8''");
+    }
+
+    @Test
     void testAppendWithNewlineEmptyStringBuilder() {
         StringBuilder stringBuilder = new StringBuilder();
 

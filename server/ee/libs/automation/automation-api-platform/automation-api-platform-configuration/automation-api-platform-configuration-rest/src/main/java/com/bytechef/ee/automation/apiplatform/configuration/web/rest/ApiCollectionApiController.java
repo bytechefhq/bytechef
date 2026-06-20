@@ -9,6 +9,7 @@ package com.bytechef.ee.automation.apiplatform.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection;
 import com.bytechef.ee.automation.apiplatform.configuration.dto.ApiCollectionDTO;
 import com.bytechef.ee.automation.apiplatform.configuration.exception.ApiCollectionErrorType;
@@ -89,7 +90,8 @@ public class ApiCollectionApiController implements ApiCollectionApi {
 
         bodyBuilder.contentType(MediaType.APPLICATION_OCTET_STREAM);
 
-        bodyBuilder.header(HttpHeaders.CONTENT_DISPOSITION, "filename=\"" + getFilename(id) + "\"");
+        bodyBuilder.header(
+            HttpHeaders.CONTENT_DISPOSITION, StringUtils.toContentDispositionHeaderValue(getFilename(id)));
 
         String openApiSpecification = apiCollectionFacade.getOpenApiSpecification(id);
 

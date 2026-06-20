@@ -51,7 +51,9 @@ public abstract class AbstractWorkflowApiController {
 
         return ResponseEntity.ok()
             .contentType(MediaType.APPLICATION_OCTET_STREAM)
-            .header(HttpHeaders.CONTENT_DISPOSITION, "filename=\"" + fileName + "\"")
+            .header(
+                HttpHeaders.CONTENT_DISPOSITION,
+                com.bytechef.commons.util.StringUtils.toContentDispositionHeaderValue(fileName))
             .body(new ByteArrayResource(definition.getBytes(StandardCharsets.UTF_8)));
     }
 }
