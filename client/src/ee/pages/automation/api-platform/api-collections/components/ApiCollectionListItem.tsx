@@ -13,6 +13,7 @@ import {ApiCollectionTagKeys} from '@/ee/shared/mutations/automation/apiCollecti
 import {useDeleteApiCollectionMutation} from '@/ee/shared/mutations/automation/apiCollections.mutations';
 import {ApiCollectionKeys} from '@/ee/shared/mutations/automation/apiCollections.queries';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import TagList from '@/shared/components/TagList';
 import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/projectDeployments.mutations';
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
@@ -35,6 +36,8 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
     );
 
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
     const endpointsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const apiCollectionTagIds = apiCollection.tags?.map((tag) => tag.id);
@@ -49,7 +52,7 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
                 queryKey: ApiCollectionKeys.apiCollections,
             });
             queryClient.invalidateQueries({
-                queryKey: ApiCollectionTagKeys.apiCollectionTags,
+                queryKey: ApiCollectionTagKeys.apiCollectionTags(currentWorkspaceId!),
             });
         },
     });

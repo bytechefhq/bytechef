@@ -68,7 +68,7 @@ const ApiCollections = () => {
         tagId: searchParams.get('tagId') ? parseInt(searchParams.get('tagId')!) : undefined,
     });
 
-    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery();
+    const {data: tags, error: tagsError, isLoading: tagsIsLoading} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
     return (
         <LayoutContainer

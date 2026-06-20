@@ -27,7 +27,7 @@ const ApiClients = () => {
         projectDeployments: true,
     });
 
-    const {data: tags} = useGetApiCollectionTagsQuery();
+    const {data: tags} = useGetApiCollectionTagsQuery(currentWorkspaceId!);
 
     return (
         <PageLoader errors={[apiKeysError]} loading={apiKeysLoading}>
