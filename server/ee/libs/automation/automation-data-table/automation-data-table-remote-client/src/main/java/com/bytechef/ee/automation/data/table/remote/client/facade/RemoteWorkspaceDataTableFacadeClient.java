@@ -10,8 +10,12 @@ package com.bytechef.ee.automation.data.table.remote.client.facade;
 import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,6 +66,46 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
 
     @Override
     public void renameTable(long dataTableId, String newBaseName, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public DataTableRow updateRow(long dataTableId, long rowId, Map<String, Object> values, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean deleteRow(long dataTableId, long rowId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String exportCsv(long dataTableId, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void importCsv(long dataTableId, String csv, long environmentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void updateTags(long dataTableId, List<Tag> tags) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
 }

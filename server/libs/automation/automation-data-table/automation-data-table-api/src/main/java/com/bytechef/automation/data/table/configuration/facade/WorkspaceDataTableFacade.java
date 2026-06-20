@@ -17,8 +17,12 @@
 package com.bytechef.automation.data.table.configuration.facade;
 
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Coordinates the platform {@code DataTableService} with the workspace relation, exposing the workspace-scoped
@@ -44,4 +48,20 @@ public interface WorkspaceDataTableFacade {
     void renameColumn(long dataTableId, String fromColumnName, String newName, long environmentId);
 
     void renameTable(long dataTableId, String newBaseName, long environmentId);
+
+    List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId);
+
+    DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId);
+
+    DataTableRow updateRow(long dataTableId, long rowId, Map<String, Object> values, long environmentId);
+
+    boolean deleteRow(long dataTableId, long rowId, long environmentId);
+
+    String exportCsv(long dataTableId, long environmentId);
+
+    void importCsv(long dataTableId, String csv, long environmentId);
+
+    void updateTags(long dataTableId, List<Tag> tags);
+
+    List<Webhook> listWebhooks(long dataTableId, long environmentId);
 }

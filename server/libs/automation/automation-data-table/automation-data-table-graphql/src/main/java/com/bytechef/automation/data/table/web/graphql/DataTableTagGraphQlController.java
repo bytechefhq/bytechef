@@ -17,6 +17,7 @@
 package com.bytechef.automation.data.table.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.data.table.configuration.facade.WorkspaceDataTableFacade;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
 import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
 import com.bytechef.platform.tag.domain.Tag;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -39,19 +41,26 @@ public class DataTableTagGraphQlController {
 
     private final DataTableTagService dataTableTagService;
     private final DataTableService dataTableService;
+    private final WorkspaceDataTableFacade workspaceDataTableFacade;
 
     @SuppressFBWarnings("EI")
-    public DataTableTagGraphQlController(DataTableTagService dataTableTagService, DataTableService dataTableService) {
+    public DataTableTagGraphQlController(
+        DataTableTagService dataTableTagService, DataTableService dataTableService,
+        WorkspaceDataTableFacade workspaceDataTableFacade) {
+
         this.dataTableTagService = dataTableTagService;
         this.dataTableService = dataTableService;
+        this.workspaceDataTableFacade = workspaceDataTableFacade;
     }
 
     @QueryMapping
+    @PreAuthorize("isAuthenticated()")
     public List<Tag> dataTableTags() {
         return dataTableTagService.getAllTags();
     }
 
     @QueryMapping
+    @PreAuthorize("isAuthenticated()")
     public List<DataTableTagsEntry> dataTableTagsByTable() {
         Map<String, List<Tag>> tagsByTableName = dataTableTagService.getTagsByTableName();
 
@@ -78,7 +87,7 @@ public class DataTableTagGraphQlController {
             })
             .collect(Collectors.toList());
 
-        dataTableTagService.updateTags(input.tableId(), tags);
+        workspaceDataTableFacade.updateTags(input.tableId(), tags);
 
         return true;
     }

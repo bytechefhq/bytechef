@@ -20,9 +20,16 @@ import com.bytechef.automation.data.table.configuration.domain.WorkspaceDataTabl
 import com.bytechef.automation.data.table.configuration.service.WorkspaceDataTableService;
 import com.bytechef.platform.data.table.configuration.domain.DataTableInfo;
 import com.bytechef.platform.data.table.configuration.service.DataTableService;
+import com.bytechef.platform.data.table.configuration.service.DataTableTagService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
+import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.execution.domain.DataTableRow;
+import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -37,14 +44,22 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
+    private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
+    private final DataTableTagService dataTableTagService;
+    private final DataTableWebhookService dataTableWebhookService;
     private final WorkspaceDataTableService workspaceDataTableService;
 
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
-        DataTableService dataTableService, WorkspaceDataTableService workspaceDataTableService) {
+        DataTableRowService dataTableRowService, DataTableService dataTableService,
+        DataTableTagService dataTableTagService, DataTableWebhookService dataTableWebhookService,
+        WorkspaceDataTableService workspaceDataTableService) {
 
+        this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
+        this.dataTableTagService = dataTableTagService;
+        this.dataTableWebhookService = dataTableWebhookService;
         this.workspaceDataTableService = workspaceDataTableService;
     }
 
@@ -112,5 +127,58 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
     public void renameTable(long dataTableId, String newBaseName, long environmentId) {
         dataTableService.renameTable(dataTableService.getBaseNameById(dataTableId), newBaseName, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')")
+    public List<DataTableRow> listRows(long dataTableId, int limit, int offset, long environmentId) {
+        return dataTableRowService.listRows(dataTableService.getBaseNameById(dataTableId), limit, offset,
+            environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public DataTableRow insertRow(long dataTableId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.insertRow(dataTableService.getBaseNameById(dataTableId), values, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public DataTableRow updateRow(long dataTableId, long rowId, Map<String, Object> values, long environmentId) {
+        return dataTableRowService.updateRow(
+            dataTableService.getBaseNameById(dataTableId), rowId, values, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public boolean deleteRow(long dataTableId, long rowId, long environmentId) {
+        return dataTableRowService.deleteRow(dataTableService.getBaseNameById(dataTableId), rowId, environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')")
+    public String exportCsv(long dataTableId, long environmentId) {
+        return dataTableRowService.exportCsv(dataTableService.getBaseNameById(dataTableId), environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void importCsv(long dataTableId, String csv, long environmentId) {
+        dataTableRowService.importCsv(dataTableService.getBaseNameById(dataTableId), csv, environmentId);
+    }
+
+    @Override
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')")
+    public void updateTags(long dataTableId, List<Tag> tags) {
+        dataTableTagService.updateTags(dataTableId, tags);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')")
+    public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
+        return dataTableWebhookService.listWebhooks(dataTableService.getBaseNameById(dataTableId), environmentId);
     }
 }
