@@ -98,13 +98,13 @@ public class ProjectTagApiControllerIntTest {
 
     @Test
     public void testGetProjectTags() {
-        when(projectTagFacade.getProjectTags())
+        when(projectTagFacade.getProjectTags(anyLong()))
             .thenReturn(List.of(new Tag(1L, "tag1"), new Tag(2L, "tag2")));
 
         try {
             this.webTestClient
                 .get()
-                .uri("/internal/projects/tags")
+                .uri("/internal/workspaces/1/project-tags")
                 .exchange()
                 .expectStatus()
                 .isOk()

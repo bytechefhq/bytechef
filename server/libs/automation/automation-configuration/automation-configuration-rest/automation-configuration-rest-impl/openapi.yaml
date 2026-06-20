@@ -505,13 +505,21 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Category"
-  /projects/tags:
+  /workspaces/{id}/project-tags:
     get:
-      description: "Get project tags."
-      summary: "Get project tags."
+      description: "Get project tags for a workspace."
+      summary: "Get project tags"
       tags:
-      - "project-tag"
+        - "project-tag"
       operationId: "getProjectTags"
+      parameters:
+        - name: "id"
+          description: "The id of a workspace."
+          in: "path"
+          required: true
+          schema:
+            type: "integer"
+            format: "int64"
       responses:
         "200":
           description: "The list of project tags."

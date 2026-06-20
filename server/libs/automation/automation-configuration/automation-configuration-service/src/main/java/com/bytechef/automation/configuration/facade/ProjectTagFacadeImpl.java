@@ -44,13 +44,13 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
         this.tagService = tagService;
     }
 
-    // NOTE: getProjectTags() returns tags across all projects globally and is consumed by the (non-admin) workspace
-    // Projects page for filtering, so it cannot carry a blanket gate. Closing its cross-workspace exposure requires
-    // server-side workspace-scoping (a workspaceId arg + filter) -- a T22 residual rather than a @PreAuthorize gate.
     @Override
     @Transactional(readOnly = true)
-    public List<Tag> getProjectTags() {
-        List<Project> projects = projectService.getProjects();
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getProjectTags(long workspaceId) {
+        List<Long> projectIds = projectService.getWorkspaceProjectIds(workspaceId);
+
+        List<Project> projects = projectService.getProjects(projectIds);
 
         return tagService.getTags(CollectionUtils.flatMap(projects, Project::getTagIds));
     }

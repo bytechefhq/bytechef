@@ -442,7 +442,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");
@@ -460,7 +460,7 @@ public class ProjectFacadeIntTest {
         projectRepository.save(project);
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2", "tag3");
@@ -468,7 +468,7 @@ public class ProjectFacadeIntTest {
         projectRepository.deleteById(Validate.notNull(project.getId(), "id"));
 
         assertThat(
-            projectTagFacade.getProjectTags()
+            projectTagFacade.getProjectTags(workspace.getId())
                 .stream()
                 .map(Tag::getName)
                 .collect(Collectors.toSet())).contains("tag1", "tag2");

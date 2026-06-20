@@ -24,9 +24,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
- * Pins the project-tag write gate (T22). {@code updateProjectTags} keys on the project via {@code ProjectScope};
- * {@code getProjectTags} is a global findAll consumed by the non-admin workspace page and stays ungated (workspace
- * scoping is the proper fix, tracked as a residual) -- a negative assertion locks that in.
+ * Pins the project-tag gates. {@code updateProjectTags} keys on the project via {@code ProjectScope};
+ * {@code getProjectTags} is workspace-scoped and gated by {@code WorkspaceRole VIEWER}.
  *
  * @author Ivica Cardic
  */
@@ -45,12 +44,15 @@ class ProjectTagFacadeAuthorizationTest {
     }
 
     @Test
-    void testGetProjectTagsIsNotGated() {
-        Method method = findMethod("getProjectTags");
+    void testGetProjectTagsRequiresWorkspaceViewer() {
+        Method method = findMethod("getProjectTags", long.class);
 
-        assertThat(method.isAnnotationPresent(PreAuthorize.class))
-            .as("getProjectTags (global findAll consumed by non-admin page) must NOT carry @PreAuthorize")
-            .isFalse();
+        PreAuthorize preAuthorize = method.getAnnotation(PreAuthorize.class);
+
+        assertThat(preAuthorize)
+            .as("@PreAuthorize on getProjectTags")
+            .isNotNull();
+        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
     }
 
     private static Method findMethod(String methodName, Class<?>... parameterTypes) {
