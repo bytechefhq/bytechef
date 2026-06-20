@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.component.exception;
 
-import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.exception.AbstractErrorType;
 
 /**
@@ -39,6 +39,6 @@ public class TriggerDefinitionErrorType extends AbstractErrorType {
     public static final TriggerDefinitionErrorType TRIGGER_TEST_FAILED = new TriggerDefinitionErrorType(109);
 
     private TriggerDefinitionErrorType(int errorKey) {
-        super(ActionDefinition.class, errorKey);
+        super(TriggerDefinition.class, errorKey);
     }
 }
