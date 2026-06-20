@@ -1,3 +1,4 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {Tag, useDataTableTagsQuery} from '@/shared/middleware/graphql';
 import {useSearchParams} from 'react-router-dom';
 
@@ -11,7 +12,9 @@ export default function useDataTablesLeftSidebarNav(): UseDataTablesLeftSidebarN
     const [searchParams] = useSearchParams();
     const tagId = searchParams.get('tagId');
 
-    const {data, isLoading} = useDataTableTagsQuery();
+    const workspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+
+    const {data, isLoading} = useDataTableTagsQuery({workspaceId: String(workspaceId)});
 
     const tags = (data?.dataTableTags ?? []) as Tag[];
 
