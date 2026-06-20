@@ -73,6 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -141,6 +142,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentDTO.projectId, 'ProjectScope', 'WORKFLOW_EDIT')")
     public long createProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         return createProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(), CollectionUtils.map(
@@ -197,6 +199,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     @Transactional(propagation = Propagation.NEVER)
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public long createProjectDeploymentWorkflowJob(Long id, String workflowId) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow =
             projectDeploymentWorkflowService.getProjectDeploymentWorkflow(
@@ -234,6 +237,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void deleteProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
@@ -273,6 +277,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void enableProjectDeployment(long projectDeploymentId, boolean enable) {
         List<ProjectDeploymentWorkflow> projectDeploymentWorkflows = projectDeploymentWorkflowService
             .getProjectDeploymentWorkflows(projectDeploymentId);
@@ -293,6 +298,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void enableProjectDeploymentWorkflow(long projectDeploymentId, String workflowId, boolean enable) {
         ProjectDeploymentWorkflow projectDeploymentWorkflow = doEnableProjectDeploymentWorkflow(
             projectDeploymentId, workflowId, enable);
@@ -311,6 +317,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment:ResourceRole', 'VIEWER')")
     public ProjectDeploymentDTO getProjectDeployment(long id) {
         ProjectDeployment projectDeployment = projectDeploymentService.getProjectDeployment(id);
 
@@ -332,6 +339,10 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
             tagService.getTags(projectDeployment.getTagIds()));
     }
 
+    // NOTE: getProjectDeploymentTags() returns tags across all deployments globally and is consumed by the
+    // (non-admin) workspace deployment page for filtering, so it cannot carry a blanket gate. Closing its
+    // cross-workspace exposure requires server-side workspace-scoping (a workspaceId arg + filter) -- a T22
+    // residual rather than a @PreAuthorize gate.
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getProjectDeploymentTags() {
@@ -345,6 +356,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'WorkspaceRole', 'VIEWER')")
     public List<ProjectDeploymentDTO> getWorkspaceProjectDeployments(
         long id, Long environmentId, Long projectId, Long tagId, boolean includeAllFields) {
 
@@ -404,6 +416,7 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void updateProjectDeployment(ProjectDeploymentDTO projectDeploymentDTO) {
         updateProjectDeployment(
             projectDeploymentDTO.toProjectDeployment(),
@@ -483,11 +496,13 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void updateProjectDeploymentTags(long id, List<Tag> tags) {
         projectDeploymentService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDeploymentWorkflow.projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')")
     public void updateProjectDeploymentWorkflow(ProjectDeploymentWorkflow projectDeploymentWorkflow) {
         validateProjectDeploymentWorkflow(projectDeploymentWorkflow);
 
