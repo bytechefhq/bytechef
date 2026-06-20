@@ -1,6 +1,7 @@
 dependencies {
     implementation("org.slf4j:slf4j-api")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-api"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-api"))

@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.component.definition.Authorization.AuthorizationType;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.ai.mcp.domain.McpIntegrationInstanceConfigurationWorkflow;
@@ -68,6 +69,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,6 +81,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional
 @ConditionalOnEEVersion
+@SkipAutomationAuthorization
 public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrationFacade {
 
     private final ClusterElementDefinitionService clusterElementDefinitionService;
@@ -185,20 +188,26 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
 
     @Override
     public void deleteIntegrationInstance(String externalUserId, long integrationInstanceId) {
-        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
-
         IntegrationInstance integrationInstance =
             integrationInstanceService.getIntegrationInstance(integrationInstanceId);
 
         IntegrationInstanceConfiguration integrationInstanceConfiguration = integrationInstanceConfigurationService
             .getIntegrationInstanceConfiguration(integrationInstance.getIntegrationInstanceConfigurationId());
 
-        connectedUserService.fetchConnectedUser(externalUserId, integrationInstanceConfiguration.getEnvironment())
-            .ifPresent(connectedUser -> {
-                if (Objects.equals(connectedUser.getExternalId(), externalUserId)) {
-                    integrationInstanceService.delete(integrationInstanceId);
-                }
-            });
+        ConnectedUser connectedUser = connectedUserService.getConnectedUser(
+            externalUserId, integrationInstanceConfiguration.getEnvironment());
+
+        // Verify the instance actually belongs to the connected user resolved from externalUserId. The previous
+        // check compared connectedUser.getExternalId() against externalUserId — the user was fetched BY externalUserId,
+        // so that was always true (tautological) and let any caller delete any instance's workflows.
+        if (!Objects.equals(integrationInstance.getConnectedUserId(), connectedUser.getId())) {
+            throw new AccessDeniedException(
+                "Integration instance " + integrationInstanceId + " is not owned by the connected user");
+        }
+
+        integrationInstanceWorkflowService.deleteByIntegrationInstanceId(integrationInstanceId);
+
+        integrationInstanceService.delete(integrationInstanceId);
     }
 
     @Override
