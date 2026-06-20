@@ -20,6 +20,7 @@ import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -58,6 +59,8 @@ public class ActionApiController implements ActionApi {
     public ResponseEntity<Object> executeAction(
         String externalUserId, String componentName, Integer componentVersion, String actionName,
         ExecuteActionRequestModel executeActionRequestModel, EnvironmentModel xEnvironment, Long xInstanceId) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 

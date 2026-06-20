@@ -17,6 +17,8 @@
 package com.bytechef.platform.security.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.ArrayList;
@@ -25,6 +27,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -52,6 +55,35 @@ class SecurityUtilsTest {
         Optional<String> login = SecurityUtils.fetchCurrentUserLogin();
 
         assertThat(login).contains("admin");
+    }
+
+    @Test
+    void testCheckCurrentUserLoginPassesWhenMatching() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("user-a", ""));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThatCode(() -> SecurityUtils.checkCurrentUserLogin("user-a")).doesNotThrowAnyException();
+    }
+
+    @Test
+    void testCheckCurrentUserLoginDeniesWhenDifferent() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(new UsernamePasswordAuthenticationToken("user-a", ""));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThatExceptionOfType(AccessDeniedException.class)
+            .isThrownBy(() -> SecurityUtils.checkCurrentUserLogin("user-b"));
+    }
+
+    @Test
+    void testCheckCurrentUserLoginDeniesWhenUnauthenticated() {
+        assertThatExceptionOfType(AccessDeniedException.class)
+            .isThrownBy(() -> SecurityUtils.checkCurrentUserLogin("user-a"));
     }
 
     @Test

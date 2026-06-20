@@ -60,6 +60,8 @@ public class ConnectionApiController implements ConnectionApi {
     public ResponseEntity<List<ConnectionModel>> getConnections(
         String externalUserId, String componentName, EnvironmentModel xEnvironment, List<Long> connectionIds) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         // The authenticated embedded principal's name IS the connected user's externalId (see
         // EmbeddedApiKeyAuthenticationProvider). The path externalUserId must match it, otherwise a caller
         // authenticated for one end user could read another end user's connections (IDOR).

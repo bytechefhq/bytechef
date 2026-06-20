@@ -11,6 +11,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceWorkflowFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -82,6 +83,8 @@ class McpIntegrationInstanceWorkflowApiController {
     public ResponseEntity<Void> enableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, true);
 
         return ResponseEntity.noContent()
@@ -92,6 +95,8 @@ class McpIntegrationInstanceWorkflowApiController {
     @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-workflows/{workflowUuid}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceWorkflow(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable String workflowUuid) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         mcpIntegrationInstanceWorkflowFacade.enableMcpIntegrationInstanceWorkflow(id, workflowUuid, false);
 

@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.public_.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.ai.mcp.facade.McpIntegrationInstanceToolFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -66,6 +67,8 @@ class McpIntegrationInstanceToolApiController {
     public ResponseEntity<Void> enableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, true);
 
         return ResponseEntity.noContent()
@@ -76,6 +79,8 @@ class McpIntegrationInstanceToolApiController {
     @DeleteMapping("/external/{externalUserId}/integration-instances/{id}/mcp-tools/{mcpToolId}/enable")
     public ResponseEntity<Void> disableMcpIntegrationInstanceTool(
         @PathVariable String externalUserId, @PathVariable Long id, @PathVariable Long mcpToolId) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         mcpIntegrationInstanceToolFacade.enableMcpIntegrationInstanceTool(id, mcpToolId, false);
 

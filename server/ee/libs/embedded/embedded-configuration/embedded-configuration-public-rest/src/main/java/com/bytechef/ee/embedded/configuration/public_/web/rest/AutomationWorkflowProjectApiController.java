@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -59,6 +60,8 @@ public class AutomationWorkflowProjectApiController implements AutomationWorkflo
     @Override
     public ResponseEntity<List<AutomationWorkflowProjectModel>> getProjects(
         String externalUserId, EnvironmentModel xEnvironment) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         List<AutomationWorkflowProjectModel> models = automationWorkflowProjectFacade
             .getPublishedProjects(externalUserId, getEnvironment(xEnvironment))

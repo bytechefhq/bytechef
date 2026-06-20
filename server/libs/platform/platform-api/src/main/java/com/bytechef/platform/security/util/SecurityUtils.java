@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -67,6 +68,23 @@ public final class SecurityUtils {
      */
     public static String getCurrentUserLogin() {
         return fetchCurrentUserLogin().orElseThrow(() -> new IllegalStateException("Current user is not set!"));
+    }
+
+    /**
+     * Verifies that {@code expectedLogin} matches the currently authenticated principal's login. Used at the embedded
+     * public-API boundary so a path-supplied {@code externalUserId} cannot diverge from the authenticated connected
+     * user: in API-key mode the principal is derived from the path segment (this is a no-op); in JWT mode it stops a
+     * signed token issued for user A from acting on user B by placing B's id in the path.
+     *
+     * @param expectedLogin the login the request claims to act as (e.g. a path {@code externalUserId})
+     * @throws AccessDeniedException if no user is authenticated or the logins differ
+     */
+    public static void checkCurrentUserLogin(String expectedLogin) {
+        String currentUserLogin = fetchCurrentUserLogin().orElse(null);
+
+        if (currentUserLogin == null || !currentUserLogin.equals(expectedLogin)) {
+            throw new AccessDeniedException("Access is denied");
+        }
     }
 
     /**

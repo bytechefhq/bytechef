@@ -59,6 +59,8 @@ public class ConnectedUserApiController implements ConnectedUserApi {
     public ResponseEntity<Void> updateConnectedUser(
         String externalUserId, EnvironmentModel xEnvironment, Map<String, Object> requestBody) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         connectedUserService.updateConnectedUser(externalUserId, getEnvironment(xEnvironment), requestBody);
 
         return ResponseEntity.noContent()

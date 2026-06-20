@@ -66,6 +66,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<Void> disableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         connectedUserIntegrationInstanceFacade.disableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
 
@@ -90,6 +92,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<Void> enableIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         connectedUserIntegrationInstanceFacade.enableIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid);
 
@@ -112,6 +116,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     @Override
     public ResponseEntity<List<OptionModel>> getComponentInputOptions(
         String externalUserId, Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         return ResponseEntity.ok(
             resolveComponentInputOptions(externalUserId, id, componentInputOptionsRequestModel));
@@ -138,6 +144,8 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
     public ResponseEntity<Void> updateIntegrationInstanceWorkflow(
         String externalUserId, Long id, String workflowUuid,
         @NonNull UpdateFrontendIntegrationInstanceWorkflowRequestModel updateFrontendIntegrationInstanceWorkflowRequestModel) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         connectedUserIntegrationInstanceFacade.updateIntegrationInstanceWorkflow(
             externalUserId, id, workflowUuid,

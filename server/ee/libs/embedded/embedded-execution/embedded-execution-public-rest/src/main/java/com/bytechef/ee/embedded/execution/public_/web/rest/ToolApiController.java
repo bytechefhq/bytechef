@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.execution.public_.web.rest.model.ToolModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -48,6 +49,8 @@ public class ToolApiController implements ToolApi {
         String externalUserId, ExecuteToolRequestModel executeToolRequestModel, EnvironmentModel xEnvironment,
         Long xInstanceId) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 
         return ResponseEntity.ok(
@@ -60,6 +63,8 @@ public class ToolApiController implements ToolApi {
     public ResponseEntity<Map<String, List<ToolModel>>> getTools(
         String externalUserId, EnvironmentModel xEnvironment, List<String> categories, List<String> components,
         List<String> tools) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());
 

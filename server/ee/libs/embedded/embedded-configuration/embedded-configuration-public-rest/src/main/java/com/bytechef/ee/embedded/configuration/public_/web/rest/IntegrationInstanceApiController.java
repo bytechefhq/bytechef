@@ -75,6 +75,8 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
         CreateFrontendIntegrationInstanceRequestModel createFrontendIntegrationInstanceRequestModel,
         EnvironmentModel xEnvironment) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         CreateFrontendIntegrationInstanceRequestConnectionModel connection =
             createFrontendIntegrationInstanceRequestModel.getConnection();
 
@@ -100,6 +102,8 @@ public class IntegrationInstanceApiController implements IntegrationInstanceApi 
 
     @Override
     public ResponseEntity<Void> deleteIntegrationInstance(String externalUserId, Long id) {
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         connectedUserIntegrationFacade.deleteIntegrationInstance(externalUserId, id);
 
         return ResponseEntity.noContent()

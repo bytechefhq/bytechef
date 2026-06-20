@@ -76,6 +76,8 @@ public class IntegrationApiController implements IntegrationApi {
     public ResponseEntity<IntegrationModel> getIntegration(
         String externalUserId, Long id, EnvironmentModel xEnvironment) {
 
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
+
         ConnectedUserIntegrationDTO connectedUserIntegrationDTO;
 
         try {
@@ -92,6 +94,8 @@ public class IntegrationApiController implements IntegrationApi {
     @Override
     public ResponseEntity<List<IntegrationBasicModel>> getIntegrations(
         String externalUserId, EnvironmentModel xEnvironment) {
+
+        SecurityUtils.checkCurrentUserLogin(externalUserId);
 
         return ResponseEntity.ok(
             connectedUserIntegrationFacade
