@@ -171,6 +171,44 @@ Companion to `gecko-security-report.md`. The 455 findings are consolidated into 
 
 ---
 
+## Workspace-scoping & residual-gating pass (T20/T22/T24 list-read residuals)
+
+Plan: `docs/superpowers/plans/2026-06-20-workspace-scoping-residual-gating.md`. Closes the remaining
+"list tags / list resources" endpoints that returned cross-workspace data behind a `WorkspaceRole VIEWER`
+gate on the facade/service impl (never the controller).
+
+- [x] **Tag listings scoped to workspace** — `getProjectTags`/`getProjectDeploymentTags`/`getConnectionTags`
+  (REST → `/workspaces/{id}/*-tags`), `getApiCollectionTags` (EE REST), `dataTableTags`/`assetFileTags`/
+  `knowledgeBaseTags` (GraphQL, `workspaceId` arg). Each scopes via the existing workspace-relation repo
+  and carries `hasPermission(#workspaceId,'WorkspaceRole','VIEWER')`. Tags remain tenant-global in storage.
+- [x] **MCP** — `mcpServerTags(type)` (shared automation+embedded) **split** into gated
+  `workspaceMcpServerTags(workspaceId)` (automation) + `embeddedMcpServerTags` (embedded, app/environment
+  trust); the platform `mcpServerTags` resolver/schema/int-test deleted. `mcpProjects` now requires
+  `workspaceId` and composes over the workspace's gated MCP servers. The dead global `mcpServers(type)`
+  query (no client caller) removed.
+- [x] **Codegen drift fixed** — `client/codegen.ts` had three stale GraphQL schema globs (automation-mcp,
+  ai/mcp, embedded-mcp) that excluded the MCP/management/embedded schemas, breaking `graphql-codegen`
+  entirely. Repointed to the moved module paths; codegen is green again.
+- [x] **Eval reads (T24 residual) — verified already gated** (2026-06-21): `AiEvalScoreFacadeImpl`/
+  `AiEvalScoreConfigFacadeImpl`/`AiEvalRuleFacadeImpl` `get*ByWorkspace` carry `WorkspaceRole VIEWER`
+  (analytics variant `ROLE_ADMIN`); the async `AiEvalExecutor` bypasses the facade by calling the service
+  directly (intended). No code change.
+- [ ] **Subflow list `getSubWorkflows` — DEFERRED** (decision gate). The subflow dropdown lists all
+  workspaces' subflows, but the task-dispatcher `OptionsFunction` is `(String search) -> List<Option>` with
+  **no context object**, so the editing workflow's workspace is not derivable at the call site without
+  changing the shared `OptionsFunction` SPI across every task dispatcher. Deferred to its own design rather
+  than fabricating a plumbing path.
+- [ ] **Subflow schema reads (#A) — DEFERRED** (documented rationale). `getSubWorkflowInputSchema`/
+  `getSubWorkflowOutputSchema(workflowUuid)` return any workflow's I/O schema by uuid with no ownership
+  check, but are reached only through the cluster-element/task-dispatcher option/properties/output functions
+  during definition resolution: that path (a) is shared with worker/embedded execution (no reliable
+  `SecurityContext`), and (b) at the call site has only the *referenced* subflow's `workflowUuid`, not the
+  containing workflow's id/workspace. A clean gate needs its own mini-design (gate at the editor entry point
+  that carries a SecurityContext + containing-workflow id, validating the referenced uuid resolves to a
+  workflow in the caller's accessible workspace).
+
+---
+
 ### Notes
 - Counts are approximate per-task tallies; exact per-finding detail (CVSS score, file, description) is in `gecko-security-report.md`, grouped by priority then type.
 - Many IDOR tasks (T18–T25) share the same fix shape — once **T17** lands, each domain sweep is largely mechanical.
