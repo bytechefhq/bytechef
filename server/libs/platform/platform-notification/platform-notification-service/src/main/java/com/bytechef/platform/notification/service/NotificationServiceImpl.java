@@ -21,6 +21,7 @@ import com.bytechef.platform.notification.domain.Notification;
 import com.bytechef.platform.notification.domain.NotificationEvent;
 import com.bytechef.platform.notification.repository.NotificationRepository;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public void delete(long notificationId) {
         notificationRepository.deleteById(notificationId);
     }

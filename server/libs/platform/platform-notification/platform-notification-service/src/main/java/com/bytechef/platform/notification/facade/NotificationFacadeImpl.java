@@ -22,6 +22,7 @@ import com.bytechef.platform.notification.service.NotificationEventService;
 import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -42,6 +43,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public List<NotificationDTO> getNotifications() {
         return notificationService.getNotifications()
             .stream()
@@ -51,6 +53,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public NotificationDTO createNotification(Notification notification) {
 
         notification = notificationService.create(notification);
@@ -61,6 +64,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
     public NotificationDTO updateNotification(Notification notification) {
         notification = notificationService.update(notification);
 
