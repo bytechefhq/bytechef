@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import org.springframework.security.access.prepost.PreAuthorize;
 import tools.jackson.core.type.TypeReference;
 
 /**
@@ -52,6 +53,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         List<LogEntry> allEntries = readLogEntriesByJobId(jobId);
 
@@ -61,6 +63,7 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         String filename = jobId + ".jsonl";
 
@@ -77,11 +80,13 @@ public class LogFileStorageImpl implements LogFileStorage {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public boolean logsExist(long jobId) {
         return fileStorageService.fileExists(LOG_FILES_DIR, jobId + ".jsonl");
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'EDITOR')")
     public void deleteLogEntries(long jobId) {
         String filename = jobId + ".jsonl";
 

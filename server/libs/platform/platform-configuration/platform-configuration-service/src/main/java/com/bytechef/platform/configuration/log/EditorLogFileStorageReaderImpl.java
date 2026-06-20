@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 import tools.jackson.core.type.TypeReference;
 
@@ -57,6 +58,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         List<LogEntry> allEntries = readLogEntriesByJobId(jobId);
 
@@ -66,6 +68,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         try {
             String filename = jobId + ".jsonl";
@@ -88,6 +91,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
     public boolean logsExist(long jobId) {
         return fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl");
     }
