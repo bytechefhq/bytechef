@@ -58,6 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -203,8 +204,9 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
-    public List<Tag> getApiCollectionTags() {
-        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(null, null, null, null);
+    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    public List<Tag> getApiCollectionTags(long workspaceId) {
+        List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(workspaceId, null, null, null);
 
         return tagService.getTags(
             apiCollections.stream()

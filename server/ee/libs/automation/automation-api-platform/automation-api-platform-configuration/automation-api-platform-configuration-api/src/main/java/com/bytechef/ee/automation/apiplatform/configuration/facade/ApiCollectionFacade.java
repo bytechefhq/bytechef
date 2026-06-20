@@ -30,7 +30,7 @@ public interface ApiCollectionFacade {
 
     List<ApiCollectionDTO> getApiCollections(long workspaceId, Long environmentId, Long projectId, Long tagId);
 
-    List<Tag> getApiCollectionTags();
+    List<Tag> getApiCollectionTags(long workspaceId);
 
     String getOpenApiSpecification(long id);
 

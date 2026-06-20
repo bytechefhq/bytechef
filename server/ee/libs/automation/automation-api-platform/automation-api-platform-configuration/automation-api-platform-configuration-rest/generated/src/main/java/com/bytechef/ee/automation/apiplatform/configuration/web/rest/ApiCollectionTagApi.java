@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:34:58.724728+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.498462+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "api-collection-tag", description = "The Automation API Platform Collection Tag Internal API")
 public interface ApiCollectionTagApi {
@@ -43,17 +43,18 @@ public interface ApiCollectionTagApi {
         return Optional.empty();
     }
 
-    String PATH_GET_API_COLLECTION_TAGS = "/api-collections/tags";
+    String PATH_GET_API_COLLECTION_TAGS = "/workspaces/{id}/api-collection-tags";
     /**
-     * GET /api-collections/tags : Get API collection tags
-     * Get API collection tags.
+     * GET /workspaces/{id}/api-collection-tags : Get API collection tags
+     * Get API collection tags for a workspace.
      *
+     * @param id The id of a workspace. (required)
      * @return The list of API collection tags. (status code 200)
      */
     @Operation(
         operationId = "getApiCollectionTags",
         summary = "Get API collection tags",
-        description = "Get API collection tags.",
+        description = "Get API collection tags for a workspace.",
         tags = { "api-collection-tag" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of API collection tags.", content = {
@@ -67,7 +68,7 @@ public interface ApiCollectionTagApi {
         produces = { "application/json" }
     )
     default ResponseEntity<List<TagModel>> getApiCollectionTags(
-        
+        @Parameter(name = "id", description = "The id of a workspace.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

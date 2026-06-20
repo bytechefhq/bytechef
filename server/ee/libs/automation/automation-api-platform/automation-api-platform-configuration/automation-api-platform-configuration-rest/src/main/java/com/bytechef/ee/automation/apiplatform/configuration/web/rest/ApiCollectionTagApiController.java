@@ -48,8 +48,8 @@ public class ApiCollectionTagApiController implements ApiCollectionTagApi {
     }
 
     @Override
-    public ResponseEntity<List<TagModel>> getApiCollectionTags() {
-        return ResponseEntity.ok(apiCollectionFacade.getApiCollectionTags()
+    public ResponseEntity<List<TagModel>> getApiCollectionTags(Long id) {
+        return ResponseEntity.ok(apiCollectionFacade.getApiCollectionTags(id)
             .stream()
             .map(tag -> conversionService.convert(tag, TagModel.class))
             .toList());
