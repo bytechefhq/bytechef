@@ -1,10 +1,9 @@
 import {Type} from '@/ee/pages/embedded/mcp-servers/McpServers';
 import {
-    PlatformType,
     Tag,
+    useEmbeddedMcpServerTagsQuery,
     useEmbeddedMcpServersQuery,
     useMcpIntegrationInstanceConfigurationsQuery,
-    useMcpServerTagsQuery,
 } from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
@@ -26,18 +25,14 @@ const useMcpServers = () => {
 
     const {data, error: mcpServersError, isLoading: mcpServersIsLoading} = useEmbeddedMcpServersQuery();
 
-    const {
-        data: tagsData,
-        error: tagsError,
-        isLoading: tagsIsLoading,
-    } = useMcpServerTagsQuery({type: PlatformType.Embedded});
+    const {data: tagsData, error: tagsError, isLoading: tagsIsLoading} = useEmbeddedMcpServerTagsQuery();
 
     const {data: mcpIntegrationInstanceConfigurationsData} = useMcpIntegrationInstanceConfigurationsQuery();
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({});
 
     const validMcpServers = data?.embeddedMcpServers?.filter((server) => server !== null) || [];
-    const tags = tagsData?.mcpServerTags as Tag[] | undefined;
+    const tags = tagsData?.embeddedMcpServerTags as Tag[] | undefined;
     const validMcpServerIds = new Set(validMcpServers.map((server) => server.id));
 
     const allComponentNames = Array.from(

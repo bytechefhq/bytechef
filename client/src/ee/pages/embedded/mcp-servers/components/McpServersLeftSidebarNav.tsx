@@ -1,10 +1,6 @@
 import {Type} from '@/ee/pages/embedded/mcp-servers/McpServers';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
-import {
-    PlatformType,
-    useMcpIntegrationInstanceConfigurationsQuery,
-    useMcpServerTagsQuery,
-} from '@/shared/middleware/graphql';
+import {useEmbeddedMcpServerTagsQuery, useMcpIntegrationInstanceConfigurationsQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
 import {TagIcon} from 'lucide-react';
@@ -33,9 +29,9 @@ const McpServersLeftSidebarNav = ({allComponentNames, validMcpServerIds}: McpSer
     const {data: mcpIntegrationInstanceConfigurationsData, isLoading: mcpIntegrationInstanceConfigurationsIsLoading} =
         useMcpIntegrationInstanceConfigurationsQuery();
 
-    const {data: tagsData, isLoading: tagsIsLoading} = useMcpServerTagsQuery({type: PlatformType.Embedded});
+    const {data: tagsData, isLoading: tagsIsLoading} = useEmbeddedMcpServerTagsQuery();
 
-    const tags = tagsData?.mcpServerTags;
+    const tags = tagsData?.embeddedMcpServerTags;
 
     const mcpIntegrationInstanceConfigurations =
         mcpIntegrationInstanceConfigurationsData?.mcpIntegrationInstanceConfigurations?.filter(

@@ -1,10 +1,9 @@
 import {Type} from '@/pages/automation/mcp-servers/McpServers';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {
-    PlatformType,
     Tag,
     useMcpProjectsQuery,
-    useMcpServerTagsQuery,
+    useWorkspaceMcpServerTagsQuery,
     useWorkspaceMcpServersQuery,
 } from '@/shared/middleware/graphql';
 import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
@@ -36,14 +35,14 @@ const useMcpServers = () => {
         data: tagsData,
         error: tagsError,
         isLoading: tagsIsLoading,
-    } = useMcpServerTagsQuery({type: PlatformType.Automation});
+    } = useWorkspaceMcpServerTagsQuery({workspaceId: currentWorkspaceId + ''});
 
     const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery();
 
     const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
 
     const validMcpServers = data?.workspaceMcpServers?.filter((server) => server !== null) || [];
-    const tags = tagsData?.mcpServerTags as Tag[] | undefined;
+    const tags = tagsData?.workspaceMcpServerTags as Tag[] | undefined;
     const validMcpServerIds = new Set(validMcpServers.map((server) => server.id));
 
     const allComponentNames = Array.from(
