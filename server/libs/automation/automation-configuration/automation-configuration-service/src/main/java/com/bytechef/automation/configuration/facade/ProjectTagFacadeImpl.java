@@ -24,6 +24,7 @@ import com.bytechef.platform.tag.service.TagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
 import java.util.List;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,9 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
         this.tagService = tagService;
     }
 
+    // NOTE: getProjectTags() returns tags across all projects globally and is consumed by the (non-admin) workspace
+    // Projects page for filtering, so it cannot carry a blanket gate. Closing its cross-workspace exposure requires
+    // server-side workspace-scoping (a workspaceId arg + filter) -- a T22 residual rather than a @PreAuthorize gate.
     @Override
     @Transactional(readOnly = true)
     public List<Tag> getProjectTags() {
@@ -52,6 +56,7 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'WORKFLOW_EDIT')")
     public void updateProjectTags(long id, List<Tag> tags) {
         tags = checkTags(tags);
 
