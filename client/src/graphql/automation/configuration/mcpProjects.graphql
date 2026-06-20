@@ -1,5 +1,5 @@
-query mcpProjects {
-    mcpProjects {
+query mcpProjects($workspaceId: ID!) {
+    mcpProjects(workspaceId: $workspaceId) {
         id
         mcpServerId
         project {

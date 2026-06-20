@@ -37,7 +37,9 @@ const useMcpServers = () => {
         isLoading: tagsIsLoading,
     } = useWorkspaceMcpServerTagsQuery({workspaceId: currentWorkspaceId + ''});
 
-    const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery();
+    const {data: mcpProjectsData, isLoading: mcpProjectsIsLoading} = useMcpProjectsQuery({
+        workspaceId: currentWorkspaceId + '',
+    });
 
     const {data: componentDefinitions, isLoading: componentDefinitionsIsLoading} = useGetComponentDefinitionsQuery({});
 
