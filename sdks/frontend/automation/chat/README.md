@@ -50,7 +50,7 @@ Open [http://localhost:3000](http://localhost:3000) to see the demos.
 ## 📦 Installation
 
 ```bash
-npm install @bytechef/automation-chat
+npm install @bytechef/chat
 ```
 
 ## 💡 Usage
@@ -58,8 +58,8 @@ npm install @bytechef/automation-chat
 ### Embeddable Chat
 
 ```tsx
-import {ByteChefChat} from '@bytechef/automation-chat';
-import '@bytechef/automation-chat/dist/style.css';
+import {ByteChefChat} from '@bytechef/chat';
+import '@bytechef/chat/dist/style.css';
 
 <ByteChefChat
     config={{
@@ -71,8 +71,8 @@ import '@bytechef/automation-chat/dist/style.css';
 ### Modal Chat
 
 ```tsx
-import {ByteChefChatModal} from '@bytechef/automation-chat';
-import '@bytechef/automation-chat/dist/style.css';
+import {ByteChefChatModal} from '@bytechef/chat';
+import '@bytechef/chat/dist/style.css';
 
 <ByteChefChatModal
     config={{

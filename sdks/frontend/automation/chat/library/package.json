@@ -1,5 +1,5 @@
 {
-    "name": "@bytechef/automation-chat",
+    "name": "@bytechef/chat",
     "version": "0.1.0",
     "description": "ByteChef Automation Chat SDK - Embeddable chat widget for workflow automation",
     "type": "module",
@@ -18,7 +18,7 @@
         "build-storybook": "storybook build",
         "publish:local": "npm publish --registry http://localhost:4873",
         "link:local": "npm link",
-        "unlink:local": "npm unlink -g @bytechef/automation-chat"
+        "unlink:local": "npm unlink -g @bytechef/chat"
     },
     "module": "./dist/index.js",
     "exports": {

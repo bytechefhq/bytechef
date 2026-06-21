@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 const AutomationChatModal = dynamic(
-    () => import('@bytechef/automation-chat').then((mod) => ({default: mod.AutomationChatModal})),
+    () => import('@bytechef/chat').then((mod) => ({default: mod.AutomationChatModal})),
     {
         ssr: false,
     }

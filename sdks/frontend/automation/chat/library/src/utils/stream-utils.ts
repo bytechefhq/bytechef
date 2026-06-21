@@ -6,16 +6,15 @@
  * @returns Extracted text chunk as a string
  */
 export function extractStreamChunk(data: unknown): string {
-    let chunk = '';
+    let chunk: string;
 
     try {
         const obj = typeof data === 'string' ? JSON.parse(data) : data;
 
-        chunk = obj?.text ?? obj?.delta ?? obj?.token ?? obj?.message ?? obj?.content?.[0]?.text ?? obj?.content ?? '';
+        const extracted =
+            obj?.text ?? obj?.delta ?? obj?.token ?? obj?.message ?? obj?.content?.[0]?.text ?? obj?.content ?? '';
 
-        if (typeof chunk !== 'string') {
-            chunk = String(chunk ?? '');
-        }
+        chunk = typeof extracted === 'string' ? extracted : String(extracted ?? '');
     } catch {
         // Not JSON, treat as raw string
         chunk = String(data ?? '');

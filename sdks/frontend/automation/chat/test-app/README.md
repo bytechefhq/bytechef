@@ -118,7 +118,7 @@ The test app imports the SDK styles and extends them with custom CSS:
 
 ```css
 /* app/globals.css */
-@import '@bytechef/automation-chat/dist/style.css';
+@import '@bytechef/chat/dist/style.css';
 
 /* Your custom styles */
 ```
@@ -165,7 +165,7 @@ npm run start
 
 ### Module Not Found
 
-If you see `Cannot find module '@bytechef/automation-chat'`:
+If you see `Cannot find module '@bytechef/chat'`:
 
 1. Make sure the library is built:
 
@@ -184,7 +184,7 @@ cd ../test-app && npm install
 Make sure you're importing the CSS in your layout:
 
 ```tsx
-import '@bytechef/automation-chat/dist/style.css';
+import '@bytechef/chat/dist/style.css';
 ```
 
 ### Connection Issues
