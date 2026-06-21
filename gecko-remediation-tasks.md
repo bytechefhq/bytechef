@@ -20,9 +20,10 @@ Companion to `gecko-security-report.md`. The 455 findings are consolidated into 
   `authenticate()` allows omitting the `Authorization` header / fails to verify both secret-key and user API key. Require and validate both credentials; reject on missing/invalid.
   Files: `ManagementMcpServerApiKeyAuthenticationProvider.java`, `AutomationMcpServerApiKeyAuthenticationProvider.java`.
 
-- [ ] **T4. Validate & parameterize tenant identifiers** _(4 findings — 2× 9.4 SQLi)_
+- [x] **T4. Validate & parameterize tenant identifiers** _(4 findings — 2× 9.4 SQLi)_
   `CURRENT_TENANT_ID` header and base64 tenant tokens flow unsanitized into `SET search_path` / `TenantContext`. Whitelist tenant-ID charset, parameterize, and reject unknown tenants.
   Files: `RemoteMultiTenantFilter.java`, `JobResumeId.java` / `JobResumeFacadeImpl`, `WorkflowExecutionId.java`.
+  **Done** (spec/plan `docs/superpowers/{specs,plans}/2026-06-21-tenant-id-validation*`): shared CE `TenantIdValidator` (`^[a-zA-Z0-9_]+$`) enforced at the `TenantContext.setCurrentTenantId` chokepoint — through which `runWithTenantId`/`callWithTenantId`/`resetCurrentTenantId` and thus the remote header filter, both base64 token parsers, and the scheduler all funnel — closing every vector at once. Plus defense-in-depth schema checks at both `SET search_path` sinks (`BaseDataSource`, EE `MultiTenantDriverDelegate`), fail-fast in `WorkflowExecutionId.parse`/`JobResumeId.parse`, and a 400 guard in `RemoteMultiTenantFilter`. EE `TenantRepository` consolidated onto the shared validator (dropped its never-used hyphen). Charset confirmed against live schemas (`bytechef_000001`…, `public`). Postgres cannot bind-parameter `SET`, so charset whitelisting is the correct mitigation. Fixed 3 test fixtures that used illegitimate hyphenated tenant ids.
 
 ---
 
