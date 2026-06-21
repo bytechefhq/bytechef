@@ -10,8 +10,11 @@ package com.bytechef.ee.remote.client;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.constant.TenantConstants;
 import java.net.URI;
+import java.util.function.Consumer;
 import java.util.function.Function;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpHeaders;
 import org.springframework.resilience.annotation.Retryable;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.util.UriBuilder;
@@ -25,8 +28,18 @@ public class AbstractRestClient {
 
     private final RestClient restClient;
 
+    @Value("${bytechef.internal.service-token:}")
+    private String serviceToken;
+
     public AbstractRestClient(RestClient.Builder restClientBuilder) {
         this.restClient = restClientBuilder.build();
+    }
+
+    Consumer<HttpHeaders> headers() {
+        return httpHeaders -> {
+            httpHeaders.set(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            httpHeaders.set(TenantConstants.INTERNAL_SERVICE_TOKEN, serviceToken);
+        };
     }
 
     @Retryable
@@ -34,7 +47,7 @@ public class AbstractRestClient {
         restClient
             .delete()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
+            .headers(headers())
             .retrieve()
             .toBodilessEntity();
     }
@@ -44,7 +57,7 @@ public class AbstractRestClient {
         restClient
             .get()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
+            .headers(headers())
             .retrieve()
             .toBodilessEntity();
     }
@@ -54,7 +67,7 @@ public class AbstractRestClient {
         return restClient
             .get()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
+            .headers(headers())
             .retrieve()
             .body(responseClass);
     }
@@ -64,7 +77,7 @@ public class AbstractRestClient {
         return restClient
             .get()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId())
+            .headers(headers())
             .retrieve()
             .body(responseTypeRef);
     }
@@ -74,7 +87,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
@@ -89,7 +102,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
@@ -106,7 +119,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .post()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
@@ -121,7 +134,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
@@ -136,7 +149,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
@@ -153,7 +166,7 @@ public class AbstractRestClient {
         RestClient.RequestBodySpec requestBodySpec = restClient
             .put()
             .uri(uriFunction)
-            .header(TenantConstants.CURRENT_TENANT_ID, TenantContext.getCurrentTenantId());
+            .headers(headers());
 
         if (bodyValue != null) {
             requestBodySpec.body(bodyValue);
