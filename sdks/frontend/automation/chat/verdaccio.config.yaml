@@ -1,5 +1,5 @@
 # Verdaccio Configuration for Local Development
-# This is a local npm registry for testing @bytechef/automation-chat
+# This is a local npm registry for testing @bytechef/chat
 
 storage: ./verdaccio-storage
 plugins: ./verdaccio-plugins

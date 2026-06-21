@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 
 const AutomationChat = dynamic(
-    () => import('@bytechef/automation-chat').then((mod) => ({default: mod.AutomationChat})),
+    () => import('@bytechef/chat').then((mod) => ({default: mod.AutomationChat})),
     {
         ssr: false,
         loading: () => <div className="flex size-full items-center justify-center">Loading chat...</div>,

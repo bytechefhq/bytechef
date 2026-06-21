@@ -1,6 +1,6 @@
-# Development Guide for @bytechef/automation-chat
+# Development Guide for @bytechef/chat
 
-This guide explains how to develop and test the `@bytechef/automation-chat` library with hot reload capabilities.
+This guide explains how to develop and test the `@bytechef/chat` library with hot reload capabilities.
 
 ## Table of Contents
 
@@ -34,7 +34,7 @@ npm run setup:link
 This command does the following:
 
 1. Builds the library
-2. Creates a global npm link for `@bytechef/automation-chat`
+2. Creates a global npm link for `@bytechef/chat`
 3. Links the test app to use the globally linked library
 
 ### Development Workflow
@@ -131,7 +131,7 @@ When using the local registry, you need to republish after changes:
 3. Reinstall in test app:
     ```bash
     cd ../test-app
-    npm install @bytechef/automation-chat@latest --registry http://localhost:4873
+    npm install @bytechef/chat@latest --registry http://localhost:4873
     ```
 4. Next.js will hot reload with the new version
 
@@ -147,7 +147,7 @@ To automatically use the local registry for `@bytechef` packages, edit `.npmrc`:
 Then you can use standard npm commands:
 
 ```bash
-npm install @bytechef/automation-chat@latest
+npm install @bytechef/chat@latest
 ```
 
 ### Stop the Registry
@@ -262,7 +262,7 @@ automation/chat/
 | Script                   | Description                              |
 | ------------------------ | ---------------------------------------- |
 | `npm run dev`            | Start Next.js development server         |
-| `npm run link:library`   | Link to global @bytechef/automation-chat |
+| `npm run link:library`   | Link to global @bytechef/chat |
 | `npm run unlink:library` | Unlink from global package               |
 | `npm run install:local`  | Install from local registry              |
 | `npm run build`          | Build production test app                |
@@ -274,7 +274,7 @@ automation/chat/
 **Using npm link:**
 
 1. Ensure `npm run watch` is running in library directory
-2. Check that the test app is linked: `ls -la test-app/node_modules/@bytechef/automation-chat` (should show symlink)
+2. Check that the test app is linked: `ls -la test-app/node_modules/@bytechef/chat` (should show symlink)
 3. Try restarting the Next.js dev server
 
 **Using Verdaccio:**
@@ -282,7 +282,7 @@ automation/chat/
 1. You need to republish after changes
 2. Ensure test app is installing from local registry: check `@bytechef:registry` in `.npmrc`
 
-### "Cannot find module @bytechef/automation-chat"
+### "Cannot find module @bytechef/chat"
 
 1. Check if the library is linked or installed:
 
@@ -326,7 +326,7 @@ npm run setup:link  # or your preferred method
 1. Ensure library watch mode is running: `cd library && npm run watch`
 2. Check Vite output for build errors
 3. Restart Next.js dev server: `cd test-app && npm run dev`
-4. Check symlink exists: `ls -la test-app/node_modules/@bytechef/automation-chat`
+4. Check symlink exists: `ls -la test-app/node_modules/@bytechef/chat`
 
 ### Type errors in test app
 

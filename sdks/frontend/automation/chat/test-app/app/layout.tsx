@@ -1,5 +1,5 @@
 import type {Metadata} from 'next';
-import '@bytechef/automation-chat/dist/style.css';
+import '@bytechef/chat/dist/style.css';
 import './globals.css';
 import {ThemeSwitch} from './theme-switch';
 

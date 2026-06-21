@@ -1,4 +1,4 @@
-# @bytechef/automation-chat
+# @bytechef/chat
 
 ByteChef Automation Chat SDK - A React-based embeddable chat widget for workflow automation powered by assistant-ui.
 
@@ -16,7 +16,7 @@ ByteChef Automation Chat SDK - A React-based embeddable chat widget for workflow
 ## Installation
 
 ```bash
-npm install @bytechef/automation-chat
+npm install @bytechef/chat
 ```
 
 ## Quick Start
@@ -24,8 +24,8 @@ npm install @bytechef/automation-chat
 ### Embeddable Chat
 
 ```tsx
-import {ByteChefChat} from '@bytechef/automation-chat';
-import '@bytechef/automation-chat/dist/style.css';
+import {ByteChefChat} from '@bytechef/chat';
+import '@bytechef/chat/dist/style.css';
 
 function App() {
     return (
@@ -41,8 +41,8 @@ function App() {
 ### Modal Chat
 
 ```tsx
-import {ByteChefChatModal} from '@bytechef/automation-chat';
-import '@bytechef/automation-chat/dist/style.css';
+import {ByteChefChatModal} from '@bytechef/chat';
+import '@bytechef/chat/dist/style.css';
 
 function App() {
     return (
@@ -135,7 +135,7 @@ Floating modal chat component.
 ### Using the Provider Directly
 
 ```tsx
-import {ByteChefChatProvider, Thread} from '@bytechef/automation-chat';
+import {ByteChefChatProvider, Thread} from '@bytechef/chat';
 
 function CustomChat() {
     return (
@@ -155,7 +155,7 @@ function CustomChat() {
 The SDK uses TailwindCSS and CSS variables for theming. Import the stylesheet:
 
 ```tsx
-import '@bytechef/automation-chat/dist/style.css';
+import '@bytechef/chat/dist/style.css';
 ```
 
 ### Customizing Theme
@@ -179,7 +179,7 @@ Override CSS variables in your global CSS:
 Hook for Server-Sent Events connections.
 
 ```tsx
-import {useSSE} from '@bytechef/automation-chat';
+import {useSSE} from '@bytechef/chat';
 
 const {data, error, connectionState, close} = useSSE(
     {
@@ -201,7 +201,7 @@ const {data, error, connectionState, close} = useSSE(
 Zustand store for chat state management.
 
 ```tsx
-import {useChatStore} from '@bytechef/automation-chat';
+import {useChatStore} from '@bytechef/chat';
 
 const {messages, setMessage, reset} = useChatStore();
 ```

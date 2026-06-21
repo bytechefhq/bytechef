@@ -1,5 +1,5 @@
 {
-    "name": "@bytechef/automation-chat-workspace",
+    "name": "@bytechef/chat-workspace",
     "version": "0.1.0",
     "private": true,
     "description": "Workspace for ByteChef Automation Chat SDK development",
@@ -11,7 +11,7 @@
         "dev": "concurrently \"npm:dev:library\" \"npm:dev:test-app\"",
         "dev:library": "cd library && npm run watch",
         "dev:test-app": "cd test-app && npm run dev",
-        "setup:link": "cd library && npm run build && npm link && cd ../test-app && npm link @bytechef/automation-chat",
+        "setup:link": "cd library && npm run build && npm link && cd ../test-app && npm link @bytechef/chat",
         "setup:registry": "npm run registry:start",
         "publish:library": "cd library && npm run build && npm run publish:local",
         "install:test-app": "cd test-app && npm run install:local",
