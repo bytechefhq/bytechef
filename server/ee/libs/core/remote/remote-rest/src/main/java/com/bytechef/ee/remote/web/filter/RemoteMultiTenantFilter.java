@@ -8,6 +8,7 @@
 package com.bytechef.ee.remote.web.filter;
 
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantIdValidator;
 import com.bytechef.tenant.constant.TenantConstants;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -37,6 +38,12 @@ public class RemoteMultiTenantFilter extends OncePerRequestFilter {
         throws ServletException, IOException {
 
         String currentTenantId = request.getHeader(TenantConstants.CURRENT_TENANT_ID);
+
+        if (!TenantIdValidator.isValid(currentTenantId)) {
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+
+            return;
+        }
 
         TenantContext.runWithTenantId(currentTenantId, () -> filterChain.doFilter(request, response));
     }
