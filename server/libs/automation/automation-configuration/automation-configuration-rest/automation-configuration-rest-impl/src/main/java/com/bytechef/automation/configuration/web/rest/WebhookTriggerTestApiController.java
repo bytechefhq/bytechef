@@ -17,9 +17,8 @@
 package com.bytechef.automation.configuration.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.automation.configuration.facade.WebhookTriggerTestApiFacade;
 import com.bytechef.automation.configuration.web.rest.model.StartWebhookTriggerTest200ResponseModel;
-import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
-import com.bytechef.platform.constant.PlatformType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,17 +31,17 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
-    private final WebhookTriggerTestFacade webhookTriggerTestFacade;
+    private final WebhookTriggerTestApiFacade webhookTriggerTestApiFacade;
 
-    public WebhookTriggerTestApiController(WebhookTriggerTestFacade webhookTriggerTestFacade) {
-        this.webhookTriggerTestFacade = webhookTriggerTestFacade;
+    public WebhookTriggerTestApiController(WebhookTriggerTestApiFacade webhookTriggerTestApiFacade) {
+        this.webhookTriggerTestApiFacade = webhookTriggerTestApiFacade;
     }
 
     @Override
     public ResponseEntity<StartWebhookTriggerTest200ResponseModel> startWebhookTriggerTest(
         String workflowId, Long environmentId) {
 
-        String webhookUrl = webhookTriggerTestFacade.enableTrigger(workflowId, environmentId, PlatformType.AUTOMATION);
+        String webhookUrl = webhookTriggerTestApiFacade.enableTrigger(workflowId, environmentId);
 
         return ResponseEntity.ok(
             new StartWebhookTriggerTest200ResponseModel()
@@ -51,7 +50,7 @@ public class WebhookTriggerTestApiController implements WebhookTriggerTestApi {
 
     @Override
     public ResponseEntity<Void> stopWebhookTriggerTest(String workflowId, Long environmentId) {
-        webhookTriggerTestFacade.disableTrigger(workflowId, environmentId, PlatformType.AUTOMATION);
+        webhookTriggerTestApiFacade.disableTrigger(workflowId, environmentId);
 
         return ResponseEntity.noContent()
             .build();
