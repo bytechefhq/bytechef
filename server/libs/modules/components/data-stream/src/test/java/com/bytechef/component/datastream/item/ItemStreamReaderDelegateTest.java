@@ -39,7 +39,7 @@ import org.springframework.batch.infrastructure.item.ExecutionContext;
  */
 class ItemStreamReaderDelegateTest {
 
-    private static final String TEST_TENANT_ID = "test-tenant";
+    private static final String TEST_TENANT_ID = "test_tenant";
 
     @Test
     void testCopiesSinceFromJobParameterToExecutionContext() throws Exception {

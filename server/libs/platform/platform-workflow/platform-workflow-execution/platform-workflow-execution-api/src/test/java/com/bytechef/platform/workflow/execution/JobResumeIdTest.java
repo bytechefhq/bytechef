@@ -38,18 +38,18 @@ class JobResumeIdTest {
 
     @Test
     void testOfCreatesValidInstance() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         JobResumeId jobResumeId = JobResumeId.of(42L);
 
         assertEquals(42L, jobResumeId.getJobId());
-        assertEquals("test-tenant", jobResumeId.getTenantId());
+        assertEquals("test_tenant", jobResumeId.getTenantId());
         assertNotNull(jobResumeId.getUuidAsString());
     }
 
     @Test
     void testToStringAndParseRoundTrip() {
-        TenantContext.setCurrentTenantId("my-tenant");
+        TenantContext.setCurrentTenantId("my_tenant");
 
         JobResumeId original = JobResumeId.of(99L);
 

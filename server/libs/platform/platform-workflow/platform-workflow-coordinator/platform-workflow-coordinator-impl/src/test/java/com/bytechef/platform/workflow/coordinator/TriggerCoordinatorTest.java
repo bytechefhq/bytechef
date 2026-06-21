@@ -102,7 +102,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerPollEventCancelsOrphanedTriggerOnIllegalArgumentException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
@@ -120,7 +120,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerPollEventCancelsOrphanedTriggerOnConfigurationException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
@@ -140,7 +140,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerListenerEventCancelsOrphanedTriggerOnIllegalArgumentException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
@@ -161,7 +161,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerListenerEventCancelsOrphanedTriggerOnConfigurationException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
@@ -184,7 +184,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerWebhookEventCancelsOrphanedTriggerOnIllegalArgumentException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
@@ -205,7 +205,7 @@ class TriggerCoordinatorTest {
 
     @Test
     void testOnTriggerWebhookEventCancelsOrphanedTriggerOnConfigurationException() {
-        TenantContext.setCurrentTenantId("test-tenant");
+        TenantContext.setCurrentTenantId("test_tenant");
 
         WorkflowExecutionId workflowExecutionId = WorkflowExecutionId.of(
             PlatformType.AUTOMATION, 1L, "workflow-uuid", "trigger1");
