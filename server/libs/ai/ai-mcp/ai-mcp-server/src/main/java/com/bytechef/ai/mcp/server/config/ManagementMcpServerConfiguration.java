@@ -26,10 +26,7 @@ import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
 import com.bytechef.platform.configuration.service.PropertyService;
-import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -130,10 +127,7 @@ public class ManagementMcpServerConfiguration {
     }
 
     @Bean
-    SecurityConfigurerContributor mcpServerSecurityConfigurerContributor(
-        ApiKeyService apiKeyService, AuthorityService authorityService, PropertyService propertyService,
-        UserService userService) {
-
+    SecurityConfigurerContributor mcpServerSecurityConfigurerContributor(PropertyService propertyService) {
         return new SecurityConfigurerContributor() {
 
             @Override
@@ -141,8 +135,7 @@ public class ManagementMcpServerConfiguration {
             public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
                 getSecurityConfigurerAdapter() {
 
-                return (T) new ManagementMcpServerSecurityConfigurer(
-                    apiKeyService, authorityService, propertyService, userService);
+                return (T) new ManagementMcpServerSecurityConfigurer(propertyService);
             }
         };
     }

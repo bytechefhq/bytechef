@@ -25,28 +25,17 @@ import org.springframework.security.core.userdetails.User;
  */
 public class ManagementMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
 
-    private String authSecretKey;
     private String mcpServerSecretKey;
 
-    public ManagementMcpServerApiKeyAuthenticationToken() {
-        setAuthenticated(true);
-    }
-
-    public ManagementMcpServerApiKeyAuthenticationToken(String mcpServerSecretKey, String authSecretKey,
-        String tenantId) {
+    public ManagementMcpServerApiKeyAuthenticationToken(String mcpServerSecretKey, String tenantId) {
         super(-1, tenantId);
 
-        this.authSecretKey = authSecretKey;
         this.mcpServerSecretKey = mcpServerSecretKey;
     }
 
     @SuppressFBWarnings("EI")
     public ManagementMcpServerApiKeyAuthenticationToken(User user) {
         super(user);
-    }
-
-    public String getAuthSecretKey() {
-        return authSecretKey;
     }
 
     public String getMcpServerSecretKey() {
