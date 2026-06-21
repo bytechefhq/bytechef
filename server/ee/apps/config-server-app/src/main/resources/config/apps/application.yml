@@ -158,6 +158,9 @@ bytechef:
     provider: filesystem
     filesystem:
       basedir: ${user.home}/bytechef/data/file-storage
+  internal:
+    # Shared secret authenticating internal /remote microservice calls. Fail-closed: when unset, /remote is rejected.
+    service-token: ${BYTECHEF_INTERNAL_SERVICE_TOKEN:}
   mail:
     base-url: ${bytechef.public-url}
     from: noreply@app.bytechef.io

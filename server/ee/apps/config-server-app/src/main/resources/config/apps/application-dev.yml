@@ -3,6 +3,11 @@ logging:
     ROOT: INFO
     com.bytechef: DEBUG
 
+bytechef:
+  internal:
+    # Dev-only default so local distributed runs work without an env var; production stays fail-closed.
+    service-token: dev-internal-service-token
+
 spring:
   devtools:
     restart:
