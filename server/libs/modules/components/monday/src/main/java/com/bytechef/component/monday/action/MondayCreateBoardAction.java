@@ -31,6 +31,7 @@ import static com.bytechef.component.monday.util.MondayUtils.executeGraphQLQuery
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -75,11 +76,19 @@ public class MondayCreateBoardAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        String query = "mutation{create_board(board_name: \"%s\", description: \"%s\", board_kind: %s){id name}}"
-            .formatted(inputParameters.getRequiredString(BOARD_NAME), inputParameters.getString(DESCRIPTION, ""),
-                inputParameters.getRequiredString(BOARD_KIND));
+        // Pass user-supplied values as GraphQL variables instead of interpolating them into the query string, so the
+        // Monday API parses them as data rather than executable GraphQL/SQL.
+        String query =
+            "mutation($boardName: String!, $description: String, $boardKind: BoardKind!) {" +
+                "create_board(board_name: $boardName, description: $description, board_kind: $boardKind){id name}}";
 
-        Map<String, Object> body = executeGraphQLQuery(query, context);
+        Map<String, Object> variables = new HashMap<>();
+
+        variables.put("boardName", inputParameters.getRequiredString(BOARD_NAME));
+        variables.put("description", inputParameters.getString(DESCRIPTION, ""));
+        variables.put("boardKind", inputParameters.getRequiredString(BOARD_KIND));
+
+        Map<String, Object> body = executeGraphQLQuery(query, variables, context);
 
         return body.get(DATA);
     }

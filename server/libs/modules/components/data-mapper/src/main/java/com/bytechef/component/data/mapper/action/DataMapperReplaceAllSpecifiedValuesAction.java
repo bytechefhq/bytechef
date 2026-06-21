@@ -49,6 +49,7 @@ import com.bytechef.component.data.mapper.model.ObjectMapping;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,6 +63,8 @@ import java.util.regex.Pattern;
  * @author Marko Kriskovic
  */
 public class DataMapperReplaceAllSpecifiedValuesAction {
+
+    private static final long REGEX_TIMEOUT_MILLIS = 2_000;
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("replaceAllSpecifiedValues")
         .title("Replace All Specified Values")
@@ -286,7 +289,10 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
                     Object value = entry.getValue();
 
                     Pattern pattern = Pattern.compile(key.toString());
-                    Matcher matcher = pattern.matcher(inputValue.toString());
+
+                    // Match against a time-bounded view of the input so a user-supplied 'from' regex causing
+                    // catastrophic backtracking (ReDoS) aborts instead of hanging the worker thread.
+                    Matcher matcher = pattern.matcher(timeBoundedCharSequence(inputValue.toString()));
 
                     outputEntry.setValue(matcher.replaceAll(value.toString()));
                 }
@@ -300,5 +306,41 @@ public class DataMapperReplaceAllSpecifiedValuesAction {
         }
 
         return outputMap;
+    }
+
+    /**
+     * Wraps a {@link CharSequence} so that character access fails once {@link #REGEX_TIMEOUT_MILLIS} has elapsed. A
+     * regex causing catastrophic backtracking accesses characters an enormous number of times, so the deadline trips
+     * and the match unwinds rather than running unbounded.
+     */
+    private static CharSequence timeBoundedCharSequence(CharSequence value) {
+        long deadlineNanos = System.nanoTime() + REGEX_TIMEOUT_MILLIS * 1_000_000;
+
+        return new CharSequence() {
+
+            @Override
+            public char charAt(int index) {
+                if (System.nanoTime() > deadlineNanos) {
+                    throw new ProviderException("Regular expression evaluation timed out");
+                }
+
+                return value.charAt(index);
+            }
+
+            @Override
+            public int length() {
+                return value.length();
+            }
+
+            @Override
+            public CharSequence subSequence(int start, int end) {
+                return value.subSequence(start, end);
+            }
+
+            @Override
+            public String toString() {
+                return value.toString();
+            }
+        };
     }
 }

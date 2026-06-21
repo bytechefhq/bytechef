@@ -27,6 +27,7 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLInputFactory;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
@@ -43,6 +44,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.type.TypeFactory;
+import tools.jackson.dataformat.xml.XmlFactory;
 import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
@@ -61,6 +63,14 @@ public class XmlUtils {
     static {
         DOCUMENT_BUILDER_FACTORY = createSecureDocumentBuilderFactory();
         TRANSFORMER_FACTORY = createSecureTransformerFactory();
+
+        try {
+            // Disable extension functions and other non-secure XPath features so a user-supplied path expression
+            // cannot reach beyond node selection within the supplied document.
+            X_PATH_FACTORY.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
+        } catch (Exception e) {
+            log.warn("Could not enable secure processing on the XPath factory", e);
+        }
     }
 
     private static XmlMapper xmlMapper;
@@ -181,6 +191,28 @@ public class XmlUtils {
     @SuppressFBWarnings("EI")
     public static void setXmlMapper(XmlMapper xmlMapper) {
         XmlUtils.xmlMapper = xmlMapper;
+    }
+
+    /**
+     * Creates an {@link XmlMapper} whose underlying StAX input factory has DTD processing and external-entity
+     * resolution disabled. This hardens the {@code read(...)} methods (which deserialize raw XML directly through
+     * Jackson) against XXE and entity-expansion (billion-laughs) attacks, mirroring the protections already applied to
+     * the DOM-based {@link #parse(InputStream, String)} path.
+     */
+    public static XmlMapper createSecureXmlMapper() {
+        XMLInputFactory xmlInputFactory = XMLInputFactory.newFactory();
+
+        // Disabling DTDs blocks both external-entity (XXE) and internal entity-expansion attacks; disabling external
+        // entities is kept as defense-in-depth for StAX implementations that still permit DTDs.
+        xmlInputFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+        xmlInputFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+
+        XmlFactory xmlFactory = XmlFactory.builder()
+            .xmlInputFactory(xmlInputFactory)
+            .build();
+
+        return XmlMapper.builder(xmlFactory)
+            .build();
     }
 
     public static Stream<Map<String, ?>> stream(InputStream inputStream) {

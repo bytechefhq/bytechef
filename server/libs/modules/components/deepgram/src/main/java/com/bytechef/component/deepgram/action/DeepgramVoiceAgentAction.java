@@ -30,6 +30,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.WebSocket;
 import java.nio.ByteBuffer;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -147,7 +148,7 @@ public class DeepgramVoiceAgentAction {
         Parameters inputParameters, Parameters connectionParameters, ActionContext context) {
 
         String apiKey = connectionParameters.getRequiredString(TOKEN);
-        String settingsMessage = buildSettingsMessage(inputParameters);
+        String settingsMessage = buildSettingsMessage(inputParameters, context);
 
         return webSocketEmitter -> {
             AtomicBoolean closed = new AtomicBoolean(false);
@@ -182,66 +183,51 @@ public class DeepgramVoiceAgentAction {
         };
     }
 
-    private static String buildSettingsMessage(Parameters inputParameters) {
+    private static String buildSettingsMessage(Parameters inputParameters, ActionContext context) {
         String language = inputParameters.getString(LANGUAGE, "en");
         String llmProvider = inputParameters.getString(LLM_PROVIDER, "open_ai");
         String llmModel = inputParameters.getString(LLM_MODEL, "gpt-4o-mini");
         String ttsProvider = inputParameters.getString(TTS_PROVIDER, "deepgram");
         String ttsModel = inputParameters.getString(TTS_MODEL, "aura-asteria-en");
         String inputEncoding = inputParameters.getString(AUDIO_INPUT_ENCODING, "linear16");
-        String inputSampleRate = inputParameters.getString(AUDIO_INPUT_SAMPLE_RATE, "16000");
+        int inputSampleRate = inputParameters.getInteger(AUDIO_INPUT_SAMPLE_RATE, 16000);
         String outputEncoding = inputParameters.getString(AUDIO_OUTPUT_ENCODING, "linear16");
-        String outputSampleRate = inputParameters.getString(AUDIO_OUTPUT_SAMPLE_RATE, "24000");
+        int outputSampleRate = inputParameters.getInteger(AUDIO_OUTPUT_SAMPLE_RATE, 24000);
         String prompt = inputParameters.getString(PROMPT);
         String greeting = inputParameters.getString(GREETING);
 
-        StringBuilder settings = new StringBuilder();
+        // Build the settings message as a structured map and serialize it with a JSON writer rather than concatenating
+        // raw user input into a JSON string, so every value is correctly escaped and cannot tamper with the message.
+        Map<String, Object> think = new LinkedHashMap<>();
 
-        settings.append("{\"type\":\"Settings\",");
-        settings.append("\"audio\":{");
-        settings.append("\"input\":{\"encoding\":\"")
-            .append(inputEncoding)
-            .append("\",\"sample_rate\":")
-            .append(inputSampleRate)
-            .append("},");
-        settings.append("\"output\":{\"encoding\":\"")
-            .append(outputEncoding)
-            .append("\",\"sample_rate\":")
-            .append(outputSampleRate)
-            .append("}},");
-        settings.append("\"agent\":{");
-        settings.append("\"language\":\"")
-            .append(language)
-            .append("\",");
-        settings.append("\"listen\":{\"provider\":{\"type\":\"deepgram\",\"model\":\"nova-3\"}},");
-        settings.append("\"think\":{\"provider\":{\"type\":\"")
-            .append(llmProvider)
-            .append("\",\"model\":\"")
-            .append(llmModel)
-            .append("\"}");
+        think.put("provider", Map.of("type", llmProvider, "model", llmModel));
 
         if (prompt != null && !prompt.isBlank()) {
-            settings.append(",\"instructions\":\"")
-                .append(escapeJson(prompt))
-                .append("\"");
+            think.put("instructions", prompt);
         }
 
-        settings.append("},");
-        settings.append("\"speak\":{\"provider\":{\"type\":\"")
-            .append(ttsProvider)
-            .append("\",\"model\":\"")
-            .append(ttsModel)
-            .append("\"}}");
+        Map<String, Object> agent = new LinkedHashMap<>();
+
+        agent.put("language", language);
+        agent.put("listen", Map.of("provider", Map.of("type", "deepgram", "model", "nova-3")));
+        agent.put("think", think);
+        agent.put("speak", Map.of("provider", Map.of("type", ttsProvider, "model", ttsModel)));
 
         if (greeting != null && !greeting.isBlank()) {
-            settings.append(",\"greeting\":\"")
-                .append(escapeJson(greeting))
-                .append("\"");
+            agent.put("greeting", greeting);
         }
 
-        settings.append("}}");
+        Map<String, Object> settings = new LinkedHashMap<>();
 
-        return settings.toString();
+        settings.put("type", "Settings");
+        settings.put(
+            "audio",
+            Map.of(
+                "input", Map.of("encoding", inputEncoding, "sample_rate", inputSampleRate),
+                "output", Map.of("encoding", outputEncoding, "sample_rate", outputSampleRate)));
+        settings.put("agent", agent);
+
+        return context.json(json -> json.write(settings));
     }
 
     private static void sendAudio(WebSocket deepgramWebSocket, byte[] audioData, AtomicBoolean closed) {
@@ -283,15 +269,6 @@ public class DeepgramVoiceAgentAction {
         if (closed.compareAndSet(false, true) && !deepgramWebSocket.isOutputClosed()) {
             deepgramWebSocket.sendClose(WebSocket.NORMAL_CLOSURE, "done");
         }
-    }
-
-    private static String escapeJson(String value) {
-        return value
-            .replace("\\", "\\\\")
-            .replace("\"", "\\\"")
-            .replace("\n", "\\n")
-            .replace("\r", "\\r")
-            .replace("\t", "\\t");
     }
 
     private static class DeepgramAgentListener implements WebSocket.Listener {

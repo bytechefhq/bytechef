@@ -41,7 +41,7 @@ public class DeleteJdbcOperation implements JdbcOperation<Map<String, Integer>> 
     public Map<String, Integer> execute(Map<String, ?> inputParameters, DataSource dataSource) {
         String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, TABLE);
-        String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
+        String condition = SqlUtils.validateCondition(MapUtils.getRequiredString(inputParameters, CONDITION));
 
         int rowsAffected = JdbcExecutor.update(
             "DELETE FROM %s.%s WHERE %s".formatted(

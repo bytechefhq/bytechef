@@ -23,7 +23,6 @@ import com.bytechef.commons.util.XmlUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
-import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -35,11 +34,9 @@ public class JacksonConfiguration {
     static class JsonUtilsConfiguration implements InitializingBean {
 
         private final ObjectMapper objectMapper;
-        private final XmlMapper xmlMapper;
 
-        JsonUtilsConfiguration(ObjectMapper objectMapper, XmlMapper xmlMapper) {
+        JsonUtilsConfiguration(ObjectMapper objectMapper) {
             this.objectMapper = objectMapper;
-            this.xmlMapper = xmlMapper;
         }
 
         @Override
@@ -47,7 +44,10 @@ public class JacksonConfiguration {
             ConvertUtils.setObjectMapper(objectMapper);
             JsonUtils.setObjectMapper(objectMapper);
             MapUtils.setObjectMapper(objectMapper);
-            XmlUtils.setXmlMapper(xmlMapper);
+
+            // Use an XXE-hardened XmlMapper rather than the auto-configured one so XmlUtils.read(...) cannot be abused
+            // for external-entity or entity-expansion attacks regardless of the ambient Jackson XML configuration.
+            XmlUtils.setXmlMapper(XmlUtils.createSecureXmlMapper());
         }
     }
 }

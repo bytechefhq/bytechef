@@ -25,7 +25,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
-import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * @author Ivica Cardic
@@ -34,7 +33,7 @@ class XmlUtilsTest {
 
     @BeforeAll
     static void setUp() {
-        XmlUtils.setXmlMapper(new XmlMapper());
+        XmlUtils.setXmlMapper(XmlUtils.createSecureXmlMapper());
     }
 
     @Test
@@ -54,6 +53,24 @@ class XmlUtilsTest {
 
         // Should throw exception because DOCTYPE is disallowed
         assertThatThrownBy(() -> XmlUtils.readList(inputStream, "/root/data"))
+            .isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void testXxeAttackThroughReadIsBlocked() {
+        // The read(String) path deserializes raw XML directly through Jackson (not the DOM/XPath path), so it must be
+        // hardened independently.
+        String xxePayload = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <!DOCTYPE foo [
+                <!ENTITY xxe SYSTEM "file:///etc/passwd">
+            ]>
+            <root>
+                <data>&xxe;</data>
+            </root>
+            """;
+
+        assertThatThrownBy(() -> XmlUtils.read(xxePayload))
             .isInstanceOf(RuntimeException.class);
     }
 

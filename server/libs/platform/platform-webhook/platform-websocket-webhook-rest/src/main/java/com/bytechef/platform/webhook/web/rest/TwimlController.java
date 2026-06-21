@@ -18,6 +18,8 @@ package com.bytechef.platform.webhook.web.rest;
 
 import com.bytechef.platform.webhook.web.websocket.CallSessionRegistry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -123,15 +125,17 @@ class TwimlController {
     private static String buildTwimlResponse(
         String publicUrl, String workflowExecutionId, String callSid, String subWorkflowId) {
 
+        // URL-encode every attacker-influenced value placed into a URL so it cannot inject extra path segments or query
+        // parameters, then XML-encode the resulting attribute values so they cannot break out of the TwiML markup.
         String wsUrl = publicUrl.replace("https://", "wss://")
             .replace("http://", "ws://")
-            + "/webhooks/" + workflowExecutionId + "/wss?callSid=" + callSid;
+            + "/webhooks/" + urlEncode(workflowExecutionId) + "/wss?callSid=" + urlEncode(callSid);
 
         if (subWorkflowId != null) {
-            wsUrl += "&subWorkflowId=" + subWorkflowId;
+            wsUrl += "&subWorkflowId=" + urlEncode(subWorkflowId);
         }
 
-        String statusCallbackUrl = publicUrl + "/webhooks/twilio/status?callSid=" + callSid;
+        String statusCallbackUrl = publicUrl + "/webhooks/twilio/status?callSid=" + urlEncode(callSid);
 
         return """
             <?xml version="1.0" encoding="UTF-8"?>
@@ -142,6 +146,19 @@ class TwimlController {
                     </Stream>
                 </Connect>
             </Response>
-            """.formatted(statusCallbackUrl, wsUrl, statusCallbackUrl, callSid);
+            """.formatted(
+            escapeXml(statusCallbackUrl), escapeXml(wsUrl), escapeXml(statusCallbackUrl), escapeXml(callSid));
+    }
+
+    private static String urlEncode(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    private static String escapeXml(String value) {
+        return value.replace("&", "&amp;")
+            .replace("<", "&lt;")
+            .replace(">", "&gt;")
+            .replace("\"", "&quot;")
+            .replace("'", "&apos;");
     }
 }

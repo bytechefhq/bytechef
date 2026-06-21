@@ -44,6 +44,9 @@ class MondayCreateBoardActionTest {
     private final ActionContext mockedActionContext = mock(ActionContext.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<Map<String, Object>> variablesArgumentCaptor = forClass(Map.class);
+
     @Test
     void testPerform() {
         Parameters parameters = MockParametersFactory.create(
@@ -52,15 +55,20 @@ class MondayCreateBoardActionTest {
         try (MockedStatic<MondayUtils> mondayUtilsMockedStatic = mockStatic(MondayUtils.class)) {
             mondayUtilsMockedStatic
                 .when(() -> MondayUtils.executeGraphQLQuery(
-                    stringArgumentCaptor.capture(), contextArgumentCaptor.capture()))
+                    stringArgumentCaptor.capture(), variablesArgumentCaptor.capture(),
+                    contextArgumentCaptor.capture()))
                 .thenReturn(Map.of("data", Map.of(ID, "abc")));
 
             Object result = MondayCreateBoardAction.perform(parameters, parameters, mockedActionContext);
 
             assertEquals(Map.of(ID, "abc"), result);
             assertEquals(
-                "mutation{create_board(board_name: \"Test Board\", description: \"Sample Description\", board_kind: public){id name}}",
+                "mutation($boardName: String!, $description: String, $boardKind: BoardKind!) {" +
+                    "create_board(board_name: $boardName, description: $description, board_kind: $boardKind){id name}}",
                 stringArgumentCaptor.getValue());
+            assertEquals(
+                Map.of("boardName", "Test Board", "description", "Sample Description", "boardKind", "public"),
+                variablesArgumentCaptor.getValue());
             assertEquals(mockedActionContext, contextArgumentCaptor.getValue());
         }
     }

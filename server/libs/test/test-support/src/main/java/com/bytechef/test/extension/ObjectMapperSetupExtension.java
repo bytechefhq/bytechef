@@ -23,7 +23,6 @@ import com.bytechef.commons.util.XmlUtils;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import tools.jackson.databind.json.JsonMapper;
-import tools.jackson.dataformat.xml.XmlMapper;
 
 /**
  * This extension is used to setup the ObjectMapper for the tests.
@@ -40,8 +39,6 @@ public class ObjectMapperSetupExtension implements BeforeAllCallback {
         ConvertUtils.setObjectMapper(objectMapper);
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);
-        XmlUtils.setXmlMapper(
-            XmlMapper.builder()
-                .build());
+        XmlUtils.setXmlMapper(XmlUtils.createSecureXmlMapper());
     }
 }

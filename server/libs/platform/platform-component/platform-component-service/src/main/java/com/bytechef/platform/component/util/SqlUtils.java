@@ -79,6 +79,33 @@ public class SqlUtils {
         return "\"" + identifier.replace("\"", "\"\"") + "\"";
     }
 
+    /**
+     * Validates a free-form SQL condition (a {@code WHERE} clause) authored by the workflow creator. The condition is
+     * an intentional SQL fragment, not a bindable value, so it cannot be fully parameterized. This guard rejects the
+     * constructs that let an attacker escalate a single boolean predicate into stacked statements or comment-based
+     * truncation (statement terminators and SQL comment markers), which limits the SQL-injection blast radius while
+     * preserving legitimate single-expression conditions.
+     *
+     * @param condition the user-provided condition
+     * @return the same condition, when it passes validation
+     * @throws IllegalArgumentException if the condition is blank or contains statement separators or SQL comments
+     */
+    public static String validateCondition(String condition) {
+        if (condition == null || condition.isBlank()) {
+            throw new IllegalArgumentException("Condition must not be empty");
+        }
+
+        if (condition.contains(";") || condition.contains("--") || condition.contains("/*") ||
+            condition.contains("*/")) {
+
+            throw new IllegalArgumentException(
+                "Condition must be a single boolean expression and may not contain statement separators (';') or " +
+                    "SQL comments ('--', '/*', '*/')");
+        }
+
+        return condition;
+    }
+
     @SuppressFBWarnings("ODR")
     public static void checkColumnTypes(
         String schema, String table, List<Map<String, Object>> rows, DataSource dataSource) {

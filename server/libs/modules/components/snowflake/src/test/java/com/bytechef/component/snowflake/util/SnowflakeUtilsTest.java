@@ -24,6 +24,7 @@ import static com.bytechef.component.snowflake.constant.SnowflakeConstants.SCHEM
 import static com.bytechef.component.snowflake.constant.SnowflakeConstants.TABLE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -60,6 +61,28 @@ class SnowflakeUtilsTest {
         Map.of("name", "test1"),
         Map.of("name", "test2"));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+
+    @Test
+    void validateConditionAcceptsSingleExpression() {
+        assertEquals("col1 = 2", SnowflakeUtils.validateCondition("col1 = 2"));
+    }
+
+    @Test
+    void validateConditionRejectsStatementStacking() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> SnowflakeUtils.validateCondition("1 = 1; DROP TABLE users"));
+    }
+
+    @Test
+    void validateConditionRejectsComment() {
+        assertThrows(IllegalArgumentException.class, () -> SnowflakeUtils.validateCondition("1 = 1 -- comment"));
+    }
+
+    @Test
+    void validateConditionRejectsBlank() {
+        assertThrows(IllegalArgumentException.class, () -> SnowflakeUtils.validateCondition("  "));
+    }
 
     @Test
     void getDatabaseNameOptions(

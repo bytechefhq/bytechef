@@ -65,7 +65,7 @@ public class SnowflakeDeleteRowAction {
             SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(DATABASE)),
             SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(SCHEMA)),
             SnowflakeUtils.quoteIdentifier(inputParameters.getRequiredString(TABLE)),
-            inputParameters.getRequiredString(CONDITION));
+            SnowflakeUtils.validateCondition(inputParameters.getRequiredString(CONDITION)));
 
         return SnowflakeUtils.executeStatement(context, sqlStatement);
     }

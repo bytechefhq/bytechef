@@ -52,7 +52,7 @@ public class UpdateJdbcOperation implements JdbcOperation<Map<String, Integer>> 
         List<Map<String, Object>> rows = MapUtils.getList(valuesMap, ROWS, new TypeReference<>() {}, List.of());
         String schema = MapUtils.getString(inputParameters, SCHEMA, "public");
         String table = MapUtils.getRequiredString(inputParameters, TABLE);
-        String condition = MapUtils.getRequiredString(inputParameters, CONDITION);
+        String condition = SqlUtils.validateCondition(MapUtils.getRequiredString(inputParameters, CONDITION));
 
         String set = String.join(
             ", ",

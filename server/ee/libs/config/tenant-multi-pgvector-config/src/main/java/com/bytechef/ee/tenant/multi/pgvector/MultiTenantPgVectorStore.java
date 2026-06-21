@@ -177,7 +177,10 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
 
     @Override
     @SuppressFBWarnings(
-        value = "SQL_INJECTION_SPRING_JDBC", justification = "Table/schema names are trusted configuration")
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Table/schema names are trusted configuration; the filter clause is produced by " +
+            "PgVectorFilterExpressionConverter from a typed Filter.Expression, which escapes single quotes and " +
+            "JSONPath member names, so user-supplied metadata values cannot break out of the predicate")
     public List<Document> doSimilaritySearch(SearchRequest request) {
         String nativeFilterExpression = (request.getFilterExpression() != null)
             ? filterExpressionConverter.convertExpression(request.getFilterExpression()) : "";
@@ -200,7 +203,10 @@ public class MultiTenantPgVectorStore extends AbstractObservationVectorStore imp
 
     @Override
     @SuppressFBWarnings(
-        value = "SQL_INJECTION_SPRING_JDBC", justification = "Table/schema names are trusted configuration")
+        value = "SQL_INJECTION_SPRING_JDBC",
+        justification = "Table/schema names are trusted configuration; the filter clause is produced by " +
+            "PgVectorFilterExpressionConverter from a typed Filter.Expression, which escapes single quotes and " +
+            "JSONPath member names, so user-supplied metadata values cannot break out of the predicate")
     protected void doDelete(Filter.Expression filterExpression) {
         String filterClause = this.filterExpressionConverter.convertExpression(filterExpression);
 

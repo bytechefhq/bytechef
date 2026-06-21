@@ -60,4 +60,15 @@ public class MondayUtils {
             .getBody(new TypeReference<>() {});
     }
 
+    public static Map<String, Object> executeGraphQLQuery(
+        String query, Map<String, Object> variables, Context context) {
+
+        return context
+            .http(http -> http.post(""))
+            .body(Body.of(Map.of("query", query, "variables", variables)))
+            .configuration(Http.responseType(Http.ResponseType.JSON))
+            .execute()
+            .getBody(new TypeReference<>() {});
+    }
+
 }

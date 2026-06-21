@@ -52,21 +52,33 @@ Companion to `gecko-security-report.md`. The 455 findings are consolidated into 
   `MergeHelperSQLQueryAction` runs arbitrary SQL incl. DuckDB file functions. Restrict to SELECT, disable file/`read_*`/`COPY` functions.
   File: `mergehelper/util/MergeHelperUtils.java`.
 
-- [ ] **T11. Parameterize SQL & filter-expression injections** _(6 findings — 8.8→7.0)_
+- [x] **T11. Parameterize SQL & filter-expression injections** _(6 findings — 8.8→7.0)_
   Replace string-concatenated queries/filters with parameter binding (and GraphQL variables for Monday).
   Files: `memory/action/VectorStoreChatMemoryDeleteAction.java`, `jdbc/operation/UpdateJdbcOperation.java`, `multi/pgvector/MultiTenantPgVectorStore.java`, `monday/action/MondayCreateBoardAction.java`, `snowflake/action/SnowflakeDeleteRowAction.java`.
+  **Done:**
+  - `VectorStoreChatMemoryDeleteAction` — the real sink. Replaced the raw `vectorStore.delete(String)` filter built by concatenating `conversationId` with the typed `FilterExpressionBuilder().eq(METADATA_CONVERSATION_ID, conversationId).build()` → `delete(Filter.Expression)`. The value now passes through the store's `FilterExpressionConverter` (which escapes `'`/JSONPath), so it can't break out of the filter.
+  - `MultiTenantPgVectorStore` — **safe as-is, documented**. Verified `PgVectorFilterExpressionConverter` (spring-ai 2.0.0-M7) escapes single quotes (`'`→`''`) and JS-escapes JSONPath member names, so its converter output is safe to embed once the input is a typed `Filter.Expression`. The scanner flagged the concat pattern, but the escaping layer is the converter. Updated the two `@SuppressFBWarnings` justifications (`doSimilaritySearch`/`doDelete(Filter.Expression)`) to state this instead of the table-name-only rationale. No behavior change (any code change here would risk the EE vector store; matches upstream Spring AI exactly).
+  - `MondayCreateBoardAction` — switched to GraphQL **variables**: new `MondayUtils.executeGraphQLQuery(query, variables, context)` overload, mutation now declares `$boardName: String!, $description: String, $boardKind: BoardKind!` and binds them, so board name/description are parsed as data, not GraphQL. Test updated to assert the parameterized query + variables map.
+  - `UpdateJdbcOperation` / `DeleteJdbcOperation` / `SnowflakeDeleteRowAction` — the `WHERE` clause is an **intentional builder-authored SQL fragment**, not a bindable value, so it can't be fully parameterized (documented honestly, not relabeled). Added `SqlUtils.validateCondition` (platform) and `SnowflakeUtils.validateCondition` (component) which reject blank conditions and statement-stacking/comment escalation (`;`, `--`, `/*`, `*/`) — a single boolean predicate is preserved, but the worst case (stacked `DROP`/comment-truncation) is blocked. `DeleteJdbcOperation` added for parity though only Update was in the report. Regression tests added (`SqlUtilsTest`, `SnowflakeUtilsTest` +4).
 
-- [ ] **T12. Harden XML handling (XXE + XML/TwiML injection)** _(4 findings)_
+- [x] **T12. Harden XML handling (XXE + XML/TwiML injection)** _(4 findings)_
   Disable external entities/DTDs in `XmlUtils`; XML-encode values inserted into TwiML; validate XPath input.
   Files: `commons/util/XmlUtils.java`, `web/rest/TwimlController.java`.
+  **Done:**
+  - `XmlUtils` — the DOM/XPath `parse()` path was already XXE-hardened (`disallow-doctype-decl`); the gap was the Jackson `read(...)` path, which deserialized raw XML straight through the injected `XmlMapper`. Added `createSecureXmlMapper()` building the mapper over a StAX `XMLInputFactory` with `SUPPORT_DTD=false` + `IS_SUPPORTING_EXTERNAL_ENTITIES=false` (blocks XXE **and** entity-expansion/billion-laughs). `JacksonConfiguration` + both test setups (`ObjectMapperSetupExtension`, `XmlUtilsTest`) now feed XmlUtils this hardened mapper regardless of Boot autoconfig; new `XmlUtilsTest.testXxeAttackThroughReadIsBlocked` pins the `read()` path. XPath: enabled `FEATURE_SECURE_PROCESSING` on the `XPathFactory` (XML File Read's `PATH` is the user-intended node selector, so it's a structural query, not a value — secure processing disables extension functions).
+  - `TwimlController.buildTwimlResponse` — URL-encode every attacker-influenced value (`workflowExecutionId`, `callSid`, `subWorkflowId`) into the ws/status URLs so it can't inject path segments/query params, then XML-escape all attribute values (`escapeXml`) so they can't break out of the TwiML markup.
 
-- [ ] **T13. Add ReDoS / recursion guards** _(3 findings — 6.5 DoS)_
+- [x] **T13. Add ReDoS / recursion guards** _(3 findings — 6.5 DoS)_
   Validate or time-bound user regexes; bound the recursive task-parent walk.
   Files: `helper/util/TextHelperUtils.java`, `mapper/action/DataMapperReplaceAllSpecifiedValuesAction.java`, `event/listener/TaskStartedApplicationEventListener.java`.
+  **Done:**
+  - `TextHelperUtils.extractByRegEx` + `DataMapperReplaceAllSpecifiedValuesAction.fillOutput` — time-bound the user regex via a private `timeBoundedCharSequence` wrapper whose `charAt` throws once a 2s deadline passes; catastrophic backtracking accesses chars enormously, so it trips the deadline and unwinds instead of hanging the worker (no watchdog thread needed). Results for normal patterns are unchanged (wrapper delegates to the real string).
+  - `TaskStartedApplicationEventListener.onApplicationEvent` — replaced the self-recursive parent-chain walk with a bounded `for` loop (`MAX_PARENT_CHAIN_DEPTH = 10_000`), preserving exact semantics (per-parent `createDate = Instant.now()`, cancel-dispatch early return) so a malformed/deep parent chain can't exhaust the stack.
 
-- [ ] **T14. JSON-escape user input in VoiceAgent settings** _(1 finding)_
+- [x] **T14. JSON-escape user input in VoiceAgent settings** _(1 finding)_
   Build JSON with a serializer instead of string concatenation.
   File: `deepgram/action/DeepgramVoiceAgentAction.java`.
+  **Done:** `buildSettingsMessage` now builds a structured `Map` and serializes it via `context.json(json -> json.write(...))` instead of `StringBuilder` concatenation, so **every** field is escaped (previously only `prompt`/`greeting` went through a hand-rolled `escapeJson`; `language`, the model/provider/encoding fields, and the unquoted `sample_rate` numbers were raw). Sample rates are now read as `getInteger` and emitted as real JSON numbers; the dead `escapeJson` helper was removed.
 
 - [ ] **T15. Add SSRF defenses (URL allowlist / IP filtering)** _(~17 findings + open redirect)_
   Introduce a shared outbound-URL validator (scheme allowlist, DNS/IP resolution check blocking private/link-local ranges) and apply it to connection base-URI building, documentation fetch, job/task webhooks, JDBC/RabbitMQ/Cassandra hosts, OAuth tenant/region URLs, and the redirect validator.

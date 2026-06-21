@@ -39,6 +39,8 @@ import java.util.stream.Collectors;
  */
 public class TextHelperUtils {
 
+    private static final long REGEX_TIMEOUT_MILLIS = 2_000;
+
     private TextHelperUtils() {
     }
 
@@ -61,7 +63,10 @@ public class TextHelperUtils {
 
     public static List<String> extractByRegEx(String text, String regularExpression) {
         Pattern pattern = Pattern.compile(regularExpression);
-        Matcher matcher = pattern.matcher(text);
+
+        // Run the user-supplied regex against a time-bounded view of the text so a malicious pattern causing
+        // catastrophic backtracking (ReDoS) aborts instead of hanging the worker thread.
+        Matcher matcher = pattern.matcher(timeBoundedCharSequence(text));
 
         List<String> extractedStrings = new ArrayList<>();
 
@@ -70,6 +75,42 @@ public class TextHelperUtils {
         }
 
         return extractedStrings;
+    }
+
+    /**
+     * Wraps a {@link CharSequence} so that character access fails once {@link #REGEX_TIMEOUT_MILLIS} has elapsed. A
+     * regex causing catastrophic backtracking accesses characters an enormous number of times, so the deadline trips
+     * and the match unwinds rather than running unbounded.
+     */
+    private static CharSequence timeBoundedCharSequence(CharSequence value) {
+        long deadlineNanos = System.nanoTime() + REGEX_TIMEOUT_MILLIS * 1_000_000;
+
+        return new CharSequence() {
+
+            @Override
+            public char charAt(int index) {
+                if (System.nanoTime() > deadlineNanos) {
+                    throw new ProviderException("Regular expression evaluation timed out");
+                }
+
+                return value.charAt(index);
+            }
+
+            @Override
+            public int length() {
+                return value.length();
+            }
+
+            @Override
+            public CharSequence subSequence(int start, int end) {
+                return value.subSequence(start, end);
+            }
+
+            @Override
+            public String toString() {
+                return value.toString();
+            }
+        };
     }
 
     public static List<Option<String>> getCurrencyOptions() {
