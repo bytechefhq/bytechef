@@ -23,10 +23,14 @@ import com.bytechef.ee.embedded.configuration.public_.web.rest.model.Environment
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.IntegrationModel;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.service.EnvironmentService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @version ee
@@ -42,6 +46,17 @@ class IntegrationApiControllerTest {
 
     private final IntegrationApiController integrationApiController = new IntegrationApiController(
         conversionService, connectedUserIntegrationFacade, environmentService);
+
+    @BeforeEach
+    void setUp() {
+        SecurityContextHolder.getContext()
+            .setAuthentication(new UsernamePasswordAuthenticationToken("external-user-id", null));
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testGetIntegrationReturnsNotFoundWhenIntegrationNotVisible() {
