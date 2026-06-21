@@ -63,6 +63,7 @@ import java.util.Objects;
 import java.util.Optional;
 import org.apache.commons.lang3.Validate;
 import org.jspecify.annotations.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 /**
@@ -109,6 +110,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
@@ -146,6 +148,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
@@ -176,6 +179,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
@@ -205,6 +209,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })
@@ -237,6 +242,7 @@ public class WorkflowNodeTestOutputFacadeImpl implements WorkflowNodeTestOutputF
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @WorkflowCacheEvict(cacheNames = {
         PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE, PREVIOUS_WORKFLOW_NODE_SAMPLE_OUTPUTS_CACHE
     })

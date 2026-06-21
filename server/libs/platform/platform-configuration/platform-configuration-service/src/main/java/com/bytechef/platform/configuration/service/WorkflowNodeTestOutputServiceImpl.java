@@ -36,6 +36,7 @@ import org.jspecify.annotations.Nullable;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,6 +60,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public boolean checkWorkflowNodeTestOutputExists(
         String workflowId, String workflowNodeName, @Nullable Instant createdDate, long environmentId) {
 
@@ -71,6 +73,7 @@ public class WorkflowNodeTestOutputServiceImpl implements WorkflowNodeTestOutput
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     @CacheEvict(value = WORKFLOW_TEST_NODE_OUTPUT_CACHE)
     @WorkflowCacheEvict(cacheNames = {
         WorkflowNodeOutputFacade.PREVIOUS_WORKFLOW_NODE_OUTPUTS_CACHE,
