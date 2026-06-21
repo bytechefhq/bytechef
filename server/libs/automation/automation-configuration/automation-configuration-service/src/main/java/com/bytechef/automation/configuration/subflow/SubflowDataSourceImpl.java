@@ -71,6 +71,10 @@ class SubflowDataSourceImpl implements SubflowDataSource {
     public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowInputSchema(String workflowUuid) {
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
+        if (!isReferencedWorkflowAccessible(workflowId)) {
+            return null;
+        }
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         WorkflowTrigger callableTrigger = getCallableTrigger(workflow, WorkflowConstants.NEW_WORKFLOW_CALL);
@@ -91,6 +95,10 @@ class SubflowDataSourceImpl implements SubflowDataSource {
     @Override
     public BaseProperty.@Nullable BaseValueProperty<?> getSubWorkflowOutputSchema(String workflowUuid) {
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        if (!isReferencedWorkflowAccessible(workflowId)) {
+            return null;
+        }
 
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
@@ -148,6 +156,26 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         }
 
         return subWorkflowEntries;
+    }
+
+    /**
+     * Authorizes a schema read of the referenced sub-workflow. Returns {@code true} when no user principal is available
+     * (e.g. workflow execution resolving the sub-workflow's I/O schema — not an authorization context); otherwise the
+     * referenced workflow's owning workspace must be accessible to the caller, so the editor cannot read another
+     * workspace's sub-workflow input/output schema by uuid.
+     */
+    private boolean isReferencedWorkflowAccessible(String workflowId) {
+        Set<Long> accessibleWorkspaceIds = fetchAccessibleWorkspaceIds();
+
+        if (accessibleWorkspaceIds == null) {
+            return true;
+        }
+
+        ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
+
+        Project project = projectService.getProject(projectWorkflow.getProjectId());
+
+        return accessibleWorkspaceIds.contains(project.getWorkspaceId());
     }
 
     /**

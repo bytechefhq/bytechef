@@ -169,6 +169,24 @@ class SubflowDataSourceTest {
     }
 
     @Test
+    void testGetSubWorkflowInputSchemaDeniesInaccessibleWorkspace() {
+        mockInaccessibleReferencedWorkflow();
+
+        BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowInputSchema(WORKFLOW_UUID);
+
+        assertNull(result);
+    }
+
+    @Test
+    void testGetSubWorkflowOutputSchemaDeniesInaccessibleWorkspace() {
+        mockInaccessibleReferencedWorkflow();
+
+        BaseProperty.BaseValueProperty<?> result = subflowDataSource.getSubWorkflowOutputSchema(WORKFLOW_UUID);
+
+        assertNull(result);
+    }
+
+    @Test
     void testGetSubWorkflowsReturnsEmptyWhenNoCallableWorkflows() {
         when(projectWorkflowService.getLatestProjectWorkflows()).thenReturn(List.of());
 
@@ -467,5 +485,29 @@ class SubflowDataSourceTest {
             assertEquals(1, result.size());
             assertNotNull(result.getFirst());
         }
+    }
+
+    private void mockInaccessibleReferencedWorkflow() {
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(100L);
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+        Workspace accessibleWorkspace = mock(Workspace.class);
+
+        when(accessibleWorkspace.getId()).thenReturn(10L);
+        when(workspaceFacade.getUserWorkspaces(100L)).thenReturn(List.of(accessibleWorkspace));
+
+        when(projectWorkflowService.getLastWorkflowId(WORKFLOW_UUID)).thenReturn(WORKFLOW_ID);
+
+        ProjectWorkflow projectWorkflow = mock(ProjectWorkflow.class);
+
+        when(projectWorkflow.getProjectId()).thenReturn(2L);
+        when(projectWorkflowService.getWorkflowProjectWorkflow(WORKFLOW_ID)).thenReturn(projectWorkflow);
+
+        Project project = mock(Project.class);
+
+        when(project.getWorkspaceId()).thenReturn(20L);
+        when(projectService.getProject(2L)).thenReturn(project);
     }
 }

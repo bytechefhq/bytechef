@@ -234,14 +234,15 @@ gate on the facade/service impl (never the controller).
   the editor — it tightens automatically once the principal rides the EE remote hop. The AI-agent consumer
   (`WorkflowCallWorkflowTool`) shares the method and is unaffected (rehydrated principal → filtered; none →
   unfiltered). New `SubflowDataSourceTest.testGetSubWorkflowsFiltersInaccessibleWorkspaces` pins it.
-- [ ] **Subflow schema reads (#A) — OPEN, next** (the `getSubWorkflows` fix above establishes the pattern).
-  `getSubWorkflowInputSchema`/`getSubWorkflowOutputSchema(workflowUuid)` return any workflow's I/O schema by
-  uuid with no ownership check. Unlike the list, these **are** genuinely execution-reachable (the dispatcher
-  resolves input/output schema while running), so a hard gate would break execution — but the same
-  **fail-open-when-no-principal** approach used for `getSubWorkflows` applies: when a `SecurityContext` is
-  present (editor/definition-resolution), resolve the referenced `workflowUuid` → owning project → workspace
-  and reject when it's not in the caller's accessible workspaces; when no principal is resolvable (execution),
-  leave it. Same `SubflowDataSourceImpl` deps already injected — straightforward follow-up.
+- [x] **Subflow schema reads (#A) — DONE** (same pattern as the `getSubWorkflows` fix above).
+  `getSubWorkflowInputSchema`/`getSubWorkflowOutputSchema(workflowUuid)` returned any workflow's I/O schema by
+  uuid with no ownership check. These **are** genuinely execution-reachable (the dispatcher resolves
+  input/output schema while running), so a hard gate would break execution — handled with the same
+  **fail-open-when-no-principal** approach: new `isReferencedWorkflowAccessible(workflowId)` guard returns
+  early `null` when a `SecurityContext` is present (editor/definition-resolution) and the referenced
+  `workflowUuid` → `getWorkflowProjectWorkflow` → project → `workspaceId` is **not** in the caller's accessible
+  workspaces; when no principal is resolvable (execution) it leaves the read untouched. `SubflowDataSourceTest`
+  gains `testGetSubWorkflow{Input,Output}SchemaDeniesInaccessibleWorkspace`.
 
 ---
 
