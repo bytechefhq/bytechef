@@ -18,41 +18,27 @@ package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @author Ivica Cardic
  */
 public class AutomationMcpServerApiKeyAuthenticationToken extends AbstractApiKeyAuthenticationToken {
 
-    private final String authSecretKey;
     private String mcpServerSecretKey;
 
-    public AutomationMcpServerApiKeyAuthenticationToken(String authSecretKey) {
-        setAuthenticated(true);
-
-        this.authSecretKey = authSecretKey;
-    }
-
-    public AutomationMcpServerApiKeyAuthenticationToken(
-        String mcpServerSecretKey, String authSecretKey, String tenantId) {
-
+    public AutomationMcpServerApiKeyAuthenticationToken(String mcpServerSecretKey, String tenantId) {
         super(-1, tenantId);
 
-        this.authSecretKey = authSecretKey;
         this.mcpServerSecretKey = mcpServerSecretKey;
     }
 
-    public String getAuthSecretKey() {
-        return authSecretKey;
+    @SuppressFBWarnings("EI")
+    public AutomationMcpServerApiKeyAuthenticationToken(User user) {
+        super(user);
     }
 
     public String getMcpServerSecretKey() {
         return mcpServerSecretKey;
-    }
-
-    @Override
-    @SuppressFBWarnings("EI")
-    public Object getPrincipal() {
-        return authSecretKey;
     }
 }

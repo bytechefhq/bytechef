@@ -18,12 +18,15 @@ package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.util.Objects;
+import java.util.List;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 
 /**
  * @author Ivica Cardic
@@ -39,20 +42,29 @@ public class AutomationMcpServerApiKeyAuthenticationProvider implements Authenti
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        AutomationMcpServerApiKeyAuthenticationToken automationMcpServerApiKeyAuthenticationToken =
+        AutomationMcpServerApiKeyAuthenticationToken token =
             (AutomationMcpServerApiKeyAuthenticationToken) authentication;
 
-        McpServer mcpServer = mcpServerService.getMcpServer(
-            automationMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey());
+        String secretKey = token.getMcpServerSecretKey();
 
-        if (!Objects.equals(
-            mcpServer.getSecretKey(), automationMcpServerApiKeyAuthenticationToken.getMcpServerSecretKey())) {
-
+        if (secretKey == null || secretKey.isBlank()) {
             throw new BadCredentialsException("Invalid secret key");
         }
 
+        McpServer mcpServer;
+
+        try {
+            mcpServer = mcpServerService.getMcpServer(secretKey);
+        } catch (IllegalArgumentException illegalArgumentException) {
+            throw new BadCredentialsException("Invalid secret key", illegalArgumentException);
+        }
+
+        if (!mcpServer.isEnabled()) {
+            throw new BadCredentialsException("MCP server is disabled");
+        }
+
         return new AutomationMcpServerApiKeyAuthenticationToken(
-            automationMcpServerApiKeyAuthenticationToken.getAuthSecretKey());
+            new User("system", "", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
     }
 
     @Override

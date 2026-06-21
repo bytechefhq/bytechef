@@ -50,7 +50,6 @@ public class AutomationMcpServerSecurityConfigurer extends AbstractApiKeyHttpCon
 
         @Override
         public Authentication convert(HttpServletRequest request) {
-            String authToken = fetchAuthToken(request);
             String servletPath = request.getServletPath();
 
             String mcpServerSecretKey = servletPath.replace("/api/automation/", "")
@@ -58,8 +57,7 @@ public class AutomationMcpServerSecurityConfigurer extends AbstractApiKeyHttpCon
 
             TenantKey tenantKey = TenantKey.parse(mcpServerSecretKey);
 
-            return new AutomationMcpServerApiKeyAuthenticationToken(
-                mcpServerSecretKey, authToken, tenantKey.getTenantId());
+            return new AutomationMcpServerApiKeyAuthenticationToken(mcpServerSecretKey, tenantKey.getTenantId());
         }
     }
 }
