@@ -16,7 +16,7 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentApiFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -34,15 +34,15 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 public class KnowledgeBaseDocumentTagGraphQlController {
 
-    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
+    private final KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade;
     private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
 
     @SuppressFBWarnings("EI")
     public KnowledgeBaseDocumentTagGraphQlController(
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
+        KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService) {
 
-        this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
+        this.knowledgeBaseDocumentApiFacade = knowledgeBaseDocumentApiFacade;
         this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
     }
 
@@ -64,7 +64,7 @@ public class KnowledgeBaseDocumentTagGraphQlController {
     public boolean updateKnowledgeBaseDocumentTags(@Argument UpdateKnowledgeBaseDocumentTagsInput input) {
         List<String> tagNames = input.tags() == null ? List.of() : input.tags();
 
-        knowledgeBaseDocumentFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tagNames);
+        knowledgeBaseDocumentApiFacade.updateKnowledgeBaseDocumentTags(input.knowledgeBaseDocumentId(), tagNames);
 
         return true;
     }

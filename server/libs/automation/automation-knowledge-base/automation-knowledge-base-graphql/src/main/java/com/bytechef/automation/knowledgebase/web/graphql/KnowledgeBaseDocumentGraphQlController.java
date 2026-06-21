@@ -16,12 +16,10 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentApiFacade;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.dto.DocumentStatusUpdate;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
-import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,30 +34,17 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentGraphQlController {
 
-    private final KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
-    private final KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade;
-    private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
+    private final KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade;
 
     @SuppressFBWarnings("EI")
-    KnowledgeBaseDocumentGraphQlController(
-        KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade,
-        KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
-
-        this.knowledgeBaseDocumentChunkFacade = knowledgeBaseDocumentChunkFacade;
-        this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
-        this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
+    KnowledgeBaseDocumentGraphQlController(KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade) {
+        this.knowledgeBaseDocumentApiFacade = knowledgeBaseDocumentApiFacade;
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "chunks")
     List<KnowledgeBaseDocumentChunk> documentChunks(KnowledgeBaseDocument knowledgeBaseDocument) {
-        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(
+        return knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentChunksByDocumentId(
             knowledgeBaseDocument.getId());
-    }
-
-    @QueryMapping
-    List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
-        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(id);
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "tags")
@@ -75,17 +60,17 @@ class KnowledgeBaseDocumentGraphQlController {
 
     @QueryMapping
     KnowledgeBaseDocument knowledgeBaseDocument(@Argument Long id) {
-        return knowledgeBaseDocumentService.getKnowledgeBaseDocument(id);
+        return knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocument(id);
     }
 
     @QueryMapping
     DocumentStatusUpdate knowledgeBaseDocumentStatus(@Argument Long id) {
-        return knowledgeBaseDocumentService.getKnowledgeBaseDocumentStatus(id);
+        return knowledgeBaseDocumentApiFacade.getKnowledgeBaseDocumentStatus(id);
     }
 
     @MutationMapping
     boolean deleteKnowledgeBaseDocument(@Argument Long id) {
-        knowledgeBaseDocumentFacade.deleteKnowledgeBaseDocument(id);
+        knowledgeBaseDocumentApiFacade.deleteKnowledgeBaseDocument(id);
 
         return true;
     }

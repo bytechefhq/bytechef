@@ -16,8 +16,8 @@
 
 package com.bytechef.automation.knowledgebase.web.graphql;
 
+import com.bytechef.automation.knowledgebase.facade.KnowledgeBaseDocumentApiFacade;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
-import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -31,11 +31,11 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI")
 class KnowledgeBaseDocumentChunkGraphQlController {
 
-    private final KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade;
+    private final KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade;
 
     @SuppressFBWarnings("EI")
-    KnowledgeBaseDocumentChunkGraphQlController(KnowledgeBaseDocumentChunkFacade knowledgeBaseDocumentChunkFacade) {
-        this.knowledgeBaseDocumentChunkFacade = knowledgeBaseDocumentChunkFacade;
+    KnowledgeBaseDocumentChunkGraphQlController(KnowledgeBaseDocumentApiFacade knowledgeBaseDocumentApiFacade) {
+        this.knowledgeBaseDocumentApiFacade = knowledgeBaseDocumentApiFacade;
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocumentChunk", field = "content")
@@ -58,13 +58,13 @@ class KnowledgeBaseDocumentChunkGraphQlController {
         @Argument Long id,
         @Argument("knowledgeBaseDocumentChunk") KnowledgeBaseDocumentChunkInput knowledgeBaseDocumentChunk) {
 
-        return knowledgeBaseDocumentChunkFacade.updateKnowledgeBaseDocumentChunk(
+        return knowledgeBaseDocumentApiFacade.updateKnowledgeBaseDocumentChunk(
             id, knowledgeBaseDocumentChunk.content());
     }
 
     @MutationMapping
     boolean deleteKnowledgeBaseDocumentChunk(@Argument Long id) {
-        knowledgeBaseDocumentChunkFacade.deleteKnowledgeBaseDocumentChunk(id);
+        knowledgeBaseDocumentApiFacade.deleteKnowledgeBaseDocumentChunk(id);
 
         return true;
     }
