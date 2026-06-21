@@ -79,8 +79,8 @@ docker compose -f docker-compose.dev.server.yml up -d
 - **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 3.4
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
-- **Build System**: Gradle 8+ with Kotlin DSL
-- **Code Execution**: GraalVM Polyglot 25.0.2 (Java, JavaScript, Python, Ruby)
+- **Build System**: Gradle 9.4.1 with Kotlin DSL
+- **Code Execution**: GraalVM Polyglot 25.0.3 (Java, JavaScript, Python, Ruby)
 - **Testing**: JUnit 5, Vitest 4, Testcontainers
 - **Node.js**: Version 20.19+ required for client development
 - **Additional Tools**: MapStruct 1.6.3, Jackson 2.19 (transitioning to 3.x — both `com.fasterxml.jackson` and `tools.jackson` packages currently appear in deps), SpringDoc OpenAPI 3.0.3
