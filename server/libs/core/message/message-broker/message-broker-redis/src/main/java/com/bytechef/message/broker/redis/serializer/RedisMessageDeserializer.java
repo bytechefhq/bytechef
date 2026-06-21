@@ -16,6 +16,7 @@
 
 package com.bytechef.message.broker.redis.serializer;
 
+import com.bytechef.message.broker.serializer.MessageTypeResolver;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.data.redis.serializer.SerializationException;
 import org.springframework.util.Assert;
@@ -39,7 +40,7 @@ public class RedisMessageDeserializer {
         try {
             RedisMessage redisMessage = objectMapper.readValue(string, RedisMessage.class);
 
-            return objectMapper.readValue(redisMessage.payload(), Class.forName(redisMessage.type()));
+            return objectMapper.readValue(redisMessage.payload(), MessageTypeResolver.resolve(redisMessage.type()));
         } catch (Exception e) {
             throw new SerializationException(e.getMessage());
         }

@@ -28,29 +28,37 @@ Companion to `gecko-security-report.md`. The 455 findings are consolidated into 
 
 ## Phase 1 — Code execution, injection, SSRF, webhook authenticity
 
-- [ ] **T5. Lock down code-execution deploy endpoints** _(6 findings — 8.8/7.2 RCE)_
+- [x] **T5. Lock down code-execution deploy endpoints** _(6 findings — 8.8/7.2 RCE)_
   Project/custom-component deploy endpoints execute uploaded JARs and polyglot scripts. Add strong authorization (admin/role), and sandbox or disable arbitrary code execution; validate artifact provenance.
   Files: `ProjectCodeWorkflowApiController.java`, `loader/automation/ProjectHandlerPolyglotEngine.java`, `web/rest/CustomComponentApiController.java`, `customcomponent/loader/ComponentHandlerPolyglotEngine.java`.
+  **Done:** these are intentional "run uploaded code" features, so the control is **authorization**, not sandboxing — the deploy engines must execute the artifact with host interop (they map guest `perform` closures to host `Function` to load the handler definition), so sandboxing them like the Script component would break code workflows. Added `@PreAuthorize(hasAuthority ROLE_ADMIN)` on `ProjectCodeWorkflowFacadeImpl.save` (the facade-tier guard the `loadProjectDefinition` javadoc already *claimed* existed but didn't enforce) + a matching authorization note on `ProjectCodeWorkflowApiController`. Custom-component deploy was **already** admin-gated under T25 (`CustomComponentFacadeImpl.save` + `CustomComponentServiceImpl.save`, both `ROLE_ADMIN`) — verified, no change. Gate on the facade so every caller is covered, not just the REST entry point.
 
-- [ ] **T6. Sandbox SpEL evaluation in the Condition task dispatcher** _(3 findings — 8.8/8.5 RCE)_
+- [x] **T6. Sandbox SpEL evaluation in the Condition task dispatcher** _(3 findings — 8.8/8.5 RCE)_
   `ConditionTaskUtils.resolveCase` evaluates user SpEL with the default context. Use a restricted `SimpleEvaluationContext` (no type/bean/constructor resolvers).
   File: `condition/util/ConditionTaskUtils.java`.
+  **Done (already remediated):** `resolveCase` already evaluates against `SimpleEvaluationContext.forReadOnlyDataBinding().withInstanceMethods().build()` (forbids `T(...)`, constructors, bean refs, static/Object/Class/ClassLoader methods), with a security javadoc referencing issue #5081. Verified — no change needed.
 
-- [ ] **T7. Sandbox GraalVM polyglot & script-tool execution** _(3 findings — 8.5/7.8)_
+- [x] **T7. Sandbox GraalVM polyglot & script-tool execution** _(3 findings — 8.5/7.8)_
   Script Tool, SkillsTool ZIP scripts, and FileSystemTools run unsandboxed. Constrain the GraalVM `Context` (no host access, filesystem allowlist, time/memory limits) and set a working-directory jail.
   Files: `script/engine/PolyglotEngine.java`, `ScriptToolDefinition`, `utils/cluster/AiAgentUtilsSkillsTool.java`, `AiAgentUtilsFileSystemTools.java`.
+  **Done:**
+  - **`PolyglotEngine.getContext()` is the single chokepoint** for all three script-RCE findings (Script component, Script Tool, SkillsTool ZIP scripts all run through it). Pinned the guest context to a no-host/no-IO sandbox: `HostAccess.NONE`, `allowHostClassLoading(false)`, `allowHostClassLookup(_→false)`, `allowNativeAccess(false)`, `allowCreateThread(false)`, `allowCreateProcess(false)`, `IOAccess.NONE`, `EnvironmentAccess.NONE`, `PolyglotAccess.NONE`. Scripts still reach the platform only via the guest `ContextProxyObject`/`ComponentProxyObject` proxies (no host access required), so no functionality is lost; the 17 script-module tests (JS/Java/Python/Ruby/R) still pass. These match GraalVM's secure defaults but are now explicit so the sandbox can't be silently weakened. _Resource (time/memory) limits not added — they need per-language tuning and risk killing legitimate scripts; the host/IO lockdown is the load-bearing RCE mitigation._
+  - **`AiAgentUtilsFileSystemTools`** — the agent's Read/Write/Edit ran against the raw filesystem (LFI/AFO). The dependency is already at `spring-ai-agent-utils 0.8.0`, whose `FileSystemTools.Builder.allowedDirectory(Path)` enforces a jail (`normalize` + `toRealPath` + `startsWith`, defeating `..`/symlink escapes). Now jails to a per-run `Files.createTempDirectory("bytechef-agent-fs-")`.
 
-- [ ] **T8. Restrict class loading in message deserializers** _(2 findings — 8.5/7.9 RCE)_
+- [x] **T8. Restrict class loading in message deserializers** _(2 findings — 8.5/7.9 RCE)_
   Redis & Kafka deserializers call `Class.forName()` on attacker-controlled type names. Replace with an explicit type allowlist / Jackson `PolymorphicTypeValidator`.
   Files: `redis/serializer/RedisMessageDeserializer.java`, `kafka/config/KafkaMessageBrokerConfiguration.java`.
+  **Done:** new shared `MessageTypeResolver` (in `message-broker-api`) gates `Class.forName` behind a `com.bytechef.` package allowlist (ByteChef only ever publishes its own message types). `RedisMessageDeserializer.deserialize` now resolves via it (rejecting forged types with a `SerializationException`); the Kafka `convertFromInternal` only resolves the `_type` header when allowlisted and otherwise falls back to the declared `targetClass` instead of loading an arbitrary gadget. Unit-tested (`MessageTypeResolverTest`: allows bytechef types, rejects `java.lang.Runtime` / Spring context / null).
 
-- [ ] **T9. Escape shell commands in ClaudeCode actions** _(2 findings — 8.8 RCE)_
+- [x] **T9. Escape shell commands in ClaudeCode actions** _(2 findings — 8.8 RCE)_
   Shell strings are built by concatenation. Use argument arrays / `ProcessBuilder` with no shell, or strictly escape inputs.
   Files: `code/action/ClaudeCodeChat.java`, `ClaudeCodeAddMCPAction`.
+  **Done (already remediated):** the shell-concatenation sink no longer exists. `ClaudeCodeAddMCPAction` builds a typed `McpServerConfig.McpHttpServerConfig` and `ClaudeCodeChat` calls `AgentClient.run(message)` — the whole module was rewritten onto the `io.github.markpollack.agents` SDK; `grep` confirms zero `ProcessBuilder`/`Runtime.exec`/shell usage. The finding referred to a prior `StringBuilder`-based implementation. Verified, no change.
 
-- [ ] **T10. Restrict DuckDB SQL to safe read-only operations** _(2 findings — 8.8 RCE / 7.8 LFI)_
+- [x] **T10. Restrict DuckDB SQL to safe read-only operations** _(2 findings — 8.8 RCE / 7.8 LFI)_
   `MergeHelperSQLQueryAction` runs arbitrary SQL incl. DuckDB file functions. Restrict to SELECT, disable file/`read_*`/`COPY` functions.
   File: `mergehelper/util/MergeHelperUtils.java`.
+  **Done:** `configureSecureConnection` runs `SET disabled_filesystems='LocalFileSystem'` + `SET enable_external_access=false` + `SET lock_configuration=true` on the in-process DuckDB connection before any user SQL. `enable_external_access=false` blocks the file-reading table functions (`read_csv`/`read_parquet`/…), `COPY … TO/FROM` file targets, `httpfs`, AND `INSTALL`/`LOAD` of extensions (the extension-based RCE vector) in one switch; `lock_configuration=true` stops a user query re-enabling it. Plus defense-in-depth `validateReadOnlyQuery` (single statement, must start with SELECT/WITH/FROM/…; rejects DML/DDL/stacking, comment-aware). DuckDB 0.10.3 predates 1.0 so `allow_community_extensions` isn't used — `enable_external_access=false` already covers extension loading. **Real-driver tests** prove `read_csv_auto('/etc/passwd')` is blocked and `SET enable_external_access=true` is rejected post-lock; existing 23 merge-helper tests still pass (in-memory ops unaffected).
 
 - [x] **T11. Parameterize SQL & filter-expression injections** _(6 findings — 8.8→7.0)_
   Replace string-concatenated queries/filters with parameter binding (and GraphQL variables for Monday).

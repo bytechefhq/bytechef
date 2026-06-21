@@ -43,7 +43,11 @@ import java.util.concurrent.locks.ReentrantLock;
 import javax.annotation.Nullable;
 import org.graalvm.polyglot.Context;
 import org.graalvm.polyglot.Engine;
+import org.graalvm.polyglot.EnvironmentAccess;
+import org.graalvm.polyglot.HostAccess;
+import org.graalvm.polyglot.PolyglotAccess;
 import org.graalvm.polyglot.Value;
+import org.graalvm.polyglot.io.IOAccess;
 import org.graalvm.polyglot.proxy.ProxyArray;
 import org.graalvm.polyglot.proxy.ProxyDate;
 import org.graalvm.polyglot.proxy.ProxyExecutable;
@@ -229,8 +233,22 @@ public class PolyglotEngine {
     }
 
     private static Context getContext() {
+        // User-supplied scripts (Script component, Script Tool, and SkillsTool scripts) are evaluated here, so the
+        // guest context is pinned to a no-host, no-IO sandbox. The script still interacts with the platform solely
+        // through the ContextProxyObject/ComponentProxyObject guest proxies, which do not require host access. These
+        // restrictions match GraalVM's secure defaults but are set explicitly so the sandbox cannot be silently
+        // weakened by a future default change or accidental builder edit.
         return Context.newBuilder()
             .engine(getEngine())
+            .allowHostAccess(HostAccess.NONE)
+            .allowHostClassLoading(false)
+            .allowHostClassLookup(className -> false)
+            .allowNativeAccess(false)
+            .allowCreateThread(false)
+            .allowCreateProcess(false)
+            .allowIO(IOAccess.NONE)
+            .allowEnvironmentAccess(EnvironmentAccess.NONE)
+            .allowPolyglotAccess(PolyglotAccess.NONE)
             .build();
     }
 

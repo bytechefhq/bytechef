@@ -18,6 +18,7 @@ package com.bytechef.component.mergehelper.util;
 
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.flatten;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
@@ -29,9 +30,11 @@ import static org.mockito.Mockito.when;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
+import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
 import java.util.List;
@@ -214,5 +217,59 @@ class MergeHelperUtilsTest {
         verify(statement).executeQuery("SELECT id, name FROM people");
         verify(rs).close();
         verify(statement).close();
+    }
+
+    @Test
+    void testValidateReadOnlyQueryAcceptsSelectAndWith() {
+        MergeHelperUtils.validateReadOnlyQuery("SELECT * FROM people");
+        MergeHelperUtils.validateReadOnlyQuery("  with cte as (select 1) select * from cte;  ");
+        MergeHelperUtils.validateReadOnlyQuery("-- comment\nSELECT 1");
+    }
+
+    @Test
+    void testValidateReadOnlyQueryRejectsNonReadOnly() {
+        assertThrows(
+            IllegalArgumentException.class, () -> MergeHelperUtils.validateReadOnlyQuery("DELETE FROM people"));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> MergeHelperUtils.validateReadOnlyQuery("INSTALL httpfs; LOAD httpfs; SELECT 1"));
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> MergeHelperUtils.validateReadOnlyQuery("COPY (SELECT 1) TO '/tmp/x.csv'"));
+    }
+
+    @Test
+    void testValidateReadOnlyQueryRejectsStatementStacking() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> MergeHelperUtils.validateReadOnlyQuery("SELECT 1; SELECT 2"));
+    }
+
+    @Test
+    void testConfigureSecureConnectionBlocksFileAccess() throws SQLException {
+        try (Connection duckDbConnection = DriverManager.getConnection("jdbc:duckdb:")) {
+            MergeHelperUtils.configureSecureConnection(duckDbConnection);
+
+            try (Statement duckDbStatement = duckDbConnection.createStatement()) {
+                // External/file access is disabled, so a file-reading table function must fail rather than disclose
+                // the local filesystem.
+                assertThrows(
+                    SQLException.class,
+                    () -> duckDbStatement.execute("SELECT * FROM read_csv_auto('/etc/passwd')"));
+            }
+        }
+    }
+
+    @Test
+    void testConfigureSecureConnectionRejectsReEnablingExternalAccess() throws SQLException {
+        try (Connection duckDbConnection = DriverManager.getConnection("jdbc:duckdb:")) {
+            MergeHelperUtils.configureSecureConnection(duckDbConnection);
+
+            try (Statement duckDbStatement = duckDbConnection.createStatement()) {
+                // The configuration is locked, so a user query cannot turn external access back on.
+                assertThrows(
+                    SQLException.class, () -> duckDbStatement.execute("SET enable_external_access=true"));
+            }
+        }
     }
 }

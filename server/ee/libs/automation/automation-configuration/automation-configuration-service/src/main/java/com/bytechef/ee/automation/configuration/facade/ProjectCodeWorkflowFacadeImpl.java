@@ -19,6 +19,7 @@ import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowCo
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
@@ -27,6 +28,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -59,7 +61,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectCodeWorkflowService = projectCodeWorkflowService;
     }
 
+    /**
+     * Deploying a code workflow loads and executes the uploaded artifact (a JAR or polyglot script) on the server, so
+     * it is restricted to administrators. The guard lives here on the facade so it protects every caller, not only the
+     * REST entry point.
+     */
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void save(long workspaceId, byte[] bytes, Language language) {
         ProjectDefinition projectDefinition;
 

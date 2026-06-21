@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -38,6 +39,80 @@ import java.util.regex.Pattern;
 public class MergeHelperUtils {
 
     private static final Pattern SAFE_IDENTIFIER_PATTERN = Pattern.compile("[a-zA-Z_][a-zA-Z0-9_]*");
+
+    private static final Set<String> ALLOWED_QUERY_PREFIXES = Set.of(
+        "SELECT", "WITH", "FROM", "TABLE", "VALUES", "DESCRIBE", "DESC", "SUMMARIZE", "EXPLAIN", "PIVOT", "UNPIVOT");
+
+    /**
+     * Locks the in-process DuckDB connection down before any user SQL runs. Disabling external/file access blocks the
+     * file-reading table functions ({@code read_csv}/{@code read_parquet}/...), {@code COPY ... TO/FROM} file targets,
+     * {@code httpfs}, and {@code INSTALL}/{@code LOAD} of extensions — i.e. the LFI/AFO and extension-based RCE vectors
+     * — and locking the configuration prevents a user query from re-enabling any of it.
+     */
+    @SuppressFBWarnings("SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE")
+    public static void configureSecureConnection(Connection connection) throws SQLException {
+        try (Statement statement = connection.createStatement()) {
+            statement.execute("SET disabled_filesystems='LocalFileSystem'");
+            statement.execute("SET enable_external_access=false");
+
+            // Must be last: once locked, no further SET (including a malicious re-enable) is permitted.
+            statement.execute("SET lock_configuration=true");
+        }
+    }
+
+    /**
+     * Defense-in-depth check restricting the user-supplied query to a single read-only statement. The DuckDB sandbox
+     * configured by {@link #configureSecureConnection(Connection)} is the primary mitigation; this additionally blocks
+     * statement stacking and non-read-only top-level statements.
+     */
+    public static void validateReadOnlyQuery(String query) {
+        String normalized = stripLeadingComments(query);
+
+        while (normalized.endsWith(";")) {
+            normalized = normalized.substring(0, normalized.length() - 1)
+                .strip();
+        }
+
+        if (normalized.isEmpty()) {
+            throw new IllegalArgumentException("SQL query must not be empty");
+        }
+
+        if (normalized.contains(";")) {
+            throw new IllegalArgumentException("Only a single SQL statement is allowed");
+        }
+
+        String firstToken = normalized.split("\\s+", 2)[0].toUpperCase(Locale.ROOT);
+
+        if (!ALLOWED_QUERY_PREFIXES.contains(firstToken)) {
+            throw new IllegalArgumentException(
+                "Only read-only queries are allowed; the statement must start with one of " + ALLOWED_QUERY_PREFIXES);
+        }
+    }
+
+    private static String stripLeadingComments(String sql) {
+        String normalized = sql.strip();
+        boolean changed = true;
+
+        while (changed) {
+            changed = false;
+
+            if (normalized.startsWith("--")) {
+                int newLineIndex = normalized.indexOf('\n');
+
+                normalized = newLineIndex < 0 ? "" : normalized.substring(newLineIndex + 1)
+                    .strip();
+                changed = true;
+            } else if (normalized.startsWith("/*")) {
+                int endIndex = normalized.indexOf("*/");
+
+                normalized = endIndex < 0 ? "" : normalized.substring(endIndex + 2)
+                    .strip();
+                changed = true;
+            }
+        }
+
+        return normalized;
+    }
 
     public static List<Map<String, Object>> flatten(Object input) {
         List<Map<String, Object>> rows = new ArrayList<>();

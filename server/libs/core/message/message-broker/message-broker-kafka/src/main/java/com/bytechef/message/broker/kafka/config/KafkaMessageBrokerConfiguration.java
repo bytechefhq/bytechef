@@ -21,6 +21,7 @@ package com.bytechef.message.broker.kafka.config;
 import com.bytechef.message.broker.MessageBroker;
 import com.bytechef.message.broker.annotation.ConditionalOnMessageBrokerKafka;
 import com.bytechef.message.broker.kafka.KafkaMessageBroker;
+import com.bytechef.message.broker.serializer.MessageTypeResolver;
 import java.util.Map;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
@@ -107,10 +108,16 @@ public class KafkaMessageBrokerConfiguration {
                 String type = (String) messageHeaders.get("_type");
 
                 if (type != null) {
-                    try {
-                        targetClass = Class.forName(type);
-                    } catch (ClassNotFoundException e) {
-                        log.warn("Class not found: " + type, e);
+                    // Only resolve the message type when it names a ByteChef class; an unrecognized/forged header
+                    // falls back to the declared targetClass rather than loading an arbitrary (gadget) class.
+                    if (MessageTypeResolver.isAllowed(type)) {
+                        try {
+                            targetClass = MessageTypeResolver.resolve(type);
+                        } catch (ClassNotFoundException e) {
+                            log.warn("Class not found: " + type, e);
+                        }
+                    } else {
+                        log.warn("Refusing to resolve a message type outside the allowlisted package: {}", type);
                     }
                 }
 

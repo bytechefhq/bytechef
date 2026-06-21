@@ -38,6 +38,11 @@ public class ProjectCodeWorkflowApiController implements ProjectCodeWorkflowApi 
         this.projectCodeWorkflowFacade = projectCodeWorkflowFacade;
     }
 
+    /**
+     * Authorization note: the {@code ROLE_ADMIN} guard lives on {@code ProjectCodeWorkflowFacadeImpl#save} so it
+     * protects every caller of the facade (the deploy loads and executes the uploaded artifact), not only this REST
+     * entry point.
+     */
     @Override
     public ResponseEntity<Void> deployProject(Long projectId, MultipartFile projectFile) {
         try {

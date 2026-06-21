@@ -23,6 +23,10 @@ import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Context;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ToolCallbackProviderFunction;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import org.springaicommunity.agent.tools.FileSystemTools;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallbackProvider;
@@ -45,7 +49,21 @@ public class AiAgentUtilsFileSystemTools {
     private static ToolCallbackProvider apply(
         Parameters inputParameters, Parameters connectionParameters, Context context) {
 
+        // Jail the agent's file read/write/edit to a per-run sandbox directory. Without an allowed directory the tool
+        // operates on the raw filesystem, letting the agent (or a prompt-injection of it) read or overwrite any file
+        // the server process can reach. FileSystemTools canonicalizes paths (toRealPath) and enforces the allowlist,
+        // so '..'/symlink escapes are rejected.
+        Path sandboxDirectory;
+
+        try {
+            sandboxDirectory = Files.createTempDirectory("bytechef-agent-fs-");
+        } catch (IOException ioException) {
+            throw new UncheckedIOException(
+                "Failed to create a sandbox directory for the file system tools", ioException);
+        }
+
         FileSystemTools fileSystemTools = FileSystemTools.builder()
+            .allowedDirectory(sandboxDirectory)
             .build();
 
         return ToolCallbackProvider.from(ToolCallbacks.from(fileSystemTools));

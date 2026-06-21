@@ -22,10 +22,12 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.mergehelper.constant.MergeHelperConstants.INPUTS;
 import static com.bytechef.component.mergehelper.constant.MergeHelperConstants.SQL_QUERY;
+import static com.bytechef.component.mergehelper.util.MergeHelperUtils.configureSecureConnection;
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.createTable;
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.executeQuery;
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.flatten;
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.insertData;
+import static com.bytechef.component.mergehelper.util.MergeHelperUtils.validateReadOnlyQuery;
 import static com.bytechef.component.mergehelper.util.MergeHelperUtils.validateSQL;
 
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
@@ -80,7 +82,11 @@ public class MergeHelperSQLQueryAction {
         List<TableConfiguration> inputs = inputParameters.getList(INPUTS, TableConfiguration.class, List.of());
         String query = inputParameters.getRequiredString(SQL_QUERY);
 
+        validateReadOnlyQuery(query);
+
         try (Connection connection = DriverManager.getConnection("jdbc:duckdb:")) {
+            configureSecureConnection(connection);
+
             for (TableConfiguration input : inputs) {
                 String tableName = input.tableName;
                 List<Map<String, Object>> rows = flatten(input.value);
