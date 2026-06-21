@@ -17,6 +17,7 @@
 package com.bytechef.tenant.sql;
 
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantIdValidator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.PrintWriter;
 import java.sql.Connection;
@@ -127,6 +128,8 @@ public abstract class BaseDataSource implements DataSource {
     })
     protected void setSearchPath(Connection connection) throws SQLException {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(getVectorSchemaSuffix());
+
+        TenantIdValidator.validateDatabaseSchema(currentDatabaseSchema);
 
         String searchPath = Objects.equals(currentDatabaseSchema, TenantContext.DEFAULT_TENANT_ID)
             ? currentDatabaseSchema : currentDatabaseSchema + ", " + TenantContext.DEFAULT_TENANT_ID;
