@@ -222,19 +222,26 @@ gate on the facade/service impl (never the controller).
   `AiEvalScoreConfigFacadeImpl`/`AiEvalRuleFacadeImpl` `get*ByWorkspace` carry `WorkspaceRole VIEWER`
   (analytics variant `ROLE_ADMIN`); the async `AiEvalExecutor` bypasses the facade by calling the service
   directly (intended). No code change.
-- [ ] **Subflow list `getSubWorkflows` — DEFERRED** (decision gate). The subflow dropdown lists all
-  workspaces' subflows, but the task-dispatcher `OptionsFunction` is `(String search) -> List<Option>` with
-  **no context object**, so the editing workflow's workspace is not derivable at the call site without
-  changing the shared `OptionsFunction` SPI across every task dispatcher. Deferred to its own design rather
-  than fabricating a plumbing path.
-- [ ] **Subflow schema reads (#A) — DEFERRED** (documented rationale). `getSubWorkflowInputSchema`/
-  `getSubWorkflowOutputSchema(workflowUuid)` return any workflow's I/O schema by uuid with no ownership
-  check, but are reached only through the cluster-element/task-dispatcher option/properties/output functions
-  during definition resolution: that path (a) is shared with worker/embedded execution (no reliable
-  `SecurityContext`), and (b) at the call site has only the *referenced* subflow's `workflowUuid`, not the
-  containing workflow's id/workspace. A clean gate needs its own mini-design (gate at the editor entry point
-  that carries a SecurityContext + containing-workflow id, validating the referenced uuid resolves to a
-  workflow in the caller's accessible workspace).
+- [x] **Subflow list `getSubWorkflows` — DONE** (the earlier "no SecurityContext / no derivable workspace"
+  deferral rationale didn't hold up). `getSubWorkflows` is **editor-only** — both EE execution stubs
+  (`RuntimeJobSubflowDataSource`, `RemoteSubflowDataSourceClient`) throw for it, so it never runs on the
+  fire-and-forget worker path. The real `SubflowDataSourceImpl` runs where a user principal is available
+  (CE monolith request thread; EE `configuration-app`, with principal propagation across the option-load hop
+  landing as EE remote matures). Fixed by scoping it to the caller's accessible workspaces, mirroring the T25
+  `AutomationSearchFacadeImpl` precedent: resolve `workspaceFacade.getUserWorkspaces(currentUserId)` via the
+  non-throwing `userService.fetchCurrentUser()`, then drop any `ProjectWorkflow` whose `project.getWorkspaceId()`
+  is not accessible. **Fail-open when no principal is resolvable** (no `SecurityContext`) rather than breaking
+  the editor — it tightens automatically once the principal rides the EE remote hop. The AI-agent consumer
+  (`WorkflowCallWorkflowTool`) shares the method and is unaffected (rehydrated principal → filtered; none →
+  unfiltered). New `SubflowDataSourceTest.testGetSubWorkflowsFiltersInaccessibleWorkspaces` pins it.
+- [ ] **Subflow schema reads (#A) — OPEN, next** (the `getSubWorkflows` fix above establishes the pattern).
+  `getSubWorkflowInputSchema`/`getSubWorkflowOutputSchema(workflowUuid)` return any workflow's I/O schema by
+  uuid with no ownership check. Unlike the list, these **are** genuinely execution-reachable (the dispatcher
+  resolves input/output schema while running), so a hard gate would break execution — but the same
+  **fail-open-when-no-principal** approach used for `getSubWorkflows` applies: when a `SecurityContext` is
+  present (editor/definition-resolution), resolve the referenced `workflowUuid` → owning project → workspace
+  and reject when it's not in the caller's accessible workspaces; when no principal is resolvable (execution),
+  leave it. Same `SubflowDataSourceImpl` deps already injected — straightforward follow-up.
 
 ---
 

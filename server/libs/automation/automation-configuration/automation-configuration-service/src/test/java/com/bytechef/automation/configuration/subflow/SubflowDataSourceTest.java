@@ -29,6 +29,8 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
@@ -36,9 +38,12 @@ import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntry;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -62,13 +67,20 @@ class SubflowDataSourceTest {
     private ProjectWorkflowService projectWorkflowService;
 
     @Mock
+    private UserService userService;
+
+    @Mock
     private WorkflowService workflowService;
+
+    @Mock
+    private WorkspaceFacade workspaceFacade;
 
     private SubflowDataSourceImpl subflowDataSource;
 
     @BeforeEach
     void setUp() {
-        subflowDataSource = new SubflowDataSourceImpl(projectService, projectWorkflowService, workflowService);
+        subflowDataSource = new SubflowDataSourceImpl(
+            projectService, projectWorkflowService, userService, workflowService, workspaceFacade);
     }
 
     @Test
@@ -201,6 +213,73 @@ class SubflowDataSourceTest {
             assertEquals(WORKFLOW_UUID, result.getFirst()
                 .workflowUuid());
             assertEquals("My Project > My Workflow", result.getFirst()
+                .name());
+        }
+    }
+
+    @Test
+    void testGetSubWorkflowsFiltersInaccessibleWorkspaces() {
+        User user = mock(User.class);
+
+        when(user.getId()).thenReturn(100L);
+        when(userService.fetchCurrentUser()).thenReturn(Optional.of(user));
+
+        Workspace accessibleWorkspace = mock(Workspace.class);
+
+        when(accessibleWorkspace.getId()).thenReturn(10L);
+        when(workspaceFacade.getUserWorkspaces(100L)).thenReturn(List.of(accessibleWorkspace));
+
+        ProjectWorkflow accessibleProjectWorkflow = mock(ProjectWorkflow.class);
+
+        when(accessibleProjectWorkflow.getWorkflowId()).thenReturn("accessible-wf");
+        when(accessibleProjectWorkflow.getProjectId()).thenReturn(1L);
+        when(accessibleProjectWorkflow.getUuidAsString()).thenReturn("accessible-uuid");
+
+        ProjectWorkflow inaccessibleProjectWorkflow = mock(ProjectWorkflow.class);
+
+        when(inaccessibleProjectWorkflow.getWorkflowId()).thenReturn("inaccessible-wf");
+        when(inaccessibleProjectWorkflow.getProjectId()).thenReturn(2L);
+
+        when(projectWorkflowService.getLatestProjectWorkflows())
+            .thenReturn(List.of(accessibleProjectWorkflow, inaccessibleProjectWorkflow));
+
+        Workflow accessibleWorkflow = mock(Workflow.class);
+
+        when(accessibleWorkflow.getLabel()).thenReturn("Accessible");
+
+        Workflow inaccessibleWorkflow = mock(Workflow.class);
+
+        when(workflowService.getWorkflow("accessible-wf")).thenReturn(accessibleWorkflow);
+        when(workflowService.getWorkflow("inaccessible-wf")).thenReturn(inaccessibleWorkflow);
+
+        WorkflowTrigger callableTrigger = mock(WorkflowTrigger.class);
+
+        when(callableTrigger.getType()).thenReturn("workflow/v1/newWorkflowCall");
+
+        Project accessibleProject = mock(Project.class);
+
+        when(accessibleProject.getName()).thenReturn("Accessible Project");
+        when(accessibleProject.getWorkspaceId()).thenReturn(10L);
+        when(projectService.getProject(1L)).thenReturn(accessibleProject);
+
+        Project inaccessibleProject = mock(Project.class);
+
+        when(inaccessibleProject.getWorkspaceId()).thenReturn(20L);
+        when(projectService.getProject(2L)).thenReturn(inaccessibleProject);
+
+        try (MockedStatic<WorkflowTrigger> mockedWorkflowTrigger = mockStatic(WorkflowTrigger.class)) {
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(accessibleWorkflow))
+                .thenReturn(List.of(callableTrigger));
+            mockedWorkflowTrigger.when(() -> WorkflowTrigger.of(inaccessibleWorkflow))
+                .thenReturn(List.of(callableTrigger));
+
+            List<SubflowEntry> result =
+                subflowDataSource.getSubWorkflows(PlatformType.AUTOMATION, WorkflowConstants.NEW_WORKFLOW_CALL, null);
+
+            assertEquals(1, result.size());
+            assertEquals("accessible-uuid", result.getFirst()
+                .workflowUuid());
+            assertEquals("Accessible Project > Accessible", result.getFirst()
                 .name());
         }
     }

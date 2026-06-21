@@ -21,6 +21,8 @@ import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
+import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.facade.WorkspaceFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.MapUtils;
@@ -29,6 +31,7 @@ import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.configuration.domain.WorkflowTrigger;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.user.service.UserService;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.workflow.task.dispatcher.definition.PropertyFactory;
 import com.bytechef.platform.workflow.task.dispatcher.subflow.SubflowDataSource;
@@ -36,6 +39,8 @@ import com.bytechef.platform.workflow.task.dispatcher.subflow.domain.SubflowEntr
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
@@ -47,15 +52,19 @@ class SubflowDataSourceImpl implements SubflowDataSource {
 
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
+    private final UserService userService;
     private final WorkflowService workflowService;
+    private final WorkspaceFacade workspaceFacade;
 
     SubflowDataSourceImpl(
-        ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        WorkflowService workflowService) {
+        ProjectService projectService, ProjectWorkflowService projectWorkflowService, UserService userService,
+        WorkflowService workflowService, WorkspaceFacade workspaceFacade) {
 
         this.projectService = projectService;
         this.projectWorkflowService = projectWorkflowService;
+        this.userService = userService;
         this.workflowService = workflowService;
+        this.workspaceFacade = workspaceFacade;
     }
 
     @Override
@@ -106,6 +115,12 @@ class SubflowDataSourceImpl implements SubflowDataSource {
 
         String lowerCaseSearch = (search == null) ? null : search.toLowerCase();
 
+        // Scope the picker to the caller's accessible workspaces so it cannot enumerate other workspaces' subflows
+        // (cross-workspace IDOR). Resolved from the authenticated calling thread; when no user principal is available
+        // (e.g. the EE remote option-load path before principal propagation lands) the listing is left unfiltered
+        // rather than breaking the editor — it tightens automatically once the principal is present on that path.
+        Set<Long> accessibleWorkspaceIds = fetchAccessibleWorkspaceIds();
+
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getLatestProjectWorkflows();
 
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
@@ -113,6 +128,12 @@ class SubflowDataSourceImpl implements SubflowDataSource {
 
             if (getCallableTrigger(workflow, triggerName) != null) {
                 Project project = projectService.getProject(projectWorkflow.getProjectId());
+
+                if (accessibleWorkspaceIds != null &&
+                    !accessibleWorkspaceIds.contains(project.getWorkspaceId())) {
+
+                    continue;
+                }
 
                 String workflowLabel = workflow.getLabel() == null ? "Unnamed Workflow" : workflow.getLabel();
                 String name = project.getName() + " > " + workflowLabel;
@@ -127,6 +148,19 @@ class SubflowDataSourceImpl implements SubflowDataSource {
         }
 
         return subWorkflowEntries;
+    }
+
+    /**
+     * Resolves the current user's accessible workspace ids, or {@code null} when no user principal is available (the
+     * caller is then left unfiltered — see {@link #getSubWorkflows}).
+     */
+    private @Nullable Set<Long> fetchAccessibleWorkspaceIds() {
+        return userService.fetchCurrentUser()
+            .map(user -> workspaceFacade.getUserWorkspaces(user.getId())
+                .stream()
+                .map(Workspace::getId)
+                .collect(Collectors.toSet()))
+            .orElse(null);
     }
 
     private @Nullable WorkflowTask getCallableResponseTask(Workflow workflow) {
