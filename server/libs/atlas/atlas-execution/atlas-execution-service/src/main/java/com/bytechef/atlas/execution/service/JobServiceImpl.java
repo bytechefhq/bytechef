@@ -21,11 +21,13 @@ import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.repository.JobRepository;
 import com.bytechef.commons.util.OptionalUtils;
+import com.bytechef.commons.util.UrlValidator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,10 +42,23 @@ public class JobServiceImpl implements JobService {
     private static final int DEFAULT_PAGE_SIZE = 20;
 
     private final JobRepository jobRepository;
+    private final boolean ssrfEnabled;
+    private final Set<String> ssrfAllowedHosts;
+
+    /**
+     * Convenience constructor for test and embedded in-memory executors. SSRF webhook validation is disabled here so
+     * harness behavior is unchanged; production wires {@link #JobServiceImpl(JobRepository, boolean, Set)} with the
+     * configured policy.
+     */
+    public JobServiceImpl(JobRepository jobRepository) {
+        this(jobRepository, false, Set.of());
+    }
 
     @SuppressFBWarnings("EI2")
-    public JobServiceImpl(JobRepository jobRepository) {
+    public JobServiceImpl(JobRepository jobRepository, boolean ssrfEnabled, Set<String> ssrfAllowedHosts) {
         this.jobRepository = jobRepository;
+        this.ssrfEnabled = ssrfEnabled;
+        this.ssrfAllowedHosts = ssrfAllowedHosts;
     }
 
     @Override
@@ -189,7 +204,7 @@ public class JobServiceImpl implements JobService {
         return job;
     }
 
-    private static void validate(JobParametersDTO jobParametersDTO, Workflow workflow) {
+    private void validate(JobParametersDTO jobParametersDTO, Workflow workflow) {
         // validate inputs
 
         Map<String, Object> inputs = jobParametersDTO.getInputs();
@@ -205,6 +220,14 @@ public class JobServiceImpl implements JobService {
         for (Job.Webhook webhook : jobParametersDTO.getWebhooks()) {
             Assert.notNull(webhook.type(), "must define 'type' on webhook");
             Assert.notNull(webhook.url(), "must define 'url' on webhook");
+
+            validateWebhookUrl(webhook.url());
+        }
+    }
+
+    void validateWebhookUrl(String url) {
+        if (ssrfEnabled) {
+            UrlValidator.validate(url, ssrfAllowedHosts);
         }
     }
 }

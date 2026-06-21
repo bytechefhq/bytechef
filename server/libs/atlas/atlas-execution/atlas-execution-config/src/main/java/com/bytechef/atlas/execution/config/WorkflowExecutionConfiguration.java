@@ -32,6 +32,8 @@ import com.bytechef.atlas.execution.service.JobServiceImpl;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.execution.service.TaskExecutionServiceImpl;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -57,8 +59,12 @@ public class WorkflowExecutionConfiguration {
     }
 
     @Bean
-    JobService jobService(JobRepository jobRepository) {
-        return new JobServiceImpl(jobRepository);
+    JobService jobService(
+        JobRepository jobRepository,
+        @Value("${bytechef.security.ssrf.enabled:true}") boolean ssrfEnabled,
+        @Value("${bytechef.security.ssrf.allowed-hosts:}") Set<String> ssrfAllowedHosts) {
+
+        return new JobServiceImpl(jobRepository, ssrfEnabled, ssrfAllowedHosts);
     }
 
     @Bean
