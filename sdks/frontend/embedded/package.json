@@ -9,14 +9,14 @@
         "registry:start": "verdaccio --config verdaccio.config.yaml",
         "registry:stop": "pkill -f verdaccio",
         "dev": "concurrently \"npm:dev:library\" \"npm:dev:test-app\"",
-        "dev:library": "cd library/react && npm run watch",
-        "dev:test-app": "cd test-apps/react && npm run dev",
-        "setup:link": "cd library/react && npm run build && npm link && cd ../../test-apps/react && npm link @bytechef/embedded-react",
+        "dev:library": "cd library && npm run watch",
+        "dev:test-app": "cd test-apps && npm run dev",
+        "setup:link": "cd library && npm run build && npm link && cd ../test-apps && npm link @bytechef/embedded",
         "setup:registry": "npm run registry:start",
-        "publish:library": "cd library/react && npm run build && npm run publish:local",
-        "install:test-app": "cd test-apps/react && npm run install:local",
-        "build:all": "cd library/react && npm run build",
-        "clean": "rm -rf library/react/dist library/react/node_modules test-apps/react/.next test-apps/react/node_modules verdaccio-storage"
+        "publish:library": "cd library && npm run build && npm run publish:local",
+        "install:test-app": "cd test-apps && npm run install:local",
+        "build:all": "cd library && npm run build",
+        "clean": "rm -rf library/dist library/node_modules test-apps/.next test-apps/node_modules verdaccio-storage"
     },
     "devDependencies": {
         "concurrently": "^9.1.2",
@@ -24,7 +24,7 @@
         "verdaccio": "^6.2.4"
     },
     "workspaces": [
-        "library/react",
-        "test-apps/react"
+        "library",
+        "test-apps"
     ]
 }

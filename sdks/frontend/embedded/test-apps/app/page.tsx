@@ -1,6 +1,6 @@
 'use client';
 
-import {useConnectDialog} from '@bytechef/embedded-react';
+import {useConnectDialog} from '@bytechef/embedded';
 import {useState, useEffect} from 'react';
 
 interface Integration {

@@ -1,4 +1,4 @@
-import {useConnectDialog} from '@bytechef/embedded-react';
+import {useConnectDialog} from '@bytechef/embedded';
 import {useEffect, useRef, useState} from 'react';
 import {createRoot} from 'react-dom/client';
 

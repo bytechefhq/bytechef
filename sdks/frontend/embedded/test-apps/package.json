@@ -11,12 +11,12 @@
         "lint": "next lint",
         "format": "prettier --check .",
         "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx,md}\"",
-        "link:library": "npm link @bytechef/embedded-react",
-        "unlink:library": "npm unlink @bytechef/embedded-react",
-        "install:local": "npm install @bytechef/embedded-react@latest --registry http://localhost:4873"
+        "link:library": "npm link @bytechef/embedded",
+        "unlink:library": "npm unlink @bytechef/embedded",
+        "install:local": "npm install @bytechef/embedded@latest --registry http://localhost:4873"
     },
     "dependencies": {
-        "@bytechef/embedded-react": "^0.1.0",
+        "@bytechef/embedded": "^0.1.0",
         "next": "16.2.6",
         "react": "19.2.6",
         "react-dom": "19.2.6"

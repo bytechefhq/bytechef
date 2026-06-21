@@ -1,9 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     reactStrictMode: true,
-    transpilePackages: ['@bytechef/embedded-react'],
+    transpilePackages: ['@bytechef/embedded'],
     experimental: {
-        optimizePackageImports: ['@bytechef/embedded-react'],
+        optimizePackageImports: ['@bytechef/embedded'],
     },
     turbopack: {},
 };

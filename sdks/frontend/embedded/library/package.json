@@ -1,5 +1,5 @@
 {
-    "name": "@bytechef/embedded-react",
+    "name": "@bytechef/embedded",
     "version": "0.1.0",
     "description": "ByteChef Embedded React SDK.",
     "type": "module",
@@ -20,7 +20,7 @@
         "watch": "tsc && vite build --watch",
         "publish:local": "npm publish --registry http://localhost:4873",
         "link:local": "npm link",
-        "unlink:local": "npm unlink -g @bytechef/embedded-react"
+        "unlink:local": "npm unlink -g @bytechef/embedded"
     },
     "module": "./dist/main.js",
     "exports": "./dist/main.js",
@@ -37,7 +37,7 @@
     "repository": {
         "type": "git",
         "url": "git+https://github.com/bytechefhq/bytechef.git",
-        "directory": "sdks/frontend/embedded/library/react"
+        "directory": "sdks/frontend/embedded/library"
     },
     "keywords": [
         "bytechef",
