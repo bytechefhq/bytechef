@@ -24,6 +24,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
+@SuppressWarnings("PMD.AvoidUsingHardCodedIP") // literal IPs are intentional: deterministic, network-free SSRF tests
 class RedirectValidatorTest {
 
     private static final String SERVER_HOST = "example.com";

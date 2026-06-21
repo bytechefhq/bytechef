@@ -25,6 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * @author Ivica Cardic
  */
+@SuppressWarnings("PMD.AvoidUsingHardCodedIP") // literal IPs are intentional: deterministic, network-free SSRF tests
 class UrlValidatorTest {
 
     @Test

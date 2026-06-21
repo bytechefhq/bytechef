@@ -41,7 +41,7 @@ class ApiConnectorAiServiceImplTest {
     private final WebScrapeService webScrapeService = mock(WebScrapeService.class);
 
     private final ApiConnectorAiServiceImpl service =
-        new ApiConnectorAiServiceImpl(jobService, chatModel, webScrapeService);
+        new ApiConnectorAiServiceImpl(jobService, chatModel, webScrapeService, false, java.util.Set.of());
 
     private void givenLlmReturns(String text) {
         ChatResponse chatResponse = ChatResponse.builder()
