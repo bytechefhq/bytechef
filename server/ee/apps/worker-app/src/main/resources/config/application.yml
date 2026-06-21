@@ -6,6 +6,10 @@ spring:
       com.embabel.agent.autoconfigure.platform.AgentPlatformAutoConfiguration,
       org.springaicommunity.agents.claude.autoconfigure.ClaudeAgentAutoConfiguration,
       org.springaicommunity.agents.claude.autoconfigure.ClaudeHookAutoConfiguration
+  cloud:
+    config:
+      username: ${BYTECHEF_CONFIG_SERVER_USERNAME:configserver}
+      password: ${BYTECHEF_CONFIG_SERVER_PASSWORD:dev-config-server-secret}
   config:
     import: optional:configserver:http://localhost:6111
   profiles:

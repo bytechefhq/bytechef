@@ -6,6 +6,10 @@ spring:
 #      discovery:
 #        enabled: true
 #        service-id: config-server-app
+  cloud:
+    config:
+      username: ${BYTECHEF_CONFIG_SERVER_USERNAME:configserver}
+      password: ${BYTECHEF_CONFIG_SERVER_PASSWORD:dev-config-server-secret}
   config:
     import: optional:configserver:http://localhost:6111
   profiles:
