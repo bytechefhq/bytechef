@@ -253,6 +253,10 @@ gate on the facade/service impl (never the controller).
   - `copilot/agent/WorkflowEditorSpringAIAgent` (6.5) — Copilot agent reads arbitrary workflow data cross-user.
   - `tool/automation/ReadProjectWorkflowTools` (6.2) — MCP tool-search lists all workflows cross-workspace (scope the underlying query to the caller's accessible workspaces, like T25 search providers).
   **Needs-review items (separate, lower confidence):** `web/filter/AbstractApiKeyAuthenticationConverter` (7.8 — environment-boundary bypass; auth-infra, T3/T23/T4-adjacent); `ConnectedUserProjectWorkflowApiController` (T23's notes claim coverage but it has 0 `checkCurrentUserLogin` calls — verify); `security/config/PlatformConfigurationAuthorizeHttpRequestContributor` (5.3 — trigger-form; likely already covered by T24's HMAC token signing).
+  **Investigated 2026-06-21 (plan Phase B) — confirmed none is a mechanical gate, each needs its own per-surface design:**
+  - **B3 `WebhookTriggerTest`** — `enableTrigger`/`disableTrigger(workflowId,…)` is shared by *three* callers: the automation controller (platform-user editor), the **embedded** EE `/internal` controller (API-key principal, **no** `hasWorkflowScope`), and the **runtime** `WorkflowNodeTestOutputFacadeImpl.disableTrigger`. A facade `hasWorkflowScope` would break **both** embedded and runtime. Fix = per-controller facade for the automation path (gated) + T23 for embedded + ungated runtime split for `disableTrigger`.
+  - **B1 `WorkflowEditorSpringAIAgent.createSystemMessage`** — runs inside the SpringAI copilot agent; scope the `getWorkflow(workflowId)` to the caller's workspace **inside** the copilot auth-context propagation (`STATE_AUTHENTICATION`/`runAs`), not on the shared `WorkflowService`.
+  - **B2 `ReadProjectWorkflowTools.searchWorkflows`** — delegate's `projectId==null` path calls `getProjectWorkflows()` (every project). `ProjectWorkflowTools` is wired into AI-Hub + Copilot + Management MCP (3 agent contexts); TenantContext bounds it to one tenant but not to the caller's workspace. Fix = workspace-scope the no-`projectId` path per agent context. Deferred to per-surface implementation.
 
 ---
 
