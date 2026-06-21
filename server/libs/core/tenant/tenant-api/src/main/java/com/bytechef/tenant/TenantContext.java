@@ -98,6 +98,8 @@ public class TenantContext {
     public static void setCurrentTenantId(String tenantId) {
         Assert.notNull(tenantId, "tenantId must not be null");
 
+        TenantIdValidator.validate(tenantId);
+
         currentTenant.set(tenantId);
 
         MDC.put("tenantId", tenantId);
