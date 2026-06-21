@@ -154,7 +154,7 @@ class EmbeddedApiKeyAuthenticationConverterTest {
 
     @Test
     void testConvertWithJwtTokenReturnsAuthentication() throws NoSuchAlgorithmException {
-        String tenantId = "jwt-tenant";
+        String tenantId = "jwt_tenant";
         String externalUserId = "jwt-user";
         String keyId = EncodingUtils.base64EncodeToString(tenantId + ":keyId");
 
