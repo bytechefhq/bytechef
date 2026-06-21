@@ -58,6 +58,32 @@ public final class UrlValidator {
         }
     }
 
+    /**
+     * Returns {@code true} only when {@code host} resolves and at least one of its addresses is private/loopback/
+     * link-local/any-local/multicast/CGNAT/IPv6-ULA. A host that cannot be resolved, or that resolves to all-public
+     * addresses, returns {@code false}. Intended for callers (e.g. redirect validation) that must block internal
+     * targets without rejecting merely-unresolvable ones.
+     */
+    public static boolean resolvesToPrivateAddress(String host) {
+        if (host == null || host.isBlank()) {
+            return false;
+        }
+
+        try {
+            InetAddress[] addresses = InetAddress.getAllByName(host);
+
+            for (InetAddress address : addresses) {
+                if (isPrivateAddress(address)) {
+                    return true;
+                }
+            }
+
+            return false;
+        } catch (UnknownHostException unknownHostException) {
+            return false;
+        }
+    }
+
     public static void validate(String url, Set<String> allowedHosts) {
         if (url == null || url.isBlank()) {
             throw new UrlValidationException("URL must not be null or blank");
@@ -108,6 +134,30 @@ public final class UrlValidator {
             if (allowedHost.equalsIgnoreCase(host)) {
                 return true;
             }
+        }
+
+        return false;
+    }
+
+    private static boolean isPrivateAddress(InetAddress address) {
+        if (address.isLinkLocalAddress() || address.isLoopbackAddress() || address.isSiteLocalAddress()
+            || address.isAnyLocalAddress() || address.isMulticastAddress()) {
+
+            return true;
+        }
+
+        if (address instanceof Inet4Address) {
+            byte[] bytes = address.getAddress();
+            int first = bytes[0] & 0xFF;
+            int second = bytes[1] & 0xFF;
+
+            return first == 100 && second >= 64 && second <= 127;
+        }
+
+        if (address instanceof Inet6Address) {
+            byte[] bytes = address.getAddress();
+
+            return (bytes[0] & 0xFE) == 0xFC;
         }
 
         return false;

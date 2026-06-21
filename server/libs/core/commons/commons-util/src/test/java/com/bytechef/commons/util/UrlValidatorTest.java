@@ -72,4 +72,13 @@ class UrlValidatorTest {
         assertThatThrownBy(() -> UrlValidator.validate("http://127.0.0.1", Set.of()))
             .isInstanceOf(UrlValidationException.class);
     }
+
+    @Test
+    void testResolvesToPrivateAddress() {
+        assertThat(UrlValidator.resolvesToPrivateAddress("10.0.0.1")).isTrue();
+        assertThat(UrlValidator.resolvesToPrivateAddress("127.0.0.1")).isTrue();
+        assertThat(UrlValidator.resolvesToPrivateAddress("1.1.1.1")).isFalse();
+        // Unresolvable host is treated as not-private (callers must not reject merely-unresolvable targets).
+        assertThat(UrlValidator.resolvesToPrivateAddress("nonexistent.invalid")).isFalse();
+    }
 }

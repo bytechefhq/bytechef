@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.webhook.rest.validator;
 
+import com.bytechef.commons.util.UrlValidator;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Set;
@@ -104,7 +105,8 @@ public final class RedirectValidator {
             if (allowedDomains != null && !allowedDomains.isEmpty()) {
                 for (String allowedDomain : allowedDomains) {
                     if (hostMatchesDomain(host, allowedDomain)) {
-                        return true;
+                        // Defense-in-depth: even an allowlisted domain must not resolve to a private/loopback address.
+                        return !UrlValidator.resolvesToPrivateAddress(host);
                     }
                 }
             }

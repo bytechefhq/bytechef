@@ -185,4 +185,15 @@ class RedirectValidatorTest {
     void testUrlWithPort() {
         assertThat(RedirectValidator.isValidRedirect("https://example.com:8080/page", SERVER_HOST)).isTrue();
     }
+
+    @Test
+    void testAllowlistedPrivateLiteralTargetRejected() {
+        // Even an allowlisted host must not resolve to a private/loopback address.
+        assertThat(RedirectValidator.isValidRedirect("http://10.0.0.1/x", SERVER_HOST, Set.of("10.0.0.1"))).isFalse();
+    }
+
+    @Test
+    void testAllowlistedPublicLiteralTargetAllowed() {
+        assertThat(RedirectValidator.isValidRedirect("https://1.1.1.1/x", SERVER_HOST, Set.of("1.1.1.1"))).isTrue();
+    }
 }
