@@ -24,8 +24,10 @@ import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.event.listener.ApplicationEventListener;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.commons.util.UrlValidator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -40,12 +42,18 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
     private static final Logger log = LoggerFactory.getLogger(WebhookTaskStartedApplicationEventListener.class);
 
     private final JobService jobService;
+    private final boolean ssrfEnabled;
+    private final Set<String> ssrfAllowedHosts;
 
     private final RestTemplate rest = new RestTemplate();
 
     @SuppressFBWarnings("EI2")
-    public WebhookTaskStartedApplicationEventListener(JobService jobService) {
+    public WebhookTaskStartedApplicationEventListener(
+        JobService jobService, boolean ssrfEnabled, Set<String> ssrfAllowedHosts) {
+
         this.jobService = jobService;
+        this.ssrfEnabled = ssrfEnabled;
+        this.ssrfAllowedHosts = ssrfAllowedHosts;
     }
 
     @Override
@@ -67,6 +75,12 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
 
                     webhookEvent.put(WorkflowConstants.EVENT, taskStartedApplicationEvent);
 
+                    if (!isAllowedWebhookUrl(webhook.url())) {
+                        log.warn("Skipping webhook delivery to disallowed url={}", webhook.url());
+
+                        continue;
+                    }
+
                     rest.postForObject(webhook.url(), webhookEvent, String.class);
 
                     if (log.isDebugEnabled()) {
@@ -75,5 +89,9 @@ public class WebhookTaskStartedApplicationEventListener implements ApplicationEv
                 }
             }
         }
+    }
+
+    boolean isAllowedWebhookUrl(String url) {
+        return !ssrfEnabled || UrlValidator.isValid(url, ssrfAllowedHosts);
     }
 }

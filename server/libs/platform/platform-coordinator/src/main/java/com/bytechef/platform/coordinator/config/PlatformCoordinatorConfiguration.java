@@ -30,6 +30,8 @@ import com.bytechef.platform.notification.service.NotificationService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.Optional;
+import java.util.Set;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -69,8 +71,11 @@ public class PlatformCoordinatorConfiguration {
     }
 
     @Bean
-    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener() {
-        return new WebhookTaskStartedApplicationEventListener(jobService);
+    WebhookTaskStartedApplicationEventListener taskStartedWebhookEventListener(
+        @Value("${bytechef.security.ssrf.enabled:true}") boolean ssrfEnabled,
+        @Value("${bytechef.security.ssrf.allowed-hosts:}") Set<String> ssrfAllowedHosts) {
+
+        return new WebhookTaskStartedApplicationEventListener(jobService, ssrfEnabled, ssrfAllowedHosts);
     }
 
     @Bean
