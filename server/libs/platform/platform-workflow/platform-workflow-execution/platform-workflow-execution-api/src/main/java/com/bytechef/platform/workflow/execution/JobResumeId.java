@@ -18,6 +18,7 @@ package com.bytechef.platform.workflow.execution;
 
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantIdValidator;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
@@ -60,6 +61,8 @@ public class JobResumeId implements Serializable {
         } catch (IllegalArgumentException illegalArgumentException) {
             throw new IllegalArgumentException("Invalid JobResumeId UUID component", illegalArgumentException);
         }
+
+        TenantIdValidator.validate(items[0]);
 
         return new JobResumeId(items[0], Long.parseLong(items[1]), parsedUuid.toString());
     }

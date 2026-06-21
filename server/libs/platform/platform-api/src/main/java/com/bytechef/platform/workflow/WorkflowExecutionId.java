@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow;
 import com.bytechef.commons.util.EncodingUtils;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantIdValidator;
 import java.io.Serializable;
 import java.util.Objects;
 import org.springframework.util.Assert;
@@ -62,6 +63,8 @@ public class WorkflowExecutionId implements Serializable {
         id = EncodingUtils.base64DecodeToString(id);
 
         String[] items = id.split(":");
+
+        TenantIdValidator.validate(items[0]);
 
         return new WorkflowExecutionId(
             items[0], PlatformType.values()[Integer.parseInt(items[1])], Long.parseLong(items[2]), items[3], items[4]);
