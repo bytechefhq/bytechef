@@ -11,9 +11,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.platform.apiconnector.configuration.domain.ApiConnector;
 import com.bytechef.ee.platform.apiconnector.configuration.repository.ApiConnectorRepository;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -35,6 +37,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector create(ApiConnector apiConnector) {
         Assert.notNull(apiConnector, "'openApiConnector' must not be null");
         Assert.notNull(apiConnector.getDefinition(), "'definition' must not be null");
@@ -46,6 +49,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void delete(long id) {
         apiConnectorRepository.deleteById(id);
     }
@@ -68,6 +72,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector update(ApiConnector apiConnector) {
         Assert.notNull(apiConnector, "'openApiConnector' must not be null");
         Assert.notNull(apiConnector.getName(), "name");
@@ -84,6 +89,7 @@ public class ApiConnectorServiceImpl implements ApiConnectorService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector enableApiConnector(long id, boolean enable) {
         ApiConnector apiConnector = getApiConnector(id);
 

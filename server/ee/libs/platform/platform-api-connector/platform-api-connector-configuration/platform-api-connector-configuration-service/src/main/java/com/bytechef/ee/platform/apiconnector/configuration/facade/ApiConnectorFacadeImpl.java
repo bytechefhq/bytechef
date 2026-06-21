@@ -19,6 +19,7 @@ import com.bytechef.ee.platform.apiconnector.configuration.service.ApiConnectorS
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.apiconnector.file.storage.ApiConnectorFileStorage;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.swagger.parser.OpenAPIParser;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.lang.Nullable;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -66,7 +68,13 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         this.apiConnectorService = apiConnectorService;
     }
 
+    /**
+     * Importing/generating a connector turns a user-supplied OpenAPI spec into server-side Java source that is compiled
+     * and class-loaded, so it is restricted to administrators. The guard lives on the facade so it protects every
+     * caller, not only the GraphQL entry point.
+     */
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector generateFromDocumentation(String name, String documentationUrl) {
         if (apiConnectorAiService == null) {
             throw new ConfigurationException(
@@ -80,6 +88,7 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ApiConnector importOpenApiSpecification(String name, String specification) {
         name = convertComponentName(name);
 
@@ -245,7 +254,8 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
         }
     }
 
-    private static String convertComponentName(String componentName) {
+    // Package-private for unit testing of the path-traversal validation.
+    static String convertComponentName(String componentName) {
         componentName = StringUtils.trim(componentName);
 
         componentName = componentName.toLowerCase();
@@ -254,7 +264,25 @@ public class ApiConnectorFacadeImpl implements ApiConnectorFacade {
 
         componentName = StringUtils.replaceChars(componentName, " ", "");
 
+        validateComponentName(componentName);
+
         return componentName;
+    }
+
+    /**
+     * The component name is used to build a package/directory path for the generated component sources, so it must not
+     * be able to escape that location. Reject anything outside a simple {@code [a-z0-9.]} identifier (which excludes
+     * path separators) and any dotted form that could traverse upward.
+     */
+    private static void validateComponentName(String componentName) {
+        if (StringUtils.isBlank(componentName) || !componentName.matches("[a-z0-9.]+") ||
+            componentName.contains("..") || StringUtils.startsWith(componentName, ".") ||
+            StringUtils.endsWith(componentName, ".")) {
+
+            throw new ConfigurationException(
+                "Invalid API connector name; only letters, digits, and dots are allowed",
+                ApiConnectorErrorType.INVALID_API_CONNECTOR_DEFINITION);
+        }
     }
 
     private String getDescription(Info info) {

@@ -230,7 +230,17 @@ gate on the facade/service impl (never the controller).
 
 ---
 
+## Phase 4 — Coverage gap (surfaced after T5–T27)
+
+- [x] **T28. API Connector OpenAPI-import: deploy authorization + path-traversal** _(3 findings — 2× 8.8, 1× 8.3)_
+  The `ApiConnector` import/generate surface compiles user-supplied OpenAPI specs into server-side Java that is class-loaded, with no authorization and a path-traversal in the generated file path. These three findings (RCE via Java compilation — report `web/graphql/ApiConnectorGraphQlController.java`; LFI/arbitrary-file-write via `componentName` path traversal — `ApiConnectorFacadeImpl`; IDOR — all mutations lack a role annotation) were **not** listed under any of T1–T27 — only the **SSRF** aspect of the same surface (`ApiConnectorAiServiceImpl` documentation fetch) was tracked, under **T15** (done). Closest homes would have been T5 (deploy/codegen RCE) and the T17–T25 IDOR sweep, but neither named the `ApiConnector*` files.
+  Files: `web/graphql/ApiConnectorGraphQlController.java`, `configuration/facade/ApiConnectorFacadeImpl.java`, `configuration/service/ApiConnectorServiceImpl.java`.
+  **Done:** like T5, the control is **authorization** (compiling+loading code is inherently a "run uploaded code" feature). Gated `@PreAuthorize(ROLE_ADMIN)` on `ApiConnectorFacadeImpl.importOpenApiSpecification`/`generateFromDocumentation` (the codegen→compile→classload entry points) and `ApiConnectorServiceImpl.create`/`update`/`delete`/`enableApiConnector` (the IDOR mutations) — gates on the facade/service tier so every caller is covered, not just the GraphQL controller (added an authorization note there). Reads (`getApiConnector`/`fetchApiConnector`/`getApiConnectors`) stay **ungated** because the component runtime (`ApiConnectorDynamicComponentHandlerRegistry`) resolves connector definitions through them. Path traversal (the 8.8 LFI): `convertComponentName` now validates the result is a `[a-z0-9.]` identifier with no `..`/leading/trailing dot (the name flows into `OpenApiGenerator`'s `outputPath.resolve(componentName)`), rejecting `../`, absolute paths, and dotted-traversal. Added `spring-security-core` dep + `ApiConnectorFacadeImplTest` (4 cases). **Left ungated by design:** `generateSpecification` (emits a YAML spec string from structured input — no codegen/persistence) and `startGenerateFromDocumentationPreview` (preview only; its doc-fetch SSRF is T15's `UrlValidator`).
+
+---
+
 ### Notes
 - Counts are approximate per-task tallies; exact per-finding detail (CVSS score, file, description) is in `gecko-security-report.md`, grouped by priority then type.
+- **T28 was a decomposition gap:** the report's "27 tasks account for all 455 findings" did not hold for the API Connector RCE/LFI/IDOR cluster; added as a Phase 4 task.
 - Many IDOR tasks (T18–T25) share the same fix shape — once **T17** lands, each domain sweep is largely mechanical.
 - Recommended order: T1–T4 (Critical) → T5–T16 (RCE/injection/SSRF/webhooks) → T17 then T18–T25 (IDOR sweeps) → T26–T27.

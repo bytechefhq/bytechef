@@ -36,6 +36,12 @@ import org.springframework.stereotype.Controller;
 /**
  * GraphQL controller for managing API Connectors.
  *
+ * <p>
+ * Authorization note: the {@code ROLE_ADMIN} guards for the connector mutations live on {@code ApiConnectorServiceImpl}
+ * (create/update/delete/enable) and {@code ApiConnectorFacadeImpl} (import/generate-from-documentation, which compile
+ * and class-load generated code) so they protect every caller, not only these REST/GraphQL entry points. Read queries
+ * stay ungated because the component runtime resolves connector definitions through the same service.
+ *
  * @version ee
  *
  * @author Ivica Cardic
