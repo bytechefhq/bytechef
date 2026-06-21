@@ -6,6 +6,10 @@ spring:
       server:
         native:
           searchLocations: classpath:/config/apps
+  security:
+    user:
+      name: ${BYTECHEF_CONFIG_SERVER_USERNAME:configserver}
+      password: ${BYTECHEF_CONFIG_SERVER_PASSWORD:}
   profiles:
     active: dev,native
 

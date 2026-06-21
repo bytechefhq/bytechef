@@ -7,3 +7,7 @@ spring:
       port: 34731
     restart:
       enabled: true
+  security:
+    user:
+      # Dev-only default so local distributed runs authenticate; production sets BYTECHEF_CONFIG_SERVER_PASSWORD.
+      password: dev-config-server-secret
