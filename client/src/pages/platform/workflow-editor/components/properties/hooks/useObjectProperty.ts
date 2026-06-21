@@ -4,11 +4,10 @@ import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, PropertyType} from '@/shared/middleware/platform/configuration';
 import {PropertyAllType, SubPropertyType} from '@/shared/types';
 import isObject from 'isobject';
-import resolvePath from 'object-resolve-path';
 import {useCallback, useEffect, useMemo, useRef, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
-import {decodePath, encodeParameters, encodePath} from '../../../utils/encodingUtils';
+import {decodePath, encodeParameters, encodePath, safeResolvePath} from '../../../utils/encodingUtils';
 import getParameterItemType from '../../../utils/getParameterItemType';
 import saveProperty from '../../../utils/saveProperty';
 
@@ -311,7 +310,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         const encodedParameters = encodeParameters(currentComponent.parameters);
         const encodedPath = encodePath(path);
 
-        const resolvedParameterObject = resolvePath(encodedParameters, encodedPath);
+        const resolvedParameterObject = safeResolvePath(encodedParameters, encodedPath);
 
         const parameterObject: {[key: string]: unknown} = {};
 
@@ -444,7 +443,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         const encodedParameters = encodeParameters(currentComponent.parameters ?? {});
         const encodedPath = encodePath(path);
 
-        const existingObject = resolvePath(encodedParameters, encodedPath);
+        const existingObject = safeResolvePath(encodedParameters, encodedPath);
 
         if (existingObject && isObject(existingObject)) {
             return;

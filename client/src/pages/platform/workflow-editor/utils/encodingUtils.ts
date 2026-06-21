@@ -10,6 +10,7 @@ import {
     PATH_UNICODE_REPLACEMENT_PREFIX,
 } from '@/shared/constants';
 import isObject from 'isobject';
+import resolvePath from 'object-resolve-path';
 
 interface EncodeParametersGenericProps {
     matchPattern: RegExp;
@@ -201,6 +202,24 @@ export function encodePath(path: string): string {
     encodedPath = encodePathGeneric(encodedPath, /:/g, PATH_COLON_REPLACEMENT);
 
     return encodedPath;
+}
+
+/**
+ * Resolves a value at the given path, returning undefined instead of throwing when the path is
+ * invalid or unresolvable.
+ *
+ * `object-resolve-path` throws "path is not a valid object path" for segments that aren't valid
+ * identifiers (e.g. a user typing "${httpClient_1}" as an OBJECT property key, which leaves "{"/"}"
+ * in the path). These lookups are best-effort "what is the current value here?" reads where a
+ * missing/invalid path simply means "no value", so the throw must degrade to undefined — otherwise
+ * the error escapes to the editor's error boundary and leaves the node permanently broken.
+ */
+export function safeResolvePath(object: object | undefined, path: string): unknown {
+    try {
+        return resolvePath(object, path);
+    } catch {
+        return undefined;
+    }
 }
 
 function encodeNonAsciiCharacters(string: string): string {

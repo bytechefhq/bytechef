@@ -3,11 +3,10 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, ComponentType, PropertyAllType} from '@/shared/types';
-import resolvePath from 'object-resolve-path';
 import {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
-import {decodePath, encodeParameters, encodePath} from '../../../utils/encodingUtils';
+import {decodePath, encodeParameters, encodePath, safeResolvePath} from '../../../utils/encodingUtils';
 import getParameterItemType from '../../../utils/getParameterItemType';
 import saveProperty from '../../../utils/saveProperty';
 
@@ -186,7 +185,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
                 return existingItem;
             }
 
-            const savedValue = resolvePath(encodedParameters, `${encodedBasePath}[${existingIndex}]`);
+            const savedValue = safeResolvePath(encodedParameters, `${encodedBasePath}[${existingIndex}]`);
 
             if (savedValue === undefined || savedValue === null) {
                 return existingItem;
@@ -233,7 +232,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
                 return;
             }
 
-            const clickedItemParameterValue = resolvePath(currentComponent.parameters ?? {}, deletePath);
+            const clickedItemParameterValue = safeResolvePath(currentComponent.parameters ?? {}, deletePath);
 
             if (clickedItemParameterValue !== undefined) {
                 onDeleteClick(deletePath);
@@ -309,7 +308,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         const encodedParameters = encodeParameters(currentComponent.parameters);
         const encodedPath = encodePath(path);
 
-        const parameterValue = resolvePath(encodedParameters, encodedPath);
+        const parameterValue = safeResolvePath(encodedParameters, encodedPath);
 
         if (parameterValue === undefined) {
             return;
@@ -548,10 +547,10 @@ export function useArrayPropertyItem({
             const encodedParameters = encodeParameters(currentComponent.parameters);
             const encodedBasePath = encodePath(basePath);
 
-            let resolvedArray = resolvePath(encodedParameters, encodedBasePath);
+            let resolvedArray = safeResolvePath(encodedParameters, encodedBasePath);
 
             if (!Array.isArray(resolvedArray)) {
-                resolvedArray = resolvePath(currentComponent.parameters as Record<string, unknown>, basePath);
+                resolvedArray = safeResolvePath(currentComponent.parameters as Record<string, unknown>, basePath);
             }
 
             if (Array.isArray(resolvedArray)) {
