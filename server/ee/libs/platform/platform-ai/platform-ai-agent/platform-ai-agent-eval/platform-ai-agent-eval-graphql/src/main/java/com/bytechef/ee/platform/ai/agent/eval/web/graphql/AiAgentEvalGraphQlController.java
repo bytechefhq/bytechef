@@ -26,10 +26,10 @@ import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentJudge;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentJudgeVerdict;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentScenarioJudge;
 import com.bytechef.ee.platform.ai.agent.eval.domain.AiAgentScenarioToolSimulation;
+import com.bytechef.ee.platform.ai.agent.eval.facade.AiAgentEvalApiFacade;
 import com.bytechef.ee.platform.ai.agent.eval.facade.AiAgentEvalRunFacade;
 import com.bytechef.ee.platform.ai.agent.eval.file.storage.AiAgentEvalFileStorage;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalResultService;
-import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalRunService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalScenarioService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentEvalTestService;
 import com.bytechef.ee.platform.ai.agent.eval.service.AiAgentJudgeService;
@@ -57,10 +57,10 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiAgentEvalGraphQlController {
 
+    private final AiAgentEvalApiFacade agentEvalApiFacade;
     private final AiAgentEvalFileStorage agentEvalFileStorage;
     private final AiAgentEvalResultService agentEvalResultService;
     private final AiAgentEvalRunFacade agentEvalRunFacade;
-    private final AiAgentEvalRunService agentEvalRunService;
     private final AiAgentEvalScenarioService agentEvalScenarioService;
     private final AiAgentEvalTestService agentEvalTestService;
     private final AiAgentJudgeService agentJudgeService;
@@ -69,17 +69,17 @@ class AiAgentEvalGraphQlController {
     private final AiAgentScenarioToolSimulationService agentScenarioToolSimulationService;
 
     AiAgentEvalGraphQlController(
-        AiAgentEvalFileStorage agentEvalFileStorage, AiAgentEvalResultService agentEvalResultService,
-        AiAgentEvalRunFacade agentEvalRunFacade, AiAgentEvalRunService agentEvalRunService,
+        AiAgentEvalApiFacade agentEvalApiFacade, AiAgentEvalFileStorage agentEvalFileStorage,
+        AiAgentEvalResultService agentEvalResultService, AiAgentEvalRunFacade agentEvalRunFacade,
         AiAgentEvalScenarioService agentEvalScenarioService, AiAgentEvalTestService agentEvalTestService,
         AiAgentJudgeService agentJudgeService, AiAgentJudgeVerdictService agentJudgeVerdictService,
         AiAgentScenarioJudgeService agentScenarioJudgeService,
         AiAgentScenarioToolSimulationService agentScenarioToolSimulationService) {
 
+        this.agentEvalApiFacade = agentEvalApiFacade;
         this.agentEvalFileStorage = agentEvalFileStorage;
         this.agentEvalResultService = agentEvalResultService;
         this.agentEvalRunFacade = agentEvalRunFacade;
-        this.agentEvalRunService = agentEvalRunService;
         this.agentEvalScenarioService = agentEvalScenarioService;
         this.agentEvalTestService = agentEvalTestService;
         this.agentJudgeService = agentJudgeService;
@@ -92,18 +92,18 @@ class AiAgentEvalGraphQlController {
 
     @QueryMapping
     List<AiAgentJudge> aiAgentJudges(@Argument String workflowId, @Argument String workflowNodeName) {
-        return agentJudgeService.getAgentJudges(workflowId, workflowNodeName);
+        return agentEvalApiFacade.getAgentJudges(workflowId, workflowNodeName);
     }
 
     @QueryMapping
     List<AiAgentEvalTest> aiAgentEvalTests(@Argument String workflowId, @Argument String workflowNodeName) {
-        return agentEvalTestService.getAgentEvalTests(workflowId, workflowNodeName);
+        return agentEvalApiFacade.getAgentEvalTests(workflowId, workflowNodeName);
     }
 
     @QueryMapping
     @Nullable
     AiAgentEvalTest aiAgentEvalTest(@Argument Long id) {
-        return agentEvalTestService.fetchAgentEvalTest(id)
+        return agentEvalApiFacade.fetchAgentEvalTest(id)
             .orElse(null);
     }
 
@@ -112,7 +112,7 @@ class AiAgentEvalGraphQlController {
         @Argument Long agentEvalTestId, @Argument @Nullable Integer limit,
         @Argument @Nullable Integer offset) {
 
-        List<AiAgentEvalRun> runs = agentEvalRunService.getAgentEvalRuns(agentEvalTestId);
+        List<AiAgentEvalRun> runs = agentEvalApiFacade.getAgentEvalRuns(agentEvalTestId);
 
         int startIndex = (offset != null) ? offset : 0;
 
@@ -130,21 +130,21 @@ class AiAgentEvalGraphQlController {
     @QueryMapping
     @Nullable
     AiAgentEvalRun aiAgentEvalRun(@Argument Long id) {
-        return agentEvalRunService.fetchAgentEvalRun(id)
+        return agentEvalApiFacade.fetchAgentEvalRun(id)
             .orElse(null);
     }
 
     @QueryMapping
     @Nullable
     AiAgentEvalResult aiAgentEvalResult(@Argument Long id) {
-        return agentEvalResultService.fetchAgentEvalResult(id)
+        return agentEvalApiFacade.fetchAgentEvalResult(id)
             .orElse(null);
     }
 
     @QueryMapping
     @Nullable
     String aiAgentEvalResultTranscript(@Argument long id) {
-        AiAgentEvalResult aiAgentEvalResult = agentEvalResultService.getAgentEvalResult(id);
+        AiAgentEvalResult aiAgentEvalResult = agentEvalApiFacade.getAgentEvalResult(id);
 
         FileEntry transcriptFileEntry = aiAgentEvalResult.getTranscriptFileEntry();
 
