@@ -46,7 +46,7 @@
 
 - **Add the package to your project:**
     ```
-    yalc add @bytechef/embedded-react
+    yalc add @bytechef/embedded
     npm install
     ```
     This adds the package from your local Yalc store to the project.
@@ -55,7 +55,7 @@
 
 1. In the Bytechef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
    a. `options` are described in `UseConnectDialogProps`
-2. `cd ~/.../bytechef/sdks/frontend/embedded/library/react`
+2. `cd ~/.../bytechef/sdks/frontend/embedded/library`
 3. Run `npm run dev:yalc`
 4. On change inside the `sdk/index.tsx` the Bytechef dev server needs to be restarted to see the changes
    a. This is because of Vite's caching
@@ -70,7 +70,7 @@ Uncaught Error: Incompatible React versions: The "react" and "react-dom" package
   - react-dom:  19.1.1
 ```
 
-To fix this run these commands in both `client/` and `sdks/.../react/` (make sure both client servers are not running):
+To fix this run these commands in both `client/` and `sdks/.../library/` (make sure both client servers are not running):
 
 ```
 rm -rf node_modules

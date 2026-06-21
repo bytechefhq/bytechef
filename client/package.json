@@ -49,7 +49,7 @@
         "@ag-ui/core": "^0.0.57",
         "@assistant-ui/react": "^0.14.23",
         "@assistant-ui/react-markdown": "^0.14.4",
-        "@bytechef/embedded-react": "file:../sdks/frontend/embedded/library/react",
+        "@bytechef/embedded": "file:../sdks/frontend/embedded/library",
         "@hookform/resolvers": "^5.4.0",
         "@lingui/core": "^6.4.0",
         "@lingui/react": "^6.4.0",

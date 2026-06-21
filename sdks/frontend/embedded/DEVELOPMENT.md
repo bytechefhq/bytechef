@@ -1,6 +1,6 @@
-# Development Guide for @bytechef/embedded-react
+# Development Guide for @bytechef/embedded
 
-This guide explains how to develop and test the `@bytechef/embedded-react` library with hot reload capabilities.
+This guide explains how to develop and test the `@bytechef/embedded` library with hot reload capabilities.
 
 ## Table of Contents
 
@@ -34,7 +34,7 @@ npm run setup:link
 This command does the following:
 
 1. Builds the library
-2. Creates a global npm link for `@bytechef/embedded-react`
+2. Creates a global npm link for `@bytechef/embedded`
 3. Links the test app to use the globally linked library
 
 ### Development Workflow
@@ -44,20 +44,20 @@ Open **two terminal windows**:
 **Terminal 1 - Library (with watch mode):**
 
 ```bash
-cd library/react
+cd library
 npm run watch
 ```
 
 **Terminal 2 - Test App:**
 
 ```bash
-cd test-apps/react
+cd test-apps
 npm run dev
 ```
 
 Now:
 
-- Make changes to the library source code in `library/react/src/`
+- Make changes to the library source code in `library/src/`
 - Vite will automatically rebuild the library
 - Next.js will detect the changes and hot reload the test app
 - See your changes immediately in the browser
@@ -67,10 +67,10 @@ Now:
 To unlink the library:
 
 ```bash
-# From test-apps/react directory
+# From test-apps directory
 npm run unlink:library
 
-# From library/react directory
+# From library directory
 npm run unlink:local
 ```
 
@@ -113,7 +113,7 @@ npm run publish:library
 npm run install:test-app
 
 # Start the test app
-cd test-apps/react
+cd test-apps
 npm run dev
 ```
 
@@ -124,14 +124,14 @@ When using the local registry, you need to republish after changes:
 1. Make changes to library code
 2. Rebuild and republish:
     ```bash
-    cd library/react
+    cd library
     npm run build
     npm run publish:local
     ```
 3. Reinstall in test app:
     ```bash
-    cd ../../test-apps/react
-    npm install @bytechef/embedded-react@latest --registry http://localhost:4873
+    cd ../../test-apps
+    npm install @bytechef/embedded@latest --registry http://localhost:4873
     ```
 4. Next.js will hot reload with the new version
 
@@ -147,7 +147,7 @@ To automatically use the local registry for `@bytechef` packages, edit `.npmrc`:
 Then you can use standard npm commands:
 
 ```bash
-npm install @bytechef/embedded-react@latest
+npm install @bytechef/embedded@latest
 ```
 
 ### Stop the Registry
@@ -167,8 +167,8 @@ This is the **recommended approach** for active development:
 npm run setup:link
 
 # Development (in separate terminals)
-cd library/react && npm run watch     # Terminal 1
-cd test-apps/react && npm run dev     # Terminal 2
+cd library && npm run watch     # Terminal 1
+cd test-apps && npm run dev     # Terminal 2
 ```
 
 **Advantages:**
@@ -190,7 +190,7 @@ Occasionally test the full build process:
 
 ```bash
 # Build the library
-cd library/react
+cd library
 npm run build
 
 # Test the built output
@@ -210,22 +210,20 @@ npm run publish:library
 
 # Install and test in test-app
 npm run install:test-app
-cd test-apps/react && npm run build
+cd test-apps && npm run build
 ```
 
 ## Project Structure
 
 ```
 frontend/embedded/
-├── library/                   # SDK libraries
-│   └── react/                 # React SDK library
-│       ├── src/               # Source code
-│       ├── dist/              # Built output (generated)
-│       └── package.json
-├── test-apps/                 # Test applications
-│   └── react/                 # Next.js test application
-│       ├── app/               # Next.js pages
-│       └── package.json
+├── library/                   # React SDK library
+│   ├── src/                   # Source code
+│   ├── dist/                  # Built output (generated)
+│   └── package.json
+├── test-apps/                 # Next.js test application
+│   ├── app/                   # Next.js pages
+│   └── package.json
 ├── verdaccio.config.yaml      # Local registry config
 ├── .npmrc                     # NPM configuration
 ├── .gitignore                 # Git ignore file
@@ -248,7 +246,7 @@ frontend/embedded/
 | `npm run build:all`        | Build the library                                     |
 | `npm run clean`            | Clean all build artifacts and node_modules            |
 
-### Library (`library/react/`)
+### Library (`library/`)
 
 | Script                    | Description                              |
 | ------------------------- | ---------------------------------------- |
@@ -262,12 +260,12 @@ frontend/embedded/
 | `npm run storybook`       | Run Storybook dev server                 |
 | `npm run build-storybook` | Build Storybook                          |
 
-### Test App (`test-apps/react/`)
+### Test App (`test-apps/`)
 
 | Script                   | Description                             |
 | ------------------------ | --------------------------------------- |
 | `npm run dev`            | Start Next.js development server        |
-| `npm run link:library`   | Link to global @bytechef/embedded-react |
+| `npm run link:library`   | Link to global @bytechef/embedded |
 | `npm run unlink:library` | Unlink from global package              |
 | `npm run install:local`  | Install from local registry             |
 | `npm run build`          | Build production test app               |
@@ -278,8 +276,8 @@ frontend/embedded/
 
 **Using npm link:**
 
-1. Ensure `npm run watch` is running in library/react directory
-2. Check that the test app is linked: `ls -la test-apps/react/node_modules/@bytechef/embedded-react` (should show symlink)
+1. Ensure `npm run watch` is running in library directory
+2. Check that the test app is linked: `ls -la test-apps/node_modules/@bytechef/embedded` (should show symlink)
 3. Try restarting the Next.js dev server
 
 **Using Verdaccio:**
@@ -287,12 +285,12 @@ frontend/embedded/
 1. You need to republish after changes
 2. Ensure test app is installing from local registry: check `@bytechef:registry` in `.npmrc`
 
-### "Cannot find module @bytechef/embedded-react"
+### "Cannot find module @bytechef/embedded"
 
 1. Check if the library is linked or installed:
 
     ```bash
-    cd test-apps/react
+    cd test-apps
     ls -la node_modules/@bytechef
     ```
 
@@ -328,17 +326,17 @@ npm run setup:link  # or your preferred method
 
 ### Hot reload not working
 
-1. Ensure library watch mode is running: `cd library/react && npm run watch`
+1. Ensure library watch mode is running: `cd library && npm run watch`
 2. Check Vite output for build errors
-3. Restart Next.js dev server: `cd test-apps/react && npm run dev`
-4. Check symlink exists: `ls -la test-apps/react/node_modules/@bytechef/embedded-react`
+3. Restart Next.js dev server: `cd test-apps && npm run dev`
+4. Check symlink exists: `ls -la test-apps/node_modules/@bytechef/embedded`
 
 ### Type errors in test app
 
 The test app may cache old type definitions:
 
 ```bash
-cd test-apps/react
+cd test-apps
 rm -rf .next
 npm run dev
 ```
@@ -375,4 +373,4 @@ npm run dev
 3. Start development servers
 4. Make changes and see them live!
 
-For more information about the library itself, see the main [README.md](library/react/README.md).
+For more information about the library itself, see the main [README.md](library/README.md).

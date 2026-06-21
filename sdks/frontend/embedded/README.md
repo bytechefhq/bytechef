@@ -4,8 +4,8 @@ This workspace contains the ByteChef Embedded SDK for integrating workflow autom
 
 ## Structure
 
-- **library/react/** - The React SDK library for embedding ByteChef workflows
-- **test-apps/react/** - Next.js test application for development and testing
+- **library/** - The React SDK library for embedding ByteChef workflows
+- **test-apps/** - Next.js test application for development and testing
 
 ## Quick Start
 
@@ -40,7 +40,7 @@ npm run install:test-app
 ## Documentation
 
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Detailed development guide with hot reload setup
-- [library/react/README.md](library/react/README.md) - Library documentation
+- [library/README.md](library/README.md) - Library documentation
 
 ## Package Versions
 

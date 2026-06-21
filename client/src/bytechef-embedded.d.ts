@@ -1,4 +1,4 @@
-declare module '@bytechef/embedded-react' {
+declare module '@bytechef/embedded' {
     interface UseConnectDialogProps {
         baseUrl?: string;
         environment?: string;
