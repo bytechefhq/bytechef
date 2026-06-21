@@ -17,6 +17,7 @@
 package com.bytechef.ee.tenant.repository;
 
 import com.bytechef.ee.tenant.util.TenantUtils;
+import com.bytechef.tenant.TenantIdValidator;
 import com.bytechef.tenant.constant.TenantConstants;
 import com.bytechef.tenant.domain.Tenant;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,7 +30,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import org.springframework.stereotype.Repository;
@@ -42,8 +42,6 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class TenantRepository {
-
-    private static final Pattern TENANT_ID_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
 
     private final DataSource dataSource;
 
@@ -367,10 +365,6 @@ public class TenantRepository {
      * @throws IllegalArgumentException if tenantId contains invalid characters
      */
     private static void validateTenantId(String tenantId) {
-        if (tenantId == null || !TENANT_ID_PATTERN.matcher(tenantId)
-            .matches()) {
-            throw new IllegalArgumentException(
-                "Invalid tenant ID. Must contain only alphanumeric characters, underscores, and hyphens.");
-        }
+        TenantIdValidator.validate(tenantId);
     }
 }
