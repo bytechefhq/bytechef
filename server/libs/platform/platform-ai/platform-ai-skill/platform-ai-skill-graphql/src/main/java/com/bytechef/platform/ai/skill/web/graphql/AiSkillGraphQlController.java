@@ -17,7 +17,7 @@
 package com.bytechef.platform.ai.skill.web.graphql;
 
 import com.bytechef.platform.ai.skill.domain.AiSkill;
-import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
+import com.bytechef.platform.ai.skill.facade.AiSkillApiFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
 import java.util.List;
@@ -35,30 +35,30 @@ import org.springframework.stereotype.Controller;
 @SuppressFBWarnings("EI") // Spring GraphQL controllers intentionally return domain objects for serialization
 class AiSkillGraphQlController {
 
-    private final AiSkillFacade aiSkillFacade;
+    private final AiSkillApiFacade aiSkillApiFacade;
 
-    AiSkillGraphQlController(AiSkillFacade aiSkillFacade) {
-        this.aiSkillFacade = aiSkillFacade;
+    AiSkillGraphQlController(AiSkillApiFacade aiSkillApiFacade) {
+        this.aiSkillApiFacade = aiSkillApiFacade;
     }
 
     @QueryMapping
     List<AiSkill> aiSkills() {
-        return aiSkillFacade.getAiSkills();
+        return aiSkillApiFacade.getAiSkills();
     }
 
     @QueryMapping
     AiSkill aiSkill(@Argument long id) {
-        return aiSkillFacade.getAiSkill(id);
+        return aiSkillApiFacade.getAiSkill(id);
     }
 
     @QueryMapping
     List<String> aiSkillFilePaths(@Argument long id) {
-        return aiSkillFacade.getAiSkillFilePaths(id);
+        return aiSkillApiFacade.getAiSkillFilePaths(id);
     }
 
     @QueryMapping
     String aiSkillFileContent(@Argument long id, @Argument String path) {
-        return aiSkillFacade.getAiSkillFileContent(id, path);
+        return aiSkillApiFacade.getAiSkillFileContent(id, path);
     }
 
     @MutationMapping
@@ -77,26 +77,26 @@ class AiSkillGraphQlController {
                 illegalArgumentException);
         }
 
-        return aiSkillFacade.createAiSkill(name, description, filename, bytes);
+        return aiSkillApiFacade.createAiSkill(name, description, filename, bytes);
     }
 
     @MutationMapping
     AiSkill createAiSkillFromInstructions(
         @Argument String name, @Argument @Nullable String description, @Argument String instructions) {
 
-        return aiSkillFacade.createAiSkillFromInstructions(name, description, instructions);
+        return aiSkillApiFacade.createAiSkillFromInstructions(name, description, instructions);
     }
 
     @MutationMapping
     AiSkill updateAiSkill(
         @Argument long id, @Argument String name, @Argument @Nullable String description) {
 
-        return aiSkillFacade.updateAiSkill(id, name, description);
+        return aiSkillApiFacade.updateAiSkill(id, name, description);
     }
 
     @MutationMapping
     AiSkill updateAiSkillContent(@Argument long id, @Argument @Nullable String path, @Argument String content) {
-        return aiSkillFacade.updateAiSkillContent(id, path, content);
+        return aiSkillApiFacade.updateAiSkillContent(id, path, content);
     }
 
     @MutationMapping
@@ -111,7 +111,7 @@ class AiSkillGraphQlController {
 
     @MutationMapping
     boolean deleteAiSkill(@Argument long id) {
-        aiSkillFacade.deleteAiSkill(id);
+        aiSkillApiFacade.deleteAiSkill(id);
 
         return true;
     }
