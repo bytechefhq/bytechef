@@ -90,6 +90,11 @@ public class RemoteWorkspaceDataTableFacadeClient implements WorkspaceDataTableF
     }
 
     @Override
+    public List<Tag> getDataTableTags(long workspaceId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public String exportCsv(long dataTableId, long environmentId) {
         throw new UnsupportedOperationException();
     }
