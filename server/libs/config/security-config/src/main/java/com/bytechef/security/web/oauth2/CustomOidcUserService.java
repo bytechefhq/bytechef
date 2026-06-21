@@ -88,7 +88,9 @@ public class CustomOidcUserService extends OidcUserService {
         String authProvider = registrationId.startsWith(SSO_PREFIX) ? "SSO" : registrationId.toUpperCase();
 
         boolean autoProvision = true;
-        String defaultAuthority = AuthorityConstants.ADMIN;
+        // Non-SSO OIDC registrations join an existing instance as the non-privileged ROLE_USER. SSO-configured identity
+        // providers override this with their admin-chosen defaultAuthority below.
+        String defaultAuthority = AuthorityConstants.USER;
 
         if (registrationId.startsWith(SSO_PREFIX) && identityProviderService != null) {
             long identityProviderId = Long.parseLong(registrationId.substring(SSO_PREFIX.length()));

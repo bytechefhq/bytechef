@@ -20,5 +20,6 @@ dependencies {
     testImplementation(project(":server:libs:core:encryption:encryption-impl"))
     testImplementation(project(":server:libs:config:jdbc-config"))
     testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:core:tenant:tenant-single-service"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

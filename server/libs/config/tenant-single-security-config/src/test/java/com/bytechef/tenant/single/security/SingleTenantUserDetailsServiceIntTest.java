@@ -58,7 +58,7 @@ import org.springframework.transaction.annotation.Transactional;
 @ComponentScan(
     basePackages = {
         "com.bytechef.encryption", "com.bytechef.platform.user", "com.bytechef.security",
-        "com.bytechef.tenant.single.security"
+        "com.bytechef.tenant.single"
     })
 @EnableAutoConfiguration
 @EnableConfigurationProperties(ApplicationProperties.class)

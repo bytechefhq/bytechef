@@ -35,6 +35,7 @@ import com.bytechef.platform.user.exception.UserNotFoundException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.tenant.service.TenantService;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
 import dev.samstevens.totp.code.DefaultCodeGenerator;
 import dev.samstevens.totp.code.DefaultCodeVerifier;
@@ -82,6 +83,7 @@ public class UserServiceImpl implements UserService {
     private final PersistentTokenRepository persistentTokenRepository;
     private final SecretGenerator totpSecretGenerator = new DefaultSecretGenerator();
     private final DefaultCodeVerifier totpCodeVerifier;
+    private final TenantService tenantService;
     private final UserAuditPublisher userAuditPublisher;
     private final UserRepository userRepository;
     private final int maxFailedTotpAttempts;
@@ -90,8 +92,8 @@ public class UserServiceImpl implements UserService {
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public UserServiceImpl(
         AuthorityRepository authorityRepository, CacheManager cacheManager, PasswordEncoder passwordEncoder,
-        PersistentTokenRepository persistentTokenRepository, UserAuditPublisher userAuditPublisher,
-        UserRepository userRepository,
+        PersistentTokenRepository persistentTokenRepository, TenantService tenantService,
+        UserAuditPublisher userAuditPublisher, UserRepository userRepository,
         @Value("${bytechef.security.mfa.max-failed-attempts:5}") int maxFailedTotpAttempts,
         @Value("${bytechef.security.mfa.lockout-duration:PT15M}") Duration totpLockoutDuration) {
 
@@ -99,6 +101,7 @@ public class UserServiceImpl implements UserService {
         this.cacheManager = cacheManager;
         this.passwordEncoder = passwordEncoder;
         this.persistentTokenRepository = persistentTokenRepository;
+        this.tenantService = tenantService;
         this.userAuditPublisher = userAuditPublisher;
         this.userRepository = userRepository;
         this.maxFailedTotpAttempts = maxFailedTotpAttempts;
@@ -529,9 +532,17 @@ public class UserServiceImpl implements UserService {
         // new user gets registration key
         newUser.setActivationKey(RandomUtils.generateActivationKey());
 
+        // Grant ADMIN only for a genuine bootstrap registration: a multi-tenant registrant owns their freshly created,
+        // isolated tenant, and a single-tenant first user is the instance owner. Any later self-registration that
+        // reaches this point defaults to the non-privileged ROLE_USER (defense-in-depth: the single-tenant path is also
+        // blocked upstream once an active user exists).
+        boolean bootstrapAdmin = tenantService.isMultiTenantEnabled() || countActiveUsers() == 0;
+
+        String authorityName = bootstrapAdmin ? AuthorityConstants.ADMIN : AuthorityConstants.USER;
+
         Set<Authority> authorities = new HashSet<>();
 
-        authorityRepository.findByName(AuthorityConstants.ADMIN)
+        authorityRepository.findByName(authorityName)
             .ifPresent(authorities::add);
 
         newUser.setAuthorities(authorities);

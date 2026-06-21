@@ -20,6 +20,8 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.encryption.EncryptionKey;
 import com.bytechef.jdbc.config.AuditingJdbcConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.tenant.service.TenantService;
+import com.bytechef.tenant.single.SingleTenantService;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -53,5 +55,10 @@ public class UserIntTestConfiguration extends AbstractJdbcConfiguration {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    TenantService tenantService() {
+        return new SingleTenantService();
     }
 }

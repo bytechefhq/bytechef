@@ -28,6 +28,7 @@ import com.bytechef.platform.user.exception.TotpLockedException;
 import com.bytechef.platform.user.repository.AuthorityRepository;
 import com.bytechef.platform.user.repository.PersistentTokenRepository;
 import com.bytechef.platform.user.repository.UserRepository;
+import com.bytechef.tenant.service.TenantService;
 import dev.samstevens.totp.code.DefaultCodeGenerator;
 import dev.samstevens.totp.time.SystemTimeProvider;
 import java.time.Duration;
@@ -62,6 +63,9 @@ class UserServiceTotpLockoutTest {
     private PersistentTokenRepository persistentTokenRepository;
 
     @Mock
+    private TenantService tenantService;
+
+    @Mock
     private UserAuditPublisher userAuditPublisher;
 
     @Mock
@@ -75,8 +79,8 @@ class UserServiceTotpLockoutTest {
         CacheManager cacheManager = new ConcurrentMapCacheManager();
 
         userService = new UserServiceImpl(
-            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, userAuditPublisher,
-            userRepository, MAX_FAILED_ATTEMPTS, Duration.ofMinutes(15));
+            authorityRepository, cacheManager, passwordEncoder, persistentTokenRepository, tenantService,
+            userAuditPublisher, userRepository, MAX_FAILED_ATTEMPTS, Duration.ofMinutes(15));
 
         user = new User();
 

@@ -92,8 +92,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
             throw new OAuth2AuthenticationException("Email not available from OAuth2 provider " + registrationId);
         }
 
+        // Social-login users join an existing instance; they default to the non-privileged ROLE_USER and an instance
+        // admin promotes them through the user-admin surface. Granting ADMIN here would let anyone with an account at
+        // the configured provider self-escalate to full admin.
         User user = userService.findOrCreateSocialUser(
-            email, firstName, lastName, imageUrl, registrationId, providerId, true, AuthorityConstants.ADMIN);
+            email, firstName, lastName, imageUrl, registrationId, providerId, true, AuthorityConstants.USER);
 
         List<SimpleGrantedAuthority> grantedAuthorities = user.getAuthorityIds()
             .stream()
