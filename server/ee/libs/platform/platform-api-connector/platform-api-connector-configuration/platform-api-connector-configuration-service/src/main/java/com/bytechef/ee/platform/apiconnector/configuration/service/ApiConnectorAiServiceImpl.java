@@ -7,15 +7,18 @@
 
 package com.bytechef.ee.platform.apiconnector.configuration.service;
 
+import com.bytechef.commons.util.UrlValidator;
 import com.bytechef.ee.platform.apiconnector.configuration.exception.ApiConnectorErrorType;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.prompt.Prompt;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -58,15 +61,21 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     private final ApiConnectorGenerationJobService apiConnectorGenerationJobService;
     private final ChatModel chatModel;
     private final WebScrapeService webScrapeService;
+    private final boolean ssrfEnabled;
+    private final Set<String> ssrfAllowedHosts;
 
     @SuppressFBWarnings("EI")
     public ApiConnectorAiServiceImpl(
         ApiConnectorGenerationJobService apiConnectorGenerationJobService, ChatModel chatModel,
-        WebScrapeService webScrapeService) {
+        WebScrapeService webScrapeService,
+        @Value("${bytechef.security.ssrf.enabled:true}") boolean ssrfEnabled,
+        @Value("${bytechef.security.ssrf.allowed-hosts:}") Set<String> ssrfAllowedHosts) {
 
         this.apiConnectorGenerationJobService = apiConnectorGenerationJobService;
         this.chatModel = chatModel;
         this.webScrapeService = webScrapeService;
+        this.ssrfEnabled = ssrfEnabled;
+        this.ssrfAllowedHosts = ssrfAllowedHosts;
     }
 
     @Override
@@ -88,6 +97,8 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     }
 
     private String fetchDocumentation(String documentationUrl) {
+        validateDocumentationUrl(documentationUrl);
+
         WebScrapeService.ScrapeResult result = webScrapeService.scrape(documentationUrl);
 
         if (!result.success()) {
@@ -100,6 +111,8 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
     }
 
     private String fetchDocumentation(String documentationUrl, int maxPages) {
+        validateDocumentationUrl(documentationUrl);
+
         if (maxPages <= 1) {
             return fetchDocumentation(documentationUrl);
         }
@@ -113,6 +126,12 @@ public class ApiConnectorAiServiceImpl implements ApiConnectorAiService {
         }
 
         return result.content();
+    }
+
+    private void validateDocumentationUrl(String documentationUrl) {
+        if (ssrfEnabled) {
+            UrlValidator.validate(documentationUrl, ssrfAllowedHosts);
+        }
     }
 
     private String cleanOpenApiResponse(String response) {
