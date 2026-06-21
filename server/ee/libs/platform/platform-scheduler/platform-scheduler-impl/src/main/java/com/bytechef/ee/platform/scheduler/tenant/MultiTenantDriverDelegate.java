@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.scheduler.tenant;
 
 import com.bytechef.tenant.TenantContext;
+import com.bytechef.tenant.TenantIdValidator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.sql.Connection;
@@ -611,6 +612,8 @@ public class MultiTenantDriverDelegate extends StdJDBCDelegate {
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     private static void setSearchPath(Connection connection, String databaseSchemaName) throws SQLException {
+        TenantIdValidator.validateDatabaseSchema(databaseSchemaName);
+
         try (Statement statement = connection.createStatement()) {
             statement.execute("SET search_path TO " + databaseSchemaName);
         }
