@@ -1,11 +1,14 @@
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
-import {encodePath, transformPathForObjectAccess} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {
+    encodePath,
+    safeResolvePath,
+    transformPathForObjectAccess,
+} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 import {ComponentType, DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
-import resolvePath from 'object-resolve-path';
 import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -42,7 +45,7 @@ export const canInsertMentionForProperty = (
 
     try {
         const resolvedPath = transformPathForObjectAccess(encodePath(path));
-        const existingValue = resolvePath(parameters, resolvedPath);
+        const existingValue = safeResolvePath(parameters, resolvedPath);
 
         return !existingValue || String(existingValue).startsWith('=');
     } catch {

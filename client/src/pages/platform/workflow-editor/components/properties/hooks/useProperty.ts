@@ -6,7 +6,12 @@ import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWor
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import deleteProperty from '@/pages/platform/workflow-editor/utils/deleteProperty';
-import {decodePath, encodeParameters, encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
+import {
+    decodePath,
+    encodeParameters,
+    encodePath,
+    safeResolvePath,
+} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import saveProperty from '@/pages/platform/workflow-editor/utils/saveProperty';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {
@@ -22,7 +27,6 @@ import {ArrayPropertyType, ClusterElementItemType, ComponentType, NodeDataType, 
 import {UseQueryResult} from '@tanstack/react-query';
 import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
-import resolvePath from 'object-resolve-path';
 import {
     ChangeEvent,
     Dispatch,
@@ -983,7 +987,10 @@ export const useProperty = ({
             return;
         }
 
-        const parentParameterValue = resolvePath(encodeParameters(currentComponent.parameters ?? {}), encodePath(path));
+        const parentParameterValue = safeResolvePath(
+            encodeParameters(currentComponent.parameters ?? {}),
+            encodePath(path)
+        );
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -1308,7 +1315,7 @@ export const useProperty = ({
                     return;
                 }
 
-                const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
+                const valueFromDefinition = safeResolvePath(encodedParameters, encodedPath);
 
                 if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
                     setPropertyParameterValue(valueFromDefinition);
@@ -1339,7 +1346,7 @@ export const useProperty = ({
             encodedPath &&
             (objectName === undefined || dynamicPropertySource === objectName) &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
-            resolvePath(encodedParameters, encodedPath) !== defaultValue;
+            safeResolvePath(encodedParameters, encodedPath) !== defaultValue;
 
         if (shouldSaveHiddenProperty) {
             const saveDefaultValue = () => {
@@ -1389,7 +1396,7 @@ export const useProperty = ({
             return;
         }
 
-        const valueFromDefinition = resolvePath(encodedParameters, encodedPath);
+        const valueFromDefinition = safeResolvePath(encodedParameters, encodedPath);
 
         const effectiveValue = parameterValue !== undefined ? parameterValue : valueFromDefinition;
 
@@ -1580,7 +1587,7 @@ export const useProperty = ({
 
         const optionsLookupDependsOnValues: unknown[] = optionsDataSource.optionsLookupDependsOn.map(
             (optionLookupDependency) => {
-                const resolvedValue = resolvePath(
+                const resolvedValue = safeResolvePath(
                     currentComponent.parameters,
                     optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
@@ -1612,7 +1619,7 @@ export const useProperty = ({
 
         const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource.propertiesLookupDependsOn.map(
             (propertyLookupDependency) => {
-                const resolvedValue = resolvePath(
+                const resolvedValue = safeResolvePath(
                     currentComponent.parameters,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
@@ -1680,7 +1687,7 @@ export const useProperty = ({
 
         const encodedPath = encodePath(path);
 
-        const valueFromWorkflowDefinition = resolvePath(encodedParameters, encodedPath);
+        const valueFromWorkflowDefinition = safeResolvePath(encodedParameters, encodedPath);
 
         const nextParameterValue =
             parameterValueRef.current !== undefined ? parameterValueRef.current : valueFromWorkflowDefinition;
