@@ -158,10 +158,10 @@ describe('PropertyCodeEditorDialogToolbar', () => {
             renderWithProviders(<PropertyCodeEditorDialogToolbar {...defaultProps} />);
 
             const buttons = screen.getAllByRole('button');
-            // Find the destructive/stop button
-            const stopButton = buttons.find(
-                (button) => button.classList.contains('bg-destructive') || button.className.includes('destructive')
-            );
+            // Find the destructive/stop button by its variant background class. The generic substring
+            // 'destructive' is not specific enough because the base button styles include
+            // aria-invalid:ring-destructive on every button.
+            const stopButton = buttons.find((button) => button.className.includes('bg-surface-destructive-primary'));
 
             if (stopButton) {
                 await user.click(stopButton);
