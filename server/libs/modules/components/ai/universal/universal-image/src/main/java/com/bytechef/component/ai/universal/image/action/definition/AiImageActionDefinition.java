@@ -18,14 +18,9 @@ package com.bytechef.component.ai.universal.image.action.definition;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateImageAction;
-import com.bytechef.component.ai.llm.openai.action.OpenAiCreateImageAction;
-import com.bytechef.component.ai.llm.stability.action.StabilityCreateImageAction;
+import com.bytechef.component.ai.llm.LLMModelRegistry;
 import com.bytechef.component.ai.universal.image.action.AiImageAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
@@ -71,9 +66,7 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
         return Optional.of((PerformFunction) this::perform);
     }
 
-    protected Object perform(
-        Parameters inputParameters, Parameters connectionParameter, ActionContext context) {
-
+    protected Object perform(Parameters inputParameters, Parameters connectionParameter, ActionContext context) {
         Map<String, String> modelConnectionParametersMap = new HashMap<>();
 
         ActionContextAware actionContextAware = (ActionContextAware) context;
@@ -90,82 +83,34 @@ public class AiImageActionDefinition extends AbstractActionDefinitionWrapper {
             .map(Property::getKey)
             .toList();
 
+        Provider provider = Provider.valueOf(inputParameters.getRequiredString(PROVIDER));
+
+        String token = resolveToken(provider, activeProviderKeys, environmentId);
+
+        modelConnectionParametersMap.put(TOKEN, token);
+
         Parameters modelInputParameters = aiImageAction.createParameters(inputParameters);
         Parameters modelConnectionParameters = ParametersFactory.create(modelConnectionParametersMap);
 
-        ImageModel imageModel = getImageModel(
-            inputParameters, activeProviderKeys, modelConnectionParametersMap, environmentId);
+        ImageModel imageModel = LLMModelRegistry.getImageModel(provider);
 
         return imageModel.getResponse(modelInputParameters, modelConnectionParameters);
     }
 
-    private String getAiProviderToken(String key, List<String> activeProviderKeys, Long environmentId) {
-        return activeProviderKeys.stream()
-            .filter(key::equals)
+    private String resolveToken(Provider provider, List<String> activeProviderKeys, Long environmentId) {
+        String providerKey = provider.getKey();
+
+        String token = activeProviderKeys.stream()
+            .filter(providerKey::equals)
             .findFirst()
-            .map(curKey -> propertyService.getProperty(curKey, Scope.PLATFORM, null, environmentId))
+            .map(matchedKey -> propertyService.getProperty(matchedKey, Scope.PLATFORM, null, environmentId))
             .map(property -> (String) property.get("apiKey"))
             .orElse(null);
-    }
-
-    private ImageModel getImageModel(
-        Parameters inputParameters, List<String> activeProviderKeys,
-        Map<String, String> modelConnectionParametersMap, Long environmentId) {
-
-        return switch (Provider.valueOf(inputParameters.getRequiredString(PROVIDER))) {
-            case AZURE_OPEN_AI ->
-                getAzureOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
-            case OPEN_AI -> getOpenAiImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
-            case STABILITY -> getStabilityImageModel(activeProviderKeys, modelConnectionParametersMap, environmentId);
-            default -> throw new IllegalArgumentException("Invalid provider");
-        };
-    }
-
-    private ImageModel getAzureOpenAiImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
-
-        String token = getAiProviderToken(AZURE_OPEN_AI.getKey(), activeProviderKeys, environmentId);
 
         if (token == null) {
-            ApplicationProperties.Ai.Provider.AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
-
-            token = azureOpenAi.getApiKey();
+            token = aiProvider.getProviderApiKey(providerKey);
         }
 
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return AzureOpenAiCreateImageAction.IMAGE_MODEL;
-    }
-
-    private ImageModel getOpenAiImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
-
-        String token = getAiProviderToken(OPEN_AI.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            ApplicationProperties.Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
-
-            token = openAi.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return OpenAiCreateImageAction.IMAGE_MODEL;
-    }
-
-    private ImageModel getStabilityImageModel(
-        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap, Long environmentId) {
-
-        String token = getAiProviderToken(STABILITY.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            ApplicationProperties.Ai.Provider.Stability stability = aiProvider.getStability();
-
-            token = stability.getApiKey();
-        }
-
-        modelConnectionParametersMap.put(TOKEN, token);
-
-        return StabilityCreateImageAction.IMAGE_MODEL;
+        return token;
     }
 }

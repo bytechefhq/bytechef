@@ -18,42 +18,14 @@ package com.bytechef.component.ai.universal.text.action.definition;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
-import static com.bytechef.platform.ai.llm.Provider.ANTHROPIC;
-import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.DEEPSEEK;
-import static com.bytechef.platform.ai.llm.Provider.GROQ;
-import static com.bytechef.platform.ai.llm.Provider.MISTRAL;
-import static com.bytechef.platform.ai.llm.Provider.NVIDIA;
-import static com.bytechef.platform.ai.llm.Provider.OLLAMA;
-import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.PERPLEXITY;
-import static com.bytechef.platform.ai.llm.Provider.VERTEX_GEMINI;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
-import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
-import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
-import com.bytechef.component.ai.llm.gemini.action.GeminiChatAction;
-import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
-import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
-import com.bytechef.component.ai.llm.ollama.action.OllamaChatAction;
-import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
-import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
+import com.bytechef.component.ai.llm.LLMModelRegistry;
 import com.bytechef.component.ai.universal.text.action.AiTextAction;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.AzureOpenAi;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.DeepSeek;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Mistral;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Nvidia;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Ollama;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Perplexity;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
@@ -101,274 +73,46 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
 
         Long environmentId = actionContextAware.getEnvironmentId();
 
-        List<String> providers = Arrays.stream(Provider.values())
+        List<String> providerKeys = Arrays.stream(Provider.values())
             .map(Provider::getKey)
             .toList();
 
-        List<String> activeProviderKeys = propertyService.getProperties(providers, Scope.PLATFORM, null, environmentId)
-            .stream()
-            .filter(property -> property.getValue() != null && property.isEnabled())
-            .map(Property::getKey)
-            .toList();
+        List<String> activeProviderKeys =
+            propertyService.getProperties(providerKeys, Scope.PLATFORM, null, environmentId)
+                .stream()
+                .filter(property -> property.getValue() != null && property.isEnabled())
+                .map(Property::getKey)
+                .toList();
 
-        ChatModelResult chatModelResult = getChatModel(inputParameters, activeProviderKeys, environmentId);
+        Provider provider = Provider.valueOf(inputParameters.getRequiredString(PROVIDER));
+
+        String token = resolveToken(provider, activeProviderKeys, environmentId);
+
         Parameters modelInputParameters = aiTextAction.createParameters(inputParameters);
 
-        modelConnectionParametersMap.put(TOKEN, chatModelResult.token);
+        modelConnectionParametersMap.put(TOKEN, token);
 
-        return chatModelResult.chatModel.getResponse(
+        ChatModel chatModel = LLMModelRegistry.getChatModel(provider);
+
+        return chatModel.getResponse(
             modelInputParameters, ParametersFactory.create(modelConnectionParametersMap), context, false,
             modelInputParameters.containsPath("response.responseFormat"));
     }
 
-    private String getAiProviderToken(String key, List<String> activeProviderKeys, Long environmentId) {
-        return activeProviderKeys.stream()
-            .filter(key::equals)
+    private String resolveToken(Provider provider, List<String> activeProviderKeys, Long environmentId) {
+        String providerKey = provider.getKey();
+
+        String token = activeProviderKeys.stream()
+            .filter(providerKey::equals)
             .findFirst()
-            .map(curKey -> propertyService.getProperty(curKey, Scope.PLATFORM, null, environmentId))
+            .map(matchedKey -> propertyService.getProperty(matchedKey, Scope.PLATFORM, null, environmentId))
             .map(property -> (String) property.get("apiKey"))
             .orElse(null);
-    }
-
-    private ChatModelResult getChatModel(
-        Parameters inputParameters, List<String> activeProviderKeys, Long environmentId) {
-        return switch (Provider.valueOf(inputParameters.getRequiredString(PROVIDER))) {
-//            case AMAZON_BEDROCK_ANTHROPIC2 -> getAmazonBedrockAnthropic2ChatModel(activeProviderKeys);
-//            case AMAZON_BEDROCK_ANTHROPIC3 -> getAmazonBedrockAnthropic3ChatModel(activeProviderKeys);
-//            case AMAZON_BEDROCK_COHERE -> getAmazonBedrockCohereChatModel(activeProviderKeys);
-//            case AMAZON_BEDROCK_JURASSIC2 -> getAmazonBedrockJurassic2ChatModel(activeProviderKeys);
-//            case AMAZON_BEDROCK_LLAMA -> getAmazonBedrockLlamaChatModel(activeProviderKeys);
-//            case AMAZON_BEDROCK_TITAN -> getAmazonBedrockTitanChatModel(activeProviderKeys);
-            case ANTHROPIC -> getAnthropicChatModel(activeProviderKeys, environmentId);
-            case AZURE_OPEN_AI -> getAzureOpenAiChatModel(activeProviderKeys, environmentId);
-            case DEEPSEEK -> getDeepSeekModel(activeProviderKeys, environmentId);
-            case GROQ -> getGroqChatModel(activeProviderKeys, environmentId);
-            case MISTRAL -> getMistralChatModel(activeProviderKeys, environmentId);
-            case NVIDIA -> getNvidiaChatModel(activeProviderKeys, environmentId);
-            case OLLAMA -> getOllamaChatModel(activeProviderKeys, environmentId);
-            case OPEN_AI -> getOpenAiChatModel(activeProviderKeys, environmentId);
-            case PERPLEXITY -> getPerplexityChatModel(activeProviderKeys, environmentId);
-            case VERTEX_GEMINI -> getVertexGeminiChatModel(activeProviderKeys, environmentId);
-            default -> throw new IllegalArgumentException("Invalid provider");
-        };
-    }
-
-//    private ChatModelResult getAmazonBedrockAnthropic2ChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC2.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockAnthropic2 amazonBedrockAnthropic2 = aiProvider.getAmazonBedrockAnthropic2();
-//
-//            token = amazonBedrockAnthropic2.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockAnthropic2ChatAction.CHAT_MODEL;
-//    }
-//
-//    private ChatModelResult getAmazonBedrockAnthropic3ChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_ANTHROPIC3.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockAnthropic3 amazonBedrockAnthropic3 = aiProvider.getAmazonBedrockAnthropic3();
-//
-//            token = amazonBedrockAnthropic3.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockAnthropic3ChatAction.CHAT_MODEL;
-//    }
-//
-//    private ChatModelResult getAmazonBedrockCohereChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_COHERE.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockCohere amazonBedrockCohere = aiProvider.getAmazonBedrockCohere();
-//
-//            token = amazonBedrockCohere.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockCohereChatAction.CHAT_MODEL;
-//    }
-//
-//    private ChatModelResult getAmazonBedrockJurassic2ChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_JURASSIC2.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockJurassic2 amazonBedrockJurassic2 = aiProvider.getAmazonBedrockJurassic2();
-//
-//            token = amazonBedrockJurassic2.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockJurassic2ChatAction.CHAT_MODEL;
-//    }
-//
-//    private ChatModelResult getAmazonBedrockLlamaChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_LLAMA.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockLlama amazonBedrockLlama = aiProvider.getAmazonBedrockLlama();
-//
-//            token = amazonBedrockLlama.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockLlamaChatAction.CHAT_MODEL;
-//    }
-//
-//    private ChatModelResult getAmazonBedrockTitanChatModel(
-//        List<String> activeProviderKeys, Map<String, String> modelConnectionParametersMap) {
-//
-//        String token = getAiProviderToken(AMAZON_BEDROCK_TITAN.getKey(), activeProviderKeys);
-//
-//        if (token == null) {
-//            AmazonBedrockTitan amazonBedrockTitan = aiProvider.getAmazonBedrockTitan();
-//
-//            token = amazonBedrockTitan.getApiKey();
-//        }
-//
-//        modelConnectionParametersMap.put(TOKEN, token);
-//
-//        return AmazonBedrockTitanChatAction.CHAT_MODEL;
-//    }
-
-    private ChatModelResult getAnthropicChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(ANTHROPIC.getKey(), activeProviderKeys, environmentId);
 
         if (token == null) {
-            Anthropic anthropic = aiProvider.getAnthropic();
-
-            token = anthropic.getApiKey();
+            token = aiProvider.getProviderApiKey(providerKey);
         }
 
-        return new ChatModelResult(AnthropicChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getAzureOpenAiChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(AZURE_OPEN_AI.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
-
-            token = azureOpenAi.getApiKey();
-        }
-
-        return new ChatModelResult(AzureOpenAiChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getDeepSeekModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(DEEPSEEK.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            DeepSeek deepSeek = aiProvider.getDeepSeek();
-
-            token = deepSeek.getApiKey();
-        }
-
-        return new ChatModelResult(DeepSeekChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getGroqChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(GROQ.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            Groq groq = aiProvider.getGroq();
-
-            token = groq.getApiKey();
-        }
-
-        return new ChatModelResult(PerplexityChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getMistralChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(MISTRAL.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            Mistral mistral = aiProvider.getMistral();
-
-            token = mistral.getApiKey();
-        }
-
-        return new ChatModelResult(MistralChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getNvidiaChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(NVIDIA.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            Nvidia nvidia = aiProvider.getNvidia();
-
-            token = nvidia.getApiKey();
-        }
-
-        return new ChatModelResult(NvidiaChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getOllamaChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(OLLAMA.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            Ollama ollama = aiProvider.getOllama();
-
-            token = ollama.getApiKey();
-        }
-
-        return new ChatModelResult(OllamaChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getOpenAiChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(OPEN_AI.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            OpenAi openAi = aiProvider.getOpenAi();
-
-            token = openAi.getApiKey();
-        }
-
-        return new ChatModelResult(OpenAiChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getPerplexityChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(PERPLEXITY.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            Perplexity perplexity = aiProvider.getPerplexity();
-
-            token = perplexity.getApiKey();
-        }
-
-        return new ChatModelResult(PerplexityChatAction.CHAT_MODEL, token);
-    }
-
-    private ChatModelResult getVertexGeminiChatModel(List<String> activeProviderKeys, Long environmentId) {
-        String token = getAiProviderToken(VERTEX_GEMINI.getKey(), activeProviderKeys, environmentId);
-
-        if (token == null) {
-            VertexGemini vertexGemini = aiProvider.getVertexGemini();
-
-            token = vertexGemini.getApiKey();
-        }
-
-        return new ChatModelResult(GeminiChatAction.CHAT_MODEL, token);
-    }
-
-    record ChatModelResult(ChatModel chatModel, String token) {
+        return token;
     }
 }

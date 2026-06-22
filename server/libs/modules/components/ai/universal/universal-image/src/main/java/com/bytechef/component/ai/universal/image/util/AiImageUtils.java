@@ -18,10 +18,8 @@ package com.bytechef.component.ai.universal.image.util;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
-import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
+import com.bytechef.component.ai.llm.LLMModelRegistry;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.definition.ActionContext;
@@ -35,7 +33,6 @@ import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Predicate;
 
 /**
  * @author Marko Kriskovic
@@ -76,46 +73,17 @@ public class AiImageUtils {
             .toList();
 
         return Arrays.stream(Provider.values())
-            .filter(filter(aiProvider, activeProviderKeys))
+            .filter(provider -> isSelectable(provider, aiProvider, activeProviderKeys))
             .map(provider -> option(provider.getLabel(), String.valueOf(provider)))
             .toList();
     }
 
-    private static boolean checkAiProvider(String key, List<String> activeProviderKeys) {
-        return activeProviderKeys.stream()
-            .anyMatch(key::equals);
-    }
+    static boolean isSelectable(Provider provider, Ai.Provider aiProvider, List<String> activeProviderKeys) {
+        if (!LLMModelRegistry.hasImageModel(provider)) {
+            return false;
+        }
 
-    private static Predicate<Provider> filter(Ai.Provider aiProvider, List<String> activeProviderKeys) {
-        return provider -> switch (provider) {
-            case AZURE_OPEN_AI -> {
-                if (checkAiProvider(AZURE_OPEN_AI.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                Ai.Provider.AzureOpenAi azureOpenAi = aiProvider.getAzureOpenAi();
-
-                yield azureOpenAi.getApiKey() != null;
-            }
-            case OPEN_AI -> {
-                if (checkAiProvider(OPEN_AI.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                Ai.Provider.OpenAi openAi = aiProvider.getOpenAi();
-
-                yield openAi.getApiKey() != null;
-            }
-            case STABILITY -> {
-                if (checkAiProvider(STABILITY.getKey(), activeProviderKeys)) {
-                    yield true;
-                }
-
-                Ai.Provider.Stability stability = aiProvider.getStability();
-
-                yield stability.getApiKey() != null;
-            }
-            default -> false;
-        };
+        return activeProviderKeys.contains(provider.getKey()) ||
+            aiProvider.getProviderApiKey(provider.getKey()) != null;
     }
 }

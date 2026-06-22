@@ -22,8 +22,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.connection.domain.AiProviderConnectionId;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.repository.AiProviderConnectionRepository;
