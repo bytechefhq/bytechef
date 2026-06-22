@@ -16,6 +16,7 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.configuration.dto.AiProviderCatalogItemDTO;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.Option;
@@ -23,6 +24,7 @@ import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.connection.aiprovider.AiProviderConnectionSource;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -55,7 +57,16 @@ class AiProviderFacadeCatalogTest {
     void setUp() {
         applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
-        facade = new AiProviderFacadeImpl(componentDefinitionService, propertyService, applicationProperties);
+        // Stub returns empty supported-providers list so the facade falls back to the inline
+        // (property-enabled || hasConfigApiKey) path for all providers, keeping all existing
+        // test assertions valid without additional mock setup.
+        AiProviderConnectionSource aiProviderConnectionSource = mock(AiProviderConnectionSource.class);
+
+        lenient().when(aiProviderConnectionSource.getSupportedProviders())
+            .thenReturn(List.of());
+
+        facade = new AiProviderFacadeImpl(
+            aiProviderConnectionSource, componentDefinitionService, propertyService, applicationProperties);
     }
 
     @Test
@@ -263,6 +274,38 @@ class AiProviderFacadeCatalogTest {
             .orElseThrow();
 
         assertThat(anthropic.enabled()).isFalse();
+    }
+
+    @Test
+    void testCatalogEnabledViaDelegatedSource() {
+        // Build a facade whose AiProviderConnectionSource claims to own OPEN_AI and reports it enabled.
+        AiProviderConnectionSource delegatingSource = mock(AiProviderConnectionSource.class);
+
+        when(delegatingSource.getSupportedProviders()).thenReturn(List.of(Provider.OPEN_AI));
+        when(delegatingSource.isEnabled(Provider.OPEN_AI, ENVIRONMENT)).thenReturn(true);
+
+        AiProviderFacadeImpl delegatingFacade = new AiProviderFacadeImpl(
+            delegatingSource, componentDefinitionService, propertyService, applicationProperties);
+
+        ComponentDefinition openAiDefinition = buildEmptyActionComponentDefinition("openAi");
+
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(openAiDefinition));
+        when(propertyService.getProperties(
+            ArgumentMatchers.anyList(),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(List.of());
+
+        List<AiProviderCatalogItemDTO> catalog = delegatingFacade.getAiChatProviderCatalog(ENVIRONMENT);
+
+        AiProviderCatalogItemDTO openAi = catalog.stream()
+            .filter(item -> item.key()
+                .equals(Provider.OPEN_AI.getKey()))
+            .findFirst()
+            .orElseThrow();
+
+        assertThat(openAi.enabled()).isTrue();
     }
 
     /**

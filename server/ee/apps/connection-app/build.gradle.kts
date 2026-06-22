@@ -34,6 +34,7 @@ dependencies {
     implementation(project(":server:libs:core:encryption:encryption-property"))
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
+    implementation(project(":server:libs:platform:platform-connection:platform-connection-ai-provider"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-service"))
     implementation(project(":server:libs:platform:platform-oauth2:platform-oauth2-service"))
     implementation(project(":server:libs:platform:platform-swagger"))

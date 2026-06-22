@@ -43,6 +43,7 @@ import com.bytechef.platform.connection.domain.Connection;
  */
 public class ConnectionErrorType extends AbstractErrorType {
 
+    public static final ConnectionErrorType AI_PROVIDER_CONNECTION_READ_ONLY = new ConnectionErrorType(105);
     public static final ConnectionErrorType CONNECTION_ALREADY_AT_TARGET_VISIBILITY = new ConnectionErrorType(104);
     public static final ConnectionErrorType CONNECTION_IS_USED = new ConnectionErrorType(100);
     public static final ConnectionErrorType CONNECTION_NOT_ACTIVE = new ConnectionErrorType(103);

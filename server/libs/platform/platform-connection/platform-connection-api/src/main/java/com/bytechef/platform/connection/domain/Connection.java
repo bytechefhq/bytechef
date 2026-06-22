@@ -105,6 +105,9 @@ public final class Connection implements CredentialSecret {
     @Transient
     private boolean credentialStatusUpdated;
 
+    @Transient
+    private boolean managed;
+
     @Column("parameters")
     private EncryptedMapWrapper parameters;
 
@@ -360,6 +363,14 @@ public final class Connection implements CredentialSecret {
 
     public boolean isCredentialsStatusUpdated() {
         return credentialStatusUpdated;
+    }
+
+    public boolean isManaged() {
+        return managed;
+    }
+
+    public void setManaged(boolean managed) {
+        this.managed = managed;
     }
 
     public void setName(String name) {

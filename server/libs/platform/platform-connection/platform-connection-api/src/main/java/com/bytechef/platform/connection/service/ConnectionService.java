@@ -63,6 +63,15 @@ public interface ConnectionService {
 
     List<Connection> getConnections(List<Long> connectionIds);
 
+    /**
+     * Returns the read-only, system-managed AI-provider connections projected from enabled AI providers (see
+     * {@link com.bytechef.platform.connection.repository.AiProviderConnectionRepository}). These are
+     * platform/environment-scoped, carry negative ids, and are always {@code AUTOMATION} + {@code managed=true}.
+     * Returns an empty list when no projector is registered.
+     */
+    List<Connection> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Integer environmentId);
+
     Connection update(long id, List<Long> tagIds);
 
     Connection update(long id, String name, List<Long> tagIds, int version);

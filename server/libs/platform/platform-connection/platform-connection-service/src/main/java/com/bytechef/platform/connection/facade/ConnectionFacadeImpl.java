@@ -278,6 +278,21 @@ public class ConnectionFacadeImpl implements ConnectionFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public List<ConnectionDTO> getAiProviderConnections(
+        String componentName, Integer connectionVersion, Long environmentId, Long tagId) {
+
+        if (tagId != null) {
+            return List.of();
+        }
+
+        List<Connection> connections = connectionService.getAiProviderConnections(
+            componentName, connectionVersion, environmentId == null ? null : environmentId.intValue());
+
+        return getConnections(connections);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<Tag> getConnectionTags(PlatformType type) {
         List<Connection> connections = connectionService.getConnections(type);
 

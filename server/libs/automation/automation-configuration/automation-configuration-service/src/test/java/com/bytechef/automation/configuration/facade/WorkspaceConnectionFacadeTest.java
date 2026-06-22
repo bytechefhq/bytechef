@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -139,6 +140,8 @@ class WorkspaceConnectionFacadeTest {
             .thenReturn(allConnections);
         when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
             .thenReturn(Set.of(10L));
+        lenient().when(connectionFacade.getAiProviderConnections(null, null, null, null))
+            .thenReturn(List.of());
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
@@ -148,10 +151,69 @@ class WorkspaceConnectionFacadeTest {
     @Test
     void testGetConnectionsEmptyWorkspaceReturnsEmpty() {
         when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID)).thenReturn(List.of());
+        when(connectionFacade.getAiProviderConnections(null, null, null, null)).thenReturn(List.of());
 
         List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void testGetConnectionsIncludesAiProviderConnectionsWhenWorkspaceEmpty() {
+        // C1 regression guard: projected connections must surface even when the workspace has no
+        // real connections (i.e., the workspace_connection join table is empty).
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID)).thenReturn(List.of());
+
+        ConnectionDTO aiProviderConnection = ConnectionDTO.builder()
+            .id(-1L)
+            .componentName("openAi")
+            .build();
+
+        when(connectionFacade.getAiProviderConnections(null, null, null, null))
+            .thenReturn(List.of(aiProviderConnection));
+
+        List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0)
+            .componentName()).isEqualTo("openAi");
+    }
+
+    @Test
+    void testGetConnectionsAppendsAiProviderConnectionsToWorkspaceConnections() {
+        // Both a real workspace connection AND an AI provider connection should appear in the result.
+        WorkspaceConnection workspaceConnection = mock(WorkspaceConnection.class);
+
+        when(workspaceConnection.getConnectionId()).thenReturn(10L);
+
+        when(workspaceConnectionService.getWorkspaceConnections(WORKSPACE_ID))
+            .thenReturn(List.of(workspaceConnection));
+
+        ConnectionDTO realConnection = ConnectionDTO.builder()
+            .id(10L)
+            .componentName("slack")
+            .visibility(ResourceVisibility.PRIVATE)
+            .build();
+        List<ConnectionDTO> workspaceConnections = List.of(realConnection);
+
+        when(connectionFacade.getConnections(null, null, List.of(10L), null, null, PlatformType.AUTOMATION))
+            .thenReturn(workspaceConnections);
+        when(resourceVisibilityResolver.filterVisibleIds(eq("Connection"), eq(WORKSPACE_ID), any()))
+            .thenReturn(Set.of(10L));
+
+        ConnectionDTO aiProviderConnection = ConnectionDTO.builder()
+            .id(-1L)
+            .componentName("openAi")
+            .build();
+
+        when(connectionFacade.getAiProviderConnections(null, null, null, null))
+            .thenReturn(List.of(aiProviderConnection));
+
+        List<ConnectionDTO> result = workspaceConnectionFacade.getConnections(WORKSPACE_ID, null, null, null, null);
+
+        assertThat(result).hasSize(2);
+        assertThat(result).extracting(ConnectionDTO::componentName)
+            .containsExactlyInAnyOrder("slack", "openAi");
     }
 
     @Test

@@ -18,6 +18,7 @@ import com.bytechef.runtime.job.platform.connection.ConnectionContext;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.jspecify.annotations.Nullable;
 import org.springframework.stereotype.Service;
 
 /**
@@ -87,6 +88,13 @@ public class ConnectionServiceImpl implements ConnectionService {
 
     @Override
     public List<Connection> getConnections(List<Long> connectionIds) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public List<Connection> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Integer environmentId) {
+
         throw new UnsupportedOperationException();
     }
 

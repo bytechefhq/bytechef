@@ -212,6 +212,7 @@ include("server:libs:platform:platform-credential-store:platform-credential-stor
 include("server:libs:platform:platform-credential-store:platform-credential-store-service")
 include("server:libs:platform:platform-connection:platform-connection-graphql")
 include("server:libs:platform:platform-connection:platform-connection-service")
+include("server:libs:platform:platform-connection:platform-connection-ai-provider")
 include("server:libs:platform:platform-coordinator")
 include("server:libs:platform:platform-data-storage:platform-data-storage-api")
 include("server:libs:platform:platform-job-sync")

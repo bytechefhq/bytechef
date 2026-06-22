@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-credential-store:platform-credential-store-service"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-execution:platform-workflow-execution-api"))
 
+    testImplementation(project(":server:libs:modules:components:ai:llm"))
     testImplementation("org.springframework.boot:spring-boot-actuator")
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation("tools.jackson.core:jackson-databind")

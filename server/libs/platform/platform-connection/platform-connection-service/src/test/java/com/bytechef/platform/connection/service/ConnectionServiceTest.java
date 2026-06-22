@@ -28,6 +28,7 @@ import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.domain.ConnectionStatus;
 import com.bytechef.platform.connection.exception.ConnectionErrorType;
+import com.bytechef.platform.connection.repository.AiProviderConnectionRepository;
 import com.bytechef.platform.connection.repository.ConnectionRepository;
 import com.bytechef.platform.credential.store.CredentialStore;
 import com.bytechef.platform.credential.store.CredentialStoreType;
@@ -46,6 +47,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -62,11 +64,15 @@ class ConnectionServiceTest {
     @Mock
     private ConnectionRepository connectionRepository;
 
+    @Mock
+    private ObjectProvider<AiProviderConnectionRepository> aiProviderConnectionRepositoryProvider;
+
     private ConnectionServiceImpl connectionService;
 
     @BeforeEach
     void setUp() {
-        connectionService = new ConnectionServiceImpl(List.of(), connectionRepository);
+        connectionService = new ConnectionServiceImpl(
+            List.of(), connectionRepository, aiProviderConnectionRepositoryProvider);
 
         SecurityContextHolder.getContext()
             .setAuthentication(new UsernamePasswordAuthenticationToken(
@@ -247,7 +253,7 @@ class ConnectionServiceTest {
             .getSecret(any());
 
         ConnectionServiceImpl serviceWithStores = new ConnectionServiceImpl(
-            List.of(dbStore, awsStore), connectionRepository);
+            List.of(dbStore, awsStore), connectionRepository, aiProviderConnectionRepositoryProvider);
 
         Connection connection = new Connection();
 

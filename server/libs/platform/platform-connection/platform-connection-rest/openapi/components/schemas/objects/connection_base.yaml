@@ -11,6 +11,10 @@ properties:
     description: "If a connection is used in any of active workflows."
     type: "boolean"
     readOnly: true
+  managed:
+    description: "True when this connection is system-managed (e.g. an enabled AI provider) and cannot be edited or deleted."
+    type: "boolean"
+    readOnly: true
   authorizationType:
     $ref: "../../../../../../platform-configuration/platform-configuration-rest/platform-configuration-rest-impl/openapi.yaml#/components/schemas/AuthorizationType"
   authorizationParameters:

@@ -21,6 +21,7 @@ import com.bytechef.platform.connection.dto.ConnectionDTO;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.tag.domain.Tag;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -30,6 +31,15 @@ public interface ConnectionFacade {
     long create(ConnectionDTO connectionDTO, PlatformType type);
 
     void delete(Long id);
+
+    /**
+     * Returns the read-only AI-provider connections as DTOs. Empty when {@code tagId} is non-null (projected
+     * connections have no tags). Used by the automation workspace list to surface platform AI keys as selectable,
+     * non-deletable connections in every workspace.
+     */
+    List<ConnectionDTO> getAiProviderConnections(
+        @Nullable String componentName, @Nullable Integer connectionVersion, @Nullable Long environmentId,
+        @Nullable Long tagId);
 
     Integer executeConnectionRefresh(Long connectionId);
 

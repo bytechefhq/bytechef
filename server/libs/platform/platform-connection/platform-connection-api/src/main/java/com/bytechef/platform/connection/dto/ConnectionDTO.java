@@ -39,7 +39,7 @@ public record ConnectionDTO(
     String baseUri, String componentName, Map<String, ?> connectionParameters, int connectionVersion, String createdBy,
     Instant createdDate, CredentialStatus credentialStatus, @Nullable CredentialStoreType credentialStoreType,
     int environmentId, Long id, String lastModifiedBy, Instant lastModifiedDate, String name, Map<String, ?> parameters,
-    ConnectionStatus status, List<Tag> tags, int version, ResourceVisibility visibility) {
+    ConnectionStatus status, List<Tag> tags, int version, ResourceVisibility visibility, boolean managed) {
 
     public ConnectionDTO {
         // status and visibility are load-bearing for authorization and audit; null here would cascade
@@ -60,7 +60,7 @@ public record ConnectionDTO(
             connection.getCreatedDate(), connection.getCredentialStatus(), connection.getCredentialStoreType(),
             connection.getEnvironmentId(), connection.getId(), connection.getLastModifiedBy(),
             connection.getLastModifiedDate(), connection.getName(), connection.getParameters(),
-            connection.getStatus(), tags, connection.getVersion(), connection.getVisibility());
+            connection.getStatus(), tags, connection.getVersion(), connection.getVisibility(), connection.isManaged());
     }
 
     public Connection toConnection() {
@@ -232,7 +232,7 @@ public record ConnectionDTO(
             return new ConnectionDTO(
                 active, authorizationType, Map.of(), baseUri, componentName, Map.of(), connectionVersion, createdBy,
                 createdDate, credentialStatus, credentialStoreType, environmentId, id, lastModifiedBy, lastModifiedDate,
-                name, parameters, status, tags, version, visibility);
+                name, parameters, status, tags, version, visibility, false);
         }
     }
 }
