@@ -1,10 +1,9 @@
 import Button from '@/components/Button/Button';
-import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
+import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
-import {PopoverClose} from '@radix-ui/react-popover';
 import {PlusIcon, XIcon} from 'lucide-react';
 import {ChangeEvent} from 'react';
 

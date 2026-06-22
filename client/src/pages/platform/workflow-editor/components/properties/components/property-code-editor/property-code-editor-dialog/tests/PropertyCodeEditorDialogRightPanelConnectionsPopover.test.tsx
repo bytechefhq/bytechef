@@ -90,17 +90,14 @@ vi.mock('@/components/ui/popover', () => ({
             {children}
         </div>
     ),
-    PopoverContent: ({children}: {children: React.ReactNode}) => <div data-testid="popover-content">{children}</div>,
-    PopoverTrigger: ({children}: {asChild?: boolean; children: React.ReactNode}) => (
-        <div data-testid="popover-trigger">{children}</div>
-    ),
-}));
-
-vi.mock('@radix-ui/react-popover', () => ({
     PopoverClose: ({children, onClick}: {asChild?: boolean; children: React.ReactNode; onClick?: () => void}) => (
         <div data-testid="popover-close" onClick={onClick}>
             {children}
         </div>
+    ),
+    PopoverContent: ({children}: {children: React.ReactNode}) => <div data-testid="popover-content">{children}</div>,
+    PopoverTrigger: ({children}: {asChild?: boolean; children: React.ReactNode}) => (
+        <div data-testid="popover-trigger">{children}</div>
     ),
 }));
 

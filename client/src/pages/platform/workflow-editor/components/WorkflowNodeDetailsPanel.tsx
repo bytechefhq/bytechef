@@ -3,7 +3,7 @@ import LoadingIcon from '@/components/LoadingIcon';
 import {ScrollArea} from '@/components/ui/scroll-area';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import CurrentOperationSelect from '@/pages/platform/workflow-editor/components/CurrentOperationSelect';
 import DescriptionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/DescriptionTab';
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
@@ -16,7 +16,6 @@ import {
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import InlineSVG from 'react-inlinesvg';

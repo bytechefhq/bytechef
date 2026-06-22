@@ -1,14 +1,13 @@
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ActionDefinitionBasic,
     ClusterElementDefinitionBasic,
     TriggerDefinitionBasic,
 } from '@/shared/middleware/platform/configuration';
-import {Item, ItemIndicator, ItemText} from '@radix-ui/react-select';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
+import {Select as SelectPrimitive} from 'radix-ui';
 import {twMerge} from 'tailwind-merge';
 
 interface CurrentOperationSelectProps {
@@ -54,7 +53,7 @@ const OperationSelect = ({
 
             <SelectContent className="max-h-select-content-available-height-1/2 max-w-select-trigger-width">
                 {operations?.map((operation) => (
-                    <Item
+                    <SelectPrimitive.Item
                         className={twMerge(
                             'radix-disabled:opacity-50 flex cursor-pointer items-center overflow-hidden rounded-md px-8 py-2 text-sm font-medium text-gray-700 select-none focus:bg-gray-100 focus:outline-hidden'
                         )}
@@ -62,13 +61,13 @@ const OperationSelect = ({
                         value={operation.name}
                     >
                         <span className="absolute right-2 flex size-3.5 items-center justify-center">
-                            <ItemIndicator>
+                            <SelectPrimitive.ItemIndicator>
                                 <CheckIcon className="size-4" />
-                            </ItemIndicator>
+                            </SelectPrimitive.ItemIndicator>
                         </span>
 
                         <div className="flex flex-col">
-                            <ItemText>{operation.title || operation.name}</ItemText>
+                            <SelectPrimitive.ItemText>{operation.title || operation.name}</SelectPrimitive.ItemText>
 
                             {operation.description && (
                                 <span
@@ -79,7 +78,7 @@ const OperationSelect = ({
                                 </span>
                             )}
                         </div>
-                    </Item>
+                    </SelectPrimitive.Item>
                 ))}
             </SelectContent>
         </Select>

@@ -3,8 +3,8 @@ import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SelectOptionType} from '@/shared/types';
-import {Item, ItemIndicator, ItemText, Value} from '@radix-ui/react-select';
 import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
+import {Select as SelectPrimitive} from 'radix-ui';
 import {ReactNode} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -86,7 +86,7 @@ const PropertySelect = ({
                                 </div>
 
                                 <div className="ml-9 text-foreground">
-                                    <Value placeholder={placeholder} />
+                                    <SelectPrimitive.Value placeholder={placeholder} />
                                 </div>
                             </div>
                         ) : (
@@ -107,7 +107,7 @@ const PropertySelect = ({
 
                         {options.map((option) =>
                             option.description ? (
-                                <Item
+                                <SelectPrimitive.Item
                                     className={twMerge(
                                         'relative flex w-full cursor-default items-center rounded-sm py-1.5 pr-8 pl-2 text-sm outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
                                         option.value === value && 'px-2'
@@ -116,13 +116,13 @@ const PropertySelect = ({
                                     value={option.value}
                                 >
                                     <span className="absolute right-2 flex size-3.5 items-center justify-center">
-                                        <ItemIndicator>
+                                        <SelectPrimitive.ItemIndicator>
                                             <CheckIcon className="size-4" />
-                                        </ItemIndicator>
+                                        </SelectPrimitive.ItemIndicator>
                                     </span>
 
                                     <div className="flex flex-col">
-                                        <ItemText>{option.label}</ItemText>
+                                        <SelectPrimitive.ItemText>{option.label}</SelectPrimitive.ItemText>
 
                                         {option.description && (
                                             <span
@@ -133,7 +133,7 @@ const PropertySelect = ({
                                             </span>
                                         )}
                                     </div>
-                                </Item>
+                                </SelectPrimitive.Item>
                             ) : (
                                 <SelectItem key={`${option.value}_${option.label}`} value={option.value}>
                                     {option.label}
