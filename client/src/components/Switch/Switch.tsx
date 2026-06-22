@@ -27,12 +27,12 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
 const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
     default: {
-        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-[12.8px]',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-4',
+        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-[12.8px]',
         track: 'h-5 w-9 px-0.5 rounded-full border-0',
     },
     small: {
