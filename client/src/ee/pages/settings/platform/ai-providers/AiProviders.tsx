@@ -21,7 +21,7 @@ const AiProviders = () => {
                 header={
                     <Header
                         centerTitle
-                        description="Enable providers used by Univerzal AI Connectors"
+                        description="Enable providers used by Universal AI Connectors"
                         position="main"
                         right={<EnvironmentSelect />}
                         title="AI Providers"
