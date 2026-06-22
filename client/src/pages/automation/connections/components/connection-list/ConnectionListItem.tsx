@@ -361,12 +361,14 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                 </DropdownMenuTrigger>
 
                                 <DropdownMenuContent align="end" className="p-0">
-                                    <DropdownMenuItem
-                                        className="dropdown-menu-item"
-                                        onClick={() => setShowEditDialog(true)}
-                                    >
-                                        <EditIcon /> Edit
-                                    </DropdownMenuItem>
+                                    {!connection.managed && (
+                                        <DropdownMenuItem
+                                            className="dropdown-menu-item"
+                                            onClick={() => setShowEditDialog(true)}
+                                        >
+                                            <EditIcon /> Edit
+                                        </DropdownMenuItem>
+                                    )}
 
                                     <DropdownMenuSeparator className="m-0" />
 
@@ -379,26 +381,28 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                         </DropdownMenuItem>
                                     )}
 
-                                    <div
-                                        title={
-                                            connection.active === true
-                                                ? 'Disconnect from all workflows first to enable deletion'
-                                                : 'Delete the connection'
-                                        }
-                                    >
-                                        <DropdownMenuItem
-                                            className={
+                                    {!connection.managed && (
+                                        <div
+                                            title={
                                                 connection.active === true
-                                                    ? 'dropdown-menu-item-destructive-disabled'
-                                                    : 'dropdown-menu-item-destructive'
+                                                    ? 'Disconnect from all workflows first to enable deletion'
+                                                    : 'Delete the connection'
                                             }
-                                            disabled={connection.active}
-                                            onClick={() => setShowDeleteDialog(true)}
-                                            variant="destructive"
                                         >
-                                            <Trash2Icon /> Delete
-                                        </DropdownMenuItem>
-                                    </div>
+                                            <DropdownMenuItem
+                                                className={
+                                                    connection.active === true
+                                                        ? 'dropdown-menu-item-destructive-disabled'
+                                                        : 'dropdown-menu-item-destructive'
+                                                }
+                                                disabled={connection.active}
+                                                onClick={() => setShowDeleteDialog(true)}
+                                                variant="destructive"
+                                            >
+                                                <Trash2Icon /> Delete
+                                            </DropdownMenuItem>
+                                        </div>
+                                    )}
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>

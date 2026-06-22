@@ -8,6 +8,7 @@ Contains all required information to open a connection to a service defined by c
 Name | Type
 ------------ | -------------
 `active` | boolean
+`managed` | boolean
 `authorizationType` | [AuthorizationType](AuthorizationType.md)
 `authorizationParameters` | { [key: string]: any; }
 `baseUri` | string
@@ -37,6 +38,7 @@ import type { ConnectionBase } from ''
 // TODO: Update the object below with actual values
 const example = {
   "active": null,
+  "managed": null,
   "authorizationType": null,
   "authorizationParameters": null,
   "baseUri": null,
