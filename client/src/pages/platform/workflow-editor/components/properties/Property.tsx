@@ -2,7 +2,7 @@ import {MultiSelectOptionType} from '@/components/MultiSelect/MultiSelect';
 import RequiredMark from '@/components/RequiredMark';
 import {Label} from '@/components/ui/label';
 import {Skeleton} from '@/components/ui/skeleton';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import ArrayProperty from '@/pages/platform/workflow-editor/components/properties/ArrayProperty';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
 import ObjectProperty from '@/pages/platform/workflow-editor/components/properties/ObjectProperty';
@@ -30,7 +30,6 @@ import {
     Option,
 } from '@/shared/middleware/platform/configuration';
 import {ArrayPropertyType, PropertyAllType, SelectOptionType} from '@/shared/types';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {UseQueryResult} from '@tanstack/react-query';
 import {CircleQuestionMarkIcon, SquareFunctionIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';

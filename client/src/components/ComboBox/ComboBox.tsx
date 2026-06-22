@@ -3,8 +3,8 @@ import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList} from '@/components/ui/command';
 import {Popover, PopoverTrigger} from '@/components/ui/popover';
 import {cn} from '@/shared/util/cn-utils';
-import * as PopoverPrimitive from '@radix-ui/react-popover';
 import {CheckIcon, ChevronsUpDownIcon} from 'lucide-react';
+import {Popover as PopoverPrimitive} from 'radix-ui';
 import {FC, FocusEventHandler, ReactNode, useState} from 'react';
 
 export type ComboBoxItemType = {

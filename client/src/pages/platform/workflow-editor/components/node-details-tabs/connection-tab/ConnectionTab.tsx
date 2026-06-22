@@ -1,6 +1,6 @@
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import ConnectionTabConnectionFieldset from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTabConnectionFieldset';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
@@ -13,7 +13,6 @@ import {
     WorkflowTestConfigurationConnection,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
 import {CircleQuestionMarkIcon, XIcon} from 'lucide-react';
 import {ChangeEvent} from 'react';
 import {twMerge} from 'tailwind-merge';

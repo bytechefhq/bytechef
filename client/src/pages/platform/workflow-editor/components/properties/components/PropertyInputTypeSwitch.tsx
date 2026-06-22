@@ -1,6 +1,5 @@
 import Switch from '@/components/Switch/Switch';
-import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
-import {TooltipPortal} from '@radix-ui/react-tooltip';
+import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 
 const PropertyInputTypeSwitch = ({handleClick, mentionInput}: {handleClick: () => void; mentionInput: boolean}) => (
     <Tooltip>

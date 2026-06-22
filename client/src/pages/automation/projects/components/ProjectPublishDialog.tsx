@@ -1,12 +1,18 @@
 import Button from '@/components/Button/Button';
-import {DialogCloseButton, DialogContent, DialogDescription, DialogHeader, DialogTitle} from '@/components/ui/dialog';
+import {
+    Dialog,
+    DialogCloseButton,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {usePublishProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {ProjectKeys} from '@/shared/queries/automation/projects.queries';
-import {Dialog} from '@radix-ui/react-dialog';
 import {useQueryClient} from '@tanstack/react-query';
 import {useState} from 'react';
 import {toast} from 'sonner';
