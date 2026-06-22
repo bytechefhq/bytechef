@@ -66,79 +66,75 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
     }, [aiProviders]);
 
     return (
-        <Accordion
-            className="w-full px-4 3xl:mx-auto 3xl:w-4/5"
-            collapsible
-            onValueChange={setOpenItem}
-            type="single"
-            value={openItem}
-        >
-            {aiProviders &&
-                aiProviders.map((aiProvider) => (
-                    <AccordionItem className="ai-provider w-full" key={aiProvider.id} value={`item-${aiProvider.id}`}>
-                        <div className="flex w-full items-center justify-between">
-                            <AccordionTrigger className="flex w-full flex-1 cursor-pointer items-center justify-between py-4 text-left transition-all">
-                                <div className="flex w-full items-center gap-3">
-                                    <InlineSVG
-                                        className="size-9 flex-none"
-                                        key={aiProvider.name!}
-                                        src={aiProvider.icon!}
-                                    />
+        <div className="w-full p-4">
+            <Accordion
+                className="w-full rounded-md border"
+                collapsible
+                onValueChange={setOpenItem}
+                type="single"
+                value={openItem}
+            >
+                {aiProviders &&
+                    aiProviders.map((aiProvider) => (
+                        <AccordionItem className="ai-provider px-4" key={aiProvider.id} value={`item-${aiProvider.id}`}>
+                            <div className="flex w-full items-center justify-between gap-3">
+                                <AccordionTrigger className="flex flex-1 cursor-pointer items-center justify-start gap-3 py-3 text-left hover:no-underline">
+                                    <span className="flex-none">
+                                        <InlineSVG className="size-6" key={aiProvider.name!} src={aiProvider.icon!} />
+                                    </span>
 
-                                    <div className="mr-1 flex flex-col">
-                                        <div className="text-lg">{aiProvider.name}</div>
+                                    <div className="flex flex-col">
+                                        <span className="text-sm font-semibold">{aiProvider.name}</span>
 
-                                        <div className="text-sm text-muted-foreground">
-                                            Configure credentials {aiProvider.name} for AI provider
-                                        </div>
+                                        <span className="text-xs text-muted-foreground">
+                                            Configure {aiProvider.name} credentials
+                                        </span>
                                     </div>
-                                </div>
-                            </AccordionTrigger>
+                                </AccordionTrigger>
 
-                            <div>
                                 <Switch
                                     checked={enabledItems[aiProvider.id!]}
                                     onCheckedChange={(value) => handleOnCheckedChange(value, aiProvider)}
                                 />
                             </div>
-                        </div>
 
-                        <AccordionContent className="my-2 w-6/12 pl-12">
-                            {showForm[aiProvider.id!] ? (
-                                <AiProviderForm
-                                    environment={environment}
-                                    id={aiProvider.id!}
-                                    onClose={() =>
-                                        setShowForm((prev) => ({
-                                            ...prev,
-                                            [aiProvider.id!]: false,
-                                        }))
-                                    }
-                                    showCancel={!!aiProvider.apiKey}
-                                />
-                            ) : (
-                                <div className="flex items-center gap-2">
-                                    <span className="text-base text-muted-foreground">API Key: </span>
-
-                                    <span className="text-base">{aiProvider.apiKey}</span>
-
-                                    <Button
-                                        onClick={() =>
+                            <AccordionContent className="pb-3 pl-9">
+                                {showForm[aiProvider.id!] ? (
+                                    <AiProviderForm
+                                        environment={environment}
+                                        id={aiProvider.id!}
+                                        onClose={() =>
                                             setShowForm((prev) => ({
                                                 ...prev,
-                                                [aiProvider.id!]: true,
+                                                [aiProvider.id!]: false,
                                             }))
                                         }
-                                        variant="link"
-                                    >
-                                        Edit
-                                    </Button>
-                                </div>
-                            )}
-                        </AccordionContent>
-                    </AccordionItem>
-                ))}
-        </Accordion>
+                                        showCancel={!!aiProvider.apiKey}
+                                    />
+                                ) : (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-base text-muted-foreground">API Key: </span>
+
+                                        <span className="text-base">{aiProvider.apiKey}</span>
+
+                                        <Button
+                                            onClick={() =>
+                                                setShowForm((prev) => ({
+                                                    ...prev,
+                                                    [aiProvider.id!]: true,
+                                                }))
+                                            }
+                                            variant="link"
+                                        >
+                                            Edit
+                                        </Button>
+                                    </div>
+                                )}
+                            </AccordionContent>
+                        </AccordionItem>
+                    ))}
+            </Accordion>
+        </div>
     );
 };
 
