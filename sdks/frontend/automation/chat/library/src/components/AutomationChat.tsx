@@ -34,10 +34,10 @@ export interface AutomationChatProps {
  */
 export const AutomationChat: FC<AutomationChatProps> = ({config, className = '', header}) => {
     return (
-        <div className={`bytechef-chat-container flex flex-1 flex-col ${className}`}>
+        <div className={`bytechef-chat-container flex h-full flex-col ${className}`}>
             {header && <div className="bytechef-chat-header">{header}</div>}
             <AutomationChatProvider config={config}>
-                <div className="flex size-full flex-col">
+                <div className="flex w-full flex-1 flex-col">
                     <Thread />
                 </div>
             </AutomationChatProvider>
