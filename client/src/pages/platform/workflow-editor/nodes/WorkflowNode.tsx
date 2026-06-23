@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
@@ -9,10 +9,9 @@ import {useGetClusterElementDefinitionQuery} from '@/shared/queries/platform/clu
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ClusterElementsType, NodeDataType} from '@/shared/types';
-import {HoverCard, HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon} from 'lucide-react';
+import {CheckIcon, ComponentIcon, XIcon} from 'lucide-react';
 import {KeyboardEvent, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
@@ -52,6 +51,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     handleRenameSubmit: (newLabel: string) => void;
     hasSavedClusterElementPosition: NodePositionType;
     id: string;
+    infoCardOpen: boolean;
     isClusterElement: string | undefined;
     isHorizontal: boolean;
     isMainRootClusterElement: boolean;
@@ -62,7 +62,7 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     nodeDescription: string | undefined;
     nodeLabel: string | undefined;
     nodeWidth: number;
-    onHoveredNodeNameChange: (name: string | undefined) => void;
+    onInfoClose: () => void;
     parentClusterRootId: string | undefined;
     renameValue: string;
     setRenameValue: (value: string) => void;
@@ -83,6 +83,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             handleRenameSubmit,
             hasSavedClusterElementPosition,
             id,
+            infoCardOpen,
             isClusterElement,
             isHorizontal,
             isMainRootClusterElement,
@@ -93,7 +94,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             nodeDescription,
             nodeLabel,
             nodeWidth,
-            onHoveredNodeNameChange,
+            onInfoClose,
             parentClusterRootId,
             renameValue,
             setRenameValue,
@@ -143,14 +144,13 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                 />
             )}
 
-            <HoverCard
-                key={id}
+            <Popover
                 onOpenChange={(open) => {
-                    onHoveredNodeNameChange(open ? data.name : undefined);
+                    if (!open) onInfoClose();
                 }}
-                open={false}
+                open={infoCardOpen}
             >
-                <HoverCardTrigger>
+                <PopoverTrigger asChild>
                     <Button
                         aria-label={`${data.workflowNodeName} node`}
                         className={twMerge(
@@ -214,30 +214,48 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                             )}
                         </div>
                     </Button>
-                </HoverCardTrigger>
+                </PopoverTrigger>
 
                 {!isMainRootClusterElement && (
-                    <HoverCardPortal>
-                        <HoverCardContent className="w-fit max-w-xl min-w-72 text-sm" side="right">
-                            {nodeDescription && (
-                                <div
-                                    className="flex"
-                                    dangerouslySetInnerHTML={{
-                                        __html: sanitize(nodeDescription, {
-                                            allowedAttributes: {
-                                                div: ['class'],
-                                                table: ['class'],
-                                                td: ['class'],
-                                                tr: ['class'],
-                                            },
-                                        }),
-                                    }}
-                                />
-                            )}
-                        </HoverCardContent>
-                    </HoverCardPortal>
+                    <PopoverContent
+                        className="w-fit max-w-xl min-w-72 text-sm"
+                        onFocusOutside={(event) => event.preventDefault()}
+                        onOpenAutoFocus={(event) => event.preventDefault()}
+                        side="right"
+                    >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                            <span className="font-semibold">{nodeLabel}</span>
+
+                            <Button
+                                className="hover:bg-transparent active:bg-transparent"
+                                icon={<XIcon />}
+                                onClick={onInfoClose}
+                                size="iconXs"
+                                title="Close"
+                                variant="ghost"
+                            />
+                        </div>
+
+                        {nodeDescription ? (
+                            <div
+                                className="flex"
+                                dangerouslySetInnerHTML={{
+                                    __html: sanitize(nodeDescription, {
+                                        allowedAttributes: {
+                                            div: ['class'],
+                                            table: ['class'],
+                                            td: ['class'],
+                                            tr: ['class'],
+                                        },
+                                    }),
+                                }}
+                            />
+                        ) : (
+                            <p className="text-xs text-content-neutral-secondary">No description available.</p>
+                        )}
+                    </PopoverContent>
                 )}
-            </HoverCard>
+            </Popover>
 
             {!(isMainRootClusterElement || isNestedClusterRoot) && (
                 <div
@@ -403,7 +421,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
 WorkflowNodeContent.displayName = 'WorkflowNodeContent';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const [infoCardOpen, setInfoCardOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
@@ -491,9 +509,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         {
             environmentId: currentEnvironmentId,
             id: workflow.id!,
-            workflowNodeName: hoveredNodeName as string,
+            workflowNodeName: data.name,
         },
-        hoveredNodeName !== undefined && !data.clusterElementType
+        infoCardOpen && !data.clusterElementType
     );
 
     const {data: clusterElementDefinitionData} = useGetClusterElementDefinitionQuery(
@@ -502,7 +520,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             componentName: data.componentName,
             componentVersion: data.version as number,
         },
-        hoveredNodeName !== undefined && !!data.clusterElementType
+        infoCardOpen && !!data.clusterElementType
     );
 
     const filteredClusterElementTypes = useMemo(() => {
@@ -749,6 +767,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         handleRenameSubmit,
         hasSavedClusterElementPosition,
         id,
+        infoCardOpen,
         isClusterElement,
         isHorizontal,
         isMainRootClusterElement,
@@ -759,7 +778,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         nodeDescription,
         nodeLabel,
         nodeWidth,
-        onHoveredNodeNameChange: setHoveredNodeName,
+        onInfoClose: () => setInfoCardOpen(false),
         parentClusterRootId,
         renameValue,
         setRenameValue,
@@ -777,6 +796,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 onCopy={handleCopyNode}
                 onCut={handleCutNode}
                 onDelete={handleDelete}
+                onInfo={() => setInfoCardOpen(true)}
                 onPaste={handlePasteNode}
                 onRename={handleStartRename}
                 onResetPosition={handleResetPosition}
@@ -784,6 +804,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 showCopyAction
                 showCutAction
                 showDeleteAction
+                showInfoAction
                 showRenameAction
             >
                 <WorkflowNodeContent {...sharedContentProps} />
@@ -797,10 +818,12 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 data={data}
                 hasSavedPosition={!!hasSavedClusterElementPosition}
                 onDelete={handleDelete}
+                onInfo={() => setInfoCardOpen(true)}
                 onRename={handleStartRename}
                 onResetPosition={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
                 onSwitch={handleSwitch}
                 showDeleteAction
+                showInfoAction
                 showRenameAction
                 showReplaceAction={!data.multipleClusterElementsNode}
             >

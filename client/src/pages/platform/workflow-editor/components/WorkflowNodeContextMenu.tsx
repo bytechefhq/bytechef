@@ -13,6 +13,7 @@ import {
     ArrowLeftRightIcon,
     ClipboardPlusIcon,
     CopyIcon,
+    InfoIcon,
     RefreshCcwIcon,
     ScissorsIcon,
     TextCursorInputIcon,
@@ -30,6 +31,7 @@ interface WorkflowNodeContextMenuProps {
     onCopy?: () => void;
     onCut?: () => void;
     onDelete: () => void;
+    onInfo?: () => void;
     onPaste?: () => void;
     onRename: () => void;
     onResetPosition: () => void;
@@ -37,6 +39,7 @@ interface WorkflowNodeContextMenuProps {
     showCopyAction?: boolean;
     showCutAction?: boolean;
     showDeleteAction?: boolean;
+    showInfoAction?: boolean;
     showRenameAction?: boolean;
     showReplaceAction?: boolean;
 }
@@ -49,6 +52,7 @@ const WorkflowNodeContextMenu = ({
     onCopy,
     onCut,
     onDelete,
+    onInfo,
     onPaste,
     onRename,
     onResetPosition,
@@ -56,6 +60,7 @@ const WorkflowNodeContextMenu = ({
     showCopyAction = false,
     showCutAction = false,
     showDeleteAction = false,
+    showInfoAction = false,
     showRenameAction = false,
     showReplaceAction = false,
 }: WorkflowNodeContextMenuProps) => {
@@ -129,6 +134,13 @@ const WorkflowNodeContextMenu = ({
                                 <TextCursorInputIcon className="size-4 shrink-0" />
                                 Rename
                             </ContextMenuItem>
+
+                            {showInfoAction && (
+                                <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onInfo}>
+                                    <InfoIcon className="size-4 shrink-0" />
+                                    Info
+                                </ContextMenuItem>
+                            )}
                         </>
                     ) : (
                         <>
@@ -156,7 +168,9 @@ const WorkflowNodeContextMenu = ({
                             {showCopyAction && PasteMenuItem}
 
                             {(showCutAction || showReplaceAction || showCopyAction || canPaste) &&
-                                (showRenameAction || hasSavedPosition) && <ContextMenuSeparator className="m-0" />}
+                                (showRenameAction || hasSavedPosition || showInfoAction) && (
+                                    <ContextMenuSeparator className="m-0" />
+                                )}
 
                             {showRenameAction && (
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onRename}>
@@ -169,6 +183,13 @@ const WorkflowNodeContextMenu = ({
                                 <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onResetPosition}>
                                     <RefreshCcwIcon className="size-4 shrink-0" />
                                     Reset position
+                                </ContextMenuItem>
+                            )}
+
+                            {showInfoAction && (
+                                <ContextMenuItem className="dropdown-menu-item gap-2" onClick={onInfo}>
+                                    <InfoIcon className="size-4 shrink-0" />
+                                    Info
                                 </ContextMenuItem>
                             )}
 
