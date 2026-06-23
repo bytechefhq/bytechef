@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
     "delete": [ "EMBEDDING" ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ],
+    "search": [ "EMBEDDING" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER", "EMBEDDING" ]
   },
   "actions": [ {
     "batch": null,
@@ -22,7 +22,7 @@
       "advancedOption": null,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "List of metadata key-value pairs to filter by.",
+      "description": "List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -186,12 +186,12 @@
         "required": null,
         "type": "OBJECT"
       } ],
-      "label": "Metadata",
+      "label": "Metadata Filter",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "metadata",
+      "name": "metadataFilter",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -218,7 +218,7 @@
       "advancedOption": null,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "List of metadata key-value pairs to filter by.",
+      "description": "List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -382,12 +382,12 @@
         "required": null,
         "type": "OBJECT"
       } ],
-      "label": "Metadata",
+      "label": "Metadata Filter",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "metadata",
+      "name": "metadataFilter",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -441,7 +441,7 @@
       "advancedOption": null,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "List of metadata key-value pairs to filter by.",
+      "description": "List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -605,12 +605,12 @@
         "required": null,
         "type": "OBJECT"
       } ],
-      "label": "Metadata",
+      "label": "Metadata Filter",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "metadata",
+      "name": "metadataFilter",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -678,7 +678,7 @@
       "advancedOption": null,
       "controlType": "ARRAY_BUILDER",
       "defaultValue": null,
-      "description": "List of metadata key-value pairs to filter by.",
+      "description": "List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed.",
       "displayCondition": null,
       "exampleValue": null,
       "expressionEnabled": null,
@@ -842,12 +842,12 @@
         "required": null,
         "type": "OBJECT"
       } ],
-      "label": "Metadata",
+      "label": "Metadata Filter",
       "maxItems": null,
       "metadata": { },
       "minItems": null,
       "multipleValues": null,
-      "name": "metadata",
+      "name": "metadataFilter",
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
@@ -859,8 +859,8 @@
     "workflowNodeDescription": null
   } ],
   "clusterElementClusterElementTypes": {
-    "vectorStore": [ "EMBEDDING" ],
-    "search": [ "EMBEDDING" ]
+    "search": [ "EMBEDDING" ],
+    "vectorStore": [ "EMBEDDING" ]
   },
   "clusterElementTypes": [ {
     "name": "DOCUMENT_READER",
