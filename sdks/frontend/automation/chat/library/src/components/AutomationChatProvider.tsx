@@ -4,7 +4,9 @@ import {
     CompositeAttachmentAdapter,
     SimpleImageAttachmentAdapter,
     SimpleTextAttachmentAdapter,
+    Suggestions,
     ThreadMessageLike,
+    useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, memo, useCallback, useEffect, useMemo, useState} from 'react';
@@ -213,6 +215,8 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
         )
     );
 
+    const aui = useAui({suggestions: Suggestions(suggestions ?? [])}, {parent: null});
+
     const {connectionState} = useSSE(sseEnabled ? streamRequest : null, {eventHandlers});
 
     useEffect(() => {
@@ -223,7 +227,9 @@ export const AutomationChatProvider = memo(function AutomationChatProvider({
 
     return (
         <AutomationChatContext.Provider value={contextValue}>
-            <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>
+            <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+                {children}
+            </AssistantRuntimeProvider>
         </AutomationChatContext.Provider>
     );
 });
