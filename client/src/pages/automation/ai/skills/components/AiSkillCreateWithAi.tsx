@@ -1,7 +1,8 @@
-import {Thread, type ThreadSuggestionI} from '@/components/assistant-ui/thread';
+import {Thread} from '@/components/assistant-ui/thread';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {type SuggestionConfig} from '@assistant-ui/react';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
 import {useLocation, useNavigate} from 'react-router-dom';
@@ -20,25 +21,25 @@ function extractSkillIds(data: AiSkillsQueryDataI | undefined): Set<string> {
     return new Set(data?.aiSkills?.map((skill) => skill.id) ?? []);
 }
 
-const SKILL_SUGGESTIONS: ThreadSuggestionI[] = [
+const SKILL_SUGGESTIONS: SuggestionConfig[] = [
     {
-        action: 'Create a skill that summarizes my unread Gmail and sends me a daily digest',
         label: 'that summarizes my unread emails daily',
+        prompt: 'Create a skill that summarizes my unread Gmail and sends me a daily digest',
         title: 'Create a skill',
     },
     {
-        action: 'What information do you need from me to create a great skill?',
         label: 'to create a great skill?',
+        prompt: 'What information do you need from me to create a great skill?',
         title: 'What should I tell you',
     },
     {
-        action: 'Show me an example of a well-structured SKILL.md',
         label: 'of a well-structured SKILL.md',
+        prompt: 'Show me an example of a well-structured SKILL.md',
         title: 'Show me an example',
     },
     {
-        action: 'Help me design a skill from scratch — walk me through the questions you need answered',
         label: 'a skill from scratch — walk me through it',
+        prompt: 'Help me design a skill from scratch — walk me through the questions you need answered',
         title: 'Help me design',
     },
 ];
@@ -82,8 +83,8 @@ const AiSkillCreateWithAi = () => {
 
     return (
         <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col overflow-hidden">
-            <CopilotRuntimeProvider source={Source.SKILLS}>
-                <Thread suggestions={SKILL_SUGGESTIONS} transparent />
+            <CopilotRuntimeProvider source={Source.SKILLS} suggestions={SKILL_SUGGESTIONS}>
+                <Thread transparent />
             </CopilotRuntimeProvider>
         </div>
     );
