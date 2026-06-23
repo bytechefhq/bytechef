@@ -1,15 +1,14 @@
 import Button from '@/components/Button/Button';
-import {HoverCard, HoverCardContent, HoverCardTrigger} from '@/components/ui/hover-card';
+import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
-import {HoverCardPortal} from '@radix-ui/react-hover-card';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon} from 'lucide-react';
+import {CheckIcon, ComponentIcon, PinOffIcon, TrashIcon, XIcon} from 'lucide-react';
 import {ChangeEvent, FocusEvent, KeyboardEvent, memo, useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
@@ -33,7 +32,7 @@ import saveWorkflowDefinition from '../utils/saveWorkflowDefinition';
 import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
-    const [hoveredNodeName, setHoveredNodeName] = useState<string | undefined>();
+    const [infoCardOpen, setInfoCardOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
@@ -50,7 +49,6 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             workflow: state.workflow,
         }))
     );
-    const clusterElementsCanvasOpen = useWorkflowEditorStore((state) => state.clusterElementsCanvasOpen);
     const {copiedNode, copiedWorkflowId, renamingNodeName, setCopiedNode, setCopiedWorkflowId, setRenamingNodeName} =
         useWorkflowEditorStore(
             useShallow((state) => ({
@@ -110,9 +108,9 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
         {
             environmentId: currentEnvironmentId,
             id: workflow.id!,
-            workflowNodeName: hoveredNodeName!,
+            workflowNodeName: data.workflowNodeName,
         },
-        hoveredNodeName !== undefined
+        infoCardOpen
     );
 
     const handleNodeClick = useNodeClickHandler(data, id);
@@ -289,6 +287,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     );
 
     const isRenaming = renamingNodeName === data.name;
+    const suppressHover = isRenaming;
 
     const canPaste = useMemo(
         () => !!copiedNode && copiedWorkflowId === workflow.id,
@@ -305,6 +304,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onCopy={handleCopyNode}
             onCut={handleCutNode}
             onDelete={handleDelete}
+            onInfo={() => setInfoCardOpen(true)}
             onPaste={handlePasteNode}
             onRename={handleStartRename}
             onResetPosition={handleResetPosition}
@@ -312,6 +312,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             showCopyAction
             showCutAction
             showDeleteAction
+            showInfoAction
             showRenameAction
         >
             <div
@@ -322,18 +323,41 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 data-nodetype="clusterRoot"
                 key={id}
             >
-                <HoverCard
-                    key={id}
-                    onOpenChange={(open) => {
-                        if (open) {
-                            setHoveredNodeName(data.name);
-                        } else {
-                            setHoveredNodeName(undefined);
-                        }
-                    }}
-                    open={false}
+                <div
+                    className={twMerge(
+                        'invisible absolute top-0 left-workflow-node-popover-hover pr-4',
+                        !suppressHover && 'group-hover:visible'
+                    )}
                 >
-                    <HoverCardTrigger>
+                    <div className="flex flex-col gap-1">
+                        <Button
+                            className="opacity-100"
+                            icon={<TrashIcon />}
+                            onClick={() => handleDeleteNodeClick(data)}
+                            size="iconSm"
+                            title="Delete a node"
+                            variant="destructiveGhost"
+                        />
+
+                        {hasSavedNodePosition && (
+                            <Button
+                                icon={<PinOffIcon />}
+                                onClick={() => handleRemoveNodePosition(data.name)}
+                                size="iconSm"
+                                title="Remove saved node position"
+                                variant="ghost"
+                            />
+                        )}
+                    </div>
+                </div>
+
+                <Popover
+                    onOpenChange={(open) => {
+                        if (!open) setInfoCardOpen(false);
+                    }}
+                    open={infoCardOpen}
+                >
+                    <PopoverTrigger asChild>
                         <Button
                             className="flex h-auto min-h-18 w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
                             onClick={handleNodeClick}
@@ -407,30 +431,46 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                                 </ul>
                             )}
                         </Button>
-                    </HoverCardTrigger>
+                    </PopoverTrigger>
 
-                    {!clusterElementsCanvasOpen && (
-                        <HoverCardPortal>
-                            <HoverCardContent className="w-fit max-w-xl min-w-72 text-sm" side="right">
-                                {workflowNodeDescription?.description && (
-                                    <div
-                                        className="flex"
-                                        dangerouslySetInnerHTML={{
-                                            __html: sanitize(workflowNodeDescription.description, {
-                                                allowedAttributes: {
-                                                    div: ['class'],
-                                                    table: ['class'],
-                                                    td: ['class'],
-                                                    tr: ['class'],
-                                                },
-                                            }),
-                                        }}
-                                    />
-                                )}
-                            </HoverCardContent>
-                        </HoverCardPortal>
-                    )}
-                </HoverCard>
+                    <PopoverContent
+                        className="w-fit max-w-xl min-w-72 text-sm"
+                        onFocusOutside={(event) => event.preventDefault()}
+                        onOpenAutoFocus={(event) => event.preventDefault()}
+                        side="right"
+                    >
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                            <span className="font-semibold">{nodeLabel}</span>
+
+                            <Button
+                                className="hover:bg-transparent active:bg-transparent"
+                                icon={<XIcon />}
+                                onClick={() => setInfoCardOpen(false)}
+                                size="iconXs"
+                                title="Close"
+                                variant="ghost"
+                            />
+                        </div>
+
+                        {workflowNodeDescription?.description ? (
+                            <div
+                                className="flex"
+                                dangerouslySetInnerHTML={{
+                                    __html: sanitize(workflowNodeDescription.description, {
+                                        allowedAttributes: {
+                                            div: ['class'],
+                                            table: ['class'],
+                                            td: ['class'],
+                                            tr: ['class'],
+                                        },
+                                    }),
+                                }}
+                            />
+                        ) : (
+                            <p className="text-xs text-content-neutral-secondary">No description available.</p>
+                        )}
+                    </PopoverContent>
+                </Popover>
 
                 <div
                     className={twMerge(
