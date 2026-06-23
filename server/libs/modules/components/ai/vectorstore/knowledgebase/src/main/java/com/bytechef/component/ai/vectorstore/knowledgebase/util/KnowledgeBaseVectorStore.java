@@ -274,11 +274,13 @@ public final class KnowledgeBaseVectorStore {
             Long knowledgeBaseId = inputParameters.getRequiredLong(KNOWLEDGE_BASE_ID);
 
             if (Boolean.TRUE.equals(inputParameters.getBoolean(IS_MULTIPLE))) {
-                updateMultiple(inputParameters, connectionParameters, embeddingModel, knowledgeBaseId,
-                    documentReader, documentTransformers);
+                updateMultiple(
+                    inputParameters, connectionParameters, embeddingModel, knowledgeBaseId, documentReader,
+                    documentTransformers);
             } else {
-                updateSingle(inputParameters, connectionParameters, embeddingModel, knowledgeBaseId,
-                    documentReader, documentTransformers);
+                updateSingle(
+                    inputParameters, connectionParameters, embeddingModel, knowledgeBaseId, documentReader,
+                    documentTransformers);
             }
         }
 
@@ -295,8 +297,9 @@ public final class KnowledgeBaseVectorStore {
 
             delete(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel);
 
-            load(ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel,
-                documentReader, documentTransformers);
+            load(
+                ParametersFactory.create(deleteParametersMap), connectionParameters, embeddingModel, documentReader,
+                documentTransformers);
         }
 
         private void updateSingle(
@@ -377,8 +380,9 @@ public final class KnowledgeBaseVectorStore {
                 loadParametersMap.put(KNOWLEDGE_BASE_DOCUMENT_ID, knowledgeBaseDocumentId);
             }
 
-            load(ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel,
-                documentReader, documentTransformers);
+            load(
+                ParametersFactory.create(loadParametersMap), connectionParameters, embeddingModel, documentReader,
+                documentTransformers);
         }
 
         @Override
