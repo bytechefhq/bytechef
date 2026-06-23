@@ -1,9 +1,9 @@
 {
   "actionClusterElementTypes": {
-    "delete": [ ],
-    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
+    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
     "search": [ ],
-    "load": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ]
+    "update": [ "DOCUMENT_READER", "DOCUMENT_TRANSFORMER" ],
+    "delete": [ ]
   },
   "actions": [ {
     "batch": null,
