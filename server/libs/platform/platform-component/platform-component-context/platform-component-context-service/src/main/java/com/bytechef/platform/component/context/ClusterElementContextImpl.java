@@ -128,21 +128,20 @@ class ClusterElementContextImpl extends ContextImpl implements ClusterElementCon
         String componentName, int componentVersion, String clusterElementName,
         @Nullable ComponentConnection componentConnection) {
 
-        return ClusterElementContextImpl
-            .builder(
-                componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
-                eventPublisher, httpClientExecutor, tempFileStorage)
-            .componentConnection(componentConnection)
-            .environmentId(environmentId)
-            .jobId(jobId)
-            .jobPrincipalId(jobPrincipalId)
-            .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
-            .logFileStorageWriter(logFileStorageWriter)
-            .publicUrl(publicUrl)
-            .taskExecutionId(taskExecutionId)
-            .type(type)
-            .workflowId(workflowId)
-            .build();
+        return builder(
+            componentName, componentVersion, clusterElementName, editorEnvironment, cacheManager, dataStorage,
+            eventPublisher, httpClientExecutor, tempFileStorage)
+                .componentConnection(componentConnection)
+                .environmentId(environmentId)
+                .jobId(jobId)
+                .jobPrincipalId(jobPrincipalId)
+                .jobPrincipalWorkflowId(jobPrincipalWorkflowId)
+                .logFileStorageWriter(logFileStorageWriter)
+                .publicUrl(publicUrl)
+                .taskExecutionId(taskExecutionId)
+                .type(type)
+                .workflowId(workflowId)
+                .build();
     }
 
     @Override
