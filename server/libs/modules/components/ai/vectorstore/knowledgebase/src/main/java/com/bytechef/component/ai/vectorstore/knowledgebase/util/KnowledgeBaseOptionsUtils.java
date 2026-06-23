@@ -138,8 +138,7 @@ public final class KnowledgeBaseOptionsUtils {
     }
 
     private static List<Option<Long>> buildDocumentOptions(
-        Parameters inputParameters, String searchText,
-        KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
+        Parameters inputParameters, String searchText, KnowledgeBaseDocumentService knowledgeBaseDocumentService) {
 
         Long knowledgeBaseId = inputParameters.getLong(KNOWLEDGE_BASE_ID);
 
@@ -149,15 +148,15 @@ public final class KnowledgeBaseOptionsUtils {
 
         List<Option<Long>> options = new ArrayList<>();
 
-        List<KnowledgeBaseDocument> documents =
-            knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId);
+        List<KnowledgeBaseDocument> documents = knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId);
 
         for (KnowledgeBaseDocument document : documents) {
             String name = document.getName();
 
             if (matchesSearchText(name, searchText)) {
-                options.add(option(name, document.getId()
-                    .longValue()));
+                Long documentId = document.getId();
+
+                options.add(option(name, documentId.longValue()));
             }
         }
 
@@ -180,13 +179,16 @@ public final class KnowledgeBaseOptionsUtils {
 
         for (int i = 0; i < chunks.size(); i++) {
             KnowledgeBaseDocumentChunk chunk = chunks.get(i);
+
             String textContent = chunk.getTextContent();
+
             String label = (textContent != null && !textContent.isBlank())
                 ? (textContent.length() > 50 ? textContent.substring(0, 50) + "..." : textContent)
                 : "Chunk #" + (i + 1);
 
-            options.add(option(label, chunk.getId()
-                .longValue()));
+            Long chunkId = chunk.getId();
+
+            options.add(option(label, chunkId.longValue()));
         }
 
         return options;
