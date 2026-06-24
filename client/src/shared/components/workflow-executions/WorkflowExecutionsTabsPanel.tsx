@@ -174,7 +174,7 @@ const WorkflowExecutionsTabsPanel = ({
                 </div>
             </div>
 
-            <div className="flex items-center justify-between p-3">
+            <div className="flex items-center justify-between px-3">
                 <TabsList>
                     <TabsTrigger value="input">Input</TabsTrigger>
 
@@ -244,7 +244,7 @@ const WorkflowExecutionsTabsPanel = ({
                 )}
             </div>
 
-            <ScrollArea className="min-h-0 flex-1 pr-4 pb-4">
+            <ScrollArea className="min-h-0 flex-1 pr-4">
                 <div className="mb-4">
                     <TabsContent className="p-3" value="input">
                         {selectedItemDataLoading ? (
