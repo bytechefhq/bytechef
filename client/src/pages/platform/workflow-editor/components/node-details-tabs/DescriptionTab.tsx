@@ -209,7 +209,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                 <Input
                     className="bg-white shadow-none"
                     defaultValue={workflowTaskOrTrigger?.label}
-                    key={`${currentNode?.componentName}-${workflowTaskOrTrigger?.type}-${workflowTaskOrTrigger?.label}_nodeTitle`}
+                    key={`${currentNode?.componentName}-${currentNode?.workflowNodeName}_nodeTitle`}
                     name="nodeTitle"
                     onChange={handleLabelChange}
                 />
