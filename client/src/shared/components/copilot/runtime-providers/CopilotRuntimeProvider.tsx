@@ -1,6 +1,7 @@
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/stores/useCopilotToolResultHandlerRegistry';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
@@ -82,12 +83,24 @@ export function CopilotRuntimeProvider({
         // Prepare an empty assistant message to stream into
         addMessage({content: '', role: 'assistant'});
 
+        const toolCallNamesById = new Map<string, string>();
+
         const subscriber: AgentSubscriber = {
             onTextMessageContentEvent: ({event, textMessageBuffer}) => {
                 appendToLastAssistantMessage(textMessageBuffer + event.delta);
             },
             onTextMessageEndEvent: ({textMessageBuffer}) => {
                 appendToLastAssistantMessage(textMessageBuffer);
+            },
+            onToolCallResultEvent: ({event}) => {
+                const toolCallName = toolCallNamesById.get(event.toolCallId);
+
+                toolCallNamesById.delete(event.toolCallId);
+
+                useCopilotToolResultHandlerRegistry.getState().runFor(toolCallName ?? '', event.content);
+            },
+            onToolCallStartEvent: ({event}) => {
+                toolCallNamesById.set(event.toolCallId, event.toolCallName);
             },
         };
 
