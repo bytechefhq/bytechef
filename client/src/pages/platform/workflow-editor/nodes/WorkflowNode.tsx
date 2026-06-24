@@ -224,7 +224,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                         side="right"
                     >
                         <div className="mb-2 flex items-center justify-between gap-2">
-                            <span className="font-semibold">{nodeLabel}</span>
+                            <h3 className="text-lg font-semibold">{nodeLabel}</h3>
 
                             <Button
                                 className="hover:bg-transparent active:bg-transparent"
