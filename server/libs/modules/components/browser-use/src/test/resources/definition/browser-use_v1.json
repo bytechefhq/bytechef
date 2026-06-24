@@ -1210,7 +1210,7 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "The natural-language instruction for the agent to execute.",
       "displayCondition": null,
@@ -3878,7 +3878,7 @@
     "processErrorResponse": null,
     "properties": [ {
       "advancedOption": null,
-      "controlType": "TEXT",
+      "controlType": "TEXT_AREA",
       "defaultValue": null,
       "description": "The natural-language instruction for the agent to execute.",
       "displayCondition": null,

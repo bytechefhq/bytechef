@@ -31,6 +31,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Context.Http.responseType;
+import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
 
 import com.bytechef.component.browser.use.util.BrowserUseUtils;
 import com.bytechef.component.definition.ActionContext;
@@ -54,6 +55,7 @@ public class BrowserUseCreateSessionAction {
             string(TASK)
                 .label("Task")
                 .description("The natural-language instruction for the agent to execute.")
+                .controlType(TEXT_AREA)
                 .required(true),
             string(MODEL)
                 .label("Model")
