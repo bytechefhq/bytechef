@@ -5,6 +5,7 @@ import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatT
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import useCopilotToolResultHandlerRegistry from '@/shared/components/copilot/stores/useCopilotToolResultHandlerRegistry';
 import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
@@ -135,6 +136,8 @@ export function CopilotRuntimeProvider({
                 const toolCallName = toolCallNamesById.get(event.toolCallId);
 
                 toolCallNamesById.delete(event.toolCallId);
+
+                useCopilotToolResultHandlerRegistry.getState().runFor(toolCallName ?? '', event.content);
 
                 const dataPart = toToolResultDataPart(toolCallName ?? '', event.content);
 
