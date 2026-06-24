@@ -102,7 +102,7 @@ const PropertyJsonSchemaBuilderSampleDataDialog = ({onChange}: {onChange?: (newS
             </DialogTrigger>
 
             <DialogContent
-                className="max-w-output-tab-sample-data-dialog-width"
+                className="max-w-output-tab-sample-data-dialog-width sm:max-w-output-tab-sample-data-dialog-width"
                 onFocusOutside={(event) => event.preventDefault()}
                 onOpenAutoFocus={(event) => {
                     event.preventDefault();
