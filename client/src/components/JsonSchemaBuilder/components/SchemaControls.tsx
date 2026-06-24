@@ -149,6 +149,12 @@ const SchemaArrayControls = ({onAdd, onChange, root, schema}: SchemaArrayControl
 
     const isObjectSchema = getSchemaType(schema) === 'object';
 
+    useEffect(() => {
+        if (!schema || !getSchemaType(schema)) {
+            onChange(setSchemaTypeAndRemoveWrongFields('object', schema));
+        }
+    }, [schema, onChange]);
+
     const extraFields: string[] =
         (schema &&
             isObjectSchema &&
