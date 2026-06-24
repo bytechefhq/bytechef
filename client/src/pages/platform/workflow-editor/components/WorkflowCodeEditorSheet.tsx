@@ -3,7 +3,7 @@ import UnsavedChangesAlertDialog from '@/components/UnsavedChangesAlertDialog';
 import {ButtonGroup, ButtonGroupSeparator} from '@/components/ui/button-group';
 import {ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import {ScrollArea} from '@/components/ui/scroll-area';
-import {Sheet, SheetClose, SheetContent, SheetTitle} from '@/components/ui/sheet';
+import {Sheet, SheetCloseButton, SheetContent, SheetTitle} from '@/components/ui/sheet';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowExecutionsTestOutput from '@/pages/platform/workflow-editor/components/WorkflowExecutionsTestOutput';
 import WorkflowTestConfigurationDialog from '@/pages/platform/workflow-editor/components/workflow-test-configuration/WorkflowTestConfigurationDialog';
@@ -23,7 +23,6 @@ import {
     Settings2Icon,
     SparklesIcon,
     SquareIcon,
-    XIcon,
 } from 'lucide-react';
 import {VisuallyHidden} from 'radix-ui';
 import {Suspense, lazy} from 'react';
@@ -199,15 +198,7 @@ const WorkflowCodeEditorSheet = ({
                                 </Tooltip>
                             )}
 
-                            <SheetClose asChild>
-                                <Button
-                                    className="[&_svg]:size-5"
-                                    icon={<XIcon />}
-                                    onClick={() => handleOpenChange(false)}
-                                    size="icon"
-                                    variant="ghost"
-                                />
-                            </SheetClose>
+                            <SheetCloseButton />
                         </div>
                     </header>
 
