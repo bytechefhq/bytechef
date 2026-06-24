@@ -10,7 +10,10 @@ import {
     CompositeAttachmentAdapter,
     SimpleImageAttachmentAdapter,
     SimpleTextAttachmentAdapter,
+    type SuggestionConfig,
+    Suggestions,
     ThreadMessageLike,
+    useAui,
     useExternalStoreRuntime,
 } from '@assistant-ui/react';
 import {ReactNode, useState} from 'react';
@@ -19,6 +22,13 @@ import {useShallow} from 'zustand/react/shallow';
 const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
     return message;
 };
+
+const WORKFLOW_TEST_CHAT_SUGGESTIONS: SuggestionConfig[] = [
+    {label: '', prompt: 'Hello! 👋 How does this work?', title: 'Hello! 👋 How does this work?'},
+    {label: '', prompt: 'What can you do?', title: 'What can you do?'},
+    {label: '', prompt: 'Give me an example', title: 'Give me an example'},
+    {label: '', prompt: 'Help me get started', title: 'Help me get started'},
+];
 
 export function WorkflowTestChatRuntimeProvider({
     children,
@@ -130,5 +140,11 @@ export function WorkflowTestChatRuntimeProvider({
         onNew,
     });
 
-    return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
+    const aui = useAui({suggestions: Suggestions(WORKFLOW_TEST_CHAT_SUGGESTIONS)}, {parent: null});
+
+    return (
+        <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+            {children}
+        </AssistantRuntimeProvider>
+    );
 }
