@@ -1630,12 +1630,20 @@ components:
         - "name"
         - "tasks"
       properties:
+        createdDate:
+          description: "The created date of a workflow."
+          type: "string"
+          format: "date-time"
         description:
           description: "The description of a workflow."
           type: "string"
         definition:
           description: "The definition of a workflow."
           type: "string"
+        lastModifiedDate:
+          description: "The last modified date of a workflow."
+          type: "string"
+          format: "date-time"
         enabled:
           type: "boolean"
           description: "If a workflow is enabled or not."

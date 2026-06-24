@@ -25,8 +25,10 @@ public interface ConnectUserProjectWorkflowMapper
     extends Converter<ConnectedUserProjectWorkflowDTO, ConnectedUserProjectWorkflowModel> {
 
     @Override
+    @Mapping(target = "createdDate", source = "workflow.createdDate")
     @Mapping(target = "definition", source = "workflow.definition")
     @Mapping(target = "description", source = "workflow.description")
     @Mapping(target = "label", source = "workflow.label")
+    @Mapping(target = "lastModifiedDate", source = "workflow.lastModifiedDate")
     ConnectedUserProjectWorkflowModel convert(ConnectedUserProjectWorkflowDTO connectedUserProjectWorkflowDTO);
 }
