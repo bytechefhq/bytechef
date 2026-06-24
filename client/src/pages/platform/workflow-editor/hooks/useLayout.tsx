@@ -9,6 +9,7 @@ import {
     ON_ERROR_WIRE_KEY_MAIN_BRANCH,
     PROJECT_LEFT_SIDEBAR_WIDTH,
     TASK_DISPATCHER_NAMES,
+    WORKFLOW_NODES_SIDEBAR_WIDTH,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
@@ -25,6 +26,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useRightSidebarStore from '../stores/useRightSidebarStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
@@ -178,6 +180,7 @@ export default function useLayout({
         (state) => state.workflowNodeDetailsPanelOpen
     );
     const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
+    const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
@@ -191,6 +194,7 @@ export default function useLayout({
     const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousTestChatPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
+    const previousRightSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     canvasWidthRef.current = canvasWidth;
     canvasHeightRef.current = canvasHeight;
@@ -640,6 +644,7 @@ export default function useLayout({
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
             previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
+            previousRightSidebarOpenRef.current = rightSidebarOpen;
 
             return;
         }
@@ -690,12 +695,20 @@ export default function useLayout({
             widthDelta += leftSidebarOpen ? PROJECT_LEFT_SIDEBAR_WIDTH : -PROJECT_LEFT_SIDEBAR_WIDTH;
         }
 
+        if (
+            previousRightSidebarOpenRef.current !== undefined &&
+            previousRightSidebarOpenRef.current !== rightSidebarOpen
+        ) {
+            widthDelta += rightSidebarOpen ? WORKFLOW_NODES_SIDEBAR_WIDTH : -WORKFLOW_NODES_SIDEBAR_WIDTH;
+        }
+
         if (widthDelta === 0) {
             previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
             previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
+            previousRightSidebarOpenRef.current = rightSidebarOpen;
 
             return;
         }
@@ -705,6 +718,7 @@ export default function useLayout({
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
         previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
         previousLeftSidebarOpenRef.current = leftSidebarOpen;
+        previousRightSidebarOpenRef.current = rightSidebarOpen;
 
         if (cancelAnimationRef.current) {
             cancelAnimationRef.current();
@@ -731,7 +745,14 @@ export default function useLayout({
         }));
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
-    }, [copilotPanelOpen, dataPillPanelOpen, leftSidebarOpen, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
+    }, [
+        copilotPanelOpen,
+        dataPillPanelOpen,
+        leftSidebarOpen,
+        rightSidebarOpen,
+        workflowNodeDetailsPanelOpen,
+        workflowTestChatPanelOpen,
+    ]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
