@@ -28,6 +28,7 @@ import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import useWorkflowNodeDetailsPanelStore from '../stores/useWorkflowNodeDetailsPanelStore';
+import useWorkflowTestChatStore from '../stores/useWorkflowTestChatStore';
 import animateNodePositions from '../utils/animateNodePositions';
 import createBranchEdges from '../utils/createBranchEdges';
 import createBranchNode from '../utils/createBranchNode';
@@ -176,6 +177,7 @@ export default function useLayout({
     const workflowNodeDetailsPanelOpen = useWorkflowNodeDetailsPanelStore(
         (state) => state.workflowNodeDetailsPanelOpen
     );
+    const workflowTestChatPanelOpen = useWorkflowTestChatStore((state) => state.workflowTestChatPanelOpen);
     const layoutResetCounter = useWorkflowDataStore((state) => state.layoutResetCounter);
 
     const cancelAnimationRef = useRef<(() => void) | null>(null);
@@ -187,6 +189,7 @@ export default function useLayout({
     const previousCopilotPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousDataPillPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousNodeDetailsPanelOpenRef = useRef<boolean | undefined>(undefined);
+    const previousTestChatPanelOpenRef = useRef<boolean | undefined>(undefined);
     const previousLeftSidebarOpenRef = useRef<boolean | undefined>(undefined);
 
     canvasWidthRef.current = canvasWidth;
@@ -635,6 +638,7 @@ export default function useLayout({
             previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+            previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
@@ -666,6 +670,13 @@ export default function useLayout({
         }
 
         if (
+            previousTestChatPanelOpenRef.current !== undefined &&
+            previousTestChatPanelOpenRef.current !== workflowTestChatPanelOpen
+        ) {
+            widthDelta += workflowTestChatPanelOpen ? NODE_DETAILS_PANEL_WIDTH : -NODE_DETAILS_PANEL_WIDTH;
+        }
+
+        if (
             previousDataPillPanelOpenRef.current !== undefined &&
             previousDataPillPanelOpenRef.current !== dataPillPanelOpen
         ) {
@@ -683,6 +694,7 @@ export default function useLayout({
             previousCopilotPanelOpenRef.current = copilotPanelOpen;
             previousDataPillPanelOpenRef.current = dataPillPanelOpen;
             previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+            previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
             previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
             return;
@@ -691,6 +703,7 @@ export default function useLayout({
         previousCopilotPanelOpenRef.current = copilotPanelOpen;
         previousDataPillPanelOpenRef.current = dataPillPanelOpen;
         previousNodeDetailsPanelOpenRef.current = workflowNodeDetailsPanelOpen;
+        previousTestChatPanelOpenRef.current = workflowTestChatPanelOpen;
         previousLeftSidebarOpenRef.current = leftSidebarOpen;
 
         if (cancelAnimationRef.current) {
@@ -718,7 +731,7 @@ export default function useLayout({
         }));
 
         cancelAnimationRef.current = animateNodePositions(currentNodes, shiftedNodes, updateNodes);
-    }, [copilotPanelOpen, dataPillPanelOpen, leftSidebarOpen, workflowNodeDetailsPanelOpen]);
+    }, [copilotPanelOpen, dataPillPanelOpen, leftSidebarOpen, workflowNodeDetailsPanelOpen, workflowTestChatPanelOpen]);
 
     useEffect(() => {
         if (useWorkflowDataStore.getState().isNodeDragging) {
