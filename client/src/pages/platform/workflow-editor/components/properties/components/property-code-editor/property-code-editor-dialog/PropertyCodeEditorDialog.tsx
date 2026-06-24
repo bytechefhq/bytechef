@@ -50,7 +50,7 @@ const PropertyCodeEditorDialog = ({
 
                 <DialogContent
                     className={twMerge(
-                        'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0 transition-[left,width] duration-300 ease-in-out',
+                        'absolute top-12 bottom-4 flex h-[calc(100vh-64px)] max-w-none translate-x-0 translate-y-0 flex-row gap-0 overflow-hidden p-0 transition-[left,width] duration-300 ease-in-out sm:max-w-none',
                         copilotPanelOpen ? 'left-2 w-[calc(100vw-16px)]' : 'left-16 w-[calc(100vw-80px)]'
                     )}
                     onFocusOutside={(event) => event.preventDefault()}
