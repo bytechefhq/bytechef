@@ -213,8 +213,17 @@ export function encodePath(path: string): string {
  * in the path). These lookups are best-effort "what is the current value here?" reads where a
  * missing/invalid path simply means "no value", so the throw must degrade to undefined — otherwise
  * the error escapes to the editor's error boundary and leaves the node permanently broken.
+ *
+ * "{"/"}" can never appear in a resolvable path (object-resolve-path uses dot and bracket-index
+ * notation), so a fast-path guard short-circuits the motivating case — an expression being typed —
+ * without paying the throw/catch cost on every lookup. The try/catch remains as a backstop for any
+ * other invalid path.
  */
 export function safeResolvePath(object: object | undefined, path: string): unknown {
+    if (object === undefined || path.includes('{') || path.includes('}')) {
+        return undefined;
+    }
+
     try {
         return resolvePath(object, path);
     } catch {
