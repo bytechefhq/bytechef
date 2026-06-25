@@ -28,6 +28,6 @@ public class ApprovalFormAuthorizeHttpRequestContributor implements AuthorizeHtt
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/automation/internal/approval-form/**");
+        return List.of("/api/platform/internal/approval-form/**");
     }
 }
