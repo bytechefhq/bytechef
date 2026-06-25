@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.graphql.data.method.annotation.Argument;
@@ -32,6 +33,7 @@ import org.springframework.stereotype.Controller;
  * @version ee
  */
 @Controller
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 class McpIntegrationInstanceConfigurationGraphQlController {
 
