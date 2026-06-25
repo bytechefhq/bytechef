@@ -318,7 +318,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             <div
                 className={twMerge(
                     'group relative flex min-w-60 cursor-pointer items-center justify-center',
-                    isHorizontal && !hasIcons && 'min-w-0'
+                    !hasIcons && 'min-w-0'
                 )}
                 data-nodetype="clusterRoot"
                 key={id}
@@ -359,7 +359,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 >
                     <PopoverTrigger asChild>
                         <Button
-                            className="flex h-auto min-h-18 w-full flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
+                            className="flex h-auto min-h-18 flex-col items-center justify-center rounded-md border-2 border-stroke-neutral-tertiary bg-surface-neutral-primary p-4 shadow-sm hover:border-stroke-brand-secondary-hover hover:bg-surface-neutral-primary hover:shadow-none focus-visible:ring-stroke-brand-focus active:bg-surface-neutral-primary"
                             onClick={handleNodeClick}
                         >
                             <span className="self-center text-content-neutral-primary [&_svg]:size-9">
