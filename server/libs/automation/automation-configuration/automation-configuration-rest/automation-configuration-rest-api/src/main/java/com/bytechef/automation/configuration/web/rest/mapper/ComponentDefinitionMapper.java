@@ -21,6 +21,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.configuration.web.rest.mapper.config.PlatformConfigurationMapperSpringConfig;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
@@ -31,6 +32,7 @@ public class ComponentDefinitionMapper {
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 
+        @Mapping(target = "inputsCount", ignore = true)
         ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
 
         @AfterMapping

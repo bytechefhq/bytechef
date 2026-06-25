@@ -37,6 +37,7 @@ public class ProjectDeploymentWorkflowMapper {
 
         @Override
         @Mapping(target = "lastExecutionDate", ignore = true)
+        @Mapping(target = "lastExecutionStatus", ignore = true)
         @Mapping(target = "staticWebhookUrl", ignore = true)
         @Mapping(target = "workflowUuid", ignore = true)
         ProjectDeploymentWorkflowModel convert(ProjectDeploymentWorkflow projectDeploymentWorkflow);
