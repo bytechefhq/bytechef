@@ -282,7 +282,7 @@ const useWorkflowEditorCanvas = ({
     }, []);
 
     const handleNodeDragStart = useCallback(
-        (_event: React.MouseEvent, node: Node) => {
+        (_event: MouseEvent | TouchEvent, node: Node) => {
             setIsNodeDragging(true);
 
             const nodeData = node.data as NodeDataType;
@@ -414,7 +414,7 @@ const useWorkflowEditorCanvas = ({
     );
 
     const handleNodeDragStop = useCallback(
-        (_event: React.MouseEvent, draggedNode: Node) => {
+        (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
             setIsNodeDragging(false);
 
             if (updateWorkflowMutation) {
