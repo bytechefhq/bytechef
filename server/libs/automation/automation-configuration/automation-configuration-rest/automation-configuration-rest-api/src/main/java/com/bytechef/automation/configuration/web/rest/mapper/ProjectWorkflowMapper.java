@@ -16,11 +16,13 @@
 
 package com.bytechef.automation.configuration.web.rest.mapper;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.web.rest.mapper.config.AutomationConfigurationMapperSpringConfig;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.automation.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -42,6 +44,9 @@ public abstract class ProjectWorkflowMapper {
         @Mapping(target = "workflowTaskComponentNames", ignore = true)
         @Mapping(target = "workflowTriggerComponentNames", ignore = true)
         public abstract WorkflowModel convert(ProjectWorkflowDTO workflowDTO);
+
+        @Mapping(target = "componentReference", ignore = true)
+        public abstract WorkflowInputModel map(Workflow.Input input);
 
         @AfterMapping
         public void afterMapping(ProjectWorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {

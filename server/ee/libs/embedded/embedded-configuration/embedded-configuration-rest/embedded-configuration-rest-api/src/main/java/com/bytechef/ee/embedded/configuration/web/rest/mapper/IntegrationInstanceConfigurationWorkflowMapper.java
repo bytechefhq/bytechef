@@ -50,6 +50,8 @@ public class IntegrationInstanceConfigurationWorkflowMapper {
 
         @InheritInverseConfiguration
         @DelegatingConverter
+        @Mapping(target = "componentInputGroups", ignore = true)
+        @Mapping(target = "withComponentInputGroups", ignore = true)
         @Mapping(target = "workflow", ignore = true)
         IntegrationInstanceConfigurationWorkflowDTO invertConvert(
             IntegrationInstanceConfigurationWorkflowModel integrationInstanceConfigurationWorkflowModel);

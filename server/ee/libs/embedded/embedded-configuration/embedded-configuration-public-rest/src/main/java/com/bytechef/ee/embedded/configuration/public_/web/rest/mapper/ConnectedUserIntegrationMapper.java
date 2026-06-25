@@ -122,7 +122,11 @@ public interface ConnectedUserIntegrationMapper {
         IntegrationWorkflowModel map(
             IntegrationInstanceConfigurationWorkflowDTO integrationInstanceConfigurationWorkflowDTO);
 
+        @Mapping(target = "id", ignore = true)
         McpToolModel map(ConnectedUserIntegrationDTO.McpToolInfo mcpToolInfo);
+
+        @Mapping(target = "componentReference", ignore = true)
+        InputModel map(ConnectedUserIntegrationDTO.Input input);
 
         @Mapping(target = "description", source = "description")
         @Mapping(target = "inputs", source = "inputs")

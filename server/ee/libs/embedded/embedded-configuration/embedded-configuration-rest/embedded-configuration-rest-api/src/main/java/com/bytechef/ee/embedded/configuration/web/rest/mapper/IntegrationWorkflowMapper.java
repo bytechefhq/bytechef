@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.embedded.configuration.web.rest.mapper;
 
+import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.web.rest.mapper.config.EmbeddedConfigurationMapperSpringConfig;
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowBasicModel;
 import com.bytechef.ee.embedded.configuration.web.rest.model.WorkflowModel;
 import com.bytechef.platform.configuration.web.rest.mapper.util.WorkflowMapperUtils;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -35,6 +37,9 @@ public abstract class IntegrationWorkflowMapper {
         @Mapping(target = "workflowTaskComponentNames", ignore = true)
         @Mapping(target = "workflowTriggerComponentNames", ignore = true)
         public abstract WorkflowModel convert(IntegrationWorkflowDTO workflowDTO);
+
+        @Mapping(target = "componentReference", ignore = true)
+        public abstract WorkflowInputModel map(Workflow.Input input);
 
         @AfterMapping
         public void afterMapping(IntegrationWorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {

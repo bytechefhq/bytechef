@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.springframework.core.convert.converter.Converter;
 
@@ -55,6 +56,7 @@ public class ComponentDefinitionMapper {
     public interface ComponentDefinitionToComponentDefinitionBasicModelMapper
         extends Converter<ComponentDefinition, ComponentDefinitionBasicModel> {
 
+        @Mapping(target = "inputsCount", ignore = true)
         ComponentDefinitionBasicModel convert(ComponentDefinition componentDefinition);
 
         @AfterMapping
