@@ -22,6 +22,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiCollectionEndpoint.HttpMethod;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.WebhookTriggerFlags;
 import com.bytechef.platform.component.trigger.WebhookRequest;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -61,6 +62,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping(ApiPlatformHandlerController.API_PLATFORM_BASE_PATH + "/**")
 @CrossOrigin
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 public class ApiPlatformHandlerController extends AbstractWebhookTriggerController {
 

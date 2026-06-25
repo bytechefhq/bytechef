@@ -20,6 +20,7 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollectionFacade;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.TagModel;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.UpdateTagsRequestModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/api-platform/internal")
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 public class ApiCollectionTagApiController implements ApiCollectionTagApi {
 
