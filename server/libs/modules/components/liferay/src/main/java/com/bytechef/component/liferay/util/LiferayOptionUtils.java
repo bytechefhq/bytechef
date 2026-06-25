@@ -28,6 +28,8 @@ import com.bytechef.component.definition.TypeReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author Marija Horvat
@@ -50,16 +52,46 @@ public class LiferayOptionUtils {
             .execute()
             .getBody(new TypeReference<>() {});
 
-        for (String key : body.keySet()) {
-            if (body.get(key) instanceof List<?> values) {
-                String yamlUrl = (String) values.getFirst();
-
-                options.add(option(key, yamlUrl.replace(".yaml", ".json")));
-            }
+        if (body == null || body.isEmpty()) {
+            return List.of();
         }
+
+        body.entrySet()
+            .forEach(entry -> {
+                if (!(entry.getValue() instanceof List<?> applications)) {
+                    return;
+                }
+                if (applications.isEmpty()) {
+                    return;
+                }
+
+                for (Object application : applications) {
+                    if (application instanceof String path) {
+                        String applicationOpenapiRelativePath =
+                            path.substring(path.indexOf((String) entry.getKey()) + 1);
+
+                        options.add(option(getHeadlessApplicationQualifiedName(applicationOpenapiRelativePath),
+                            applicationOpenapiRelativePath.replace("/openapi.yaml", "")));
+                    }
+                }
+            });
 
         return options;
     }
+
+    private static String getHeadlessApplicationQualifiedName(String path) {
+        Matcher matcher = versionPattern.matcher(path);
+
+        if (!matcher.find()) {
+            return path;
+        }
+
+        int appNameEndIdx = path.indexOf("/");
+
+        return path.substring(0, appNameEndIdx) + " " + matcher.group(1);
+    }
+
+    private static final Pattern versionPattern = Pattern.compile("/(v\\d.\\d+)/");
 
     public static List<Option<String>> getEndpointsOptions(
         Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -72,7 +104,7 @@ public class LiferayOptionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context
-            .http(http -> http.get(inputParameters.getRequiredString(APPLICATION)))
+            .http(http -> http.get("/o/" + inputParameters.getRequiredString(APPLICATION) + "/openapi.json"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});

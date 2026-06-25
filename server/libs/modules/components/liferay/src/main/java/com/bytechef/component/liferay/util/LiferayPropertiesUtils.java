@@ -52,7 +52,9 @@ public class LiferayPropertiesUtils {
     public static PropertiesContainer createPropertiesForParameters(
         String application, String endpoint, ActionContext context) {
 
-        return getPropertiesContainer(application, endpoint, context);
+        String url = "/o/" + application + "/openapi.json";
+
+        return getPropertiesContainer(url, endpoint, context);
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(

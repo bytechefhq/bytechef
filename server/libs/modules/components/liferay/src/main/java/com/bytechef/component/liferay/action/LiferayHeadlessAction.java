@@ -142,6 +142,10 @@ public class LiferayHeadlessAction {
 
         String baseUri = connectionParameters.getRequiredString(BASE_URI);
 
+        if (baseUri.endsWith("/")) {
+            baseUri = baseUri.substring(0, baseUri.length() - 1);
+        }
+
         String endpointUri = baseUri + "/o/" + inputParameters.getRequiredString(APPLICATION) + applicationEndpoint;
 
         if (Objects.isNull(pathParameters) || pathParameters.isEmpty()) {
