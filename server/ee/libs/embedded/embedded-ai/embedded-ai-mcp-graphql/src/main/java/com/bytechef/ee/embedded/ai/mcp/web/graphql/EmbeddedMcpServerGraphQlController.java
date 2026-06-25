@@ -13,6 +13,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationVersion.Status;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Controller;
  * @version ee
  */
 @Controller
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 class EmbeddedMcpServerGraphQlController {
 

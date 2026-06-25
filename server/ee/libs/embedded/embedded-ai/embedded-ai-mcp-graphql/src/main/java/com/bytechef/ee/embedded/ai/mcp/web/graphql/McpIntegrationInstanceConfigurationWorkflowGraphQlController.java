@@ -26,6 +26,7 @@ import com.bytechef.ee.embedded.configuration.dto.IntegrationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.WorkflowConstants;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.Property;
@@ -51,6 +52,7 @@ import org.springframework.stereotype.Controller;
  * @version ee
  */
 @Controller
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 class McpIntegrationInstanceConfigurationWorkflowGraphQlController {
 
