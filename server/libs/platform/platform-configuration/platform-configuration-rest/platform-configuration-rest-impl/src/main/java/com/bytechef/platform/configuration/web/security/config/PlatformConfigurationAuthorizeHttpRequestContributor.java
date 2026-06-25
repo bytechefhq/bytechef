@@ -28,6 +28,11 @@ public class PlatformConfigurationAuthorizeHttpRequestContributor implements Aut
 
     @Override
     public List<String> getApiPermitAllRequestMatcherPaths() {
-        return List.of("/api/platform/internal/trigger-form/**");
+        // The trigger-form endpoint is served by the automation TriggerFormApiController at
+        // /api/automation/internal/trigger-form/{id}; it is a public form (the unguessable random-v4 workflow uuid in
+        // the WorkflowExecutionId is the capability, like a webhook URL). The previous /api/platform/... path matched
+        // no
+        // controller, so anonymous form loads failed.
+        return List.of("/api/automation/internal/trigger-form/**");
     }
 }
