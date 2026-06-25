@@ -42,6 +42,7 @@ import java.util.Objects;
 
 /**
  * @author Marija Horvat
+ * @author Nikolina Spehar
  */
 public class LiferayPropertiesUtils {
 
@@ -51,9 +52,7 @@ public class LiferayPropertiesUtils {
     public static PropertiesContainer createPropertiesForParameters(
         String application, String endpoint, ActionContext context) {
 
-        String url = "/o/" + application + "/openapi.json";
-
-        return getPropertiesContainer(url, endpoint, context);
+        return getPropertiesContainer(application, endpoint, context);
     }
 
     private static List<Map<String, Object>> extractPropertiesFromSchema(

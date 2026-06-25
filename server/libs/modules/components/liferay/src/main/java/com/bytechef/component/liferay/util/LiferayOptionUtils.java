@@ -31,6 +31,7 @@ import java.util.Map;
 
 /**
  * @author Marija Horvat
+ * @author Nikolina Spehar
  */
 public class LiferayOptionUtils {
 
@@ -44,26 +45,17 @@ public class LiferayOptionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context
-            .http(http -> http.get("/o/openapi/openapi.json"))
+            .http(http -> http.get("/o/openapi"))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
 
-        if (!(body.get("paths") instanceof Map<?, ?> resources)) {
-            return List.of();
-        }
+        for (String key : body.keySet()) {
+            if (body.get(key) instanceof List<?> values) {
+                String yamlUrl = (String) values.getFirst();
 
-        List<String> uniqueApps = resources.keySet()
-            .stream()
-            .map(Object::toString)
-            .filter(path -> path.contains("openapi.{type"))
-            .map(path -> path.replaceFirst("/", ""))
-            .map(path -> path.replaceFirst("/openapi\\.\\{type.*}$", ""))
-            .distinct()
-            .toList();
-
-        for (String app : uniqueApps) {
-            options.add(option(app, app));
+                options.add(option(key, yamlUrl.replace(".yaml", ".json")));
+            }
         }
 
         return options;
@@ -80,7 +72,7 @@ public class LiferayOptionUtils {
         List<Option<String>> options = new ArrayList<>();
 
         Map<String, ?> body = context
-            .http(http -> http.get("/o/" + inputParameters.getRequiredString(APPLICATION) + "/openapi.json"))
+            .http(http -> http.get(inputParameters.getRequiredString(APPLICATION)))
             .configuration(responseType(ResponseType.JSON))
             .execute()
             .getBody(new TypeReference<>() {});
