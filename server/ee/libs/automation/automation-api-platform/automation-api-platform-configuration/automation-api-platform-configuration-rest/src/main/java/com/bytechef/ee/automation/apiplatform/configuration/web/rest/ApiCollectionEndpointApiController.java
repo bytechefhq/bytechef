@@ -14,6 +14,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.facade.ApiCollection
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiCollectionEndpointService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiCollectionEndpointModel;
 import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/api-platform/internal")
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 public class ApiCollectionEndpointApiController implements ApiCollectionEndpointApi {
 

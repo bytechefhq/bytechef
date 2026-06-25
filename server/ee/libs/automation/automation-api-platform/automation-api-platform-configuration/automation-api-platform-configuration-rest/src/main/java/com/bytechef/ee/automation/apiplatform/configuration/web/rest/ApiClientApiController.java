@@ -23,6 +23,7 @@ import com.bytechef.ee.automation.apiplatform.configuration.domain.ApiClient;
 import com.bytechef.ee.automation.apiplatform.configuration.service.ApiClientService;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.ApiClientModel;
 import com.bytechef.ee.automation.apiplatform.configuration.web.rest.model.CreateApiClient200ResponseModel;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
@@ -35,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.automation:}/api-platform/internal")
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 public class ApiClientApiController implements ApiClientApi {
 
