@@ -20,7 +20,7 @@ import {
 } from '@/shared/middleware/platform/configuration';
 import {ClickedDefinitionType, NodeDataType} from '@/shared/types';
 import {Node, NodeChange, XYPosition, useReactFlow} from '@xyflow/react';
-import {DragEventHandler, type MouseEvent as ReactMouseEvent, useCallback, useEffect, useMemo, useRef} from 'react';
+import {DragEventHandler, useCallback, useEffect, useMemo, useRef} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import LabeledBranchCaseEdge from '../edges/LabeledBranchCaseEdge';
@@ -282,7 +282,7 @@ const useWorkflowEditorCanvas = ({
     }, []);
 
     const handleNodeDragStart = useCallback(
-        (_event: ReactMouseEvent, node: Node) => {
+        (_event: MouseEvent | TouchEvent, node: Node) => {
             setIsNodeDragging(true);
 
             const nodeData = node.data as NodeDataType;
@@ -414,7 +414,7 @@ const useWorkflowEditorCanvas = ({
     );
 
     const handleNodeDragStop = useCallback(
-        (_event: ReactMouseEvent, draggedNode: Node) => {
+        (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
             setIsNodeDragging(false);
 
             if (updateWorkflowMutation) {
