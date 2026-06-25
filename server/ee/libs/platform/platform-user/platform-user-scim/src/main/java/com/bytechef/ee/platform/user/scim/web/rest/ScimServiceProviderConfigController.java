@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.user.scim.web.rest;
 
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import java.util.List;
 import java.util.Map;
 import org.springframework.http.MediaType;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(path = "/api/scim/v2", produces = "application/scim+json")
+@ConditionalOnEEVersion
 class ScimServiceProviderConfigController {
 
     @GetMapping("/ServiceProviderConfig")
