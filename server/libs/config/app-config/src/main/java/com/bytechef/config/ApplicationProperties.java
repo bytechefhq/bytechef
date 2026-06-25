@@ -128,6 +128,11 @@ public class ApplicationProperties {
     private Kafka kafka = new Kafka();
 
     /**
+     * Licence configuration
+     */
+    private Licence licence = new Licence();
+
+    /**
      * Email configuration
      */
     private Mail mail = new Mail();
@@ -272,6 +277,10 @@ public class ApplicationProperties {
         return kafka;
     }
 
+    public Licence getLicence() {
+        return licence;
+    }
+
     public Mail getMail() {
         return mail;
     }
@@ -402,6 +411,10 @@ public class ApplicationProperties {
 
     public void setKafka(Kafka kafka) {
         this.kafka = kafka;
+    }
+
+    public void setLicence(Licence licence) {
+        this.licence = licence;
     }
 
     public void setMail(Mail mail) {
@@ -3404,6 +3417,109 @@ public class ApplicationProperties {
 
             public void setGroupId(String groupId) {
                 this.groupId = groupId;
+            }
+        }
+    }
+
+    /**
+     * Licence configuration for the ByteChef offline licence.
+     */
+    public static class Licence {
+
+        /**
+         * Ed25519 public key used to verify licence signatures (raw 32-byte hex). Overrides the baked-in default.
+         */
+        private String publicKey;
+
+        /**
+         * Path to the bootstrap .lic file. Seeds the database on first boot if the licence table is empty.
+         */
+        private String path;
+
+        /**
+         * Number of days the instance continues to run after a licence expires before enforcement kicks in.
+         */
+        private int gracePeriodDays = 14;
+
+        /**
+         * Keygen account ID. Required only for online check-in.
+         */
+        private String accountId;
+
+        /**
+         * Online check-in configuration.
+         */
+        private CheckIn checkIn = new CheckIn();
+
+        public String getPublicKey() {
+            return publicKey;
+        }
+
+        public void setPublicKey(String publicKey) {
+            this.publicKey = publicKey;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
+
+        public int getGracePeriodDays() {
+            return gracePeriodDays;
+        }
+
+        public void setGracePeriodDays(int gracePeriodDays) {
+            this.gracePeriodDays = gracePeriodDays;
+        }
+
+        public String getAccountId() {
+            return accountId;
+        }
+
+        public void setAccountId(String accountId) {
+            this.accountId = accountId;
+        }
+
+        public CheckIn getCheckIn() {
+            return checkIn;
+        }
+
+        public void setCheckIn(CheckIn checkIn) {
+            this.checkIn = checkIn;
+        }
+
+        /**
+         * Online check-in scheduling configuration.
+         */
+        public static class CheckIn {
+
+            /**
+             * Whether periodic online check-in against Keygen is enabled. Disabled by default.
+             */
+            private boolean enabled = false;
+
+            /**
+             * How often the instance checks in with Keygen. Defaults to 24 hours.
+             */
+            private Duration interval = Duration.ofHours(24);
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+
+            public Duration getInterval() {
+                return interval;
+            }
+
+            public void setInterval(Duration interval) {
+                this.interval = interval;
             }
         }
     }

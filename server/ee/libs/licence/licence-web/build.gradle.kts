@@ -1,0 +1,15 @@
+dependencies {
+    implementation(project(":server:libs:licence:licence-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation("com.graphql-java:graphql-java")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-web")
+    implementation("org.springframework:spring-webmvc")
+    implementation("org.springframework.graphql:spring-graphql")
+    implementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testImplementation("org.mockito:mockito-core")
+    testImplementation("org.springframework:spring-test")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+}

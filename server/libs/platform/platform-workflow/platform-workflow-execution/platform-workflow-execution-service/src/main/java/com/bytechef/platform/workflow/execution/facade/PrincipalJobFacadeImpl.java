@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.dto.JobParametersDTO;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.workflow.execution.service.LicenceJobUsageService;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Optional;
@@ -43,16 +44,18 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     private final JobFacade jobFacade;
     private final JobService jobService;
     private final WorkflowService workflowService;
+    private final LicenceJobUsageService licenceJobUsageService;
 
     @SuppressFBWarnings("EI")
     public PrincipalJobFacadeImpl(
         PrincipalJobService principalJobService, JobFacade jobFacade, JobService jobService,
-        WorkflowService workflowService) {
+        WorkflowService workflowService, LicenceJobUsageService licenceJobUsageService) {
 
         this.principalJobService = principalJobService;
         this.jobFacade = jobFacade;
         this.jobService = jobService;
         this.workflowService = workflowService;
+        this.licenceJobUsageService = licenceJobUsageService;
     }
 
     @Override
@@ -75,6 +78,8 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     @Override
     // TODO @Transactional
     public long createJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+        licenceJobUsageService.consumeOrThrow();
+
         long jobId = jobFacade.createJob(jobParametersDTO);
 
         principalJobService.create(jobId, jobPrincipalId, type);
@@ -85,6 +90,8 @@ public class PrincipalJobFacadeImpl implements PrincipalJobFacade {
     @Override
     @Transactional
     public Job createSyncJob(JobParametersDTO jobParametersDTO, long jobPrincipalId, PlatformType type) {
+        licenceJobUsageService.consumeOrThrow();
+
         Job job = jobService.create(jobParametersDTO, workflowService.getWorkflow(jobParametersDTO.getWorkflowId()));
 
         principalJobService.create(Validate.notNull(job.getId(), "id"), jobPrincipalId, type);

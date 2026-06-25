@@ -78,6 +78,15 @@ bytechef:
       basedir: ${user.home}/bytechef/data/file-storage
   help-hub:
     enabled: false
+  # Licence (EE). Mandatory when edition=ee; no enable/disable switch.
+  licence:
+    # public-key:            # override the baked-in Keygen Ed25519 verify key (raw 32-byte hex)
+    # path:                  # bootstrap .lic file path (seeds DB on first boot if empty)
+    grace-period-days: 14
+    # account-id:            # Keygen account id (only needed for online check-in)
+    check-in:
+      enabled: false
+      interval: PT24H
   mail:
     auth: false
     base-url: ${bytechef.public-url}
