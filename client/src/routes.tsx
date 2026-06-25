@@ -62,6 +62,7 @@ const WorkflowTemplate = lazy(() => import('@/pages/automation/template/workflow
 const WorkflowTemplates = lazy(() => import('@/pages/automation/templates/workflow-templates/WorkflowTemplates'));
 
 const AiProviders = lazy(() => import('@/ee/pages/settings/platform/ai-providers/AiProviders'));
+const License = lazy(() => import('@/ee/pages/settings/platform/license/License'));
 const ApiClients = lazy(() => import('@/ee/pages/automation/api-platform/api-clients/ApiClients'));
 const ApiCollections = lazy(() => import('@/ee/pages/automation/api-platform/api-collections/ApiCollections'));
 const ApiConnectors = lazy(() => import('@/ee/pages/settings/platform/api-connectors/ApiConnectors'));
@@ -347,6 +348,18 @@ const platformSettingsRoutes = {
             ),
             path: 'admin-api-keys',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <License />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'license',
+        },
     ],
     navItems: [
         {
@@ -387,6 +400,10 @@ const platformSettingsRoutes = {
         {
             href: 'admin-api-keys',
             title: 'Admin API Keys',
+        },
+        {
+            href: 'license',
+            title: 'License',
         },
     ],
 };
