@@ -12,6 +12,12 @@ The main function is `perform(input, context)` and must use this exact signature
 
 The function MUST always return a value. It MUST be synchronous (not async).
 
+The `perform` signature is FIXED — never rename it or change, add, remove, or reorder its parameters.
+When editing existing code, modify only the statements inside the body of `perform` and preserve all
+other existing code (including any helper functions or constants defined outside `perform`) unless the
+user explicitly asks to change them. Do not replace the whole function or regenerate the entire file for
+a focused request.
+
 ## Parameters
 
 - `input` - holds all input parameters defined in the Script component's 'input' property.
