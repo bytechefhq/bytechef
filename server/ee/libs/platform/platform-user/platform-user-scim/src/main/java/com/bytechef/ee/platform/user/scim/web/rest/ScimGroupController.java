@@ -13,6 +13,7 @@ import com.bytechef.ee.platform.user.scim.model.ScimGroup;
 import com.bytechef.ee.platform.user.scim.model.ScimListResponse;
 import com.bytechef.ee.platform.user.scim.model.ScimMeta;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.service.AuthorityService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -41,6 +42,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(path = "/api/scim/v2/Groups", produces = "application/scim+json")
+@ConditionalOnEEVersion
 class ScimGroupController {
 
     private final AuthorityService authorityService;

@@ -16,6 +16,7 @@ import com.bytechef.ee.platform.user.scim.model.ScimName;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchOperation;
 import com.bytechef.ee.platform.user.scim.model.ScimPatchRequest;
 import com.bytechef.ee.platform.user.scim.model.ScimUser;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.dto.AdminUserDTO;
 import com.bytechef.platform.user.service.UserService;
@@ -47,6 +48,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping(path = "/api/scim/v2/Users", produces = "application/scim+json")
+@ConditionalOnEEVersion
 class ScimUserController {
 
     private final UserService userService;
