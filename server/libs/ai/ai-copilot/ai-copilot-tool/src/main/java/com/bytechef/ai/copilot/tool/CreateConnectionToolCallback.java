@@ -109,8 +109,13 @@ public class CreateConnectionToolCallback implements ToolCallback {
             String resolvedFromComponentName = null;
 
             if (componentDefinition.isEmpty()) {
-                String resolvedComponentName = ComponentSlugUtils.resolveSingleMatch(
-                    componentName, componentDefinitionService);
+                // The slug doesn't exist verbatim. If a colloquial name (e.g. "gmail"/"google-mail") unambiguously
+                // resolves to a single catalog slug, open the Connect dialog for it directly — this saves the agent a
+                // wasted round-trip guessing the exact slug. An ambiguous or unknown name still fails loud and
+                // actionable with candidate slugs: emitting a "Connect <slug>" button with a bogus or wrong slug would
+                // otherwise hard-fail the client's strict component-definition lookup with an opaque "Bad Request".
+                String resolvedComponentName =
+                    ComponentSlugUtils.resolveSingleMatch(componentName, componentDefinitionService);
 
                 if (resolvedComponentName == null) {
                     return toolError(ComponentSlugUtils.unknownComponentMessage(componentName,
