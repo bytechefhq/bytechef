@@ -18,8 +18,8 @@ package com.bytechef.automation.configuration.service;
 
 /**
  * Core authorization engine. Registered as Spring bean {@code "permissionService"}; the
- * {@code AutomationPermissionEvaluator} delegates the {@code hasPermission(...)} SpEL built-in to it, and direct Java
- * callers invoke it as well.
+ * {@code ProjectWorkspacePermissionEvaluator} delegates the {@code hasPermission(...)} SpEL built-in to it, and direct
+ * Java callers invoke it as well.
  *
  * @author Ivica Cardic
  */
