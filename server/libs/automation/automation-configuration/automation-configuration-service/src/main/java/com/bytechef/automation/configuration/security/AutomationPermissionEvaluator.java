@@ -74,7 +74,11 @@ public class AutomationPermissionEvaluator implements PermissionEvaluator {
             return true;
         }
 
-        long id = ((Number) targetId).longValue();
+        if (!(targetId instanceof Number number)) {
+            return false;
+        }
+
+        long id = number.longValue();
         String value = String.valueOf(permission);
 
         return switch (targetType) {
