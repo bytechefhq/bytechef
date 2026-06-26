@@ -56,6 +56,13 @@ class AutomationPermissionEvaluatorTest {
     }
 
     @Test
+    void testNonNumericTargetIdReturnsFalse() {
+        assertThat(evaluator.hasPermission(null, "not-a-number", "User", "SELF")).isFalse();
+
+        verifyNoInteractions(permissionService);
+    }
+
+    @Test
     void testTenantAdminObjectFormDelegates() {
         when(permissionService.isTenantAdmin()).thenReturn(true);
 
