@@ -1,12 +1,19 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/McpComponentListItem';
-import McpComponentToolList from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/McpComponentToolList';
 import useMcpComponentList from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
 import {McpServer} from '@/shared/middleware/graphql';
-import {Fragment} from 'react';
+import {useMemo} from 'react';
 
 const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     const {data, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
+
+    const sortedComponents = useMemo(
+        () =>
+            data?.mcpComponentsByServerId
+                ? [...data.mcpComponentsByServerId].sort((a, b) => a!.componentName.localeCompare(b!.componentName))
+                : [],
+        [data?.mcpComponentsByServerId]
+    );
 
     if (isMcpComponentsLoading) {
         return (
@@ -37,31 +44,10 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="py-1 pl-4">
-            {data.mcpComponentsByServerId
-                .sort((previousComponent, currentComponent) =>
-                    previousComponent!.componentName.localeCompare(currentComponent!.componentName)
-                )
-                .map((mcpComponent) => (
-                    <Fragment key={mcpComponent!.id}>
-                        <McpComponentListItem
-                            key={mcpComponent?.id}
-                            mcpComponent={mcpComponent!}
-                            mcpServer={mcpServer}
-                        />
-
-                        <div className="pl-6">
-                            <McpComponentToolList
-                                componentName={mcpComponent!.componentName}
-                                componentVersion={mcpComponent!.componentVersion}
-                                connectionId={mcpComponent!.connectionId}
-                                mcpComponent={mcpComponent!}
-                                mcpServerId={mcpServer.id!}
-                                mcpTools={mcpComponent!.mcpTools}
-                            />
-                        </div>
-                    </Fragment>
-                ))}
+        <div className="flex flex-col gap-1.5 py-2">
+            {sortedComponents.map((mcpComponent) => (
+                <McpComponentListItem key={mcpComponent!.id} mcpComponent={mcpComponent!} mcpServer={mcpServer} />
+            ))}
         </div>
     );
 };
