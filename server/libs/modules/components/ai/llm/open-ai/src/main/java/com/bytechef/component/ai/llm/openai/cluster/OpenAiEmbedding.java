@@ -33,12 +33,14 @@ import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 
 public class OpenAiEmbedding {
 
+    public static final EmbeddingFunction EMBEDDING_MODEL = OpenAiEmbedding::apply;
+
     public static final ClusterElementDefinition<?> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<EmbeddingFunction>clusterElement("embedding")
             .title("OpenAI Embedding")
             .description("OpenAI embedding.")
             .type(EmbeddingFunction.EMBEDDING)
-            .object(() -> OpenAiEmbedding::apply)
+            .object(() -> EMBEDDING_MODEL)
             .properties(
                 string(MODEL)
                     .label("Model")
