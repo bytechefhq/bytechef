@@ -36,6 +36,7 @@ import {MentionStorage} from './MentionStorage.extension';
 import PropertyMentionNodeView from './PropertyMentionNodeView';
 import {buildToolFunctionDefinitions} from './fromAiFunctionDefinition';
 import {getDataPillIconSource} from './getDataPillIconSource';
+import {getMentionsInputPlaceholder} from './mentionsInputPlaceholder';
 import {
     PROPERTY_MENTION_CHIP_CLASS,
     PROPERTY_MENTION_LABEL_CLASS,
@@ -219,10 +220,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                     ...(expressionEnabled !== false ? {suggestion: getSuggestionOptions()} : {}),
                 }),
                 Placeholder.configure({
-                    placeholder:
-                        expressionEnabled === false
-                            ? placeholder || ''
-                            : placeholder || "Use '$' for data pills and '=' for an expression",
+                    placeholder: getMentionsInputPlaceholder({expressionEnabled, placeholder, toolProperty}),
                 }),
             ];
 
@@ -262,6 +260,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             path,
             placeholder,
             setIsFormulaMode,
+            toolProperty,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
