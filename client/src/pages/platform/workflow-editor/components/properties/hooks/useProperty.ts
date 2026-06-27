@@ -51,6 +51,7 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {getTask} from '../../../utils/getTask';
+import {computeFromAiToggle} from './fromAiToggle';
 
 function getInitialControlledDynamicMode(
     control: Control<FieldValues, FieldValues> | undefined,
@@ -704,11 +705,18 @@ export const useProperty = ({
         (fromAi: boolean, fieldOnChange: (value: string) => void) => {
             setControlledFromAi(fromAi);
 
-            const value = fromAi ? fromAiExpression : '';
+            const {savePayload, value} = computeFromAiToggle({
+                custom,
+                fromAi,
+                fromAiExpression,
+                hasPath: !!path,
+                hasWorkflowId: !!workflow.id,
+            });
 
             fieldOnChange(value);
 
             if (
+                !savePayload ||
                 !path ||
                 !workflow.id ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
@@ -717,13 +725,11 @@ export const useProperty = ({
             }
 
             saveProperty({
-                fromAi,
-                includeInMetadata: custom || fromAi,
+                ...savePayload,
                 path,
                 type,
                 updateClusterElementParameterMutation,
                 updateWorkflowNodeParameterMutation,
-                value,
                 workflowId: workflow.id,
             });
         },
@@ -1175,42 +1181,50 @@ export const useProperty = ({
 
             setControlledFromAi(fromAi);
 
-            let value = propertyParameterValue;
+            const {savePayload, value} = computeFromAiToggle({
+                custom,
+                fromAi,
+                fromAiExpression,
+                hasPath: !!path,
+                hasWorkflowId: !!workflow.id,
+            });
+
+            setPropertyParameterValue(value);
+
+            const editorContent = value.startsWith('=') ? value.substring(1) : value;
 
             if (fromAi) {
-                if (editorRef.current) {
-                    editorRef.current.commands.setContent(fromAiExpression);
-                    editorRef.current.setEditable(false);
-
-                    value = fromAiExpression;
-                }
+                editorRef.current?.commands.setContent(value);
+                editorRef.current?.setEditable(false);
             } else {
-                if (editorRef.current) {
-                    editorRef.current.setEditable(true);
+                // "Customize AI generation": reveal the =fromAi(...) expression as an editable formula.
+                // Raw setter (not the setIsFormulaMode wrapper, declared below) to avoid a TDZ reference.
+                setIsFormulaModeInternal(true);
 
-                    editorRef.current.commands.focus();
+                editorRef.current?.commands.setContent(editorContent);
+                editorRef.current?.setEditable(true);
+                editorRef.current?.commands.focus();
 
-                    setFocusedInput(editorRef.current);
-                }
+                setFocusedInput(editorRef.current);
             }
 
-            saveProperty({
-                fromAi,
-                includeInMetadata: custom || fromAi,
-                path,
-                type,
-                updateClusterElementParameterMutation,
-                updateWorkflowNodeParameterMutation,
-                value,
-                workflowId: workflow.id,
-            });
+            if (savePayload) {
+                saveProperty({
+                    ...savePayload,
+                    path,
+                    type,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    workflowId: workflow.id,
+                });
+            }
         },
         [
             custom,
             fromAiExpression,
             path,
-            propertyParameterValue,
             setFocusedInput,
+            setIsFormulaModeInternal,
             type,
             updateClusterElementParameterMutation,
             updateWorkflowNodeParameterMutation,
