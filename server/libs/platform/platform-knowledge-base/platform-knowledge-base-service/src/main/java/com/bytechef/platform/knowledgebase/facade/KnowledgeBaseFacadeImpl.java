@@ -21,9 +21,13 @@ import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstant
 import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -50,17 +54,19 @@ class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
 
     private final KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService;
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
+    private final KnowledgeBaseService knowledgeBaseService;
     private final ObjectMapper objectMapper;
     private final VectorStore vectorStore;
 
     @SuppressFBWarnings("EI")
     KnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage, ObjectMapper objectMapper,
-        @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
+        ObjectMapper objectMapper, @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
         this.knowledgeBaseDocumentChunkService = knowledgeBaseDocumentChunkService;
         this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
+        this.knowledgeBaseService = knowledgeBaseService;
         this.objectMapper = objectMapper;
         this.vectorStore = vectorStore;
     }
@@ -78,7 +84,19 @@ class KnowledgeBaseFacadeImpl implements KnowledgeBaseFacade {
             .filterExpression(filterExpression)
             .build();
 
-        List<Document> documents = vectorStore.similaritySearch(searchRequest);
+        KnowledgeBase knowledgeBase = knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
+
+        Environment environment = knowledgeBase.getEnvironment();
+
+        EnvironmentContext.set(environment);
+
+        List<Document> documents;
+
+        try {
+            documents = vectorStore.similaritySearch(searchRequest);
+        } finally {
+            EnvironmentContext.clear();
+        }
 
         return documents.stream()
             .map(this::toKnowledgeBaseDocumentChunk)
