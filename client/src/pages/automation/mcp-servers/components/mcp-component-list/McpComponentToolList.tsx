@@ -1,8 +1,9 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import {McpComponent, McpTool} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentToolListItem from './McpComponentToolListItem';
@@ -26,22 +27,41 @@ const McpComponentToolList = ({
 }: McpComponentToolListProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({componentName, componentVersion});
+
     const tools = mcpTools?.filter((tool): tool is McpTool => tool !== null && tool.name !== null) || [];
 
+    // Tool descriptions aren't persisted on the McpTool row; resolve them from the component definition's
+    // TOOLS cluster elements (matched by name), the same source the tool-selection dialog uses.
+    const toolDescriptionsByName = useMemo(() => {
+        const descriptions: Record<string, string> = {};
+
+        componentDefinition?.clusterElements
+            ?.filter((element) => element.type === 'TOOLS')
+            .forEach((element) => {
+                if (element.description) {
+                    descriptions[element.name] = element.description;
+                }
+            });
+
+        return descriptions;
+    }, [componentDefinition?.clusterElements]);
+
     return tools.length > 0 ? (
-        <div className="flex flex-wrap gap-2 py-2 pl-6">
+        <div className="flex flex-col gap-1">
             {tools.map((tool) => (
                 <McpComponentToolListItem
                     componentName={componentName}
                     componentVersion={componentVersion}
                     connectionId={connectionId}
+                    description={toolDescriptionsByName[tool.name]}
                     key={tool.name}
                     mcpTool={tool}
                 />
             ))}
         </div>
     ) : (
-        <div className="flex justify-center py-4 pl-6">
+        <div className="flex justify-center py-4">
             <EmptyList
                 button={<Button label="Edit Tools" onClick={() => setShowEditDialog(true)} />}
                 icon={<ComponentIcon className="size-12 text-gray-300" />}

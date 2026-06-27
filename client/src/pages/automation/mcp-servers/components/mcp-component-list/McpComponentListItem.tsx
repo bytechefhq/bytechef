@@ -1,13 +1,16 @@
 import '@/shared/styles/dropdownMenu.css';
 import Badge from '@/components/Badge/Badge';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import McpComponentListItemDropdownMenu from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItemDropdownMenu';
 import useMcpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentListItem';
 import {McpComponent, McpServer} from '@/shared/middleware/graphql';
-import {ComponentIcon} from 'lucide-react';
+import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
+import McpComponentToolList from './McpComponentToolList';
 
 const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpComponent; mcpServer: McpServer}) => {
     const {componentDefinition, setShowEditDialog, showEditDialog} = useMcpComponentListItem(
@@ -15,58 +18,75 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
         mcpComponent.componentVersion
     );
 
-    return (
-        <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-            <div className="flex flex-1 items-center py-1">
-                <div className="flex flex-1 cursor-pointer items-center" onClick={() => setShowEditDialog(true)}>
-                    <div className="flex flex-1 items-center gap-x-2">
-                        {componentDefinition?.icon ? (
-                            <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
-                        ) : (
-                            <ComponentIcon className="size-4 text-content-neutral-secondary" />
-                        )}
+    const [expanded, setExpanded] = useState(false);
 
-                        <span className="mr-2 text-base font-semibold">
+    return (
+        <Collapsible className="group rounded-md border border-border" onOpenChange={setExpanded} open={expanded}>
+            <div className="flex items-center gap-2.5 px-3 py-2.5">
+                <CollapsibleTrigger asChild>
+                    <button
+                        aria-label={expanded ? 'Hide tools' : 'Show tools'}
+                        className="shrink-0 text-muted-foreground hover:text-foreground"
+                        type="button"
+                    >
+                        {expanded ? <ChevronDownIcon className="size-4" /> : <ChevronRightIcon className="size-4" />}
+                    </button>
+                </CollapsibleTrigger>
+
+                {componentDefinition?.icon ? (
+                    <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />
+                ) : (
+                    <ComponentIcon className="size-6 shrink-0 text-content-neutral-secondary" />
+                )}
+
+                <CollapsibleTrigger asChild>
+                    <button className="flex min-w-0 flex-1 cursor-pointer items-center gap-2 text-left" type="button">
+                        <span className="truncate text-sm font-medium">
                             {mcpComponent.title || mcpComponent.componentName}
                         </span>
-                    </div>
+                    </button>
+                </CollapsibleTrigger>
 
-                    <div className="flex items-center justify-end gap-x-6">
-                        <Tooltip>
-                            <TooltipTrigger asChild>
-                                <Badge
-                                    label={`v${mcpComponent.componentVersion}`}
-                                    styleType="secondary-filled"
-                                    weight="semibold"
-                                />
-                            </TooltipTrigger>
-
-                            <TooltipContent>Component Version</TooltipContent>
-                        </Tooltip>
-
-                        <div className="flex min-w-52 flex-col items-end gap-y-4">
-                            <Tooltip>
-                                <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                                    {mcpComponent.lastModifiedDate ? (
-                                        <span className="text-xs">
-                                            {`Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`}
-                                        </span>
-                                    ) : (
-                                        '-'
-                                    )}
-                                </TooltipTrigger>
-
-                                <TooltipContent>Last Updated Date</TooltipContent>
-                            </Tooltip>
-                        </div>
-
-                        <McpComponentListItemDropdownMenu
-                            mcpComponent={mcpComponent}
-                            onEditClick={() => setShowEditDialog(true)}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Badge
+                            label={`v${mcpComponent.componentVersion}`}
+                            styleType="secondary-filled"
+                            weight="semibold"
                         />
-                    </div>
-                </div>
+                    </TooltipTrigger>
+
+                    <TooltipContent>Component Version</TooltipContent>
+                </Tooltip>
+
+                <Tooltip>
+                    <TooltipTrigger className="flex items-center text-xs text-content-neutral-secondary">
+                        {mcpComponent.lastModifiedDate
+                            ? `Modified at ${new Date(mcpComponent.lastModifiedDate).toLocaleDateString()} ${new Date(mcpComponent.lastModifiedDate).toLocaleTimeString()}`
+                            : '-'}
+                    </TooltipTrigger>
+
+                    <TooltipContent>Last Updated Date</TooltipContent>
+                </Tooltip>
+
+                <McpComponentListItemDropdownMenu
+                    mcpComponent={mcpComponent}
+                    onEditClick={() => setShowEditDialog(true)}
+                />
             </div>
+
+            <CollapsibleContent>
+                <div className="border-t border-border px-3 py-2 pl-10">
+                    <McpComponentToolList
+                        componentName={mcpComponent.componentName}
+                        componentVersion={mcpComponent.componentVersion}
+                        connectionId={mcpComponent.connectionId}
+                        mcpComponent={mcpComponent}
+                        mcpServerId={mcpServer.id!}
+                        mcpTools={mcpComponent.mcpTools}
+                    />
+                </div>
+            </CollapsibleContent>
 
             <McpComponentDialog
                 mcpComponent={mcpComponent}
@@ -74,7 +94,7 @@ const McpComponentListItem = ({mcpComponent, mcpServer}: {mcpComponent: McpCompo
                 onOpenChange={setShowEditDialog}
                 open={showEditDialog}
             />
-        </div>
+        </Collapsible>
     );
 };
 

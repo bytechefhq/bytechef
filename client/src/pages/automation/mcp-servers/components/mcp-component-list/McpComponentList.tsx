@@ -2,11 +2,10 @@ import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentListItem';
-import McpComponentToolList from '@/pages/automation/mcp-servers/components/mcp-component-list/McpComponentToolList';
 import useMcpComponentList from '@/pages/automation/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
 import {McpServer} from '@/shared/middleware/graphql';
 import {ComponentIcon} from 'lucide-react';
-import {Fragment, useMemo, useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 
@@ -52,22 +51,17 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="py-1 pl-4">
+        <div>
             {sortedComponents.length > 0 ? (
-                sortedComponents.map((mcpComponent) => (
-                    <Fragment key={mcpComponent!.id}>
-                        <McpComponentListItem mcpComponent={mcpComponent!} mcpServer={mcpServer} />
-
-                        <McpComponentToolList
-                            componentName={mcpComponent!.componentName}
-                            componentVersion={mcpComponent!.componentVersion}
-                            connectionId={mcpComponent!.connectionId}
+                <div className="flex flex-col gap-1.5">
+                    {sortedComponents.map((mcpComponent) => (
+                        <McpComponentListItem
+                            key={mcpComponent!.id}
                             mcpComponent={mcpComponent!}
-                            mcpServerId={mcpServer.id!}
-                            mcpTools={mcpComponent!.mcpTools}
+                            mcpServer={mcpServer}
                         />
-                    </Fragment>
-                ))
+                    ))}
+                </div>
             ) : (
                 <div className="flex justify-center py-8">
                     <EmptyList

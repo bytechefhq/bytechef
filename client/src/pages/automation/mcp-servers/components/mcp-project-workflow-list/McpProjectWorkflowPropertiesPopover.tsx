@@ -21,7 +21,7 @@ const McpProjectWorkflowPropertiesPopover = ({
 
     return (
         <PopoverContent
-            align="start"
+            align="end"
             className="flex max-h-(--radix-popover-content-available-height) w-md flex-col p-0"
             onInteractOutside={(event) => event.preventDefault()}
             side="bottom"

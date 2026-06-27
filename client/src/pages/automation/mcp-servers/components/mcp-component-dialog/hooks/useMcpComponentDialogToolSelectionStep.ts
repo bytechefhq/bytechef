@@ -47,7 +47,11 @@ const useMcpComponentDialogToolSelectionStep = ({
         !!selectedComponent
     );
 
-    const {data: connections = [], isLoading: isLoadingConnections} = useGetWorkspaceConnectionsQuery(
+    const {
+        data: connections = [],
+        isLoading: isLoadingConnections,
+        refetch: refetchConnections,
+    } = useGetWorkspaceConnectionsQuery(
         {
             componentName: selectedComponent?.name,
             connectionVersion: selectedComponent?.version,
@@ -167,11 +171,15 @@ const useMcpComponentDialogToolSelectionStep = ({
 
     return {
         allToolsSelected,
+        componentDefinition,
         connections,
+        currentEnvironmentId,
+        currentWorkspaceId,
         handleSelectAllTools,
         handleToolToggle,
         isLoadingComponentDefinition,
         isLoadingConnections,
+        refetchConnections,
         selectAllCheckboxRef,
         someToolsSelected,
         toolElements,

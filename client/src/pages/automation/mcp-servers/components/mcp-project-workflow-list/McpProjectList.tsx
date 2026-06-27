@@ -4,10 +4,8 @@ import {Skeleton} from '@/components/ui/skeleton';
 import McpProjectWorkflowDialog from '@/pages/automation/mcp-servers/components/McpProjectWorkflowDialog';
 import {McpServer} from '@/shared/middleware/graphql';
 import {WorkflowIcon} from 'lucide-react';
-import {Fragment} from 'react';
 
 import McpProjectListItem from './McpProjectListItem';
-import McpProjectWorkflowList from './McpProjectWorkflowList';
 import useMcpProjectList from './hooks/useMcpProjectList';
 
 interface McpProjectListProps {
@@ -41,33 +39,22 @@ const McpProjectList = ({mcpServer}: McpProjectListProps) => {
         );
     }
 
-    return (
-        <div className="py-1 pl-4">
-            {mcpProjects && mcpProjects.length > 0 ? (
-                mcpProjects.map((mcpProject) => (
-                    <Fragment key={mcpProject.id}>
-                        <McpProjectListItem mcpProject={mcpProject} />
-
-                        <div className="pl-6">
-                            <McpProjectWorkflowList mcpProjectWorkflows={mcpProject.mcpProjectWorkflows} />
-                        </div>
-                    </Fragment>
-                ))
-            ) : (
-                <div className="flex justify-center py-8">
-                    <EmptyList
-                        button={
-                            <McpProjectWorkflowDialog
-                                mcpServer={mcpServer}
-                                triggerNode={<Button label="Add Workflows" />}
-                            />
-                        }
-                        icon={<WorkflowIcon className="size-24 text-gray-300" />}
-                        message="No MCP projects found for this server."
-                        title="No MCP Projects"
-                    />
-                </div>
-            )}
+    return mcpProjects && mcpProjects.length > 0 ? (
+        <div className="flex flex-col gap-1.5">
+            {mcpProjects.map((mcpProject) => (
+                <McpProjectListItem key={mcpProject.id} mcpProject={mcpProject} />
+            ))}
+        </div>
+    ) : (
+        <div className="flex justify-center py-8">
+            <EmptyList
+                button={
+                    <McpProjectWorkflowDialog mcpServer={mcpServer} triggerNode={<Button label="Add Workflows" />} />
+                }
+                icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                message="No MCP projects found for this server."
+                title="No MCP Projects"
+            />
         </div>
     );
 };
