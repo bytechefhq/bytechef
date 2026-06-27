@@ -22,6 +22,7 @@ import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstant
 import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_KNOWLEDGE_BASE_ID;
 import static com.bytechef.platform.knowledgebase.constant.KnowledgeBaseConstants.METADATA_TAG_NAMES;
 
+import com.bytechef.platform.configuration.context.EnvironmentContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -66,7 +67,13 @@ public class KnowledgeBaseVectorStoreWriter {
                     document, knowledgeBaseId, knowledgeBaseDocumentId, -1, environmentId, tagNames))
             .toList();
 
-        vectorStore.add(sanitizedDocuments);
+        EnvironmentContext.set((int) environmentId);
+
+        try {
+            vectorStore.add(sanitizedDocuments);
+        } finally {
+            EnvironmentContext.clear();
+        }
     }
 
     /**
@@ -86,7 +93,13 @@ public class KnowledgeBaseVectorStoreWriter {
         Document sanitizedDocument = sanitizeDocument(
             document, knowledgeBaseId, documentId, knowledgeBaseChunkId, environmentId, tagNames);
 
-        vectorStore.add(List.of(sanitizedDocument));
+        EnvironmentContext.set((int) environmentId);
+
+        try {
+            vectorStore.add(List.of(sanitizedDocument));
+        } finally {
+            EnvironmentContext.clear();
+        }
     }
 
     /**
