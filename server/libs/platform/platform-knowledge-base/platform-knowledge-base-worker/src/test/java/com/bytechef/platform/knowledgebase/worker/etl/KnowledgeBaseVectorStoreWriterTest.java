@@ -17,6 +17,7 @@
 package com.bytechef.platform.knowledgebase.worker.etl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 
@@ -48,9 +49,26 @@ class KnowledgeBaseVectorStoreWriterTest {
 
             return null;
         }).when(vectorStore)
-            .add(org.mockito.ArgumentMatchers.anyList());
+            .add(anyList());
 
         writer.write(List.of(new Document("hello")), 1L, 2L, Environment.STAGING.ordinal(), List.of());
+
+        assertThat(observed.get()).isEqualTo(Environment.STAGING);
+        assertThat(EnvironmentContext.getCurrentEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testWriteChunkSetsEnvironmentDuringAddAndClearsAfter() {
+        AtomicReference<Environment> observed = new AtomicReference<>();
+
+        doAnswer(invocation -> {
+            observed.set(EnvironmentContext.getCurrentEnvironment());
+
+            return null;
+        }).when(vectorStore)
+            .add(anyList());
+
+        writer.writeChunk(new Document("hello"), 1L, 2L, 3L, Environment.STAGING.ordinal(), List.of());
 
         assertThat(observed.get()).isEqualTo(Environment.STAGING);
         assertThat(EnvironmentContext.getCurrentEnvironment()).isEqualTo(Environment.PRODUCTION);
