@@ -16,15 +16,13 @@ describe('getMentionsInputPlaceholder', () => {
     });
 
     it('prefers an explicit placeholder over the tool-property default', () => {
-        expect(
-            getMentionsInputPlaceholder({expressionEnabled: true, placeholder: 'Custom', toolProperty: true})
-        ).toBe('Custom');
+        expect(getMentionsInputPlaceholder({expressionEnabled: true, placeholder: 'Custom', toolProperty: true})).toBe(
+            'Custom'
+        );
     });
 
     it('returns empty (or explicit) when expressions are disabled', () => {
         expect(getMentionsInputPlaceholder({expressionEnabled: false, toolProperty: true})).toBe('');
-        expect(getMentionsInputPlaceholder({expressionEnabled: false, placeholder: 'X', toolProperty: true})).toBe(
-            'X'
-        );
+        expect(getMentionsInputPlaceholder({expressionEnabled: false, placeholder: 'X', toolProperty: true})).toBe('X');
     });
 });

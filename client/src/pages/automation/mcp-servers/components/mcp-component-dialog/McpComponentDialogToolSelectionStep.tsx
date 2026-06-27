@@ -62,7 +62,7 @@ const McpComponentDialogToolSelectionStep = ({
 
     const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
 
-    const connectionTagsQueryResult = useGetConnectionTagsQuery();
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId ?? 0);
 
     return (
         <div className="space-y-4 py-4">
@@ -123,7 +123,7 @@ const McpComponentDialogToolSelectionStep = ({
                 <ConnectionDialog
                     componentDefinition={componentDefinition}
                     componentDefinitions={componentDefinitions}
-                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId)}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setShowCreateConnection(false)}
                     onConnectionCreate={async (newConnectionId) => {
