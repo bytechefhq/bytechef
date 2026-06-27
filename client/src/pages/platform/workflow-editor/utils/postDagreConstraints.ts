@@ -305,7 +305,15 @@ function alignCaseChainNodes(
     let currentNodeId = startNode.id;
     let currentData = startNode.data as NodeDataType;
 
+    const visitedNodeIds = new Set<string>();
+
     while (currentNodeId) {
+        if (visitedNodeIds.has(currentNodeId)) {
+            break;
+        }
+
+        visitedNodeIds.add(currentNodeId);
+
         let nextNodeId = '';
 
         if (currentData?.taskDispatcher && currentData.taskDispatcherId) {
@@ -497,7 +505,15 @@ export function separateOverlappingConditionChildren(allNodes: Node[], edges: Ed
             const bottomGhostId = `${childData.taskDispatcherId}-${componentName}-bottom-ghost`;
             let chainNodeId = edges.find((chainEdge) => chainEdge.source === bottomGhostId)?.target || '';
 
+            const visitedChainNodeIds = new Set<string>();
+
             while (chainNodeId) {
+                if (visitedChainNodeIds.has(chainNodeId)) {
+                    break;
+                }
+
+                visitedChainNodeIds.add(chainNodeId);
+
                 const chainNode = allNodes.find((node) => node.id === chainNodeId);
 
                 if (!chainNode || chainNode.type === 'taskDispatcherBottomGhostNode') {
@@ -619,7 +635,15 @@ export function separateOverlappingOnErrorChildren(allNodes: Node[], edges: Edge
             const bottomGhostId = bottomGhostIdForDispatcherTask(componentName, childData.taskDispatcherId);
             let chainNodeId = edges.find((chainEdge) => chainEdge.source === bottomGhostId)?.target || '';
 
+            const visitedChainNodeIds = new Set<string>();
+
             while (chainNodeId) {
+                if (visitedChainNodeIds.has(chainNodeId)) {
+                    break;
+                }
+
+                visitedChainNodeIds.add(chainNodeId);
+
                 const chainNode = allNodes.find((node) => node.id === chainNodeId);
 
                 if (!chainNode || chainNode.type === 'taskDispatcherBottomGhostNode') {
@@ -782,7 +806,15 @@ export function centerNodesAfterBottomGhost(
 
         let currentNodeId = edge.target;
 
+        const visitedNodeIds = new Set<string>();
+
         while (currentNodeId) {
+            if (visitedNodeIds.has(currentNodeId)) {
+                break;
+            }
+
+            visitedNodeIds.add(currentNodeId);
+
             const currentNode = allNodes.find((node) => node.id === currentNodeId);
 
             if (!currentNode || currentNode.type === 'taskDispatcherBottomGhostNode') {
@@ -852,7 +884,15 @@ export function centerNodesAfterBottomGhost(
 function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: Node[], edges: Edge[]): boolean {
     let currentNodeId = firstNodeId;
 
+    const visitedNodeIds = new Set<string>();
+
     while (currentNodeId) {
+        if (visitedNodeIds.has(currentNodeId)) {
+            return false;
+        }
+
+        visitedNodeIds.add(currentNodeId);
+
         const currentNode = allNodes.find((node) => node.id === currentNodeId);
 
         if (!currentNode) {
@@ -2597,10 +2637,14 @@ function collectChainMainNodeIds(
     const nodeIds: string[] = [];
     let currentNodeId = startNodeId;
 
+    const visitedNodeIds = new Set<string>();
+
     while (currentNodeId) {
-        if (currentNodeId === bottomGhostId) {
+        if (currentNodeId === bottomGhostId || visitedNodeIds.has(currentNodeId)) {
             break;
         }
+
+        visitedNodeIds.add(currentNodeId);
 
         const currentNode = allNodes.find((node) => node.id === currentNodeId);
 

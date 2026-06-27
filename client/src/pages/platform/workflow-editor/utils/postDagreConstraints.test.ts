@@ -4892,3 +4892,41 @@ describe('centerDispatcherChildrenOnMainAxis', () => {
         expect(loopBottomGhost.position.y).toBe(originalLoopBottomY + shift);
     });
 });
+
+describe('edge-walk cycle safety', () => {
+    // A malformed workflow (e.g. two tasks sharing the same name) produces nodes
+    // with duplicate ids, which makes edges.find(...) resolve the wrong node and
+    // can yield a cyclic edge graph. The chain-walking constraints must terminate
+    // on such input instead of spinning forever and freezing the browser tab.
+    it('terminates centerNodesAfterBottomGhost when the edge chain forms a cycle', () => {
+        const dispatcherNode: Node = {
+            data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+            id: 'condition_1',
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        };
+        const bottomGhost: Node = {
+            data: {conditionId: 'condition_1', taskDispatcherId: 'condition_1'},
+            id: 'condition_1-condition-bottom-ghost',
+            position: {x: 0, y: 500},
+            type: 'taskDispatcherBottomGhostNode',
+        };
+        const nodeA: Node = {data: {}, id: 'A', position: {x: 100, y: 600}, type: 'workflow'};
+        const nodeB: Node = {data: {}, id: 'B', position: {x: 100, y: 700}, type: 'workflow'};
+
+        const allNodes = [dispatcherNode, bottomGhost, nodeA, nodeB];
+
+        // Cycle: bottom-ghost -> A -> B -> A -> B -> ...
+        const edges: Edge[] = [
+            {id: 'e1', source: 'condition_1-condition-bottom-ghost', target: 'A'},
+            {id: 'e2', source: 'A', target: 'B'},
+            {id: 'e3', source: 'B', target: 'A'},
+        ];
+
+        centerNodesAfterBottomGhost(allNodes, edges, {crossAxis: 'x', crossAxisSize: NODE_WIDTH, direction: 'TB'});
+
+        // Reaching this assertion at all proves the loop terminated. The body still
+        // ran, so the first chain node was centered onto the dispatcher's axis.
+        expect(nodeA.position.x).toBe(0);
+    });
+});

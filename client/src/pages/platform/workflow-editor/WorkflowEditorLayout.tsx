@@ -22,6 +22,7 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
+import DuplicateNodeNamesBanner from './components/DuplicateNodeNamesBanner';
 import SubflowBanner from './components/SubflowBanner';
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
@@ -198,6 +199,8 @@ const WorkflowEditorLayout = ({
                 )}
             >
                 <SubflowBanner />
+
+                <DuplicateNodeNamesBanner />
 
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense>
