@@ -8,18 +8,10 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.ai.llm.Provider;
-import com.bytechef.config.ApplicationProperties;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -29,11 +21,10 @@ import org.junit.jupiter.api.Test;
  */
 class CatalogChatClientResolverTest {
 
-    private final PropertyService propertyService = mock(PropertyService.class);
     private final CatalogChatModelFactory catalogChatModelFactory = mock(CatalogChatModelFactory.class);
-    private final ApplicationProperties applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
+    private final ProviderApiKeyResolver providerApiKeyResolver = mock(ProviderApiKeyResolver.class);
     private final CatalogChatClientResolver resolver =
-        new CatalogChatClientResolverImpl(propertyService, catalogChatModelFactory, applicationProperties);
+        new CatalogChatClientResolverImpl(catalogChatModelFactory, providerApiKeyResolver);
 
     @Test
     void testResolveReturnsNullForUnknownProviderKey() {
@@ -42,50 +33,32 @@ class CatalogChatClientResolverTest {
 
     @Test
     void testResolveReturnsNullForOutOfRangeEnvironment() {
-        // The range check short-circuits before any propertyService lookup, so no stubbing is needed (and a forged
-        // or out-of-range ordinal can never drive platform-API-key selection — fail closed).
+        // The range check short-circuits before any providerApiKeyResolver lookup, so no stubbing is needed (and a
+        // forged or out-of-range ordinal can never drive platform-API-key selection — fail closed).
         assertThat(resolver.resolve(99, "ai.provider.openAi", "gpt-4o")).isNull();
         assertThat(resolver.resolve(-1, "ai.provider.openAi", "gpt-4o")).isNull();
     }
 
     @Test
-    void testResolveReturnsNullWhenProviderDisabledAndNoConfigKey() {
-        Property property = mock(Property.class);
-
-        when(property.isEnabled()).thenReturn(false);
-        when(propertyService.fetchProperty(eq("ai.provider.openAi"), eq(Scope.PLATFORM), eq(null), anyLong()))
-            .thenReturn(Optional.of(property));
-        when(applicationProperties.getAi()
-            .getProvider()
-            .getOpenAi()
-            .getApiKey()).thenReturn(null);
+    void testResolveReturnsNullWhenResolverReturnsNull() {
+        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn(null);
 
         assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNull();
     }
 
     @Test
-    void testResolveBuildsClientWhenEnabledWithKey() {
-        Property property = mock(Property.class);
-
-        when(property.isEnabled()).thenReturn(true);
-        when(property.get("apiKey")).thenReturn("sk-test");
-        when(propertyService.fetchProperty(eq("ai.provider.openAi"), eq(Scope.PLATFORM), eq(null), anyLong()))
-            .thenReturn(Optional.of(property));
-        when(catalogChatModelFactory.createChatModel(eq(Provider.OPEN_AI), eq("gpt-4o"), eq("sk-test")))
+    void testResolveBuildsClientWhenResolverReturnsKey() {
+        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn("sk-test");
+        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
         assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNotNull();
     }
 
     @Test
-    void testResolveFallsBackToConfigApiKeyWhenPropertyAbsent() {
-        when(propertyService.fetchProperty(eq("ai.provider.openAi"), eq(Scope.PLATFORM), eq(null), anyLong()))
-            .thenReturn(Optional.empty());
-        when(applicationProperties.getAi()
-            .getProvider()
-            .getOpenAi()
-            .getApiKey()).thenReturn("sk-config");
-        when(catalogChatModelFactory.createChatModel(eq(Provider.OPEN_AI), eq("gpt-4o"), eq("sk-config")))
+    void testResolveReturnsNullWhenResolverReturnsFallbackKey() {
+        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn("sk-config");
+        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
         assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNotNull();
