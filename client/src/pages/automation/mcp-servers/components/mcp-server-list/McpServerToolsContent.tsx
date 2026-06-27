@@ -49,9 +49,14 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
 
     return (
         <McpActivePopoverProvider>
-            <McpComponentList mcpServer={mcpServer} />
+            {/* Components and projects are separate lists; the wrapper gap keeps the same spacing between a
+             * component card and a project card as between two cards within either list. */}
 
-            <McpProjectList mcpServer={mcpServer} />
+            <div className="flex flex-col gap-1.5">
+                <McpComponentList mcpServer={mcpServer} />
+
+                <McpProjectList mcpServer={mcpServer} />
+            </div>
         </McpActivePopoverProvider>
     );
 };

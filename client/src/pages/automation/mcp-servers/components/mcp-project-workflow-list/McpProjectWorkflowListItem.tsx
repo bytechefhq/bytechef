@@ -1,10 +1,9 @@
-import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {Popover, PopoverAnchor} from '@/components/ui/popover';
 import ProjectDeploymentEditWorkflowDialog from '@/pages/automation/project-deployments/components/ProjectDeploymentEditWorkflowDialog';
-import {useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
-import {BoltIcon, PencilIcon, XIcon} from 'lucide-react';
+import {useCloseActivePopoverOnUnmount, useMcpActivePopover} from '@/shared/contexts/McpActivePopoverContext';
+import {BoltIcon, PencilIcon, Trash2Icon} from 'lucide-react';
 
 import McpProjectWorkflowPropertiesPopover from './McpProjectWorkflowPropertiesPopover';
 import {McpProjectWorkflowItemType} from './hooks/useMcpProjectList';
@@ -32,46 +31,50 @@ const McpProjectWorkflowListItem = ({mcpProjectWorkflow}: McpProjectWorkflowList
     const isPopoverOpen = activePopoverId === popoverId;
     const workflowLabel = mcpProjectWorkflow.workflow?.label || 'Unnamed Workflow';
 
+    useCloseActivePopoverOnUnmount(isPopoverOpen);
+
     return (
         <>
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
-                <PopoverAnchor asChild>
-                    <Badge className="max-w-96 gap-1 py-1 pr-1 pl-2.5" styleType="secondary-filled">
-                        <span className="truncate text-sm">{workflowLabel}</span>
+                <div className="flex items-center gap-2 py-0.5">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{workflowLabel}</span>
 
-                        <span className="ml-auto flex shrink-0 items-center gap-0.5">
+                    <div className="flex shrink-0 items-center gap-0.5">
+                        {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
+
+                        <PopoverAnchor asChild>
                             <Button
                                 aria-label="Configure"
-                                className="rounded p-0.5 hover:bg-foreground/10"
-                                icon={<BoltIcon className="size-3" />}
+                                className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                                icon={<BoltIcon className="size-4" />}
                                 onClick={() => openPopover(popoverId)}
-                                size="iconXxs"
+                                size="iconSm"
                                 title="Configure"
                                 variant="ghost"
                             />
+                        </PopoverAnchor>
 
-                            <Button
-                                aria-label="Edit"
-                                className="rounded p-0.5 hover:bg-foreground/10"
-                                icon={<PencilIcon className="size-3" />}
-                                onClick={() => setShowEditWorkflowDialog(true)}
-                                size="iconXxs"
-                                title="Edit"
-                                variant="ghost"
-                            />
+                        <Button
+                            aria-label="Edit"
+                            className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
+                            icon={<PencilIcon className="size-4" />}
+                            onClick={() => setShowEditWorkflowDialog(true)}
+                            size="iconSm"
+                            title="Edit"
+                            variant="ghost"
+                        />
 
-                            <Button
-                                aria-label="Delete"
-                                className="rounded p-0.5 hover:bg-destructive/10 hover:text-destructive"
-                                icon={<XIcon className="size-3" />}
-                                onClick={() => setShowDeleteDialog(true)}
-                                size="iconXxs"
-                                title="Delete"
-                                variant="ghost"
-                            />
-                        </span>
-                    </Badge>
-                </PopoverAnchor>
+                        <Button
+                            aria-label="Delete"
+                            className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
+                            icon={<Trash2Icon className="size-4" />}
+                            onClick={() => setShowDeleteDialog(true)}
+                            size="iconSm"
+                            title="Delete"
+                            variant="ghost"
+                        />
+                    </div>
+                </div>
 
                 {isPopoverOpen && (
                     <McpProjectWorkflowPropertiesPopover

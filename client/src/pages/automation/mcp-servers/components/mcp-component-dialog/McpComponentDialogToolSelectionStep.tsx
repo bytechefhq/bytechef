@@ -1,10 +1,17 @@
+import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
+import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
+import {useGetComponentDefinitionsQuery} from '@/shared/queries/automation/componentDefinitions.queries';
+import {ConnectionKeys, useGetConnectionTagsQuery} from '@/shared/queries/automation/connections.queries';
+import {PlusIcon} from 'lucide-react';
+import {useState} from 'react';
 
 import useMcpComponentDialogToolSelectionStep, {SelectedToolType} from './hooks/useMcpComponentDialogToolSelectionStep';
 
@@ -29,13 +36,18 @@ const McpComponentDialogToolSelectionStep = ({
     selectedConnection,
     selectedTools,
 }: ToolSelectionStepProps) => {
+    const [showCreateConnection, setShowCreateConnection] = useState(false);
+
     const {
         allToolsSelected,
+        componentDefinition,
         connections,
+        currentWorkspaceId,
         handleSelectAllTools,
         handleToolToggle,
         isLoadingComponentDefinition,
         isLoadingConnections,
+        refetchConnections,
         selectAllCheckboxRef,
         toolElements,
     } = useMcpComponentDialogToolSelectionStep({
@@ -48,6 +60,10 @@ const McpComponentDialogToolSelectionStep = ({
         selectedTools,
     });
 
+    const {data: componentDefinitions} = useGetComponentDefinitionsQuery({connectionDefinitions: true});
+
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId ?? 0);
+
     return (
         <div className="space-y-4 py-4">
             <div className="space-y-2">
@@ -55,38 +71,78 @@ const McpComponentDialogToolSelectionStep = ({
                     Select Connection
                 </Label>
 
-                <Select
-                    onValueChange={(value) => {
-                        if (value === 'no-connection') {
-                            onConnectionChange(null);
-                        } else {
-                            const connection = connections.find((conn) => conn.id?.toString() === value);
-                            onConnectionChange(connection || null);
-                        }
-                    }}
-                    value={selectedConnection?.id?.toString() || 'no-connection'}
-                >
-                    <SelectTrigger id="connection-select">
-                        <SelectValue placeholder="Choose a connection..." />
-                    </SelectTrigger>
+                <div className="flex items-center gap-2">
+                    <Select
+                        onValueChange={(value) => {
+                            if (value === 'no-connection') {
+                                onConnectionChange(null);
+                            } else {
+                                const connection = connections.find((conn) => conn.id?.toString() === value);
+                                onConnectionChange(connection || null);
+                            }
+                        }}
+                        value={selectedConnection?.id?.toString() || 'no-connection'}
+                    >
+                        <SelectTrigger className="flex-1" id="connection-select">
+                            <SelectValue placeholder="Choose a connection..." />
+                        </SelectTrigger>
 
-                    <SelectContent>
-                        <SelectItem value="no-connection">No connection</SelectItem>
+                        <SelectContent>
+                            <SelectItem value="no-connection">No connection</SelectItem>
 
-                        {isLoadingConnections ? (
-                            <SelectItem disabled value="loading">
-                                Loading connections...
-                            </SelectItem>
-                        ) : (
-                            connections.map((connection) => (
-                                <SelectItem key={connection.id} value={connection.id?.toString() || 'no-connection'}>
-                                    {connection.name}
+                            {isLoadingConnections ? (
+                                <SelectItem disabled value="loading">
+                                    Loading connections...
                                 </SelectItem>
-                            ))
-                        )}
-                    </SelectContent>
-                </Select>
+                            ) : (
+                                connections.map((connection) => (
+                                    <SelectItem
+                                        key={connection.id}
+                                        value={connection.id?.toString() || 'no-connection'}
+                                    >
+                                        {connection.name}
+                                    </SelectItem>
+                                ))
+                            )}
+                        </SelectContent>
+                    </Select>
+
+                    <Button
+                        aria-label="Create new connection"
+                        disabled={!selectedComponent}
+                        icon={<PlusIcon />}
+                        onClick={() => setShowCreateConnection(true)}
+                        size="icon"
+                        title="Create new connection"
+                        variant="outline"
+                    />
+                </div>
             </div>
+
+            {showCreateConnection && componentDefinition && componentDefinitions && currentWorkspaceId != null && (
+                <ConnectionDialog
+                    componentDefinition={componentDefinition}
+                    componentDefinitions={componentDefinitions}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId)}
+                    connectionsQueryKey={ConnectionKeys.connections}
+                    onClose={() => setShowCreateConnection(false)}
+                    onConnectionCreate={async (newConnectionId) => {
+                        const {data: refreshedConnections} = await refetchConnections();
+
+                        const createdConnection = (refreshedConnections ?? []).find(
+                            (connection) => connection.id === newConnectionId
+                        );
+
+                        if (createdConnection) {
+                            onConnectionChange(createdConnection);
+                        }
+
+                        setShowCreateConnection(false);
+                    }}
+                    useCreateConnectionMutation={useCreateConnectionMutation}
+                    useGetConnectionTagsQuery={() => connectionTagsQueryResult}
+                />
+            )}
 
             {isLoadingComponentDefinition ? (
                 <div className="flex items-center justify-center py-8">

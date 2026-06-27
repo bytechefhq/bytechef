@@ -1,4 +1,4 @@
-import {ReactNode, createContext, useCallback, useContext, useState} from 'react';
+import {ReactNode, createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
 
 interface McpActivePopoverContextI {
     activePopoverId: string | null;
@@ -26,3 +26,25 @@ export const McpActivePopoverProvider = ({children}: {children: ReactNode}) => {
 };
 
 export const useMcpActivePopover = () => useContext(McpActivePopoverContext);
+
+/**
+ * Closes the active popover when the owning component unmounts (e.g. its card collapses), but only if this component is
+ * the one currently open. Without this, the active popover id outlives the unmounted owner and the popover reopens when
+ * the card is expanded again.
+ */
+export const useCloseActivePopoverOnUnmount = (isActive: boolean) => {
+    const {closePopover} = useMcpActivePopover();
+
+    const isActiveRef = useRef(isActive);
+
+    isActiveRef.current = isActive;
+
+    useEffect(
+        () => () => {
+            if (isActiveRef.current) {
+                closePopover();
+            }
+        },
+        [closePopover]
+    );
+};

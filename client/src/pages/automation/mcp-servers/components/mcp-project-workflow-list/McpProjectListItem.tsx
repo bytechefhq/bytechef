@@ -1,10 +1,13 @@
 import Badge from '@/components/Badge/Badge';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import ProjectDeploymentDialog from '@/pages/automation/project-deployments/components/project-deployment-dialog/ProjectDeploymentDialog';
-import {WorkflowIcon} from 'lucide-react';
+import {ChevronDownIcon, ChevronRightIcon, WorkflowIcon} from 'lucide-react';
+import {useState} from 'react';
 
 import McpProjectWorkflowDialog from '../McpProjectWorkflowDialog';
 import McpProjectListItemDropdownMenu from './McpProjectListItemDropdownMenu';
+import McpProjectWorkflowList from './McpProjectWorkflowList';
 import {McpProjectItemType} from './hooks/useMcpProjectList';
 import useMcpProjectListItem from './hooks/useMcpProjectListItem';
 
@@ -13,6 +16,8 @@ interface McpProjectListItemProps {
 }
 
 const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
+    const [expanded, setExpanded] = useState(false);
+
     const {
         handleOnProjectDeploymentDialogClose,
         mcpWorkflowUuids,
@@ -24,21 +29,33 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
     } = useMcpProjectListItem(mcpProject);
 
     return (
-        <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-            <div className="flex flex-1 items-center py-1">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <div className="flex w-full items-center gap-x-2">
-                            <WorkflowIcon className="size-4 flex-none text-content-neutral-secondary" />
+        <>
+            <Collapsible className="group rounded-md border border-border" onOpenChange={setExpanded} open={expanded}>
+                <div className="flex items-center gap-2.5 px-3 py-2.5">
+                    <CollapsibleTrigger asChild>
+                        <button
+                            aria-label={expanded ? 'Collapse project' : 'Expand project'}
+                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            type="button"
+                        >
+                            {expanded ? (
+                                <ChevronDownIcon className="size-4" />
+                            ) : (
+                                <ChevronRightIcon className="size-4" />
+                            )}
+                        </button>
+                    </CollapsibleTrigger>
 
-                            <span className="mr-2 text-base font-semibold">
+                    <WorkflowIcon className="size-6 shrink-0 text-content-neutral-secondary" />
+
+                    <CollapsibleTrigger asChild>
+                        <button className="flex min-w-0 flex-1 cursor-pointer items-center text-left" type="button">
+                            <span className="truncate text-sm font-medium">
                                 {mcpProject.project?.name || `Project ${mcpProject.projectDeploymentId}`}
                             </span>
-                        </div>
-                    </div>
-                </div>
+                        </button>
+                    </CollapsibleTrigger>
 
-                <div className="flex items-center justify-end gap-x-6">
                     {mcpProject.projectVersion && (
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -53,21 +70,19 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                         </Tooltip>
                     )}
 
-                    <div className="flex min-w-52 flex-col items-end gap-y-4">
-                        <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                                {mcpProject.lastModifiedDate ? (
-                                    <span className="text-xs">
-                                        {`Modified at ${new Date(mcpProject.lastModifiedDate).toLocaleDateString()} ${new Date(mcpProject.lastModifiedDate).toLocaleTimeString()}`}
-                                    </span>
-                                ) : (
-                                    '-'
-                                )}
-                            </TooltipTrigger>
+                    <Tooltip>
+                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                            {mcpProject.lastModifiedDate ? (
+                                <span className="text-xs">
+                                    {`Modified at ${new Date(mcpProject.lastModifiedDate).toLocaleDateString()} ${new Date(mcpProject.lastModifiedDate).toLocaleTimeString()}`}
+                                </span>
+                            ) : (
+                                '-'
+                            )}
+                        </TooltipTrigger>
 
-                            <TooltipContent>Last Updated Date</TooltipContent>
-                        </Tooltip>
-                    </div>
+                        <TooltipContent>Last Updated Date</TooltipContent>
+                    </Tooltip>
 
                     <McpProjectListItemDropdownMenu
                         mcpProject={mcpProject}
@@ -75,7 +90,13 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                         onEditWorkflowsClick={() => setShowEditWorkflowsDialog(true)}
                     />
                 </div>
-            </div>
+
+                <CollapsibleContent>
+                    <div className="border-t border-border px-3 py-2 pl-10">
+                        <McpProjectWorkflowList mcpProjectWorkflows={mcpProject.mcpProjectWorkflows} />
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
 
             {showEditWorkflowsDialog && (
                 <McpProjectWorkflowDialog mcpProject={mcpProject} onClose={() => setShowEditWorkflowsDialog(false)} />
@@ -90,7 +111,7 @@ const McpProjectListItem = ({mcpProject}: McpProjectListItemProps) => {
                     redirectOnSubmit={false}
                 />
             )}
-        </div>
+        </>
     );
 };
 
