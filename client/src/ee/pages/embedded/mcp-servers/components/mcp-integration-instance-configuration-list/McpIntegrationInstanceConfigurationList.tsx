@@ -1,9 +1,7 @@
 import {Skeleton} from '@/components/ui/skeleton';
 import {McpServer} from '@/shared/middleware/graphql';
-import {Fragment} from 'react';
 
 import McpIntegrationInstanceConfigurationListItem from './McpIntegrationInstanceConfigurationListItem';
-import McpIntegrationInstanceConfigurationWorkflowList from './McpIntegrationInstanceConfigurationWorkflowList';
 import useMcpIntegrationInstanceConfigurationList from './hooks/useMcpIntegrationInstanceConfigurationList';
 
 interface McpIntegrationInstanceConfigurationListProps {
@@ -38,22 +36,12 @@ const McpIntegrationInstanceConfigurationList = ({mcpServer}: McpIntegrationInst
     }
 
     return (
-        <div className="py-1 pl-4">
+        <div className="flex flex-col gap-1.5 py-2">
             {mcpIntegrationInstanceConfigurations?.map((mcpIntegrationInstanceConfiguration) => (
-                <Fragment key={mcpIntegrationInstanceConfiguration.id}>
-                    <McpIntegrationInstanceConfigurationListItem
-                        mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
-                    />
-
-                    <div className="pl-6">
-                        <McpIntegrationInstanceConfigurationWorkflowList
-                            componentName={mcpIntegrationInstanceConfiguration.integration?.componentName || ''}
-                            mcpIntegrationInstanceConfigurationWorkflows={
-                                mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows
-                            }
-                        />
-                    </div>
-                </Fragment>
+                <McpIntegrationInstanceConfigurationListItem
+                    key={mcpIntegrationInstanceConfiguration.id}
+                    mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
+                />
             ))}
         </div>
     );

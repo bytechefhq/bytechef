@@ -32,16 +32,16 @@ export const useMcpActivePopover = () => useContext(McpActivePopoverContext);
  * the one currently open. Without this, the active popover id outlives the unmounted owner and the popover reopens when
  * the card is expanded again.
  */
-export const useCloseActivePopoverOnUnmount = (isActive: boolean) => {
+export const useCloseActivePopoverOnUnmount = (isPopoverOpen: boolean) => {
     const {closePopover} = useMcpActivePopover();
 
-    const isActiveRef = useRef(isActive);
+    const isPopoverOpenRef = useRef(isPopoverOpen);
 
-    isActiveRef.current = isActive;
+    isPopoverOpenRef.current = isPopoverOpen;
 
     useEffect(
         () => () => {
-            if (isActiveRef.current) {
+            if (isPopoverOpenRef.current) {
                 closePopover();
             }
         },

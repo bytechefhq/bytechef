@@ -1,12 +1,15 @@
 import Badge from '@/components/Badge/Badge';
+import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import IntegrationInstanceConfigurationDialog from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
 import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
-import {ComponentIcon} from 'lucide-react';
+import {ChevronDownIcon, ChevronRightIcon, ComponentIcon} from 'lucide-react';
+import {useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import McpIntegrationInstanceConfigurationWorkflowDialog from '../McpIntegrationInstanceConfigurationWorkflowDialog';
 import McpIntegrationInstanceConfigurationListItemDropdownMenu from './McpIntegrationInstanceConfigurationListItemDropdownMenu';
+import McpIntegrationInstanceConfigurationWorkflowList from './McpIntegrationInstanceConfigurationWorkflowList';
 import {McpIntegrationInstanceConfigurationItemType} from './hooks/useMcpIntegrationInstanceConfigurationList';
 import useMcpIntegrationInstanceConfigurationListItem from './hooks/useMcpIntegrationInstanceConfigurationListItem';
 
@@ -17,6 +20,8 @@ interface McpIntegrationInstanceConfigurationListItemProps {
 const McpIntegrationInstanceConfigurationListItem = ({
     mcpIntegrationInstanceConfiguration,
 }: McpIntegrationInstanceConfigurationListItemProps) => {
+    const [expanded, setExpanded] = useState(true);
+
     const {
         handleOnIntegrationInstanceConfigurationDialogClose,
         integrationInstanceConfiguration,
@@ -36,26 +41,34 @@ const McpIntegrationInstanceConfigurationListItem = ({
     );
 
     return (
-        <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
-            <div className="flex flex-1 items-center py-1">
-                <div className="flex-1">
-                    <div className="flex items-center justify-between">
-                        <div className="flex w-full items-center gap-x-2">
-                            {componentDefinition?.icon ? (
-                                <InlineSVG className="size-4 flex-none" src={componentDefinition.icon} />
+        <>
+            <Collapsible className="group rounded-md border border-border" onOpenChange={setExpanded} open={expanded}>
+                <div className="flex items-center gap-2.5 px-3 py-2.5">
+                    <CollapsibleTrigger asChild>
+                        <button
+                            aria-label={expanded ? 'Collapse integration' : 'Expand integration'}
+                            className="shrink-0 text-muted-foreground hover:text-foreground"
+                            type="button"
+                        >
+                            {expanded ? (
+                                <ChevronDownIcon className="size-4" />
                             ) : (
-                                <ComponentIcon className="size-4 flex-none text-content-neutral-secondary" />
+                                <ChevronRightIcon className="size-4" />
                             )}
+                        </button>
+                    </CollapsibleTrigger>
 
-                            <span className="mr-2 text-base font-semibold">
-                                {mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationName ||
-                                    `Integration ${mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId}`}
-                            </span>
-                        </div>
-                    </div>
-                </div>
+                    {componentDefinition?.icon ? (
+                        <InlineSVG className="size-6 shrink-0" src={componentDefinition.icon} />
+                    ) : (
+                        <ComponentIcon className="size-6 shrink-0 text-content-neutral-secondary" />
+                    )}
 
-                <div className="flex items-center justify-end gap-x-6">
+                    <span className="min-w-0 flex-1 truncate text-sm font-medium">
+                        {mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationName ||
+                            `Integration ${mcpIntegrationInstanceConfiguration.integrationInstanceConfigurationId}`}
+                    </span>
+
                     {mcpIntegrationInstanceConfiguration.integrationVersion && (
                         <Tooltip>
                             <TooltipTrigger asChild>
@@ -70,21 +83,19 @@ const McpIntegrationInstanceConfigurationListItem = ({
                         </Tooltip>
                     )}
 
-                    <div className="flex min-w-52 flex-col items-end gap-y-4">
-                        <Tooltip>
-                            <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
-                                {mcpIntegrationInstanceConfiguration.lastModifiedDate ? (
-                                    <span className="text-xs">
-                                        {`Modified at ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleDateString()} ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleTimeString()}`}
-                                    </span>
-                                ) : (
-                                    '-'
-                                )}
-                            </TooltipTrigger>
+                    <Tooltip>
+                        <TooltipTrigger className="flex items-center text-sm text-content-neutral-secondary">
+                            {mcpIntegrationInstanceConfiguration.lastModifiedDate ? (
+                                <span className="text-xs">
+                                    {`Modified at ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleDateString()} ${new Date(mcpIntegrationInstanceConfiguration.lastModifiedDate).toLocaleTimeString()}`}
+                                </span>
+                            ) : (
+                                '-'
+                            )}
+                        </TooltipTrigger>
 
-                            <TooltipContent>Last Updated Date</TooltipContent>
-                        </Tooltip>
-                    </div>
+                        <TooltipContent>Last Updated Date</TooltipContent>
+                    </Tooltip>
 
                     <McpIntegrationInstanceConfigurationListItemDropdownMenu
                         mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
@@ -92,7 +103,18 @@ const McpIntegrationInstanceConfigurationListItem = ({
                         onUpdateIntegrationVersionClick={() => setShowUpdateIntegrationVersionDialog(true)}
                     />
                 </div>
-            </div>
+
+                <CollapsibleContent>
+                    <div className="border-t border-border px-3 py-2 pl-10">
+                        <McpIntegrationInstanceConfigurationWorkflowList
+                            componentName={mcpIntegrationInstanceConfiguration.integration?.componentName || ''}
+                            mcpIntegrationInstanceConfigurationWorkflows={
+                                mcpIntegrationInstanceConfiguration.mcpIntegrationInstanceConfigurationWorkflows
+                            }
+                        />
+                    </div>
+                </CollapsibleContent>
+            </Collapsible>
 
             {showEditWorkflowsDialog && (
                 <McpIntegrationInstanceConfigurationWorkflowDialog
@@ -109,7 +131,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
                     updateIntegrationVersion={true}
                 />
             )}
-        </div>
+        </>
     );
 };
 

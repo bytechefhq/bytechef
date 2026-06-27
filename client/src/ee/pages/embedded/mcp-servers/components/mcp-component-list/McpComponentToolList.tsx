@@ -29,7 +29,7 @@ const McpComponentToolList = ({
     const tools = mcpTools?.filter((tool): tool is McpTool => tool !== null && tool.name !== null) || [];
 
     return tools.length > 0 ? (
-        <div className="flex flex-wrap gap-2 py-2">
+        <div className="flex flex-col gap-1">
             {tools.map((tool) => (
                 <McpComponentToolListItem
                     componentName={componentName}
