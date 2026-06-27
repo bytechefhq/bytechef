@@ -1,3 +1,4 @@
+import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
 import Switch from '@/components/Switch/Switch';
 import {Accordion, AccordionContent, AccordionItem, AccordionTrigger} from '@/components/ui/accordion';
@@ -84,7 +85,17 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                     </span>
 
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-semibold">{aiProvider.name}</span>
+                                        <span className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold">{aiProvider.name}</span>
+
+                                            {aiProvider.supportsEmbeddings && (
+                                                <Badge
+                                                    label="Embeddings"
+                                                    styleType="secondary-outline"
+                                                    weight="semibold"
+                                                />
+                                            )}
+                                        </span>
 
                                         <span className="text-xs text-muted-foreground">
                                             Configure {aiProvider.name} credentials
