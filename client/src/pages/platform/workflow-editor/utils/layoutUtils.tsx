@@ -16,11 +16,13 @@ import {
     PLACEHOLDER_NODE_HEIGHT,
     ROOT_CLUSTER_WIDTH,
     TASK_DISPATCHER_NAMES,
+    TRIGGER_PLACEHOLDER_NODE_ID,
 } from '@/shared/constants';
 import {
     ComponentDefinitionBasic,
     TaskDispatcherDefinitionBasic,
     WorkflowTask,
+    WorkflowTrigger,
 } from '@/shared/middleware/platform/configuration';
 import {
     BranchCaseType,
@@ -75,6 +77,16 @@ export const CLUSTER_ELEMENT_GAP = 70;
 export const CLUSTER_ELEMENT_LABEL_PADDING = 20;
 export const CLUSTER_ELEMENT_OVERLAP_PADDING = 20;
 export const CLUSTER_ROOT_GAP = 40;
+const TRIGGER_PLACEHOLDER_GAP = 40;
+
+// Triggers render as a ~72px icon box with the label overflowing to its right.
+// Reserving the full NODE_WIDTH (sized for tasks) spaces the trigger row too far
+// apart, so triggers get a tighter dagre footprint in the vertical (TB) layout.
+const TRIGGER_NODE_DAGRE_WIDTH = 160;
+
+// The visible trigger box is a 72px icon square (w-18/min-h-18). Used to vertically
+// center the small add-trigger "+" slot on that square.
+const TRIGGER_NODE_BOX_SIZE = 72;
 
 let dagre: typeof import('@dagrejs/dagre') | null = null;
 
@@ -134,6 +146,11 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
 export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
     const height = calculateNodeHeight(node);
 
+    // Triggers render as a ~72px icon box; reserving the full task footprint
+    // spaces the trigger row too far apart, so they get a tighter cross-axis
+    // size — width in TB (horizontal row), height in LR (vertical column).
+    const isTrigger = (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID;
+
     if (direction === 'LR') {
         const isGhostNode =
             node.type === 'taskDispatcherTopGhostNode' ||
@@ -152,11 +169,15 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
             width = hasConfiguredClusterElements(node) ? 292 : 120;
         }
 
-        return {height: NODE_WIDTH, width};
+        return {height: isTrigger ? TRIGGER_NODE_DAGRE_WIDTH : NODE_WIDTH, width};
     }
 
     if (node.type === 'clusterRoot' && hasConfiguredClusterElements(node)) {
         return {height, width: CLUSTER_ROOT_NODE_WIDTH};
+    }
+
+    if (isTrigger) {
+        return {height, width: TRIGGER_NODE_DAGRE_WIDTH};
     }
 
     return {height, width: NODE_WIDTH};
@@ -165,7 +186,7 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
 export const convertTaskToNode = (
     task: WorkflowTask,
     taskDefinition: ComponentDefinitionBasic | TaskDispatcherDefinitionBasic,
-    index: number
+    isTrigger: boolean
 ): Node => {
     const componentName = task.type.split('/')[0];
 
@@ -185,13 +206,99 @@ export const convertTaskToNode = (
             operationName: task.type.split('/')[2],
             taskDispatcher: isTaskDispatcher,
             taskDispatcherId: isTaskDispatcher ? task.name : undefined,
-            trigger: index === 0,
+            trigger: isTrigger,
             workflowNodeName: task.name,
         },
         id: task.name,
         position: {x: 0, y: 0},
         type: task.clusterRoot ? 'clusterRoot' : 'workflow',
     };
+};
+
+export const buildTriggerNodes = (
+    triggers: WorkflowTrigger[] | undefined,
+    componentDefinitions: ComponentDefinitionBasic[],
+    canvasWidth: number
+): {placeholderNode: Node; triggerNodes: Node[]} => {
+    const placeholderNode: Node = {
+        data: {label: '+'},
+        id: TRIGGER_PLACEHOLDER_NODE_ID,
+        position: {x: 0, y: 0},
+        type: 'triggerPlaceholder',
+    };
+
+    if (!triggers || triggers.length === 0) {
+        return {placeholderNode, triggerNodes: [createDefaultNodes(canvasWidth)[0]]};
+    }
+
+    const triggerNodes = triggers.map((trigger) => {
+        const componentName = trigger.type.split('/')[0];
+
+        const triggerDefinition = componentDefinitions.find((definition) => definition.name === componentName);
+
+        if (triggerDefinition) {
+            return convertTaskToNode(trigger, triggerDefinition, true);
+        }
+
+        return {
+            data: {
+                ...trigger,
+                componentName,
+                icon: <ComponentIcon className="size-9 flex-none text-gray-900" />,
+                operationName: trigger.type.split('/')[2],
+                trigger: true,
+                workflowNodeName: trigger.name,
+            },
+            id: trigger.name,
+            position: {x: 0, y: 0},
+            type: 'workflow',
+        } as Node;
+    });
+
+    return {placeholderNode, triggerNodes};
+};
+
+export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirectionType): void => {
+    const placeholderNode = nodes.find((node) => node.id === TRIGGER_PLACEHOLDER_NODE_ID);
+
+    if (!placeholderNode) {
+        return;
+    }
+
+    const triggerNodes = nodes.filter((node) => node.data?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID);
+
+    if (triggerNodes.length === 0) {
+        return;
+    }
+
+    // The add-trigger "+" slot sits past the trigger's icon box AND its overflowing label
+    // so it never crosses the label text, and is vertically centered on the icon box.
+    if (direction === 'LR') {
+        const lowestTrigger = triggerNodes.reduce((lowest, node) =>
+            node.position.y > lowest.position.y ? node : lowest
+        );
+
+        placeholderNode.position = {
+            x: lowestTrigger.position.x,
+            // Clear the trigger's icon AND its label lines (which render below the
+            // icon in LR), plus a slot-sized gap so the add-trigger "+" reads as the
+            // next trigger position rather than crowding the label.
+            y: lowestTrigger.position.y + NODE_HEIGHT + NODE_HEIGHT / 4 + TRIGGER_PLACEHOLDER_GAP,
+        };
+    } else {
+        const rightmostTrigger = triggerNodes.reduce((rightmost, node) =>
+            node.position.x > rightmost.position.x ? node : rightmost
+        );
+
+        placeholderNode.position = {
+            // A full NODE_WIDTH clears the trigger's icon and its overflowing label lines, so the
+            // "+" reads as the next trigger slot instead of crossing the label text.
+            x: rightmostTrigger.position.x + NODE_WIDTH + TRIGGER_PLACEHOLDER_GAP,
+            // Vertically center the 28px "+" on the 72px icon box (node content is center-aligned,
+            // so the box starts at the node's y position).
+            y: rightmostTrigger.position.y + (TRIGGER_NODE_BOX_SIZE - PLACEHOLDER_NODE_HEIGHT) / 2,
+        };
+    }
 };
 
 interface GetLayoutElementsProps {
@@ -603,7 +710,14 @@ export const getLayoutElements = async ({
     });
 
     edges.forEach((edge) => {
-        if (edge.target.includes('bottom-ghost')) {
+        if ((edge.data as Record<string, unknown> | undefined)?.triggerFanIn) {
+            // Span extra ranks so the trigger row sits a full standard gap above the
+            // horizontal bus AND the bus sits a full standard gap above the first
+            // task. The bus itself is pinned a fixed short distance below the trigger
+            // row by the edge components (TRIGGER_FAN_IN_BUS_OFFSET), so this rank
+            // span only sizes the lower (bus→first-task) leg to one task-to-task gap.
+            dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
+        } else if (edge.target.includes('bottom-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 2});
         } else if (edge.target.includes('top-ghost')) {
             dagreGraph.setEdge(edge.source, edge.target, {minlen: 1});
@@ -637,7 +751,20 @@ export const getLayoutElements = async ({
 
     const triggerCrossHalf = direction === 'LR' ? NODE_WIDTH / 2 : 72 / 2;
 
-    const canvasCenteringOffset = canvasCrossDimension / 2 - dagreGraph.node(nodes[0].id)[crossAxis] - triggerCrossHalf;
+    // Center the graph on the midpoint of the entry (trigger) row rather than the
+    // first trigger. With multiple triggers, anchoring on nodes[0] (the leftmost
+    // trigger) pushes the whole row off to one side; the row midpoint keeps it
+    // centered and collapses to the old behavior when there is a single trigger.
+    const entryNodeCrossPositions = nodes
+        .filter((node) => (node.data as NodeDataType)?.trigger === true && node.id !== TRIGGER_PLACEHOLDER_NODE_ID)
+        .map((node) => dagreGraph.node(node.id)[crossAxis]);
+
+    const entryAnchorCross =
+        entryNodeCrossPositions.length > 0
+            ? (Math.min(...entryNodeCrossPositions) + Math.max(...entryNodeCrossPositions)) / 2
+            : dagreGraph.node(nodes[0].id)[crossAxis];
+
+    const canvasCenteringOffset = canvasCrossDimension / 2 - entryAnchorCross - triggerCrossHalf;
 
     const allNodes = nodes.map((node) => {
         const dagreNode = dagreGraph.node(node.id);
@@ -688,6 +815,8 @@ export const getLayoutElements = async ({
     if (direction === 'LR') {
         centerLRSmallNodes(allNodes, crossAxis);
     }
+
+    positionTriggerPlaceholder(allNodes, direction);
 
     const mainAxis = direction === 'TB' ? 'y' : 'x';
 

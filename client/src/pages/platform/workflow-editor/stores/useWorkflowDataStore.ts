@@ -347,7 +347,9 @@ function buildWorkflowDataState(
         setWorkflow: (workflow) =>
             set((state) => {
                 const workflowNodes: Array<{name: string; type: string}> = [
-                    workflow.triggers?.[0] || (createDefaultNodes(1200)[0].data as {name: string; type: string}),
+                    ...((workflow.triggers && workflow.triggers.length > 0
+                        ? workflow.triggers
+                        : [createDefaultNodes(1200)[0].data]) as Array<{name: string; type: string}>),
                     ...(workflow?.tasks || []),
                 ];
 

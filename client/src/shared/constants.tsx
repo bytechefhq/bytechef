@@ -85,6 +85,13 @@ export const toEnvironmentName = (environmentId: number): string => {
 
 export const FINAL_PLACEHOLDER_NODE_ID = getRandomId();
 
+export const TRIGGER_PLACEHOLDER_NODE_ID = 'trigger-placeholder';
+
+// Distance (px) the horizontal trigger fan-in bus sits below the trigger row.
+// Pinning the bus to a fixed small offset keeps the trigger→bus drop short and
+// decoupled from the bus→first-task leg (which would otherwise both change together).
+export const TRIGGER_FAN_IN_BUS_OFFSET = 40;
+
 export const EDITOR_PLACEHOLDER = (
     <>
         <pre>{'//'}Write sample output value, for example:</pre>

@@ -196,17 +196,23 @@ export default function saveWorkflowNodesPosition({
         return;
     }
 
-    // Update trigger position if it was the dragged node
-    if (workflowDefinition.triggers?.[0]?.name === draggedNodeId) {
+    // Update trigger position if a trigger was the dragged node
+    if (Array.isArray(workflowDefinition.triggers)) {
+        const draggedTriggerIndex = workflowDefinition.triggers.findIndex(
+            (trigger: {name: string}) => trigger.name === draggedNodeId
+        );
+
         const triggerPosition = nodePositions[draggedNodeId];
 
-        if (triggerPosition) {
-            workflowDefinition.triggers[0] = {
-                ...workflowDefinition.triggers[0],
+        if (draggedTriggerIndex !== -1 && triggerPosition) {
+            const draggedTrigger = workflowDefinition.triggers[draggedTriggerIndex];
+
+            workflowDefinition.triggers[draggedTriggerIndex] = {
+                ...draggedTrigger,
                 metadata: {
-                    ...workflowDefinition.triggers[0].metadata,
+                    ...draggedTrigger.metadata,
                     ui: {
-                        ...workflowDefinition.triggers[0].metadata?.ui,
+                        ...draggedTrigger.metadata?.ui,
                         nodePosition: triggerPosition,
                     },
                 },

@@ -34,8 +34,12 @@ export default function extractDefinitionPositions(definition: string): Map<stri
     try {
         const parsed = JSON.parse(definition);
 
-        if (parsed.triggers?.[0]?.metadata?.ui?.nodePosition) {
-            positionMap.set(parsed.triggers[0].name, parsed.triggers[0].metadata.ui.nodePosition);
+        if (Array.isArray(parsed.triggers)) {
+            for (const trigger of parsed.triggers) {
+                if (trigger?.metadata?.ui?.nodePosition) {
+                    positionMap.set(trigger.name, trigger.metadata.ui.nodePosition);
+                }
+            }
         }
 
         if (parsed.tasks) {

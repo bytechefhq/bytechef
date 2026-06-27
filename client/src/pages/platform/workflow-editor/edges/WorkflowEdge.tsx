@@ -1,5 +1,6 @@
 import '@/shared/styles/dropdownMenu.css';
 import {ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger} from '@/components/ui/context-menu';
+import {TRIGGER_FAN_IN_BUS_OFFSET} from '@/shared/constants';
 import {NodeDataType} from '@/shared/types';
 import {BaseEdge, EdgeLabelRenderer, EdgeProps, getSmoothStepPath} from '@xyflow/react';
 import {ClipboardPlusIcon, PlusIcon} from 'lucide-react';
@@ -74,8 +75,23 @@ export default function WorkflowEdge({
         targetY,
     });
 
+    // For the trigger fan-in "+" edge, pin the bus a fixed short distance below the
+    // trigger row (matching RoundedSmoothStepEdge) so the bend aligns with the side
+    // connectors and the "+" sits on the lower leg above the first task.
+    const isTriggerFanIn = !!(data as Record<string, unknown>)?.triggerFanIn;
+    const isVerticalFanIn =
+        Math.abs(correctedTargetY - correctedSourceY) >= Math.abs(correctedTargetX - correctedSourceX);
+
+    const busCenter =
+        isTriggerFanIn && isVerticalFanIn
+            ? {centerY: correctedSourceY + TRIGGER_FAN_IN_BUS_OFFSET}
+            : isTriggerFanIn
+              ? {centerX: correctedSourceX + TRIGGER_FAN_IN_BUS_OFFSET}
+              : {};
+
     const [edgePath, edgeCenterX, edgeCenterY] = getSmoothStepPath({
         borderRadius: 10,
+        ...busCenter,
         sourcePosition: correctedSourcePosition,
         sourceX: correctedSourceX,
         sourceY: correctedSourceY,
@@ -90,35 +106,55 @@ export default function WorkflowEdge({
 
     const isSourceTaskDispatcherTopGhostNode = sourceNode?.type === 'taskDispatcherTopGhostNode';
 
-    const buttonPosition = useMemo(
-        () =>
-            computeEdgeButtonPosition({
-                correctedSourceX,
-                correctedSourceY,
-                correctedTargetX,
-                correctedTargetY,
-                edgeCenterX,
-                edgeCenterY,
-                isHorizontal,
-                sourceNodeComponentName,
-                sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
-                sourceNodeType: sourceNode?.type,
-                targetNodeType: targetNode?.type,
-            }),
-        [
-            isHorizontal,
+    const buttonPosition = useMemo(() => {
+        // For the trigger fan-in "+", center it on the lower leg using the raw handle
+        // coordinates (geometry-independent — the reported edge center is unreliable
+        // for the L-shaped middle edge of an even trigger count): midway between the
+        // bus (a fixed offset below the trigger handles) and the target handle,
+        // pinned to the target's cross-axis so it sits on the center connector.
+        if (isTriggerFanIn && targetNode) {
+            if (isHorizontal) {
+                const busX = sourceX + TRIGGER_FAN_IN_BUS_OFFSET;
+
+                return {x: (busX + targetX) / 2, y: targetY};
+            }
+
+            const busY = sourceY + TRIGGER_FAN_IN_BUS_OFFSET;
+
+            return {x: targetX, y: (busY + targetY) / 2};
+        }
+
+        return computeEdgeButtonPosition({
             correctedSourceX,
             correctedSourceY,
             correctedTargetX,
             correctedTargetY,
-            sourceNode?.type,
-            sourceNode?.data,
-            targetNode?.type,
-            sourceNodeComponentName,
             edgeCenterX,
             edgeCenterY,
-        ]
-    );
+            isHorizontal,
+            sourceNodeComponentName,
+            sourceNodeTaskDispatcherId: (sourceNode?.data as NodeDataType)?.taskDispatcherId,
+            sourceNodeType: sourceNode?.type,
+            targetNodeType: targetNode?.type,
+        });
+    }, [
+        isTriggerFanIn,
+        isHorizontal,
+        correctedSourceX,
+        correctedSourceY,
+        correctedTargetX,
+        correctedTargetY,
+        sourceNode?.type,
+        sourceNode?.data,
+        targetNode,
+        sourceNodeComponentName,
+        sourceX,
+        sourceY,
+        targetX,
+        targetY,
+        edgeCenterX,
+        edgeCenterY,
+    ]);
 
     const copiedNode = useWorkflowEditorStore((state) => state.copiedNode);
     const copiedWorkflowId = useWorkflowEditorStore((state) => state.copiedWorkflowId);

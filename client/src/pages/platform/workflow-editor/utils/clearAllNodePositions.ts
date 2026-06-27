@@ -146,18 +146,26 @@ export default function clearAllNodePositions({
 
     const workflowDefinition = JSON.parse(workflow.definition);
 
-    // Clear trigger position
-    if (workflowDefinition.triggers?.[0]?.metadata?.ui?.nodePosition) {
-        workflowDefinition.triggers[0] = {
-            ...workflowDefinition.triggers[0],
-            metadata: {
-                ...workflowDefinition.triggers[0].metadata,
-                ui: {
-                    ...workflowDefinition.triggers[0].metadata.ui,
-                    nodePosition: undefined,
-                },
-            },
-        };
+    // Clear trigger positions
+    if (Array.isArray(workflowDefinition.triggers)) {
+        workflowDefinition.triggers = workflowDefinition.triggers.map(
+            (trigger: {metadata?: {ui?: {nodePosition?: unknown}}}) => {
+                if (trigger?.metadata?.ui?.nodePosition) {
+                    return {
+                        ...trigger,
+                        metadata: {
+                            ...trigger.metadata,
+                            ui: {
+                                ...trigger.metadata.ui,
+                                nodePosition: undefined,
+                            },
+                        },
+                    };
+                }
+
+                return trigger;
+            }
+        );
     }
 
     // Clear all task positions recursively

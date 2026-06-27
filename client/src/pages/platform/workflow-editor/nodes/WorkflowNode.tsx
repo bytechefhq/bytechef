@@ -33,6 +33,7 @@ import {mapHandlePosition} from '../utils/directionUtils';
 import {getTask} from '../utils/getTask';
 import {getContextFromTaskNodeData} from '../utils/getTaskDispatcherContext';
 import handleDeleteTask from '../utils/handleDeleteTask';
+import handleDeleteTrigger from '../utils/handleDeleteTrigger';
 import pasteNode from '../utils/pasteNode';
 import removeWorkflowNodePosition from '../utils/removeWorkflowNodePosition';
 import saveClusterElementNodesPosition from '../utils/saveClusterElementNodesPosition';
@@ -540,6 +541,8 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const {tasks: workflowTasks, triggers: workflowTriggers} = workflow;
 
+    const triggerCount = workflowTriggers?.length ?? 0;
+
     const nodeLabel = useMemo(
         () =>
             getNodeLabel({
@@ -612,6 +615,18 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const handleDeleteNodeClick = useCallback(
         (nodeData: NodeDataType) => {
             if (!nodeData) {
+                return;
+            }
+
+            if (nodeData.trigger) {
+                handleDeleteTrigger({
+                    cancelWorkflowQueries: cancelWorkflowQueries!,
+                    invalidateWorkflowQueries: invalidateWorkflowQueries!,
+                    triggerName: nodeData.name,
+                    updateWorkflowMutation: updateWorkflowMutation!,
+                    workflow,
+                });
+
                 return;
             }
 
@@ -830,7 +845,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
             onSwitch={handleSwitch}
             showCopyAction
             showCutAction
-            showDeleteAction
+            showDeleteAction={!data.trigger || triggerCount > 1}
             showInfoAction
             showRenameAction
             trigger={kebabButton}
@@ -900,9 +915,9 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 onRename={handleStartRename}
                 onResetPosition={handleResetPosition}
                 onSwitch={handleSwitch}
-                showCopyAction
-                showCutAction
-                showDeleteAction
+                showCopyAction={!data.trigger}
+                showCutAction={!data.trigger}
+                showDeleteAction={!data.trigger || triggerCount > 1}
                 showInfoAction
                 showRenameAction
             >

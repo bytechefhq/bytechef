@@ -155,7 +155,7 @@ const WorkflowNodeContextMenu = ({
                 </ContextMenuContent>
             </ContextMenu>
 
-            {!data.trigger && showDeleteAction && (
+            {showDeleteAction && (
                 <DeleteAlertDialog
                     nodeName={data.label}
                     onCancel={handleDeleteCancel}

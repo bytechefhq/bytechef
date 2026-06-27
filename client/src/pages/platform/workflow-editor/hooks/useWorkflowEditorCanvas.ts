@@ -36,6 +36,7 @@ import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
 import TaskDispatcherLeftGhostNode from '../nodes/TaskDispatcherLeftGhostNode';
 import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
+import TriggerPlaceholderNode from '../nodes/TriggerPlaceholderNode';
 import WorkflowNode from '../nodes/WorkflowNode';
 import {useWorkflowEditor} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
@@ -47,6 +48,7 @@ import {
     computePlaceholderDragPosition,
 } from '../utils/dragTrailingPlaceholder';
 import {containsNodePosition} from '../utils/postDagreConstraints';
+import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
 import {isWorkflowMutating} from '../utils/workflowMutationGuard';
 
@@ -105,7 +107,12 @@ const useWorkflowEditorCanvas = ({
 
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
-    const [handleDropOnPlaceholderNode, handleDropOnWorkflowEdge, handleDropOnTriggerNode] = useHandleDrop({
+    const [
+        handleDropOnPlaceholderNode,
+        handleDropOnWorkflowEdge,
+        handleDropOnTriggerNode,
+        handleDropOnTriggerPlaceholder,
+    ] = useHandleDrop({
         taskDispatcherDefinitions,
     });
 
@@ -124,6 +131,7 @@ const useWorkflowEditorCanvas = ({
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
             taskDispatcherLeftGhostNode: TaskDispatcherLeftGhostNode,
             taskDispatcherTopGhostNode: TaskDispatcherTopGhostNode,
+            triggerPlaceholder: TriggerPlaceholderNode,
             workflow: WorkflowNode,
         }),
         []
@@ -203,11 +211,19 @@ const useWorkflowEditorCanvas = ({
                 const targetNode = useWorkflowDataStore.getState().nodes.find((node) => node.id === targetNodeId);
 
                 if (targetNode) {
-                    handleDropOnTriggerNode(droppedNode);
+                    const targetNodeName = resolveTargetTriggerName(targetNode.data as NodeDataType);
+
+                    if (targetNodeName) {
+                        handleDropOnTriggerNode(droppedNode, targetNodeName);
+                    }
                 }
 
                 return;
             }
+
+            // Any trigger dropped in the trigger zone that is not on an existing
+            // trigger node (including the "+" add-trigger slot) appends a new trigger.
+            handleDropOnTriggerPlaceholder(droppedNode);
         } else {
             const getClosestEdgeElement = (element: HTMLElement | null): HTMLElement | null => {
                 let current: HTMLElement | null = element;

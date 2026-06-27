@@ -141,7 +141,7 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 ),
                 label: componentLabel,
                 metadata: undefined,
-                name: trigger ? 'trigger_1' : getFormattedName(componentName),
+                name: trigger ? (sourceNodeName ?? getFormattedName('trigger')) : getFormattedName(componentName),
                 operationName,
                 parameters: getParametersWithDefaultValues({
                     properties: definition?.properties as Array<PropertyAllType>,
@@ -149,10 +149,12 @@ const WorkflowNodesPopoverMenuOperationList = ({
                 trigger: trigger,
                 type: `${componentName}/v${version}/${operationName}`,
                 version,
-                workflowNodeName: trigger ? 'trigger_1' : getFormattedName(componentName),
+                workflowNodeName: trigger
+                    ? (sourceNodeName ?? getFormattedName('trigger'))
+                    : getFormattedName(componentName),
             };
         },
-        [clusterRoot, trigger]
+        [clusterRoot, sourceNodeName, trigger]
     );
 
     const saveNodeToWorkflow = useCallback(
