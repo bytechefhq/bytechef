@@ -57,6 +57,21 @@ class ProviderApiKeyResolverTest {
     }
 
     @Test
+    void testFallsBackToConfigWhenPropertyDisabled() {
+        Property property = mock(Property.class);
+
+        when(property.isEnabled()).thenReturn(false);
+        when(propertyService.fetchProperty(Provider.OPEN_AI.getKey(), Scope.PLATFORM, null, 2L))
+            .thenReturn(Optional.of(property));
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .getApiKey()).thenReturn("sk-from-config");
+
+        assertThat(resolver.resolve(Provider.OPEN_AI, 2)).isEqualTo("sk-from-config");
+    }
+
+    @Test
     void testReturnsNullWhenNeitherPresent() {
         when(propertyService.fetchProperty(Provider.OPEN_AI.getKey(), Scope.PLATFORM, null, 2L))
             .thenReturn(Optional.empty());

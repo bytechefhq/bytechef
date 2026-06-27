@@ -56,7 +56,7 @@ class CatalogChatClientResolverTest {
     }
 
     @Test
-    void testResolveReturnsNullWhenResolverReturnsFallbackKey() {
+    void testResolveBuildsClientWhenResolverReturnsFallbackKey() {
         when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn("sk-config");
         when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
