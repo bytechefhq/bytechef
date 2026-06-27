@@ -60,6 +60,7 @@ interface PropertyMentionsInputProps {
     required?: boolean;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
     showInputTypeSwitchButton?: boolean;
+    toolProperty?: boolean;
     type?: string;
     validateBeforeSave?: (value: string | number) => boolean;
     value?: string;
@@ -89,6 +90,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             required = false,
             setIsFormulaMode,
             showInputTypeSwitchButton = false,
+            toolProperty,
             type = 'STRING',
             validateBeforeSave,
             value,
@@ -310,6 +312,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             ref={getPropertyMentionsInputEditorRef}
                             setIsFormulaMode={setIsFormulaMode}
                             taskDispatcherDefinitions={taskDispatcherDefinitions}
+                            toolProperty={toolProperty}
                             type={type}
                             validateBeforeSave={validateBeforeSave}
                             value={value ?? defaultValue}

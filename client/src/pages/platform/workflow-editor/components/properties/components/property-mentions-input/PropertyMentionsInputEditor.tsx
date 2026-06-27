@@ -34,6 +34,7 @@ import {FunctionSignature} from './FunctionSignature.extension';
 import {FunctionSuggestion, FunctionSuggestionPluginKey} from './FunctionSuggestion.extension';
 import {MentionStorage} from './MentionStorage.extension';
 import PropertyMentionNodeView from './PropertyMentionNodeView';
+import {buildToolFunctionDefinitions} from './fromAiFunctionDefinition';
 import {getDataPillIconSource} from './getDataPillIconSource';
 import {
     PROPERTY_MENTION_CHIP_CLASS,
@@ -62,6 +63,7 @@ interface PropertyMentionsInputEditorProps {
     placeholder?: string;
     setIsFormulaMode?: (isFormulaMode: boolean) => void;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
+    toolProperty?: boolean;
     type: string;
     value?: string | number;
     validateBeforeSave?: (value: string | number) => boolean;
@@ -88,6 +90,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
             placeholder,
             setIsFormulaMode,
             taskDispatcherDefinitions,
+            toolProperty,
             type,
             validateBeforeSave,
             value,
@@ -587,8 +590,11 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 return;
             }
 
-            editor.storage.FunctionSuggestion.functionDefinitions = evaluatorFunctionDefinitions;
-        }, [editor, evaluatorFunctionDefinitions]);
+            editor.storage.FunctionSuggestion.functionDefinitions = buildToolFunctionDefinitions(
+                evaluatorFunctionDefinitions,
+                toolProperty ?? false
+            );
+        }, [editor, evaluatorFunctionDefinitions, toolProperty]);
 
         // Update editor content when editorValue changes (but not during local updates)
         useEffect(() => {
