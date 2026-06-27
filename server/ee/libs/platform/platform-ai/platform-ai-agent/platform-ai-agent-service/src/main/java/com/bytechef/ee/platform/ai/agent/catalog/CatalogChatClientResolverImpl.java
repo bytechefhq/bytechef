@@ -8,15 +8,10 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import com.bytechef.component.ai.llm.Provider;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.configuration.domain.Environment;
-import com.bytechef.platform.configuration.domain.Property;
-import com.bytechef.platform.configuration.domain.Property.Scope;
-import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Objects;
-import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatModel;
@@ -36,18 +31,15 @@ import org.springframework.stereotype.Component;
 @Component
 public class CatalogChatClientResolverImpl implements CatalogChatClientResolver {
 
-    private final PropertyService propertyService;
     private final CatalogChatModelFactory catalogChatModelFactory;
-    private final ApplicationProperties applicationProperties;
+    private final ProviderApiKeyResolver providerApiKeyResolver;
 
     @SuppressFBWarnings("EI")
     public CatalogChatClientResolverImpl(
-        PropertyService propertyService, CatalogChatModelFactory catalogChatModelFactory,
-        ApplicationProperties applicationProperties) {
+        CatalogChatModelFactory catalogChatModelFactory, ProviderApiKeyResolver providerApiKeyResolver) {
 
-        this.propertyService = propertyService;
         this.catalogChatModelFactory = catalogChatModelFactory;
-        this.applicationProperties = applicationProperties;
+        this.providerApiKeyResolver = providerApiKeyResolver;
     }
 
     @Override
@@ -65,7 +57,7 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
             return null;
         }
 
-        String apiKey = resolveApiKey(provider, environment);
+        String apiKey = providerApiKeyResolver.resolve(provider, environment);
 
         if (apiKey == null || apiKey.isBlank()) {
             return null;
@@ -82,42 +74,5 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
                 ChatOptions.builder()
                     .model(model))
             .build();
-    }
-
-    private @Nullable String resolveApiKey(Provider provider, int environment) {
-        Optional<Property> property = propertyService.fetchProperty(
-            provider.getKey(), Scope.PLATFORM, null, (long) environment);
-
-        return property
-            .filter(Property::isEnabled)
-            .map(enabledProperty -> enabledProperty.get("apiKey"))
-            .map(Object::toString)
-            .filter(apiKey -> !apiKey.isBlank())
-            .orElseGet(() -> configApiKey(provider));
-    }
-
-    private @Nullable String configApiKey(Provider provider) {
-        ApplicationProperties.Ai.Provider configProvider = applicationProperties.getAi()
-            .getProvider();
-
-        return switch (provider) {
-            case OPEN_AI -> configProvider.getOpenAi()
-                .getApiKey();
-            case ANTHROPIC -> configProvider.getAnthropic()
-                .getApiKey();
-            case MISTRAL -> configProvider.getMistral()
-                .getApiKey();
-            case VERTEX_GEMINI -> configProvider.getVertexGemini()
-                .getApiKey();
-            case GROQ -> configProvider.getGroq()
-                .getApiKey();
-            case PERPLEXITY -> configProvider.getPerplexity()
-                .getApiKey();
-            case NVIDIA -> configProvider.getNvidia()
-                .getApiKey();
-            case DEEPSEEK -> configProvider.getDeepSeek()
-                .getApiKey();
-            default -> null;
-        };
     }
 }
