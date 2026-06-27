@@ -45,6 +45,7 @@ interface PropertyMentionsInputProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    disableAutoSave?: boolean;
     error?: boolean;
     errorMessage?: string;
     expressionEnabled?: boolean;
@@ -75,6 +76,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
             defaultValue,
             deletePropertyButton,
             description,
+            disableAutoSave,
             error,
             errorMessage,
             expressionEnabled,
@@ -298,6 +300,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             componentDefinitions={componentDefinitions}
                             controlType={controlType}
                             dataPills={dataPills}
+                            disableAutoSave={disableAutoSave}
                             elementId={elementId}
                             expressionEnabled={expressionEnabled}
                             handleFromAiClick={handleFromAiClick}
