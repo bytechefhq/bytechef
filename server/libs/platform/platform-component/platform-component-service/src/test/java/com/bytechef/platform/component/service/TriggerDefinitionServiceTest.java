@@ -150,16 +150,32 @@ public class TriggerDefinitionServiceTest {
 
     @Test
     public void testExecutePollingTriggerSkipsOnRateLimit() {
+        // The provider has hit its per-minute quota: poll() fails with HTTP 429.
+        assertPollingTriggerSkipsOnTransientError(new ProviderException(
+            429, "Quota exceeded for quota metric 'Expensive Reads'"));
+    }
+
+    @Test
+    public void testExecutePollingTriggerSkipsOnServiceUnavailable() {
+        // The provider is temporarily down: poll() fails with HTTP 503.
+        assertPollingTriggerSkipsOnTransientError(new ProviderException(503, "Service Unavailable"));
+    }
+
+    @Test
+    public void testExecutePollingTriggerSkipsOnRetryAfterHeader() {
+        // A Retry-After header marks the error transient even when the status code is not itself retryable (409).
+        assertPollingTriggerSkipsOnTransientError(
+            ProviderException.getProviderException(409, "Conflict", Map.of("Retry-After", List.of("120"))));
+    }
+
+    private void assertPollingTriggerSkipsOnTransientError(ProviderException providerException) {
         TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
 
         when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
         when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
 
-        // A provider that has hit its per-minute quota: poll() fails with HTTP 429. The poll cycle must be skipped
-        // (no records, no exception) and the prior closure state preserved so the next scheduled poll resumes.
-        ProviderException providerException = new ProviderException(
-            429, "Quota exceeded for quota metric 'Expensive Reads'");
-
+        // A transient provider failure must skip the cycle (no records, no exception) while preserving the prior
+        // closure state so the next scheduled poll resumes from the same cursor.
         PollFunction mockPollFunction = (inputParameters, connectionParameters, closureParameters, context) -> {
             throw providerException;
         };
@@ -188,7 +204,7 @@ public class TriggerDefinitionServiceTest {
 
         assertNotNull(output, "TriggerOutput should not be null");
         assertInstanceOf(List.class, output.value(), "Output should be a List");
-        assertTrue(((List<?>) output.value()).isEmpty(), "A rate-limited poll should yield no records");
+        assertTrue(((List<?>) output.value()).isEmpty(), "A skipped poll should yield no records");
         assertEquals(priorState, output.state(), "Closure state must be preserved across a skipped poll cycle");
 
         boolean warningLogged = logAppender.list.stream()
@@ -199,7 +215,47 @@ public class TriggerDefinitionServiceTest {
                     && formattedMessage.contains("testTrigger");
             });
 
-        assertTrue(warningLogged, "A WARN naming the rate-limited trigger should be emitted instead of an error");
+        assertTrue(warningLogged, "A WARN naming the skipped trigger should be emitted instead of an error");
+    }
+
+    @Test
+    public void testExecutePollingTriggerSkipsMidPaginationKeepingPartialRecordsAndCursor() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        AtomicInteger pollCount = new AtomicInteger();
+
+        // The first page succeeds and advances the cursor without asking to stop; the second page hits a 429. The
+        // records already collected and the cursor advanced by the first page must be retained so the next scheduled
+        // poll resumes from there rather than discarding partial progress.
+        PollFunction mockPollFunction = (inputParameters, connectionParameters, closureParameters, context) -> {
+            if (pollCount.incrementAndGet() == 1) {
+                return new PollOutput(List.of("record-page-1"), Map.of("cursor", "page-2"), false);
+            }
+
+            throw new ProviderException(429, "Quota exceeded");
+        };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher, List.of());
+
+        TriggerOutput output = triggerDefinitionService.executeTrigger(
+            "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), Map.of("cursor", "page-1"), null,
+            null, null, PlatformType.AUTOMATION, false);
+
+        assertNotNull(output, "TriggerOutput should not be null");
+        assertEquals(
+            List.of("record-page-1"), output.value(), "Records collected before the transient error must be kept");
+        assertEquals(
+            Map.of("cursor", "page-2"), output.state(), "Cursor must reflect the last successfully polled page");
+        assertEquals(2, pollCount.get(), "The second page should have been attempted before the skip");
     }
 
     @Test

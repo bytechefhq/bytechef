@@ -283,7 +283,7 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         try {
             return actionDefinition.getProcessErrorResponse()
                 .orElseGet(() -> (statusCode1, body1, headers1, context1) -> ProviderException.getProviderException(
-                    statusCode1, body1))
+                    statusCode1, body1, headers1))
                 .apply(statusCode, body, headers, actionContext);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);

@@ -239,7 +239,7 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         try {
             return triggerDefinition.getProcessErrorResponse()
                 .orElseGet(() -> (statusCode1, body1, headers1, context1) -> ProviderException.getProviderException(
-                    statusCode1, body1))
+                    statusCode1, body1, headers1))
                 .apply(statusCode, body, headers, triggerContext);
         } catch (Exception e) {
             throw new ExecutionException(e, ActionDefinitionErrorType.EXECUTE_PROCESS_ERROR_RESPONSE);
@@ -493,14 +493,19 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 log.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
             }
         } catch (ProviderException providerException) {
-            if (!isRateLimitException(providerException)) {
+            if (!providerException.isRetryable()) {
                 throw providerException;
             }
 
+            // A transient provider error (HTTP 429 quota / 503 unavailable / Retry-After) is not a configuration
+            // error: skip this poll cycle, keep the records already collected and the last good cursor, and let the
+            // next scheduled poll retry. Logged at WARN instead of surfaced as a failed trigger execution so quota
+            // spikes don't flood error reporting.
             log.warn(
-                "Polling trigger '{}.{}' skipped: provider rate limit/quota reached (HTTP {}). State preserved; the " +
-                    "next scheduled poll will retry. Provider message: {}",
-                componentName, triggerName, providerException.getStatusCode(), providerException.getMessage());
+                "Polling trigger '{}.{}' skipped: provider signalled a transient error (HTTP {}, Retry-After {}). " +
+                    "State preserved; the next scheduled poll will retry. Provider message: {}",
+                componentName, triggerName, providerException.getStatusCode(), providerException.getRetryAfter(),
+                providerException.getMessage());
         }
 
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
@@ -772,12 +777,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return triggerDefinition.getListenerEnable()
             .orElseThrow(() -> new IllegalArgumentException("Listener enable function is not defined."));
-    }
-
-    private static boolean isRateLimitException(ProviderException providerException) {
-        Integer statusCode = providerException.getStatusCode();
-
-        return statusCode != null && statusCode == HttpStatus.TOO_MANY_REQUESTS.getValue();
     }
 
     private Map<String, ?> toWebhookEnabledOutputParameters(@Nullable Object triggerState) {
