@@ -1,7 +1,7 @@
 The workflow needs to be in JSON format similar to:
 %s
 
-- Every workflow must only have one trigger, but as many actions or task dispatchers as needed
+- A workflow can have one or more triggers, plus as many actions or task dispatchers as needed
 
 Output properties:
 Some tasks have output properties that you get with getTaskOutputProperty() tool. Output property is a response to the task.

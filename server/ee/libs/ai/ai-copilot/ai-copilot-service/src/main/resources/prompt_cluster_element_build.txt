@@ -77,7 +77,7 @@ updateWorkflowRootProperties(workflowId, rootPropertiesDefinition)  // only if r
 // If a component is still missing a connection, ask the user to create it
 
 ## Important Rules when getting Errors:
-- Every workflow must only have one trigger, but as many actions or task dispatchers as needed
+- A workflow can have one or more triggers, plus as many actions or task dispatchers as needed
 - Every task must have a unique name in format: componentName_{number}
 - Required fields must be filled, the other fields are optional
 - If an array in taskDefinition contains multiple objects, you can use any of the objects for that array
