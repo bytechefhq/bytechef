@@ -16,6 +16,10 @@
 
 package com.bytechef.component.exception;
 
+import com.bytechef.component.definition.HttpStatus;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Igor Beslic
  * @author Ivica Cardic
@@ -23,6 +27,7 @@ package com.bytechef.component.exception;
 public class ProviderException extends RuntimeException {
 
     private Integer statusCode;
+    private String retryAfter;
 
     /**
      *
@@ -74,6 +79,56 @@ public class ProviderException extends RuntimeException {
      */
     public Integer getStatusCode() {
         return statusCode;
+    }
+
+    /**
+     * Returns the raw {@code Retry-After} header value the provider sent with this error, if any.
+     *
+     * @return the {@code Retry-After} value (delay-seconds or an HTTP-date), or {@code null} when absent
+     */
+    public String getRetryAfter() {
+        return retryAfter;
+    }
+
+    /**
+     * Whether this provider error is transient and worth retrying later rather than surfacing as a hard failure: an
+     * explicit rate limit (HTTP 429), a temporary unavailability (HTTP 503), or any response carrying a
+     * {@code Retry-After} header.
+     *
+     * @return true if the error is transient/retryable
+     */
+    public boolean isRetryable() {
+        if (retryAfter != null) {
+            return true;
+        }
+
+        if (statusCode == null) {
+            return false;
+        }
+
+        return statusCode == HttpStatus.TOO_MANY_REQUESTS.getValue() ||
+            statusCode == HttpStatus.SERVICE_UNAVAILABLE.getValue();
+    }
+
+    /**
+     * Walks the cause chain of the given throwable and reports whether any {@link ProviderException} in it is
+     * {@link #isRetryable() retryable}.
+     *
+     * @param throwable the throwable to inspect (may be {@code null})
+     * @return true if a retryable provider error is present anywhere in the cause chain
+     */
+    public static boolean isRetryable(Throwable throwable) {
+        Throwable current = throwable;
+
+        while (current != null) {
+            if (current instanceof ProviderException providerException && providerException.isRetryable()) {
+                return true;
+            }
+
+            current = current.getCause();
+        }
+
+        return false;
     }
 
     /**
@@ -145,5 +200,33 @@ public class ProviderException extends RuntimeException {
             case 404 -> new ProviderException.NotFoundException(message);
             default -> new ProviderException(statusCode, message);
         };
+    }
+
+    public static ProviderException getProviderException(
+        int statusCode, Object body, Map<String, List<String>> headers) {
+
+        ProviderException providerException = getProviderException(statusCode, body);
+
+        providerException.retryAfter = getRetryAfter(headers);
+
+        return providerException;
+    }
+
+    private static String getRetryAfter(Map<String, List<String>> headers) {
+        if (headers == null) {
+            return null;
+        }
+
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            if ("retry-after".equalsIgnoreCase(entry.getKey())) {
+                List<String> values = entry.getValue();
+
+                if (values != null && !values.isEmpty()) {
+                    return values.getFirst();
+                }
+            }
+        }
+
+        return null;
     }
 }

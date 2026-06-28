@@ -242,19 +242,39 @@ class TokenRefreshAspectIntTest {
 
     @Test
     void testExecute429RateLimitPropagatedWithoutRefresh() {
+        assertTransientErrorPropagatedWithoutRefresh(
+            new ProviderException(429, "Quota exceeded for quota metric 'Expensive Reads'"), "Quota exceeded");
+    }
+
+    @Test
+    void testExecute503ServiceUnavailablePropagatedWithoutRefresh() {
+        assertTransientErrorPropagatedWithoutRefresh(
+            new ProviderException(503, "Service Unavailable"), "Service Unavailable");
+    }
+
+    @Test
+    void testExecuteRetryAfterHeaderPropagatedWithoutRefresh() {
+        assertTransientErrorPropagatedWithoutRefresh(
+            ProviderException.getProviderException(409, "Conflict", Map.of("Retry-After", List.of("30"))),
+            "Conflict");
+    }
+
+    private void assertTransientErrorPropagatedWithoutRefresh(
+        ProviderException providerException, String expectedMessageFragment) {
+
         ComponentConnection connection = createOAuth2Connection();
 
-        // Even with a refresh policy configured for 401, a transient 429 (quota / rate limit) must not trigger a
-        // token refresh and must not be relabeled as a ConfigurationException — it propagates unchanged.
+        // Even with a refresh policy configured for 401, a transient provider error (429 / 503 / Retry-After) must not
+        // trigger a token refresh and must not be relabeled as a ConfigurationException — it propagates unchanged.
         setupRefreshOn401();
 
         tokenRefreshTestService.setBehavior(() -> {
-            throw new ProviderException(429, "Quota exceeded for quota metric 'Expensive Reads'");
+            throw providerException;
         });
 
         assertThatThrownBy(() -> tokenRefreshTestService.executeWithConnection("testComponent", 1, connection))
             .isInstanceOf(ProviderException.class)
-            .hasMessageContaining("Quota exceeded");
+            .hasMessageContaining(expectedMessageFragment);
 
         assertThat(tokenRefreshTestService.getCallCount()).isEqualTo(1);
 

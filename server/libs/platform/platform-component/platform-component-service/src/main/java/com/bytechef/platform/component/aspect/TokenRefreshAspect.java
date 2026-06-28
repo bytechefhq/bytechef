@@ -17,7 +17,6 @@
 package com.bytechef.platform.component.aspect;
 
 import com.bytechef.component.definition.Context;
-import com.bytechef.component.definition.HttpStatus;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ErrorType;
@@ -104,7 +103,7 @@ public class TokenRefreshAspect {
             throw exception;
         }
 
-        if (isRateLimitException(exception)) {
+        if (ProviderException.isRetryable(exception)) {
             throw exception;
         }
 
@@ -241,24 +240,6 @@ public class TokenRefreshAspect {
 
     private Context createContext(String componentName, ComponentConnection componentConnection) {
         return contextFactory.createContext(componentName, componentConnection);
-    }
-
-    private static boolean isRateLimitException(Throwable throwable) {
-        Throwable current = throwable;
-
-        while (current != null) {
-            if (current instanceof ProviderException providerException) {
-                Integer statusCode = providerException.getStatusCode();
-
-                if (statusCode != null && statusCode == HttpStatus.TOO_MANY_REQUESTS.getValue()) {
-                    return true;
-                }
-            }
-
-            current = current.getCause();
-        }
-
-        return false;
     }
 
     private Exception wrapException(Exception exception, WithTokenRefresh withTokenRefresh) {
