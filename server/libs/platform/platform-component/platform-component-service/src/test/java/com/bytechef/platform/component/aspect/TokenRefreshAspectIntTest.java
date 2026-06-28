@@ -241,6 +241,28 @@ class TokenRefreshAspectIntTest {
     }
 
     @Test
+    void testExecute429RateLimitPropagatedWithoutRefresh() {
+        ComponentConnection connection = createOAuth2Connection();
+
+        // Even with a refresh policy configured for 401, a transient 429 (quota / rate limit) must not trigger a
+        // token refresh and must not be relabeled as a ConfigurationException — it propagates unchanged.
+        setupRefreshOn401();
+
+        tokenRefreshTestService.setBehavior(() -> {
+            throw new ProviderException(429, "Quota exceeded for quota metric 'Expensive Reads'");
+        });
+
+        assertThatThrownBy(() -> tokenRefreshTestService.executeWithConnection("testComponent", 1, connection))
+            .isInstanceOf(ProviderException.class)
+            .hasMessageContaining("Quota exceeded");
+
+        assertThat(tokenRefreshTestService.getCallCount()).isEqualTo(1);
+
+        verify(connectionDefinitionService, never()).executeRefresh(
+            anyString(), anyInt(), any(), any(), any());
+    }
+
+    @Test
     void testExecuteCustomAuthAcquireNewCredentials() {
         ComponentConnection connection = createCustomConnection();
 
