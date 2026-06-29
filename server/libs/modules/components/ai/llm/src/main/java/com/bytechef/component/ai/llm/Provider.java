@@ -16,6 +16,8 @@
 
 package com.bytechef.component.ai.llm;
 
+import java.util.Set;
+
 /**
  * @author Ivica Cardic
  */
@@ -42,6 +44,8 @@ public enum Provider {
     PERPLEXITY(16, "perplexity", "ai.provider.perplexity", "Perplexity"),
     DEEPSEEK(17, "deepseek", "ai.provider.deepseek", "DeepSeek");
 
+    private static final Set<Provider> EMBEDDING_SUPPORTED_PROVIDERS = Set.of(OPEN_AI);
+
     private final int id;
     private final String label;
     private final String key;
@@ -52,6 +56,10 @@ public enum Provider {
         this.label = label;
         this.key = key;
         this.name = name;
+    }
+
+    public boolean isEmbeddingSupported() {
+        return EMBEDDING_SUPPORTED_PROVIDERS.contains(this);
     }
 
     public int getId() {

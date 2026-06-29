@@ -37,4 +37,16 @@ class CatalogEmbeddingModelFactoryTest {
     void testReturnsNullForProviderWithoutEmbeddingSupport() {
         assertThat(factory.createEmbeddingModel(Provider.ANTHROPIC, "irrelevant", "sk-test")).isNull();
     }
+
+    @Test
+    void testEmbeddingSupportMatchesProviderCapability() {
+        for (Provider provider : Provider.values()) {
+            EmbeddingModel embeddingModel = factory.createEmbeddingModel(
+                provider, "text-embedding-3-small", "sk-test");
+
+            assertThat(embeddingModel != null)
+                .as("Provider %s: factory builds an embedding model iff Provider.isEmbeddingSupported()", provider)
+                .isEqualTo(provider.isEmbeddingSupported());
+        }
+    }
 }

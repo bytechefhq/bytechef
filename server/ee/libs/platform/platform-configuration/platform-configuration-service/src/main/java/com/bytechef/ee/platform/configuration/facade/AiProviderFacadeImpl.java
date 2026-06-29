@@ -180,7 +180,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, enabled,
-                    supportsEmbeddings(provider));
+                    provider.isEmbeddingSupported());
             })
             .filter(Objects::nonNull)
             .toList();
@@ -244,13 +244,6 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 .getModel();
             default -> null;
         };
-    }
-
-    /**
-     * Mirrors {@code CatalogEmbeddingModelFactory.resolveFactory}: only OpenAI is wired for embeddings today.
-     */
-    private static boolean supportsEmbeddings(Provider provider) {
-        return provider == Provider.OPEN_AI;
     }
 
     private boolean hasConfigApiKey(Provider provider) {
