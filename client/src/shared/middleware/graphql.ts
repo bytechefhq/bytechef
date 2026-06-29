@@ -790,6 +790,13 @@ export type KnowledgeBaseDocumentTagsByDocumentQueryVariables = Exact<{ [key: st
 
 export type KnowledgeBaseDocumentTagsByDocumentQuery = { knowledgeBaseDocumentTagsByDocument: Array<{ knowledgeBaseDocumentId: string, tags: Array<string> }> | null };
 
+export type KnowledgeBaseEmbeddingActiveQueryVariables = Exact<{
+  environment: number;
+}>;
+
+
+export type KnowledgeBaseEmbeddingActiveQuery = { knowledgeBaseEmbeddingActive: boolean };
+
 export type KnowledgeBaseTagsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4501,6 +4508,28 @@ export const useKnowledgeBaseDocumentTagsByDocumentQuery = <
       {
     queryKey: variables === undefined ? ['knowledgeBaseDocumentTagsByDocument'] : ['knowledgeBaseDocumentTagsByDocument', variables],
     queryFn: fetcher<KnowledgeBaseDocumentTagsByDocumentQuery, KnowledgeBaseDocumentTagsByDocumentQueryVariables>(KnowledgeBaseDocumentTagsByDocumentDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseEmbeddingActiveDocument = new TypedDocumentString(`
+    query knowledgeBaseEmbeddingActive($environment: Int!) {
+  knowledgeBaseEmbeddingActive(environment: $environment)
+}
+    `);
+
+export const useKnowledgeBaseEmbeddingActiveQuery = <
+      TData = KnowledgeBaseEmbeddingActiveQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseEmbeddingActiveQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseEmbeddingActiveQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseEmbeddingActiveQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseEmbeddingActiveQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBaseEmbeddingActive', variables],
+    queryFn: fetcher<KnowledgeBaseEmbeddingActiveQuery, KnowledgeBaseEmbeddingActiveQueryVariables>(KnowledgeBaseEmbeddingActiveDocument, variables),
     ...options
   }
     )};
