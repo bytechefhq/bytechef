@@ -15,5 +15,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  * @author Ivica Cardic
  */
 @SuppressFBWarnings("EI")
-public record AiProviderDTO(int id, String name, String icon, String apiKey, boolean enabled) {
+public record AiProviderDTO(int id, String name, String icon, String apiKey, boolean enabled,
+    boolean supportsEmbeddings) {
 }
