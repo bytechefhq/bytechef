@@ -600,6 +600,7 @@ include("server:ee:libs:automation:automation-api-platform:automation-api-platfo
 include("server:ee:libs:automation:automation-api-platform:automation-api-platform-handler:automation-api-platform-handler-rest")
 include("server:ee:libs:automation:automation-code-workflow-loader")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-api")
+include("server:ee:libs:automation:automation-configuration:automation-configuration-graphql")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-public-rest")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-client")
 include("server:ee:libs:automation:automation-configuration:automation-configuration-remote-rest")

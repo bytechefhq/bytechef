@@ -1,0 +1,41 @@
+extend type Query {
+    "List all users of a workspace. Requires at least VIEWER workspace role."
+    workspaceUsers(workspaceId: ID!): [WorkspaceUser!]!
+    "Returns the permission scope names the current user has in the given workspace"
+    myWorkspaceScopes(workspaceId: ID!): [String!]!
+    "Returns the workspace role name for the current user in the given workspace"
+    myWorkspaceRole(workspaceId: ID!): String
+}
+
+extend type Mutation {
+    "Add a user to a workspace. Requires ADMIN workspace role."
+    addWorkspaceUser(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
+    "Update a workspace user's role. Requires ADMIN workspace role."
+    updateWorkspaceUserRole(workspaceId: ID!, userId: ID!, role: WorkspaceRole!): WorkspaceUser!
+    "Remove a user from a workspace. Requires ADMIN workspace role."
+    removeWorkspaceUser(workspaceId: ID!, userId: ID!): Boolean!
+}
+
+type WorkspaceUser {
+    id: ID!
+    workspaceId: ID!
+    userId: ID!
+    "Built-in workspace role, null if using a custom role"
+    workspaceRole: WorkspaceRole
+    "Custom role ID (EE only), null if using a built-in role"
+    customRoleId: ID
+    user: WorkspaceUserInfo
+    createdDate: String
+}
+
+type WorkspaceUserInfo {
+    email: String!
+    firstName: String
+    lastName: String
+}
+
+enum WorkspaceRole {
+    ADMIN
+    EDITOR
+    VIEWER
+}
