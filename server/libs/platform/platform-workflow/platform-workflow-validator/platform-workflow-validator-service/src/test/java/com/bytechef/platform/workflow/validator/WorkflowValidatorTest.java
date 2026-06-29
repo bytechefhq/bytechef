@@ -4182,7 +4182,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowAddsNestedTasksToTaskDefinitionMapMultipleFlows() {
+    void validateWorkflowReportsDuplicateNodeNamesInMultipleNestedFlows() {
         String workflow = """
             {
                 "label": "Test Workflow",
