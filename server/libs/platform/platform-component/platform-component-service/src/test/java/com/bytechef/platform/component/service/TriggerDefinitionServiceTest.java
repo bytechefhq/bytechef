@@ -186,7 +186,7 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, eventPublisher, List.of());
+            componentDefinitionRegistry, contextFactory, eventPublisher);
 
         Map<String, Object> priorState = Map.of("cursor", "page-1");
 
@@ -244,7 +244,7 @@ public class TriggerDefinitionServiceTest {
             .thenReturn(mockTriggerDefinition);
 
         TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
-            componentDefinitionRegistry, contextFactory, eventPublisher, List.of());
+            componentDefinitionRegistry, contextFactory, eventPublisher);
 
         TriggerOutput output = triggerDefinitionService.executeTrigger(
             "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), Map.of("cursor", "page-1"), null,
