@@ -462,7 +462,9 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
             int pollFunctionApplyCount = 1;
 
             while (!polledRecords.isEmpty() || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
-                records.addAll(polledRecords.subList(0, Math.min(MAX_POLLING_TRIGGER_RECORDS, polledRecords.size())));
+                int remainingCapacity = MAX_POLLING_TRIGGER_RECORDS - records.size();
+
+                records.addAll(polledRecords.subList(0, Math.min(remainingCapacity, polledRecords.size())));
 
                 if (pollOutput.pollImmediately() || records.size() >= MAX_POLLING_TRIGGER_RECORDS
                     || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
