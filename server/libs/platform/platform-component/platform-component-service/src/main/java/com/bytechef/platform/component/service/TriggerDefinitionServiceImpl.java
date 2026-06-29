@@ -499,10 +499,6 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
                 throw providerException;
             }
 
-            // A transient provider error (HTTP 429 quota / 503 unavailable / Retry-After) is not a configuration
-            // error: skip this poll cycle, keep the records already collected and the last good cursor, and let the
-            // next scheduled poll retry. Logged at WARN instead of surfaced as a failed trigger execution so quota
-            // spikes don't flood error reporting.
             log.warn(
                 "Polling trigger '{}.{}' skipped: provider signalled a transient error (HTTP {}, Retry-After {}). " +
                     "State preserved; the next scheduled poll will retry. Provider message: {}",
