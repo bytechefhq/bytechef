@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:07.859460+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-27T23:33:44.855705+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "ai-provider", description = "The Platform AI Provider Internal API")
 public interface AiProviderApi {
@@ -137,7 +137,7 @@ public interface AiProviderApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"apiKey\" : \"apiKey\", \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true }, { \"apiKey\" : \"apiKey\", \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true } ]";
+                    String exampleString = "[ { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true }, { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
