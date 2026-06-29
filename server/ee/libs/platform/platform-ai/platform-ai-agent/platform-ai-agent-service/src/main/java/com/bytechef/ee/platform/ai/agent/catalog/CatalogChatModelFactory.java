@@ -20,6 +20,7 @@ import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
@@ -35,6 +36,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CatalogChatModelFactory {
 
     public @Nullable ChatModel createChatModel(Provider provider, String model, String apiKey) {

@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
@@ -22,6 +23,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CatalogEmbeddingProviderStatusProvider implements EmbeddingProviderStatusProvider {
 
     private final ProviderApiKeyResolver providerApiKeyResolver;
