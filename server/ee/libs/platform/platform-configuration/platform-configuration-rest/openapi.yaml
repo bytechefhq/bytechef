@@ -190,6 +190,10 @@ components:
         enabled:
           description: "The enabled status of an AI provider."
           type: "boolean"
+        supportsEmbeddings:
+          description: "Whether this AI provider can be used for embeddings."
+          type: "boolean"
+          readOnly: true
     GitConfiguration:
       description: "The git configuration."
       required:
