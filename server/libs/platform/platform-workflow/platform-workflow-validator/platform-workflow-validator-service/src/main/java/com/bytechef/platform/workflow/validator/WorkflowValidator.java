@@ -19,11 +19,12 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Stream;
+import java.util.Set;
 import org.jspecify.annotations.Nullable;
 import tools.jackson.databind.JsonNode;
 
@@ -84,6 +85,8 @@ public class WorkflowValidator {
             validateWorkflowStructure(workflow, errors);
 
             JsonNode workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
+
+            validateDuplicateNodeNames(workflowJsonNode, errors);
 
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
@@ -399,17 +402,6 @@ public class WorkflowValidator {
             Iterator<JsonNode> iterator = tasksJsonNode.iterator();
 
             iterator.forEachRemaining(taskJsonNode -> {
-                Stream<JsonNode> stream = taskJsonNodes.stream();
-
-                JsonNode nameJsonNode = taskJsonNode.get("name");
-
-                if (stream.anyMatch(previousTask -> Objects.equals(
-                    previousTask.get("name"), nameJsonNode))) {
-
-                    errors.append("Tasks cannot have repeating names: ");
-                    errors.append(nameJsonNode.asString());
-                }
-
                 taskJsonNodes.add(taskJsonNode);
 
                 JsonNode typeJsonNode = taskJsonNode.get("type");
@@ -461,6 +453,125 @@ public class WorkflowValidator {
                     errors.append("There can only be one trigger in the workflow");
                 }
             });
+        }
+    }
+
+    /**
+     * Collects every node name (the trigger plus all tasks, including tasks nested inside condition, loop, branch,
+     * parallel, each, fork-join and on-error dispatchers) and reports each name that occurs more than once. Node names
+     * are the ids of workflow nodes, so a duplicate name produces two nodes with the same id and a broken graph in the
+     * editor.
+     */
+    private static void validateDuplicateNodeNames(JsonNode workflowJsonNode, StringBuilder errors) {
+        List<String> nodeNames = new ArrayList<>();
+
+        JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
+
+        if (triggersJsonNode != null && triggersJsonNode.isArray()) {
+            for (JsonNode triggerJsonNode : triggersJsonNode) {
+                collectNodeName(triggerJsonNode, nodeNames);
+            }
+        }
+
+        JsonNode tasksJsonNode = workflowJsonNode.get("tasks");
+
+        if (tasksJsonNode != null && tasksJsonNode.isArray()) {
+            collectTaskNames(tasksJsonNode, nodeNames);
+        }
+
+        Set<String> seenNames = new HashSet<>();
+        Set<String> duplicateNames = new LinkedHashSet<>();
+
+        for (String nodeName : nodeNames) {
+            if (!seenNames.add(nodeName)) {
+                duplicateNames.add(nodeName);
+            }
+        }
+
+        for (String duplicateName : duplicateNames) {
+            StringUtils.appendWithNewline("Node names must be unique. Duplicate node name: " + duplicateName, errors);
+        }
+    }
+
+    /**
+     * Recursively collects the names of the given tasks and of any tasks nested within their parameters.
+     */
+    private static void collectTaskNames(JsonNode tasksJsonNode, List<String> nodeNames) {
+        for (JsonNode taskJsonNode : tasksJsonNode) {
+            if (!taskJsonNode.isObject()) {
+                continue;
+            }
+
+            collectNodeName(taskJsonNode, nodeNames);
+
+            JsonNode parametersJsonNode = taskJsonNode.get("parameters");
+
+            if (parametersJsonNode != null && parametersJsonNode.isObject()) {
+                collectNestedTaskNames(parametersJsonNode, nodeNames);
+            }
+        }
+    }
+
+    /**
+     * Collects task names from the task-dispatcher nesting shapes: condition caseTrue/caseFalse, branch default/cases,
+     * parallel/on-error task arrays, loop/each/map iteratee (array or single object) and fork-join branches.
+     */
+    private static void collectNestedTaskNames(JsonNode parametersJsonNode, List<String> nodeNames) {
+        for (String key : new String[] {
+            "caseTrue", "caseFalse", "default", "main-branch", "on-error-branch", "tasks"
+        }) {
+
+            JsonNode nestedTasksJsonNode = parametersJsonNode.get(key);
+
+            if (nestedTasksJsonNode != null && nestedTasksJsonNode.isArray()) {
+                collectTaskNames(nestedTasksJsonNode, nodeNames);
+            }
+        }
+
+        JsonNode iterateeJsonNode = parametersJsonNode.get("iteratee");
+
+        if (iterateeJsonNode != null) {
+            if (iterateeJsonNode.isArray()) {
+                collectTaskNames(iterateeJsonNode, nodeNames);
+            } else if (iterateeJsonNode.isObject() && iterateeJsonNode.has("name")) {
+                collectNodeName(iterateeJsonNode, nodeNames);
+
+                JsonNode iterateeParametersJsonNode = iterateeJsonNode.get("parameters");
+
+                if (iterateeParametersJsonNode != null && iterateeParametersJsonNode.isObject()) {
+                    collectNestedTaskNames(iterateeParametersJsonNode, nodeNames);
+                }
+            }
+        }
+
+        JsonNode casesJsonNode = parametersJsonNode.get("cases");
+
+        if (casesJsonNode != null && casesJsonNode.isArray()) {
+            for (JsonNode caseJsonNode : casesJsonNode) {
+                JsonNode caseTasksJsonNode = caseJsonNode.get("tasks");
+
+                if (caseTasksJsonNode != null && caseTasksJsonNode.isArray()) {
+                    collectTaskNames(caseTasksJsonNode, nodeNames);
+                }
+            }
+        }
+
+        JsonNode branchesJsonNode = parametersJsonNode.get("branches");
+
+        if (branchesJsonNode != null && branchesJsonNode.isArray()) {
+            for (JsonNode branchJsonNode : branchesJsonNode) {
+                if (branchJsonNode.isArray()) {
+                    collectTaskNames(branchJsonNode, nodeNames);
+                }
+            }
+        }
+    }
+
+    private static void collectNodeName(JsonNode nodeJsonNode, List<String> nodeNames) {
+        JsonNode nameJsonNode = nodeJsonNode.get("name");
+
+        if (nameJsonNode != null && nameJsonNode.isString()) {
+            nodeNames.add(nameJsonNode.asString());
         }
     }
 
