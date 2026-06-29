@@ -19,6 +19,7 @@ package com.bytechef.ee.tenant.service;
 import com.bytechef.ee.tenant.repository.TenantRepository;
 import com.bytechef.ee.tenant.util.TenantUtils;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.annotation.ConditionalOnMultiTenant;
 import com.bytechef.tenant.constant.Tenancy;
 import com.bytechef.tenant.domain.Tenant;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.stream.Collectors;
 import javax.sql.DataSource;
 import liquibase.integration.spring.MultiTenantSpringLiquibase;
 import org.slf4j.Logger;
@@ -157,29 +157,24 @@ public class MultiTenantService implements TenantService, ResourceLoaderAware {
 
     @Override
     public void loadChangelog(List<String> tenantIds, Tenancy tenancy) {
+        for (String tenantId : tenantIds) {
+            TenantContext.runWithTenantId(tenantId, () -> loadChangelog(tenantId, tenancy));
+        }
+    }
+
+    void loadChangelog(String tenantId, Tenancy tenancy) throws Exception {
         MultiTenantSpringLiquibase multiTenantSpringLiquibase = new MultiTenantSpringLiquibase();
 
         multiTenantSpringLiquibase.setContexts(getRuntimeContext(tenancy));
         multiTenantSpringLiquibase.setDataSource(dataSource);
         multiTenantSpringLiquibase.setResourceLoader(resourceLoader);
-
-        List<String> schemas =
-            tenantIds
-                .stream()
-                .map(TenantUtils::getDatabaseSchema)
-                .collect(Collectors.toList());
-
-        multiTenantSpringLiquibase.setSchemas(schemas);
+        multiTenantSpringLiquibase.setSchemas(List.of(TenantUtils.getDatabaseSchema(tenantId)));
         multiTenantSpringLiquibase.setChangeLog("classpath:config/liquibase/master.xml");
         multiTenantSpringLiquibase.setDefaultSchema(liquibaseProperties.getDefaultSchema());
         multiTenantSpringLiquibase.setDropFirst(liquibaseProperties.isDropFirst());
         multiTenantSpringLiquibase.setParameters(liquibaseProperties.getParameters());
 
-        try {
-            multiTenantSpringLiquibase.afterPropertiesSet();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        multiTenantSpringLiquibase.afterPropertiesSet();
     }
 
     @Override
