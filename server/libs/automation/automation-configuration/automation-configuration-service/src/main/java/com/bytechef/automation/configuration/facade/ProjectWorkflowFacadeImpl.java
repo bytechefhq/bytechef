@@ -75,6 +75,7 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.core.type.TypeReference;
@@ -136,6 +137,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE')")
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
         workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
 
@@ -147,6 +149,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_DELETE')")
     public void deleteSharedWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
@@ -160,6 +163,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_DELETE')")
     public void deleteWorkflow(String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -198,6 +202,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE') and " +
+        "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public String duplicateWorkflow(long projectId, String workflowId) {
         Project project = projectService.getWorkflowProject(workflowId);
 
@@ -217,6 +223,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public void exportSharedWorkflow(String workflowId, String description) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
@@ -316,6 +323,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
     public ProjectWorkflowDTO getProjectWorkflow(String workflowId) {
         ProjectWorkflow projectWorkflow = projectWorkflowService.getWorkflowProjectWorkflow(workflowId);
 
@@ -339,6 +347,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflowDTO> getProjectWorkflows(long projectId) {
         Project project = projectService.getProject(projectId);
 
@@ -363,6 +372,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     @Transactional(readOnly = true)
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflowDTO> getProjectVersionWorkflows(
         long projectId, int projectVersion, boolean includeAllFields) {
 
@@ -455,6 +465,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE')")
     public long importWorkflowTemplate(long projectId, String id, boolean sharedWorkflow) {
         if (!sharedWorkflow) {
             WorkflowTemplate workflowTemplate = preBuiltTemplateService.getWorkflowTemplate(id);
@@ -484,6 +495,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     }
 
     @Override
+    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
         workflowFacade.update(workflowId, definition, version);
 
