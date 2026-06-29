@@ -4,7 +4,15 @@ import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCop
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
-import {AppendMessage, AssistantRuntimeProvider, ThreadMessageLike, useExternalStoreRuntime} from '@assistant-ui/react';
+import {
+    AppendMessage,
+    AssistantRuntimeProvider,
+    type SuggestionConfig,
+    Suggestions,
+    ThreadMessageLike,
+    useAui,
+    useExternalStoreRuntime,
+} from '@assistant-ui/react';
 import {ReactNode, useMemo, useState} from 'react';
 import {toast} from 'sonner';
 import {useShallow} from 'zustand/react/shallow';
@@ -16,9 +24,11 @@ const convertMessage = (message: ThreadMessageLike): ThreadMessageLike => {
 export function CopilotRuntimeProvider({
     children,
     source: sourceProp,
+    suggestions,
 }: Readonly<{
     children: ReactNode;
     source?: Source;
+    suggestions?: SuggestionConfig[];
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
@@ -194,5 +204,11 @@ export function CopilotRuntimeProvider({
         onReload,
     });
 
-    return <AssistantRuntimeProvider runtime={runtime}>{children}</AssistantRuntimeProvider>;
+    const aui = useAui({suggestions: Suggestions(suggestions ?? [])}, {parent: null});
+
+    return (
+        <AssistantRuntimeProvider aui={aui} runtime={runtime}>
+            {children}
+        </AssistantRuntimeProvider>
+    );
 }
