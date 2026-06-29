@@ -22,6 +22,22 @@ export const isNodePositioned = (metadata: any): boolean =>
     metadata?.ui?.nodePosition !== undefined || metadata?.ui?.chainAlignedPosition !== undefined;
 
 /**
+ * Records `nodeId` in `visitedNodeIds` and reports whether it had already been
+ * seen. The chain-walking layout helpers below use this to break out of cyclic
+ * edge graphs — which a malformed workflow (e.g. duplicate node names producing
+ * duplicate node ids) can create — instead of looping forever and freezing the tab.
+ */
+function isAlreadyVisited(visitedNodeIds: Set<string>, nodeId: string): boolean {
+    if (visitedNodeIds.has(nodeId)) {
+        return true;
+    }
+
+    visitedNodeIds.add(nodeId);
+
+    return false;
+}
+
+/**
  * Returns the parent dispatcher ID for a node that is a child of a dispatcher.
  * Ghost/placeholder nodes use `taskDispatcherId` directly, while workflow child
  * nodes use dispatcher-specific data properties (conditionData, loopData, etc.).
@@ -308,11 +324,9 @@ function alignCaseChainNodes(
     const visitedNodeIds = new Set<string>();
 
     while (currentNodeId) {
-        if (visitedNodeIds.has(currentNodeId)) {
+        if (isAlreadyVisited(visitedNodeIds, currentNodeId)) {
             break;
         }
-
-        visitedNodeIds.add(currentNodeId);
 
         let nextNodeId = '';
 
@@ -508,11 +522,9 @@ export function separateOverlappingConditionChildren(allNodes: Node[], edges: Ed
             const visitedChainNodeIds = new Set<string>();
 
             while (chainNodeId) {
-                if (visitedChainNodeIds.has(chainNodeId)) {
+                if (isAlreadyVisited(visitedChainNodeIds, chainNodeId)) {
                     break;
                 }
-
-                visitedChainNodeIds.add(chainNodeId);
 
                 const chainNode = allNodes.find((node) => node.id === chainNodeId);
 
@@ -638,11 +650,9 @@ export function separateOverlappingOnErrorChildren(allNodes: Node[], edges: Edge
             const visitedChainNodeIds = new Set<string>();
 
             while (chainNodeId) {
-                if (visitedChainNodeIds.has(chainNodeId)) {
+                if (isAlreadyVisited(visitedChainNodeIds, chainNodeId)) {
                     break;
                 }
-
-                visitedChainNodeIds.add(chainNodeId);
 
                 const chainNode = allNodes.find((node) => node.id === chainNodeId);
 
@@ -809,11 +819,9 @@ export function centerNodesAfterBottomGhost(
         const visitedNodeIds = new Set<string>();
 
         while (currentNodeId) {
-            if (visitedNodeIds.has(currentNodeId)) {
+            if (isAlreadyVisited(visitedNodeIds, currentNodeId)) {
                 break;
             }
-
-            visitedNodeIds.add(currentNodeId);
 
             const currentNode = allNodes.find((node) => node.id === currentNodeId);
 
@@ -887,11 +895,9 @@ function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: No
     const visitedNodeIds = new Set<string>();
 
     while (currentNodeId) {
-        if (visitedNodeIds.has(currentNodeId)) {
+        if (isAlreadyVisited(visitedNodeIds, currentNodeId)) {
             return false;
         }
-
-        visitedNodeIds.add(currentNodeId);
 
         const currentNode = allNodes.find((node) => node.id === currentNodeId);
 
@@ -2640,11 +2646,9 @@ function collectChainMainNodeIds(
     const visitedNodeIds = new Set<string>();
 
     while (currentNodeId) {
-        if (currentNodeId === bottomGhostId || visitedNodeIds.has(currentNodeId)) {
+        if (currentNodeId === bottomGhostId || isAlreadyVisited(visitedNodeIds, currentNodeId)) {
             break;
         }
-
-        visitedNodeIds.add(currentNodeId);
 
         const currentNode = allNodes.find((node) => node.id === currentNodeId);
 
