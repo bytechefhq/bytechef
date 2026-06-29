@@ -198,9 +198,11 @@ const WorkflowEditorLayout = ({
                     copilotLayoutShifted && 'mr-0'
                 )}
             >
-                <SubflowBanner />
+                <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
+                    <SubflowBanner />
 
-                <DuplicateNodeNamesBanner />
+                    <DuplicateNodeNamesBanner />
+                </div>
 
                 {componentDefinitions && taskDispatcherDefinitions && (
                     <Suspense>
