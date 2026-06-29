@@ -1,0 +1,3 @@
+query knowledgeBaseEmbeddingActive($environment: Int!) {
+    knowledgeBaseEmbeddingActive(environment: $environment)
+}

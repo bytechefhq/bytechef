@@ -5,7 +5,9 @@ import KnowledgeBases from '../KnowledgeBases';
 
 const hoisted = vi.hoisted(() => {
     return {
+        currentEnvironmentId: 1,
         currentWorkspaceId: 1049,
+        mockUseKnowledgeBaseEmbeddingActiveQuery: vi.fn(),
         mockUseKnowledgeBases: vi.fn(),
     };
 });
@@ -19,6 +21,21 @@ vi.mock('@/pages/automation/stores/useWorkspaceStore', () => ({
         selector({currentWorkspaceId: hoisted.currentWorkspaceId})
     ),
 }));
+
+vi.mock('@/shared/stores/useEnvironmentStore', () => ({
+    useEnvironmentStore: vi.fn((selector: (state: {currentEnvironmentId: number}) => number) =>
+        selector({currentEnvironmentId: hoisted.currentEnvironmentId})
+    ),
+}));
+
+vi.mock('@/shared/middleware/graphql', async (importOriginal) => {
+    const actual = await importOriginal<typeof import('@/shared/middleware/graphql')>();
+
+    return {
+        ...actual,
+        useKnowledgeBaseEmbeddingActiveQuery: hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery,
+    };
+});
 
 vi.mock('@/components/PageLoader', () => ({
     default: ({children, errors, loading}: {children: React.ReactNode; errors: unknown[]; loading: boolean}) =>
@@ -151,6 +168,9 @@ const defaultMockReturn = {
 beforeEach(() => {
     windowResizeObserver();
     hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
+    hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
+        data: {knowledgeBaseEmbeddingActive: true},
+    });
 });
 
 afterEach(() => {
@@ -278,5 +298,62 @@ describe('KnowledgeBases', () => {
         render(<KnowledgeBases />);
 
         expect(screen.queryByTestId('filter-title')).not.toBeInTheDocument();
+    });
+});
+
+describe('KnowledgeBases embedding banner', () => {
+    beforeEach(() => {
+        windowResizeObserver();
+        hoisted.mockUseKnowledgeBases.mockReturnValue({...defaultMockReturn});
+    });
+
+    afterEach(() => {
+        resetAll();
+        vi.clearAllMocks();
+    });
+
+    it('shows the banner when embedding is not active', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
+            data: {knowledgeBaseEmbeddingActive: false},
+        });
+
+        render(<KnowledgeBases />);
+
+        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
+        expect(screen.getByText('Go to AI Providers')).toBeInTheDocument();
+    });
+
+    it('hides the banner when embedding is active', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
+            data: {knowledgeBaseEmbeddingActive: true},
+        });
+
+        render(<KnowledgeBases />);
+
+        expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
+    });
+
+    it('hides the banner by default when query has no data (fail-open)', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({data: undefined});
+
+        render(<KnowledgeBases />);
+
+        expect(screen.queryByText('No embedding model is active')).not.toBeInTheDocument();
+    });
+
+    it('shows the banner even when the knowledge base list is empty', () => {
+        hoisted.mockUseKnowledgeBaseEmbeddingActiveQuery.mockReturnValue({
+            data: {knowledgeBaseEmbeddingActive: false},
+        });
+
+        hoisted.mockUseKnowledgeBases.mockReturnValue({
+            ...defaultMockReturn,
+            filteredKnowledgeBases: [],
+            knowledgeBases: [],
+        });
+
+        render(<KnowledgeBases />);
+
+        expect(screen.getByText('No embedding model is active')).toBeInTheDocument();
     });
 });
