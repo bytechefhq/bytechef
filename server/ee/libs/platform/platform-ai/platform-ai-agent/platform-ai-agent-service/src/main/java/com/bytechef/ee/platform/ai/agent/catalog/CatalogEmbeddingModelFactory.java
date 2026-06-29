@@ -46,10 +46,12 @@ public class CatalogEmbeddingModelFactory {
     }
 
     private static @Nullable EmbeddingFunction resolveFactory(Provider provider) {
+        if (!provider.isEmbeddingSupported()) {
+            return null;
+        }
+
         return switch (provider) {
             case OPEN_AI -> OpenAiEmbedding.EMBEDDING_MODEL;
-            // Only OpenAI exposes embedding config today (bytechef.ai.provider.embedding.openai). Extend here when
-            // another provider gains embedding configuration.
             default -> null;
         };
     }
