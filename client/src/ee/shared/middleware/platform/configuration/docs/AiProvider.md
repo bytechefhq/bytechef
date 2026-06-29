@@ -12,6 +12,7 @@ Name | Type
 `icon` | string
 `apiKey` | string
 `enabled` | boolean
+`supportsEmbeddings` | boolean
 
 ## Example
 
@@ -25,6 +26,7 @@ const example = {
   "icon": null,
   "apiKey": null,
   "enabled": null,
+  "supportsEmbeddings": null,
 } satisfies AiProvider
 
 console.log(example)

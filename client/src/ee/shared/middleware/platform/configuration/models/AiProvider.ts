@@ -49,6 +49,12 @@ export interface AiProvider {
      * @memberof AiProvider
      */
     enabled?: boolean;
+    /**
+     * Whether this AI provider can be used for embeddings.
+     * @type {boolean}
+     * @memberof AiProvider
+     */
+    readonly supportsEmbeddings?: boolean;
 }
 
 /**
@@ -74,6 +80,7 @@ export function AiProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'icon': json['icon'] == null ? undefined : json['icon'],
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'supportsEmbeddings': json['supportsEmbeddings'] == null ? undefined : json['supportsEmbeddings'],
     };
 }
 
@@ -81,7 +88,7 @@ export function AiProviderToJSON(json: any): AiProvider {
     return AiProviderToJSONTyped(json, false);
 }
 
-export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'> | null, ignoreDiscriminator: boolean = false): any {
+export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'|'supportsEmbeddings'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
