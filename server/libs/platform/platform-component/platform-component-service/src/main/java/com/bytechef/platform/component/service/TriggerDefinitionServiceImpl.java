@@ -447,45 +447,65 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
         Parameters inputParameters = ParametersFactory.create(inputParameterMap);
         Parameters connectionParameters = ParametersFactory.create(componentConnection);
 
-        PollOutput pollOutput = pollFunctionApply(
-            pollFunction, inputParameters, connectionParameters, ParametersFactory.create(closureParameterMap),
-            triggerContext);
-
-        List<?> polledRecords = pollOutput.records();
         List<Object> records = new ArrayList<>();
-        int pollFunctionApplyCount = 1;
 
-        while (!polledRecords.isEmpty() || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
-            records.addAll(polledRecords.subList(0, Math.min(MAX_POLLING_TRIGGER_RECORDS, polledRecords.size())));
+        Object closureParameters = closureParameterMap;
 
-            if (pollOutput.pollImmediately() || records.size() >= MAX_POLLING_TRIGGER_RECORDS
-                || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
-                break;
+        try {
+            PollOutput pollOutput = pollFunctionApply(
+                pollFunction, inputParameters, connectionParameters, ParametersFactory.create(closureParameterMap),
+                triggerContext);
+
+            closureParameters = pollOutput.closureParameters();
+
+            List<?> polledRecords = pollOutput.records();
+            int pollFunctionApplyCount = 1;
+
+            while (!polledRecords.isEmpty() || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
+                records.addAll(polledRecords.subList(0, Math.min(MAX_POLLING_TRIGGER_RECORDS, polledRecords.size())));
+
+                if (pollOutput.pollImmediately() || records.size() >= MAX_POLLING_TRIGGER_RECORDS
+                    || pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS) {
+                    break;
+                }
+
+                pollOutput = pollFunctionApply(
+                    pollFunction, inputParameters, connectionParameters,
+                    ParametersFactory.create(pollOutput.closureParameters()), triggerContext);
+
+                closureParameters = pollOutput.closureParameters();
+                polledRecords = pollOutput.records();
+
+                pollFunctionApplyCount++;
             }
 
-            pollOutput = pollFunctionApply(
-                pollFunction, inputParameters, connectionParameters,
-                ParametersFactory.create(pollOutput.closureParameters()), triggerContext);
+            if (pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS
+                || records.size() >= MAX_POLLING_TRIGGER_RECORDS) {
 
-            polledRecords = pollOutput.records();
+                log.warn(
+                    "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
+                        "resume. Likely cause: component keeps requesting immediate re-poll without completing " +
+                        "pagination.",
+                    componentName, triggerName, pollFunctionApplyCount, records.size());
+            }
 
-            pollFunctionApplyCount++;
-        }
+            if (pollOutput.pollImmediately()) {
+                log.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
+            }
+        } catch (ProviderException providerException) {
+            if (!isRateLimitException(providerException)) {
+                throw providerException;
+            }
 
-        if (pollFunctionApplyCount >= MAX_POLLING_TRIGGER_ITERATIONS || records.size() >= MAX_POLLING_TRIGGER_RECORDS) {
             log.warn(
-                "Polling trigger '{}.{}' hit safety limit (iterations={}, records={}); next scheduled poll will " +
-                    "resume. Likely cause: component keeps requesting immediate re-poll without completing pagination.",
-                componentName, triggerName, pollFunctionApplyCount, records.size());
-        }
-
-        if (pollOutput.pollImmediately()) {
-            log.warn("Polling trigger '{}.{}' configured to poll immediately", componentName, triggerName);
+                "Polling trigger '{}.{}' skipped: provider rate limit/quota reached (HTTP {}). State preserved; the " +
+                    "next scheduled poll will retry. Provider message: {}",
+                componentName, triggerName, providerException.getStatusCode(), providerException.getMessage());
         }
 
         Optional<Boolean> triggerDefinitionBatch = triggerDefinition.getBatch();
 
-        return new TriggerOutput(records, pollOutput.closureParameters(), triggerDefinitionBatch.orElse(false));
+        return new TriggerOutput(records, closureParameters, triggerDefinitionBatch.orElse(false));
     }
 
     @SuppressWarnings("unchecked")
@@ -752,6 +772,12 @@ public class TriggerDefinitionServiceImpl implements TriggerDefinitionService {
 
         return triggerDefinition.getListenerEnable()
             .orElseThrow(() -> new IllegalArgumentException("Listener enable function is not defined."));
+    }
+
+    private static boolean isRateLimitException(ProviderException providerException) {
+        Integer statusCode = providerException.getStatusCode();
+
+        return statusCode != null && statusCode == HttpStatus.TOO_MANY_REQUESTS.getValue();
     }
 
     private Map<String, ?> toWebhookEnabledOutputParameters(@Nullable Object triggerState) {

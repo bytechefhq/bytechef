@@ -16,6 +16,7 @@
 
 package com.bytechef.platform.component.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -145,6 +146,60 @@ public class TriggerDefinitionServiceTest {
         assertSame(
             providerException, thrownException,
             "The thrown exception should be the same instance as the original ProviderException");
+    }
+
+    @Test
+    public void testExecutePollingTriggerSkipsOnRateLimit() {
+        TriggerDefinition mockTriggerDefinition = mock(TriggerDefinition.class);
+
+        when(mockTriggerDefinition.getType()).thenReturn(TriggerType.POLLING);
+        when(mockTriggerDefinition.getBatch()).thenReturn(Optional.of(false));
+
+        // A provider that has hit its per-minute quota: poll() fails with HTTP 429. The poll cycle must be skipped
+        // (no records, no exception) and the prior closure state preserved so the next scheduled poll resumes.
+        ProviderException providerException = new ProviderException(
+            429, "Quota exceeded for quota metric 'Expensive Reads'");
+
+        PollFunction mockPollFunction = (inputParameters, connectionParameters, closureParameters, context) -> {
+            throw providerException;
+        };
+
+        when(mockTriggerDefinition.getPoll()).thenReturn(Optional.of(mockPollFunction));
+
+        when(componentDefinitionRegistry.getTriggerDefinition("testComponent", 1, "testTrigger"))
+            .thenReturn(mockTriggerDefinition);
+
+        TriggerDefinitionServiceImpl triggerDefinitionService = new TriggerDefinitionServiceImpl(
+            componentDefinitionRegistry, contextFactory, eventPublisher, List.of());
+
+        Map<String, Object> priorState = Map.of("cursor", "page-1");
+
+        ListAppender<ILoggingEvent> logAppender = attachLogAppender();
+
+        TriggerOutput output;
+
+        try {
+            output = triggerDefinitionService.executeTrigger(
+                "testComponent", 1, "testTrigger", null, null, Collections.emptyMap(), priorState, null, null, null,
+                PlatformType.AUTOMATION, false);
+        } finally {
+            detachLogAppender(logAppender);
+        }
+
+        assertNotNull(output, "TriggerOutput should not be null");
+        assertInstanceOf(List.class, output.value(), "Output should be a List");
+        assertTrue(((List<?>) output.value()).isEmpty(), "A rate-limited poll should yield no records");
+        assertEquals(priorState, output.state(), "Closure state must be preserved across a skipped poll cycle");
+
+        boolean warningLogged = logAppender.list.stream()
+            .anyMatch(event -> {
+                String formattedMessage = event.getFormattedMessage();
+
+                return event.getLevel() == Level.WARN && formattedMessage.contains("testComponent")
+                    && formattedMessage.contains("testTrigger");
+            });
+
+        assertTrue(warningLogged, "A WARN naming the rate-limited trigger should be emitted instead of an error");
     }
 
     @Test
