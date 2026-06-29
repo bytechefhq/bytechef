@@ -50,15 +50,20 @@ public interface WorkflowValidatorFacade {
      * duplicate produces two nodes with the same id and a broken graph. Intended as a lightweight save-time guard that
      * does not resolve component/trigger definitions.
      *
+     * <p>
+     * Malformed workflow JSON that cannot be parsed also yields an empty list: this guard fails open on purpose because
+     * structurally invalid JSON is reported by the separate structure validation, not here.
+     *
      * @param workflow the workflow JSON string to inspect
-     * @return the duplicated node names, or an empty list when all node names are unique
+     * @return the duplicated node names, or an empty list when all node names are unique (or the JSON cannot be parsed)
      */
     List<String> getDuplicateNodeNames(String workflow);
 
     /**
      * Save-time guard that rejects a workflow whose node names are not unique. Delegates to
      * {@link #getDuplicateNodeNames(String)} so the guard and the editor's inline validation agree on what counts as a
-     * duplicate.
+     * duplicate. Consistent with that method, it fails open on workflow JSON that cannot be parsed (left to structure
+     * validation), so it only ever rejects genuine duplicate node names.
      *
      * @param workflow the workflow JSON string to inspect
      * @throws ConfigurationException if any node name occurs more than once
