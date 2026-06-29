@@ -29,6 +29,7 @@ type WorkflowEditorPropsType = {
     componentDefinitions: ComponentDefinitionBasic[];
     customCanvasWidth?: number;
     enableUndoRedo?: boolean;
+    fitViewOnWorkflowChange?: boolean;
     leftSidebarOpen?: boolean;
     taskDispatcherDefinitions: TaskDispatcherDefinitionBasic[];
 };
@@ -37,6 +38,7 @@ const WorkflowEditor = ({
     componentDefinitions,
     customCanvasWidth,
     enableUndoRedo,
+    fitViewOnWorkflowChange,
     leftSidebarOpen,
     readOnlyWorkflow,
     taskDispatcherDefinitions,
@@ -60,6 +62,7 @@ const WorkflowEditor = ({
         useWorkflowEditorCanvas({
             componentDefinitions,
             customCanvasWidth,
+            fitViewOnWorkflowChange,
             leftSidebarOpen,
             readOnlyWorkflow,
             taskDispatcherDefinitions,

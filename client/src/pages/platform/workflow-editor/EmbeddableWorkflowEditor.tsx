@@ -240,6 +240,7 @@ const EmbeddableWorkflowEditorInner = ({
                             <div className="flex size-full" ref={canvasContainerRef}>
                                 <WorkflowEditorLayout
                                     customCanvasWidth={canvasWidth}
+                                    fitViewOnWorkflowChange
                                     leftSidebarOpen={false}
                                     runDisabled={runDisabled}
                                     showCopilot={false}
