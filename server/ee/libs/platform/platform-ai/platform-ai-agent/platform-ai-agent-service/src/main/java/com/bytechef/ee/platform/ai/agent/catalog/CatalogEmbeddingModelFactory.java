@@ -13,6 +13,7 @@ import static com.bytechef.component.definition.Authorization.TOKEN;
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CatalogEmbeddingModelFactory {
 
     public @Nullable EmbeddingModel createEmbeddingModel(Provider provider, String model, String apiKey) {

@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -29,6 +30,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class CatalogChatClientResolverImpl implements CatalogChatClientResolver {
 
     private final CatalogChatModelFactory catalogChatModelFactory;

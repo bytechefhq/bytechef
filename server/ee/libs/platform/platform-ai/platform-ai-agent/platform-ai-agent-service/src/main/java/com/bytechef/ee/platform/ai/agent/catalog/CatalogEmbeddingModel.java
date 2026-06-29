@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.github.benmanes.caffeine.cache.Cache;
@@ -42,6 +43,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Primary
+@ConditionalOnEEVersion
 public class CatalogEmbeddingModel implements EmbeddingModel {
 
     private static final int MAX_CACHED_DELEGATES = 256;

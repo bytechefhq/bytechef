@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Component;
  * @author Ivica Cardic
  */
 @Component
+@ConditionalOnEEVersion
 public class ProviderApiKeyResolver {
 
     private final PropertyService propertyService;
