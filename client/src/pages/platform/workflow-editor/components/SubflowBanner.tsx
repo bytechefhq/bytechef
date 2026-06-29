@@ -59,7 +59,7 @@ const SubflowBanner = ({className}: {className?: string}) => {
     return (
         <div
             className={twMerge(
-                'absolute top-2 left-2 z-10 flex w-[483px] items-center gap-2 rounded-md border border-stroke-warning-secondary bg-surface-warning-secondary px-3 py-2',
+                'flex w-[483px] items-center gap-2 rounded-md border border-stroke-warning-secondary bg-surface-warning-secondary px-3 py-2',
                 className
             )}
         >

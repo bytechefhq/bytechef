@@ -36,7 +36,7 @@ const DuplicateNodeNamesBanner = ({className}: {className?: string}) => {
     return (
         <div
             className={twMerge(
-                'bg-surface-error-secondary absolute top-2 left-2 z-10 flex w-[520px] items-center gap-2 rounded-md border border-stroke-destructive-secondary px-3 py-2',
+                'bg-surface-error-secondary flex w-[520px] items-center gap-2 rounded-md border border-stroke-destructive-secondary px-3 py-2',
                 className
             )}
         >
