@@ -29,6 +29,7 @@ import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
 import com.bytechef.platform.definition.WorkflowNodeType;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.List;
@@ -44,15 +45,17 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
     private final ComponentConnectionFacade componentConnectionFacade;
     private final ComponentDefinitionService componentDefinitionService;
+    private final WorkflowValidatorFacade workflowValidatorFacade;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI")
     public WorkflowFacadeImpl(
         ComponentConnectionFacade componentConnectionFacade, ComponentDefinitionService componentDefinitionService,
-        WorkflowService workflowService) {
+        WorkflowValidatorFacade workflowValidatorFacade, WorkflowService workflowService) {
 
         this.componentConnectionFacade = componentConnectionFacade;
         this.componentDefinitionService = componentDefinitionService;
+        this.workflowValidatorFacade = workflowValidatorFacade;
         this.workflowService = workflowService;
     }
 
@@ -83,6 +86,8 @@ public class WorkflowFacadeImpl implements WorkflowFacade {
 
     @Override
     public void update(String id, String definition, Integer version) {
+        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+
         workflowService.update(id, definition, version);
     }
 

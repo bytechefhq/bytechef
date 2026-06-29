@@ -32,6 +32,7 @@ import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.dto.WorkflowDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -56,6 +57,9 @@ public class WorkflowFacadeTest {
     @Mock
     private WorkflowService workflowService;
 
+    @Mock
+    private WorkflowValidatorFacade workflowValidatorFacade;
+
     private WorkflowFacade workflowFacade;
 
     @Mock
@@ -63,7 +67,8 @@ public class WorkflowFacadeTest {
 
     @BeforeEach
     public void beforeEach() {
-        workflowFacade = new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
+        workflowFacade = new WorkflowFacadeImpl(
+            componentConnectionFacade, componentDefinitionService, workflowValidatorFacade, workflowService);
 
         when(testWorkflow.getId()).thenReturn("test-workflow-id");
         when(testWorkflow.getDefinition())

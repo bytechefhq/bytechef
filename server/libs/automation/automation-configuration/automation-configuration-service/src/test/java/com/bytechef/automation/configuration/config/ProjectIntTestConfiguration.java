@@ -38,6 +38,7 @@ import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -107,8 +108,16 @@ public class ProjectIntTestConfiguration {
     }
 
     @Bean
-    WorkflowFacade workflowFacade(WorkflowService workflowService) {
-        return new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
+    WorkflowFacade workflowFacade(
+        WorkflowValidatorFacade workflowValidatorFacade, WorkflowService workflowService) {
+
+        return new WorkflowFacadeImpl(
+            componentConnectionFacade, componentDefinitionService, workflowValidatorFacade, workflowService);
+    }
+
+    @Bean
+    WorkflowValidatorFacade workflowValidatorFacade() {
+        return mock(WorkflowValidatorFacade.class);
     }
 
     @Bean

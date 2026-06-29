@@ -16,6 +16,8 @@
 
 package com.bytechef.automation.ai.mcp.config;
 
+import static org.mockito.Mockito.mock;
+
 import com.bytechef.atlas.configuration.repository.WorkflowCrudRepository;
 import com.bytechef.atlas.configuration.repository.WorkflowRepository;
 import com.bytechef.atlas.configuration.service.WorkflowService;
@@ -32,6 +34,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
@@ -82,8 +85,16 @@ public class McpProjectIntTestConfiguration {
     }
 
     @Bean
-    WorkflowFacade workflowFacade(WorkflowService workflowService) {
-        return new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
+    WorkflowFacade workflowFacade(
+        WorkflowValidatorFacade workflowValidatorFacade, WorkflowService workflowService) {
+
+        return new WorkflowFacadeImpl(
+            componentConnectionFacade, componentDefinitionService, workflowValidatorFacade, workflowService);
+    }
+
+    @Bean
+    WorkflowValidatorFacade workflowValidatorFacade() {
+        return mock(WorkflowValidatorFacade.class);
     }
 
     @Bean
