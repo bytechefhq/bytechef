@@ -2634,6 +2634,7 @@ export type Query = {
   knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
   knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
+  knowledgeBaseEmbeddingActive: Scalars['Boolean']['output'];
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
@@ -3064,6 +3065,11 @@ export type QueryKnowledgeBaseDocumentArgs = {
 
 export type QueryKnowledgeBaseDocumentStatusArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseEmbeddingActiveArgs = {
+  environment: Scalars['Int']['input'];
 };
 
 
