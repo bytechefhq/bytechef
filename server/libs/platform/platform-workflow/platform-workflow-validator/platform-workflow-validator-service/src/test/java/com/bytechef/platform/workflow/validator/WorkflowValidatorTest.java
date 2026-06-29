@@ -3981,7 +3981,7 @@ class WorkflowValidatorTest {
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
             new HashMap<>(), new HashMap<>(), new HashMap<>(), errors, warnings);
 
-        assertEquals("Tasks cannot have repeating names: duplicate_name", errors.toString());
+        assertEquals("Node names must be unique. Duplicate node name: duplicate_name", errors.toString());
         assertEquals("", warnings.toString());
     }
 
@@ -4182,7 +4182,7 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowAddsNestedTasksToTaskDefinitionMapMultipleFlowsNoErrors() {
+    void validateWorkflowAddsNestedTasksToTaskDefinitionMapMultipleFlows() {
         String workflow = """
             {
                 "label": "Test Workflow",
@@ -4293,7 +4293,11 @@ class WorkflowValidatorTest {
         WorkflowValidator.validateWorkflow(workflow, taskDefProvider, taskOutputProvider, clusterTypesProvider,
             taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
 
-        assertEquals("", errors.toString());
+        assertEquals(
+            """
+                Node names must be unique. Duplicate node name: task3
+                Node names must be unique. Duplicate node name: task2""",
+            errors.toString());
         assertEquals("", warnings.toString());
         assertEquals(
             "{component/v1/action2=[], component/v1/action1=[], component/v1/trigger1=[], loop/v1=[], condition/v1=[]}",
