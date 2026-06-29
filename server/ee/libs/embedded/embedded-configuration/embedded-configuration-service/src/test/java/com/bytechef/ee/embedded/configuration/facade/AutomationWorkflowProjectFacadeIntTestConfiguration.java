@@ -30,6 +30,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.WorkflowTemplateProxyClient;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import java.io.InputStream;
 import java.util.List;
 import java.util.UUID;
@@ -103,9 +104,16 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
     @Bean
     WorkflowFacade workflowFacade(
         ComponentConnectionFacade componentConnectionFacade,
-        ComponentDefinitionService componentDefinitionService, WorkflowService workflowService) {
+        ComponentDefinitionService componentDefinitionService,
+        WorkflowValidatorFacade workflowValidatorFacade, WorkflowService workflowService) {
 
-        return new WorkflowFacadeImpl(componentConnectionFacade, componentDefinitionService, workflowService);
+        return new WorkflowFacadeImpl(
+            componentConnectionFacade, componentDefinitionService, workflowValidatorFacade, workflowService);
+    }
+
+    @Bean
+    WorkflowValidatorFacade workflowValidatorFacade() {
+        return mock(WorkflowValidatorFacade.class);
     }
 
     @Bean

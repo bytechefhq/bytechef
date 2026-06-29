@@ -53,6 +53,7 @@ import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplate;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateAuthor;
 import com.bytechef.platform.githubproxy.client.model.WorkflowTemplateSummary;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -102,6 +103,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
     private final List<WorkflowPreDeleteListener> workflowPreDeleteListeners;
     private final WorkflowService workflowService;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
+    private final WorkflowValidatorFacade workflowValidatorFacade;
 
     @SuppressFBWarnings("EI")
     public ProjectWorkflowFacadeImpl(
@@ -112,8 +114,8 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         ProjectWorkflowService projectWorkflowService, SharedTemplateFileStorage sharedTemplateFileStorage,
         SharedTemplateService sharedTemplateService, WorkflowCacheManager workflowCacheManager,
         WorkflowFacade workflowFacade, List<WorkflowPreDeleteListener> workflowPreDeleteListeners,
-        WorkflowService workflowService,
-        WorkflowTestConfigurationService workflowTestConfigurationService) {
+        WorkflowService workflowService, WorkflowTestConfigurationService workflowTestConfigurationService,
+        WorkflowValidatorFacade workflowValidatorFacade) {
 
         this.componentDefinitionHelper = componentDefinitionHelper;
         this.preBuiltTemplateService = preBuiltTemplateService;
@@ -130,10 +132,13 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
         this.workflowPreDeleteListeners = workflowPreDeleteListeners;
         this.workflowService = workflowService;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
+        this.workflowValidatorFacade = workflowValidatorFacade;
     }
 
     @Override
     public ProjectWorkflow addWorkflow(long projectId, String definition) {
+        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+
         Project project = projectService.getProject(projectId);
 
         Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
@@ -480,7 +485,7 @@ public class ProjectWorkflowFacadeImpl implements ProjectWorkflowFacade {
 
     @Override
     public ProjectWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
-        workflowService.update(workflowId, definition, version);
+        workflowFacade.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
             for (Environment environment : environmentService.getEnvironments()) {

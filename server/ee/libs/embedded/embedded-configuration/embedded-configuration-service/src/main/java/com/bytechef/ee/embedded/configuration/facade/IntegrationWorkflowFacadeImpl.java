@@ -26,6 +26,7 @@ import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.configuration.service.WorkflowTestConfigurationService;
+import com.bytechef.platform.workflow.validator.WorkflowValidatorFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Objects;
@@ -51,6 +52,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
     private final WorkflowCacheManager workflowCacheManager;
     private final WorkflowService workflowService;
     private final WorkflowFacade workflowFacade;
+    private final WorkflowValidatorFacade workflowValidatorFacade;
     private final WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @SuppressFBWarnings("EI")
@@ -60,6 +62,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         IntegrationInstanceConfigurationWorkflowService integrationInstanceConfigurationWorkflowService,
         IntegrationService integrationService, IntegrationWorkflowService integrationWorkflowService,
         WorkflowCacheManager workflowCacheManager, WorkflowService workflowService, WorkflowFacade workflowFacade,
+        WorkflowValidatorFacade workflowValidatorFacade,
         WorkflowTestConfigurationService workflowTestConfigurationService) {
 
         this.environmentService = environmentService;
@@ -70,11 +73,14 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
         this.workflowCacheManager = workflowCacheManager;
         this.workflowService = workflowService;
         this.workflowFacade = workflowFacade;
+        this.workflowValidatorFacade = workflowValidatorFacade;
         this.workflowTestConfigurationService = workflowTestConfigurationService;
     }
 
     @Override
     public long addWorkflow(long integrationId, String definition) {
+        workflowValidatorFacade.validateNoDuplicateNodeNames(definition);
+
         Integration integration = integrationService.getIntegration(integrationId);
 
         Workflow workflow = workflowService.create(definition, Workflow.Format.JSON, Workflow.SourceType.JDBC);
@@ -193,7 +199,7 @@ public class IntegrationWorkflowFacadeImpl implements IntegrationWorkflowFacade 
 
     @Override
     public IntegrationWorkflowDTO updateWorkflow(String workflowId, String definition, int version) {
-        workflowService.update(workflowId, definition, version);
+        workflowFacade.update(workflowId, definition, version);
 
         for (String cacheName : WorkflowNodeOutputFacade.WORKFLOW_CACHE_NAMES) {
             for (Environment environment : environmentService.getEnvironments()) {

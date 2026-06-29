@@ -86,7 +86,10 @@ public class WorkflowValidator {
 
             JsonNode workflowJsonNode = com.bytechef.commons.util.JsonUtils.readTree(workflow);
 
-            validateDuplicateNodeNames(workflowJsonNode, errors);
+            for (String duplicateNodeName : getDuplicateNodeNames(workflowJsonNode)) {
+                StringUtils.appendWithNewline(
+                    "Node names must be unique. Duplicate node name: " + duplicateNodeName, errors);
+            }
 
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
@@ -457,12 +460,20 @@ public class WorkflowValidator {
     }
 
     /**
-     * Collects every node name (the trigger plus all tasks, including tasks nested inside condition, loop, branch,
-     * parallel, each, fork-join and on-error dispatchers) and reports each name that occurs more than once. Node names
-     * are the ids of workflow nodes, so a duplicate name produces two nodes with the same id and a broken graph in the
-     * editor.
+     * Returns the node names (the trigger plus all tasks, including tasks nested inside condition, loop, branch,
+     * parallel, each, fork-join and on-error dispatchers) that occur more than once in the given workflow JSON. Node
+     * names are global ids of workflow nodes, so a duplicate name produces two nodes with the same id and a broken,
+     * unrenderable graph. A malformed workflow yields an empty list (it is reported by structure validation, not here).
      */
-    private static void validateDuplicateNodeNames(JsonNode workflowJsonNode, StringBuilder errors) {
+    public static List<String> getDuplicateNodeNames(String workflow) {
+        try {
+            return getDuplicateNodeNames(com.bytechef.commons.util.JsonUtils.readTree(workflow));
+        } catch (Exception e) {
+            return List.of();
+        }
+    }
+
+    static List<String> getDuplicateNodeNames(JsonNode workflowJsonNode) {
         List<String> nodeNames = new ArrayList<>();
 
         JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
@@ -488,9 +499,7 @@ public class WorkflowValidator {
             }
         }
 
-        for (String duplicateName : duplicateNames) {
-            StringUtils.appendWithNewline("Node names must be unique. Duplicate node name: " + duplicateName, errors);
-        }
+        return new ArrayList<>(duplicateNames);
     }
 
     /**

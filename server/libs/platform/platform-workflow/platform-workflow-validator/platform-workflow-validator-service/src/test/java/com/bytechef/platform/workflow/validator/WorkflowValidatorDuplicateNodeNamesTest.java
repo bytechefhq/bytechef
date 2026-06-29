@@ -16,9 +16,13 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.workflow.validator.exception.WorkflowValidatorErrorType;
 import com.bytechef.platform.workflow.validator.model.PropertyInfo;
 import java.util.HashMap;
 import java.util.List;
@@ -169,6 +173,66 @@ class WorkflowValidatorDuplicateNodeNamesTest {
             """;
 
         assertEquals("", validate(workflow));
+    }
+
+    @Test
+    void validateNoDuplicateNodeNamesThrowsWithErrorKeyOnDuplicate() {
+        String workflow = """
+            {
+                "label": "L",
+                "description": "D",
+                "triggers": [],
+                "tasks": [
+                    {"label": "T", "name": "task_1", "type": "logger/v1/info", "parameters": {}},
+                    {"label": "T", "name": "task_1", "type": "logger/v1/info", "parameters": {}}
+                ]
+            }
+            """;
+
+        ConfigurationException exception = assertThrows(
+            ConfigurationException.class, () -> duplicateNodeNamesFacade().validateNoDuplicateNodeNames(workflow));
+
+        assertEquals(WorkflowValidatorErrorType.DUPLICATE_NODE_NAMES.getErrorKey(), exception.getErrorKey());
+    }
+
+    @Test
+    void validateNoDuplicateNodeNamesPassesWhenUnique() {
+        String workflow = """
+            {
+                "label": "L",
+                "description": "D",
+                "triggers": [],
+                "tasks": [
+                    {"label": "T", "name": "task_1", "type": "logger/v1/info", "parameters": {}}
+                ]
+            }
+            """;
+
+        assertDoesNotThrow(() -> duplicateNodeNamesFacade().validateNoDuplicateNodeNames(workflow));
+    }
+
+    /**
+     * A minimal {@link WorkflowValidatorFacade} that exercises the real {@code validateNoDuplicateNodeNames} default
+     * method against the real duplicate detection, without resolving component/trigger definitions.
+     */
+    private static WorkflowValidatorFacade duplicateNodeNamesFacade() {
+        return new WorkflowValidatorFacade() {
+
+            @Override
+            public WorkflowValidationResult validateWorkflow(String workflow) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
+            public WorkflowValidationResult validateWorkflowById(String workflowId) {
+                return new WorkflowValidationResult(List.of(), List.of());
+            }
+
+            @Override
+            public List<String> getDuplicateNodeNames(String workflow) {
+                return WorkflowValidator.getDuplicateNodeNames(workflow);
+            }
+        };
     }
 
     private static String validate(String workflow) {

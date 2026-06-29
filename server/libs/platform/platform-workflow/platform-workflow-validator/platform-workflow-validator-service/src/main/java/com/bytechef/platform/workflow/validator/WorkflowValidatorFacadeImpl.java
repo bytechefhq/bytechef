@@ -108,6 +108,11 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
         return validateWorkflow(workflow.getDefinition());
     }
 
+    @Override
+    public List<String> getDuplicateNodeNames(String workflow) {
+        return WorkflowValidator.getDuplicateNodeNames(workflow);
+    }
+
     private List<PropertyInfo> getTaskProperties(String taskType, String kind) {
         try {
             WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(taskType);
