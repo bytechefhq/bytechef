@@ -68,7 +68,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public String getClusterElementWorkflowNodeDescription(
         String workflowId, String workflowNodeName, String clusterElementName, Long environmentId) {
 
@@ -88,7 +88,7 @@ public class WorkflowNodeDescriptionFacadeImpl implements WorkflowNodeDescriptio
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')")
     public String getWorkflowNodeDescription(String workflowId, String workflowNodeName, long environmentId) {
         Workflow workflow = workflowService.getWorkflow(workflowId);
         Map<String, ?> inputs = workflowTestConfigurationService.getWorkflowTestConfigurationInputs(

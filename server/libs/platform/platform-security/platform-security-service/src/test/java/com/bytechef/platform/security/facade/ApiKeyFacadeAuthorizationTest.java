@@ -33,22 +33,22 @@ class ApiKeyFacadeAuthorizationTest {
 
     @Test
     void testGetApiKeyRequiresOwner() {
-        assertExpression("getApiKey", "hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')");
+        assertExpression("getApiKey", "isResourceOwner(#id, 'ApiKey')");
     }
 
     @Test
     void testDeleteRequiresOwner() {
-        assertExpression("delete", "hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')");
+        assertExpression("delete", "isResourceOwner(#id, 'ApiKey')");
     }
 
     @Test
     void testUpdateRequiresOwner() {
-        assertExpression("update", "hasPermission(#apiKey.id, 'ApiKey:ResourceOwner', 'SELF')");
+        assertExpression("update", "isResourceOwner(#apiKey.id, 'ApiKey')");
     }
 
     @Test
     void testGetAdminApiKeysRequiresTenantAdmin() {
-        assertExpression("getAdminApiKeys", "hasPermission('Tenant', 'ADMIN')");
+        assertExpression("getAdminApiKeys", "isTenantAdmin()");
     }
 
     @Test

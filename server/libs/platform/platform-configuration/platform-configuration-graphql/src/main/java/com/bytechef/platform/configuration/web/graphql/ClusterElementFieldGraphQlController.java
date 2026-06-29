@@ -46,7 +46,7 @@ class ClusterElementFieldGraphQlController {
     }
 
     @QueryMapping
-    @PreAuthorize("#connectionId == null or hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_USE')")
+    @PreAuthorize("#connectionId == null or hasPermission(#connectionId, 'Connection', 'CONNECTION_USE')")
     public List<Field> clusterElementFields(
         @Argument String componentName, @Argument int componentVersion, @Argument String clusterElementName,
         @Argument @Nullable Long connectionId, @Argument @Nullable Map<String, ?> inputParameters) {

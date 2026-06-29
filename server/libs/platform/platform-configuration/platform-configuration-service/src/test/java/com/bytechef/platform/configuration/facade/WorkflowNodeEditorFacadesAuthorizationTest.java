@@ -25,9 +25,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 /**
  * Pins the {@code @PreAuthorize} expressions that close workflow-node editor IDOR (T22) across the output, dynamic
  * properties, description, and script facades. Every operation keys on its {@code workflowId} and resolves the owning
- * project's workspace via {@code @permissionService.hasWorkflowScope}; reads require {@code WORKFLOW_VIEW}, script
- * test-executions require {@code WORKFLOW_EDIT}. These facades are invoked only by the workflow-editor controllers (no
- * worker/execution method callers), so per-workflow gates are safe.
+ * project's workspace via {@code hasPermission(#workflowId, 'Workflow', ...)}; reads require {@code WORKFLOW_VIEW},
+ * script test-executions require {@code WORKFLOW_EDIT}. These facades are invoked only by the workflow-editor
+ * controllers (no worker/execution method callers), so per-workflow gates are safe.
  *
  * @author Ivica Cardic
  */
@@ -87,6 +87,6 @@ class WorkflowNodeEditorFacadesAuthorizationTest {
             .as("@PreAuthorize-annotated method %s on %s", methodName, clazz.getSimpleName())
             .isNotNull();
         assertThat(match.getAnnotation(PreAuthorize.class)
-            .value()).isEqualTo("@permissionService.hasWorkflowScope(#workflowId, '" + scope + "')");
+            .value()).isEqualTo("hasPermission(#workflowId, 'Workflow', '" + scope + "')");
     }
 }

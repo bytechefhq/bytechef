@@ -33,87 +33,87 @@ class WorkspaceDataTableFacadeAuthorizationTest {
 
     @Test
     void testCreateRequiresWorkspaceEditor() {
-        assertExpression("createTable", "hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')");
+        assertExpression("createTable", "hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_CREATE')");
     }
 
     @Test
     void testListRequiresWorkspaceViewer() {
-        assertExpression("listTables", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("listTables", "hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')");
     }
 
     @Test
     void testGetDataTableTagsRequiresWorkspaceViewer() {
-        assertExpression("getDataTableTags", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getDataTableTags", "hasPermission(#workspaceId, 'Workspace', 'DATA_TABLE_VIEW')");
     }
 
     @Test
     void testAddColumnRequiresTableEditor() {
-        assertExpression("addColumn", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("addColumn", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testDropRequiresTableEditor() {
-        assertExpression("dropTable", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("dropTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testDuplicateRequiresTableEditor() {
-        assertExpression("duplicateTable", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("duplicateTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testRemoveColumnRequiresTableEditor() {
-        assertExpression("removeColumn", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("removeColumn", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testRenameColumnRequiresTableEditor() {
-        assertExpression("renameColumn", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("renameColumn", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testRenameTableRequiresTableEditor() {
-        assertExpression("renameTable", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("renameTable", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testListRowsRequiresTableViewer() {
-        assertExpression("listRows", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')");
+        assertExpression("listRows", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
     }
 
     @Test
     void testInsertRowRequiresTableEditor() {
-        assertExpression("insertRow", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("insertRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testUpdateRowRequiresTableEditor() {
-        assertExpression("updateRow", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("updateRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testDeleteRowRequiresTableEditor() {
-        assertExpression("deleteRow", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("deleteRow", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testExportCsvRequiresTableViewer() {
-        assertExpression("exportCsv", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')");
+        assertExpression("exportCsv", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
     }
 
     @Test
     void testImportCsvRequiresTableEditor() {
-        assertExpression("importCsv", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("importCsv", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testUpdateTagsRequiresTableEditor() {
-        assertExpression("updateTags", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'EDITOR')");
+        assertExpression("updateTags", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_EDIT')");
     }
 
     @Test
     void testListWebhooksRequiresTableViewer() {
-        assertExpression("listWebhooks", "hasPermission(#dataTableId, 'DataTable:ResourceRole', 'VIEWER')");
+        assertExpression("listWebhooks", "hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')");
     }
 
     private static void assertExpression(String methodName, String expression) {

@@ -38,13 +38,13 @@ class AgentEvalTestServiceImpl implements AiAgentEvalTestService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalTest createAiAgentEvalTest(AiAgentEvalTest aiAgentEvalTest) {
         return agentEvalTestRepository.save(aiAgentEvalTest);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void deleteAiAgentEvalTest(long id) {
         agentEvalTestRepository.deleteById(id);
     }
@@ -76,7 +76,7 @@ class AgentEvalTestServiceImpl implements AiAgentEvalTestService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalTest updateAiAgentEvalTest(AiAgentEvalTest aiAgentEvalTest) {
         return agentEvalTestRepository.save(aiAgentEvalTest);
     }

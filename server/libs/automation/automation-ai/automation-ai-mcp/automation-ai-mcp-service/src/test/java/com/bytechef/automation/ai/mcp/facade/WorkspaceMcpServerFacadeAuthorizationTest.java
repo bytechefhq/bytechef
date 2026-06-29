@@ -33,27 +33,27 @@ class WorkspaceMcpServerFacadeAuthorizationTest {
 
     @Test
     void testGetWorkspaceMcpServersRequiresViewer() {
-        assertExpression("getWorkspaceMcpServers", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getWorkspaceMcpServers", "hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')");
     }
 
     @Test
     void testGetWorkspaceMcpServerTagsRequiresViewer() {
-        assertExpression("getWorkspaceMcpServerTags", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getWorkspaceMcpServerTags", "hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')");
     }
 
     @Test
     void testGetWorkspaceMcpProjectsRequiresViewer() {
-        assertExpression("getWorkspaceMcpProjects", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getWorkspaceMcpProjects", "hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')");
     }
 
     @Test
     void testCreateRequiresEditor() {
-        assertExpression("createWorkspaceMcpServer", "hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')");
+        assertExpression("createWorkspaceMcpServer", "hasPermission(#workspaceId, 'Workspace', 'MCP_CREATE')");
     }
 
     @Test
     void testDeleteRequiresServerEditor() {
-        assertExpression("deleteWorkspaceMcpServer", "hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')");
+        assertExpression("deleteWorkspaceMcpServer", "hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')");
     }
 
     private static void assertExpression(String methodName, String expression) {

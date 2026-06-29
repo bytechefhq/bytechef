@@ -42,7 +42,7 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MANAGE')")
     public Optional<GitConfigurationDTO> fetchGitConfiguration(long workspaceId) {
         return propertyService.fetchProperty(GIT_CONFIGURATION, Scope.WORKSPACE, workspaceId)
             .map(property -> ConvertUtils.convertValue(property.getValue(), GitConfigurationDTO.class));
@@ -56,7 +56,7 @@ public class GitConfigurationFacadeImpl implements GitConfigurationFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MANAGE')")
     public void save(GitConfigurationDTO gitConfigurationDTO, long workspaceId) {
         fetchGitConfiguration(workspaceId).ifPresentOrElse(
             curGitConfigurationDTO -> {

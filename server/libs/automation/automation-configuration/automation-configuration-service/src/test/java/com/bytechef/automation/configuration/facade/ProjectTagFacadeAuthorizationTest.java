@@ -40,7 +40,7 @@ class ProjectTagFacadeAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on updateProjectTags")
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#id, 'ProjectScope', 'WORKFLOW_EDIT')");
+        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')");
     }
 
     @Test
@@ -52,7 +52,7 @@ class ProjectTagFacadeAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on getProjectTags")
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')");
     }
 
     private static Method findMethod(String methodName, Class<?>... parameterTypes) {

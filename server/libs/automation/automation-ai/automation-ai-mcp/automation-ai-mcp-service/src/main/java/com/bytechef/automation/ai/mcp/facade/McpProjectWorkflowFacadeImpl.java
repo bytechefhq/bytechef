@@ -46,7 +46,7 @@ public class McpProjectWorkflowFacadeImpl implements McpProjectWorkflowFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
     public void deleteMcpProjectWorkflow(long mcpProjectWorkflowId) {
         McpProjectWorkflow mcpProjectWorkflow = mcpProjectWorkflowService.fetchMcpProjectWorkflow(mcpProjectWorkflowId)
             .orElseThrow(

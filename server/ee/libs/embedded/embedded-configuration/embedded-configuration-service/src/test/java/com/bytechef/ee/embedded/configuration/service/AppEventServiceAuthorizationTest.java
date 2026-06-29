@@ -58,7 +58,7 @@ class AppEventServiceAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on %s", methodName)
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission('Tenant', 'ADMIN')");
+        assertThat(preAuthorize.value()).isEqualTo("isTenantAdmin()");
     }
 
     private static void assertNotGated(String methodName) {

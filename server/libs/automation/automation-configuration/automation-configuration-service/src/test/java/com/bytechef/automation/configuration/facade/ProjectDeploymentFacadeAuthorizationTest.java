@@ -43,77 +43,77 @@ class ProjectDeploymentFacadeAuthorizationTest {
     @Test
     void testCreateProjectDeploymentRequiresWorkflowEdit() {
         assertExpression(
-            "hasPermission(#projectDeploymentDTO.projectId, 'ProjectScope', 'WORKFLOW_EDIT')",
+            "hasPermission(#projectDeploymentDTO.projectId, 'Project', 'WORKFLOW_EDIT')",
             "createProjectDeployment", ProjectDeploymentDTO.class);
     }
 
     @Test
     void testCreateProjectDeploymentWorkflowJobRequiresEditor() {
         assertExpression(
-            "hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "createProjectDeploymentWorkflowJob", Long.class, String.class);
     }
 
     @Test
     void testDeleteProjectDeploymentRequiresEditor() {
         assertExpression(
-            "hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "deleteProjectDeployment", long.class);
     }
 
     @Test
     void testEnableProjectDeploymentRequiresEditor() {
         assertExpression(
-            "hasPermission(#projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "enableProjectDeployment", long.class, boolean.class);
     }
 
     @Test
     void testEnableProjectDeploymentWorkflowRequiresEditor() {
         assertExpression(
-            "hasPermission(#projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "enableProjectDeploymentWorkflow", long.class, String.class, boolean.class);
     }
 
     @Test
     void testGetProjectDeploymentRequiresViewer() {
         assertExpression(
-            "hasPermission(#id, 'ProjectDeployment:ResourceRole', 'VIEWER')",
+            "hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_VIEW')",
             "getProjectDeployment", long.class);
     }
 
     @Test
     void testGetProjectDeploymentTagsRequiresWorkspaceViewer() {
         assertExpression(
-            "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')",
+            "hasPermission(#workspaceId, 'Workspace', 'DEPLOYMENT_VIEW')",
             "getProjectDeploymentTags", long.class);
     }
 
     @Test
     void testGetWorkspaceProjectDeploymentsRequiresWorkspaceViewer() {
         assertExpression(
-            "hasPermission(#id, 'WorkspaceRole', 'VIEWER')",
+            "hasPermission(#id, 'Workspace', 'DEPLOYMENT_VIEW')",
             "getWorkspaceProjectDeployments", long.class, Long.class, Long.class, Long.class, boolean.class);
     }
 
     @Test
     void testUpdateProjectDeploymentRequiresEditor() {
         assertExpression(
-            "hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#projectDeploymentDTO.id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "updateProjectDeployment", ProjectDeploymentDTO.class);
     }
 
     @Test
     void testUpdateProjectDeploymentTagsRequiresEditor() {
         assertExpression(
-            "hasPermission(#id, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#id, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "updateProjectDeploymentTags", long.class, List.class);
     }
 
     @Test
     void testUpdateProjectDeploymentWorkflowRequiresEditor() {
         assertExpression(
-            "hasPermission(#projectDeploymentWorkflow.projectDeploymentId, 'ProjectDeployment:ResourceRole', 'EDITOR')",
+            "hasPermission(#projectDeploymentWorkflow.projectDeploymentId, 'ProjectDeployment', 'DEPLOYMENT_EDIT')",
             "updateProjectDeploymentWorkflow", ProjectDeploymentWorkflow.class);
     }
 

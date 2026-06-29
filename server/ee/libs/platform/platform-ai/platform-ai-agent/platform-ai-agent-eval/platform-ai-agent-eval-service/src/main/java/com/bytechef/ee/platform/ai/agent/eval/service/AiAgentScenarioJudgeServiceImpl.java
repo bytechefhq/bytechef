@@ -37,13 +37,13 @@ class AgentScenarioJudgeServiceImpl implements AiAgentScenarioJudgeService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentScenarioJudge createAiAgentScenarioJudge(AiAgentScenarioJudge agentScenarioJudge) {
         return agentScenarioJudgeRepository.save(agentScenarioJudge);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void deleteAiAgentScenarioJudge(long id) {
         agentScenarioJudgeRepository.deleteById(id);
     }
@@ -63,7 +63,7 @@ class AgentScenarioJudgeServiceImpl implements AiAgentScenarioJudgeService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentScenarioJudge updateAiAgentScenarioJudge(AiAgentScenarioJudge agentScenarioJudge) {
         return agentScenarioJudgeRepository.save(agentScenarioJudge);
     }

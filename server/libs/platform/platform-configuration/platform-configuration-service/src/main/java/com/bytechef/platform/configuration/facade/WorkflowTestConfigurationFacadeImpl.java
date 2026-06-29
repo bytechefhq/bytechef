@@ -62,7 +62,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public void deleteWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
@@ -93,7 +93,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowTestConfiguration.workflowId, 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#workflowTestConfiguration.workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public WorkflowTestConfiguration saveWorkflowTestConfiguration(
         WorkflowTestConfiguration workflowTestConfiguration) {
 
@@ -106,7 +106,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public void saveClusterElementTestConfigurationConnection(
         String workflowId, String workflowNodeName, String clusterElementType,
         String clusterElementWorkflowNodeName, String workflowConnectionKey, long connectionId,
@@ -128,7 +128,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public void saveWorkflowTestConfigurationConnection(
         String workflowId, String workflowNodeName, String workflowConnectionKey, long connectionId,
         long environmentId) {
@@ -145,7 +145,7 @@ public class WorkflowTestConfigurationFacadeImpl implements WorkflowTestConfigur
     }
 
     @Override
-    @PreAuthorize("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')")
     public void saveWorkflowTestConfigurationInputs(String workflowId, String key, Object value, long environmentId) {
         Validate.notEmpty(key, "Missing required param: " + key);
 

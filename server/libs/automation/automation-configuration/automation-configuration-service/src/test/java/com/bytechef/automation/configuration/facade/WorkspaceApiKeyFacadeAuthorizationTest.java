@@ -33,17 +33,17 @@ class WorkspaceApiKeyFacadeAuthorizationTest {
 
     @Test
     void testCreateRequiresApiKeyCreateScope() {
-        assertExpression("create", "hasPermission(#workspaceId, 'WorkspaceScope', 'API_KEY_CREATE')");
+        assertExpression("create", "hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')");
     }
 
     @Test
     void testDeleteRequiresApiKeyDeleteScope() {
-        assertExpression("delete", "hasPermission(#apiKeyId, 'ApiKey:ResourceScope', 'API_KEY_DELETE')");
+        assertExpression("delete", "hasPermission(#apiKeyId, 'ApiKey', 'API_KEY_DELETE')");
     }
 
     @Test
     void testGetApiKeysRequiresApiKeyViewScope() {
-        assertExpression("getApiKeys", "hasPermission(#workspaceId, 'WorkspaceScope', 'API_KEY_VIEW')");
+        assertExpression("getApiKeys", "hasPermission(#workspaceId, 'Workspace', 'API_KEY_VIEW')");
     }
 
     private static void assertExpression(String methodName, String expression) {

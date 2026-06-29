@@ -34,22 +34,22 @@ class LogFileStorageAuthorizationTest {
 
     @Test
     void testReadLogEntriesRequiresJobViewer() {
-        assertExpression("readLogEntries", "hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')");
+        assertExpression("readLogEntries", "hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')");
     }
 
     @Test
     void testReadLogEntriesByJobIdRequiresJobViewer() {
-        assertExpression("readLogEntriesByJobId", "hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')");
+        assertExpression("readLogEntriesByJobId", "hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')");
     }
 
     @Test
     void testLogsExistRequiresJobViewer() {
-        assertExpression("logsExist", "hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')");
+        assertExpression("logsExist", "hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')");
     }
 
     @Test
     void testDeleteLogEntriesRequiresJobEditor() {
-        assertExpression("deleteLogEntries", "hasPermission(#jobId, 'Job:ResourceRole', 'EDITOR')");
+        assertExpression("deleteLogEntries", "hasPermission(#jobId, 'Job', 'EXECUTION_DELETE')");
     }
 
     @Test

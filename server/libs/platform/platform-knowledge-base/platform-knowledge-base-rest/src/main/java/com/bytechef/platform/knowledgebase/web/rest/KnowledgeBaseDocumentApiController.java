@@ -44,7 +44,7 @@ class KnowledgeBaseDocumentApiController {
     }
 
     @PostMapping("/{id}/documents")
-    @PreAuthorize("hasPermission(#id, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#id, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     ResponseEntity<KnowledgeBaseDocument> uploadDocument(
         @PathVariable Long id, @RequestParam("file") MultipartFile file) throws IOException {
 

@@ -51,7 +51,7 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceScope', 'API_KEY_CREATE')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_CREATE')")
     public String create(long workspaceId, ApiKey apiKey) {
         apiKey = apiKeyFacade.create(apiKey, PlatformType.AUTOMATION);
 
@@ -61,14 +61,14 @@ public class WorkspaceApiKeyFacadeImpl implements WorkspaceApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#apiKeyId, 'ApiKey:ResourceScope', 'API_KEY_DELETE')")
+    @PreAuthorize("hasPermission(#apiKeyId, 'ApiKey', 'API_KEY_DELETE')")
     public void delete(long apiKeyId) {
         workspaceApiKeyService.deleteWorkspaceApiKey(apiKeyId);
         apiKeyService.delete(apiKeyId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceScope', 'API_KEY_VIEW')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'API_KEY_VIEW')")
     public List<ApiKey> getApiKeys(long workspaceId, long environmentId) {
         List<Long> apiKeyIds = CollectionUtils.map(
             workspaceApiKeyService.getWorkspaceApiKeys(workspaceId), WorkspaceApiKey::getApiKeyId);

@@ -68,6 +68,6 @@ class EditorLogFileStorageReaderAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on %s", methodName)
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')");
+        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')");
     }
 }

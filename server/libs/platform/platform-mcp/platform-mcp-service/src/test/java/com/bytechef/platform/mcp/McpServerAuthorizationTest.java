@@ -41,20 +41,20 @@ class McpServerAuthorizationTest {
     void testGetMcpServerRequiresViewer() {
         assertExpression(
             McpServerServiceImpl.class, "getMcpServer",
-            "hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'VIEWER')",
+            "hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')",
             long.class);
     }
 
     @Test
     void testGetSecretKeyRequiresTenantAdmin() {
         assertExpression(
-            McpServerServiceImpl.class, "getMcpServerSecretKey", "hasPermission('Tenant', 'ADMIN')", long.class);
+            McpServerServiceImpl.class, "getMcpServerSecretKey", "isTenantAdmin()", long.class);
     }
 
     @Test
     void testUpdateRequiresEditor() {
         assertExpression(
-            McpServerServiceImpl.class, "update", "hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')",
+            McpServerServiceImpl.class, "update", "hasPermission(#id, 'McpServer', 'MCP_EDIT')",
             long.class, String.class, Boolean.class);
     }
 
@@ -62,21 +62,21 @@ class McpServerAuthorizationTest {
     void testDeleteMcpServerRequiresEditor() {
         assertExpression(
             McpServerFacadeImpl.class, "deleteMcpServer",
-            "hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')", long.class);
+            "hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')", long.class);
     }
 
     @Test
     void testUpdateMcpServerTagsRequiresEditor() {
         assertExpression(
             McpServerFacadeImpl.class, "updateMcpServerTags",
-            "hasPermission(#id, 'McpServer:ResourceRole', 'EDITOR')", long.class, java.util.List.class);
+            "hasPermission(#id, 'McpServer', 'MCP_EDIT')", long.class, java.util.List.class);
     }
 
     @Test
     void testCreateMcpComponentRequiresServerEditor() {
         assertExpression(
             McpServerFacadeImpl.class, "create",
-            "hasPermission(#mcpComponent.mcpServerId, 'McpServer:ResourceRole', 'EDITOR')",
+            "hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')",
             McpComponent.class, java.util.List.class);
     }
 
@@ -84,7 +84,7 @@ class McpServerAuthorizationTest {
     void testUpdateMcpComponentRequiresEditor() {
         assertExpression(
             McpServerFacadeImpl.class, "update",
-            "hasPermission(#mcpComponent.id, 'McpComponent:ResourceRole', 'EDITOR')",
+            "hasPermission(#mcpComponent.id, 'McpComponent', 'MCP_EDIT')",
             McpComponent.class, java.util.List.class);
     }
 
@@ -92,51 +92,51 @@ class McpServerAuthorizationTest {
     void testDeleteMcpComponentRequiresEditor() {
         assertExpression(
             McpServerFacadeImpl.class, "deleteMcpComponent",
-            "hasPermission(#mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')", long.class);
+            "hasPermission(#mcpComponentId, 'McpComponent', 'MCP_EDIT')", long.class);
     }
 
     @Test
     void testCreateMcpComponentServiceRequiresServerEditor() {
         assertExpression(
             McpComponentServiceImpl.class, "create",
-            "hasPermission(#mcpComponent.mcpServerId, 'McpServer:ResourceRole', 'EDITOR')", McpComponent.class);
+            "hasPermission(#mcpComponent.mcpServerId, 'McpServer', 'MCP_EDIT')", McpComponent.class);
     }
 
     @Test
     void testGetMcpComponentsRequiresTenantAdmin() {
-        assertExpression(McpComponentServiceImpl.class, "getMcpComponents", "hasPermission('Tenant', 'ADMIN')");
+        assertExpression(McpComponentServiceImpl.class, "getMcpComponents", "isTenantAdmin()");
     }
 
     @Test
     void testCreateMcpToolRequiresComponentEditor() {
         assertExpression(
             McpToolServiceImpl.class, "create",
-            "hasPermission(#mcpTool.mcpComponentId, 'McpComponent:ResourceRole', 'EDITOR')", McpTool.class);
+            "hasPermission(#mcpTool.mcpComponentId, 'McpComponent', 'MCP_EDIT')", McpTool.class);
     }
 
     @Test
     void testFetchMcpToolRequiresViewer() {
         assertExpression(
-            McpToolServiceImpl.class, "fetchMcpTool", "hasPermission(#mcpToolId, 'McpTool:ResourceRole', 'VIEWER')",
+            McpToolServiceImpl.class, "fetchMcpTool", "hasPermission(#mcpToolId, 'McpTool', 'MCP_VIEW')",
             long.class);
     }
 
     @Test
     void testGetMcpToolsRequiresTenantAdmin() {
-        assertExpression(McpToolServiceImpl.class, "getMcpTools", "hasPermission('Tenant', 'ADMIN')");
+        assertExpression(McpToolServiceImpl.class, "getMcpTools", "isTenantAdmin()");
     }
 
     @Test
     void testUpdateMcpToolRequiresEditor() {
         assertExpression(
-            McpToolServiceImpl.class, "update", "hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')",
+            McpToolServiceImpl.class, "update", "hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')",
             McpTool.class);
     }
 
     @Test
     void testDeleteMcpToolRequiresEditor() {
         assertExpression(
-            McpToolServiceImpl.class, "delete", "hasPermission(#mcpTool.id, 'McpTool:ResourceRole', 'EDITOR')",
+            McpToolServiceImpl.class, "delete", "hasPermission(#mcpTool.id, 'McpTool', 'MCP_EDIT')",
             McpTool.class);
     }
 

@@ -48,7 +48,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ApiClient:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'ApiClient')")
     public void delete(long id) {
         apiClientRepository.deleteById(id);
     }
@@ -67,7 +67,7 @@ public class ApiClientServiceImpl implements ApiClientService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#id, 'ApiClient:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'ApiClient')")
     public ApiClient getApiClient(long id) {
         return OptionalUtils.get(apiClientRepository.findById(id));
     }
@@ -97,7 +97,7 @@ public class ApiClientServiceImpl implements ApiClientService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#apiClient.id, 'ApiClient:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#apiClient.id, 'ApiClient')")
     public ApiClient update(ApiClient apiClient) {
         Assert.notNull(apiClient.getId(), "id");
         Assert.notNull(apiClient.getName(), "name");

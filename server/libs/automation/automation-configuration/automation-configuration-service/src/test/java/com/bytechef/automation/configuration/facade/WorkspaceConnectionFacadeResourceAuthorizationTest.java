@@ -36,27 +36,27 @@ class WorkspaceConnectionFacadeResourceAuthorizationTest {
     @Test
     void testGetConnectionRequiresConnectionView() {
         assertExpression("getConnection",
-            "hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_VIEW')");
+            "hasPermission(#connectionId, 'Connection', 'CONNECTION_VIEW')");
     }
 
     @Test
     void testDeleteRequiresConnectionDelete() {
-        assertExpression("delete", "hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_DELETE')");
+        assertExpression("delete", "hasPermission(#connectionId, 'Connection', 'CONNECTION_DELETE')");
     }
 
     @Test
     void testUpdateRequiresConnectionEdit() {
-        assertExpression("update", "hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_EDIT')");
+        assertExpression("update", "hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')");
     }
 
     @Test
     void testUpdateTagsRequiresConnectionEdit() {
-        assertExpression("updateTags", "hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_EDIT')");
+        assertExpression("updateTags", "hasPermission(#connectionId, 'Connection', 'CONNECTION_EDIT')");
     }
 
     @Test
     void testGetConnectionsRequiresWorkspaceConnectionView() {
-        assertExpression("getConnections", "hasPermission(#workspaceId, 'WorkspaceScope', 'CONNECTION_VIEW')");
+        assertExpression("getConnections", "hasPermission(#workspaceId, 'Workspace', 'CONNECTION_VIEW')");
     }
 
     private static void assertExpression(String methodName, String expression) {

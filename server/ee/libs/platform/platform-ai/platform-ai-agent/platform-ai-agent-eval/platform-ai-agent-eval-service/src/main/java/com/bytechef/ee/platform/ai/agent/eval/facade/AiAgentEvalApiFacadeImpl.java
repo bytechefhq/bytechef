@@ -50,43 +50,43 @@ class AiAgentEvalApiFacadeImpl implements AiAgentEvalApiFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<AiAgentJudge> getAgentJudges(String workflowId, String workflowNodeName) {
         return agentJudgeService.getAgentJudges(workflowId, workflowNodeName);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<AiAgentEvalTest> getAgentEvalTests(String workflowId, String workflowNodeName) {
         return agentEvalTestService.getAgentEvalTests(workflowId, workflowNodeName);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public Optional<AiAgentEvalTest> fetchAgentEvalTest(long id) {
         return agentEvalTestService.fetchAgentEvalTest(id);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<AiAgentEvalRun> getAgentEvalRuns(long agentEvalTestId) {
         return agentEvalRunService.getAgentEvalRuns(agentEvalTestId);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public Optional<AiAgentEvalRun> fetchAgentEvalRun(long id) {
         return agentEvalRunService.fetchAgentEvalRun(id);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public Optional<AiAgentEvalResult> fetchAgentEvalResult(long id) {
         return agentEvalResultService.fetchAgentEvalResult(id);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalResult getAgentEvalResult(long id) {
         return agentEvalResultService.getAgentEvalResult(id);
     }

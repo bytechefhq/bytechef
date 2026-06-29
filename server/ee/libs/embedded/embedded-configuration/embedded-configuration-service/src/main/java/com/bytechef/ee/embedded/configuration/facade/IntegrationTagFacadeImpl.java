@@ -42,7 +42,7 @@ public class IntegrationTagFacadeImpl implements IntegrationTagFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<Tag> getIntegrationTags() {
         List<Integration> integrations = integrationService.getIntegrations();
 
@@ -55,7 +55,7 @@ public class IntegrationTagFacadeImpl implements IntegrationTagFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationTags(long id, List<Tag> tags) {
         tags = CollectionUtils.isEmpty(tags) ? Collections.emptyList() : tagService.save(tags);
 

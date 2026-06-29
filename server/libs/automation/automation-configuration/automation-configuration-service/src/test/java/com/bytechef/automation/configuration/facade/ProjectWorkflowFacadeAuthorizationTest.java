@@ -25,7 +25,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Pins the {@code @PreAuthorize} expressions that close workflow IDOR (T22). Workflow-UUID operations resolve the
- * owning project's workspace via {@code @permissionService.hasWorkflowScope}; project-id operations use the
+ * owning project's workspace via {@code hasPermission(#workflowId, 'Workflow', ...)}; project-id operations use the
  * {@code ProjectScope} token directly.
  *
  * @author Ivica Cardic
@@ -34,59 +34,59 @@ class ProjectWorkflowFacadeAuthorizationTest {
 
     @Test
     void testAddWorkflowRequiresWorkflowCreate() {
-        assertExpression("addWorkflow", "hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE')");
+        assertExpression("addWorkflow", "hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')");
     }
 
     @Test
     void testDeleteWorkflowRequiresWorkflowDelete() {
-        assertExpression("deleteWorkflow", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_DELETE')");
+        assertExpression("deleteWorkflow", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_DELETE')");
     }
 
     @Test
     void testDeleteSharedWorkflowRequiresWorkflowDelete() {
-        assertExpression("deleteSharedWorkflow", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_DELETE')");
+        assertExpression("deleteSharedWorkflow", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_DELETE')");
     }
 
     @Test
     void testExportSharedWorkflowRequiresWorkflowView() {
-        assertExpression("exportSharedWorkflow", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')");
+        assertExpression("exportSharedWorkflow", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')");
     }
 
     @Test
     void testGetProjectWorkflowByWorkflowIdRequiresWorkflowView() {
-        assertExpression("getProjectWorkflow", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')",
+        assertExpression("getProjectWorkflow", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')",
             String.class);
     }
 
     @Test
     void testGetProjectWorkflowsByProjectIdRequiresWorkflowView() {
-        assertExpression("getProjectWorkflows", "hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_VIEW')",
+        assertExpression("getProjectWorkflows", "hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')",
             long.class);
     }
 
     @Test
     void testGetProjectVersionWorkflowsRequiresWorkflowView() {
         assertExpression(
-            "getProjectVersionWorkflows", "hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_VIEW')",
+            "getProjectVersionWorkflows", "hasPermission(#projectId, 'Project', 'WORKFLOW_VIEW')",
             long.class, int.class, boolean.class);
     }
 
     @Test
     void testImportWorkflowTemplateRequiresWorkflowCreate() {
-        assertExpression("importWorkflowTemplate", "hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE')");
+        assertExpression("importWorkflowTemplate", "hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE')");
     }
 
     @Test
     void testUpdateWorkflowRequiresWorkflowEdit() {
-        assertExpression("updateWorkflow", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+        assertExpression("updateWorkflow", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testDuplicateWorkflowRequiresCreateAndSourceView() {
         assertExpression(
             "duplicateWorkflow",
-            "hasPermission(#projectId, 'ProjectScope', 'WORKFLOW_CREATE') and "
-                + "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')");
+            "hasPermission(#projectId, 'Project', 'WORKFLOW_CREATE') and "
+                + "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')");
     }
 
     private static void assertExpression(String methodName, String expression, Class<?>... parameterTypes) {

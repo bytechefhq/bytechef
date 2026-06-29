@@ -65,7 +65,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')")
     public List<McpProject> getWorkspaceMcpProjects(Long workspaceId) {
         Set<Long> mcpServerIds = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId)
             .stream()
@@ -80,7 +80,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')")
     public List<McpServer> getWorkspaceMcpServers(Long workspaceId) {
         List<WorkspaceMcpServer> workspaceMcpServers = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId);
 
@@ -91,7 +91,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_VIEW')")
     public List<Tag> getWorkspaceMcpServerTags(Long workspaceId) {
         List<Long> tagIds = workspaceMcpServerService.getWorkspaceMcpServers(workspaceId)
             .stream()
@@ -108,7 +108,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'MCP_CREATE')")
     public McpServer createWorkspaceMcpServer(
         String name, PlatformType type, Environment environment, Boolean enabled, Long workspaceId) {
 
@@ -120,7 +120,7 @@ public class WorkspaceMcpServerFacadeImpl implements WorkspaceMcpServerFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public void deleteWorkspaceMcpServer(Long mcpServerId) {
         workspaceMcpServerService.removeMcpServerFromWorkspace(mcpServerId);
 

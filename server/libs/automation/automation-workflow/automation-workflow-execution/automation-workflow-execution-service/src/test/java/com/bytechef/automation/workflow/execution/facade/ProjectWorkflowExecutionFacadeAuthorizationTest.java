@@ -33,17 +33,17 @@ class ProjectWorkflowExecutionFacadeAuthorizationTest {
 
     @Test
     void testGetWorkflowExecutionRequiresJobViewer() {
-        assertExpression("getWorkflowExecution", "hasPermission(#id, 'Job:ResourceRole', 'VIEWER')");
+        assertExpression("getWorkflowExecution", "hasPermission(#id, 'Job', 'EXECUTION_VIEW')");
     }
 
     @Test
     void testGetWorkflowExecutionTaskExecutionRequiresJobViewer() {
-        assertExpression("getWorkflowExecutionTaskExecution", "hasPermission(#id, 'Job:ResourceRole', 'VIEWER')");
+        assertExpression("getWorkflowExecutionTaskExecution", "hasPermission(#id, 'Job', 'EXECUTION_VIEW')");
     }
 
     @Test
     void testGetWorkflowExecutionsRequiresWorkspaceViewer() {
-        assertExpression("getWorkflowExecutions", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getWorkflowExecutions", "hasPermission(#workspaceId, 'Workspace', 'EXECUTION_VIEW')");
     }
 
     private static void assertExpression(String methodName, String expression) {

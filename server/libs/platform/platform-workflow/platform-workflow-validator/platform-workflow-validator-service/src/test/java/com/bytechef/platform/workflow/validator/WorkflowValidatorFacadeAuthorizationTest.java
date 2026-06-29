@@ -24,8 +24,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Pins the workflow-validation gate (T22). {@code validateWorkflowById} resolves the owning project's workspace via
- * {@code @permissionService.hasWorkflowScope}; {@code validateWorkflow} validates a caller-supplied definition string
- * (no id, no IDOR) and stays ungated -- a negative assertion locks that in.
+ * {@code hasPermission(#workflowId, 'Workflow', ...)}; {@code validateWorkflow} validates a caller-supplied definition
+ * string (no id, no IDOR) and stays ungated -- a negative assertion locks that in.
  *
  * @author Ivica Cardic
  */
@@ -41,7 +41,7 @@ class WorkflowValidatorFacadeAuthorizationTest {
             .as("@PreAuthorize on validateWorkflowById")
             .isNotNull();
         assertThat(preAuthorize.value())
-            .isEqualTo("@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_VIEW')");
+            .isEqualTo("hasPermission(#workflowId, 'Workflow', 'WORKFLOW_VIEW')");
     }
 
     @Test

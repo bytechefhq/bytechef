@@ -73,7 +73,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
 
     @Override
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
-    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PULL')")
     public void pullProjectFromGit(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -128,7 +128,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PULL')")
     public List<String> getRemoteBranches(long projectId) {
         Workspace workspace = workspaceService.getProjectWorkspace(projectId);
 
@@ -139,7 +139,7 @@ public class ProjectGitFacadeImpl implements ProjectGitFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PUSH')")
+    @PreAuthorize("hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')")
     public String pushProjectToGit(long projectId, String commitMessage) {
         Project project = projectService.getProject(projectId);
 

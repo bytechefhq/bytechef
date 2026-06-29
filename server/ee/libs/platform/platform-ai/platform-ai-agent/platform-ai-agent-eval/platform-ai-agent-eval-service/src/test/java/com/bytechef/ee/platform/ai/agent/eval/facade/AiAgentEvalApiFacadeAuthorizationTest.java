@@ -57,6 +57,6 @@ class AiAgentEvalApiFacadeAuthorizationTest {
             .isNotNull();
         assertThat(preAuthorize.value())
             .as("@PreAuthorize expression on %s", methodName)
-            .isEqualTo("hasPermission('Tenant', 'ADMIN')");
+            .isEqualTo("isTenantAdmin()");
     }
 }

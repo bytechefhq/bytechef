@@ -33,11 +33,11 @@ import org.springframework.security.core.Authentication;
  * without it, anonymous callers slip past admin-only mutations.
  *
  * <p>
- * The resource-scope authorization (the {@code hasPermission('KnowledgeBase:ResourceRole', ...)} tokens) is exercised
- * by the {@code *AuthorizationTest} reflection tests and the evaluator/permission-service unit tests; these GraphQL
- * slice tests focus on wiring/behavior, so a permissive {@link PermissionEvaluator} is provided so the per-id
- * authorization does not deny the behavioral assertions. Authority-based checks ({@code hasAuthority('ROLE_ADMIN')}) do
- * not go through the evaluator and remain enforced.
+ * The resource-scope authorization (the {@code hasPermission('KnowledgeBase', ...)} tokens) is exercised by the
+ * {@code *AuthorizationTest} reflection tests and the evaluator/permission-service unit tests; these GraphQL slice
+ * tests focus on wiring/behavior, so a permissive {@link PermissionEvaluator} is provided so the per-id authorization
+ * does not deny the behavioral assertions. Authority-based checks ({@code hasAuthority('ROLE_ADMIN')}) do not go
+ * through the evaluator and remain enforced.
  *
  * @author Ivica Cardic
  */

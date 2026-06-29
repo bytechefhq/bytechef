@@ -29,13 +29,14 @@ class GitConfigurationFacadeAuthorizationTest {
     @Test
     void testFetchGitConfigurationRequiresWorkspaceAdmin() {
         assertExpression(
-            "fetchGitConfiguration", "hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')", long.class);
+            "fetchGitConfiguration", "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MANAGE')", long.class);
     }
 
     @Test
     void testSaveRequiresWorkspaceAdmin() {
         assertExpression(
-            "save", "hasPermission(#workspaceId, 'WorkspaceRole', 'ADMIN')", GitConfigurationDTO.class, long.class);
+            "save", "hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_MANAGE')", GitConfigurationDTO.class,
+            long.class);
     }
 
     @Test

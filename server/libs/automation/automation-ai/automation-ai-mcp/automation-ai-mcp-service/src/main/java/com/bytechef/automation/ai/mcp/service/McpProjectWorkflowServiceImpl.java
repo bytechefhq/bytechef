@@ -54,14 +54,14 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')")
     public void delete(long mcpProjectWorkflowId) {
         mcpProjectWorkflowRepository.deleteById(mcpProjectWorkflowId);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_VIEW')")
     public Optional<McpProjectWorkflow> fetchMcpProjectWorkflow(long mcpProjectWorkflowId) {
         return mcpProjectWorkflowRepository.findById(mcpProjectWorkflowId);
     }
@@ -97,7 +97,7 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')")
     public McpProjectWorkflow update(long id, Long mcpProjectId, Long projectDeploymentWorkflowId) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));
@@ -114,7 +114,7 @@ public class McpProjectWorkflowServiceImpl implements McpProjectWorkflowService 
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')")
     public McpProjectWorkflow updateParameters(long id, Map<String, ?> parameters) {
         McpProjectWorkflow existingMcpProjectWorkflow = fetchMcpProjectWorkflow(id)
             .orElseThrow(() -> new IllegalArgumentException("McpProjectWorkflow not found with id: " + id));

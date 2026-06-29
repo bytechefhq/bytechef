@@ -68,7 +68,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')")
     public McpProject createMcpProject(
         long mcpServerId, long projectId, int projectVersion, List<String> selectedWorkflowIds) {
 
@@ -109,7 +109,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public void deleteMcpProject(long mcpProjectId) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -135,7 +135,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds) {
         McpProject mcpProject = mcpProjectService.fetchMcpProject(mcpProjectId)
             .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
@@ -194,7 +194,7 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')")
     public McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId) {
         // Resolve the source first so a forged mcpProjectId or stale id surfaces a typed IllegalArgumentException
         // before we try to provision the deployment for the clone — failing fast keeps the rollback surface small.

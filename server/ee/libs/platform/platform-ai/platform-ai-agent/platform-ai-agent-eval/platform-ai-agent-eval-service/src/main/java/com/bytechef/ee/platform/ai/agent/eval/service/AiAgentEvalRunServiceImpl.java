@@ -39,13 +39,13 @@ class AgentEvalRunServiceImpl implements AiAgentEvalRunService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalRun createAgentEvalRun(AiAgentEvalRun aiAgentEvalRun) {
         return agentEvalRunRepository.save(aiAgentEvalRun);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void deleteAgentEvalRun(long id) {
         agentEvalRunRepository.deleteById(id);
     }

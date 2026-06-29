@@ -39,7 +39,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void delete(long notificationId) {
         notificationRepository.deleteById(notificationId);
     }

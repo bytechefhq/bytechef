@@ -81,7 +81,7 @@ class AiAgentEvalAuthorizationTest {
             .as("@PreAuthorize-annotated method %s on %s", methodName, clazz.getSimpleName())
             .isNotNull();
         assertThat(match.getAnnotation(PreAuthorize.class)
-            .value()).isEqualTo("hasPermission('Tenant', 'ADMIN')");
+            .value()).isEqualTo("isTenantAdmin()");
     }
 
     private static void assertNotGated(Class<?> clazz, String methodName) {

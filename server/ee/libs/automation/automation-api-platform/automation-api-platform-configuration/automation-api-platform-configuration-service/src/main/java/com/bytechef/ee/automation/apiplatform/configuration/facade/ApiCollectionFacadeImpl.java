@@ -204,7 +204,7 @@ public class ApiCollectionFacadeImpl implements ApiCollectionFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')")
     public List<Tag> getApiCollectionTags(long workspaceId) {
         List<ApiCollection> apiCollections = apiCollectionService.getApiCollections(workspaceId, null, null, null);
 

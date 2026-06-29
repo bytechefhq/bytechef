@@ -24,17 +24,17 @@ class ProjectGitFacadeAuthorizationTest {
 
     @Test
     void testPullRequiresDeploymentPull() {
-        assertExpression("pullProjectFromGit", "hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')");
+        assertExpression("pullProjectFromGit", "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PULL')");
     }
 
     @Test
     void testGetRemoteBranchesRequiresDeploymentPull() {
-        assertExpression("getRemoteBranches", "hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PULL')");
+        assertExpression("getRemoteBranches", "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PULL')");
     }
 
     @Test
     void testPushRequiresDeploymentPush() {
-        assertExpression("pushProjectToGit", "hasPermission(#projectId, 'ProjectScope', 'DEPLOYMENT_PUSH')");
+        assertExpression("pushProjectToGit", "hasPermission(#projectId, 'Project', 'DEPLOYMENT_PUSH')");
     }
 
     private static void assertExpression(String methodName, String expression) {

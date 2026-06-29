@@ -39,7 +39,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentScenarioToolSimulation createAiAgentScenarioToolSimulation(
         AiAgentScenarioToolSimulation toolSimulation) {
 
@@ -47,7 +47,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void deleteAiAgentScenarioToolSimulation(long id) {
         agentScenarioToolSimulationRepository.deleteById(id);
     }
@@ -67,7 +67,7 @@ class AgentScenarioToolSimulationServiceImpl implements AiAgentScenarioToolSimul
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentScenarioToolSimulation updateAiAgentScenarioToolSimulation(
         AiAgentScenarioToolSimulation toolSimulation) {
 

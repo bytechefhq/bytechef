@@ -38,7 +38,7 @@ class WorkspaceConnectionTagFacadeAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on getConnectionTags")
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertThat(preAuthorize.value()).isEqualTo("hasPermission(#workspaceId, 'Workspace', 'CONNECTION_VIEW')");
     }
 
     private static Method findMethod(String methodName, Class<?>... parameterTypes) {

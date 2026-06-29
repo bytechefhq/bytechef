@@ -33,12 +33,12 @@ class WebhookTriggerTestApiFacadeAuthorizationTest {
 
     @Test
     void testEnableTriggerRequiresWorkflowEdit() {
-        assertExpression("enableTrigger", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+        assertExpression("enableTrigger", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testDisableTriggerRequiresWorkflowEdit() {
-        assertExpression("disableTrigger", "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+        assertExpression("disableTrigger", "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     private static void assertExpression(String methodName, String expression) {

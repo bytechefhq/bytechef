@@ -43,7 +43,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<NotificationDTO> getNotifications() {
         return notificationService.getNotifications()
             .stream()
@@ -53,7 +53,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public NotificationDTO createNotification(Notification notification) {
 
         notification = notificationService.create(notification);
@@ -64,7 +64,7 @@ public class NotificationFacadeImpl implements NotificationFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public NotificationDTO updateNotification(Notification notification) {
         notification = notificationService.update(notification);
 

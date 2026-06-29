@@ -49,7 +49,7 @@ public class AssetFileTagServiceImpl implements AssetFileTagService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKSPACE_VIEW')")
     public List<Tag> getAllTags(long workspaceId) {
         Set<Long> tagIdSet = new HashSet<>();
 

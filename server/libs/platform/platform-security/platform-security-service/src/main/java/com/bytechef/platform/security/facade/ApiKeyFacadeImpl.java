@@ -54,19 +54,19 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'ApiKey')")
     public void delete(long id) {
         apiKeyService.delete(id);
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public java.util.List<ApiKey> getAdminApiKeys(long environmentId) {
         return apiKeyService.getApiKeys(environmentId, null);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ApiKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'ApiKey')")
     public ApiKey getApiKey(long id) {
         return apiKeyService.getApiKey(id);
     }
@@ -78,7 +78,7 @@ public class ApiKeyFacadeImpl implements ApiKeyFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#apiKey.id, 'ApiKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#apiKey.id, 'ApiKey')")
     public ApiKey update(ApiKey apiKey) {
         return apiKeyService.update(apiKey);
     }

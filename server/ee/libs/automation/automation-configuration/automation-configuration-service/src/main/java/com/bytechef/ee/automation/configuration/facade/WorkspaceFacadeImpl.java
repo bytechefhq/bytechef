@@ -45,7 +45,7 @@ public class WorkspaceFacadeImpl implements WorkspaceFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN') or hasPermission(#id, 'User', 'SELF')")
+    @PreAuthorize("isTenantAdmin() or isCurrentUser(#id)")
     @Transactional(readOnly = true)
     public List<Workspace> getUserWorkspaces(long id) {
         List<Workspace> workspaces = workspaceService.getWorkspaces();

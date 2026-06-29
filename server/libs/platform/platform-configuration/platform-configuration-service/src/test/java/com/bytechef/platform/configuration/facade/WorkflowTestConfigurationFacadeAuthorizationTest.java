@@ -24,7 +24,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Pins the workflow-test-configuration write gates (T22). Each editor write resolves the owning project's workspace via
- * {@code @permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')} (or {@code #workflowTestConfiguration
+ * {@code hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')} (or {@code #workflowTestConfiguration
  * .workflowId} for the object overload). {@code removeUnusedWorkflowTestConfigurationConnections} is an internal
  * after-save event-listener cleanup (no user controller caller) and stays ungated -- a negative assertion locks that
  * in.
@@ -37,35 +37,35 @@ class WorkflowTestConfigurationFacadeAuthorizationTest {
     void testDeleteConnectionRequiresEdit() {
         assertExpression(
             "deleteWorkflowTestConfigurationConnection",
-            "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+            "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testSaveConfigurationRequiresEdit() {
         assertExpression(
             "saveWorkflowTestConfiguration",
-            "@permissionService.hasWorkflowScope(#workflowTestConfiguration.workflowId, 'WORKFLOW_EDIT')");
+            "hasPermission(#workflowTestConfiguration.workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testSaveClusterElementConnectionRequiresEdit() {
         assertExpression(
             "saveClusterElementTestConfigurationConnection",
-            "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+            "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testSaveConnectionRequiresEdit() {
         assertExpression(
             "saveWorkflowTestConfigurationConnection",
-            "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+            "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test
     void testSaveInputsRequiresEdit() {
         assertExpression(
             "saveWorkflowTestConfigurationInputs",
-            "@permissionService.hasWorkflowScope(#workflowId, 'WORKFLOW_EDIT')");
+            "hasPermission(#workflowId, 'Workflow', 'WORKFLOW_EDIT')");
     }
 
     @Test

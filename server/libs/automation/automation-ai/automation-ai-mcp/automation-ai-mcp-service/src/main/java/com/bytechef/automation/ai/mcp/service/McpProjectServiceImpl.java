@@ -62,7 +62,7 @@ public class McpProjectServiceImpl implements McpProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#mcpProjectId, 'McpProject', 'MCP_VIEW')")
     public Optional<McpProject> fetchMcpProject(long mcpProjectId) {
         return mcpProjectRepository.findById(mcpProjectId);
     }
@@ -73,7 +73,7 @@ public class McpProjectServiceImpl implements McpProjectService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#mcpServerId, 'McpServer', 'MCP_VIEW')")
     public List<McpProject> getMcpServerMcpProjects(long mcpServerId) {
         return mcpProjectRepository.findAllByMcpServerId(mcpServerId);
     }

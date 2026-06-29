@@ -84,7 +84,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'SigningKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'SigningKey')")
     public void delete(long id) {
         signingKeyRepository.deleteById(id);
     }
@@ -106,7 +106,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#id, 'SigningKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#id, 'SigningKey')")
     public SigningKey getSigningKey(long id) {
         return signingKeyRepository.findById(id)
             .orElseThrow(() -> new IllegalArgumentException("Signing key not found for id: " + id));
@@ -119,7 +119,7 @@ public class SigningKeyServiceImpl implements SigningKeyService {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#signingKey.id, 'SigningKey:ResourceOwner', 'SELF')")
+    @PreAuthorize("isResourceOwner(#signingKey.id, 'SigningKey')")
     public SigningKey update(SigningKey signingKey) {
         Assert.notNull(signingKey, "'signingKey' must not be null");
 

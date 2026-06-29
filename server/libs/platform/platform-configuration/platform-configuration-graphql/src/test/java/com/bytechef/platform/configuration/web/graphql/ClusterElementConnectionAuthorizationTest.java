@@ -32,7 +32,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 class ClusterElementConnectionAuthorizationTest {
 
     private static final String EXPRESSION =
-        "#connectionId == null or hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_USE')";
+        "#connectionId == null or hasPermission(#connectionId, 'Connection', 'CONNECTION_USE')";
 
     @Test
     void testClusterElementOptionsGuardsConnection() {

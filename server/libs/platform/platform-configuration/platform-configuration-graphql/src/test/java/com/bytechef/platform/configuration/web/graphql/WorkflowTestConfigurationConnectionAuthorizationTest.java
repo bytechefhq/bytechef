@@ -31,7 +31,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 class WorkflowTestConfigurationConnectionAuthorizationTest {
 
     private static final String EXPRESSION =
-        "hasPermission(#connectionId, 'Connection:ResourceScope', 'CONNECTION_USE')";
+        "hasPermission(#connectionId, 'Connection', 'CONNECTION_USE')";
 
     @Test
     void testSaveWorkflowTestConfigurationConnectionGuardsConnection() {

@@ -23,17 +23,17 @@ class ApiClientServiceAuthorizationTest {
 
     @Test
     void testGetApiClientRequiresOwner() {
-        assertExpression("getApiClient", "hasPermission(#id, 'ApiClient:ResourceOwner', 'SELF')");
+        assertExpression("getApiClient", "isResourceOwner(#id, 'ApiClient')");
     }
 
     @Test
     void testUpdateRequiresOwner() {
-        assertExpression("update", "hasPermission(#apiClient.id, 'ApiClient:ResourceOwner', 'SELF')");
+        assertExpression("update", "isResourceOwner(#apiClient.id, 'ApiClient')");
     }
 
     @Test
     void testDeleteRequiresOwner() {
-        assertExpression("delete", "hasPermission(#id, 'ApiClient:ResourceOwner', 'SELF')");
+        assertExpression("delete", "isResourceOwner(#id, 'ApiClient')");
     }
 
     private static void assertExpression(String methodName, String expression) {

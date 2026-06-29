@@ -37,35 +37,35 @@ class McpProjectWorkflowAuthorizationTest {
     void testFetchRequiresViewer() {
         assertExpression(
             McpProjectWorkflowServiceImpl.class, "fetchMcpProjectWorkflow",
-            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'VIEWER')");
+            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_VIEW')");
     }
 
     @Test
     void testDeleteServiceRequiresEditor() {
         assertExpression(
             McpProjectWorkflowServiceImpl.class, "delete",
-            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'EDITOR')");
+            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')");
     }
 
     @Test
     void testUpdateRequiresEditor() {
         assertExpression(
             McpProjectWorkflowServiceImpl.class, "update",
-            "hasPermission(#id, 'McpProjectWorkflow:ResourceRole', 'EDITOR')");
+            "hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')");
     }
 
     @Test
     void testUpdateParametersRequiresEditor() {
         assertExpression(
             McpProjectWorkflowServiceImpl.class, "updateParameters",
-            "hasPermission(#id, 'McpProjectWorkflow:ResourceRole', 'EDITOR')");
+            "hasPermission(#id, 'McpProjectWorkflow', 'MCP_EDIT')");
     }
 
     @Test
     void testFacadeDeleteRequiresEditor() {
         assertExpression(
             McpProjectWorkflowFacadeImpl.class, "deleteMcpProjectWorkflow",
-            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow:ResourceRole', 'EDITOR')");
+            "hasPermission(#mcpProjectWorkflowId, 'McpProjectWorkflow', 'MCP_EDIT')");
     }
 
     private static void assertExpression(Class<?> clazz, String methodName, String expression) {

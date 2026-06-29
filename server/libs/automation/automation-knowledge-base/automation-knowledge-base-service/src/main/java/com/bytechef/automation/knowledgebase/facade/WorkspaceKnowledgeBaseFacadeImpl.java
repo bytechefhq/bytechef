@@ -72,7 +72,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
     public List<Tag> getKnowledgeBaseTags(long workspaceId) {
         List<Long> knowledgeBaseIds = workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId)
             .stream()
@@ -85,7 +85,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')")
     public List<KnowledgeBase> getWorkspaceKnowledgeBases(Long workspaceId, long environmentId) {
         List<WorkspaceKnowledgeBase> workspaceKnowledgeBases =
             workspaceKnowledgeBaseService.getWorkspaceKnowledgeBases(workspaceId);
@@ -99,20 +99,20 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
     public KnowledgeBase getKnowledgeBase(Long knowledgeBaseId) {
         return knowledgeBaseService.getKnowledgeBase(knowledgeBaseId);
     }
 
     @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public KnowledgeBase updateKnowledgeBase(Long knowledgeBaseId, KnowledgeBase knowledgeBase) {
         return knowledgeBaseService.updateKnowledgeBase(knowledgeBaseId, knowledgeBase);
     }
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')")
     public List<KnowledgeBaseDocumentChunk> searchKnowledgeBase(
         Long knowledgeBaseId, String query, String metadataFilters) {
 
@@ -120,7 +120,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_CREATE')")
     public KnowledgeBase createWorkspaceKnowledgeBase(
         KnowledgeBase knowledgeBase, Long workspaceId, long environmentId) {
 
@@ -188,7 +188,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     }
 
     @Override
-    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')")
+    @PreAuthorize("hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')")
     public void deleteWorkspaceKnowledgeBase(Long knowledgeBaseId) {
         List<KnowledgeBaseDocument> documents = knowledgeBaseDocumentService.getKnowledgeBaseDocuments(knowledgeBaseId);
 

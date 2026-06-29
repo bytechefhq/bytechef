@@ -49,7 +49,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public String getManagementMcpServerUrl() {
         Optional<Property> propertyOptional = propertyService.fetchProperty(
             MCP_SERVER_PROPERTY_KEY, Property.Scope.PLATFORM, null);
@@ -70,7 +70,7 @@ public class ManagementMcpServerServiceImpl implements ManagementMcpServerServic
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public String updateManagementMcpServerUrl() {
         String secretKey = String.valueOf(TenantKey.of());
 

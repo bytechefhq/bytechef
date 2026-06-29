@@ -380,7 +380,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public List<Tag> getIntegrationInstanceConfigurationTags() {
         List<IntegrationInstanceConfiguration> integrationInstanceConfigurations =
             integrationInstanceConfigurationService.getIntegrationInstanceConfigurations();
@@ -486,7 +486,7 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void updateIntegrationInstanceConfigurationTags(long id, List<Tag> tags) {
         integrationInstanceConfigurationService.update(id, CollectionUtils.map(checkTags(tags), Tag::getId));
     }

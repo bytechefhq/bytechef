@@ -24,11 +24,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 
 /**
  * Pins the {@code @PreAuthorize} expression that closes {@code WorkspaceApiController.getUserWorkspaces} IDOR (T25):
- * passing another user's id enumerated their workspace memberships. The {@code 'User'/'SELF'} token restricts the call
- * to the caller's own user id (tenant admins may pass any id); it matches the EE variant exactly. In CE
+ * passing another user's id enumerated their workspace memberships. The {@code isCurrentUser(#id)} built-in restricts
+ * the call to the caller's own user id (tenant admins may pass any id); it matches the EE variant exactly. In CE
  * {@code isCurrentUser} is permissive (single-workspace model), so the gate is a no-op there but kept for consistency.
  * The internal membership-check callers (AI Hub / asset-file / auto-memory) all pass
- * {@code userService.getCurrentUser().getId()}, so they satisfy SELF.
+ * {@code userService.getCurrentUser().getId()}, so they satisfy the current-user check.
  *
  * @author Ivica Cardic
  */
@@ -50,6 +50,6 @@ class WorkspaceFacadeAuthorizationTest {
             .as("@PreAuthorize on getUserWorkspaces")
             .isNotNull();
         assertThat(preAuthorize.value())
-            .isEqualTo("hasPermission('Tenant', 'ADMIN') or hasPermission(#id, 'User', 'SELF')");
+            .isEqualTo("isTenantAdmin() or isCurrentUser(#id)");
     }
 }

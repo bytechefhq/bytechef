@@ -23,17 +23,17 @@ class SigningKeyServiceAuthorizationTest {
 
     @Test
     void testGetSigningKeyRequiresOwner() {
-        assertExpression("getSigningKey", "hasPermission(#id, 'SigningKey:ResourceOwner', 'SELF')");
+        assertExpression("getSigningKey", "isResourceOwner(#id, 'SigningKey')");
     }
 
     @Test
     void testUpdateRequiresOwner() {
-        assertExpression("update", "hasPermission(#signingKey.id, 'SigningKey:ResourceOwner', 'SELF')");
+        assertExpression("update", "isResourceOwner(#signingKey.id, 'SigningKey')");
     }
 
     @Test
     void testDeleteRequiresOwner() {
-        assertExpression("delete", "hasPermission(#id, 'SigningKey:ResourceOwner', 'SELF')");
+        assertExpression("delete", "isResourceOwner(#id, 'SigningKey')");
     }
 
     private static void assertExpression(String methodName, String expression) {

@@ -33,40 +33,42 @@ class WorkspaceKnowledgeBaseFacadeAuthorizationTest {
 
     @Test
     void testGetWorkspaceKnowledgeBasesRequiresViewer() {
-        assertExpression("getWorkspaceKnowledgeBases", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getWorkspaceKnowledgeBases",
+            "hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')");
     }
 
     @Test
     void testGetKnowledgeBaseTagsRequiresWorkspaceViewer() {
-        assertExpression("getKnowledgeBaseTags", "hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')");
+        assertExpression("getKnowledgeBaseTags", "hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_VIEW')");
     }
 
     @Test
     void testGetKnowledgeBaseRequiresResourceViewer() {
-        assertExpression("getKnowledgeBase", "hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')");
+        assertExpression("getKnowledgeBase", "hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')");
     }
 
     @Test
     void testSearchRequiresResourceViewer() {
         assertExpression("searchKnowledgeBase",
-            "hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'VIEWER')");
+            "hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_VIEW')");
     }
 
     @Test
     void testCreateRequiresWorkspaceEditor() {
-        assertExpression("createWorkspaceKnowledgeBase", "hasPermission(#workspaceId, 'WorkspaceRole', 'EDITOR')");
+        assertExpression("createWorkspaceKnowledgeBase",
+            "hasPermission(#workspaceId, 'Workspace', 'KNOWLEDGE_BASE_CREATE')");
     }
 
     @Test
     void testUpdateRequiresResourceEditor() {
         assertExpression("updateKnowledgeBase",
-            "hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')");
+            "hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')");
     }
 
     @Test
     void testDeleteRequiresResourceEditor() {
         assertExpression(
-            "deleteWorkspaceKnowledgeBase", "hasPermission(#knowledgeBaseId, 'KnowledgeBase:ResourceRole', 'EDITOR')");
+            "deleteWorkspaceKnowledgeBase", "hasPermission(#knowledgeBaseId, 'KnowledgeBase', 'KNOWLEDGE_BASE_EDIT')");
     }
 
     private static void assertExpression(String methodName, String expression) {

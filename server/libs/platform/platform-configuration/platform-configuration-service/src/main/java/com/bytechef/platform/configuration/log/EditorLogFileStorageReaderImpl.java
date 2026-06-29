@@ -58,7 +58,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntries(long jobId, long taskExecutionId) {
         List<LogEntry> allEntries = readLogEntriesByJobId(jobId);
 
@@ -68,7 +68,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public List<LogEntry> readLogEntriesByJobId(long jobId) {
         try {
             String filename = jobId + ".jsonl";
@@ -91,7 +91,7 @@ class EditorLogFileStorageReaderImpl implements EditorLogFileStorageReader {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#jobId, 'Job:ResourceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#jobId, 'Job', 'EXECUTION_VIEW')")
     public boolean logsExist(long jobId) {
         return fileStorageService.fileExists(EDITOR_LOG_DIR, jobId + ".jsonl");
     }

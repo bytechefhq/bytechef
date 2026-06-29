@@ -61,6 +61,6 @@ class IntegrationTagAuthorizationTest {
         assertThat(preAuthorize)
             .as("@PreAuthorize on %s", methodName)
             .isNotNull();
-        assertThat(preAuthorize.value()).isEqualTo("hasPermission('Tenant', 'ADMIN')");
+        assertThat(preAuthorize.value()).isEqualTo("isTenantAdmin()");
     }
 }

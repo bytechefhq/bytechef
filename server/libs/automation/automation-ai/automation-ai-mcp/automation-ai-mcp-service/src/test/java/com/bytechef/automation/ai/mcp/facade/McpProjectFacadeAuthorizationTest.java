@@ -33,22 +33,22 @@ class McpProjectFacadeAuthorizationTest {
 
     @Test
     void testCreateRequiresServerEditor() {
-        assertExpression("createMcpProject", "hasPermission(#mcpServerId, 'McpServer:ResourceRole', 'EDITOR')");
+        assertExpression("createMcpProject", "hasPermission(#mcpServerId, 'McpServer', 'MCP_EDIT')");
     }
 
     @Test
     void testDeleteRequiresProjectEditor() {
-        assertExpression("deleteMcpProject", "hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')");
+        assertExpression("deleteMcpProject", "hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')");
     }
 
     @Test
     void testUpdateRequiresProjectEditor() {
-        assertExpression("updateMcpProject", "hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')");
+        assertExpression("updateMcpProject", "hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')");
     }
 
     @Test
     void testCloneRequiresProjectEditor() {
-        assertExpression("cloneMcpProject", "hasPermission(#mcpProjectId, 'McpProject:ResourceRole', 'EDITOR')");
+        assertExpression("cloneMcpProject", "hasPermission(#mcpProjectId, 'McpProject', 'MCP_EDIT')");
     }
 
     private static void assertExpression(String methodName, String expression) {

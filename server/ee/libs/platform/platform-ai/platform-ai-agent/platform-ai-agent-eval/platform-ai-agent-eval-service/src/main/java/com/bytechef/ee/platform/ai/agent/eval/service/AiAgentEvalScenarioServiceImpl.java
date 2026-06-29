@@ -37,7 +37,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalScenario createAiAgentEvalScenario(AiAgentEvalScenario aiAgentEvalScenario) {
         int maxTurns = aiAgentEvalScenario.getMaxTurns();
 
@@ -49,7 +49,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public void deleteAiAgentEvalScenario(long id) {
         agentEvalScenarioRepository.deleteById(id);
     }
@@ -68,7 +68,7 @@ class AgentEvalScenarioServiceImpl implements AiAgentEvalScenarioService {
     }
 
     @Override
-    @PreAuthorize("hasPermission('Tenant', 'ADMIN')")
+    @PreAuthorize("isTenantAdmin()")
     public AiAgentEvalScenario updateAiAgentEvalScenario(AiAgentEvalScenario aiAgentEvalScenario) {
         int maxTurns = aiAgentEvalScenario.getMaxTurns();
 

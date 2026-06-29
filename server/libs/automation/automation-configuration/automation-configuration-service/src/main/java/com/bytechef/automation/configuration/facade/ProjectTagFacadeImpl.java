@@ -46,7 +46,7 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
 
     @Override
     @Transactional(readOnly = true)
-    @PreAuthorize("hasPermission(#workspaceId, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public List<Tag> getProjectTags(long workspaceId) {
         List<Long> projectIds = projectService.getWorkspaceProjectIds(workspaceId);
 
@@ -56,7 +56,7 @@ public class ProjectTagFacadeImpl implements ProjectTagFacade {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'WORKFLOW_EDIT')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
     public void updateProjectTags(long id, List<Tag> tags) {
         tags = checkTags(tags);
 

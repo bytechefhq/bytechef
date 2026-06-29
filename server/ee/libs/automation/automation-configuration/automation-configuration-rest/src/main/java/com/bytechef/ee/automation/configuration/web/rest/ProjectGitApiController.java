@@ -47,7 +47,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'PROJECT_SETTINGS')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public ResponseEntity<ProjectGitConfigurationModel> getProjectGitConfiguration(Long id) {
         return projectGitConfigurationService.fetchProjectGitConfiguration(id)
             .map(projectGitConfiguration -> conversionService.convert(
@@ -57,7 +57,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'WorkspaceRole', 'VIEWER')")
+    @PreAuthorize("hasPermission(#id, 'Workspace', 'WORKSPACE_VIEW')")
     public ResponseEntity<List<ProjectGitConfigurationModel>> getWorkspaceProjectGitConfigurations(Long id) {
         return ResponseEntity.ok(
             projectGitConfigurationService.getWorkspaceProjectGitConfigurations(id)
@@ -68,13 +68,13 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'DEPLOYMENT_PULL')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'DEPLOYMENT_PULL')")
     public ResponseEntity<List<String>> getProjectRemoteBranches(Long id) {
         return ResponseEntity.ok(projectGitFacade.getRemoteBranches(id));
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'DEPLOYMENT_PULL')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'DEPLOYMENT_PULL')")
     public ResponseEntity<Void> pullProjectFromGit(Long id) {
         projectGitFacade.pullProjectFromGit(id);
 
@@ -82,7 +82,7 @@ public class ProjectGitApiController implements ProjectGitApi {
     }
 
     @Override
-    @PreAuthorize("hasPermission(#id, 'ProjectScope', 'PROJECT_SETTINGS')")
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public ResponseEntity<Void> updateProjectGitConfiguration(
         Long id, ProjectGitConfigurationModel projectGitConfigurationModel) {
 
