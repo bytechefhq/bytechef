@@ -684,3 +684,5 @@ include("server:ee:libs:modules:components:app-event")
 include("server:ee:libs:modules:components:code-workflow")
 include("server:ee:libs:modules:components:embedded-workflow-builder")
 include("server:ee:libs:modules:components:request")
+
+include("spring-ai:spring-ai-model-chat-memory-repository-aws")
