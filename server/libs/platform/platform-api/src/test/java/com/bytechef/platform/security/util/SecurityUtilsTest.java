@@ -136,7 +136,7 @@ class SecurityUtilsTest {
         });
 
         assertThat(result).isEqualTo("ran-with-override");
-        // The original context must be restored once runAs returns — otherwise a thread-pool reuse would
+        // The original context must be restored once runAs returns - otherwise a thread-pool reuse would
         // leak the override user's authorities to whoever runs on this thread next.
         assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo("original-user");
         assertThat(SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)).isFalse();
