@@ -25,13 +25,9 @@ import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.component.definition.ComponentDsl;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.component.definition.ai.agent.ChatMemoryFunction;
-import java.util.List;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
-import org.springframework.ai.chat.messages.AssistantMessage;
-import org.springframework.ai.chat.messages.Message;
-import org.springframework.ai.chat.messages.ToolResponseMessage;
 
 /**
  * @author Ivica Cardic
@@ -64,55 +60,9 @@ public class ChatMemory {
             .chatMemoryRepository(chatMemoryRepository)
             .build();
 
-        return new ChatMemoryFunction.Result(
-            MessageChatMemoryAdvisor.builder(new ToolCallIntermediateMessageFilteringChatMemory(chatMemory))
-                .build(),
-            chatMemory);
-    }
+        MessageChatMemoryAdvisor messageChatMemoryAdvisor = MessageChatMemoryAdvisor.builder(chatMemory)
+            .build();
 
-    /**
-     * Wraps a {@link org.springframework.ai.chat.memory.ChatMemory} and suppresses intermediate tool-call messages from
-     * being persisted. Specifically, {@link AssistantMessage} instances that carry tool_calls and
-     * {@link ToolResponseMessage} instances are skipped on {@code add()} — only user messages and final assistant
-     * replies are stored. This prevents JDBC-backed memory from accumulating empty/stripped tool-call stubs that would
-     * otherwise cause 400 errors from LLM providers on subsequent turns.
-     */
-    private static class ToolCallIntermediateMessageFilteringChatMemory
-        implements org.springframework.ai.chat.memory.ChatMemory {
-
-        private final org.springframework.ai.chat.memory.ChatMemory delegate;
-
-        ToolCallIntermediateMessageFilteringChatMemory(org.springframework.ai.chat.memory.ChatMemory delegate) {
-            this.delegate = delegate;
-        }
-
-        @Override
-        public void add(String conversationId, List<Message> messages) {
-            List<Message> filtered = messages.stream()
-                .filter(ToolCallIntermediateMessageFilteringChatMemory::isStorable)
-                .toList();
-
-            if (!filtered.isEmpty()) {
-                delegate.add(conversationId, filtered);
-            }
-        }
-
-        @Override
-        public List<Message> get(String conversationId) {
-            return delegate.get(conversationId);
-        }
-
-        @Override
-        public void clear(String conversationId) {
-            delegate.clear(conversationId);
-        }
-
-        private static boolean isStorable(Message message) {
-            if (message instanceof AssistantMessage assistantMessage) {
-                return !assistantMessage.hasToolCalls();
-            }
-
-            return !(message instanceof ToolResponseMessage);
-        }
+        return new ChatMemoryFunction.Result(messageChatMemoryAdvisor, chatMemory);
     }
 }
