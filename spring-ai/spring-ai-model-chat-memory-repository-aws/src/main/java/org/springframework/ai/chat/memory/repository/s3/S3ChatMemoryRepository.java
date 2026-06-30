@@ -188,7 +188,7 @@ public final class S3ChatMemoryRepository implements ChatMemoryRepository {
         }
 
         public Builder keyPrefix(String keyPrefix) {
-            this.keyPrefix = keyPrefix;
+            this.keyPrefix = keyPrefix == null ? "" : keyPrefix;
 
             return this;
         }
