@@ -221,6 +221,7 @@ public class WordPressNewPostTrigger {
                                                 bool("templated")
                                                     .description(
                                                         "Whether the link is templated.")))))))
+        .help("", "https://docs.bytechef.io/reference/components/wordpress_v1#new-post")
         .poll(WordPressNewPostTrigger::poll);
 
     private WordPressNewPostTrigger() {

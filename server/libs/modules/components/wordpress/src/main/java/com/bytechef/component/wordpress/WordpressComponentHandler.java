@@ -49,7 +49,8 @@ public class WordpressComponentHandler extends AbstractWordpressComponentHandler
         return modifiableComponentDefinition
             .icon("path:assets/wordpress.svg")
             .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp("", "https://developer.wordpress.org/rest-api/");
     }
 
     @Override
@@ -57,6 +58,8 @@ public class WordpressComponentHandler extends AbstractWordpressComponentHandler
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
 
         return modifiableConnectionDefinition
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/sendfox_v1#connection-setup")
             .baseUri((connectionParameters, context) -> "%s/wp-json"
                 .formatted(connectionParameters.getRequiredString(WEBSITE)))
             .authorizations(
