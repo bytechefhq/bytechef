@@ -4,10 +4,13 @@ import {Edge, Node} from '@xyflow/react';
 import {describe, expect, it} from 'vitest';
 
 import {
+    CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET,
+    REGULAR_NODE_HANDLE_OFFSET,
     adjustBottomGhostForMovedChildren,
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
     alignDispatcherGhostsCrossAxis,
+    alignSimpleConditionChildren,
     alignTrailingPlaceholder,
     applySavedPositions,
     centerDispatcherChildrenOnMainAxis,
@@ -20,7 +23,6 @@ import {
     containsNodePosition,
     getConditionBranchCaseOffset,
     positionConditionCasePlaceholders,
-    pullSimpleConditionChildrenInward,
     separateOverlappingConditionChildren,
     shiftConditionBranchContent,
 } from './postDagreConstraints';
@@ -4116,7 +4118,7 @@ describe('alignConditionCaseChildren', () => {
     it('should pull single-node branch children inward when placed too far from center (TB mode)', () => {
         const {allNodes, edges, leftNode, rightNode} = makeConditionWithSingleNodeBranches(500, 100, 900);
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4136,7 +4138,7 @@ describe('alignConditionCaseChildren', () => {
             expectedRight
         );
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4215,7 +4217,7 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4227,9 +4229,6 @@ describe('alignConditionCaseChildren', () => {
         expect(loggerLeft.position.x).toBe(expectedLeft);
         expect(rightNode.position.x).toBe(500 + CONDITION_CASE_OFFSET);
     });
-
-    const CLUSTER_ROOT_HANDLE_OFFSET = 120;
-    const REGULAR_HANDLE_OFFSET = 36;
 
     function makeConditionWithClusterRootBranch(conditionX: number) {
         const conditionNode: Node = {
@@ -4294,14 +4293,14 @@ describe('alignConditionCaseChildren', () => {
     it('should align a cluster-root branch child handle with its chain successor (straight down-edge)', () => {
         const {allNodes, clusterChainChild, clusterRootNode, edges} = makeConditionWithClusterRootBranch(500);
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
         });
 
-        const clusterHandle = clusterRootNode.position.x + CLUSTER_ROOT_HANDLE_OFFSET;
-        const childHandle = clusterChainChild.position.x + REGULAR_HANDLE_OFFSET;
+        const clusterHandle = clusterRootNode.position.x + CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET;
+        const childHandle = clusterChainChild.position.x + REGULAR_NODE_HANDLE_OFFSET;
 
         expect(clusterHandle).toBe(childHandle);
     });
@@ -4309,15 +4308,15 @@ describe('alignConditionCaseChildren', () => {
     it('should keep a cluster-root branch symmetric around the condition handle', () => {
         const {allNodes, clusterRootNode, conditionNode, edges, rightNode} = makeConditionWithClusterRootBranch(500);
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
         });
 
-        const leftHandle = clusterRootNode.position.x + CLUSTER_ROOT_HANDLE_OFFSET;
-        const rightHandle = rightNode.position.x + REGULAR_HANDLE_OFFSET;
-        const conditionHandle = conditionNode.position.x + REGULAR_HANDLE_OFFSET;
+        const leftHandle = clusterRootNode.position.x + CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET;
+        const rightHandle = rightNode.position.x + REGULAR_NODE_HANDLE_OFFSET;
+        const conditionHandle = conditionNode.position.x + REGULAR_NODE_HANDLE_OFFSET;
 
         expect((leftHandle + rightHandle) / 2).toBe(conditionHandle);
     });
@@ -4325,7 +4324,7 @@ describe('alignConditionCaseChildren', () => {
     it('should place a cluster-root branch child so its box clears the opposite branch', () => {
         const {allNodes, clusterRootNode, edges, rightNode} = makeConditionWithClusterRootBranch(500);
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4400,7 +4399,7 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4468,7 +4467,7 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'x',
             nodesep: 50,
@@ -4536,7 +4535,7 @@ describe('alignConditionCaseChildren', () => {
             },
         ];
 
-        pullSimpleConditionChildrenInward(allNodes, edges, {
+        alignSimpleConditionChildren(allNodes, edges, {
             conditionCaseOffset: CONDITION_CASE_OFFSET,
             crossAxis: 'y',
             nodesep: 50,

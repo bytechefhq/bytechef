@@ -934,7 +934,7 @@ function isBranchSimple(firstNodeId: string, bottomGhostId: string, allNodes: No
     return false;
 }
 
-function hasConfiguredClusterElements(node: Node): boolean {
+export function hasConfiguredClusterElements(node: Node): boolean {
     const data = node.data as NodeDataType;
 
     return (
@@ -953,8 +953,8 @@ function getNodeCrossSize(node: Node, crossAxis: 'x' | 'y'): number {
     return node.type === 'clusterRoot' && hasConfiguredClusterElements(node) ? CLUSTER_ROOT_NODE_WIDTH : NODE_WIDTH;
 }
 
-const REGULAR_NODE_HANDLE_OFFSET = 36;
-const CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET = 120;
+export const REGULAR_NODE_HANDLE_OFFSET = 36;
+export const CONFIGURED_CLUSTER_ROOT_HANDLE_OFFSET = 120;
 
 function getNodeHandleOffset(node: Node, crossAxis: 'x' | 'y'): number {
     if (crossAxis !== 'x') {
@@ -974,7 +974,15 @@ export function getConditionBranchCaseOffset(
     return branchCrossSizes.reduce((offset, crossSize) => Math.max(offset, (crossSize + nodesep) / 2), defaultOffset);
 }
 
-export function pullSimpleConditionChildrenInward(
+/**
+ * Aligns condition branch children to their branch handle column for conditions
+ * where BOTH branches contain only simple (non-task-dispatcher) nodes, since
+ * branches with nested dispatchers need their dagre-assigned space. The
+ * adjustment is bidirectional: children dagre placed farther from center than
+ * necessary are pulled inward, and branches are pushed outward when a wide
+ * (configured cluster-root) child requires more spacing than conditionCaseOffset.
+ */
+export function alignSimpleConditionChildren(
     allNodes: Node[],
     edges: Edge[],
     options: {
@@ -1090,7 +1098,7 @@ export function pullSimpleConditionChildrenInward(
 }
 
 /**
- * Pulls on-error branch children inward (mirrors pullSimpleConditionChildrenInward).
+ * Pulls on-error branch children inward (mirrors alignSimpleConditionChildren).
  */
 export function pullSimpleOnErrorChildrenInward(
     allNodes: Node[],
