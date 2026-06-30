@@ -7,16 +7,33 @@ import type {ReactNode} from 'react';
 interface FormLabelWithDescriptionPropsI {
     description?: string | null;
     label: ReactNode;
+    required?: boolean;
 }
 
-export const FormLabelWithDescription = ({description, label}: FormLabelWithDescriptionPropsI) => {
+const RequiredMarker = () => (
+    <span aria-hidden="true" className="ml-0.5 text-destructive">
+        *
+    </span>
+);
+
+export const FormLabelWithDescription = ({description, label, required}: FormLabelWithDescriptionPropsI) => {
     if (!description) {
-        return <FormLabel>{label}</FormLabel>;
+        return (
+            <FormLabel>
+                {label}
+
+                {required && <RequiredMarker />}
+            </FormLabel>
+        );
     }
 
     return (
         <FormLabel className="flex items-center gap-1.5">
-            <span>{label}</span>
+            <span>
+                {label}
+
+                {required && <RequiredMarker />}
+            </span>
 
             <TooltipProvider delayDuration={150}>
                 <Tooltip>

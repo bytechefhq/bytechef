@@ -22,7 +22,7 @@ export const TextAreaFieldRenderer = ({form, formInput, name}: TextAreaFieldRend
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <FormControl>
                         <Textarea
@@ -35,7 +35,7 @@ export const TextAreaFieldRenderer = ({form, formInput, name}: TextAreaFieldRend
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

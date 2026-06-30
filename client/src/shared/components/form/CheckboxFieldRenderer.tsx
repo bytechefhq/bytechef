@@ -27,13 +27,17 @@ export const CheckboxFieldRenderer = ({form, formInput, name}: CheckboxFieldRend
                             <Checkbox checked={!!field.value} onCheckedChange={field.onChange} />
                         </FormControl>
 
-                        <FormLabelWithDescription description={fieldDescription} label={placeholder || label} />
+                        <FormLabelWithDescription
+                            description={fieldDescription}
+                            label={placeholder || label}
+                            required={required}
+                        />
                     </div>
 
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };
