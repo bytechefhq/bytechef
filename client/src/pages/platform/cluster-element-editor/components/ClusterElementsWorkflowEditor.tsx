@@ -14,13 +14,13 @@ import {
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {BrushCleaningIcon} from 'lucide-react';
-import {useCallback} from 'react';
+import {useCallback, useEffect} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
 import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
-const SETTLE_FRAMES = 22;
+const SETTLE_DELAY = 350;
 
 export const RemeasureClusterNodes = () => {
     const updateNodeInternals = useUpdateNodeInternals();
@@ -34,24 +34,17 @@ export const RemeasureClusterNodes = () => {
             }
         };
 
+        // Remeasure immediately, on the next frame after the dialog open
+        // transition begins, and once more after it settles.
         remeasure();
 
-        let frame = 0;
-        let rafId = 0;
+        const rafId = requestAnimationFrame(remeasure);
+        const timeoutId = setTimeout(remeasure, SETTLE_DELAY);
 
-        const tick = () => {
-            remeasure();
-
-            frame += 1;
-
-            if (frame < SETTLE_FRAMES) {
-                rafId = requestAnimationFrame(tick);
-            }
+        return () => {
+            cancelAnimationFrame(rafId);
+            clearTimeout(timeoutId);
         };
-
-        rafId = requestAnimationFrame(tick);
-
-        return () => cancelAnimationFrame(rafId);
     }, [nodeCount, getNodes, updateNodeInternals]);
 
     return null;
