@@ -25,7 +25,7 @@ spring-shell = "4.0.1"
 spring-vault = "4.0.2"
 markpollack-agent-claude = "0.19.0"
 markpollack-agent-judge = "0.11.0"
-springaicommunity-agent-utils = "0.8.0"
+springaicommunity-agent-utils = "0.10.0"
 springaicommunity-spring-ai-session = "0.4.2"
 testcontainers = "1.21.3"
 
