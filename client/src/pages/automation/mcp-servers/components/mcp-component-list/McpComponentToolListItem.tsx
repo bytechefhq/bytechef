@@ -49,6 +49,7 @@ const McpComponentToolListItem = ({
 
                         <PopoverAnchor asChild>
                             <Button
+                                aria-label="Configure"
                                 className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                                 icon={<BoltIcon className="size-4" />}
                                 onClick={() => openPopover(popoverId)}
@@ -59,6 +60,7 @@ const McpComponentToolListItem = ({
                         </PopoverAnchor>
 
                         <Button
+                            aria-label="Delete"
                             className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                             icon={<Trash2Icon className="size-4" />}
                             onClick={() => setShowDeleteDialog(true)}
