@@ -48,6 +48,7 @@ import {
     alignBranchCaseChildren,
     alignChainNodesCrossAxis,
     alignDispatcherGhostsCrossAxis,
+    alignSimpleConditionChildren,
     alignTrailingPlaceholder,
     applySavedPositions,
     centerDispatcherChildrenOnMainAxis,
@@ -59,9 +60,9 @@ import {
     constrainLeftGhostPositions,
     constrainOnErrorGhostsCrossAxis,
     containsNodePosition,
+    hasConfiguredClusterElements,
     positionConditionCasePlaceholders,
     positionOnErrorCasePlaceholders,
-    pullSimpleConditionChildrenInward,
     pullSimpleOnErrorChildrenInward,
     separateOverlappingConditionChildren,
     separateOverlappingOnErrorChildren,
@@ -124,19 +125,10 @@ function getRenderedMainAxisSize(node: Node, direction: LayoutDirectionType): nu
     }
 
     if (node.type === 'clusterRoot') {
-        return nodeHasConfiguredClusterElements(node) ? 240 : 72;
+        return hasConfiguredClusterElements(node) ? 240 : 72;
     }
 
     return 72;
-}
-
-export function nodeHasConfiguredClusterElements(node: Node): boolean {
-    return (
-        !!node.data.clusterElements &&
-        Object.entries(node.data.clusterElements as Record<string, unknown>).some(
-            ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-        )
-    );
 }
 
 export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {height: number; width: number} {
@@ -157,13 +149,13 @@ export function getDagreNodeSize(node: Node, direction: LayoutDirectionType): {h
         } else if (node.type === 'placeholder') {
             width = height;
         } else if (node.type === 'clusterRoot') {
-            width = nodeHasConfiguredClusterElements(node) ? 292 : 120;
+            width = hasConfiguredClusterElements(node) ? 292 : 120;
         }
 
         return {height: NODE_WIDTH, width};
     }
 
-    if (node.type === 'clusterRoot' && nodeHasConfiguredClusterElements(node)) {
+    if (node.type === 'clusterRoot' && hasConfiguredClusterElements(node)) {
         return {height, width: CLUSTER_ROOT_NODE_WIDTH};
     }
 
@@ -618,12 +610,7 @@ export const getLayoutElements = async ({
         } else {
             const sourceNode = nodes.find((node) => node.id === edge.source);
 
-            const hasValidClusterElements =
-                sourceNode?.data.clusterElements &&
-                Object.entries(sourceNode.data.clusterElements).some(
-                    ([, value]) =>
-                        value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-                );
+            const hasValidClusterElements = !!sourceNode && hasConfiguredClusterElements(sourceNode);
 
             let edgeLength = 1;
 
@@ -656,11 +643,7 @@ export const getLayoutElements = async ({
         const dagreNode = dagreGraph.node(node.id);
         let crossAxisPosition = dagreNode[crossAxis] + canvasCenteringOffset;
 
-        const hasValidClusterElements =
-            node.data.clusterElements &&
-            Object.entries(node.data.clusterElements).some(
-                ([, value]) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
-            );
+        const hasValidClusterElements = hasConfiguredClusterElements(node);
 
         if (hasValidClusterElements && node.data.clusterRoot && direction === 'TB') {
             crossAxisPosition -= 85;
@@ -694,7 +677,7 @@ export const getLayoutElements = async ({
     alignDispatcherGhostsCrossAxis(allNodes, crossAxis);
     separateOverlappingConditionChildren(allNodes, edges, crossAxis);
     separateOverlappingOnErrorChildren(allNodes, edges, crossAxis);
-    pullSimpleConditionChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis, nodesep});
+    alignSimpleConditionChildren(allNodes, edges, {conditionCaseOffset, crossAxis, nodesep});
     pullSimpleOnErrorChildrenInward(allNodes, edges, {conditionCaseOffset, crossAxis});
     positionConditionCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
     positionOnErrorCasePlaceholders(allNodes, {conditionCaseOffset, crossAxis});
