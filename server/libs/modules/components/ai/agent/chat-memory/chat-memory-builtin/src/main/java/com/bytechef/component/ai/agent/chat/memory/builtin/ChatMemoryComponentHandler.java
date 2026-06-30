@@ -25,17 +25,10 @@ import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryDele
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryGetMessagesAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.action.ChatMemoryListConversationsAction;
 import com.bytechef.component.ai.agent.chat.memory.builtin.cluster.ChatMemory;
-import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
-import com.bytechef.component.ai.agent.chat.memory.jdbc.util.OrderedJdbcChatMemoryRepository;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import javax.sql.DataSource;
-import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.memory.ChatMemoryRepository;
-import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
@@ -47,35 +40,18 @@ public class ChatMemoryComponentHandler implements ComponentHandler {
     private final ComponentDefinition componentDefinition;
 
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
-    public ChatMemoryComponentHandler(
-        ChatMemoryRepository chatMemoryRepository,
-        @Autowired(required = false) @Nullable JdbcTemplate jdbcTemplate) {
-
-        ChatMemoryRepository orderedRepository = chatMemoryRepository;
-
-        if (jdbcTemplate != null) {
-            DataSource dataSource = jdbcTemplate.getDataSource();
-
-            if (dataSource != null) {
-                JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
-
-                orderedRepository = new OrderedJdbcChatMemoryRepository(
-                    chatMemoryRepository, jdbcTemplate,
-                    JdbcChatMemoryUtils.getSelectConversationIdsOrderedSql(dialect));
-            }
-        }
-
+    public ChatMemoryComponentHandler(ChatMemoryRepository chatMemoryRepository) {
         this.componentDefinition = component(CHAT_MEMORY)
             .title("Chat Memory")
             .description("Built-in chat memory.")
             .icon("path:assets/chat-memory.svg")
             .categories(ComponentCategory.ARTIFICIAL_INTELLIGENCE)
             .actions(
-                ChatMemoryAddMessagesAction.of(orderedRepository),
-                ChatMemoryGetMessagesAction.of(orderedRepository),
-                ChatMemoryDeleteAction.of(orderedRepository),
-                ChatMemoryListConversationsAction.of(orderedRepository))
-            .clusterElements(ChatMemory.of(orderedRepository));
+                ChatMemoryAddMessagesAction.of(chatMemoryRepository),
+                ChatMemoryGetMessagesAction.of(chatMemoryRepository),
+                ChatMemoryDeleteAction.of(chatMemoryRepository),
+                ChatMemoryListConversationsAction.of(chatMemoryRepository))
+            .clusterElements(ChatMemory.of(chatMemoryRepository));
     }
 
     @Override
