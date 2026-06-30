@@ -72,6 +72,10 @@ class S3ChatMemoryRepositoryIntTest {
 
     @AfterAll
     static void afterAll() {
+        if (s3Client != null) {
+            s3Client.close();
+        }
+
         if (localStack != null) {
             localStack.stop();
         }
@@ -108,6 +112,8 @@ class S3ChatMemoryRepositoryIntTest {
 
         List<String> ids = repository.findConversationIds();
 
+        assertTrue(ids.contains("newer"), "expected 'newer' conversation to be present");
+        assertTrue(ids.contains("older"), "expected 'older' conversation to be present");
         assertTrue(ids.indexOf("newer") < ids.indexOf("older"), "most recently modified conversation must come first");
     }
 

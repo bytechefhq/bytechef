@@ -25,7 +25,6 @@ import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.repository.s3.S3ChatMemoryRepository;
 import org.springframework.ai.chat.messages.Message;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.BucketAlreadyExistsException;
 import software.amazon.awssdk.services.s3.model.BucketAlreadyOwnedByYouException;
 import software.amazon.awssdk.services.s3.model.CreateBucketRequest;
 import software.amazon.awssdk.services.s3.model.HeadBucketRequest;
@@ -115,8 +114,8 @@ final class TenantRoutingS3ChatMemoryRepository implements ChatMemoryRepository 
             s3Client.createBucket(CreateBucketRequest.builder()
                 .bucket(bucketName)
                 .build());
-        } catch (BucketAlreadyOwnedByYouException | BucketAlreadyExistsException ignored) {
-            // another pod created it concurrently — bucket is ready
+        } catch (BucketAlreadyOwnedByYouException ignored) {
+            // another pod created it concurrently under our account — bucket is ready
         }
     }
 }

@@ -32,16 +32,27 @@ import software.amazon.awssdk.services.s3.S3Client;
 @Configuration
 class AwsChatMemoryConfiguration {
 
-    @Bean
+    @Bean(destroyMethod = "close")
     @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "aws")
-    ChatMemoryRepository awsChatMemoryRepository(ApplicationProperties applicationProperties) {
+    S3Client awsChatMemoryS3Client(ApplicationProperties applicationProperties) {
         Aws aws = applicationProperties.getAi()
             .getMemory()
             .getAws();
 
-        S3Client s3Client = AwsS3ClientFactory.create(aws);
+        return AwsS3ClientFactory.create(aws);
+    }
 
-        return new TenantRoutingS3ChatMemoryRepository(s3Client, aws.getBucketPrefix(), aws.getKeyPrefix());
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "aws")
+    ChatMemoryRepository awsChatMemoryRepository(
+        ApplicationProperties applicationProperties, S3Client awsChatMemoryS3Client) {
+
+        Aws aws = applicationProperties.getAi()
+            .getMemory()
+            .getAws();
+
+        return new TenantRoutingS3ChatMemoryRepository(
+            awsChatMemoryS3Client, aws.getBucketPrefix(), aws.getKeyPrefix());
     }
 
     @Bean
