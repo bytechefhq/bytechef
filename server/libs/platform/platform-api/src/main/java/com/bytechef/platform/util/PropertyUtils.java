@@ -75,11 +75,11 @@ public class PropertyUtils {
      * <p>
      * Path conventions:
      * <ul>
-     * <li>{@code parent.child} — descend into an object property's children.</li>
-     * <li>{@code arrayProp[].child} — explicit descent into the first item type of an array property.</li>
-     * <li>{@code parent.child} — implicit descent when {@code parent} is an array whose single item type is an
+     * <li>{@code parent.child} - descend into an object property's children.</li>
+     * <li>{@code arrayProp[].child} - explicit descent into the first item type of an array property.</li>
+     * <li>{@code arrayProp.child} - implicit descent when {@code arrayProp} is an array whose single item type is an
      * object.</li>
-     * <li>{@code propName} — top-level match by {@link BaseProperty#getName()}.</li>
+     * <li>{@code propName} - top-level match by {@link BaseProperty#getName()}.</li>
      * </ul>
      */
     public static @Nullable BaseProperty findPropertyByPath(
@@ -117,7 +117,7 @@ public class PropertyUtils {
 
             if (i < segments.length - 1) {
                 if (arrayDescent) {
-                    // explicit `arrayProp[].child` — descend into the array's first item type; if it's an
+                    // explicit `arrayProp[].child` - descend into the array's first item type; if it's an
                     // object, expose its children so the next segment can match a field name
                     if (!(current instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty)) {
                         return null;
@@ -136,7 +136,7 @@ public class PropertyUtils {
                         currentProperties = objectItem.getProperties()
                             .orElse(List.of());
                     } else {
-                        // first item is itself a leaf — no further children to traverse
+                        // first item is itself a leaf - no further children to traverse
                         return null;
                     }
                 } else {
@@ -147,7 +147,7 @@ public class PropertyUtils {
                     }
                 }
             } else if (arrayDescent) {
-                // path ends in `[]` — caller wants the array's item type, not the array property itself
+                // path ends in `[]` - caller wants the array's item type, not the array property itself
                 if (!(current instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty)) {
                     return null;
                 }
@@ -173,7 +173,7 @@ public class PropertyUtils {
         }
 
         if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
-            // implicit descent into array items — accept `parent.child` when parent is an array of objects
+            // implicit descent into array items - accept `arrayProp.child` when parent is an array of objects
             List<? extends BaseProperty> items = arrayProperty.getItems()
                 .orElse(List.of());
 

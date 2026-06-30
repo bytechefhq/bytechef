@@ -125,8 +125,8 @@ public interface TriggerDefinitionService extends OperationDefinitionService {
 
     /**
      * Returns {@code true} when the trigger's owning component declares a connection definition. Used by the shared
-     * component-interaction tooling (AI Hub and the in-editor Copilot) — e.g. the {@code lookupTriggerPropertyOptions}
-     * tool callback — to decide whether a property-options lookup must carry a {@code connectionId}. When the
+     * component-interaction tooling (AI Hub and the in-editor Copilot) - e.g. the {@code lookupTriggerPropertyOptions}
+     * tool callback - to decide whether a property-options lookup must carry a {@code connectionId}. When the
      * underlying component has no connection, the lookup can proceed without one and the {@code connection_required}
      * precondition envelope is skipped.
      *
