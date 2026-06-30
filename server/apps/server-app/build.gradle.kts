@@ -148,6 +148,7 @@ dependencies {
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-coordinator"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-rest"))
     implementation(project(":server:libs:automation:automation-workflow:automation-workflow-execution:automation-workflow-execution-service"))
+    implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-aws-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-in-memory-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-jdbc-config"))
     implementation(project(":server:libs:config:ai-chat-memory-config:ai-chat-memory-redis-config"))
