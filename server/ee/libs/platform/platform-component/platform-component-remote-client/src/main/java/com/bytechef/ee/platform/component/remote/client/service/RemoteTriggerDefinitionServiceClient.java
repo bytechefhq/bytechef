@@ -140,6 +140,13 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
     }
 
     @Override
+    public List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String triggerName, String propertyName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public TriggerDefinition getTriggerDefinition(
         String componentName, int componentVersion, String triggerName) {
 
@@ -177,6 +184,18 @@ public class RemoteTriggerDefinitionServiceClient extends AbstractWorkerClient i
 
     @Override
     public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String triggerName, String propertyName) {
+
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean triggerDefinesConnection(String componentName, int componentVersion, String triggerName) {
         throw new UnsupportedOperationException();
     }
 

@@ -22,6 +22,7 @@ import com.bytechef.definition.BaseProperty;
 import com.bytechef.definition.BaseProperty.BaseArrayProperty;
 import com.bytechef.definition.BaseProperty.BaseObjectProperty;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @author Ivica Cardic
@@ -64,6 +65,126 @@ public class PropertyUtils {
         if (property instanceof BaseObjectProperty<?> objectProperty) {
             checkObjectProperty(objectProperty);
         }
+    }
+
+    /**
+     * Traverses {@code properties} along the dotted {@code path}, descending into {@link BaseObjectProperty} children
+     * and {@link BaseArrayProperty} item types as needed. Returns {@code null} if {@code path} is null/blank or any
+     * segment cannot be resolved.
+     *
+     * <p>
+     * Path conventions:
+     * <ul>
+     * <li>{@code parent.child} — descend into an object property's children.</li>
+     * <li>{@code arrayProp[].child} — explicit descent into the first item type of an array property.</li>
+     * <li>{@code parent.child} — implicit descent when {@code parent} is an array whose single item type is an
+     * object.</li>
+     * <li>{@code propName} — top-level match by {@link BaseProperty#getName()}.</li>
+     * </ul>
+     */
+    public static @Nullable BaseProperty findPropertyByPath(
+        List<? extends BaseProperty> properties, @Nullable String path) {
+
+        if (path == null || path.isBlank()) {
+            return null;
+        }
+
+        String[] segments = path.split("\\.");
+
+        List<? extends BaseProperty> currentProperties = properties;
+        BaseProperty current = null;
+
+        for (int i = 0; i < segments.length; i++) {
+            String segment = segments[i];
+
+            boolean arrayDescent = segment.endsWith("[]");
+
+            String name = arrayDescent ? segment.substring(0, segment.length() - 2) : segment;
+
+            current = null;
+
+            for (BaseProperty property : currentProperties) {
+                if (name.equals(property.getName())) {
+                    current = property;
+
+                    break;
+                }
+            }
+
+            if (current == null) {
+                return null;
+            }
+
+            if (i < segments.length - 1) {
+                if (arrayDescent) {
+                    // explicit `arrayProp[].child` — descend into the array's first item type; if it's an
+                    // object, expose its children so the next segment can match a field name
+                    if (!(current instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty)) {
+                        return null;
+                    }
+
+                    List<? extends BaseProperty> items = arrayProperty.getItems()
+                        .orElse(List.of());
+
+                    if (items.isEmpty()) {
+                        return null;
+                    }
+
+                    BaseProperty firstItem = items.getFirst();
+
+                    if (firstItem instanceof BaseObjectProperty<? extends BaseProperty> objectItem) {
+                        currentProperties = objectItem.getProperties()
+                            .orElse(List.of());
+                    } else {
+                        // first item is itself a leaf — no further children to traverse
+                        return null;
+                    }
+                } else {
+                    currentProperties = childPropertiesOf(current);
+
+                    if (currentProperties == null) {
+                        return null;
+                    }
+                }
+            } else if (arrayDescent) {
+                // path ends in `[]` — caller wants the array's item type, not the array property itself
+                if (!(current instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty)) {
+                    return null;
+                }
+
+                List<? extends BaseProperty> items = arrayProperty.getItems()
+                    .orElse(List.of());
+
+                if (items.isEmpty()) {
+                    return null;
+                }
+
+                current = items.getFirst();
+            }
+        }
+
+        return current;
+    }
+
+    private static @Nullable List<? extends BaseProperty> childPropertiesOf(BaseProperty property) {
+        if (property instanceof BaseObjectProperty<? extends BaseProperty> objectProperty) {
+            return objectProperty.getProperties()
+                .orElse(List.of());
+        }
+
+        if (property instanceof BaseArrayProperty<? extends BaseProperty> arrayProperty) {
+            // implicit descent into array items — accept `parent.child` when parent is an array of objects
+            List<? extends BaseProperty> items = arrayProperty.getItems()
+                .orElse(List.of());
+
+            if (items.size() == 1
+                && items.getFirst() instanceof BaseObjectProperty<? extends BaseProperty> objectItem) {
+                return objectItem.getProperties()
+                    .orElse(List.of());
+            }
+        }
+
+        return null;
     }
 
     private static void checkArrayProperty(BaseArrayProperty<? extends BaseProperty> arrayProperty, boolean checkName) {
