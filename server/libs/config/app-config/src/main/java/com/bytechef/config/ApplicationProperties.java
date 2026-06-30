@@ -699,17 +699,98 @@ public class ApplicationProperties {
                 REDIS
             }
 
+            private Aws aws = new Aws();
+
             /**
              * Memory storage provider
              */
             private Provider provider = Provider.JDBC;
 
+            public Aws getAws() {
+                return aws;
+            }
+
             public Provider getProvider() {
                 return provider;
             }
 
+            public void setAws(Aws aws) {
+                this.aws = aws;
+            }
+
             public void setProvider(Provider provider) {
                 this.provider = provider;
+            }
+
+            /**
+             * AWS S3-backed chat memory provider configuration. Active when {@code provider} is {@code AWS}.
+             */
+            public static class Aws {
+
+                /**
+                 * Prefix used to derive the per-tenant S3 bucket name.
+                 */
+                private String bucketPrefix = "bytechef-chat-memory";
+
+                /**
+                 * AWS region
+                 */
+                private String region;
+
+                /**
+                 * AWS access key ID
+                 */
+                private String accessKeyId;
+
+                /**
+                 * AWS secret access key
+                 */
+                private String secretAccessKey;
+
+                /**
+                 * Key prefix prepended to every stored object key.
+                 */
+                private String keyPrefix = "";
+
+                public String getBucketPrefix() {
+                    return bucketPrefix;
+                }
+
+                public String getRegion() {
+                    return region;
+                }
+
+                public String getAccessKeyId() {
+                    return accessKeyId;
+                }
+
+                public String getSecretAccessKey() {
+                    return secretAccessKey;
+                }
+
+                public String getKeyPrefix() {
+                    return keyPrefix;
+                }
+
+                public void setBucketPrefix(String bucketPrefix) {
+                    this.bucketPrefix = bucketPrefix;
+                }
+
+                public void setRegion(String region) {
+                    this.region = region;
+                }
+
+                public void setAccessKeyId(String accessKeyId) {
+                    this.accessKeyId = accessKeyId;
+                }
+
+                public void setSecretAccessKey(String secretAccessKey) {
+                    this.secretAccessKey = secretAccessKey;
+                }
+
+                public void setKeyPrefix(String keyPrefix) {
+                    this.keyPrefix = keyPrefix;
+                }
             }
         }
 
