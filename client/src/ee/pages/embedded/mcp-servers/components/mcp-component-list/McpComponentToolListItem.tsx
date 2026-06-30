@@ -37,10 +37,9 @@ const McpComponentToolListItem = ({
                     <span className="min-w-0 flex-1 truncate text-sm font-medium">{mcpTool.title || mcpTool.name}</span>
 
                     <div className="flex shrink-0 items-center gap-0.5">
-                        {/* Anchor the popover to the Configure button so it opens right-aligned to that button. */}
-
                         <PopoverAnchor asChild>
                             <Button
+                                aria-label="Configure"
                                 className="rounded p-1 text-muted-foreground hover:bg-muted hover:text-foreground"
                                 icon={<BoltIcon className="size-4" />}
                                 onClick={() => openPopover(popoverId)}
@@ -51,6 +50,7 @@ const McpComponentToolListItem = ({
                         </PopoverAnchor>
 
                         <Button
+                            aria-label="Delete"
                             className="rounded p-1 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
                             icon={<Trash2Icon className="size-4" />}
                             onClick={() => setShowDeleteDialog(true)}
