@@ -2,7 +2,7 @@ import {WorkflowTask} from '@/shared/middleware/platform/configuration';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {beforeEach, describe, expect, it, vi} from 'vitest';
 
-import DuplicateNodeNamesBanner from './DuplicateNodeNamesBanner';
+import ErrorsBanner from '../ErrorsBanner';
 
 const task = (name: string): WorkflowTask => ({name, type: 'example/v1/action'}) as WorkflowTask;
 
@@ -33,7 +33,7 @@ describe('DuplicateNodeNamesBanner', () => {
     it('renders nothing when all node names are unique', () => {
         hoisted.workflowState.workflow = {tasks: [task('a'), task('b')], triggers: []};
 
-        const {container} = render(<DuplicateNodeNamesBanner />);
+        const {container} = render(<ErrorsBanner />);
 
         expect(container).toBeEmptyDOMElement();
     });
@@ -41,7 +41,7 @@ describe('DuplicateNodeNamesBanner', () => {
     it('renders a singular label for a single duplicate name', () => {
         hoisted.workflowState.workflow = {tasks: [task('dup'), task('dup')], triggers: []};
 
-        render(<DuplicateNodeNamesBanner />);
+        render(<ErrorsBanner />);
 
         expect(screen.getByText(/Duplicate node name:/)).toBeInTheDocument();
         expect(screen.getByText('dup')).toBeInTheDocument();
@@ -50,7 +50,7 @@ describe('DuplicateNodeNamesBanner', () => {
     it('renders a plural label and joins multiple duplicate names', () => {
         hoisted.workflowState.workflow = {tasks: [task('a'), task('a'), task('b'), task('b')], triggers: []};
 
-        render(<DuplicateNodeNamesBanner />);
+        render(<ErrorsBanner />);
 
         expect(screen.getByText(/Duplicate node names:/)).toBeInTheDocument();
         expect(screen.getByText('a, b')).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe('DuplicateNodeNamesBanner', () => {
     it('opens the code editor sheet when the action button is clicked', () => {
         hoisted.workflowState.workflow = {tasks: [task('dup'), task('dup')], triggers: []};
 
-        render(<DuplicateNodeNamesBanner />);
+        render(<ErrorsBanner />);
 
         fireEvent.click(screen.getByText('Open code editor'));
 
@@ -69,7 +69,7 @@ describe('DuplicateNodeNamesBanner', () => {
     it('hides the banner once it is dismissed', () => {
         hoisted.workflowState.workflow = {tasks: [task('dup'), task('dup')], triggers: []};
 
-        render(<DuplicateNodeNamesBanner />);
+        render(<ErrorsBanner />);
 
         const dismissButton = getDismissButton();
 
