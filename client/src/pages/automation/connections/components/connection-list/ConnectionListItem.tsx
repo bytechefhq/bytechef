@@ -101,10 +101,19 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
         },
     });
 
-    const componentDefinition = useMemo(
-        () => componentDefinitions.find((definition) => definition.name === connection.componentName),
-        [componentDefinitions, connection.componentName]
-    );
+    const componentDefinition = useMemo(() => {
+        const matchingComponentDefinitions = componentDefinitions.filter(
+            (definition) => definition.name === connection.componentName
+        );
+
+        // The list normally holds a single entry per component, but if several
+        // versions are present resolve to the latest so the icon is picked
+        // deterministically instead of depending on array order.
+        return matchingComponentDefinitions.reduce<ComponentDefinitionBasic | undefined>(
+            (latest, definition) => (!latest || definition.version > latest.version ? definition : latest),
+            undefined
+        );
+    }, [componentDefinitions, connection.componentName]);
 
     const handleAlertDeleteDialogClick = () => {
         if (connection.id) {
