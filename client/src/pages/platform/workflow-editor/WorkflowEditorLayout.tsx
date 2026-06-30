@@ -22,7 +22,7 @@ import {useParams} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
 
-import DuplicateNodeNamesBanner from './components/DuplicateNodeNamesBanner';
+import ErrorsBanner from './components/ErrorsBanner';
 import SubflowBanner from './components/SubflowBanner';
 import WorkflowCodeEditorSheet from './components/WorkflowCodeEditorSheet';
 import {
@@ -201,7 +201,7 @@ const WorkflowEditorLayout = ({
                 <div className="absolute top-2 left-2 z-10 flex flex-col gap-2">
                     <SubflowBanner />
 
-                    <DuplicateNodeNamesBanner />
+                    <ErrorsBanner />
                 </div>
 
                 {componentDefinitions && taskDispatcherDefinitions && (

@@ -7,7 +7,7 @@ import {twMerge} from 'tailwind-merge';
 
 import getDuplicateNodeNames from '../utils/getDuplicateNodeNames';
 
-const DuplicateNodeNamesBanner = ({className}: {className?: string}) => {
+const ErrorsBanner = ({className}: {className?: string}) => {
     const [dismissed, setDismissed] = useState(false);
 
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -74,4 +74,4 @@ const DuplicateNodeNamesBanner = ({className}: {className?: string}) => {
     );
 };
 
-export default DuplicateNodeNamesBanner;
+export default ErrorsBanner;
