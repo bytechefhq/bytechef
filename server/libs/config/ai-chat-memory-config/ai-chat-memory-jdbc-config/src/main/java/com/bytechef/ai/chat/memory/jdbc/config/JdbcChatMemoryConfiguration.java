@@ -16,12 +16,19 @@
 
 package com.bytechef.ai.chat.memory.jdbc.config;
 
+import com.bytechef.component.ai.agent.chat.memory.jdbc.util.JdbcChatMemoryUtils;
+import com.bytechef.component.ai.agent.chat.memory.jdbc.util.OrderedJdbcChatMemoryRepository;
+import javax.sql.DataSource;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.chat.memory.ChatMemoryRepository;
 import org.springframework.ai.chat.memory.MessageWindowChatMemory;
 import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepository;
+import org.springframework.ai.chat.memory.repository.jdbc.JdbcChatMemoryRepositoryDialect;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  * @author Ivica Cardic
@@ -30,10 +37,29 @@ import org.springframework.context.annotation.Configuration;
 class JdbcChatMemoryConfiguration {
 
     @Bean
+    @Primary
     @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "jdbc")
-    ChatMemory jdbcChatMemory(JdbcChatMemoryRepository jdbcChatMemoryRepository) {
+    ChatMemoryRepository orderedJdbcChatMemoryRepository(
+        JdbcChatMemoryRepository jdbcChatMemoryRepository, JdbcTemplate jdbcTemplate) {
+
+        DataSource dataSource = jdbcTemplate.getDataSource();
+
+        if (dataSource == null) {
+            return jdbcChatMemoryRepository;
+        }
+
+        JdbcChatMemoryRepositoryDialect dialect = JdbcChatMemoryRepositoryDialect.from(dataSource);
+
+        return new OrderedJdbcChatMemoryRepository(
+            jdbcChatMemoryRepository, jdbcTemplate,
+            JdbcChatMemoryUtils.getSelectConversationIdsOrderedSql(dialect));
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.memory", name = "provider", havingValue = "jdbc")
+    ChatMemory jdbcChatMemory(ChatMemoryRepository chatMemoryRepository) {
         return MessageWindowChatMemory.builder()
-            .chatMemoryRepository(jdbcChatMemoryRepository)
+            .chatMemoryRepository(chatMemoryRepository)
             .maxMessages(500)
             .build();
     }
