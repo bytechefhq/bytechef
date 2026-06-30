@@ -35,6 +35,21 @@ import org.jspecify.annotations.Nullable;
 public interface ActionDefinitionService extends OperationDefinitionService {
 
     /**
+     * Returns {@code true} when the action's owning component declares a connection definition. Used by the shared
+     * component-interaction tooling (AI Hub and the in-editor Copilot) — e.g. the {@code lookupActionPropertyOptions}
+     * tool callback — to decide whether a property-options lookup must carry a {@code connectionId}. When the
+     * underlying component has no connection, the lookup can proceed without one and the {@code connection_required}
+     * precondition envelope is skipped.
+     *
+     * @param componentName    the name of the component
+     * @param componentVersion the version of the component
+     * @param actionName       the name of the action (accepted for symmetry with sibling methods; the connection
+     *                         requirement is currently a component-level concern)
+     * @return {@code true} when the component declares a {@code ConnectionDefinition}, {@code false} otherwise
+     */
+    boolean actionDefinesConnection(String componentName, int componentVersion, String actionName);
+
+    /**
      * Executes the routine for dynamic resolution of particular properties required for component action to properly is
      * unpredictable as it may require connecting to outer APIs/microservices/platforms. Method is only called in
      * designTime, never in runtime. Every change of the lookupDependsOnPaths parameter triggers this method to
@@ -82,6 +97,27 @@ public interface ActionDefinitionService extends OperationDefinitionService {
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
         @Nullable ComponentConnection componentConnection);
 
+    /**
+     * Executes the dynamic resolution of options for a property of an action that binds multiple connections. Behaves
+     * like {@link #executeOptions(String, int, String, String, Map, List, String, ComponentConnection)} but receives
+     * every bound connection (keyed by component connection name) so the options function can reach more than one
+     * external system when resolving the selectable values. Used in design-time to update options dynamically based on
+     * input parameters or dependent property values.
+     *
+     * @param componentName        the name of the component
+     * @param componentVersion     the version of the component
+     * @param actionName           the name of the action triggering the option resolution
+     * @param propertyName         the name of the property for which options are being resolved
+     * @param inputParameters      a map containing input parameters required for business logic
+     * @param lookupDependsOnPaths a list of dependent property paths that impact the options
+     * @param searchText           the text query to filter the resolved options (if applicable)
+     * @param componentConnections a map of the action's bound connections, keyed by component connection name
+     * @param extensions           a map of optional extensions to further control the option resolution
+     * @return a list of {@link Option} objects dynamically resolved for the specified property
+     * @throws com.bytechef.exception.ConfigurationException if there are issues within the system during execution
+     * @throws ProviderException                             if the external systems or services are unavailable or
+     *                                                       result in errors
+     */
     List<Option> executeOptions(
         String componentName, int componentVersion, String actionName, String propertyName,
         Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
@@ -197,6 +233,17 @@ public interface ActionDefinitionService extends OperationDefinitionService {
     List<ActionDefinition> getActionDefinitions(String componentName, int componentVersion);
 
     /**
+     * Returns the lookup-depends-on paths for a property's OptionsDataSource, or an empty list when the property has no
+     * dynamic options OR cannot be resolved. Used by the shared component-interaction tooling (AI Hub and the in-editor
+     * Copilot) to enforce dependency ordering before fetching options. {@code propertyName} accepts dotted paths:
+     * {@code parent.child} descends into an ObjectProperty's children, {@code arrayProp[].child} is explicit descent
+     * into an ArrayProperty's first item type, and {@code arrayProp.child} is implicit descent when the array has a
+     * single object item type. Plain names match at the top level.
+     */
+    List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String actionName, String propertyName);
+
+    /**
      * Checks if a dynamic output is defined for the given component, version, and action.
      *
      * @param componentName    the name of the component to check
@@ -205,4 +252,14 @@ public interface ActionDefinitionService extends OperationDefinitionService {
      * @return true if a dynamic output is defined, false otherwise
      */
     boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName);
+
+    /**
+     * Returns true when the named property has a dynamic OptionsDataSource. Used by the shared component-interaction
+     * tooling (AI Hub and the in-editor Copilot) to short-circuit lookup calls that the LLM made for properties without
+     * dynamic options. {@code propertyName} accepts dotted paths (see {@link #getPropertyLookupDependsOn} for the
+     * supported conventions). The "not found" and "found but no data source" cases are intentionally indistinguishable:
+     * both yield the safest fallback (the lookup gate emits {@code no_options_for_property}).
+     */
+    boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String actionName, String propertyName);
 }

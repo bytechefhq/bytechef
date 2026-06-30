@@ -42,6 +42,7 @@ import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.exception.ConfigurationException;
 import com.bytechef.exception.ExecutionException;
 import com.bytechef.platform.component.ComponentConnection;
@@ -61,10 +62,12 @@ import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
+import com.bytechef.platform.util.PropertyUtils;
 import com.bytechef.platform.util.SchemaUtils;
 import com.bytechef.platform.util.WorkflowNodeDescriptionUtils;
 import java.time.Instant;
@@ -91,6 +94,19 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
         this.componentDefinitionRegistry = componentDefinitionRegistry;
         this.contextFactory = contextFactory;
+    }
+
+    @Override
+    public boolean actionDefinesConnection(String componentName, int componentVersion, String actionName) {
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return false;
+        }
+
+        ComponentDefinition componentDefinition = componentDefinitionRegistry.getComponentDefinition(
+            componentName, componentVersion);
+
+        return componentDefinition.getConnection()
+            .isPresent();
     }
 
     @Override
@@ -309,14 +325,8 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
 
     @Override
     public ActionDefinition getActionDefinition(String componentName, int componentVersion, String actionName) {
-        if (componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
-            return new ActionDefinition(
-                componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName),
-                componentName, componentVersion);
-        }
-
         return new ActionDefinition(
-            componentDefinitionRegistry.getActionDefinition("missing", 1, "missing"), componentName, componentVersion);
+            doGetActionDefinition(componentName, componentVersion, actionName), componentName, componentVersion);
     }
 
     @Override
@@ -328,10 +338,79 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
     }
 
     @Override
+    public List<String> getPropertyLookupDependsOn(
+        String componentName, int componentVersion, String actionName, String propertyName) {
+
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return List.of();
+        }
+
+        Property property = findActionProperty(componentName, componentVersion, actionName, propertyName);
+
+        if (!(property instanceof OptionsDataSourceAware optionsDataSourceAware)) {
+            return List.of();
+        }
+
+        com.bytechef.platform.component.domain.OptionsDataSource optionsDataSource =
+            optionsDataSourceAware.getOptionsDataSource();
+
+        if (optionsDataSource == null) {
+            return List.of();
+        }
+
+        return optionsDataSource.getOptionsLookupDependsOn();
+    }
+
+    @Override
     public boolean isDynamicOutputDefined(String componentName, int componentVersion, String actionName) {
         ActionDefinition actionDefinition = getActionDefinition(componentName, componentVersion, actionName);
 
         return actionDefinition.isOutputFunctionDefined();
+    }
+
+    @Override
+    public boolean propertyHasOptionsDataSource(
+        String componentName, int componentVersion, String actionName, String propertyName) {
+
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return false;
+        }
+
+        Property property = findActionProperty(componentName, componentVersion, actionName, propertyName);
+
+        if (!(property instanceof OptionsDataSourceAware optionsDataSourceAware)) {
+            return false;
+        }
+
+        return optionsDataSourceAware.getOptionsDataSource() != null;
+    }
+
+    private com.bytechef.component.definition.ActionDefinition doGetActionDefinition(
+        String componentName, int componentVersion, String actionName) {
+
+        if (componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return componentDefinitionRegistry.getActionDefinition(componentName, componentVersion, actionName);
+        }
+
+        return componentDefinitionRegistry.getActionDefinition("missing", 1, "missing");
+    }
+
+    private @Nullable Property findActionProperty(
+        String componentName, int componentVersion, String actionName, String propertyName) {
+
+        if (!componentDefinitionRegistry.hasComponentDefinition(componentName, componentVersion)) {
+            return null;
+        }
+
+        com.bytechef.component.definition.ActionDefinition actionDefinition = doGetActionDefinition(
+            componentName, componentVersion, actionName);
+
+        List<? extends BaseProperty> properties = actionDefinition.getProperties()
+            .orElse(List.of());
+
+        BaseProperty property = PropertyUtils.findPropertyByPath(properties, propertyName);
+
+        return Property.toProperty((com.bytechef.component.definition.Property) property);
     }
 
     private static ConvertResult convert(
