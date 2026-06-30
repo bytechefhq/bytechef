@@ -100,7 +100,7 @@ describe('TriggerForm', () => {
 
         await waitFor(() => expect(screen.getByText('Submit Test')).toBeInTheDocument(), {timeout: 3000});
 
-        fireEvent.change(screen.getByLabelText('Text Label'), {target: {value: 'test value'}});
+        fireEvent.change(screen.getByLabelText('Text Label', {exact: false}), {target: {value: 'test value'}});
         fireEvent.click(screen.getByText('Submit Test'));
 
         await waitFor(() => {
@@ -128,7 +128,7 @@ describe('TriggerForm', () => {
 
         await waitFor(() => expect(screen.getByText('Submit Test')).toBeInTheDocument(), {timeout: 3000});
 
-        fireEvent.change(screen.getByLabelText('Text Label'), {target: {value: 'test value'}});
+        fireEvent.change(screen.getByLabelText('Text Label', {exact: false}), {target: {value: 'test value'}});
         fireEvent.click(screen.getByText('Submit Test'));
 
         await waitFor(() => {

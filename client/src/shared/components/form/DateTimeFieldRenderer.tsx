@@ -24,7 +24,7 @@ export const DateTimeFieldRenderer = ({form, formInput, name}: DateTimeFieldRend
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <FormControl>
                         {fieldType === FieldType.DATE_PICKER ? (
@@ -43,7 +43,7 @@ export const DateTimeFieldRenderer = ({form, formInput, name}: DateTimeFieldRend
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

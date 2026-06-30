@@ -24,7 +24,7 @@ export const RadioFieldRenderer = ({form, formInput, name}: RadioFieldRendererPr
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <div className="flex flex-col gap-2">
                         <RadioGroup
@@ -46,7 +46,7 @@ export const RadioFieldRenderer = ({form, formInput, name}: RadioFieldRendererPr
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

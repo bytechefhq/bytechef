@@ -35,7 +35,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                 name={name}
                 render={({field}) => (
                     <FormItem className="space-y-2">
-                        <FormLabelWithDescription description={fieldDescription} label={label} />
+                        <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                         <div className="flex flex-col gap-2">
                             {options.map((option) => (
@@ -72,7 +72,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                     </FormItem>
                 )}
                 rules={{
-                    required: required ? 'Required' : false,
+                    required: required ? 'This field is required' : false,
                     validate: (value: unknown) => {
                         if (!Array.isArray(value)) {
                             return true;
@@ -99,7 +99,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <Select
                         onValueChange={field.onChange}
@@ -123,7 +123,7 @@ export const SelectFieldRenderer = ({form, formInput, name}: SelectFieldRenderer
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

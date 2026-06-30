@@ -38,7 +38,7 @@ export const InputFieldRenderer = ({form, formInput, name}: InputFieldRendererPr
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <FormControl>
                         <Input
@@ -54,7 +54,7 @@ export const InputFieldRenderer = ({form, formInput, name}: InputFieldRendererPr
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

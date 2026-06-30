@@ -21,7 +21,7 @@ export const FileInputFieldRenderer = ({form, formInput, name}: FileInputFieldRe
             name={name}
             render={({field}) => (
                 <FormItem className="space-y-2">
-                    <FormLabelWithDescription description={fieldDescription} label={label} />
+                    <FormLabelWithDescription description={fieldDescription} label={label} required={required} />
 
                     <FormControl>
                         <div>
@@ -36,7 +36,7 @@ export const FileInputFieldRenderer = ({form, formInput, name}: FileInputFieldRe
                     <FormMessage />
                 </FormItem>
             )}
-            rules={{required}}
+            rules={{required: required ? 'This field is required' : false}}
         />
     );
 };

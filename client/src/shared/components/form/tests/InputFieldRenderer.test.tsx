@@ -1,6 +1,6 @@
 import {FieldType} from '@/shared/constants';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
-import {describe, expect, it} from 'vitest';
+import {describe, expect, it, vi} from 'vitest';
 
 import {InputFieldRenderer} from '../InputFieldRenderer';
 import {createMockForm} from './testUtils';
@@ -185,6 +185,39 @@ describe('InputFieldRenderer', () => {
 
         const input = screen.getByRole('textbox');
         expect(input).toHaveValue('');
+    });
+
+    it('should render a required marker when the field is required', () => {
+        const {form, wrapper} = createMockForm();
+
+        render(<InputFieldRenderer form={form} formInput={{fieldLabel: 'Name', required: true}} name="name" />, {
+            wrapper,
+        });
+
+        expect(screen.getByText('*')).toBeInTheDocument();
+    });
+
+    it('should not render a required marker when the field is not required', () => {
+        const {form, wrapper} = createMockForm();
+
+        render(<InputFieldRenderer form={form} formInput={{fieldLabel: 'Name'}} name="name" />, {wrapper});
+
+        expect(screen.queryByText('*')).not.toBeInTheDocument();
+    });
+
+    it('should block submission and show a message when a required field is empty', async () => {
+        const {form, formRef, wrapper} = createMockForm();
+
+        render(<InputFieldRenderer form={form} formInput={{fieldLabel: 'Name', required: true}} name="name" />, {
+            wrapper,
+        });
+
+        const onValid = vi.fn();
+
+        await formRef.current?.handleSubmit(onValid)();
+
+        expect(await screen.findByText('This field is required')).toBeInTheDocument();
+        expect(onValid).not.toHaveBeenCalled();
     });
 
     it('should handle undefined fieldType gracefully', () => {

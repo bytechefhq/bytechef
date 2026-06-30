@@ -148,7 +148,7 @@ export default function ApprovalForm({
 
                         <Button
                             disabled={submitting}
-                            onClick={form.handleSubmit((values) => handleSubmit(values, false))}
+                            onClick={() => handleSubmit(form.getValues(), false)}
                             type="button"
                             variant="outline"
                         >
