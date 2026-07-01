@@ -21,40 +21,48 @@ import static com.bytechef.component.zenrows.constant.ZenRowsConstants.JS_RENDER
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.ORIGINAL_STATUS;
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZenRowsScrapeUrlAutoparseActionTest {
 
     private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(
         URL, "mockUrl", ORIGINAL_STATUS, false, JS_RENDER, false));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String stringResponse = "scrapedUrl";
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(
             stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
@@ -62,16 +70,20 @@ class ZenRowsScrapeUrlAutoparseActionTest {
             stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
             stringArgumentCaptor.capture(), booleanArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(stringResponse);
 
         String result = ZenRowsScrapeUrlAutoparseAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
         assertEquals(
-            List.of(URL, "mockUrl", AUTOPARSE, ORIGINAL_STATUS, JS_RENDER), stringArgumentCaptor.getAllValues());
+            List.of("", URL, "mockUrl", AUTOPARSE, ORIGINAL_STATUS, JS_RENDER), stringArgumentCaptor.getAllValues());
         assertEquals(List.of(true, false, false), booleanArgumentCaptor.getAllValues());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.TEXT, configuration.getResponseType());
     }
 }
