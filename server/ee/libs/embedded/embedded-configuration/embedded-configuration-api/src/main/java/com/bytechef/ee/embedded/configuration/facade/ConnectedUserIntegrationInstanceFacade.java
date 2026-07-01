@@ -22,9 +22,9 @@ public interface ConnectedUserIntegrationInstanceFacade {
 
     void enableIntegrationInstanceWorkflow(String externalUserId, long id, String workflowUuid);
 
-    List<Option> getIntegrationInstanceWorkflowInputOptions(
-        String externalUserId, long id, String workflowUuid, String inputName, String propertyName,
-        Map<String, Object> lookupDependsOnValues, String searchText);
+    List<Option> getComponentInputOptions(
+        String externalUserId, long id, String componentName, int componentVersion, String groupName,
+        String propertyName, Map<String, Object> lookupDependsOnValues, String searchText);
 
     void updateIntegrationInstanceWorkflow(
         String externalUserId, long id, String workflowUuid, Map<String, Object> inputs);

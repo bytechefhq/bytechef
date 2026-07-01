@@ -11,10 +11,10 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.ee.embedded.configuration.exception.EmbeddedIntegrationNotVisibleException;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserIntegrationInstanceFacade;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.converter.CaseInsensitiveEnumPropertyEditorSupport;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputOptionsRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.EnvironmentModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowInputOptionsRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.security.util.SecurityUtils;
@@ -99,23 +99,22 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
 
     @Override
     @CrossOrigin
-    public ResponseEntity<List<OptionModel>> getFrontendIntegrationInstanceWorkflowInputOptions(
-        Long id, String workflowUuid, WorkflowInputOptionsRequestModel workflowInputOptionsRequestModel) {
+    public ResponseEntity<List<OptionModel>> getFrontendComponentInputOptions(
+        Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
 
         String externalUserId = SecurityUtils.fetchCurrentUserLogin()
             .orElseThrow(() -> new RuntimeException("User not authenticated"));
 
         return ResponseEntity.ok(
-            getWorkflowInputOptions(externalUserId, id, workflowUuid, workflowInputOptionsRequestModel));
+            resolveComponentInputOptions(externalUserId, id, componentInputOptionsRequestModel));
     }
 
     @Override
-    public ResponseEntity<List<OptionModel>> getIntegrationInstanceWorkflowInputOptions(
-        String externalUserId, Long id, String workflowUuid,
-        WorkflowInputOptionsRequestModel workflowInputOptionsRequestModel) {
+    public ResponseEntity<List<OptionModel>> getComponentInputOptions(
+        String externalUserId, Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
 
         return ResponseEntity.ok(
-            getWorkflowInputOptions(externalUserId, id, workflowUuid, workflowInputOptionsRequestModel));
+            resolveComponentInputOptions(externalUserId, id, componentInputOptionsRequestModel));
     }
 
     @Override
@@ -159,17 +158,17 @@ public class IntegrationInstanceWorkflowApiController implements IntegrationInst
         dataBinder.registerCustomEditor(EnvironmentModel.class, new CaseInsensitiveEnumPropertyEditorSupport());
     }
 
-    private List<OptionModel> getWorkflowInputOptions(
-        String externalUserId, Long id, String workflowUuid,
-        WorkflowInputOptionsRequestModel workflowInputOptionsRequestModel) {
+    private List<OptionModel> resolveComponentInputOptions(
+        String externalUserId, Long id, ComponentInputOptionsRequestModel componentInputOptionsRequestModel) {
 
-        Map<String, Object> lookupDependsOnValues = workflowInputOptionsRequestModel.getLookupDependsOnValues();
+        Map<String, Object> lookupDependsOnValues = componentInputOptionsRequestModel.getLookupDependsOnValues();
 
-        List<Option> options = connectedUserIntegrationInstanceFacade.getIntegrationInstanceWorkflowInputOptions(
-            externalUserId, id, workflowUuid, workflowInputOptionsRequestModel.getInputName(),
-            workflowInputOptionsRequestModel.getPropertyName(),
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            externalUserId, id, componentInputOptionsRequestModel.getComponentName(),
+            componentInputOptionsRequestModel.getComponentVersion(),
+            componentInputOptionsRequestModel.getGroupName(), componentInputOptionsRequestModel.getPropertyName(),
             lookupDependsOnValues == null ? Map.of() : lookupDependsOnValues,
-            workflowInputOptionsRequestModel.getSearchText());
+            componentInputOptionsRequestModel.getSearchText());
 
         return options.stream()
             .map(option -> new OptionModel()
