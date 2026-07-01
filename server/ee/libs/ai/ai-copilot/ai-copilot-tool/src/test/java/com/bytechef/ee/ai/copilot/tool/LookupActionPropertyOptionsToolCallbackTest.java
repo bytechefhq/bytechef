@@ -22,9 +22,11 @@ import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.user.service.AuthorityService;
 import com.bytechef.platform.user.service.UserService;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.ai.chat.model.ToolContext;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -34,6 +36,7 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class LookupActionPropertyOptionsToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
