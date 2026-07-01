@@ -36,12 +36,15 @@ public class ZenRowsComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("zenrows")
         .title("ZenRows")
+        .version(1)
         .description(
             "ZenRows is a web scraping service with an advanced toolkit and APIs that simplify data extraction from " +
                 "bot-protected websites.")
         .icon("path:assets/zenrows.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(ZenRowsConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://docs.zenrows.com/first-steps/welcome")
         .actions(
             ZenRowScrapeUrlAction.ACTION_DEFINITION,
             ZenRowsScrapeUrlAutoparseAction.ACTION_DEFINITION,

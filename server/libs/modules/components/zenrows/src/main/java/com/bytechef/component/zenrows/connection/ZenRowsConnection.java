@@ -34,6 +34,8 @@ public class ZenRowsConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.zenrows.com/v1/")
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/zenrows_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.API_KEY)
                 .properties(
