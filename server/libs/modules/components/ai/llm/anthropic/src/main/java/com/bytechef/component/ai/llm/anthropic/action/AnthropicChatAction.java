@@ -35,6 +35,8 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
+import org.springframework.ai.anthropic.AnthropicCacheOptions;
+import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 
@@ -56,7 +58,11 @@ public class AnthropicChatAction {
             .model(inputParameters.getRequiredString(MODEL))
             .maxTokens(inputParameters.getInteger(MAX_TOKENS))
             .stopSequences(inputParameters.getList(STOP, new TypeReference<>() {}))
-            .topK(inputParameters.getInteger(TOP_K));
+            .topK(inputParameters.getInteger(TOP_K))
+            .cacheOptions(
+                AnthropicCacheOptions.builder()
+                    .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
+                    .build());
 
         // Anthropic rejects requests that include both `temperature` and `top_p`; pick one.
         Double temperature = inputParameters.getDouble(TEMPERATURE);

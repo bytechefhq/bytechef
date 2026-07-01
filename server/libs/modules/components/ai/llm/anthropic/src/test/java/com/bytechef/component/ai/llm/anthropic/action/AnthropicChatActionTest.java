@@ -43,6 +43,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
+import org.springframework.ai.anthropic.AnthropicCacheStrategy;
 import org.springframework.ai.anthropic.AnthropicChatModel;
 import org.springframework.ai.anthropic.AnthropicChatOptions;
 
@@ -97,6 +98,9 @@ class AnthropicChatActionTest {
             assertEquals(50, anthropicChatOptions.getTopK());
             assertEquals(0.7, anthropicChatOptions.getTemperature());
             assertNull(anthropicChatOptions.getTopP());
+            assertEquals(
+                AnthropicCacheStrategy.CONVERSATION_HISTORY, anthropicChatOptions.getCacheOptions()
+                    .getStrategy());
         }
     }
 
@@ -142,6 +146,9 @@ class AnthropicChatActionTest {
             assertEquals(50, anthropicChatOptions.getTopK());
             assertNull(anthropicChatOptions.getTemperature());
             assertEquals(0.9, anthropicChatOptions.getTopP());
+            assertEquals(
+                AnthropicCacheStrategy.CONVERSATION_HISTORY, anthropicChatOptions.getCacheOptions()
+                    .getStrategy());
         }
     }
 
@@ -184,6 +191,9 @@ class AnthropicChatActionTest {
             assertEquals(50, anthropicChatOptions.getTopK());
             assertNull(anthropicChatOptions.getTemperature());
             assertNull(anthropicChatOptions.getTopP());
+            assertEquals(
+                AnthropicCacheStrategy.CONVERSATION_HISTORY, anthropicChatOptions.getCacheOptions()
+                    .getStrategy());
         }
     }
 }
