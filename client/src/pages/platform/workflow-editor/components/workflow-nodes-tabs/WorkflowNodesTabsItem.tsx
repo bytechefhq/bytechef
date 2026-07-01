@@ -44,22 +44,43 @@ const WorkflowNodesTabsItem = ({draggable, handleClick, node, selected}: Workflo
         if (iconRef.current) {
             const nodeContainer = document.createElement('div');
 
-            nodeContainer.className =
-                'flex size-14 items-center justify-center rounded-lg border-2 border-slate-200 bg-white absolute left-[-1000px] top-[-1000px]';
+            nodeContainer.style.position = 'absolute';
+            nodeContainer.style.top = '-9999px';
+            nodeContainer.style.left = '-9999px';
+            nodeContainer.style.width = '56px';
+            nodeContainer.style.height = '56px';
+            nodeContainer.style.display = 'flex';
+            nodeContainer.style.alignItems = 'center';
+            nodeContainer.style.justifyContent = 'center';
+            nodeContainer.style.backgroundColor = '#ffffff';
+            nodeContainer.style.border = '2px solid #e2e8f0';
+            nodeContainer.style.borderRadius = '8px';
+            nodeContainer.style.zIndex = '-9999';
 
             const iconClone = iconRef.current.cloneNode(true) as HTMLElement;
 
-            iconClone.className = 'm-0 size-7';
+            iconClone.style.margin = '0';
+            iconClone.style.width = '28px';
+            iconClone.style.height = '28px';
+            iconClone.style.display = 'flex';
+            iconClone.style.alignItems = 'center';
+            iconClone.style.justifyContent = 'center';
 
             const svgElement = iconClone.querySelector('svg');
 
             if (svgElement) {
-                svgElement.setAttribute('class', 'block size-full');
+                svgElement.style.display = 'block';
+                svgElement.style.width = '100%';
+                svgElement.style.height = '100%';
             }
 
             nodeContainer.appendChild(iconClone);
             document.body.appendChild(nodeContainer);
-            event.dataTransfer.setDragImage(nodeContainer, 28, 28);
+
+            const dragX = nodeContainer.offsetWidth > 0 ? 28 : 28;
+            const dragY = 28;
+
+            event.dataTransfer.setDragImage(nodeContainer, dragX, dragY);
 
             requestAnimationFrame(() => {
                 if (nodeContainer.parentNode) {
