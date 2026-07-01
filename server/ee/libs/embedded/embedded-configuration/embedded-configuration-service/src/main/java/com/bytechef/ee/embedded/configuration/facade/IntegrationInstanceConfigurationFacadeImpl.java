@@ -249,6 +249,12 @@ public class IntegrationInstanceConfigurationFacadeImpl implements IntegrationIn
             jobFacade.deleteJob(jobId);
         }
 
+        List<IntegrationInstance> integrationInstances = integrationInstanceService.getIntegrationInstances(id);
+
+        for (IntegrationInstance integrationInstance : integrationInstances) {
+            integrationInstanceFacade.deleteIntegrationInstance(integrationInstance.getId());
+        }
+
         for (IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow : integrationInstanceConfigurationWorkflows) {
 
             integrationInstanceConfigurationWorkflowService.delete(integrationInstanceConfigurationWorkflow.getId());
