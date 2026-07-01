@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -60,6 +62,9 @@ public class PropertyModel {
   private Boolean expressionEnabled = true;
 
   private Boolean hidden = false;
+
+  @Valid
+  private Map<String, Object> metadata = new HashMap<>();
 
   private @Nullable String name;
 
@@ -183,6 +188,35 @@ public class PropertyModel {
     this.hidden = hidden;
   }
 
+  public PropertyModel metadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+    return this;
+  }
+
+  public PropertyModel putMetadataItem(String key, Object metadataItem) {
+    if (this.metadata == null) {
+      this.metadata = new HashMap<>();
+    }
+    this.metadata.put(key, metadataItem);
+    return this;
+  }
+
+  /**
+   * Key-value map of metadata.
+   * @return metadata
+   */
+  
+  @Schema(name = "metadata", description = "Key-value map of metadata.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("metadata")
+  public Map<String, Object> getMetadata() {
+    return metadata;
+  }
+
+  @JsonProperty("metadata")
+  public void setMetadata(Map<String, Object> metadata) {
+    this.metadata = metadata;
+  }
+
   public PropertyModel name(@Nullable String name) {
     this.name = name;
     return this;
@@ -260,6 +294,7 @@ public class PropertyModel {
         Objects.equals(this.displayCondition, property.displayCondition) &&
         Objects.equals(this.expressionEnabled, property.expressionEnabled) &&
         Objects.equals(this.hidden, property.hidden) &&
+        Objects.equals(this.metadata, property.metadata) &&
         Objects.equals(this.name, property.name) &&
         Objects.equals(this.required, property.required) &&
         Objects.equals(this.type, property.type);
@@ -267,7 +302,7 @@ public class PropertyModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, name, required, type);
+    return Objects.hash(advancedOption, description, displayCondition, expressionEnabled, hidden, metadata, name, required, type);
   }
 
   @Override
@@ -279,6 +314,7 @@ public class PropertyModel {
     sb.append("    displayCondition: ").append(toIndentedString(displayCondition)).append("\n");
     sb.append("    expressionEnabled: ").append(toIndentedString(expressionEnabled)).append("\n");
     sb.append("    hidden: ").append(toIndentedString(hidden)).append("\n");
+    sb.append("    metadata: ").append(toIndentedString(metadata)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");

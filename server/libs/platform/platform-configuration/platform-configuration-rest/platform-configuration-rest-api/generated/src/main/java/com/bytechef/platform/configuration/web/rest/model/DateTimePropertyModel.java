@@ -17,7 +17,9 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -191,6 +193,16 @@ public class DateTimePropertyModel extends ValuePropertyModel {
 
   public DateTimePropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
+    return this;
+  }
+
+  public DateTimePropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public DateTimePropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
     return this;
   }
 

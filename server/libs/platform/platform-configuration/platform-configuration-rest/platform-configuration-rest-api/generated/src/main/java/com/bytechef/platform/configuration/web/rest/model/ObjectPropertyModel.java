@@ -298,6 +298,16 @@ public class ObjectPropertyModel extends ValuePropertyModel {
     return this;
   }
 
+  public ObjectPropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public ObjectPropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
+    return this;
+  }
+
   public ObjectPropertyModel name(String name) {
     super.name(name);
     return this;
