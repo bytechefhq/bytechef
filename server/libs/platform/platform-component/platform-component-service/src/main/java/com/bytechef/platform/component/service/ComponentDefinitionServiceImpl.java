@@ -17,17 +17,31 @@
 package com.bytechef.platform.component.service;
 
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.MapUtils;
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.ActionDefinition.OptionsFunction;
 import com.bytechef.component.definition.ConnectionDefinition;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.OptionsDataSource;
+import com.bytechef.component.definition.Parameters;
+import com.bytechef.component.exception.ProviderException;
+import com.bytechef.exception.ConfigurationException;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.ComponentDefinitionRegistry;
+import com.bytechef.platform.component.context.ContextFactory;
+import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
 import com.bytechef.platform.component.filter.ComponentDefinitionFilter;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.apache.commons.lang3.StringUtils;
@@ -42,24 +56,69 @@ import org.springframework.stereotype.Service;
 @Service("componentDefinitionService")
 public class ComponentDefinitionServiceImpl implements ComponentDefinitionService {
 
+    private static final String COMPONENT_INPUT_ACTION_NAME = "__componentInput__";
+
     @Nullable
     private volatile List<ComponentDefinition> cachedComponentDefinitions;
     private final List<ComponentDefinitionFilter> componentDefinitionFilters;
     private final ComponentDefinitionRegistry componentDefinitionRegistry;
+    private final ContextFactory contextFactory;
 
     @SuppressFBWarnings("EI2")
     public ComponentDefinitionServiceImpl(
         List<ComponentDefinitionFilter> componentDefinitionFilters,
-        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry) {
+        @Lazy ComponentDefinitionRegistry componentDefinitionRegistry, ContextFactory contextFactory) {
 
         this.componentDefinitionFilters = componentDefinitionFilters;
         this.componentDefinitionRegistry = componentDefinitionRegistry;
+        this.contextFactory = contextFactory;
     }
 
     @Override
     public Optional<ComponentDefinition> fetchComponentDefinition(String name, @Nullable Integer version) {
         return componentDefinitionRegistry.fetchComponentDefinition(name, version)
             .map(ComponentDefinition::new);
+    }
+
+    @Override
+    public List<Option> executeWorkflowInputOptions(
+        String componentName, int componentVersion, String groupName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable ComponentConnection componentConnection) {
+
+        ActionContext actionContext = contextFactory.createActionContext(
+            componentName, componentVersion, COMPONENT_INPUT_ACTION_NAME, null, null, null, null, null,
+            componentConnection, null, null, true);
+
+        try {
+            Parameters inputParametersInstance = ParametersFactory.create(inputParameters);
+            Parameters connectionParameters = ParametersFactory.create(componentConnection);
+            Map<String, String> lookupDependsOnPathsMap = MapUtils.toMap(
+                lookupDependsOnPaths, path -> path.substring(path.lastIndexOf(".") + 1), path -> path);
+
+            DynamicOptionsProperty<?> dynamicOptionsProperty =
+                (DynamicOptionsProperty<?>) componentDefinitionRegistry.getComponentInputProperty(
+                    componentName, componentVersion, groupName, propertyName, inputParametersInstance,
+                    connectionParameters, lookupDependsOnPathsMap, actionContext);
+
+            OptionsDataSource<?> optionsDataSource = dynamicOptionsProperty.getOptionsDataSource()
+                .orElseThrow(() -> new IllegalArgumentException("Options data source is not defined."));
+
+            OptionsFunction<?> optionsFunction = (OptionsFunction<?>) optionsDataSource.getOptions();
+
+            return optionsFunction
+                .apply(
+                    inputParametersInstance, connectionParameters, lookupDependsOnPathsMap, searchText, actionContext)
+                .stream()
+                .map(Option::new)
+                .toList();
+        } catch (Exception e) {
+            if (e instanceof ProviderException providerException) {
+                throw providerException;
+            }
+
+            throw new ConfigurationException(e, inputParameters, ActionDefinitionErrorType.EXECUTE_OPTIONS);
+        }
     }
 
     @Override

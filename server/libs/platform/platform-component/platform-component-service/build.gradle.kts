@@ -38,5 +38,6 @@ dependencies {
     testImplementation(project(":server:libs:modules:components:petstore"))
     testImplementation(project(":server:libs:modules:components:google:google-sheets"))
     testImplementation(project(":server:libs:modules:components:http-client"))
+    testImplementation(project(":server:libs:modules:components:slack"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }
