@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.agent;
 import com.agui.core.state.State;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 // Gateway resolver path disabled for now — see the commented block at the bottom of this class.
 // import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
@@ -43,27 +44,6 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
 
     private static final Logger log = LoggerFactory.getLogger(CopilotChatClientResolver.class);
 
-    /**
-     * AG-UI state key for the user-selected LLM provider.
-     */
-    static final String USER_SELECTED_LLM_PROVIDER_KEY = "userSelectedLlmProvider";
-
-    /**
-     * AG-UI state key for the user-selected LLM model.
-     */
-    static final String USER_SELECTED_LLM_MODEL_KEY = "userSelectedLlmModel";
-
-    /**
-     * AG-UI state key for the workspace id.
-     */
-    static final String WORKSPACE_ID_KEY = "workspaceId";
-
-    /**
-     * AG-UI state key for the active environment id (client-supplied). Used to resolve the platform AI provider catalog
-     * API key for the chosen provider.
-     */
-    static final String ENVIRONMENT_ID_KEY = "environmentId";
-
     private final CatalogChatClientResolver catalogChatClientResolver;
 
     @SuppressFBWarnings("EI")
@@ -77,8 +57,8 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        String llmProvider = StringUtils.asString(state.get(USER_SELECTED_LLM_PROVIDER_KEY));
-        String llmModel = StringUtils.asString(state.get(USER_SELECTED_LLM_MODEL_KEY));
+        String llmProvider = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_MODEL));
 
         if (llmProvider == null || llmModel == null) {
             if ((llmProvider == null) != (llmModel == null)) {
@@ -90,7 +70,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        Long environmentId = NumberUtils.asLong(state.get(ENVIRONMENT_ID_KEY));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
 
         if (environmentId != null) {
             return catalogChatClientResolver.resolve(environmentId.intValue(), llmProvider, llmModel);
