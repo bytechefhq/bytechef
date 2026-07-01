@@ -11,7 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.commons.util.JsonUtils;
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
@@ -21,6 +24,7 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class ToolErrorsTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
@@ -44,9 +48,17 @@ class ToolErrorsTest {
                 private static final long serialVersionUID = 1L;
             });
 
-        String result = ToolErrors.toolError("any message");
+        JsonUtils.setObjectMapper(failing);
 
-        assertThat(result).isEqualTo("{\"error\":\"serialization failure\"}");
+        try {
+            String result = ToolErrors.toolError("any message");
+
+            assertThat(result).isEqualTo("{\"error\":\"serialization failure\"}");
+        } finally {
+            JsonUtils.setObjectMapper(
+                JsonMapper.builder()
+                    .build());
+        }
     }
 
     @Test
