@@ -17,6 +17,8 @@
 package com.bytechef.platform.domain;
 
 import com.bytechef.commons.util.OptionalUtils;
+
+import java.util.Map;
 import java.util.Objects;
 import org.jspecify.annotations.Nullable;
 
@@ -27,6 +29,7 @@ public abstract class BaseProperty {
     protected String displayCondition;
     protected boolean expressionEnabled; // Defaults to true
     protected boolean hidden;
+    protected Map<String, Object> metadata;
     protected boolean required;
     protected String name;
 
@@ -39,6 +42,7 @@ public abstract class BaseProperty {
         this.displayCondition = OptionalUtils.orElse(property.getDisplayCondition(), null);
         this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
         this.hidden = OptionalUtils.orElse(property.getHidden(), false);
+        this.metadata = property.getMetadata();
         this.required = OptionalUtils.orElse(property.getRequired(), false);
         this.name = property.getName();
     }
@@ -56,12 +60,13 @@ public abstract class BaseProperty {
         return advancedOption == that.advancedOption && expressionEnabled == that.expressionEnabled
             && hidden == that.hidden && required == that.required
             && Objects.equals(displayCondition, that.displayCondition)
-            && Objects.equals(name, that.name);
+            && Objects.equals(name, that.name)
+            && Objects.equals(metadata, that.metadata);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(advancedOption, displayCondition, expressionEnabled, hidden, required, name);
+        return Objects.hash(advancedOption, displayCondition, expressionEnabled, hidden, metadata, required, name);
     }
 
     public boolean getAdvancedOption() {
@@ -92,5 +97,9 @@ public abstract class BaseProperty {
 
     public String getName() {
         return name;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return metadata;
     }
 }
