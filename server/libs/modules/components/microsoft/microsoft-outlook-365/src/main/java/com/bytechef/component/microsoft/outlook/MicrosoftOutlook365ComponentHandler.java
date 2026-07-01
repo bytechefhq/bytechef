@@ -32,6 +32,7 @@ import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365MoveEm
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365ReplyToEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SearchEmailAction;
 import com.bytechef.component.microsoft.outlook.action.MicrosoftOutlook365SendEmailAction;
+import com.bytechef.component.microsoft.outlook.cluster.MicrosoftOutlook365ApprovalChannel;
 import com.bytechef.component.microsoft.outlook.connection.MicrosoftOutlook365Connection;
 import com.bytechef.component.microsoft.outlook.trigger.MicrosoftOutlook365NewEmailBatchTrigger;
 import com.bytechef.component.microsoft.outlook.trigger.MicrosoftOutlook365NewEmailTrigger;
@@ -67,6 +68,7 @@ public class MicrosoftOutlook365ComponentHandler implements ComponentHandler {
             MicrosoftOutlook365SearchEmailAction.ACTION_DEFINITION,
             MicrosoftOutlook365SendEmailAction.ACTION_DEFINITION)
         .clusterElements(
+            MicrosoftOutlook365ApprovalChannel.CLUSTER_ELEMENT_DEFINITION,
             tool(MicrosoftOutlook365CreateEventAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365DeleteEventAction.ACTION_DEFINITION),
             tool(MicrosoftOutlook365ForwardEmailAction.ACTION_DEFINITION),
