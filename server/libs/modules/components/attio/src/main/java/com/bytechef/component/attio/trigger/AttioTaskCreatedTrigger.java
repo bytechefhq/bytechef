@@ -45,6 +45,7 @@ public class AttioTaskCreatedTrigger {
         .description("Triggers when new task is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(TRIGGER_OUTPUT))
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#task-created")
         .webhookEnable(AttioTaskCreatedTrigger::webhookEnable)
         .webhookDisable(AttioTaskCreatedTrigger::webhookDisable)
         .webhookRequest(AttioTaskCreatedTrigger::webhookRequest);
@@ -56,7 +57,8 @@ public class AttioTaskCreatedTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook("task.created", context, webhookUrl)), null);
+        return new WebhookEnableOutput(
+            Map.of(ID, subscribeWebhook("task.created", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(

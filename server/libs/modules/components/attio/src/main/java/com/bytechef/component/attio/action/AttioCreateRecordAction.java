@@ -58,6 +58,7 @@ public class AttioCreateRecordAction {
             getUserRecord(true),
             getDealRecord(true),
             getWorkspaceRecord(true))
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#create-record")
         .output()
         .perform(AttioCreateRecordAction::perform);
 

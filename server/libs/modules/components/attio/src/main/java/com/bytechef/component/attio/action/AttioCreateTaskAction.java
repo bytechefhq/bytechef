@@ -93,6 +93,7 @@ public class AttioCreateTaskAction {
                 .options((OptionsFunction<String>) AttioUtils::getWorkSpaceMemberIdOptions)
                 .required(false)
                 .items(string()))
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#create-task")
         .output(
             outputSchema(
                 object()

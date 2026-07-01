@@ -31,6 +31,8 @@ public class AttioConnection {
 
     public static final ModifiableConnectionDefinition CONNECTION_DEFINITION = connection()
         .baseUri((connectionParameters, context) -> "https://api.attio.com/v2")
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#connection-setup")
         .authorizations(
             authorization(AuthorizationType.BEARER_TOKEN)
                 .title("Access Token")

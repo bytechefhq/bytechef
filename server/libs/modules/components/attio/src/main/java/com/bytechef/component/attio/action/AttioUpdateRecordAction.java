@@ -65,6 +65,7 @@ public class AttioUpdateRecordAction {
             getUserRecord(false),
             getDealRecord(false),
             getWorkspaceRecord(false))
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#update-record")
         .output()
         .perform(AttioUpdateRecordAction::perform);
 
