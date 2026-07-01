@@ -8,6 +8,8 @@
 package com.bytechef.ee.ai.copilot.util;
 
 import com.agui.core.state.State;
+import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.ai.copilot.tool.AgentToolInvocationContext;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
@@ -40,10 +42,10 @@ public final class CopilotToolContextUtils {
             toolContext.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
-        Long workspaceId = asLong(state.get("workspaceId"));
-        Long userId = asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
-        Long environmentId = asLong(state.get("environmentId"));
-        String tenantId = asString(state.get(CopilotStateKeys.STATE_TENANT_ID));
+        Long workspaceId = NumberUtils.asLong(state.get("workspaceId"));
+        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+        Long environmentId = NumberUtils.asLong(state.get("environmentId"));
+        String tenantId = StringUtils.asString(state.get(CopilotStateKeys.STATE_TENANT_ID));
         Authentication authentication = state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
@@ -66,25 +68,5 @@ public final class CopilotToolContextUtils {
                 .toToolContext());
 
         return toolContext;
-    }
-
-    private static @Nullable Long asLong(@Nullable Object value) {
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-
-        if (value instanceof String string && !string.isBlank()) {
-            try {
-                return Long.parseLong(string);
-            } catch (NumberFormatException exception) {
-                return null;
-            }
-        }
-
-        return null;
-    }
-
-    private static @Nullable String asString(@Nullable Object value) {
-        return value instanceof String string && !string.isBlank() ? string : null;
     }
 }

@@ -8,6 +8,8 @@
 package com.bytechef.ee.ai.copilot.agent;
 
 import com.agui.core.state.State;
+import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.commons.util.StringUtils;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 // Gateway resolver path disabled for now — see the commented block at the bottom of this class.
 // import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
@@ -75,8 +77,8 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        String llmProvider = asString(state.get(USER_SELECTED_LLM_PROVIDER_KEY));
-        String llmModel = asString(state.get(USER_SELECTED_LLM_MODEL_KEY));
+        String llmProvider = StringUtils.asString(state.get(USER_SELECTED_LLM_PROVIDER_KEY));
+        String llmModel = StringUtils.asString(state.get(USER_SELECTED_LLM_MODEL_KEY));
 
         if (llmProvider == null || llmModel == null) {
             if ((llmProvider == null) != (llmModel == null)) {
@@ -88,33 +90,13 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        Long environment = asLong(state.get(ENVIRONMENT_ID_KEY));
+        Long environmentId = NumberUtils.asLong(state.get(ENVIRONMENT_ID_KEY));
 
-        if (environment != null) {
-            return catalogChatClientResolver.resolve(environment.intValue(), llmProvider, llmModel);
+        if (environmentId != null) {
+            return catalogChatClientResolver.resolve(environmentId.intValue(), llmProvider, llmModel);
         }
 
         return null;
-    }
-
-    private static @Nullable String asString(@Nullable Object value) {
-        return value == null ? null : value.toString();
-    }
-
-    private static @Nullable Long asLong(@Nullable Object value) {
-        if (value == null) {
-            return null;
-        }
-
-        if (value instanceof Number number) {
-            return number.longValue();
-        }
-
-        try {
-            return Long.parseLong(value.toString());
-        } catch (NumberFormatException exception) {
-            return null;
-        }
     }
 
     // ---------------------------------------------------------------------------------------------------------------
@@ -126,7 +108,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
     // private final AiGatewayProviderService aiGatewayProviderService;
     // private final AiGatewayChatModelFactory aiGatewayChatModelFactory;
     //
-    // Long workspaceId = asLong(state.get(WORKSPACE_ID_KEY));
+    // Long workspaceId = NumberUtils.asLong(state.get(WORKSPACE_ID_KEY));
     //
     // if (workspaceId == null) {
     // log.warn(
