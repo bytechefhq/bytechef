@@ -54,7 +54,7 @@ import tools.jackson.core.type.TypeReference;
 @Transactional
 @ConditionalOnEEVersion
 @SkipAutomationAuthorization
-public class ConnectedUserProjectWorkflowWriter {
+public class ConnectedUserProjectWorkflowManager {
 
     private static final String DEFAULT_DEFINITION = """
         {
@@ -78,7 +78,7 @@ public class ConnectedUserProjectWorkflowWriter {
     private final WorkflowTestConfigurationFacade workflowTestConfigurationFacade;
 
     @SuppressFBWarnings("EI")
-    public ConnectedUserProjectWorkflowWriter(
+    public ConnectedUserProjectWorkflowManager(
         ConnectedUserProjectService connectUserProjectService,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserService connectedUserService, ConnectionService connectionService, ProjectService projectService,
