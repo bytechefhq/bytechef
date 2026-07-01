@@ -17,6 +17,10 @@ import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.ai.copilot.tool.SecurityContextRehydrator;
+import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
@@ -26,6 +30,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,6 +39,8 @@ import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.tool.ToolCallback;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
 
 /**
  * @version ee
@@ -55,16 +62,21 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
     private final WorkflowService workflowService;
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
+    private final PermissionService permissionService;
+    private final SecurityContextRehydrator securityContextRehydrator;
     private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService,
-        final WorkflowNodeOutputFacade workflowNodeOutputFacade)
+        final WorkflowNodeOutputFacade workflowNodeOutputFacade, final PermissionService permissionService,
+        final SecurityContextRehydrator securityContextRehydrator)
         throws AGUIException {
 
         super(builder);
 
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
+        this.permissionService = permissionService;
+        this.securityContextRehydrator = securityContextRehydrator;
         this.overrideChatClientResolver = builder.overrideChatClientResolver;
     }
 
@@ -102,12 +114,14 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         String workflowId = (String) state.get("workflowId");
 
+        checkWorkflowAccess(state, workflowId);
+
         Workflow workflow = workflowService.getWorkflow(workflowId);
 
         contexts.add(new Context("Current Workflow Definition", workflow.getDefinition()));
 
-        List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs =
-            workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, null, 0);
+        List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs = runWithCallerSecurityContext(
+            state, () -> workflowNodeOutputFacade.getPreviousWorkflowNodeOutputs(workflowId, null, 0));
 
         contexts.add(new Context("Current Outputs", getSampleOutputs(previousWorkflowNodeOutputs)));
 
@@ -129,6 +143,57 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         return systemMessage;
     }
 
+    private void checkWorkflowAccess(State state, @Nullable String workflowId) {
+        if (workflowId == null) {
+            return;
+        }
+
+        Long userId = asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+
+        if (userId == null) {
+            if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication) {
+                return;
+            }
+
+            throw new AccessDeniedException("Access to workflow '" + workflowId + "' is denied");
+        }
+
+        boolean allowed = securityContextRehydrator.withUserSecurityContext(
+            userId, () -> permissionService.hasWorkflowScope(workflowId, "WORKFLOW_VIEW"));
+
+        if (!allowed) {
+            throw new AccessDeniedException("Access to workflow '" + workflowId + "' is denied");
+        }
+    }
+
+    private <T> T runWithCallerSecurityContext(State state, Supplier<T> action) {
+        Long userId = asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+
+        if (userId != null) {
+            return securityContextRehydrator.withUserSecurityContext(userId, action);
+        }
+
+        if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication) {
+            return callSkippingChecks(action);
+        }
+
+        return action.get();
+    }
+
+    private static <T> T callSkippingChecks(Supplier<T> action) {
+        try {
+            return AutomationAuthorizationContext.callSkippingChecks(action::get);
+        } catch (RuntimeException | Error exception) {
+            throw exception;
+        } catch (Throwable throwable) {
+            throw new IllegalStateException(throwable);
+        }
+    }
+
+    private static @Nullable Long asLong(@Nullable Object value) {
+        return value instanceof Number number ? number.longValue() : null;
+    }
+
     private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {
         StringBuilder stringBuilder = new StringBuilder("\n");
 
@@ -146,6 +211,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
         private WorkflowService workflowService;
         private WorkflowNodeOutputFacade workflowNodeOutputFacade;
+        private PermissionService permissionService;
+        private SecurityContextRehydrator securityContextRehydrator;
         private @Nullable OverrideChatClientResolver overrideChatClientResolver;
 
         public Builder overrideChatClientResolver(@Nullable OverrideChatClientResolver overrideChatClientResolver) {
@@ -245,9 +312,25 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return this;
         }
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder permissionService(final PermissionService permissionService) {
+            this.permissionService = permissionService;
+
+            return this;
+        }
+
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
+        public Builder securityContextRehydrator(final SecurityContextRehydrator securityContextRehydrator) {
+            this.securityContextRehydrator = securityContextRehydrator;
+
+            return this;
+        }
+
         public WorkflowEditorSpringAIAgent build() throws AGUIException {
 
-            return new WorkflowEditorSpringAIAgent(this, workflowService, this.workflowNodeOutputFacade);
+            return new WorkflowEditorSpringAIAgent(
+                this, workflowService, this.workflowNodeOutputFacade, this.permissionService,
+                this.securityContextRehydrator);
         }
     }
 }
