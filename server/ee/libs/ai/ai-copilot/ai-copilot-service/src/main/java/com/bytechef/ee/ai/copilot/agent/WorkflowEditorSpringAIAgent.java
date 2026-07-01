@@ -19,6 +19,7 @@ import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.ee.ai.copilot.tool.SecurityContextRehydrator;
 import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
@@ -148,7 +149,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return;
         }
 
-        Long userId = asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
 
         if (userId == null) {
             if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication) {
@@ -167,7 +168,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     }
 
     private <T> T runWithCallerSecurityContext(State state, Supplier<T> action) {
-        Long userId = asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
 
         if (userId != null) {
             return securityContextRehydrator.withUserSecurityContext(userId, action);
@@ -188,10 +189,6 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
         } catch (Throwable throwable) {
             throw new IllegalStateException(throwable);
         }
-    }
-
-    private static @Nullable Long asLong(@Nullable Object value) {
-        return value instanceof Number number ? number.longValue() : null;
     }
 
     private String getSampleOutputs(List<WorkflowNodeOutputDTO> previousWorkflowNodeOutputs) {

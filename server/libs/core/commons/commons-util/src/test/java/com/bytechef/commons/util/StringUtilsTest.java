@@ -58,163 +58,163 @@ class StringUtilsTest {
 
     @Test
     void testParseBooleanTrue() {
-        assertThat(StringUtils.parseBoolean("true")).isTrue();
-        assertThat(StringUtils.parseBoolean("TRUE")).isTrue();
-        assertThat(StringUtils.parseBoolean("True")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("true")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("TRUE")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("True")).isTrue();
     }
 
     @Test
     void testParseBooleanT() {
-        assertThat(StringUtils.parseBoolean("t")).isTrue();
-        assertThat(StringUtils.parseBoolean("T")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("t")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("T")).isTrue();
     }
 
     @Test
     void testParseBooleanYes() {
-        assertThat(StringUtils.parseBoolean("yes")).isTrue();
-        assertThat(StringUtils.parseBoolean("YES")).isTrue();
-        assertThat(StringUtils.parseBoolean("Yes")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("yes")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("YES")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("Yes")).isTrue();
     }
 
     @Test
     void testParseBooleanY() {
-        assertThat(StringUtils.parseBoolean("y")).isTrue();
-        assertThat(StringUtils.parseBoolean("Y")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("y")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("Y")).isTrue();
     }
 
     @Test
     void testParseBooleanOne() {
-        assertThat(StringUtils.parseBoolean("1")).isTrue();
+        assertThat(BooleanUtils.parseBoolean("1")).isTrue();
     }
 
     @Test
     void testParseBooleanFalse() {
-        assertThat(StringUtils.parseBoolean("false")).isFalse();
-        assertThat(StringUtils.parseBoolean("FALSE")).isFalse();
-        assertThat(StringUtils.parseBoolean("False")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("false")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("FALSE")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("False")).isFalse();
     }
 
     @Test
     void testParseBooleanF() {
-        assertThat(StringUtils.parseBoolean("f")).isFalse();
-        assertThat(StringUtils.parseBoolean("F")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("f")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("F")).isFalse();
     }
 
     @Test
     void testParseBooleanNo() {
-        assertThat(StringUtils.parseBoolean("no")).isFalse();
-        assertThat(StringUtils.parseBoolean("NO")).isFalse();
-        assertThat(StringUtils.parseBoolean("No")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("no")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("NO")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("No")).isFalse();
     }
 
     @Test
     void testParseBooleanN() {
-        assertThat(StringUtils.parseBoolean("n")).isFalse();
-        assertThat(StringUtils.parseBoolean("N")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("n")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("N")).isFalse();
     }
 
     @Test
     void testParseBooleanZero() {
-        assertThat(StringUtils.parseBoolean("0")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("0")).isFalse();
     }
 
     @Test
     void testParseBooleanInvalidString() {
         // Boolean.parseBoolean returns false for invalid strings
-        assertThat(StringUtils.parseBoolean("invalid")).isFalse();
-        assertThat(StringUtils.parseBoolean("maybe")).isFalse();
-        assertThat(StringUtils.parseBoolean("2")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("invalid")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("maybe")).isFalse();
+        assertThat(BooleanUtils.parseBoolean("2")).isFalse();
     }
 
     @Test
     void testParseBigDecimalInteger() {
-        assertThat(StringUtils.parseBigDecimal("123")).isEqualTo(new BigDecimal("123"));
+        assertThat(NumberUtils.parseBigDecimal("123")).isEqualTo(new BigDecimal("123"));
     }
 
     @Test
     void testParseBigDecimalDecimal() {
-        assertThat(StringUtils.parseBigDecimal("123.456")).isEqualTo(new BigDecimal("123.456"));
+        assertThat(NumberUtils.parseBigDecimal("123.456")).isEqualTo(new BigDecimal("123.456"));
     }
 
     @Test
     void testParseBigDecimalNegative() {
-        assertThat(StringUtils.parseBigDecimal("-123.456")).isEqualTo(new BigDecimal("-123.456"));
+        assertThat(NumberUtils.parseBigDecimal("-123.456")).isEqualTo(new BigDecimal("-123.456"));
     }
 
     @Test
     void testParseBigDecimalScientificNotation() {
-        assertThat(StringUtils.parseBigDecimal("1.23E+3")).isEqualTo(new BigDecimal("1.23E+3"));
+        assertThat(NumberUtils.parseBigDecimal("1.23E+3")).isEqualTo(new BigDecimal("1.23E+3"));
     }
 
     @Test
     void testParseBigDecimalZero() {
-        assertThat(StringUtils.parseBigDecimal("0")).isEqualTo(BigDecimal.ZERO);
-        assertThat(StringUtils.parseBigDecimal("0.0")).isEqualTo(new BigDecimal("0.0"));
+        assertThat(NumberUtils.parseBigDecimal("0")).isEqualTo(BigDecimal.ZERO);
+        assertThat(NumberUtils.parseBigDecimal("0.0")).isEqualTo(new BigDecimal("0.0"));
     }
 
     @Test
     void testParseBigDecimalInvalidString() {
-        assertThat(StringUtils.parseBigDecimal("invalid")).isNull();
-        assertThat(StringUtils.parseBigDecimal("12.34.56")).isNull();
-        assertThat(StringUtils.parseBigDecimal("")).isNull();
+        assertThat(NumberUtils.parseBigDecimal("invalid")).isNull();
+        assertThat(NumberUtils.parseBigDecimal("12.34.56")).isNull();
+        assertThat(NumberUtils.parseBigDecimal("")).isNull();
     }
 
     @Test
     void testParseBigDecimalEmptyString() {
-        assertThat(StringUtils.parseBigDecimal("")).isNull();
+        assertThat(NumberUtils.parseBigDecimal("")).isNull();
     }
 
     @Test
     void testParseLongInteger() {
-        assertThat(StringUtils.parseLong("123")).isEqualTo(123L);
+        assertThat(NumberUtils.parseLong("123")).isEqualTo(123L);
     }
 
     @Test
     void testParseLongNegative() {
-        assertThat(StringUtils.parseLong("-456")).isEqualTo(-456L);
+        assertThat(NumberUtils.parseLong("-456")).isEqualTo(-456L);
     }
 
     @Test
     void testParseLongMaxValue() {
         String maxLong = String.valueOf(Long.MAX_VALUE);
 
-        assertThat(StringUtils.parseLong(maxLong)).isEqualTo(Long.MAX_VALUE);
+        assertThat(NumberUtils.parseLong(maxLong)).isEqualTo(Long.MAX_VALUE);
     }
 
     @Test
     void testParseLongMinValue() {
         String minLong = String.valueOf(Long.MIN_VALUE);
 
-        assertThat(StringUtils.parseLong(minLong)).isEqualTo(Long.MIN_VALUE);
+        assertThat(NumberUtils.parseLong(minLong)).isEqualTo(Long.MIN_VALUE);
     }
 
     @Test
     void testParseLongFromDecimal() {
         // Should parse decimal and convert to long
-        assertThat(StringUtils.parseLong("123.456")).isEqualTo(123L);
-        assertThat(StringUtils.parseLong("999.999")).isEqualTo(999L);
+        assertThat(NumberUtils.parseLong("123.456")).isEqualTo(123L);
+        assertThat(NumberUtils.parseLong("999.999")).isEqualTo(999L);
     }
 
     @Test
     void testParseLongZero() {
-        assertThat(StringUtils.parseLong("0")).isEqualTo(0L);
+        assertThat(NumberUtils.parseLong("0")).isEqualTo(0L);
     }
 
     @Test
     void testParseLongInvalidString() {
-        assertThat(StringUtils.parseLong("invalid")).isNull();
-        assertThat(StringUtils.parseLong("12.34.56")).isNull();
-        assertThat(StringUtils.parseLong("")).isNull();
+        assertThat(NumberUtils.parseLong("invalid")).isNull();
+        assertThat(NumberUtils.parseLong("12.34.56")).isNull();
+        assertThat(NumberUtils.parseLong("")).isNull();
     }
 
     @Test
     void testParseLongEmptyString() {
-        assertThat(StringUtils.parseLong("")).isNull();
+        assertThat(NumberUtils.parseLong("")).isNull();
     }
 
     @Test
     void testParseSqlDateISOFormat() {
-        java.sql.Date date = StringUtils.parseSqlDate("2025-01-18");
+        java.sql.Date date = DateUtils.parseSqlDate("2025-01-18");
 
         assertThat(date).isNotNull();
         assertThat(date.toString()).isEqualTo("2025-01-18");
@@ -222,7 +222,7 @@ class StringUtilsTest {
 
     @Test
     void testParseSqlDateCustomFormat() {
-        java.sql.Date date = StringUtils.parseSqlDate("2025-1-18");
+        java.sql.Date date = DateUtils.parseSqlDate("2025-1-18");
 
         assertThat(date).isNotNull();
         assertThat(date.toString()).isEqualTo("2025-01-18");
@@ -232,7 +232,7 @@ class StringUtilsTest {
     void testParseSqlDateFromEpochMillis() {
         long epochMillis = 1705536000000L; // 2024-01-18 00:00:00 UTC
 
-        java.sql.Date date = StringUtils.parseSqlDate(String.valueOf(epochMillis));
+        java.sql.Date date = DateUtils.parseSqlDate(String.valueOf(epochMillis));
 
         assertThat(date).isNotNull();
         assertThat(date.getTime()).isEqualTo(epochMillis);
@@ -240,7 +240,7 @@ class StringUtilsTest {
 
     @Test
     void testParseSqlDateFromDateTime() {
-        java.sql.Date date = StringUtils.parseSqlDate("2025-01-18 12:30:45");
+        java.sql.Date date = DateUtils.parseSqlDate("2025-01-18 12:30:45");
 
         assertThat(date).isNotNull();
         assertThat(date.toString()).isEqualTo("2025-01-18");
@@ -248,32 +248,32 @@ class StringUtilsTest {
 
     @Test
     void testParseSqlDateInvalidString() {
-        assertThat(StringUtils.parseSqlDate("invalid")).isNull();
-        assertThat(StringUtils.parseSqlDate("not-a-date")).isNull();
+        assertThat(DateUtils.parseSqlDate("invalid")).isNull();
+        assertThat(DateUtils.parseSqlDate("not-a-date")).isNull();
     }
 
     @Test
     void testParseSqlDateEmptyString() {
-        assertThat(StringUtils.parseSqlDate("")).isNull();
+        assertThat(DateUtils.parseSqlDate("")).isNull();
     }
 
     @Test
     void testParseSqlTimestampISO8601() {
-        Timestamp timestamp = StringUtils.parseSqlTimestamp("2025-01-18T12:30:45Z");
+        Timestamp timestamp = DateUtils.parseSqlTimestamp("2025-01-18T12:30:45Z");
 
         assertThat(timestamp).isNotNull();
     }
 
     @Test
     void testParseSqlTimestampISO8601WithMillis() {
-        Timestamp timestamp = StringUtils.parseSqlTimestamp("2025-01-18T12:30:45.123Z");
+        Timestamp timestamp = DateUtils.parseSqlTimestamp("2025-01-18T12:30:45.123Z");
 
         assertThat(timestamp).isNotNull();
     }
 
     @Test
     void testParseSqlTimestampLocalDateTime() {
-        Timestamp timestamp = StringUtils.parseSqlTimestamp("2025-01-18 12:30:45");
+        Timestamp timestamp = DateUtils.parseSqlTimestamp("2025-01-18 12:30:45");
 
         assertThat(timestamp).isNotNull();
         assertThat(timestamp.toString()).startsWith("2025-01-18 12:30:45");
@@ -281,7 +281,7 @@ class StringUtilsTest {
 
     @Test
     void testParseSqlTimestampLocalDateTimeShort() {
-        Timestamp timestamp = StringUtils.parseSqlTimestamp("2025-01-18 12:30");
+        Timestamp timestamp = DateUtils.parseSqlTimestamp("2025-01-18 12:30");
 
         assertThat(timestamp).isNotNull();
         assertThat(timestamp.toString()).startsWith("2025-01-18 12:30:00");
@@ -291,7 +291,7 @@ class StringUtilsTest {
     void testParseSqlTimestampFromEpochMillis() {
         long epochMillis = 1705582245000L; // 2024-01-18 12:30:45 UTC
 
-        Timestamp timestamp = StringUtils.parseSqlTimestamp(String.valueOf(epochMillis));
+        Timestamp timestamp = DateUtils.parseSqlTimestamp(String.valueOf(epochMillis));
 
         assertThat(timestamp).isNotNull();
         assertThat(timestamp.getTime()).isEqualTo(epochMillis);
@@ -299,13 +299,13 @@ class StringUtilsTest {
 
     @Test
     void testParseSqlTimestampInvalidString() {
-        assertThat(StringUtils.parseSqlTimestamp("invalid")).isNull();
-        assertThat(StringUtils.parseSqlTimestamp("not-a-timestamp")).isNull();
+        assertThat(DateUtils.parseSqlTimestamp("invalid")).isNull();
+        assertThat(DateUtils.parseSqlTimestamp("not-a-timestamp")).isNull();
     }
 
     @Test
     void testParseSqlTimestampEmptyString() {
-        assertThat(StringUtils.parseSqlTimestamp("")).isNull();
+        assertThat(DateUtils.parseSqlTimestamp("")).isNull();
     }
 
     @Test

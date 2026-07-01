@@ -16,6 +16,8 @@
 
 package com.bytechef.platform.data.table.execution.service;
 
+import com.bytechef.commons.util.BooleanUtils;
+import com.bytechef.commons.util.DateUtils;
 import com.bytechef.platform.data.table.configuration.domain.DataTableWebhookType;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
 import com.bytechef.platform.data.table.domain.ColumnType;
@@ -565,32 +567,32 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
             return switch (type) {
                 case STRING -> trimmed;
-                case BOOLEAN -> com.bytechef.commons.util.StringUtils.parseBoolean(trimmed);
-                case INTEGER -> com.bytechef.commons.util.StringUtils.parseLong(trimmed);
-                case NUMBER -> com.bytechef.commons.util.StringUtils.parseBigDecimal(trimmed);
-                case DATE -> com.bytechef.commons.util.StringUtils.parseSqlDate(trimmed);
-                case DATE_TIME -> com.bytechef.commons.util.StringUtils.parseSqlTimestamp(trimmed);
+                case BOOLEAN -> BooleanUtils.parseBoolean(trimmed);
+                case INTEGER -> com.bytechef.commons.util.NumberUtils.parseLong(trimmed);
+                case NUMBER -> com.bytechef.commons.util.NumberUtils.parseBigDecimal(trimmed);
+                case DATE -> DateUtils.parseSqlDate(trimmed);
+                case DATE_TIME -> DateUtils.parseSqlTimestamp(trimmed);
             };
         }
 
         return switch (type) {
             case STRING -> String.valueOf(rawValue);
             case BOOLEAN -> (rawValue instanceof Boolean) ? rawValue
-                : com.bytechef.commons.util.StringUtils.parseBoolean(String.valueOf(rawValue));
+                : BooleanUtils.parseBoolean(String.valueOf(rawValue));
             case INTEGER -> (rawValue instanceof Number n) ? Long.valueOf(n.longValue())
-                : com.bytechef.commons.util.StringUtils.parseLong(String.valueOf(rawValue));
+                : com.bytechef.commons.util.NumberUtils.parseLong(String.valueOf(rawValue));
             case NUMBER -> (rawValue instanceof BigDecimal bd)
                 ? bd
                 : (rawValue instanceof Number n) ? toBigDecimal(n)
-                    : com.bytechef.commons.util.StringUtils.parseBigDecimal(String.valueOf(rawValue));
+                    : com.bytechef.commons.util.NumberUtils.parseBigDecimal(String.valueOf(rawValue));
             case DATE ->
                 (rawValue instanceof java.sql.Date date) ? date
                     : (rawValue instanceof Date date2) ? new Date(date2.getTime())
-                        : com.bytechef.commons.util.StringUtils.parseSqlDate(String.valueOf(rawValue));
+                        : DateUtils.parseSqlDate(String.valueOf(rawValue));
             case DATE_TIME ->
                 (rawValue instanceof Timestamp timestamp) ? timestamp
                     : (rawValue instanceof Date date3) ? new Timestamp(date3.getTime())
-                        : com.bytechef.commons.util.StringUtils.parseSqlTimestamp(String.valueOf(rawValue));
+                        : DateUtils.parseSqlTimestamp(String.valueOf(rawValue));
         };
     }
 
@@ -707,7 +709,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 else if (value instanceof Date d)
                     ps.setDate(index, new java.sql.Date(d.getTime()));
                 else
-                    ps.setDate(index, com.bytechef.commons.util.StringUtils.parseSqlDate(String.valueOf(value)));
+                    ps.setDate(index, DateUtils.parseSqlDate(String.valueOf(value)));
             }
             case DATE_TIME -> {
                 if (value instanceof Timestamp t)
@@ -717,7 +719,7 @@ public class DataTableRowServiceImpl implements DataTableRowService {
                 else
                     ps.setTimestamp(
                         index,
-                        com.bytechef.commons.util.StringUtils.parseSqlTimestamp(String.valueOf(value)));
+                        DateUtils.parseSqlTimestamp(String.valueOf(value)));
             }
             case BOOLEAN -> {
                 if (value instanceof Boolean b)
