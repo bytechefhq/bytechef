@@ -14,9 +14,11 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
+import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.List;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 /**
@@ -70,6 +74,16 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
 
         stateMap.put("workflowId", workflowId);
         stateMap.put("mode", Mode.BUILD.name());
+        stateMap.put("autonomous", true);
+
+        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+
+        Authentication authentication = SecurityContextHolder.getContext()
+            .getAuthentication();
+
+        if (authentication != null) {
+            stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
+        }
 
         if (allowedComponentNames != null && !allowedComponentNames.isEmpty()) {
             stateMap.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);

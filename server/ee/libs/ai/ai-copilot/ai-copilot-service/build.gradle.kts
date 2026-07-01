@@ -105,6 +105,8 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-jackson")
     implementation("org.springframework.ai:spring-ai-vector-store-advisor")
     implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.security:spring-security-core")
+    implementation("tools.jackson.core:jackson-databind")
     implementation(project(":spring-ai:spring-ag-ui:packages:core"))
     implementation(project(":spring-ai:spring-ag-ui:utils:json"))
     implementation(project(":spring-ai:spring-ag-ui:packages:server"))
@@ -112,6 +114,7 @@ dependencies {
     implementation(project(":server:libs:ai:ai-mcp:ai-mcp-server-api"))
     implementation(project(":server:libs:atlas:atlas-configuration:atlas-configuration-api"))
     implementation(project(":server:libs:automation:automation-ai:automation-ai-tool"))
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-ai:platform-ai-tool"))
@@ -124,4 +127,5 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-ai:automation-ai-tool"))
 
     implementation(project(":server:ee:libs:platform:platform-ai:platform-ai-agent:platform-ai-agent-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
 }
