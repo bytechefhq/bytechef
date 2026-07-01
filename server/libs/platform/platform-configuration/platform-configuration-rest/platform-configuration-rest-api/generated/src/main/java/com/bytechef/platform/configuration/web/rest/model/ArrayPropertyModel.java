@@ -17,7 +17,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -307,6 +309,16 @@ public class ArrayPropertyModel extends ValuePropertyModel {
 
   public ArrayPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
+    return this;
+  }
+
+  public ArrayPropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public ArrayPropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
     return this;
   }
 

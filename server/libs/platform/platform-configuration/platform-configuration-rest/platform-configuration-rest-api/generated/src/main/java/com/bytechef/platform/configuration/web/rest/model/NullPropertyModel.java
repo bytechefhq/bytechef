@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -81,6 +83,16 @@ public class NullPropertyModel extends ValuePropertyModel {
 
   public NullPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
+    return this;
+  }
+
+  public NullPropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public NullPropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
     return this;
   }
 

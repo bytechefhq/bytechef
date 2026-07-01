@@ -12,6 +12,8 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.HashMap;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -112,6 +114,16 @@ public class DynamicPropertiesPropertyModel extends PropertyModel {
 
   public DynamicPropertiesPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
+    return this;
+  }
+
+  public DynamicPropertiesPropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public DynamicPropertiesPropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
     return this;
   }
 
