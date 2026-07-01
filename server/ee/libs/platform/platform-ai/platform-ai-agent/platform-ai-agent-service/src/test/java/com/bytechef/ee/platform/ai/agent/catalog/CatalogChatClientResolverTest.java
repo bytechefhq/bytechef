@@ -28,22 +28,22 @@ class CatalogChatClientResolverTest {
 
     @Test
     void testResolveReturnsNullForUnknownProviderKey() {
-        assertThat(resolver.resolve(1, "notAProvider", "x")).isNull();
+        assertThat(resolver.resolve("notAProvider", "x", 1)).isNull();
     }
 
     @Test
     void testResolveReturnsNullForOutOfRangeEnvironment() {
         // The range check short-circuits before any providerApiKeyResolver lookup, so no stubbing is needed (and a
         // forged or out-of-range ordinal can never drive platform-API-key selection — fail closed).
-        assertThat(resolver.resolve(99, "ai.provider.openAi", "gpt-4o")).isNull();
-        assertThat(resolver.resolve(-1, "ai.provider.openAi", "gpt-4o")).isNull();
+        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 99)).isNull();
+        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", -1)).isNull();
     }
 
     @Test
     void testResolveReturnsNullWhenResolverReturnsNull() {
         when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn(null);
 
-        assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNull();
+        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNull();
     }
 
     @Test
@@ -52,7 +52,7 @@ class CatalogChatClientResolverTest {
         when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
-        assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNotNull();
+        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNotNull();
     }
 
     @Test
@@ -61,6 +61,6 @@ class CatalogChatClientResolverTest {
         when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
-        assertThat(resolver.resolve(1, "ai.provider.openAi", "gpt-4o")).isNotNull();
+        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNotNull();
     }
 }

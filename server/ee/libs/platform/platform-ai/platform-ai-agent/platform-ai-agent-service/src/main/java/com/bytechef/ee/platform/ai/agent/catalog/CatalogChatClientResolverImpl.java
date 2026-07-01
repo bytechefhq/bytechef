@@ -45,7 +45,7 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
     }
 
     @Override
-    public @Nullable ChatClient resolve(int environment, String providerKey, String model) {
+    public @Nullable ChatClient resolve(String providerKey, String model, int environment) {
         if (environment < 0 || environment >= Environment.values().length) {
             return null;
         }

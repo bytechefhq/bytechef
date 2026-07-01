@@ -25,12 +25,12 @@ public interface CatalogChatClientResolver {
     /**
      * Resolves a {@link ChatClient} for the given environment ordinal, catalog provider key and model name.
      *
-     * @param environment the environment ordinal (must be within the {@code Environment} enum range; out-of-range
-     *                    values fail closed and return {@code null})
      * @param providerKey the catalog provider key (e.g. {@code "ai.provider.openAi"})
      * @param model       the model name
+     * @param environment the environment ordinal (must be within the {@code Environment} enum range; out-of-range
+     *                    values fail closed and return {@code null})
      * @return a configured {@link ChatClient}, or {@code null} when the selection can't be resolved
      */
     @Nullable
-    ChatClient resolve(int environment, String providerKey, String model);
+    ChatClient resolve(String providerKey, String model, int environment);
 }
