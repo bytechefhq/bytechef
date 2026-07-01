@@ -3044,11 +3044,18 @@ components:
         - "name"
         - "value"
       properties:
+        internalOnly:
+          description: "If true, the input is configured in the admin integration instance configuration; if false (default), it is rendered in the end-user connect dialog."
+          type: "boolean"
+          default: false
         label:
           description: "The descriptive name of an input"
           type: "string"
         name:
           description: "The name of an input"
+          type: "string"
+        objectName:
+          description: "For field_mapping inputs, the name of the object whose fields are being mapped."
           type: "string"
         required:
           description: "If an input is required, or not"
