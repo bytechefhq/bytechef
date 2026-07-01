@@ -145,9 +145,9 @@ public class IntegrationInstanceConfigurationWorkflowServiceImpl
 
     @Override
     @Transactional(readOnly = true)
-    public boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceId, String workflowId) {
+    public boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceConfigurationId, String workflowId) {
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
-            getIntegrationInstanceConfigurationWorkflow(integrationInstanceId, workflowId);
+            getIntegrationInstanceConfigurationWorkflow(integrationInstanceConfigurationId, workflowId);
 
         return integrationInstanceConfigurationWorkflow.isEnabled();
     }
