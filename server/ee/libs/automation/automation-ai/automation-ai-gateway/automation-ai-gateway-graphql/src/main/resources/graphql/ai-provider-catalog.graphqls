@@ -17,7 +17,7 @@ type AiProviderModel {
 }
 
 extend type Query {
-    aiDefaultModel: AiDefaultModel
+    aiDefaultModel(environment: ID!): AiDefaultModel
 }
 
 type AiDefaultModel {
