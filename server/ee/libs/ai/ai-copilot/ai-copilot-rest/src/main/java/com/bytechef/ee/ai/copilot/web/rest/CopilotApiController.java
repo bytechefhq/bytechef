@@ -12,7 +12,12 @@ import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.Mode;
+import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -34,18 +39,23 @@ import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
  */
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}/internal")
+@ConditionalOnEEVersion
 @ConditionalOnCoordinator
 @ConditionalOnProperty(prefix = "bytechef.ai.copilot", name = "enabled", havingValue = "true")
 public class CopilotApiController {
 
     private final Map<String, LocalAgent> localAgentMap;
     private final AgUiService agUiService;
+    private final UserService userService;
 
     @SuppressFBWarnings("EI")
-    public CopilotApiController(AgUiService agUiService, List<LocalAgent> localAgents) {
+    public CopilotApiController(
+        AgUiService agUiService, List<LocalAgent> localAgents, UserService userService) {
+
         this.agUiService = agUiService;
         this.localAgentMap = localAgents.stream()
             .collect(Collectors.toMap(LocalAgent::getAgentId, localAgent -> localAgent));
+        this.userService = userService;
     }
 
     @Validated
@@ -54,8 +64,16 @@ public class CopilotApiController {
         @NonNull @PathVariable("agentId") String agentId, @NonNull @RequestBody() AgUiParameters agUiParameters) {
 
         State state = agUiParameters.getState();
+
         Map<String, Object> stateMap = state.getState();
+
         Object mode = stateMap.get("mode");
+
+        User user = userService.getCurrentUser();
+
+        stateMap.put(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID, user.getId());
+
+        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 
         if (agentId.equals("workflow_editor")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {
