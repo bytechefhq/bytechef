@@ -37,6 +37,7 @@ import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property;
 import com.bytechef.component.definition.Property.ArrayProperty;
 import com.bytechef.component.definition.Property.ObjectProperty;
+import com.bytechef.component.definition.PropertyGroup;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition;
 import com.bytechef.component.definition.TriggerDefinition.PropertiesFunction;
@@ -326,6 +327,26 @@ public class ComponentDefinitionRegistry {
         }
 
         return filteredComponentDefinitions;
+    }
+
+    public Property getComponentInputProperty(
+        String componentName, int componentVersion, String groupName, String propertyName,
+        Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
+        Context context) throws Exception {
+
+        ComponentDefinition componentDefinition = getComponentDefinition(componentName, componentVersion);
+
+        List<? extends PropertyGroup> inputs = componentDefinition.getInputs()
+            .orElseThrow(() -> new IllegalArgumentException(
+                "Component '%s' v%d defines no inputs.".formatted(componentName, componentVersion)));
+
+        PropertyGroup propertyGroup = CollectionUtils.getFirst(
+            inputs, group -> Objects.equals(group.getName(), groupName),
+            "Input group '%s' not found in component '%s'".formatted(groupName, componentName));
+
+        return getProperty(
+            propertyName, propertyGroup.getProperties(), inputParameters, connectionParameters, lookupDependsOnPaths,
+            context);
     }
 
     public ConnectionDefinition getConnectionDefinition(String componentName, int connectionVersion) {

@@ -16,10 +16,34 @@
 
 package com.bytechef.platform.component;
 
+import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.DynamicOptionsProperty;
+import com.bytechef.component.definition.Property;
+import com.bytechef.component.slack.SlackComponentHandler;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.component.definition.ParametersFactory;
+import java.util.List;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
 public class ComponentDefinitionRegistryTest {
+
+    private static ComponentDefinitionRegistry createRegistry() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+        ApplicationProperties.Component component = new ApplicationProperties.Component();
+
+        component.setRegistry(new ApplicationProperties.Component.Registry());
+        applicationProperties.setComponent(component);
+
+        return new ComponentDefinitionRegistry(
+            applicationProperties,
+            List.of(new SlackComponentHandler()),
+            List::of,
+            List.of());
+    }
 
     @Disabled
     @Test
@@ -61,6 +85,20 @@ public class ComponentDefinitionRegistryTest {
     @Test
     public void testGetComponentDefinitions() {
         // TODO
+    }
+
+    @Test
+    public void testGetComponentInputProperty() throws Exception {
+        ComponentDefinitionRegistry componentDefinitionRegistry = createRegistry();
+
+        Property property = componentDefinitionRegistry.getComponentInputProperty(
+            "slack", 1, "channel", "channel", ParametersFactory.create(Map.of()),
+            ParametersFactory.create((ComponentConnection) null), Map.of(), Mockito.mock(ActionContext.class));
+
+        Assertions.assertThat(property.getName())
+            .isEqualTo("channel");
+        Assertions.assertThat(property)
+            .isInstanceOf(DynamicOptionsProperty.class);
     }
 
     @Disabled
