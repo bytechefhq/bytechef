@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.agent.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,14 +29,13 @@ public final class ToolErrors {
     /**
      * Serialises a {@code {"error": <message>}} JSON object using the supplied {@link JsonMapper}.
      *
-     * @param jsonMapper the configured Jackson mapper
-     * @param message    the human-readable error message
+     * @param message the human-readable error message
      * @return a JSON string of the form {@code {"error":"<message>"}} or the fallback {@code {"error":"serialization
      *         failure"}}
      */
-    public static String toolError(JsonMapper jsonMapper, String message) {
+    public static String toolError(String message) {
         try {
-            return jsonMapper.writeValueAsString(Map.of("error", message));
+            return JsonUtils.write(Map.of("error", message));
         } catch (JacksonException exception) {
             log.error(
                 "Failed to serialise tool error response for message '{}': {}", message, exception.toString(),
@@ -51,7 +51,6 @@ public final class ToolErrors {
      * {@code call(toolInput, toolContext)} method so a transient DB outage, NPE, or 4xx/5xx from a downstream service
      * does not abort the entire agent run.
      *
-     * @param jsonMapper  the Jackson mapper used to serialise the response
      * @param sourceClass the calling tool callback's class — used to resolve the SLF4J log so the WARN line is
      *                    attributed to the right component instead of {@code ToolErrors}
      * @param toolName    human-readable tool name surfaced to the LLM in the error payload
@@ -59,7 +58,7 @@ public final class ToolErrors {
      * @return a JSON string of the form {@code {"error":"<toolName> failed (<simpleName>)"}}
      */
     public static String runtimeFailure(
-        JsonMapper jsonMapper, Class<?> sourceClass, String toolName, RuntimeException exception) {
+        Class<?> sourceClass, String toolName, RuntimeException exception) {
 
         Logger sourceLogger = LoggerFactory.getLogger(sourceClass);
 
@@ -67,6 +66,6 @@ public final class ToolErrors {
 
         Class<? extends RuntimeException> exceptionClass = exception.getClass();
 
-        return toolError(jsonMapper, toolName + " failed (" + exceptionClass.getSimpleName() + ")");
+        return toolError(toolName + " failed (" + exceptionClass.getSimpleName() + ")");
     }
 }

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.Agent;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext.AgentBinding;
@@ -21,7 +22,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Hand-rolled Spring AI {@link ToolCallback} that exposes the Cluster Element Copilot subagent to the parent ai_hub
@@ -57,7 +57,6 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             }""";
 
     private final ChatClient clusterElementChatClient;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ClusterElementAgentToolCallback(ChatClient clusterElementChatClient) {
@@ -81,7 +80,7 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            ClusterElementAgentInput input = jsonMapper.readValue(toolInput, ClusterElementAgentInput.class);
+            ClusterElementAgentInput input = JsonUtils.read(toolInput, ClusterElementAgentInput.class);
 
             String request = input.request();
 
@@ -103,7 +102,7 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             if (result == null) {
                 log.warn("cluster_element subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "cluster_element subagent returned null");
+                return ToolErrors.toolError("cluster_element subagent returned null");
             }
 
             return result;
@@ -116,12 +115,12 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, ClusterElementAgentToolCallback.class, "cluster_element_agent", exception);
+                ClusterElementAgentToolCallback.class, "cluster_element_agent", exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record ClusterElementAgentInput(String request) {

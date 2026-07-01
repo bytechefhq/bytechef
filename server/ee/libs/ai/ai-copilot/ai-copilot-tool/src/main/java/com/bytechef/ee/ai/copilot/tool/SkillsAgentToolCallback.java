@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.Agent;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext.AgentBinding;
@@ -21,7 +22,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Hand-rolled Spring AI {@link ToolCallback} that exposes the Skills Copilot subagent to the parent ai_hub agent.
@@ -56,7 +56,6 @@ public class SkillsAgentToolCallback implements ToolCallback {
             }""";
 
     private final ChatClient skillsChatClient;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public SkillsAgentToolCallback(ChatClient skillsChatClient) {
@@ -80,7 +79,7 @@ public class SkillsAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            SkillsAgentInput input = jsonMapper.readValue(toolInput, SkillsAgentInput.class);
+            SkillsAgentInput input = JsonUtils.read(toolInput, SkillsAgentInput.class);
 
             String request = input.request();
 
@@ -102,7 +101,7 @@ public class SkillsAgentToolCallback implements ToolCallback {
             if (result == null) {
                 log.warn("skills subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "skills subagent returned null");
+                return ToolErrors.toolError("skills subagent returned null");
             }
 
             return result;
@@ -115,12 +114,12 @@ public class SkillsAgentToolCallback implements ToolCallback {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, SkillsAgentToolCallback.class, "skills_agent", exception);
+                SkillsAgentToolCallback.class, "skills_agent", exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record SkillsAgentInput(String request) {

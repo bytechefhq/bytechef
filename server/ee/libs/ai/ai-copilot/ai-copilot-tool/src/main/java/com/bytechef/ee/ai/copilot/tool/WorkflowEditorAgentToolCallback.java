@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.Agent;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext.AgentBinding;
@@ -21,7 +22,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Hand-rolled Spring AI {@link ToolCallback} that exposes the Workflow Editor Copilot subagent to the parent ai_hub
@@ -57,7 +57,6 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             }""";
 
     private final ChatClient workflowEditorChatClient;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public WorkflowEditorAgentToolCallback(ChatClient workflowEditorChatClient) {
@@ -81,7 +80,7 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            WorkflowEditorAgentInput input = jsonMapper.readValue(toolInput, WorkflowEditorAgentInput.class);
+            WorkflowEditorAgentInput input = JsonUtils.read(toolInput, WorkflowEditorAgentInput.class);
 
             String request = input.request();
 
@@ -103,7 +102,7 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             if (result == null) {
                 log.warn("workflow_editor subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "workflow_editor subagent returned null");
+                return ToolErrors.toolError("workflow_editor subagent returned null");
             }
 
             return result;
@@ -116,12 +115,12 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, WorkflowEditorAgentToolCallback.class, "workflow_editor_agent", exception);
+                WorkflowEditorAgentToolCallback.class, "workflow_editor_agent", exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record WorkflowEditorAgentInput(String request) {

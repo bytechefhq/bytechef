@@ -26,7 +26,7 @@ class AskUserQuestionToolCallbackTest {
     @Test
     void testReturnsAskUserQuestionEnvelope() throws Exception {
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         // Mirrors the library's input schema: questions[] with question/header/multiSelect/options[label, description].
         String toolInput = """
@@ -78,7 +78,7 @@ class AskUserQuestionToolCallbackTest {
     @Test
     void testReturnsToolErrorOnMalformedInput() throws Exception {
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         String result = callback.call("{not-json}");
 
@@ -90,7 +90,7 @@ class AskUserQuestionToolCallbackTest {
     @Test
     void testToolNameMatchesLibrary() {
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         assertThat(callback.getToolDefinition()
             .name()).isEqualTo("askUserQuestion");
@@ -99,7 +99,7 @@ class AskUserQuestionToolCallbackTest {
     @Test
     void testHandlesMultipleQuestions() throws Exception {
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         // Two-question payload — exercises the multi-question loop in serialiseQuestions and the placeholder
         // map being keyed by question text. Each question carries the minimum 2 options; the wrapper's
@@ -141,7 +141,7 @@ class AskUserQuestionToolCallbackTest {
         // rejects the next iteration with "messages.<N>: user messages must have non-empty content."
         // Reproduced in production with header "Slack Channel" (13 chars). Reject in our wrapper instead.
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         String toolInput = """
             {
@@ -173,7 +173,7 @@ class AskUserQuestionToolCallbackTest {
         // Single-option questions reproduce the same production failure mode as the header-too-long case
         // — library WARNs and accepts; downstream serialisation produces an empty tool_result content block.
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         String toolInput = """
             {
@@ -203,7 +203,7 @@ class AskUserQuestionToolCallbackTest {
         // would catch and convert it into a generic error. Catching it in our wrapper produces a more
         // actionable error message the LLM can act on without seeing internal exception text.
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         String toolInput = """
             {
@@ -233,7 +233,7 @@ class AskUserQuestionToolCallbackTest {
         // Defensive — library would throw IllegalArgumentException here, but matching its 1-4 bound in our
         // wrapper means the LLM sees a consistent error format across all schema violations.
         AskUserQuestionToolCallback callback =
-            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class), jsonMapper);
+            new AskUserQuestionToolCallback(mock(ToolStateVisibilityMetrics.class));
 
         StringBuilder questions = new StringBuilder("[");
 

@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -20,7 +21,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Signaling-only Spring AI {@link ToolCallback} that instructs the chat client to render a dropdown of EXISTING
@@ -70,14 +70,10 @@ public class SelectConnectionToolCallback implements ToolCallback {
             }""";
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final JsonMapper jsonMapper;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public SelectConnectionToolCallback(
-        ComponentDefinitionService componentDefinitionService, JsonMapper jsonMapper) {
-
+    public SelectConnectionToolCallback(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
-        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -97,7 +93,7 @@ public class SelectConnectionToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            SelectConnectionInput input = jsonMapper.readValue(toolInput, SelectConnectionInput.class);
+            SelectConnectionInput input = JsonUtils.read(toolInput, SelectConnectionInput.class);
 
             String componentName = input.componentName();
 
@@ -140,7 +136,7 @@ public class SelectConnectionToolCallback implements ToolCallback {
 
             String componentLabel = resolveComponentLabel(componentDefinition.get(), componentName);
 
-            return jsonMapper.writeValueAsString(
+            return JsonUtils.write(
                 new SelectConnectionOutput(
                     "select-connection", componentName, componentLabel, resolvedFromComponentName));
         } catch (JacksonException exception) {
@@ -154,7 +150,7 @@ public class SelectConnectionToolCallback implements ToolCallback {
         } catch (RuntimeException exception) {
             // Outer guard mirrors every other subagent callback in this directory.
             return ToolErrors.runtimeFailure(
-                jsonMapper, SelectConnectionToolCallback.class, "selectConnection", exception);
+                SelectConnectionToolCallback.class, "selectConnection", exception);
         }
     }
 
@@ -165,7 +161,7 @@ public class SelectConnectionToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record SelectConnectionInput(String componentName) {
