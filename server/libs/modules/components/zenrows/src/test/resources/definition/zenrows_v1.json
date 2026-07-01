@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts HTML data from a given URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url"
+    },
     "metadata": null,
     "name": "scrapeUrl",
     "outputDefinition": {
@@ -146,7 +149,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a JSON with the page's data. For most popular websites only.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url-autoparse"
+    },
     "metadata": null,
     "name": "scrapeUrlAutoparse",
     "outputDefinition": {
@@ -286,7 +292,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Extracts specific data from a given URL.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url-with-css-selectors"
+    },
     "metadata": null,
     "name": "scrapeUrlWithCssSelectors",
     "outputDefinition": {
@@ -966,14 +975,20 @@
       "type": "API_KEY"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/zenrows_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://docs.zenrows.com/first-steps/welcome"
+  },
   "description": "ZenRows is a web scraping service with an advanced toolkit and APIs that simplify data extraction from bot-protected websites.",
   "icon": "path:assets/zenrows.svg",
   "inputs": null,
