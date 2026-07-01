@@ -155,8 +155,6 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
                 row.put("id", connectionDTO.id());
                 row.put("name", connectionDTO.name());
                 row.put("environmentId", connectionDTO.environmentId());
-//                row.put("visibility", connectionDTO.visibility()
-//                    .name());
                 row.put("active", connectionDTO.active());
 
                 connections.add(row);
@@ -192,6 +190,7 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
         Map<String, Object> envelope = new LinkedHashMap<>();
 
         envelope.put("componentName", componentName);
+        envelope.put("connectionVersion", null);
         envelope.put("connections", List.of());
 
         return envelope;
