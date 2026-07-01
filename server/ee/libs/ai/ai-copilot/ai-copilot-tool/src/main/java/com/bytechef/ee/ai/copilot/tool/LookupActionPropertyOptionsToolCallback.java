@@ -10,9 +10,12 @@ package com.bytechef.ee.ai.copilot.tool;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
+import java.util.List;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
@@ -146,12 +149,13 @@ public class LookupActionPropertyOptionsToolCallback implements ToolCallback {
             PropertyOptionsResolver.OptionsLookupResult.Success success =
                 (PropertyOptionsResolver.OptionsLookupResult.Success) result;
 
-            metrics.recordStateVisibility(TOOL_NAME, success.options()
-                .isEmpty() ? "empty" : "success");
+            List<Option> options = success.options();
+
+            metrics.recordStateVisibility(TOOL_NAME, options.isEmpty() ? "empty" : "success");
 
             return JsonUtils.write(
                 resolver.buildSuccessEnvelope(
-                    componentName, "actionName", actionName, propertyName, success.options(), success.truncated()));
+                    componentName, "actionName", actionName, propertyName, options, success.truncated()));
         } catch (JacksonException exception) {
             log.warn(
                 "lookupActionPropertyOptions rejected malformed tool input: {} — first 200 chars: {}",

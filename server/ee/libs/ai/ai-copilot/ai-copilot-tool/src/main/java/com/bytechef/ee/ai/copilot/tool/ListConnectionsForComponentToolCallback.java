@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
@@ -20,6 +21,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,8 +112,10 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
                 return toolError("Workspace context unavailable — open this chat from the AI Hub.");
             }
 
-            if (componentDefinitionService.fetchComponentDefinition(componentName, null)
-                .isEmpty()) {
+            Optional<ComponentDefinition> componentDefinitionOptional =
+                componentDefinitionService.fetchComponentDefinition(componentName, null);
+
+            if (componentDefinitionOptional.isEmpty()) {
                 metrics.recordStateVisibility(TOOL_NAME, "unknown_component");
 
                 return toolError(

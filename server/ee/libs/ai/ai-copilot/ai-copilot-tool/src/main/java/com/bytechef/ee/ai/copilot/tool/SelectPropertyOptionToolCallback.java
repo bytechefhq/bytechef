@@ -144,10 +144,11 @@ public class SelectPropertyOptionToolCallback implements ToolCallback {
             PropertyOptionsResolver.OptionsLookupResult.Success success =
                 (PropertyOptionsResolver.OptionsLookupResult.Success) result;
 
-            metrics.recordStateVisibility(TOOL_NAME, success.options()
-                .isEmpty() ? "empty" : "success");
+            List<Option> options = success.options();
 
-            return buildMarker(componentName, propertyName, success.options(), success.truncated());
+            metrics.recordStateVisibility(TOOL_NAME, options.isEmpty() ? "empty" : "success");
+
+            return buildMarker(componentName, propertyName, options, success.truncated());
         } catch (JacksonException exception) {
             log.warn(
                 "selectPropertyOption rejected malformed tool input: {} — first 200 chars: {}",
