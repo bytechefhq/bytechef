@@ -3,12 +3,16 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-client-chat")
     implementation("org.springframework.ai:spring-ai-model")
     implementation("tools.jackson.core:jackson-databind")
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
+    implementation(project(":server:libs:platform:platform-component:platform-component-api"))
+    implementation(project(":server:libs:platform:platform-user:platform-user-api"))
 
     implementation(project(":server:ee:libs:ai:ai-api"))
     implementation(project(":server:ee:libs:ai:ai-copilot:ai-copilot-api"))
-    implementation(project(":server:libs:platform:platform-ai:platform-ai-skill:platform-ai-skill-api"))
 
     testImplementation("org.assertj:assertj-core")
     testImplementation("org.junit.jupiter:junit-jupiter")
