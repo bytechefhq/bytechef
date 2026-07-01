@@ -28,6 +28,12 @@ import {
  */
 export interface WorkflowInput {
     /**
+     * If true, the input is configured in the admin integration instance configuration; if false (default), it is rendered in the end-user connect dialog.
+     * @type {boolean}
+     * @memberof WorkflowInput
+     */
+    internalOnly?: boolean;
+    /**
      * The descriptive name of an input
      * @type {string}
      * @memberof WorkflowInput
@@ -39,6 +45,12 @@ export interface WorkflowInput {
      * @memberof WorkflowInput
      */
     name: string;
+    /**
+     * For field_mapping inputs, the name of the object whose fields are being mapped.
+     * @type {string}
+     * @memberof WorkflowInput
+     */
+    objectName?: string;
     /**
      * If an input is required, or not
      * @type {boolean}
@@ -77,8 +89,10 @@ export function WorkflowInputFromJSONTyped(json: any, ignoreDiscriminator: boole
     }
     return {
         
+        'internalOnly': json['internalOnly'] == null ? undefined : json['internalOnly'],
         'label': json['label'] == null ? undefined : json['label'],
         'name': json['name'],
+        'objectName': json['objectName'] == null ? undefined : json['objectName'],
         'required': json['required'] == null ? undefined : json['required'],
         'type': json['type'] == null ? undefined : json['type'],
         'componentReference': json['componentReference'] == null ? undefined : ComponentInputReferenceFromJSON(json['componentReference']),
@@ -96,8 +110,10 @@ export function WorkflowInputToJSONTyped(value?: WorkflowInput | null, ignoreDis
 
     return {
         
+        'internalOnly': value['internalOnly'],
         'label': value['label'],
         'name': value['name'],
+        'objectName': value['objectName'],
         'required': value['required'],
         'type': value['type'],
         'componentReference': ComponentInputReferenceToJSON(value['componentReference']),

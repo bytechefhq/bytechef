@@ -6,8 +6,10 @@
 
 Name | Type
 ------------ | -------------
+`internalOnly` | boolean
 `label` | string
 `name` | string
+`objectName` | string
 `required` | boolean
 `type` | string
 `componentReference` | [ComponentInputReference](ComponentInputReference.md)
@@ -19,8 +21,10 @@ import type { WorkflowInput } from ''
 
 // TODO: Update the object below with actual values
 const example = {
+  "internalOnly": null,
   "label": null,
   "name": null,
+  "objectName": null,
   "required": null,
   "type": null,
   "componentReference": null,
