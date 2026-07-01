@@ -24,12 +24,16 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("Input")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.564853+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T23:56:54.981292+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class InputModel {
+
+  private Boolean internalOnly = false;
 
   private @Nullable String label;
 
   private String name;
+
+  private @Nullable String objectName;
 
   private Boolean required = false;
 
@@ -47,6 +51,27 @@ public class InputModel {
   public InputModel(String name, InputTypeModel type) {
     this.name = name;
     this.type = type;
+  }
+
+  public InputModel internalOnly(Boolean internalOnly) {
+    this.internalOnly = internalOnly;
+    return this;
+  }
+
+  /**
+   * If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog.
+   * @return internalOnly
+   */
+  
+  @Schema(name = "internalOnly", description = "If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("internalOnly")
+  public Boolean getInternalOnly() {
+    return internalOnly;
+  }
+
+  @JsonProperty("internalOnly")
+  public void setInternalOnly(Boolean internalOnly) {
+    this.internalOnly = internalOnly;
   }
 
   public InputModel label(@Nullable String label) {
@@ -89,6 +114,27 @@ public class InputModel {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  public InputModel objectName(@Nullable String objectName) {
+    this.objectName = objectName;
+    return this;
+  }
+
+  /**
+   * For FIELD_MAPPING inputs, the object name used to match the SDK mapObjectFields config.
+   * @return objectName
+   */
+  
+  @Schema(name = "objectName", description = "For FIELD_MAPPING inputs, the object name used to match the SDK mapObjectFields config.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("objectName")
+  public @Nullable String getObjectName() {
+    return objectName;
+  }
+
+  @JsonProperty("objectName")
+  public void setObjectName(@Nullable String objectName) {
+    this.objectName = objectName;
   }
 
   public InputModel required(Boolean required) {
@@ -163,8 +209,10 @@ public class InputModel {
       return false;
     }
     InputModel input = (InputModel) o;
-    return Objects.equals(this.label, input.label) &&
+    return Objects.equals(this.internalOnly, input.internalOnly) &&
+        Objects.equals(this.label, input.label) &&
         Objects.equals(this.name, input.name) &&
+        Objects.equals(this.objectName, input.objectName) &&
         Objects.equals(this.required, input.required) &&
         Objects.equals(this.type, input.type) &&
         Objects.equals(this.componentReference, input.componentReference);
@@ -172,15 +220,17 @@ public class InputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, name, required, type, componentReference);
+    return Objects.hash(internalOnly, label, name, objectName, required, type, componentReference);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class InputModel {\n");
+    sb.append("    internalOnly: ").append(toIndentedString(internalOnly)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    objectName: ").append(toIndentedString(objectName)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    componentReference: ").append(toIndentedString(componentReference)).append("\n");
