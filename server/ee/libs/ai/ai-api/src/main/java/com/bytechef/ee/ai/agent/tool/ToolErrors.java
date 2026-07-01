@@ -26,9 +26,7 @@ public final class ToolErrors {
     }
 
     /**
-     * Serialises a {@code {"error": <message>}} JSON object using the supplied {@link JsonMapper}. If serialisation
-     * fails (which is essentially impossible for {@code Map.of("error", String)} but kept for type-safety), logs the
-     * failure at ERROR with the underlying exception and returns a constant fallback string.
+     * Serialises a {@code {"error": <message>}} JSON object using the supplied {@link JsonMapper}.
      *
      * @param jsonMapper the configured Jackson mapper
      * @param message    the human-readable error message
