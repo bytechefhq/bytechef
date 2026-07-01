@@ -18,28 +18,11 @@ package com.bytechef.ee.ai.copilot.util;
  */
 public final class CopilotStateKeys {
 
-    /**
-     * Run-state key under which the controller injects the authenticated user id, resolved server-side from the request
-     * security context. Tools must never read the user id from a client-supplied field — it drives security-context
-     * rehydration in the shared picker tools, so it has to be trustworthy.
-     */
-    public static final String STATE_AUTHENTICATED_USER_ID = "bytechef.copilot.authenticatedUserId";
-
-    /**
-     * Run-state key under which the controller / generator injects the request's tenant id (captured on the request
-     * thread). Drives tenant rehydration in the shared tool wrapper so tools persist to the correct schema on worker
-     * threads. Server-populated, never client-supplied.
-     */
-    public static final String STATE_TENANT_ID = "bytechef.copilot.tenantId";
-
-    /**
-     * Run-state key under which the synchronous generator injects the request thread's Spring Security
-     * {@code Authentication}, captured on the request thread. The tool wrapper restores it on the agent's worker
-     * threads so {@code @PreAuthorize}-gated tools see the same principal. Used for surfaces whose principal has no
-     * backing platform user (the embedded API-key principal), which therefore cannot be rehydrated from a user id.
-     * Server-populated from the live security context, never client-supplied.
-     */
-    public static final String STATE_AUTHENTICATION = "bytechef.copilot.authentication";
+    public static final String STATE_AUTHENTICATED_USER_ID = "authenticatedUserId";
+    public static final String STATE_TENANT_ID = "tenantId";
+    public static final String STATE_AUTHENTICATION = "authentication";
+    public static final String WORKSPACE_ID = "workspaceId";
+    public static final String ENVIRONMENT_ID = "environmentId";
 
     private CopilotStateKeys() {
     }

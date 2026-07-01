@@ -10,7 +10,7 @@ package com.bytechef.ee.ai.copilot.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.agui.core.state.State;
-import com.bytechef.ee.ai.copilot.tool.AgentToolInvocationContext;
+import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
 import java.util.Map;

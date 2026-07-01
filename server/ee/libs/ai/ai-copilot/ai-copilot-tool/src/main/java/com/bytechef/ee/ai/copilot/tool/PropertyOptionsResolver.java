@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.Property;

@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.tool;
 
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
+import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;

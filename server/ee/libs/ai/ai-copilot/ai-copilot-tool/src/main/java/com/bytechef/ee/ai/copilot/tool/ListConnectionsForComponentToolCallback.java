@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.tool;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
+import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
