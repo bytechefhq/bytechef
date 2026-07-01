@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
@@ -24,7 +25,6 @@ import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.JsonNode;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Bridges spring-ai-agent-utils' {@link AskUserQuestionTool} into the shared streaming agent (AI Hub and the in-editor
@@ -54,12 +54,10 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
 
     private final ToolCallback delegate;
     private final ToolStateVisibilityMetrics metrics;
-    private final JsonMapper jsonMapper;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public AskUserQuestionToolCallback(ToolStateVisibilityMetrics metrics, JsonMapper jsonMapper) {
+    public AskUserQuestionToolCallback(ToolStateVisibilityMetrics metrics) {
         this.metrics = metrics;
-        this.jsonMapper = jsonMapper;
 
         AskUserQuestionTool askUserQuestionTool = AskUserQuestionTool.builder()
             .questionHandler(this::captureQuestionsReturningPlaceholders)
@@ -129,7 +127,7 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
 
             metrics.recordAskUserQuestion("success");
 
-            return jsonMapper.writeValueAsString(envelope);
+            return JsonUtils.write(envelope);
         } catch (RuntimeException exception) {
             metrics.recordAskUserQuestion("error");
 
@@ -138,7 +136,7 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
                 exception.getMessage(),
                 toolInput == null ? "<null>" : toolInput.substring(0, Math.min(toolInput.length(), 200)));
 
-            return ToolErrors.runtimeFailure(jsonMapper, AskUserQuestionToolCallback.class, TOOL_NAME, exception);
+            return ToolErrors.runtimeFailure(AskUserQuestionToolCallback.class, TOOL_NAME, exception);
         } finally {
             capturedQuestions.remove();
         }
@@ -211,7 +209,7 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
         JsonNode rootJsonNode;
 
         try {
-            rootJsonNode = jsonMapper.readTree(toolInput);
+            rootJsonNode = JsonUtils.readTree(toolInput);
         } catch (JacksonException exception) {
             return "askUserQuestion input is not valid JSON: " + exception.getMessage();
         }
@@ -309,6 +307,6 @@ public final class AskUserQuestionToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 }

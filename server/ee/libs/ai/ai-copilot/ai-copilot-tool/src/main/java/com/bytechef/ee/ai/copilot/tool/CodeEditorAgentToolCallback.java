@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.Agent;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ee.ai.agent.tool.CurrentAgentContext.AgentBinding;
@@ -21,7 +22,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Hand-rolled Spring AI {@link ToolCallback} that exposes the Code Editor Copilot subagent to the parent ai_hub agent.
@@ -56,7 +56,6 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             }""";
 
     private final ChatClient codeEditorChatClient;
-    private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public CodeEditorAgentToolCallback(ChatClient codeEditorChatClient) {
@@ -80,7 +79,7 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CodeEditorAgentInput input = jsonMapper.readValue(toolInput, CodeEditorAgentInput.class);
+            CodeEditorAgentInput input = JsonUtils.read(toolInput, CodeEditorAgentInput.class);
 
             String request = input.request();
 
@@ -102,7 +101,7 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             if (result == null) {
                 log.warn("code_editor subagent returned null for request='{}'", request);
 
-                return ToolErrors.toolError(jsonMapper, "code_editor subagent returned null");
+                return ToolErrors.toolError("code_editor subagent returned null");
             }
 
             return result;
@@ -115,12 +114,12 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, CodeEditorAgentToolCallback.class, "code_editor_agent", exception);
+                CodeEditorAgentToolCallback.class, "code_editor_agent", exception);
         }
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CodeEditorAgentInput(String request) {

@@ -37,7 +37,7 @@ class CreateConnectionToolCallbackTest {
     @BeforeEach
     void setUp() {
         componentDefinitionService = mock(ComponentDefinitionService.class);
-        callback = new CreateConnectionToolCallback(componentDefinitionService, jsonMapper);
+        callback = new CreateConnectionToolCallback(componentDefinitionService);
     }
 
     @Test

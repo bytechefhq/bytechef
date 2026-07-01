@@ -27,7 +27,7 @@ class ToolErrorsTest {
 
     @Test
     void testToolErrorReturnsJsonObjectWithErrorField() throws Exception {
-        String result = ToolErrors.toolError(jsonMapper, "something went wrong");
+        String result = ToolErrors.toolError("something went wrong");
 
         JsonNode node = jsonMapper.readTree(result);
 
@@ -44,7 +44,7 @@ class ToolErrorsTest {
                 private static final long serialVersionUID = 1L;
             });
 
-        String result = ToolErrors.toolError(failing, "any message");
+        String result = ToolErrors.toolError("any message");
 
         assertThat(result).isEqualTo("{\"error\":\"serialization failure\"}");
     }
@@ -55,7 +55,7 @@ class ToolErrorsTest {
             "JDBC URL=jdbc:postgresql://prod-db/secret near table ai_hub_memory");
 
         String result = ToolErrors.runtimeFailure(
-            jsonMapper, ToolErrorsTest.class, "doSomething", exception);
+            ToolErrorsTest.class, "doSomething", exception);
 
         JsonNode node = jsonMapper.readTree(result);
         String message = node.get("error")
@@ -78,7 +78,7 @@ class ToolErrorsTest {
     void testRuntimeFailureFollowsExpectedShape() throws Exception {
         RuntimeException exception = new RuntimeException("oops");
 
-        String result = ToolErrors.runtimeFailure(jsonMapper, ToolErrorsTest.class, "myTool", exception);
+        String result = ToolErrors.runtimeFailure(ToolErrorsTest.class, "myTool", exception);
 
         JsonNode node = jsonMapper.readTree(result);
 

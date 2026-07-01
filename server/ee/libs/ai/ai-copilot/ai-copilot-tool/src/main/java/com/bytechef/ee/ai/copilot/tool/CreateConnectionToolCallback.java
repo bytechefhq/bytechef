@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.tool;
 
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -20,7 +21,6 @@ import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
 import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * Signaling-only Spring AI {@link ToolCallback} that instructs the chat client to open a "Connect &lt;Component&gt;"
@@ -64,14 +64,10 @@ public class CreateConnectionToolCallback implements ToolCallback {
             }""";
 
     private final ComponentDefinitionService componentDefinitionService;
-    private final JsonMapper jsonMapper;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
-    public CreateConnectionToolCallback(
-        ComponentDefinitionService componentDefinitionService, JsonMapper jsonMapper) {
-
+    public CreateConnectionToolCallback(ComponentDefinitionService componentDefinitionService) {
         this.componentDefinitionService = componentDefinitionService;
-        this.jsonMapper = jsonMapper;
     }
 
     @Override
@@ -91,7 +87,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
     @Override
     public String call(String toolInput, @Nullable ToolContext toolContext) {
         try {
-            CreateConnectionInput input = jsonMapper.readValue(toolInput, CreateConnectionInput.class);
+            CreateConnectionInput input = JsonUtils.read(toolInput, CreateConnectionInput.class);
 
             String componentName = input.componentName();
 
@@ -109,9 +105,9 @@ public class CreateConnectionToolCallback implements ToolCallback {
 
             String componentLabel = resolveComponentLabel(componentDefinition.get(), componentName);
 
-            return jsonMapper.writeValueAsString(
-                new CreateConnectionOutput("create-connection", componentName, componentLabel,
-                    input.suggestedName()));
+            return JsonUtils.write(
+                new CreateConnectionOutput(
+                    "create-connection", componentName, componentLabel, input.suggestedName()));
         } catch (JacksonException exception) {
             log.warn(
                 "createConnection rejected malformed tool input: {} — first 200 chars of input: {}",
@@ -121,7 +117,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
             return ToolErrors.runtimeFailure(
-                jsonMapper, CreateConnectionToolCallback.class, "createConnection", exception);
+                CreateConnectionToolCallback.class, "createConnection", exception);
         }
     }
 
@@ -132,7 +128,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
     }
 
     private String toolError(String message) {
-        return ToolErrors.toolError(jsonMapper, message);
+        return ToolErrors.toolError(message);
     }
 
     public record CreateConnectionInput(String componentName, @Nullable String suggestedName) {
