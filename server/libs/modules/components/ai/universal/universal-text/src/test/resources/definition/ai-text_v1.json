@@ -120,7 +120,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -384,7 +384,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -634,11 +634,11 @@
         },
         "placeholder": null,
         "sampleOutput": {
-          "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
           "maskMap": {
             "[EMAIL_1]": "john@example.com",
             "[REDACTED_1]": "John Doe"
-          }
+          },
+          "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
         }
       },
       "outputSchema": {
@@ -727,11 +727,11 @@
         "type": "OBJECT"
       },
       "sampleOutput": {
-        "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1].",
         "maskMap": {
           "[EMAIL_1]": "john@example.com",
           "[REDACTED_1]": "John Doe"
-        }
+        },
+        "text": "Hello, my name is [REDACTED_1] and my email is [EMAIL_1]."
       }
     },
     "perform": { },
@@ -791,7 +791,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1167,7 +1167,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1436,7 +1436,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1615,7 +1615,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -1973,7 +1973,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2216,7 +2216,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,
@@ -2503,7 +2503,7 @@
       "controlType": "TEXT",
       "defaultValue": null,
       "description": "ID of the model to use.",
-      "displayCondition": "contains({'AZURE_OPEN_AI','GROQ','NVIDIA','DEEPSEEK','PERPLEXITY'}, provider)",
+      "displayCondition": "contains({'AZURE_OPEN_AI','DEEPSEEK','GROQ','NVIDIA','OLLAMA','PERPLEXITY'}, provider)",
       "exampleValue": null,
       "expressionEnabled": null,
       "hidden": null,

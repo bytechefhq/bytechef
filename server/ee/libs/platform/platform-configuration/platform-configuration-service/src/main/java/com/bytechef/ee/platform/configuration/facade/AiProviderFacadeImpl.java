@@ -23,11 +23,10 @@ import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,16 +39,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @ConditionalOnEEVersion
 public class AiProviderFacadeImpl implements AiProviderFacade {
-
-    private static final Set<Provider> CHAT_PROVIDERS = EnumSet.of(
-        Provider.ANTHROPIC,
-        Provider.GROQ,
-        Provider.MISTRAL,
-        Provider.NVIDIA,
-        Provider.OPEN_AI,
-        Provider.VERTEX_GEMINI,
-        Provider.PERPLEXITY,
-        Provider.DEEPSEEK);
 
     private final ComponentDefinitionService componentDefinitionService;
     private final PropertyService propertyService;
@@ -74,16 +63,16 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public List<AiProviderCatalogItemDTO> getAiProviderCatalog(int environment) {
+    public List<AiProviderCatalogItemDTO> getAiChatProviderCatalog(int environment) {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
         List<Property> properties = propertyService.getProperties(
-            CHAT_PROVIDERS.stream()
+            Provider.CHAT_PROVIDERS.stream()
                 .map(Provider::getKey)
                 .toList(),
             Scope.PLATFORM, null, (long) environment);
 
-        return CHAT_PROVIDERS.stream()
+        return Provider.CHAT_PROVIDERS.stream()
             .map(provider -> {
                 String providerName = provider.getName()
                     .toLowerCase();
@@ -170,13 +159,17 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 }
 
                 Property property = properties.stream()
-                    .filter(curProperty -> curProperty.getKey()
-                        .equals(provider.getKey()))
+                    .filter(curProperty -> Objects.equals(curProperty.getKey(), provider.getKey()))
                     .findFirst()
                     .orElse(null);
 
                 String apiKey = property != null ? (String) property.get("apiKey") : null;
-                boolean enabled = property != null && property.isEnabled();
+
+                if (apiKey == null || apiKey.isBlank()) {
+                    apiKey = getConfigApiKey(provider);
+                }
+
+                boolean enabled = (property != null && property.isEnabled()) || hasConfigApiKey(provider);
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, enabled,
@@ -246,29 +239,35 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
         };
     }
 
-    private boolean hasConfigApiKey(Provider provider) {
+    private String getConfigApiKey(Provider provider) {
         ApplicationProperties.Ai.Provider configProvider = applicationProperties.getAi()
             .getProvider();
 
-        String apiKey = switch (provider) {
-            case OPEN_AI -> configProvider.getOpenAi()
-                .getApiKey();
+        return switch (provider) {
             case ANTHROPIC -> configProvider.getAnthropic()
-                .getApiKey();
-            case MISTRAL -> configProvider.getMistral()
-                .getApiKey();
-            case VERTEX_GEMINI -> configProvider.getVertexGemini()
-                .getApiKey();
-            case GROQ -> configProvider.getGroq()
-                .getApiKey();
-            case PERPLEXITY -> configProvider.getPerplexity()
-                .getApiKey();
-            case NVIDIA -> configProvider.getNvidia()
                 .getApiKey();
             case DEEPSEEK -> configProvider.getDeepSeek()
                 .getApiKey();
+            case GROQ -> configProvider.getGroq()
+                .getApiKey();
+            case OLLAMA -> configProvider.getOllama()
+                .getApiKey();
+            case OPEN_AI -> configProvider.getOpenAi()
+                .getApiKey();
+            case MISTRAL -> configProvider.getMistral()
+                .getApiKey();
+            case NVIDIA -> configProvider.getNvidia()
+                .getApiKey();
+            case PERPLEXITY -> configProvider.getPerplexity()
+                .getApiKey();
+            case VERTEX_GEMINI -> configProvider.getVertexGemini()
+                .getApiKey();
             default -> null;
         };
+    }
+
+    private boolean hasConfigApiKey(Provider provider) {
+        String apiKey = getConfigApiKey(provider);
 
         return apiKey != null && !apiKey.isBlank();
     }
