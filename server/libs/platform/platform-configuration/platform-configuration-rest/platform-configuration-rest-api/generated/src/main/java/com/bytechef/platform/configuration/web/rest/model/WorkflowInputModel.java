@@ -22,12 +22,16 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("WorkflowInput")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:08.181901+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.669688+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WorkflowInputModel {
+
+  private Boolean internalOnly = false;
 
   private @Nullable String label;
 
   private String name;
+
+  private @Nullable String objectName;
 
   private Boolean required = false;
 
@@ -44,6 +48,27 @@ public class WorkflowInputModel {
    */
   public WorkflowInputModel(String name) {
     this.name = name;
+  }
+
+  public WorkflowInputModel internalOnly(Boolean internalOnly) {
+    this.internalOnly = internalOnly;
+    return this;
+  }
+
+  /**
+   * If true, the input is configured in the admin integration instance configuration; if false (default), it is rendered in the end-user connect dialog.
+   * @return internalOnly
+   */
+  
+  @Schema(name = "internalOnly", description = "If true, the input is configured in the admin integration instance configuration; if false (default), it is rendered in the end-user connect dialog.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("internalOnly")
+  public Boolean getInternalOnly() {
+    return internalOnly;
+  }
+
+  @JsonProperty("internalOnly")
+  public void setInternalOnly(Boolean internalOnly) {
+    this.internalOnly = internalOnly;
   }
 
   public WorkflowInputModel label(@Nullable String label) {
@@ -86,6 +111,27 @@ public class WorkflowInputModel {
   @JsonProperty("name")
   public void setName(String name) {
     this.name = name;
+  }
+
+  public WorkflowInputModel objectName(@Nullable String objectName) {
+    this.objectName = objectName;
+    return this;
+  }
+
+  /**
+   * For field_mapping inputs, the name of the object whose fields are being mapped.
+   * @return objectName
+   */
+  
+  @Schema(name = "objectName", description = "For field_mapping inputs, the name of the object whose fields are being mapped.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("objectName")
+  public @Nullable String getObjectName() {
+    return objectName;
+  }
+
+  @JsonProperty("objectName")
+  public void setObjectName(@Nullable String objectName) {
+    this.objectName = objectName;
   }
 
   public WorkflowInputModel required(Boolean required) {
@@ -160,8 +206,10 @@ public class WorkflowInputModel {
       return false;
     }
     WorkflowInputModel workflowInput = (WorkflowInputModel) o;
-    return Objects.equals(this.label, workflowInput.label) &&
+    return Objects.equals(this.internalOnly, workflowInput.internalOnly) &&
+        Objects.equals(this.label, workflowInput.label) &&
         Objects.equals(this.name, workflowInput.name) &&
+        Objects.equals(this.objectName, workflowInput.objectName) &&
         Objects.equals(this.required, workflowInput.required) &&
         Objects.equals(this.type, workflowInput.type) &&
         Objects.equals(this.componentReference, workflowInput.componentReference);
@@ -169,15 +217,17 @@ public class WorkflowInputModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(label, name, required, type, componentReference);
+    return Objects.hash(internalOnly, label, name, objectName, required, type, componentReference);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class WorkflowInputModel {\n");
+    sb.append("    internalOnly: ").append(toIndentedString(internalOnly)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
+    sb.append("    objectName: ").append(toIndentedString(objectName)).append("\n");
     sb.append("    required: ").append(toIndentedString(required)).append("\n");
     sb.append("    type: ").append(toIndentedString(type)).append("\n");
     sb.append("    componentReference: ").append(toIndentedString(componentReference)).append("\n");

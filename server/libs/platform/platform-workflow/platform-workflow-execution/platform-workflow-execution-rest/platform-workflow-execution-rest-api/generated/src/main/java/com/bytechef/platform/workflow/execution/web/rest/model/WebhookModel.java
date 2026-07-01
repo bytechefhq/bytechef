@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "Webhook", description = "Used to register to receive notifications for certain events.")
 @JsonTypeName("Webhook")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:12.031016+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:30.214507+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class WebhookModel {
 
   private @Nullable String type;
