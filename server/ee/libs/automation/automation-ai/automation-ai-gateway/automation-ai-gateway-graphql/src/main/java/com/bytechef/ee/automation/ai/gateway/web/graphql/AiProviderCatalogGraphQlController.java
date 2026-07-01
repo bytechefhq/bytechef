@@ -40,12 +40,12 @@ class AiProviderCatalogGraphQlController {
     @QueryMapping
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
     public List<AiProviderCatalogItemDTO> aiProviderCatalog(@Argument Long environment) {
-        return aiProviderFacade.getAiProviderCatalog(environment.intValue());
+        return aiProviderFacade.getAiChatProviderCatalog(environment.intValue());
     }
 
     @QueryMapping
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.USER + "\")")
-    public AiDefaultModelDTO aiDefaultModel() {
-        return aiProviderFacade.getAiDefaultModel();
+    public AiDefaultModelDTO aiDefaultModel(@Argument Long environment) {
+        return aiProviderFacade.getAiDefaultChatModel(environment.intValue());
     }
 }

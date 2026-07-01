@@ -36,7 +36,7 @@ class AiProviderCatalogGraphQlControllerTest {
             "ai.provider.openAi", "Open AI", "<svg/>", true, false,
             List.of(new AiProviderCatalogItemDTO.Model("gpt-5", "GPT-5")));
 
-        when(aiProviderFacade.getAiProviderCatalog(2)).thenReturn(List.of(item));
+        when(aiProviderFacade.getAiChatProviderCatalog(2)).thenReturn(List.of(item));
 
         AiProviderCatalogGraphQlController controller = new AiProviderCatalogGraphQlController(aiProviderFacade);
 
@@ -49,12 +49,12 @@ class AiProviderCatalogGraphQlControllerTest {
 
     @Test
     void testAiDefaultModelDelegatesToFacade() {
-        when(aiProviderFacade.getAiDefaultModel())
+        when(aiProviderFacade.getAiDefaultChatModel(2))
             .thenReturn(new AiDefaultModelDTO("ai.provider.anthropic", "claude-sonnet-4-6"));
 
         AiProviderCatalogGraphQlController controller = new AiProviderCatalogGraphQlController(aiProviderFacade);
 
-        AiDefaultModelDTO result = controller.aiDefaultModel();
+        AiDefaultModelDTO result = controller.aiDefaultModel(2L);
 
         assertThat(result).isNotNull();
         assertThat(result.provider()).isEqualTo("ai.provider.anthropic");

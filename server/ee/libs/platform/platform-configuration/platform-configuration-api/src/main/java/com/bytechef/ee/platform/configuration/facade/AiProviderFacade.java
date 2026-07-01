@@ -21,7 +21,7 @@ public interface AiProviderFacade {
 
     void deleteAiProvider(int id, int environment);
 
-    AiDefaultModelDTO getAiDefaultModel();
+    AiDefaultModelDTO getAiDefaultChatModel(int environmentId);
 
     List<AiProviderCatalogItemDTO> getAiChatProviderCatalog(int environment);
 

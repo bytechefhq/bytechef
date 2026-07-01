@@ -109,24 +109,24 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     @Override
     @Transactional(readOnly = true)
-    public AiDefaultModelDTO getAiDefaultModel() {
-        Provider provider;
+    public AiDefaultModelDTO getAiDefaultChatModel(int environmentId) {
+        return getAiProviders(environmentId)
+            .stream()
+            .filter(AiProviderDTO::enabled)
+            .map(aiProviderDTO -> getProvider(aiProviderDTO.id()))
+            .filter(Provider.CHAT_PROVIDERS::contains)
+            .map(provider -> {
+                String model = resolveDefaultModel(provider);
 
-        if (hasConfigApiKey(Provider.ANTHROPIC)) {
-            provider = Provider.ANTHROPIC;
-        } else if (hasConfigApiKey(Provider.OPEN_AI)) {
-            provider = Provider.OPEN_AI;
-        } else {
-            return null;
-        }
+                if (model == null || model.isBlank()) {
+                    return null;
+                }
 
-        String model = resolveDefaultModel(provider);
-
-        if (model == null || model.isBlank()) {
-            return null;
-        }
-
-        return new AiDefaultModelDTO(provider.getKey(), model);
+                return new AiDefaultModelDTO(provider.getKey(), model);
+            })
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
