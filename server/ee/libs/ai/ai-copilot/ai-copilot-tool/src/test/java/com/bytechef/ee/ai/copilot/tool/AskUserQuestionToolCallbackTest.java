@@ -10,7 +10,9 @@ package com.bytechef.ee.ai.copilot.tool;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -19,6 +21,7 @@ import tools.jackson.databind.json.JsonMapper;
  *
  * @author Ivica Cardic
  */
+@ExtendWith(ObjectMapperSetupExtension.class)
 class AskUserQuestionToolCallbackTest {
 
     private final JsonMapper jsonMapper = new JsonMapper();
@@ -49,7 +52,7 @@ class AskUserQuestionToolCallbackTest {
         JsonNode node = jsonMapper.readTree(result);
 
         assertThat(node.get("kind")
-            .asText()).isEqualTo("ask-user-question");
+            .asString()).isEqualTo("ask-user-question");
         assertThat(node.get("awaitingAnswer")
             .asBoolean()).isTrue();
 
@@ -58,10 +61,10 @@ class AskUserQuestionToolCallbackTest {
         assertThat(questions.size()).isEqualTo(1);
         assertThat(questions.get(0)
             .get("question")
-            .asText()).isEqualTo("Which messaging component?");
+            .asString()).isEqualTo("Which messaging component?");
         assertThat(questions.get(0)
             .get("header")
-            .asText()).isEqualTo("Pick");
+            .asString()).isEqualTo("Pick");
         assertThat(questions.get(0)
             .get("multiSelect")
             .asBoolean()).isFalse();
@@ -72,7 +75,7 @@ class AskUserQuestionToolCallbackTest {
             .get("options")
             .get(0)
             .get("label")
-            .asText()).isEqualTo("slack");
+            .asString()).isEqualTo("slack");
     }
 
     @Test
@@ -163,7 +166,7 @@ class AskUserQuestionToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText())
+            .asString())
                 .contains("header")
                 .contains("12");
     }
@@ -192,7 +195,7 @@ class AskUserQuestionToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText())
+            .asString())
                 .contains("options")
                 .contains("2-4");
     }
@@ -225,7 +228,7 @@ class AskUserQuestionToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("description");
+            .asString()).contains("description");
     }
 
     @Test
@@ -258,6 +261,6 @@ class AskUserQuestionToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("1-4");
+            .asString()).contains("1-4");
     }
 }
