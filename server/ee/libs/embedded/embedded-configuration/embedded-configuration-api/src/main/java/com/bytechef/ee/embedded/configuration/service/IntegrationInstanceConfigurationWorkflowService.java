@@ -51,7 +51,7 @@ public interface IntegrationInstanceConfigurationWorkflowService {
 
     boolean isConnectionUsed(long connectionId);
 
-    boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceId, String workflowId);
+    boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceConfigurationId, String workflowId);
 
     IntegrationInstanceConfigurationWorkflow update(
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow);

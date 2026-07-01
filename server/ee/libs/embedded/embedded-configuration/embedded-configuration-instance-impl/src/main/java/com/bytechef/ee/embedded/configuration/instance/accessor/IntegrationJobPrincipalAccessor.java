@@ -56,11 +56,16 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
     @Override
     public boolean isWorkflowEnabled(long jobPrincipalId, String workflowUuid) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(jobPrincipalId);
+
+        long integrationInstanceConfigurationId = integrationInstance.getIntegrationInstanceConfigurationId();
+
         boolean workflowEnabled = false;
 
-        if (integrationInstanceConfigurationService.isIntegrationInstanceConfigurationEnabled(jobPrincipalId) &&
+        if (integrationInstanceConfigurationService
+            .isIntegrationInstanceConfigurationEnabled(integrationInstanceConfigurationId) &&
             integrationInstanceConfigurationWorkflowService.isIntegrationInstanceWorkflowEnabled(
-                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowUuid))) {
+                integrationInstanceConfigurationId, getWorkflowId(jobPrincipalId, workflowUuid))) {
 
             workflowEnabled = true;
         }
@@ -82,9 +87,12 @@ public class IntegrationJobPrincipalAccessor implements JobPrincipalAccessor {
 
     @Override
     public Map<String, ?> getInputMap(long jobPrincipalId, String workflowUuid) {
+        IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(jobPrincipalId);
+
         IntegrationInstanceConfigurationWorkflow integrationInstanceConfigurationWorkflow =
             integrationInstanceConfigurationWorkflowService.getIntegrationInstanceConfigurationWorkflow(
-                jobPrincipalId, getWorkflowId(jobPrincipalId, workflowUuid));
+                integrationInstance.getIntegrationInstanceConfigurationId(),
+                getWorkflowId(jobPrincipalId, workflowUuid));
 
         return integrationInstanceConfigurationWorkflow.getInputs();
     }
