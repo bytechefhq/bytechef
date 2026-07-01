@@ -57,7 +57,7 @@ public interface IntegrationWorkflowRepository extends ListCrudRepository<Integr
         LIMIT 1
         """)
     Optional<IntegrationWorkflow> findLastByUuidAndEnvironment(
-        @Param("uuid") String uuid, @Param("environment") int environment);
+        @Param("uuid") UUID uuid, @Param("environment") int environment);
 
     @Query("""
         SELECT integration_workflow.* FROM integration_workflow
