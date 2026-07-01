@@ -201,7 +201,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": true,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -680,7 +680,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": true,
           "type": "STRING"
         }, {
           "advancedOption": null,

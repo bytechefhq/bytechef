@@ -144,7 +144,8 @@ public class ApprovalRequestApprovalAction {
                                     .label("Field Name")
                                     .description("The name of the form field.")
                                     .displayCondition(
-                                        "inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue())),
+                                        "inputs[index].fieldType != %s".formatted(CUSTOM_HTML.getValue()))
+                                    .required(true),
                                 string(FIELD_DESCRIPTION)
                                     .label("Field Description")
                                     .description("Description of the form field.")
