@@ -11,6 +11,7 @@ import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.ee.ai.copilot.tool.util.ComponentSlugUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -119,7 +120,7 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
                 metrics.recordStateVisibility(TOOL_NAME, "unknown_component");
 
                 return toolError(
-                    ComponentSlugSuggestions.unknownComponentMessage(componentName, componentDefinitionService));
+                    ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
             }
 
             int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();

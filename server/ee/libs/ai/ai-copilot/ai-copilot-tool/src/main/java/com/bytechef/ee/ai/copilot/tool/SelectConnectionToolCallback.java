@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.copilot.tool;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
+import com.bytechef.ee.ai.copilot.tool.util.ComponentSlugUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -107,19 +108,12 @@ public class SelectConnectionToolCallback implements ToolCallback {
             String resolvedFromComponentName = null;
 
             if (componentDefinition.isEmpty()) {
-                // The slug doesn't exist verbatim. If a colloquial name (e.g. "gmail"/"google-mail") unambiguously
-                // resolves to a single catalog slug, render the picker for it directly — this saves the agent a wasted
-                // round-trip guessing the exact slug. An ambiguous or unknown name still fails loud with candidate
-                // slugs: emitting a "select-connection" marker with a bogus or wrong slug would otherwise hard-fail the
-                // client's strict component-definition lookup with an opaque "Bad Request". Mirrors the
-                // resolve/validate
-                // path in CreateConnectionToolCallback.
-                String resolvedComponentName =
-                    ComponentSlugSuggestions.resolveSingleMatch(componentName, componentDefinitionService);
+                String resolvedComponentName = ComponentSlugUtils.resolveSingleMatch(
+                    componentName, componentDefinitionService);
 
                 if (resolvedComponentName == null) {
                     return toolError(
-                        ComponentSlugSuggestions.unknownComponentMessage(componentName, componentDefinitionService));
+                        ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
                 }
 
                 resolvedFromComponentName = componentName;
@@ -127,10 +121,8 @@ public class SelectConnectionToolCallback implements ToolCallback {
                 componentDefinition = componentDefinitionService.fetchComponentDefinition(componentName, null);
 
                 if (componentDefinition.isEmpty()) {
-                    // The slug came straight from the catalog scan, so a missing definition here means a concurrent
-                    // catalog change between the two lookups — fail loud rather than emit a marker for a vanished slug.
                     return toolError(
-                        ComponentSlugSuggestions.unknownComponentMessage(componentName, componentDefinitionService));
+                        ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
                 }
             }
 
@@ -140,7 +132,6 @@ public class SelectConnectionToolCallback implements ToolCallback {
                 new SelectConnectionOutput(
                     "select-connection", componentName, componentLabel, resolvedFromComponentName));
         } catch (JacksonException exception) {
-            // Malformed tool input is a recoverable LLM error — return a typed tool error so the agent can retry.
             log.warn(
                 "selectConnection rejected malformed tool input: {} — first 200 chars of input: {}",
                 exception.getMessage(),
@@ -148,7 +139,6 @@ public class SelectConnectionToolCallback implements ToolCallback {
 
             return toolError("Invalid tool input: " + exception.getMessage());
         } catch (RuntimeException exception) {
-            // Outer guard mirrors every other subagent callback in this directory.
             return ToolErrors.runtimeFailure(
                 SelectConnectionToolCallback.class, "selectConnection", exception);
         }

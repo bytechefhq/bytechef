@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.copilot.tool;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
+import com.bytechef.ee.ai.copilot.tool.util.ComponentSlugUtils;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -100,7 +101,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
 
             if (componentDefinition.isEmpty()) {
                 return toolError(
-                    ComponentSlugSuggestions.unknownComponentMessage(componentName, componentDefinitionService));
+                    ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
             }
 
             String componentLabel = resolveComponentLabel(componentDefinition.get(), componentName);
