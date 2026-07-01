@@ -70,7 +70,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         List<String> keys = catalog.stream()
             .map(AiProviderCatalogItemDTO::key)
@@ -91,7 +91,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         List<String> keys = catalog.stream()
             .map(AiProviderCatalogItemDTO::key)
@@ -135,7 +135,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         AiProviderCatalogItemDTO anthropic = catalog.stream()
             .filter(item -> item.key()
@@ -180,7 +180,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         AiProviderCatalogItemDTO groq = catalog.stream()
             .filter(item -> item.key()
@@ -204,7 +204,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         // AiProviderCatalogItemDTO has no apiKey field by design; this compiles only if the record truly lacks it.
         assertThat(catalog).isNotEmpty();
@@ -213,7 +213,7 @@ class AiProviderFacadeCatalogTest {
     }
 
     @Test
-    void testGetAiProviderCatalogIncludesVertexGeminiMatchedByGeminiComponent() {
+    void testGetAiChatProviderCatalogIncludesVertexGeminiMatchedByGeminiComponent() {
         ComponentDefinition gemini = mockComponentDefinition("gemini", "<svg>gemini</svg>");
 
         when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(gemini));
@@ -224,7 +224,7 @@ class AiProviderFacadeCatalogTest {
             ArgumentMatchers.eq((long) ENVIRONMENT)))
                 .thenReturn(List.of());
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         assertThat(catalog)
             .extracting(AiProviderCatalogItemDTO::key)
@@ -232,7 +232,7 @@ class AiProviderFacadeCatalogTest {
     }
 
     @Test
-    void testGetAiProviderCatalogMarksProviderActiveWhenConfiguredViaApplicationProperties() {
+    void testGetAiProviderCatalogMarksChatProviderActiveWhenConfiguredViaApplicationProperties() {
         List<ComponentDefinition> minimalDefinitions = buildMinimalComponentDefinitions();
 
         when(componentDefinitionService.getComponentDefinitions()).thenReturn(minimalDefinitions);
@@ -248,7 +248,7 @@ class AiProviderFacadeCatalogTest {
             .getOpenAi()
             .getApiKey()).thenReturn("sk-config");
 
-        List<AiProviderCatalogItemDTO> catalog = facade.getAiProviderCatalog(ENVIRONMENT);
+        List<AiProviderCatalogItemDTO> catalog = facade.getAiChatProviderCatalog(ENVIRONMENT);
 
         AiProviderCatalogItemDTO openAi = catalog.stream()
             .filter(item -> item.key()

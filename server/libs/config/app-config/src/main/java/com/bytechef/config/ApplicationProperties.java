@@ -1100,6 +1100,11 @@ public class ApplicationProperties {
             private Nvidia nvidia = new Nvidia();
 
             /**
+             * Ollama configuration
+             */
+            private Ollama ollama = new Ollama();
+
+            /**
              * OpenAI configuration
              */
             private OpenAi openAi = new OpenAi();
@@ -1175,6 +1180,10 @@ public class ApplicationProperties {
                 return mistral;
             }
 
+            public Ollama getOllama() {
+                return ollama;
+            }
+
             public OpenAi getOpenAi() {
                 return openAi;
             }
@@ -1245,6 +1254,10 @@ public class ApplicationProperties {
 
             public void setMistral(Mistral mistral) {
                 this.mistral = mistral;
+            }
+
+            public void setOllama(Ollama ollama) {
+                this.ollama = ollama;
             }
 
             public void setOpenAi(OpenAi openAi) {
@@ -1465,6 +1478,24 @@ public class ApplicationProperties {
              * Mistral AI API configuration.
              */
             public static class Mistral {
+                /**
+                 * API key
+                 */
+                private String apiKey;
+
+                public String getApiKey() {
+                    return apiKey;
+                }
+
+                public void setApiKey(String apiKey) {
+                    this.apiKey = apiKey;
+                }
+            }
+
+            /**
+             * Ollama API configuration.
+             */
+            public static class Ollama {
                 /**
                  * API key
                  */

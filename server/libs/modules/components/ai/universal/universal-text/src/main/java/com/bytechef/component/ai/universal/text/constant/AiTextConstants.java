@@ -22,6 +22,7 @@ import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.Provider.OLLAMA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
 import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
@@ -93,8 +94,8 @@ public class AiTextConstants {
     public static final ModifiableStringProperty MODEL_NO_OPTIONS_PROPERTY = string(MODEL)
         .label("Model")
         .description("ID of the model to use.")
-        .displayCondition("contains({'%s','%s','%s','%s','%s'}, provider)".formatted(AZURE_OPEN_AI, GROQ, NVIDIA,
-            DEEPSEEK, PERPLEXITY))
+        .displayCondition("contains({'%s','%s','%s','%s','%s','%s'}, provider)".formatted(
+            AZURE_OPEN_AI, DEEPSEEK, GROQ, NVIDIA, OLLAMA, PERPLEXITY))
         .required(true);
 
     public static final ModifiableStringProperty MODEL_URL_PROPERTY = string(MODEL)

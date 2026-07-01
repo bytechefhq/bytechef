@@ -16,6 +16,7 @@
 
 package com.bytechef.component.ai.llm;
 
+import java.util.EnumSet;
 import java.util.Set;
 
 /**
@@ -42,7 +43,19 @@ public enum Provider {
     STABILITY(15, "stability", "ai.provider.stability", "Stability"),
     VERTEX_GEMINI(14, "vertexGemini", "ai.provider.vertexGemini", "Vertex Gemini"),
     PERPLEXITY(16, "perplexity", "ai.provider.perplexity", "Perplexity"),
-    DEEPSEEK(17, "deepseek", "ai.provider.deepseek", "DeepSeek");
+    DEEPSEEK(17, "deepseek", "ai.provider.deepseek", "DeepSeek"),
+    OLLAMA(18, "ollama", "ai.provider.ollama", "Ollama");
+
+    public static final Set<Provider> CHAT_PROVIDERS = EnumSet.of(
+        ANTHROPIC,
+        DEEPSEEK,
+        GROQ,
+        MISTRAL,
+        NVIDIA,
+        OLLAMA,
+        OPEN_AI,
+        PERPLEXITY,
+        VERTEX_GEMINI);
 
     private static final Set<Provider> EMBEDDING_SUPPORTED_PROVIDERS = Set.of(OPEN_AI);
 

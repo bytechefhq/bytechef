@@ -22,6 +22,7 @@ import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
 import static com.bytechef.component.ai.llm.Provider.GROQ;
 import static com.bytechef.component.ai.llm.Provider.MISTRAL;
 import static com.bytechef.component.ai.llm.Provider.NVIDIA;
+import static com.bytechef.component.ai.llm.Provider.OLLAMA;
 import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
 import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
 import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
@@ -36,6 +37,7 @@ import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
 import com.bytechef.component.ai.llm.gemini.action.GeminiChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
+import com.bytechef.component.ai.llm.ollama.action.OllamaChatAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiChatAction;
 import com.bytechef.component.ai.llm.perplexity.action.PerplexityChatAction;
 import com.bytechef.component.ai.universal.text.action.AiTextAction;
@@ -49,6 +51,7 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.DeepSeek;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Groq;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Mistral;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Nvidia;
+import com.bytechef.config.ApplicationProperties.Ai.Provider.Ollama;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Perplexity;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
@@ -142,6 +145,7 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
             case GROQ -> getGroqChatModel(activeProviderKeys, environmentId);
             case MISTRAL -> getMistralChatModel(activeProviderKeys, environmentId);
             case NVIDIA -> getNvidiaChatModel(activeProviderKeys, environmentId);
+            case OLLAMA -> getOllamaChatModel(activeProviderKeys, environmentId);
             case OPEN_AI -> getOpenAiChatModel(activeProviderKeys, environmentId);
             case PERPLEXITY -> getPerplexityChatModel(activeProviderKeys, environmentId);
             case VERTEX_GEMINI -> getVertexGeminiChatModel(activeProviderKeys, environmentId);
@@ -315,6 +319,18 @@ public class AiTextActionDefinition extends AbstractActionDefinitionWrapper {
         }
 
         return new ChatModelResult(NvidiaChatAction.CHAT_MODEL, token);
+    }
+
+    private ChatModelResult getOllamaChatModel(List<String> activeProviderKeys, Long environmentId) {
+        String token = getAiProviderToken(OLLAMA.getKey(), activeProviderKeys, environmentId);
+
+        if (token == null) {
+            Ollama ollama = aiProvider.getOllama();
+
+            token = ollama.getApiKey();
+        }
+
+        return new ChatModelResult(OllamaChatAction.CHAT_MODEL, token);
     }
 
     private ChatModelResult getOpenAiChatModel(List<String> activeProviderKeys, Long environmentId) {

@@ -21,15 +21,9 @@ public interface AiProviderFacade {
 
     void deleteAiProvider(int id, int environment);
 
-    /**
-     * The deployment default chat model the agents fall back to when no model is explicitly selected — mirrors the
-     * runtime {@code @Primary} {@link org.springframework.ai.chat.model.ChatModel} (anthropic when its api-key is set,
-     * otherwise openai). Returns {@code null} when no provider api-key is configured or the resolved provider has no
-     * configured chat model.
-     */
     AiDefaultModelDTO getAiDefaultModel();
 
-    List<AiProviderCatalogItemDTO> getAiProviderCatalog(int environment);
+    List<AiProviderCatalogItemDTO> getAiChatProviderCatalog(int environment);
 
     List<AiProviderDTO> getAiProviders(int environment);
 
