@@ -45,6 +45,7 @@ public class AttioRecordCreatedTrigger {
         .description("Triggers when new record is created.")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(outputSchema(TRIGGER_OUTPUT))
+        .help("", "https://docs.bytechef.io/reference/components/attio_v1#record-created")
         .webhookEnable(AttioRecordCreatedTrigger::webhookEnable)
         .webhookDisable(AttioRecordCreatedTrigger::webhookDisable)
         .webhookRequest(AttioRecordCreatedTrigger::webhookRequest);
@@ -56,7 +57,8 @@ public class AttioRecordCreatedTrigger {
         Parameters inputParameters, Parameters connectionParameters, String webhookUrl, String workflowExecutionId,
         TriggerContext context) {
 
-        return new WebhookEnableOutput(Map.of(ID, subscribeWebhook("record.created", context, webhookUrl)), null);
+        return new WebhookEnableOutput(
+            Map.of(ID, subscribeWebhook("record.created", context, webhookUrl)), null);
     }
 
     protected static void webhookDisable(

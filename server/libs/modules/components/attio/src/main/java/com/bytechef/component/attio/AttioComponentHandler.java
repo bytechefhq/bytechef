@@ -42,6 +42,9 @@ public class AttioComponentHandler implements ComponentHandler {
         .icon("path:assets/attio.svg")
         .categories(ComponentCategory.CRM)
         .connection(AttioConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://developers.attio.com/docs/getting-started")
+        .version(1)
         .actions(
             AttioCreateRecordAction.ACTION_DEFINITION,
             AttioCreateTaskAction.ACTION_DEFINITION,
