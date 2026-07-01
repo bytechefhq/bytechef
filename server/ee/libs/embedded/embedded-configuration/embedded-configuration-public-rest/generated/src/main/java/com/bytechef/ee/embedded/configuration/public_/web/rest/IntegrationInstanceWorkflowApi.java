@@ -5,9 +5,9 @@
  */
 package com.bytechef.ee.embedded.configuration.public_.web.rest;
 
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputOptionsRequestModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.OptionModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.UpdateFrontendIntegrationInstanceWorkflowRequestModel;
-import com.bytechef.ee.embedded.configuration.public_.web.rest.model.WorkflowInputOptionsRequestModel;
 import io.swagger.v3.oas.annotations.ExternalDocumentation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.564853+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T23:56:54.981292+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "integration-instance-workflow", description = "The Embedded Integration Instance Workflow Public API")
 public interface IntegrationInstanceWorkflowApi {
@@ -192,42 +192,40 @@ public interface IntegrationInstanceWorkflowApi {
     }
 
 
-    String PATH_GET_FRONTEND_INTEGRATION_INSTANCE_WORKFLOW_INPUT_OPTIONS = "/integration-instances/{id}/workflows/{workflowUuid}/options";
+    String PATH_GET_COMPONENT_INPUT_OPTIONS = "/{externalUserId}/integration-instances/{id}/component-input-options";
     /**
-     * POST /integration-instances/{id}/workflows/{workflowUuid}/options : Get integration instance workflow input options
+     * POST /{externalUserId}/integration-instances/{id}/component-input-options : Get component input options
      * Resolve dynamic option values for a component-defined workflow input property.
      *
+     * @param externalUserId The external id of a connected user. (required)
      * @param id The id of an integration instance. (required)
-     * @param workflowUuid The workflow reference of the workflow. (required)
-     * @param workflowInputOptionsRequestModel  (required)
+     * @param componentInputOptionsRequestModel  (required)
      * @return The list of resolved options. (status code 200)
-     *         or Access token is missing or invalid (status code 401)
      */
     @Operation(
-        operationId = "getFrontendIntegrationInstanceWorkflowInputOptions",
-        summary = "Get integration instance workflow input options",
+        operationId = "getComponentInputOptions",
+        summary = "Get component input options",
         description = "Resolve dynamic option values for a component-defined workflow input property.",
         tags = { "integration-instance-workflow" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The list of resolved options.", content = {
                 @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = OptionModel.class)))
-            }),
-            @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
+            })
         },
         security = {
-            @SecurityRequirement(name = "jwtBearerAuth")
+            @SecurityRequirement(name = "bearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = IntegrationInstanceWorkflowApi.PATH_GET_FRONTEND_INTEGRATION_INSTANCE_WORKFLOW_INPUT_OPTIONS,
+        value = IntegrationInstanceWorkflowApi.PATH_GET_COMPONENT_INPUT_OPTIONS,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<List<OptionModel>> getFrontendIntegrationInstanceWorkflowInputOptions(
+    default ResponseEntity<List<OptionModel>> getComponentInputOptions(
+        @Parameter(name = "externalUserId", description = "The external id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
-        @Parameter(name = "WorkflowInputOptionsRequestModel", description = "", required = true) @Valid @RequestBody WorkflowInputOptionsRequestModel workflowInputOptionsRequestModel
+        @Parameter(name = "ComponentInputOptionsRequestModel", description = "", required = true) @Valid @RequestBody ComponentInputOptionsRequestModel componentInputOptionsRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
@@ -243,21 +241,19 @@ public interface IntegrationInstanceWorkflowApi {
     }
 
 
-    String PATH_GET_INTEGRATION_INSTANCE_WORKFLOW_INPUT_OPTIONS = "/{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/options";
+    String PATH_GET_FRONTEND_COMPONENT_INPUT_OPTIONS = "/integration-instances/{id}/component-input-options";
     /**
-     * POST /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/options : Get integration instance workflow input options
+     * POST /integration-instances/{id}/component-input-options : Get component input options
      * Resolve dynamic option values for a component-defined workflow input property.
      *
-     * @param externalUserId The external user id. (required)
      * @param id The id of an integration instance. (required)
-     * @param workflowUuid The workflow reference of the workflow. (required)
-     * @param workflowInputOptionsRequestModel  (required)
+     * @param componentInputOptionsRequestModel  (required)
      * @return The list of resolved options. (status code 200)
      *         or Access token is missing or invalid (status code 401)
      */
     @Operation(
-        operationId = "getIntegrationInstanceWorkflowInputOptions",
-        summary = "Get integration instance workflow input options",
+        operationId = "getFrontendComponentInputOptions",
+        summary = "Get component input options",
         description = "Resolve dynamic option values for a component-defined workflow input property.",
         tags = { "integration-instance-workflow" },
         responses = {
@@ -267,20 +263,18 @@ public interface IntegrationInstanceWorkflowApi {
             @ApiResponse(responseCode = "401", description = "Access token is missing or invalid")
         },
         security = {
-            @SecurityRequirement(name = "bearerAuth")
+            @SecurityRequirement(name = "jwtBearerAuth")
         }
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = IntegrationInstanceWorkflowApi.PATH_GET_INTEGRATION_INSTANCE_WORKFLOW_INPUT_OPTIONS,
+        value = IntegrationInstanceWorkflowApi.PATH_GET_FRONTEND_COMPONENT_INPUT_OPTIONS,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<List<OptionModel>> getIntegrationInstanceWorkflowInputOptions(
-        @Parameter(name = "externalUserId", description = "The external user id.", required = true, in = ParameterIn.PATH) @PathVariable("externalUserId") String externalUserId,
+    default ResponseEntity<List<OptionModel>> getFrontendComponentInputOptions(
         @Parameter(name = "id", description = "The id of an integration instance.", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
-        @Parameter(name = "workflowUuid", description = "The workflow reference of the workflow.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
-        @Parameter(name = "WorkflowInputOptionsRequestModel", description = "", required = true) @Valid @RequestBody WorkflowInputOptionsRequestModel workflowInputOptionsRequestModel
+        @Parameter(name = "ComponentInputOptionsRequestModel", description = "", required = true) @Valid @RequestBody ComponentInputOptionsRequestModel componentInputOptionsRequestModel
     ) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {

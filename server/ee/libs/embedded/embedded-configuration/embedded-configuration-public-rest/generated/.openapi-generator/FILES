@@ -12,6 +12,7 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Auth
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationWorkflowProjectComponentModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationWorkflowProjectModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/AutomationWorkflowProjectWorkflowTemplateModel.java
+src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ComponentInputOptionsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ComponentInputReferenceModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ComponentPropertyGroupModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/ComponentPropertyModel.java
@@ -39,6 +40,5 @@ src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/Opti
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/PublishFrontendProjectWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendIntegrationInstanceWorkflowRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/UpdateFrontendWorkflowConfigurationConnectionRequestModel.java
-src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowInputOptionsRequestModel.java
 src/main/java/com/bytechef/ee/embedded/configuration/public_/web/rest/model/WorkflowModel.java
 src/main/java/org/openapitools/configuration/EnumConverterConfiguration.java

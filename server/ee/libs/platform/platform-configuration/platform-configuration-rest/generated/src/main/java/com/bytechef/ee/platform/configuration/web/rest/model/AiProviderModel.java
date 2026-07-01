@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:23.964009+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T23:56:54.847416+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -34,6 +34,8 @@ public class AiProviderModel {
   private @Nullable String apiKey;
 
   private @Nullable Boolean enabled;
+
+  private @Nullable Boolean supportsEmbeddings;
 
   public AiProviderModel() {
     super();
@@ -151,6 +153,27 @@ public class AiProviderModel {
     this.enabled = enabled;
   }
 
+  public AiProviderModel supportsEmbeddings(@Nullable Boolean supportsEmbeddings) {
+    this.supportsEmbeddings = supportsEmbeddings;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider can be used for embeddings.
+   * @return supportsEmbeddings
+   */
+  
+  @Schema(name = "supportsEmbeddings", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider can be used for embeddings.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("supportsEmbeddings")
+  public @Nullable Boolean getSupportsEmbeddings() {
+    return supportsEmbeddings;
+  }
+
+  @JsonProperty("supportsEmbeddings")
+  public void setSupportsEmbeddings(@Nullable Boolean supportsEmbeddings) {
+    this.supportsEmbeddings = supportsEmbeddings;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -164,12 +187,13 @@ public class AiProviderModel {
         Objects.equals(this.name, aiProvider.name) &&
         Objects.equals(this.icon, aiProvider.icon) &&
         Objects.equals(this.apiKey, aiProvider.apiKey) &&
-        Objects.equals(this.enabled, aiProvider.enabled);
+        Objects.equals(this.enabled, aiProvider.enabled) &&
+        Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, icon, apiKey, enabled);
+    return Objects.hash(id, name, icon, apiKey, enabled, supportsEmbeddings);
   }
 
   @Override
@@ -181,6 +205,7 @@ public class AiProviderModel {
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    apiKey: ").append(toIndentedString(apiKey)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    supportsEmbeddings: ").append(toIndentedString(supportsEmbeddings)).append("\n");
     sb.append("}");
     return sb.toString();
   }
