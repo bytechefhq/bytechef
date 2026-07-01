@@ -164,11 +164,7 @@ public final class Workflow implements Persistable<String>, Serializable {
             } else if (WorkflowConstants.INPUTS.equals(entry.getKey())) {
                 this.inputs = CollectionUtils.map(
                     MapUtils.getList(sourceMap, WorkflowConstants.INPUTS, Map.class, Collections.emptyList()),
-                    map -> new Input(
-                        MapUtils.getRequiredString(map, WorkflowConstants.NAME),
-                        MapUtils.getString(map, WorkflowConstants.LABEL),
-                        MapUtils.getString(map, WorkflowConstants.TYPE, "string"),
-                        MapUtils.getBoolean(map, WorkflowConstants.REQUIRED, false)));
+                    Workflow::getInput);
             } else if (WorkflowConstants.LABEL.equals(entry.getKey())) {
                 this.label = MapUtils.getString(sourceMap, WorkflowConstants.LABEL);
             } else if (WorkflowConstants.OUTPUTS.equals(entry.getKey())) {
@@ -388,6 +384,27 @@ public final class Workflow implements Persistable<String>, Serializable {
             '}';
     }
 
+    private static Input getInput(Map<String, ?> map) {
+        Map<String, Object> extensions = new HashMap<>();
+
+        for (Map.Entry<?, ?> inputEntry : map.entrySet()) {
+            String key = String.valueOf(inputEntry.getKey());
+
+            if (!WorkflowConstants.NAME.equals(key) && !WorkflowConstants.LABEL.equals(key)
+                && !WorkflowConstants.TYPE.equals(key) && !WorkflowConstants.REQUIRED.equals(key)) {
+
+                extensions.put(key, inputEntry.getValue());
+            }
+        }
+
+        return new Input(
+            MapUtils.getRequiredString(map, WorkflowConstants.NAME),
+            MapUtils.getString(map, WorkflowConstants.LABEL),
+            MapUtils.getString(map, WorkflowConstants.TYPE, "string"),
+            MapUtils.getBoolean(map, WorkflowConstants.REQUIRED, false),
+            extensions);
+    }
+
     private static Map<String, ?> readWorkflowMap(String definition, String id, Format format) {
         try {
             return WorkflowReader.readWorkflowMap(
@@ -398,9 +415,29 @@ public final class Workflow implements Persistable<String>, Serializable {
         }
     }
 
-    public record Input(String name, String label, String type, boolean required)
+    public record Input(
+        String name, String label, String type, boolean required, Map<String, Object> extensions)
         implements Serializable {
 
+        public Input {
+            extensions = extensions == null ? Map.of() : new HashMap<>(extensions);
+        }
+
+        public Input(String name, String label, String type, boolean required) {
+            this(name, label, type, required, Map.of());
+        }
+
+        public Map<String, Object> extensions() {
+            return Collections.unmodifiableMap(extensions);
+        }
+
+        public <T> T getExtension(String name, Class<T> elementType, T defaultValue) {
+            return MapUtils.get(extensions, name, elementType, defaultValue);
+        }
+
+        public <T> List<T> getExtensions(String name, Class<T> elementType, List<T> defaultValue) {
+            return MapUtils.getList(extensions, name, elementType, defaultValue);
+        }
     }
 
     public record Output(String name, Object value) implements Serializable {

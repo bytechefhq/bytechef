@@ -30,6 +30,9 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     private static final String COMPONENT_NAME = "componentName";
     private static final String COMPONENT_VERSION = "componentVersion";
     private static final String CONNECTIONS = "connections";
+    private static final String GROUP_NAME = "groupName";
+    private static final String INTERNAL_ONLY = "internalOnly";
+    private static final String OBJECT_NAME = "objectName";
     private static final String TRIGGERS = "triggers";
     private static final String TAGS = "tags";
 
@@ -37,6 +40,6 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
     public List<String> getReservedWords() {
         return List.of(
             AUTHORIZATION_REQUIRED, CATEGORY, CLUSTER_ELEMENTS, COMPONENT_NAME, COMPONENT_VERSION, CONNECTIONS,
-            TAGS, TRIGGERS);
+            GROUP_NAME, INTERNAL_ONLY, OBJECT_NAME, TAGS, TRIGGERS);
     }
 }

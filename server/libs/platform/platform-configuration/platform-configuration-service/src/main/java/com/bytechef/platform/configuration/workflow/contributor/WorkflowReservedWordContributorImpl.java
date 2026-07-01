@@ -30,6 +30,7 @@ public class WorkflowReservedWordContributorImpl implements WorkflowReservedWord
         return List.of(
             WorkflowExtConstants.AUTHORIZATION_REQUIRED, "category", WorkflowExtConstants.CLUSTER_ELEMENTS,
             WorkflowExtConstants.COMPONENT_NAME, WorkflowExtConstants.COMPONENT_VERSION,
-            WorkflowExtConstants.CONNECTIONS, "tags", WorkflowExtConstants.TRIGGERS);
+            WorkflowExtConstants.CONNECTIONS, WorkflowExtConstants.GROUP_NAME, WorkflowExtConstants.INTERNAL_ONLY,
+            WorkflowExtConstants.OBJECT_NAME, "tags", WorkflowExtConstants.TRIGGERS);
     }
 }
