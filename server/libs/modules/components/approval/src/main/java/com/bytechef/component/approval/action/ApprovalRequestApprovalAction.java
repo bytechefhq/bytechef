@@ -67,12 +67,10 @@ import com.bytechef.component.definition.ComponentDsl.ModifiableActionDefinition
 import com.bytechef.component.definition.ComponentDsl.ModifiableValueProperty;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
-import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.definition.BaseOutputDefinition.OutputResponse;
 import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
-import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
@@ -283,21 +281,16 @@ public class ApprovalRequestApprovalAction {
             List<ClusterElement> approvalChannels = clusterElementMap.getClusterElements(APPROVAL_CHANNELS);
 
             for (ClusterElement approvalChannel : approvalChannels) {
-                ApprovalChannelFunction approvalChannelFunction = clusterElementDefinitionService.getClusterElement(
-                    approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
-                    approvalChannel.getClusterElementName());
-
                 ComponentConnection componentConnection = componentConnections.get(
                     approvalChannel.getWorkflowNodeName());
 
-                approvalChannelFunction.apply(
-                    ParametersFactory.create(
-                        MapUtils.concat(
-                            new HashMap<>(inputParameters.toMap()), new HashMap<>(approvalChannel.getParameters()))),
-                    ParametersFactory.create(componentConnection), formUrl,
-                    actionContextAware.toClusterElementContext(
-                        approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
-                        approvalChannel.getClusterElementName(), componentConnection));
+                Map<String, Object> channelInputParameters = MapUtils.concat(
+                    new HashMap<>(inputParameters.toMap()), new HashMap<>(approvalChannel.getParameters()));
+
+                clusterElementDefinitionService.executeApprovalChannel(
+                    approvalChannel.getComponentName(), approvalChannel.getComponentVersion(),
+                    approvalChannel.getClusterElementName(), channelInputParameters, formUrl, componentConnection,
+                    actionContextAware);
             }
         }
 
