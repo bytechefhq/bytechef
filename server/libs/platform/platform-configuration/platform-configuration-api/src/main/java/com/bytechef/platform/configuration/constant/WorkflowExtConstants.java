@@ -26,5 +26,8 @@ public class WorkflowExtConstants {
     public static final String COMPONENT_NAME = "componentName";
     public static final String COMPONENT_VERSION = "componentVersion";
     public static final String CONNECTIONS = "connections";
+    public static final String GROUP_NAME = "groupName";
+    public static final String INTERNAL_ONLY = "internalOnly";
+    public static final String OBJECT_NAME = "objectName";
     public static final String TRIGGERS = "triggers";
 }

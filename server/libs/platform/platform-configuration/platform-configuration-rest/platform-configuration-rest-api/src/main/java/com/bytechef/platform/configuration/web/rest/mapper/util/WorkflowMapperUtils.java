@@ -18,8 +18,11 @@ package com.bytechef.platform.configuration.web.rest.mapper.util;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.dto.WorkflowTaskDTO;
 import com.bytechef.platform.configuration.dto.WorkflowTriggerDTO;
+import com.bytechef.platform.configuration.web.rest.model.ComponentInputReferenceModel;
+import com.bytechef.platform.configuration.web.rest.model.WorkflowInputModel;
 import com.bytechef.platform.configuration.web.rest.model.WorkflowModelAware;
 import com.bytechef.platform.definition.WorkflowNodeType;
 import java.util.ArrayList;
@@ -54,6 +57,33 @@ public class WorkflowMapperUtils {
 
         workflowModel.setWorkflowTriggerComponentNames(
             workflowTriggerComponentNames.isEmpty() ? List.of("manual") : workflowTriggerComponentNames);
+    }
+
+    public static void populateInputModels(
+        List<Workflow.Input> inputs, List<WorkflowInputModel> workflowInputModels) {
+
+        if (inputs == null || workflowInputModels == null || inputs.size() != workflowInputModels.size()) {
+            return;
+        }
+
+        for (int i = 0; i < inputs.size(); i++) {
+            WorkflowInput workflowInput = new WorkflowInput(inputs.get(i));
+            WorkflowInputModel workflowInputModel = workflowInputModels.get(i);
+
+            workflowInputModel.setInternalOnly(workflowInput.isInternalOnly());
+            workflowInputModel.setObjectName(workflowInput.getObjectName());
+
+            WorkflowInput.ComponentInputReference componentInputReference =
+                workflowInput.getComponentInputReference();
+
+            if (componentInputReference != null) {
+                workflowInputModel.setComponentReference(
+                    new ComponentInputReferenceModel(
+                        componentInputReference.componentName(),
+                        componentInputReference.componentVersion(),
+                        componentInputReference.groupName()));
+            }
+        }
     }
 
     public static long getWorkflowTaskConnectionsCount(List<WorkflowTaskDTO> workflowTasks) {
