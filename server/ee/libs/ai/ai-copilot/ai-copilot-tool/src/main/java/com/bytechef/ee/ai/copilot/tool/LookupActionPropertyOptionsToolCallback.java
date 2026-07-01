@@ -9,6 +9,7 @@ package com.bytechef.ee.ai.copilot.tool;
 
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.ee.ai.agent.tool.ToolErrors;
+import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.component.facade.ActionDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
