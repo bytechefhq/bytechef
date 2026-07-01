@@ -88,8 +88,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectService connectUserProjectService;
+    private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
-    private final ConnectedUserProjectWorkflowWriter connectedUserProjectWorkflowWriter;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
     private final @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator;
@@ -115,8 +115,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectedUserProjectService connectUserProjectService,
+        ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
-        ConnectedUserProjectWorkflowWriter connectedUserProjectWorkflowWriter,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
         @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
@@ -131,8 +131,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectUserProjectService = connectUserProjectService;
+        this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
-        this.connectedUserProjectWorkflowWriter = connectedUserProjectWorkflowWriter;
         this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.copilotWorkflowGenerator = copilotWorkflowGenerator;
@@ -156,7 +156,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
-        return connectedUserProjectWorkflowWriter.createProjectWorkflow(externalUserId, definition, environment);
+        return connectedUserProjectWorkflowManager.createProjectWorkflow(externalUserId, definition, environment);
     }
 
     @Override
@@ -184,7 +184,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String externalUserId, String prompt, Environment environment, boolean generate) {
 
         if (!generate) {
-            return connectedUserProjectWorkflowWriter.createProjectWorkflow(externalUserId, prompt, environment);
+            return connectedUserProjectWorkflowManager.createProjectWorkflow(externalUserId, prompt, environment);
         }
 
         if (StringUtils.isBlank(prompt)) {
@@ -198,7 +198,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         String definition = buildInitialDefinition(toWorkflowLabel(prompt));
 
-        String workflowUuid = connectedUserProjectWorkflowWriter.createProjectWorkflow(
+        String workflowUuid = connectedUserProjectWorkflowManager.createProjectWorkflow(
             externalUserId, definition, environment);
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
@@ -211,7 +211,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment) {
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
@@ -264,7 +264,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
@@ -318,7 +318,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
@@ -338,7 +338,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
         String externalUserId, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         return getConnectedUserProjectWorkflows(connectedUserProject, environment);
@@ -396,7 +396,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         String workflowId = projectWorkflowService
@@ -455,7 +455,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment) {
 
-        connectedUserProjectWorkflowWriter.updateProjectWorkflow(externalUserId, workflowUuid, definition, environment);
+        connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, definition,
+            environment);
     }
 
     @Override
@@ -464,7 +465,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate) {
 
         if (!generate) {
-            connectedUserProjectWorkflowWriter.updateProjectWorkflow(externalUserId, workflowUuid, prompt, environment);
+            connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, prompt,
+                environment);
 
             return workflowUuid;
         }
@@ -478,7 +480,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
         }
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
@@ -496,7 +498,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowWriter.getOrCreateConnectedUserProject(
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
             externalUserId, environment);
 
         String workflowId = projectWorkflowService
