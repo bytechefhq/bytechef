@@ -11,8 +11,6 @@ import com.bytechef.commons.util.JsonUtils;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.core.JacksonException;
-import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -27,7 +25,7 @@ public final class ToolErrors {
     }
 
     /**
-     * Serialises a {@code {"error": <message>}} JSON object using the supplied {@link JsonMapper}.
+     * Serialises a {@code {"error": <message>}} JSON object using {@link JsonUtils}.
      *
      * @param message the human-readable error message
      * @return a JSON string of the form {@code {"error":"<message>"}} or the fallback {@code {"error":"serialization
@@ -36,7 +34,7 @@ public final class ToolErrors {
     public static String toolError(String message) {
         try {
             return JsonUtils.write(Map.of("error", message));
-        } catch (JacksonException exception) {
+        } catch (RuntimeException exception) {
             log.error(
                 "Failed to serialise tool error response for message '{}': {}", message, exception.toString(),
                 exception);
