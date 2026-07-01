@@ -20,7 +20,9 @@
     "hidden": null,
     "label": "Workflow",
     "maxLength": null,
-    "metadata": { },
+    "metadata": {
+      "editSubflow": true
+    },
     "minLength": null,
     "name": "workflowUuid",
     "options": null,

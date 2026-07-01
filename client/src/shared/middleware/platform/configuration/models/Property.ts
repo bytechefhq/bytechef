@@ -71,6 +71,12 @@ export interface Property {
      */
     hidden?: boolean;
     /**
+     * Key-value map of metadata.
+     * @type {{ [key: string]: any; }}
+     * @memberof Property
+     */
+    metadata?: { [key: string]: any; };
+    /**
      * The property name.
      * @type {string}
      * @memberof Property
@@ -157,6 +163,7 @@ export function PropertyFromJSONTyped(json: any, ignoreDiscriminator: boolean): 
         'displayCondition': json['displayCondition'] == null ? undefined : json['displayCondition'],
         'expressionEnabled': json['expressionEnabled'] == null ? undefined : json['expressionEnabled'],
         'hidden': json['hidden'] == null ? undefined : json['hidden'],
+        'metadata': json['metadata'] == null ? undefined : json['metadata'],
         'name': json['name'] == null ? undefined : json['name'],
         'required': json['required'] == null ? undefined : json['required'],
         'type': PropertyTypeFromJSON(json['type']),
@@ -212,6 +219,7 @@ export function PropertyToJSONTyped(value?: Property | null, ignoreDiscriminator
         'displayCondition': value['displayCondition'],
         'expressionEnabled': value['expressionEnabled'],
         'hidden': value['hidden'],
+        'metadata': value['metadata'],
         'name': value['name'],
         'required': value['required'],
         'type': PropertyTypeToJSON(value['type']),

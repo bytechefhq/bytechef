@@ -30,7 +30,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("create_update_lead")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:10.333828+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T08:27:57.797225479+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class CreateUpdateLeadModel {
 
   private JsonNullable<String> company = JsonNullable.<String>undefined();

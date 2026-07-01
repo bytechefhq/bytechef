@@ -12,6 +12,7 @@ Name | Type
 `displayCondition` | string
 `expressionEnabled` | boolean
 `hidden` | boolean
+`metadata` | { [key: string]: any; }
 `name` | string
 `required` | boolean
 `type` | [PropertyType](PropertyType.md)
@@ -28,6 +29,7 @@ const example = {
   "displayCondition": null,
   "expressionEnabled": null,
   "hidden": null,
+  "metadata": null,
   "name": null,
   "required": null,
   "type": null,
