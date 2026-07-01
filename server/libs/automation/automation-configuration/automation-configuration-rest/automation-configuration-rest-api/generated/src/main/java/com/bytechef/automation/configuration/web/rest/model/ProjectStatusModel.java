@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
  * The status of a project.
  */
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:08.937242+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T08:27:47.799314425+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public enum ProjectStatusModel {
   
   DRAFT("DRAFT"),

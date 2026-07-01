@@ -15,7 +15,9 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -33,7 +35,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "BooleanProperty", description = "A boolean property type.")
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:08.181901+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T08:27:46.448727059+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class BooleanPropertyModel extends ValuePropertyModel {
 
   private @Nullable Boolean defaultValue;
@@ -163,6 +165,16 @@ public class BooleanPropertyModel extends ValuePropertyModel {
 
   public BooleanPropertyModel hidden(Boolean hidden) {
     super.hidden(hidden);
+    return this;
+  }
+
+  public BooleanPropertyModel metadata(Map<String, Object> metadata) {
+    super.metadata(metadata);
+    return this;
+  }
+
+  public BooleanPropertyModel putMetadataItem(String key, Object metadataItem) {
+    super.putMetadataItem(key, metadataItem);
     return this;
   }
 

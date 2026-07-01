@@ -21,7 +21,7 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("startWebhookTriggerTest_200_response")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-06-15T23:09:09.103134+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T08:27:47.721577773+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class StartWebhookTriggerTest200ResponseModel {
 
   private @Nullable String webhookUrl;
