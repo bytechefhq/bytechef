@@ -11,7 +11,9 @@ import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.ee.discovery.util.WorkerDiscoveryUtils;
 import com.bytechef.ee.platform.component.remote.client.AbstractWorkerClient;
 import com.bytechef.ee.remote.client.DefaultRestClient;
+import com.bytechef.platform.component.ComponentConnection;
 import com.bytechef.platform.component.domain.ComponentDefinition;
+import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.constant.PlatformType;
 import java.util.List;
@@ -41,6 +43,15 @@ public class RemoteComponentDefinitionServiceClient extends AbstractWorkerClient
         DefaultRestClient defaultRestClient, DiscoveryClient discoveryClient, ObjectMapper objectMapper) {
 
         super(defaultRestClient, discoveryClient, objectMapper);
+    }
+
+    @Override
+    public List<Option> executeWorkflowInputOptions(
+        String componentName, int componentVersion, String groupName, String propertyName,
+        Map<String, ?> inputParameters, List<String> lookupDependsOnPaths, String searchText,
+        @Nullable ComponentConnection componentConnection) {
+
+        throw new UnsupportedOperationException();
     }
 
     @Override
