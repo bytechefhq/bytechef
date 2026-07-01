@@ -45,6 +45,7 @@ public abstract class IntegrationWorkflowMapper {
         public void afterMapping(IntegrationWorkflowDTO workflowDTO, @MappingTarget WorkflowModel workflowModel) {
             WorkflowMapperUtils.afterMapping(
                 workflowDTO.getInputs(), workflowDTO.getTasks(), workflowDTO.getTriggers(), workflowModel);
+            WorkflowMapperUtils.populateInputModels(workflowDTO.getInputs(), workflowModel.getInputs());
         }
     }
 

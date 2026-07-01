@@ -54,8 +54,8 @@ public record IntegrationInstanceConfigurationWorkflowDTO(
 
     /**
      * Returns a copy with the resolved component-defined input groups, keyed by workflow input name. The flat
-     * {@link Workflow.Input#componentReference()} only carries the group identifiers; this holds the resolved group the
-     * embedded SDK renders.
+     * {@link com.bytechef.platform.configuration.domain.WorkflowInput#getComponentInputReference()} only carries the
+     * group identifiers; this holds the resolved group the embedded SDK renders.
      */
     public IntegrationInstanceConfigurationWorkflowDTO withComponentInputGroups(
         Map<String, PropertyGroup> componentInputGroups) {
