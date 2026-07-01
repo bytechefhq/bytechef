@@ -41,9 +41,11 @@ import com.bytechef.platform.component.domain.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.ConnectionDefinition;
 import com.bytechef.platform.component.domain.OAuth2AuthorizationParameters;
+import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import com.bytechef.platform.configuration.facade.OAuth2ParametersFacade;
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.dto.ConnectionDTO;
@@ -330,11 +332,6 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             .build();
     }
 
-    /**
-     * Resolves each component-defined workflow input's flat {@link Workflow.ComponentInputReference} into the actual
-     * component property group, so the embedded SDK renders the rich component widget (e.g. a Slack channel select)
-     * instead of a plain text input.
-     */
     private IntegrationInstanceConfigurationWorkflowDTO resolveComponentInputGroups(
         IntegrationInstanceConfigurationWorkflowDTO workflowDTO) {
 
@@ -344,30 +341,30 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
             return workflowDTO;
         }
 
-//        Map<String, PropertyGroup> componentInputGroups = new HashMap<>();
+        Map<String, PropertyGroup> componentInputGroups = new HashMap<>();
 
-//        for (Workflow.Input input : workflow.getInputs()) {
-//            Workflow.ComponentInputReference componentReference = input.componentReference();
+        for (WorkflowInput workflowInput : WorkflowInput.of(workflow)) {
+            WorkflowInput.ComponentInputReference componentReference = workflowInput.getComponentInputReference();
 
-//            if (componentReference == null) {
-//                continue;
-//            }
+            if (componentReference == null) {
+                continue;
+            }
 
-//            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
-//                componentReference.componentName(), componentReference.componentVersion());
-//
-//            componentDefinition.getInputs()
-//                .stream()
-//                .filter(propertyGroup -> Objects.equals(propertyGroup.getName(), componentReference.groupName()))
-//                .findFirst()
-//                .ifPresent(propertyGroup -> componentInputGroups.put(input.name(), propertyGroup));
-//        }
+            ComponentDefinition componentDefinition = componentDefinitionService.getComponentDefinition(
+                componentReference.componentName(), componentReference.componentVersion());
 
-//        if (componentInputGroups.isEmpty()) {
-        return workflowDTO;
-//        }
+            componentDefinition.getInputs()
+                .stream()
+                .filter(propertyGroup -> Objects.equals(propertyGroup.getName(), componentReference.groupName()))
+                .findFirst()
+                .ifPresent(propertyGroup -> componentInputGroups.put(workflowInput.getName(), propertyGroup));
+        }
 
-//        return workflowDTO.withComponentInputGroups(componentInputGroups);
+        if (componentInputGroups.isEmpty()) {
+            return workflowDTO;
+        }
+
+        return workflowDTO.withComponentInputGroups(componentInputGroups);
     }
 
     private ConnectedUserIntegrationDTO toConnectedUserIntegrationDTO(
@@ -422,7 +419,7 @@ public class ConnectedUserIntegrationFacadeImpl implements ConnectedUserIntegrat
                             mcpComponent.getComponentName(), mcpComponent.getComponentVersion(), mcpTool.getName());
 
                     return new ConnectedUserIntegrationDTO.McpToolInfo(
-                        mcpTool.getName(), clusterElementDefinition.getDescription());
+                        mcpTool.getId(), mcpTool.getName(), clusterElementDefinition.getDescription());
                 }))
             .toList();
     }
