@@ -32,6 +32,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.PropertiesDataSource;
 import com.bytechef.component.definition.Property.DynamicPropertiesProperty;
 import com.bytechef.component.definition.ai.agent.ToolFunction;
+import com.bytechef.component.definition.approval.ApprovalChannelFunction;
 import com.bytechef.component.exception.ProviderException;
 import com.bytechef.definition.BaseOutputDefinition;
 import com.bytechef.exception.ConfigurationException;
@@ -43,6 +44,7 @@ import com.bytechef.platform.component.annotation.WithTokenRefresh.ComponentName
 import com.bytechef.platform.component.annotation.WithTokenRefresh.ConnectionParam;
 import com.bytechef.platform.component.context.ContextFactory;
 import com.bytechef.platform.component.definition.ActionContextAdapater;
+import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.PropertyFactory;
@@ -224,6 +226,36 @@ public class ClusterElementDefinitionServiceImpl implements ClusterElementDefini
         return doExecuteTool(
             componentName, componentVersion, clusterElementName, inputParameters, extensions, componentConnections,
             clusterElementContext);
+    }
+
+    @Override
+    @WithTokenRefresh(errorTypeClass = ClusterElementDefinitionErrorType.class, errorTypeField = "EXECUTE_PERFORM")
+    public Object executeApprovalChannel(
+        @ComponentNameParam String componentName, int componentVersion, String clusterElementName,
+        Map<String, ?> inputParameters, String formUrl,
+        @ConnectionParam @Nullable ComponentConnection componentConnection, ActionContextAware actionContext) {
+
+        ApprovalChannelFunction approvalChannelFunction = getClusterElement(
+            componentName, componentVersion, clusterElementName);
+
+        // Rebuild the context from componentConnection so a token-refresh retry (which swaps in the refreshed
+        // connection) runs the channel against fresh credentials, while preserving the action's execution context.
+        ClusterElementContext clusterElementContext = actionContext.toClusterElementContext(
+            componentName, componentVersion, clusterElementName, componentConnection);
+
+        Parameters inputParams = ParametersFactory.create(inputParameters);
+        Parameters connectionParams = ParametersFactory.create(componentConnection);
+
+        try {
+            return approvalChannelFunction.apply(inputParams, connectionParams, formUrl, clusterElementContext);
+        } catch (Exception exception) {
+            if (exception instanceof ProviderException) {
+                throw (ProviderException) exception;
+            }
+
+            throw new ExecutionException(
+                exception, inputParameters, ClusterElementDefinitionErrorType.EXECUTE_PERFORM);
+        }
     }
 
     @Override
