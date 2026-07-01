@@ -24,8 +24,10 @@ import com.bytechef.evaluator.SpelEvaluator;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.jackson.config.JacksonConfiguration;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.facade.ComponentConnectionFacade;
+import com.bytechef.platform.configuration.facade.WebhookTriggerTestFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.configuration.facade.WorkflowFacadeImpl;
 import com.bytechef.platform.file.storage.SharedTemplateFileStorage;
@@ -71,6 +73,11 @@ import org.springframework.data.jdbc.repository.config.EnableJdbcRepositories;
 public class AutomationWorkflowProjectFacadeIntTestConfiguration {
 
     @Bean
+    ComponentDefinitionFacade componentDefinitionFacade() {
+        return mock(ComponentDefinitionFacade.class);
+    }
+
+    @Bean
     Evaluator evaluator() {
         return SpelEvaluator.create();
     }
@@ -99,6 +106,11 @@ public class AutomationWorkflowProjectFacadeIntTestConfiguration {
             });
 
         return sharedTemplateFileStorage;
+    }
+
+    @Bean
+    WebhookTriggerTestFacade webhookTriggerTestFacade() {
+        return mock(WebhookTriggerTestFacade.class);
     }
 
     @Bean

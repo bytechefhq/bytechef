@@ -17,6 +17,7 @@ import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -38,8 +39,8 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
     private static final Logger log = LoggerFactory.getLogger(ConnectedUserIntegrationInstanceFacadeImpl.class);
 
+    private final ComponentDefinitionFacade componentDefinitionFacade;
     private final ConnectedUserService connectedUserService;
-    private final EmbeddedWorkflowInputOptionFacade embeddedWorkflowInputOptionFacade;
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService;
     private final IntegrationInstanceService integrationInstanceService;
     private final IntegrationInstanceFacade integrationInstanceFacade;
@@ -47,14 +48,13 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
 
     @SuppressFBWarnings("EI")
     public ConnectedUserIntegrationInstanceFacadeImpl(
-        ConnectedUserService connectedUserService,
-        EmbeddedWorkflowInputOptionFacade embeddedWorkflowInputOptionFacade,
+        ComponentDefinitionFacade componentDefinitionFacade, ConnectedUserService connectedUserService,
         IntegrationInstanceConfigurationService integrationInstanceConfigurationService,
         IntegrationInstanceService integrationInstanceService, IntegrationInstanceFacade integrationInstanceFacade,
         IntegrationWorkflowService integrationWorkflowService) {
 
+        this.componentDefinitionFacade = componentDefinitionFacade;
         this.connectedUserService = connectedUserService;
-        this.embeddedWorkflowInputOptionFacade = embeddedWorkflowInputOptionFacade;
         this.integrationInstanceConfigurationService = integrationInstanceConfigurationService;
         this.integrationInstanceService = integrationInstanceService;
         this.integrationInstanceFacade = integrationInstanceFacade;
@@ -72,21 +72,19 @@ public class ConnectedUserIntegrationInstanceFacadeImpl implements ConnectedUser
     }
 
     @Override
-    public List<Option> getIntegrationInstanceWorkflowInputOptions(
-        String externalUserId, long id, String workflowUuid, String inputName, String propertyName,
-        Map<String, Object> lookupDependsOnValues, String searchText) {
+    public List<Option> getComponentInputOptions(
+        String externalUserId, long id, String componentName, int componentVersion, String groupName,
+        String propertyName, Map<String, Object> lookupDependsOnValues, String searchText) {
 
         IntegrationInstance integrationInstance = integrationInstanceService.getIntegrationInstance(id);
 
-        // Return no options when the integration instance does not belong to the connected user, instead of
-        // leaking instance existence. Reads use the anti-enumeration empty result; the mutating paths fail closed
-        // with EmbeddedIntegrationNotVisibleException (HTTP 404) so the caller is not told the change was a no-op.
         if (!isOwnedByConnectedUser(externalUserId, id, integrationInstance)) {
             return List.of();
         }
 
-        return embeddedWorkflowInputOptionFacade.getWorkflowInputOptions(
-            id, workflowUuid, inputName, propertyName, lookupDependsOnValues, searchText);
+        return componentDefinitionFacade.executeWorkflowInputOptions(
+            componentName, componentVersion, groupName, propertyName, lookupDependsOnValues,
+            List.copyOf(lookupDependsOnValues.keySet()), searchText, integrationInstance.getConnectionId());
     }
 
     @Override

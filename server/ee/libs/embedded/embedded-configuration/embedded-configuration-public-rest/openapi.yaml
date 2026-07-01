@@ -630,13 +630,13 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - jwtBearerAuth: [ ]
-  /integration-instances/{id}/workflows/{workflowUuid}/options:
+  /integration-instances/{id}/component-input-options:
     post:
       description: "Resolve dynamic option values for a component-defined workflow input property."
-      summary: "Get integration instance workflow input options"
+      summary: "Get component input options"
       tags:
         - "integration-instance-workflow"
-      operationId: "getFrontendIntegrationInstanceWorkflowInputOptions"
+      operationId: "getFrontendComponentInputOptions"
       parameters:
         - name: "id"
           description: "The id of an integration instance."
@@ -645,17 +645,11 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowUuid"
-          description: "The workflow reference of the workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WorkflowInputOptionsRequest"
+              $ref: "#/components/schemas/ComponentInputOptionsRequest"
         required: true
       responses:
         "200":
@@ -1371,16 +1365,16 @@ paths:
           $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
-  /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/options:
+  /{externalUserId}/integration-instances/{id}/component-input-options:
     post:
       description: "Resolve dynamic option values for a component-defined workflow input property."
-      summary: "Get integration instance workflow input options"
+      summary: "Get component input options"
       tags:
         - "integration-instance-workflow"
-      operationId: "getIntegrationInstanceWorkflowInputOptions"
+      operationId: "getComponentInputOptions"
       parameters:
         - name: "externalUserId"
-          description: "The external user id."
+          description: "The external id of a connected user."
           in: "path"
           required: true
           schema:
@@ -1392,17 +1386,11 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowUuid"
-          description: "The workflow reference of the workflow."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
       requestBody:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/WorkflowInputOptionsRequest"
+              $ref: "#/components/schemas/ComponentInputOptionsRequest"
         required: true
       responses:
         "200":
@@ -1413,8 +1401,6 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Option"
-        "401":
-          $ref: "#/components/responses/UnauthorizedError"
       security:
         - bearerAuth: [ ]
   /{externalUserId}/integration-instances/{id}/workflows/{workflowUuid}/enable:
@@ -1836,11 +1822,18 @@ components:
         - "value"
         - "type"
       properties:
+        internalOnly:
+          description: "If true, the input is configured in the admin IntegrationInstanceConfigurationDialog; if false (default), it is rendered in the end-user ConnectDialog."
+          type: "boolean"
+          default: false
         label:
           description: "The descriptive name of an input"
           type: "string"
         name:
           description: "The name of an input"
+          type: "string"
+        objectName:
+          description: "For FIELD_MAPPING inputs, the object name used to match the SDK mapObjectFields config."
           type: "string"
         required:
           description: "If an input is required, or not"
@@ -1883,6 +1876,7 @@ components:
         - "NUMBER"
         - "STRING"
         - "TIME"
+        - "FIELD_MAPPING"
     Option:
       type: "object"
       required:
@@ -1935,17 +1929,26 @@ components:
           type: "array"
           items:
             $ref: "#/components/schemas/ComponentProperty"
-    WorkflowInputOptionsRequest:
+    ComponentInputOptionsRequest:
       type: "object"
       required:
-        - "inputName"
+        - "componentName"
+        - "componentVersion"
+        - "groupName"
         - "propertyName"
       properties:
-        inputName:
-          description: "The workflow input whose referenced component the options resolve against."
+        componentName:
+          description: "The component the input group belongs to."
+          type: "string"
+        componentVersion:
+          description: "The component version."
+          type: "integer"
+          format: "int32"
+        groupName:
+          description: "The component input group the property belongs to."
           type: "string"
         propertyName:
-          description: "The component property whose options to resolve."
+          description: "The group member property whose options to resolve."
           type: "string"
         lookupDependsOnValues:
           description: "Current values of the properties this lookup depends on."
