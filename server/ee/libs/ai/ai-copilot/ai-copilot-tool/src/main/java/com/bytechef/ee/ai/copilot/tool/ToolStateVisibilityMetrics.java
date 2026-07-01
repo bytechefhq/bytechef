@@ -22,8 +22,8 @@ public interface ToolStateVisibilityMetrics {
     void recordStateVisibility(String toolName, String state);
 
     /**
-     * Records an {@code askUserQuestion} outcome to a dedicated metric where the surface tracks one;
-     * default is a no-op for surfaces without a dedicated ask-user-question counter.
+     * Records an {@code askUserQuestion} outcome to a dedicated metric where the surface tracks one; default is a no-op
+     * for surfaces without a dedicated ask-user-question counter.
      */
     default void recordAskUserQuestion(String outcome) {
     }
