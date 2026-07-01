@@ -51,9 +51,8 @@ public final class ComponentSlugUtils {
 
         List<ComponentDefinition> matches = findMatches(componentName, componentDefinitionService);
 
-        ComponentDefinition componentDefinition = matches.getFirst();
-
-        return matches.size() == 1 ? componentDefinition.getName() : null;
+        return matches.size() == 1 ? matches.getFirst()
+            .getName() : null;
     }
 
     public static String unknownComponentMessage(

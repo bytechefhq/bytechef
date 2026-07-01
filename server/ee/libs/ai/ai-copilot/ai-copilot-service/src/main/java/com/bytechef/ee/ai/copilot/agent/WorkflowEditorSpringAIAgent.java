@@ -25,6 +25,7 @@ import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
+import com.bytechef.platform.security.util.SecurityUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
@@ -174,8 +175,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return securityContextRehydrator.withUserSecurityContext(userId, action);
         }
 
-        if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication) {
-            return callSkippingChecks(action);
+        if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication authentication) {
+            return SecurityUtils.runAs(authentication, () -> callSkippingChecks(action));
         }
 
         return action.get();

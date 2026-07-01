@@ -95,7 +95,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     .findFirst()
                     .orElse(null);
 
-                boolean enabled = (property != null && property.isEnabled()) || hasConfigApiKey(provider);
+                boolean enabled = property != null ? property.isEnabled() : hasConfigApiKey(provider);
 
                 List<AiProviderCatalogItemDTO.Model> models = readChatModels(componentDefinition);
 
@@ -169,7 +169,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     apiKey = getConfigApiKey(provider);
                 }
 
-                boolean enabled = (property != null && property.isEnabled()) || hasConfigApiKey(provider);
+                boolean enabled = property != null ? property.isEnabled() : hasConfigApiKey(provider);
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, enabled,
