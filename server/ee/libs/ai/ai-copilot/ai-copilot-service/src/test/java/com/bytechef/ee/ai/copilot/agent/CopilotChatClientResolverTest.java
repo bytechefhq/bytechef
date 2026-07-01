@@ -48,13 +48,13 @@ class CopilotChatClientResolverTest {
     void testUserSelectedWithEnvironmentDelegatesToCatalog() {
         ChatClient catalogChatClient = mock(ChatClient.class);
 
-        when(catalogChatClientResolver.resolve(3, OPENAI_KEY, OPENAI_MODEL)).thenReturn(catalogChatClient);
+        when(catalogChatClientResolver.resolve(OPENAI_KEY, OPENAI_MODEL, 3)).thenReturn(catalogChatClient);
 
         State state = new State();
 
         state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
         state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
-        state.set(CopilotChatClientResolver.ENVIRONMENT_ID_KEY, "3");
+        state.set(CopilotStateKeys.ENVIRONMENT_ID, "3");
 
         assertSame(catalogChatClient, resolver.resolve(state));
     }
@@ -68,7 +68,7 @@ class CopilotChatClientResolverTest {
         state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
 
         assertNull(resolver.resolve(state));
-        verify(catalogChatClientResolver, never()).resolve(anyInt(), anyString(), anyString());
+        verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
     }
 
     @Test

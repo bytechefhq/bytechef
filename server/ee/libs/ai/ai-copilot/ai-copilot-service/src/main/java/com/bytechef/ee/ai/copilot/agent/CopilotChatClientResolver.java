@@ -73,7 +73,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
         Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
 
         if (environmentId != null) {
-            return catalogChatClientResolver.resolve(environmentId.intValue(), llmProvider, llmModel);
+            return catalogChatClientResolver.resolve(llmProvider, llmModel, environmentId.intValue());
         }
 
         return null;

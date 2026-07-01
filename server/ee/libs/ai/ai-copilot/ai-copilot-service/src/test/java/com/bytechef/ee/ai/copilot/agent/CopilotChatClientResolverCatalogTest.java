@@ -32,7 +32,7 @@ class CopilotChatClientResolverCatalogTest {
         CatalogChatClientResolver catalogChatClientResolver = mock(CatalogChatClientResolver.class);
         ChatClient catalogChatClient = mock(ChatClient.class);
 
-        when(catalogChatClientResolver.resolve(3, "ai.provider.openAi", "gpt-4o")).thenReturn(catalogChatClient);
+        when(catalogChatClientResolver.resolve("ai.provider.openAi", "gpt-4o", 3)).thenReturn(catalogChatClient);
 
         CopilotChatClientResolver resolver = new CopilotChatClientResolver(catalogChatClientResolver);
 
@@ -40,7 +40,7 @@ class CopilotChatClientResolverCatalogTest {
 
         state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, "ai.provider.openAi");
         state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, "gpt-4o");
-        state.set(CopilotChatClientResolver.ENVIRONMENT_ID_KEY, "3");
+        state.set(CopilotStateKeys.ENVIRONMENT_ID, "3");
 
         assertThat(resolver.resolve(state)).isSameAs(catalogChatClient);
     }
