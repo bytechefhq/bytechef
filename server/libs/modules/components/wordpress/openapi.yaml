@@ -13,6 +13,7 @@ paths:
       description: "Update a post."
       operationId: "updatePost"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wordpress_v1#update-post"
       parameters:
         - name: "postId"
           description: "ID of the post that will be fetched."
@@ -432,6 +433,7 @@ paths:
       description: "Get a post by post ID."
       operationId: "getPost"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wordpress_v1#get-post"
       parameters:
         - name: "postId"
           description: "ID of the post that will be fetched."
@@ -691,6 +693,7 @@ paths:
       description: "Creates a new post."
       operationId: "createPost"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wordpress_v1#create-post"
       requestBody:
         content:
           application/json:
@@ -1015,6 +1018,7 @@ paths:
       description: "Creates a new page."
       operationId: "createPage"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/wordpress_v1#create-page"
       requestBody:
         content:
           application/json:
