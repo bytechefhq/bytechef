@@ -20,23 +20,33 @@ import static com.bytechef.component.zenrows.constant.ZenRowsConstants.JS_RENDER
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.ORIGINAL_STATUS;
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZenRowScrapeUrlActionTest {
 
     private final ArgumentCaptor<Boolean> booleanArgumentCaptor = ArgumentCaptor.forClass(Boolean.class);
@@ -48,26 +58,33 @@ class ZenRowScrapeUrlActionTest {
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        String stringResponse = "scrapedUrl";
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(
             stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
             stringArgumentCaptor.capture(), booleanArgumentCaptor.capture(),
             stringArgumentCaptor.capture(), booleanArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
-        String stringResponse = "scrapedUrl";
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(stringResponse);
 
         String result = ZenRowScrapeUrlAction.perform(mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
-        assertEquals(List.of(URL, "mockUrl", ORIGINAL_STATUS, JS_RENDER), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("", URL, "mockUrl", ORIGINAL_STATUS, JS_RENDER), stringArgumentCaptor.getAllValues());
         assertEquals(List.of(false, false), booleanArgumentCaptor.getAllValues());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.TEXT, configuration.getResponseType());
     }
 }

@@ -19,47 +19,53 @@ package com.bytechef.component.zenrows.action;
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.CSS_EXTRACTOR;
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class ZenRowsScrapeUrlWithCssSelectorActionTest {
 
-    private final Context mockedContext = mock(Context.class);
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(URL, "mockUrl", CSS_EXTRACTOR, List.of(Map.of("key", "value"))));
-    private final Http.Response mockedResponse = mock(Http.Response.class);
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testPerform() {
+    void testPerform(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         String stringResponse = "scrapedUrl";
         String mockedJson = "json";
 
-        when(mockedContext.http(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameters(
             stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
             stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(stringResponse);
 
@@ -70,6 +76,12 @@ class ZenRowsScrapeUrlWithCssSelectorActionTest {
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
-        assertEquals(List.of(URL, "mockUrl", CSS_EXTRACTOR, mockedJson), stringArgumentCaptor.getAllValues());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("", URL, "mockUrl", CSS_EXTRACTOR, mockedJson), stringArgumentCaptor.getAllValues());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.TEXT, configuration.getResponseType());
     }
 }
