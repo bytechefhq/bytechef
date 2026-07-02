@@ -1,6 +1,6 @@
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {FormControl, FormField, FormItem, FormMessage} from '@/components/ui/form';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {TriggerFormInput} from '@/shared/middleware/automation/workflow/execution';
 import {UseFormReturn} from 'react-hook-form';
 

@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI, useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import EnvironmentBadge from '@/shared/components/EnvironmentBadge';
@@ -367,7 +367,9 @@ const ConnectionTabConnectionSelect = ({
                         {!connectionDialogAllowed && !componentConnections?.length && <p>No connections available.</p>}
                     </div>
 
-                    <SelectContent className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0">
+                    <SelectContent
+                        className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0"
+                    >
                         {componentConnections &&
                             componentConnections.map((connection) => (
                                 <SelectItem

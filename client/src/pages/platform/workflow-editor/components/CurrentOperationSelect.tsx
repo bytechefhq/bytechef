@@ -1,5 +1,5 @@
+import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipPortal, TooltipTrigger} from '@/components/ui/tooltip';
 import {
     ActionDefinitionBasic,
@@ -51,7 +51,7 @@ const OperationSelect = ({
                 <SelectValue placeholder="Select an action..." />
             </SelectTrigger>
 
-            <SelectContent className="max-h-select-content-available-height-1/2 max-w-select-trigger-width">
+            <SelectContent className="max-h-select-content-available-height-1/2">
                 {operations?.map((operation) => (
                     <SelectPrimitive.Item
                         className={twMerge(

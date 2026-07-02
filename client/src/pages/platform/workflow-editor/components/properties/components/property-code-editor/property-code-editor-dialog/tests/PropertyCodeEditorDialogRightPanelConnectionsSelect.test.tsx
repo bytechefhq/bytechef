@@ -45,7 +45,7 @@ vi.mock('../hooks/usePropertyCodeEditorDialogRightPanelConnectionsSelect', () =>
     }),
 }));
 
-vi.mock('@/components/ui/select', () => ({
+vi.mock('@/components/Select/Select', () => ({
     Select: ({
         children,
         onValueChange,

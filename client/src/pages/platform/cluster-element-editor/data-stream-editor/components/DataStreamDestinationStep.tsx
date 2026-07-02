@@ -1,4 +1,4 @@
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import useClusterElementStep from '@/pages/platform/cluster-element-editor/data-stream-editor/hooks/useClusterElementStep';
 import ConnectionTab from '@/pages/platform/workflow-editor/components/node-details-tabs/connection-tab/ConnectionTab';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';

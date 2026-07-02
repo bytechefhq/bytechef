@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
     DialogCloseButton,
@@ -10,7 +11,6 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ColumnType} from '@/shared/middleware/graphql';
 import {useEffect, useState} from 'react';
 

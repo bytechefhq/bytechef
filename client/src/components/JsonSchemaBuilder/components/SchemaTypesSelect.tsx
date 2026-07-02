@@ -6,7 +6,7 @@ import {SchemaType} from '../utils/types';
 
 import '../../CreatableSelect/CreatableSelect.css';
 
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {TYPE_ICONS} from '@/shared/typeIcons';
 
 interface SchemaTypesSelectProps {

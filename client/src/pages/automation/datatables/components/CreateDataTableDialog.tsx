@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
     DialogCloseButton,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import useCreateDataTableDialog from '@/pages/automation/datatables/components/hooks/useCreateDataTableDialog';
 import {ColumnType} from '@/shared/middleware/graphql';
 import {Plus, Trash2} from 'lucide-react';

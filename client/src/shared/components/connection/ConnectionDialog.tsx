@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Alert, AlertDescription, AlertTitle} from '@/components/ui/alert';
 import {
     Dialog,
@@ -15,7 +16,6 @@ import {
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import Properties from '@/pages/platform/workflow-editor/components/properties/Properties';
 import {ConnectionI, WorkflowMockProvider} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';

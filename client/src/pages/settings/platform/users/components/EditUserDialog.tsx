@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
     DialogClose,
@@ -8,7 +9,6 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 
 import useEditUserDialog from './hooks/useEditUserDialog';
 

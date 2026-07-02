@@ -1,9 +1,9 @@
 import SubflowIcon from '@/assets/subflow.svg';
 import Badge from '@/components/Badge/Badge';
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Collapsible, CollapsibleContent, CollapsibleTrigger} from '@/components/ui/collapsible';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {ConnectionI} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {CaretDownIcon} from '@radix-ui/react-icons';
 import {CornerDownRightIcon, InfoIcon, PlusIcon} from 'lucide-react';
@@ -174,7 +174,7 @@ const ConnectionConfigurationListFormField = ({
                             </div>
                         </FormControl>
 
-                        <SelectContent className="max-w-(--radix-select-trigger-width)">
+                        <SelectContent>
                             <SelectItem value="null">Select a connection...</SelectItem>
 
                             {connectionList.map((connection) => (

@@ -6,7 +6,7 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
+} from '@/components/Select/Select';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Workflow} from '@/shared/middleware/automation/configuration';

@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {McpComponent, McpToolsByComponentIdQuery} from '@/shared/middleware/graphql';

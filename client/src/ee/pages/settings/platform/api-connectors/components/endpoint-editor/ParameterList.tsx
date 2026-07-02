@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Checkbox} from '@/components/ui/checkbox';
 import {
     Dialog,
@@ -11,7 +12,6 @@ import {
 } from '@/components/ui/dialog';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {PlusIcon, Trash2Icon} from 'lucide-react';
 import {KeyboardEvent, useCallback} from 'react';
 

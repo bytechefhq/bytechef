@@ -1,6 +1,6 @@
 import RequiredMark from '@/components/RequiredMark';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SelectOptionType} from '@/shared/types';
 import {CheckIcon, CircleQuestionMarkIcon} from 'lucide-react';
@@ -99,7 +99,6 @@ const PropertySelect = ({
                     align="start"
                     aria-label="Select options"
                     className="max-h-select-content-available-height min-w-select-trigger-width"
-                    position="popper"
                     sideOffset={5}
                 >
                     <SelectGroup>

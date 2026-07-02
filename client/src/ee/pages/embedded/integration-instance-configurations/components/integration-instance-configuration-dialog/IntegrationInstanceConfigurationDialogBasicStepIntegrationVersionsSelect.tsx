@@ -1,4 +1,4 @@
-import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {IntegrationStatus} from '@/ee/shared/middleware/embedded/configuration';
 import {useGetIntegrationVersionsQuery} from '@/ee/shared/queries/embedded/integrationVersions.queries';
 import {CheckIcon} from 'lucide-react';

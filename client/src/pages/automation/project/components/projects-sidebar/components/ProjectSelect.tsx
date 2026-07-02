@@ -6,7 +6,7 @@ import {
     SelectSeparator,
     SelectTrigger,
     SelectValue,
-} from '@/components/ui/select';
+} from '@/components/Select/Select';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {useCallback} from 'react';
