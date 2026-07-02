@@ -15,6 +15,7 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -80,6 +81,11 @@ public class CodeEditorSpringAIAgent extends SpringAIAgent {
         }
 
         return super.resolveChatClient(input);
+    }
+
+    @Override
+    protected Map<String, Object> toolContext(RunAgentInput input) {
+        return CopilotToolContextUtils.toToolContext(input.state());
     }
 
     @Override
