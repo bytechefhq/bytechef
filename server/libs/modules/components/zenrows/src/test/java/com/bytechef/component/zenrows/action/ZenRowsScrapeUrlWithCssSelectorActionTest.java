@@ -17,10 +17,15 @@
 package com.bytechef.component.zenrows.action;
 
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.CSS_EXTRACTOR;
+import static com.bytechef.component.zenrows.constant.ZenRowsConstants.KEY;
 import static com.bytechef.component.zenrows.constant.ZenRowsConstants.URL;
+import static com.bytechef.component.zenrows.constant.ZenRowsConstants.VALUE;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -31,6 +36,7 @@ import com.bytechef.component.definition.Context.Http.Configuration.Configuratio
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
+import com.bytechef.component.definition.Context.Json;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
@@ -47,9 +53,15 @@ import org.mockito.ArgumentCaptor;
 @ExtendWith(MockContextSetupExtension.class)
 class ZenRowsScrapeUrlWithCssSelectorActionTest {
 
+    @SuppressWarnings("unchecked")
+    private final ArgumentCaptor<ContextFunction<Json, Executor>> jsonFunctionArgumentCaptor =
+        forClass(ContextFunction.class);
+    private final Json mockedJson = mock(Json.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(URL, "mockUrl", CSS_EXTRACTOR, List.of(Map.of("key", "value"))));
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
+        Map.of(URL, "mockUrl", CSS_EXTRACTOR, List.of(Map.of(KEY, "key1", VALUE, "value1"))));
+    private final ArgumentCaptor<Object> objectArgumentCaptor = forClass(Object.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
     void testPerform(
@@ -58,26 +70,37 @@ class ZenRowsScrapeUrlWithCssSelectorActionTest {
         ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
 
         String stringResponse = "scrapedUrl";
-        String mockedJson = "json";
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.queryParameters(
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture(),
-            stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
-                .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(stringResponse);
 
-        when(mockedContext.json(any()))
-            .thenReturn(mockedJson);
+        when(mockedContext.json(jsonFunctionArgumentCaptor.capture()))
+            .thenAnswer(inv -> {
+                ContextFunction<Json, Executor> value = jsonFunctionArgumentCaptor.getValue();
+
+                return value.apply(mockedJson);
+            });
+        when(mockedJson.write(objectArgumentCaptor.capture()))
+            .thenReturn("json");
 
         String result = ZenRowsScrapeUrlWithCssSelectorAction.perform(
             mockedParameters, mockedParameters, mockedContext);
 
         assertEquals(stringResponse, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-        assertEquals(List.of("", URL, "mockUrl", CSS_EXTRACTOR, mockedJson), stringArgumentCaptor.getAllValues());
+        assertEquals("", stringArgumentCaptor.getValue());
+        assertNotNull(jsonFunctionArgumentCaptor.getValue());
+        assertEquals(Map.of("key1", "value1"), objectArgumentCaptor.getValue());
+
+        Object[] expectedQueryParameters = {
+            URL, "mockUrl", CSS_EXTRACTOR, "json"
+        };
+
+        assertArrayEquals(expectedQueryParameters, objectsArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();

@@ -34,7 +34,7 @@ import com.bytechef.component.definition.TypeReference;
 /**
  * @author Nikolina Spehar
  */
-public class ZenRowScrapeUrlAction {
+public class ZenRowsScrapeUrlAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("scrapeUrl")
         .title("Scrape URL")
@@ -61,9 +61,9 @@ public class ZenRowScrapeUrlAction {
             outputSchema(
                 string()
                     .description("Scraped data.")))
-        .perform(ZenRowScrapeUrlAction::perform);
+        .perform(ZenRowsScrapeUrlAction::perform);
 
-    private ZenRowScrapeUrlAction() {
+    private ZenRowsScrapeUrlAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
