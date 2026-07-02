@@ -15,6 +15,6 @@
     "utils": "@/shared/util/cn-utils",
     "ui": "@/components/ui",
     "lib": "@/lib",
-    "hooks": "@/hooks"
+    "hooks": "@/shared/hooks"
   }
 }
