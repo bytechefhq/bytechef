@@ -110,7 +110,7 @@ public class WorkflowValidator {
             List<JsonNode> taskJsonNodes = new ArrayList<>();
 
             processTriggers(
-                taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, errors, warnings,
+                taskDefinitionProvider, taskOutputProvider, taskDefinitionMap, taskOutputMap, warnings,
                 workflowJsonNode, taskJsonNodes);
             processTasks(
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
@@ -458,7 +458,7 @@ public class WorkflowValidator {
     private static void processTriggers(
         TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
         Map<String, List<PropertyInfo>> taskDefinitionPropertyInfosMap,
-        Map<String, @Nullable PropertyInfo> taskOutputPropertyInfoMap, StringBuilder errors, StringBuilder warnings,
+        Map<String, @Nullable PropertyInfo> taskOutputPropertyInfoMap, StringBuilder warnings,
         JsonNode workflowJsonNode, List<JsonNode> taskJsonNodes) {
 
         JsonNode triggersJsonNode = workflowJsonNode.get("triggers");
@@ -467,20 +467,16 @@ public class WorkflowValidator {
             Iterator<JsonNode> iterator = triggersJsonNode.iterator();
 
             iterator.forEachRemaining(triggerJsonNode -> {
-                if (taskJsonNodes.isEmpty()) {
-                    taskJsonNodes.add(triggerJsonNode);
+                taskJsonNodes.add(triggerJsonNode);
 
-                    JsonNode typeJsonNode = triggerJsonNode.get("type");
+                JsonNode typeJsonNode = triggerJsonNode.get("type");
 
-                    String type = typeJsonNode.asString();
+                String type = typeJsonNode.asString();
 
-                    taskDefinitionPropertyInfosMap.putIfAbsent(
-                        type, taskDefinitionProvider.getTaskProperties(type, "trigger"));
-                    taskOutputPropertyInfoMap.putIfAbsent(
-                        type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
-                } else {
-                    errors.append("There can only be one trigger in the workflow");
-                }
+                taskDefinitionPropertyInfosMap.putIfAbsent(
+                    type, taskDefinitionProvider.getTaskProperties(type, "trigger"));
+                taskOutputPropertyInfoMap.putIfAbsent(
+                    type, taskOutputProvider.getTaskOutputProperty(type, "trigger", warnings));
             });
         }
     }
@@ -660,13 +656,11 @@ public class WorkflowValidator {
 
             if (!triggersJsonNode.isArray()) {
                 StringUtils.appendWithNewline("Field 'triggers' must be an array", errors);
-            } else if (triggersJsonNode.size() > 1) {
-                StringUtils.appendWithNewline("Field 'triggers' must contain one or less objects", errors);
             } else {
-                JsonNode jsonNode = triggersJsonNode.get(0);
-
-                if (triggersJsonNode.size() == 1 && !jsonNode.isObject()) {
-                    StringUtils.appendWithNewline("Trigger must be an object", errors);
+                for (JsonNode triggerJsonNode : triggersJsonNode) {
+                    if (!triggerJsonNode.isObject()) {
+                        StringUtils.appendWithNewline("Trigger must be an object", errors);
+                    }
                 }
             }
         }
