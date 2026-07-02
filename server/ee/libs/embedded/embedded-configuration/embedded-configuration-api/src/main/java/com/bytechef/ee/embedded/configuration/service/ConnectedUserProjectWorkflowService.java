@@ -18,8 +18,6 @@ import java.util.Optional;
  */
 public interface ConnectedUserProjectWorkflowService {
 
-    void addConnection(long connectedUserProjectId, long projectWorkflowId, long connectionId);
-
     ConnectedUserProjectWorkflow create(ConnectedUserProjectWorkflow connectedUserProjectWorkflow);
 
     void delete(long id);
@@ -32,8 +30,6 @@ public interface ConnectedUserProjectWorkflowService {
     ConnectedUserProjectWorkflow getConnectedUserProjectWorkflow(long connectedUserProjectId, long projectWorkflowId);
 
     List<ConnectedUserProjectWorkflow> getConnectedUserProjectWorkflows(long connectedUserProjectId);
-
-    boolean isConnectionUsed(long connectionId);
 
     void incrementWorkflowVersion(long connectedUserProjectId, long projectWorkflowId);
 }

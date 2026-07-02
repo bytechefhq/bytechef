@@ -31,7 +31,6 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
@@ -237,26 +236,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             connectedUserProject.getProjectId(), workflowUuid);
 
-        Set<Long> connectionIds = new HashSet<>();
-
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
             connectedUserProjectWorkflowService
                 .fetchConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId())
-                .ifPresent(connectedUserProjectWorkflow -> {
-                    connectionIds.addAll(
-                        connectedUserProjectWorkflow.getConnections()
-                            .stream()
-                            .map(ConnectedUserProjectWorkflowConnection::getConnectionId)
-                            .toList());
-
-                    connectedUserProjectWorkflowService.delete(connectedUserProjectWorkflow.getId());
-                });
+                .ifPresent(connectedUserProjectWorkflow -> connectedUserProjectWorkflowService
+                    .delete(connectedUserProjectWorkflow.getId()));
 
             projectWorkflowFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
-        }
-
-        for (Long connectionId : connectionIds) {
-            connectionService.delete(connectionId);
         }
     }
 
