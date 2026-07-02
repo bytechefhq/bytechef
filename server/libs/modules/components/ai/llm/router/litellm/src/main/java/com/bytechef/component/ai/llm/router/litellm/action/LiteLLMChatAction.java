@@ -21,31 +21,41 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.REASONING;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_FORMAT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.RESPONSE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.SEED_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.STOP_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.SYSTEM_PROMPT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TEMPERATURE_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_K;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P;
-import static com.bytechef.component.ai.llm.constant.LLMConstants.TOP_P_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.USER_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.VERBOSITY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.FREQUENCY_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.LOGPROBS;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.LOGPROBS_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.MAX_COMPLETION_TOKENS;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.MAX_COMPLETION_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.MAX_TOKENS_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.PRESENCE_PENALTY_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.SEED_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.STOP_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.TEMPERATURE_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.TOP_K_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.TOP_LOGPROBS;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.TOP_LOGPROBS_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.TOP_P_PROPERTY;
+import static com.bytechef.component.ai.llm.router.constant.RouterConstants.VERBOSITY_PROPERTY;
 import static com.bytechef.component.ai.llm.router.litellm.constant.LiteLLMConstants.BASE_URL;
 import static com.bytechef.component.ai.llm.router.litellm.constant.LiteLLMConstants.CHAT_MODEL_PROPERTY;
 import static com.bytechef.component.ai.llm.router.litellm.constant.LiteLLMConstants.DEFAULT_BASE_URL;
@@ -79,13 +89,19 @@ public class LiteLLMChatAction {
             MESSAGES_PROPERTY,
             RESPONSE_PROPERTY,
             FREQUENCY_PENALTY_PROPERTY,
+            LOGIT_BIAS_PROPERTY,
+            LOGPROBS_PROPERTY,
+            MAX_COMPLETION_TOKENS_PROPERTY,
             MAX_TOKENS_PROPERTY,
             PRESENCE_PENALTY_PROPERTY,
             REASONING_PROPERTY,
             SEED_PROPERTY,
             STOP_PROPERTY,
             TEMPERATURE_PROPERTY,
+            TOP_LOGPROBS_PROPERTY,
+            TOP_K_PROPERTY,
             TOP_P_PROPERTY,
+            VERBOSITY_PROPERTY,
             USER_PROPERTY)
         .output(ModelUtils::output)
         .perform(LiteLLMChatAction::perform);
@@ -106,6 +122,8 @@ public class LiteLLMChatAction {
             .model(inputParameters.getRequiredString(MODEL))
             .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
             .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
+            .logprobs(inputParameters.getBoolean(LOGPROBS))
+            .maxCompletionTokens(inputParameters.getInteger(MAX_COMPLETION_TOKENS))
             .maxTokens(inputParameters.getInteger(MAX_TOKENS))
             .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
             .reasoning(inputParameters.getString(REASONING))
@@ -114,7 +132,9 @@ public class LiteLLMChatAction {
             .stop(inputParameters.getList(STOP, new TypeReference<>() {}))
             .temperature(inputParameters.getDouble(TEMPERATURE))
             .topK(inputParameters.getDouble(TOP_K))
+            .topLogprobs(inputParameters.getInteger(TOP_LOGPROBS))
             .topP(inputParameters.getDouble(TOP_P))
+            .verbosity(inputParameters.getString(VERBOSITY))
             .user(inputParameters.getString(USER))
             .build();
     };
