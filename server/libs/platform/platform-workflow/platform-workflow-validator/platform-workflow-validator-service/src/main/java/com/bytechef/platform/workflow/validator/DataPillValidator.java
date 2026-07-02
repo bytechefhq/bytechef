@@ -60,6 +60,7 @@ class DataPillValidator {
         TaskValidationContext taskContext = new TaskValidationContext();
 
         taskContext.skipTaskOrderValidation = skipTaskOrderValidation;
+        taskContext.nodeOutputMap = context.getNodeOutputMap();
 
         findDataPillsInNode(
             parametersJsonNode, "", name, context.getTaskOutputs(), context.getTaskNames(),
@@ -485,15 +486,17 @@ class DataPillValidator {
 
         if (referencedTaskType != null) {
             validatePropertyInOutput(
-                dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap, errors, warnings, text,
-                referencedTaskName, allTasksMap, taskDefinition);
+                dataPillExpression, referencedTaskType, propertyName, fieldPath, taskOutputMap,
+                context.nodeOutputMap.get(referencedTaskName), errors, warnings, text, referencedTaskName, allTasksMap,
+                taskDefinition);
         }
     }
 
     private static void validatePropertyInOutput(
         String dataPillExpression, String referencedTaskType, String propertyName, String fieldPath,
-        Map<String, PropertyInfo> taskOutput, StringBuilder errors, StringBuilder warnings, String text,
-        String referencedTaskName, Map<String, JsonNode> allTasksMap, List<PropertyInfo> taskDefinition) {
+        Map<String, PropertyInfo> taskOutput, @Nullable PropertyInfo nodeOutputInfo, StringBuilder errors,
+        StringBuilder warnings, String text, String referencedTaskName, Map<String, JsonNode> allTasksMap,
+        List<PropertyInfo> taskDefinition) {
 
         // Special handling for loop tasks - they auto-generate 'item' output based on the 'items' parameter
         if (referencedTaskType.startsWith("loop/") && propertyName.startsWith("item")) {
@@ -502,6 +505,21 @@ class DataPillValidator {
 
             validateLoopItemTypes(
                 dataPillExpression, referencedTaskName, expectedType, allTasksMap, errors, text, taskOutput);
+
+            return;
+        }
+
+        if (nodeOutputInfo != null) {
+            if (PropertyUtils.checkPropertyExists(nodeOutputInfo, propertyName)) {
+                validateTypeCompatibility(
+                    dataPillExpression, referencedTaskType, propertyName, fieldPath, nodeOutputInfo, errors, text,
+                    taskDefinition);
+            } else {
+                StringUtils.appendWithNewline(
+                    "Property '" + dataPillExpression + "' does not exist in the output of '" + referencedTaskType +
+                        "'",
+                    errors);
+            }
 
             return;
         }
@@ -562,5 +580,6 @@ class DataPillValidator {
     private static class TaskValidationContext {
         boolean stopProcessing = false;
         boolean skipTaskOrderValidation = false;
+        Map<String, PropertyInfo> nodeOutputMap = Map.of();
     }
 }

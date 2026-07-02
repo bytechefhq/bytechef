@@ -34,6 +34,7 @@ class ValidationContext {
     private final List<JsonNode> taskJsonNodes;
     private final Map<String, List<PropertyInfo>> taskDefinitionMap;
     private final Map<String, PropertyInfo> taskOutputMap;
+    private final Map<String, PropertyInfo> nodeOutputMap;
     private final Map<String, List<String>> clusterTypesProviderMap;
     private final StringBuilder errors;
     private final StringBuilder warnings;
@@ -43,12 +44,13 @@ class ValidationContext {
 
     private ValidationContext(
         List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
-        Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesProviderMap,
-        StringBuilder errors, StringBuilder warnings) {
+        Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
 
         this.taskJsonNodes = taskJsonNodes;
         this.taskDefinitionMap = taskDefinitionMap;
         this.taskOutputMap = taskOutputMap;
+        this.nodeOutputMap = nodeOutputMap;
         this.clusterTypesProviderMap = clusterTypesProviderMap;
         this.errors = errors;
         this.warnings = warnings;
@@ -61,8 +63,16 @@ class ValidationContext {
         Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesProviderMap,
         StringBuilder errors, StringBuilder warnings) {
 
-        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterTypesProviderMap, errors,
-            warnings);
+        return of(taskJsonNodes, taskDefinitionMap, taskOutputMap, Map.of(), clusterTypesProviderMap, errors, warnings);
+    }
+
+    public static ValidationContext of(
+        List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
+
+        return new ValidationContext(taskJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap,
+            clusterTypesProviderMap, errors, warnings);
     }
 
     private void buildTaskMaps() {
@@ -94,6 +104,10 @@ class ValidationContext {
 
     public Map<String, PropertyInfo> getTaskOutputs() {
         return new HashMap<>(taskOutputMap);
+    }
+
+    public Map<String, PropertyInfo> getNodeOutputMap() {
+        return nodeOutputMap;
     }
 
     public StringBuilder getErrors() {
