@@ -1,6 +1,5 @@
+import reactLogo from '@/assets/logo.svg';
 import {SidebarTrigger} from '@/components/ui/sidebar';
-
-import reactLogo from '../../assets/logo.svg';
 
 export function MobileTopNavigation() {
     return (
