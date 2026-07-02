@@ -189,6 +189,15 @@ public final class OllamaConstants {
             ModelUtils.getEnumOptions(
                 Arrays.stream(OllamaModel.values())
                     .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName))));
+    public static final ModifiableStringProperty EMBEDDING_MODEL_PROPERTY = string(MODEL)
+        .label("Model")
+        .description("ID of the model to use.")
+        .required(true)
+        .options(
+            ModelUtils.getEnumOptions(
+                Arrays.stream(OllamaModel.values())
+                    .filter(OllamaConstants::isEmbeddingModel)
+                    .collect(Collectors.toMap(OllamaModel::getName, OllamaModel::getName))));
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Num predict")
         .description(
@@ -196,5 +205,11 @@ public final class OllamaConstants {
         .advancedOption(true);
 
     private OllamaConstants() {
+    }
+
+    private static boolean isEmbeddingModel(OllamaModel ollamaModel) {
+        String name = ollamaModel.getName();
+
+        return name.contains("embed");
     }
 }
