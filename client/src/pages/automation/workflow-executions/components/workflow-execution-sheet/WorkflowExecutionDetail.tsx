@@ -17,14 +17,20 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
         activeTab,
         deepestFailedExecution,
         dialogOpen,
+        handleBreadcrumbNavigate,
+        handleSeeExecutions,
         handleTaskClick,
         isTriggerExecution,
+        job,
         jobFailedWithNoExecutions,
         jobFailureError,
+        rootJob,
         selectedItem,
         setActiveTab,
         setDialogOpen,
+        subflowStack,
         taskExecutions,
+        triggerExecution,
         workflowExecution,
         workflowExecutionLoading,
     } = useWorkflowExecutionDetail(workflowExecutionId, enabled);
@@ -44,21 +50,25 @@ const WorkflowExecutionDetail = ({enabled = true, workflowExecutionId}: Workflow
                     className="flex min-h-0 w-1/2 flex-col overflow-hidden rounded-md bg-surface-neutral-primary"
                     defaultSize={50}
                 >
-                    {workflowExecution?.job && (
+                    {job && (
                         <WorkflowExecutionSheetContent
                             activeTab={activeTab}
                             deepestFailedExecution={deepestFailedExecution}
                             dialogOpen={dialogOpen}
+                            handleBreadcrumbNavigate={handleBreadcrumbNavigate}
+                            handleSeeExecutions={handleSeeExecutions}
                             handleTaskClick={handleTaskClick}
                             isTriggerExecution={isTriggerExecution}
-                            job={workflowExecution.job}
+                            job={job}
                             jobFailedWithNoExecutions={jobFailedWithNoExecutions}
                             jobFailureError={jobFailureError}
+                            rootJob={rootJob}
                             selectedItem={selectedItem}
                             setActiveTab={setActiveTab}
                             setDialogOpen={setDialogOpen}
+                            subflowStack={subflowStack}
                             taskExecutions={taskExecutions}
-                            triggerExecution={workflowExecution?.triggerExecution}
+                            triggerExecution={triggerExecution}
                             workflowExecutionId={workflowExecutionId}
                         />
                     )}
