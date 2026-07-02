@@ -4,7 +4,7 @@ All URIs are relative to */api/embedded/internal*
 
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
-| [**createConnectedUserProjectWorkflowConnection**](ConnectionApi.md#createconnecteduserprojectworkflowconnection) | **POST** /connected-users/{connectedUserId}/workflows/{workflowUuid}/connections | Create a new connection for the connected user\&#39;s project workflow |
+| [**createConnectedUserConnection**](ConnectionApi.md#createconnecteduserconnection) | **POST** /connected-users/{connectedUserId}/connections | Create a new connection for the connected user |
 | [**createConnection**](ConnectionApi.md#createconnection) | **POST** /connections | Create a new connection |
 | [**deleteConnection**](ConnectionApi.md#deleteconnection) | **DELETE** /connections/{id} | Delete a connection |
 | [**getConnectedUserConnections**](ConnectionApi.md#getconnecteduserconnections) | **GET** /connected-users/{connectedUserId}/components/{componentName}/connections | Get all connected user\&#39;s connections |
@@ -14,13 +14,13 @@ All URIs are relative to */api/embedded/internal*
 
 
 
-## createConnectedUserProjectWorkflowConnection
+## createConnectedUserConnection
 
-> number createConnectedUserProjectWorkflowConnection(connectedUserId, workflowUuid, connection)
+> number createConnectedUserConnection(connectedUserId, connection)
 
-Create a new connection for the connected user\&#39;s project workflow
+Create a new connection for the connected user
 
-Create a new connection for the connected user\&#39;s project workflow.
+Create a new connection for the connected user.
 
 ### Example
 
@@ -29,7 +29,7 @@ import {
   Configuration,
   ConnectionApi,
 } from '';
-import type { CreateConnectedUserProjectWorkflowConnectionRequest } from '';
+import type { CreateConnectedUserConnectionRequest } from '';
 
 async function example() {
   console.log("🚀 Testing  SDK...");
@@ -38,14 +38,12 @@ async function example() {
   const body = {
     // number | The id of a connected user.
     connectedUserId: 789,
-    // string | The workflow uuid.
-    workflowUuid: workflowUuid_example,
     // Connection
     connection: ...,
-  } satisfies CreateConnectedUserProjectWorkflowConnectionRequest;
+  } satisfies CreateConnectedUserConnectionRequest;
 
   try {
-    const data = await api.createConnectedUserProjectWorkflowConnection(body);
+    const data = await api.createConnectedUserConnection(body);
     console.log(data);
   } catch (error) {
     console.error(error);
@@ -62,7 +60,6 @@ example().catch(console.error);
 | Name | Type | Description  | Notes |
 |------------- | ------------- | ------------- | -------------|
 | **connectedUserId** | `number` | The id of a connected user. | [Defaults to `undefined`] |
-| **workflowUuid** | `string` | The workflow uuid. | [Defaults to `undefined`] |
 | **connection** | [Connection](Connection.md) |  | |
 
 ### Return type
