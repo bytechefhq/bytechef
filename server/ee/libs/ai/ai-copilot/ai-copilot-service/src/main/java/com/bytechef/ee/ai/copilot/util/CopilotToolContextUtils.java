@@ -42,9 +42,9 @@ public final class CopilotToolContextUtils {
             toolContext.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
-        Long workspaceId = NumberUtils.asLong(state.get(CopilotStateKeys.WORKSPACE_ID));
+        Long workspaceId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_WORKSPACE_ID));
         Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
-        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_ENVIRONMENT_ID));
         String tenantId = StringUtils.asString(state.get(CopilotStateKeys.STATE_TENANT_ID));
         Authentication authentication = state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
