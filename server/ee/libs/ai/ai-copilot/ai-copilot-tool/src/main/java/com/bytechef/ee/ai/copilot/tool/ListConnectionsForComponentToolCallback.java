@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -117,13 +118,25 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
                 return toolError("Invocation context unavailable.");
             }
 
+            String resolvedFromComponentName = null;
             Optional<ComponentDefinition> componentDefinitionOptional = componentDefinitionService
                 .fetchComponentDefinition(componentName, null);
 
             if (componentDefinitionOptional.isEmpty()) {
-                metrics.recordStateVisibility(TOOL_NAME, "unknown_component");
+                String resolvedComponentName = ComponentSlugUtils.resolveSingleMatch(
+                    componentName, componentDefinitionService);
 
-                return toolError(ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
+                if (resolvedComponentName == null) {
+                    metrics.recordStateVisibility(TOOL_NAME, "unknown_component");
+
+                    return toolError(
+                        ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
+                }
+
+                metrics.recordStateVisibility(TOOL_NAME, "resolved_slug");
+
+                resolvedFromComponentName = componentName;
+                componentName = resolvedComponentName;
             }
 
             int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
@@ -165,6 +178,11 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
             Map<String, Object> envelope = new LinkedHashMap<>();
 
             envelope.put("componentName", componentName);
+
+            if (resolvedFromComponentName != null) {
+                envelope.put("resolvedFromComponentName", resolvedFromComponentName);
+            }
+
             envelope.put("connectionVersion", connectionVersion);
             envelope.put("connections", connections);
 
