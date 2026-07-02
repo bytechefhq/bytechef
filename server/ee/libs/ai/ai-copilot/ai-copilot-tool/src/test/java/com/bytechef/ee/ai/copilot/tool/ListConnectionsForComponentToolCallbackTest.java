@@ -111,6 +111,8 @@ class ListConnectionsForComponentToolCallbackTest {
 
         when(componentDefinitionService.fetchComponentDefinition("noConnectionComponent", null))
             .thenReturn(Optional.of(mock(ComponentDefinition.class)));
+        // getConnectionDefinition's Optional.orElseThrow() raises NoSuchElementException when the component exposes no
+        // connection definition — the legitimate "no connections to list" signal.
         when(connectionDefinitionService.getConnectionDefinition("noConnectionComponent", 1))
             .thenThrow(new NoSuchElementException("no connection definition"));
 
@@ -134,15 +136,52 @@ class ListConnectionsForComponentToolCallbackTest {
     }
 
     @Test
-    void testReturnsToolErrorWithSuggestionsWhenComponentUnknown() throws Exception {
+    void testSurfacesFailureWhenConnectionDefinitionLookupFailsUnexpectedly() throws Exception {
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+
+        when(componentDefinitionService.fetchComponentDefinition("slack", null))
+            .thenReturn(Optional.of(mock(ComponentDefinition.class)));
+        // A non-NoSuchElementException failure is a real backend defect, not "no connections" — it must NOT be masked
+        // as an empty envelope. The tool reports a failure to the LLM instead.
+        when(connectionDefinitionService.getConnectionDefinition("slack", 1))
+            .thenThrow(new IllegalStateException("registry unavailable"));
+
+        PropertyOptionsResolver resolver = new PropertyOptionsResolver(
+            new SecurityContextRehydrator(mock(UserService.class), mock(AuthorityService.class)));
+
+        ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(mock(WorkspaceConnectionFacade.class), resolver)));
+
+        ToolContext toolContext = new ToolContext(
+            new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
+
+        String result = callback.call("{\"componentName\":\"slack\"}", toolContext);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        // The outer RuntimeException handler turns this into an error/lookup-failed envelope, not an empty connections
+        // list — so the LLM does not falsely conclude the component has zero connections.
+        assertThat(node.has("error")).isTrue();
+        assertThat(node.has("connections")).isFalse();
+    }
+
+    @Test
+    void testReturnsToolErrorWithSuggestionsWhenComponentAmbiguous() throws Exception {
         ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
         ComponentDefinition googleMail = mock(ComponentDefinition.class);
+        ComponentDefinition googleDrive = mock(ComponentDefinition.class);
 
         when(googleMail.getName()).thenReturn("googleMail");
         when(googleMail.getTitle()).thenReturn("Gmail");
+        when(googleDrive.getName()).thenReturn("googleDrive");
+        when(googleDrive.getTitle()).thenReturn("Google Drive");
 
-        when(componentDefinitionService.fetchComponentDefinition("gmail", null)).thenReturn(Optional.empty());
-        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail));
+        // "google" matches two components, so there is no single unambiguous slug to auto-resolve to — the tool must
+        // still fail loud with candidates so the agent picks one, rather than guessing.
+        when(componentDefinitionService.fetchComponentDefinition("google", null)).thenReturn(Optional.empty());
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail, googleDrive));
 
         PropertyOptionsResolver resolver = new PropertyOptionsResolver(
             new SecurityContextRehydrator(mock(UserService.class), mock(AuthorityService.class)));
@@ -154,7 +193,7 @@ class ListConnectionsForComponentToolCallbackTest {
         ToolContext toolContext = new ToolContext(
             new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
 
-        String result = callback.call("{\"componentName\":\"gmail\"}", toolContext);
+        String result = callback.call("{\"componentName\":\"google\"}", toolContext);
 
         JsonNode node = jsonMapper.readTree(result);
 
@@ -163,8 +202,83 @@ class ListConnectionsForComponentToolCallbackTest {
         String error = node.get("error")
             .asString();
 
-        assertThat(error).contains("gmail");
+        assertThat(error).contains("google");
         assertThat(error).contains("googleMail (Gmail)");
+        assertThat(error).contains("googleDrive (Google Drive)");
+    }
+
+    @Test
+    void testAutoResolvesSingleFuzzyMatchAndListsConnections() throws Exception {
+        assertAutoResolves("gmail");
+    }
+
+    @Test
+    void testAutoResolvesHyphenatedNameAndListsConnections() throws Exception {
+        // The colloquial "google-mail" used to match nothing (the hyphen broke the raw substring match), forcing an
+        // extra round-trip; normalized matching now resolves it to the single googleMail slug.
+        assertAutoResolves("google-mail");
+    }
+
+    private void assertAutoResolves(String requestedComponentName) throws Exception {
+        ComponentDefinitionService componentDefinitionService = mock(ComponentDefinitionService.class);
+        ConnectionDefinitionService connectionDefinitionService = mock(ConnectionDefinitionService.class);
+        WorkspaceConnectionFacade workspaceConnectionFacade = mock(WorkspaceConnectionFacade.class);
+        UserService userService = mock(UserService.class);
+
+        ComponentDefinition googleMail = mock(ComponentDefinition.class);
+
+        when(googleMail.getName()).thenReturn("googleMail");
+        when(googleMail.getTitle()).thenReturn("Gmail");
+
+        when(componentDefinitionService.fetchComponentDefinition(requestedComponentName, null))
+            .thenReturn(Optional.empty());
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail));
+        when(connectionDefinitionService.getConnectionDefinition("googleMail", 1))
+            .thenReturn(buildConnectionDefinition(1));
+
+        User user = mock(User.class);
+
+        when(user.getLogin()).thenReturn("user@localhost.com");
+        when(user.getAuthorityIds()).thenReturn(List.of());
+        when(userService.fetchUser(10L)).thenReturn(Optional.of(user));
+
+        ConnectionDTO connectionDTO = ConnectionDTO.builder()
+            .id(77L)
+            .name("Gmail24")
+            .componentName("googleMail")
+            .connectionVersion(1)
+            .environmentId(0)
+            .active(true)
+            .build();
+
+        when(workspaceConnectionFacade.getConnections(eq(1L), eq("googleMail"), eq(1), eq(0L), eq(null)))
+            .thenReturn(List.of(connectionDTO));
+
+        PropertyOptionsResolver resolver =
+            new PropertyOptionsResolver(new SecurityContextRehydrator(userService, mock(AuthorityService.class)));
+
+        ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, resolver)));
+
+        ToolContext toolContext = new ToolContext(
+            new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
+
+        String result = callback.call("{\"componentName\":\"" + requestedComponentName + "\"}", toolContext);
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isFalse();
+        assertThat(node.get("componentName")
+            .asText()).isEqualTo("googleMail");
+        assertThat(node.get("resolvedFromComponentName")
+            .asText()).isEqualTo(requestedComponentName);
+        assertThat(node.get("connections")
+            .size()).isEqualTo(1);
+        assertThat(node.get("connections")
+            .get(0)
+            .get("id")
+            .asLong()).isEqualTo(77L);
     }
 
     @Test
