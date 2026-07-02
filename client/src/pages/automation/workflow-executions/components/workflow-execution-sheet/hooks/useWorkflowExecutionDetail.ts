@@ -1,5 +1,5 @@
 import {getWorkflowStatusType} from '@/shared/components/workflow-executions/util/workflowExecution-utils';
-import {JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
+import {Job, JobStatusEnum, TaskExecution, TriggerExecution} from '@/shared/middleware/automation/workflow/execution';
 import {useGetProjectWorkflowExecutionQuery} from '@/shared/queries/automation/workflowExecutions.queries';
 import {TabValueType} from '@/shared/types';
 import getDeepestFailedExecution from '@/shared/util/getDeepestFailedExecution';
@@ -11,6 +11,7 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
     const [activeTab, setActiveTab] = useState<TabValueType>('output');
     const [dialogOpen, setDialogOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<TaskExecution | TriggerExecution | undefined>(undefined);
+    const [subflowStack, setSubflowStack] = useState<Array<{job: Job; label: string}>>([]);
 
     const jobIdRef = useRef<string | undefined>(undefined);
 
@@ -29,10 +30,12 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
 
     useGetProjectWorkflowExecutionQuery({id: workflowExecutionId}, enabled && isWorkflowRunning, POLLING_INTERVAL_MS);
 
-    const job = workflowExecution?.job;
+    const rootJob = workflowExecution?.job;
     const triggerExecution = workflowExecution?.triggerExecution;
 
-    const taskExecutions = useMemo(() => job?.taskExecutions || [], [job?.taskExecutions]);
+    const activeJob = subflowStack.length > 0 ? subflowStack[subflowStack.length - 1].job : rootJob;
+
+    const taskExecutions = useMemo(() => activeJob?.taskExecutions || [], [activeJob?.taskExecutions]);
 
     const deepestFailedExecution = useMemo(() => {
         if (triggerExecution) {
@@ -58,9 +61,9 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         return null;
     }, [taskExecutions, triggerExecution]);
 
-    const jobFailedWithNoExecutions = !job?.taskExecutions?.length && job?.status === JobStatusEnum.Failed;
+    const jobFailedWithNoExecutions = !activeJob?.taskExecutions?.length && activeJob?.status === JobStatusEnum.Failed;
 
-    const jobFailureError = job?.error ?? {
+    const jobFailureError = activeJob?.error ?? {
         message: 'Workflow execution failed before any executions were created.',
         stackTrace: [],
     };
@@ -73,34 +76,56 @@ const useWorkflowExecutionDetail = (workflowExecutionId: number, enabled: boolea
         setSelectedItem(taskExecution);
     };
 
+    const handleSeeExecutions = (childJob: Job) => {
+        const label = childJob.label ?? 'Subflow';
+
+        setSubflowStack((previousStack) => [...previousStack, {job: childJob, label}]);
+    };
+
+    const handleBreadcrumbNavigate = (index: number) => {
+        setSubflowStack((previousStack) => previousStack.slice(0, index));
+    };
+
     useEffect(() => {
-        if (!job?.id || job.id === jobIdRef.current) {
+        setSubflowStack([]);
+    }, [workflowExecutionId]);
+
+    useEffect(() => {
+        if (!activeJob?.id || activeJob.id === jobIdRef.current) {
             return;
         }
 
-        jobIdRef.current = job.id;
+        jobIdRef.current = activeJob.id;
 
-        const hasNoTaskExecutions = !job.taskExecutions || job.taskExecutions.length === 0;
-        const jobFailed = hasNoTaskExecutions && job.status === JobStatusEnum.Failed;
+        const hasNoTaskExecutions = !activeJob.taskExecutions || activeJob.taskExecutions.length === 0;
+        const jobFailed = hasNoTaskExecutions && activeJob.status === JobStatusEnum.Failed;
         const newActiveTab = jobFailed || deepestFailedExecution?.execution.error ? 'error' : 'output';
 
         setActiveTab(newActiveTab);
 
-        setSelectedItem(deepestFailedExecution?.execution || triggerExecution || job.taskExecutions?.[0] || undefined);
-    }, [deepestFailedExecution, job, triggerExecution]);
+        setSelectedItem(
+            deepestFailedExecution?.execution || triggerExecution || activeJob.taskExecutions?.[0] || undefined
+        );
+    }, [deepestFailedExecution, activeJob, triggerExecution]);
 
     return {
         activeTab,
         deepestFailedExecution,
         dialogOpen,
+        handleBreadcrumbNavigate,
+        handleSeeExecutions,
         handleTaskClick,
         isTriggerExecution,
+        job: activeJob,
         jobFailedWithNoExecutions,
         jobFailureError,
+        rootJob,
         selectedItem,
         setActiveTab,
         setDialogOpen,
+        subflowStack,
         taskExecutions,
+        triggerExecution,
         workflowExecution,
         workflowExecutionLoading,
     };
