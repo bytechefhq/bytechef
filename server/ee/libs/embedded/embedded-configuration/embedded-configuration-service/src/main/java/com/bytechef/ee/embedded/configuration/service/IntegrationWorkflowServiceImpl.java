@@ -99,7 +99,7 @@ public class IntegrationWorkflowServiceImpl implements IntegrationWorkflowServic
     @Override
     public String getLastWorkflowId(String workflowUuid, Environment environment) {
         return integrationWorkflowRepository
-            .findLastByUuidAndEnvironment(workflowUuid, environment.ordinal())
+            .findLastByUuidAndEnvironment(UUID.fromString(workflowUuid), environment.ordinal())
             .map(IntegrationWorkflow::getWorkflowId)
             .orElseThrow(() -> new IllegalArgumentException("Workflow not found for uuid: " + workflowUuid));
     }

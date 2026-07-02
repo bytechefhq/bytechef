@@ -155,7 +155,7 @@ public class RemoteIntegrationInstanceConfigurationConfigurationWorkflowServiceC
     }
 
     @Override
-    public boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceId, String workflowId) {
+    public boolean isIntegrationInstanceWorkflowEnabled(long integrationInstanceConfigurationId, String workflowId) {
         throw new UnsupportedOperationException();
     }
 

@@ -16,17 +16,16 @@ import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectDeployment;
 import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflowConnection;
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.facade.ProjectDeploymentFacade;
 import com.bytechef.automation.configuration.facade.ProjectFacade;
 import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
+import com.bytechef.automation.configuration.security.SkipAutomationAuthorization;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
 import com.bytechef.commons.util.JsonUtils;
-import com.bytechef.commons.util.MapUtils;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
@@ -56,11 +55,11 @@ import com.bytechef.platform.configuration.service.WorkflowTestConfigurationServ
 import com.bytechef.platform.connection.domain.Connection;
 import com.bytechef.platform.connection.service.ConnectionService;
 import com.bytechef.platform.constant.PlatformType;
-import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -70,8 +69,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import tools.jackson.core.type.TypeReference;
 
 /**
  * @version ee
@@ -81,22 +80,15 @@ import tools.jackson.core.type.TypeReference;
 @Service
 @Transactional
 @ConditionalOnEEVersion
+@SkipAutomationAuthorization
 public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacade {
 
-    private static final String DEFAULT_DEFINITION = """
-        {
-            "label": "New Workflow",
-            "description": "",
-            "inputs": [],
-            "triggers": [],
-            "tasks": []
-        }
-        """;
     private static final String MARKER = "__EMBEDDED__";
 
     private final AutomationWorkflowProjectFacade automationWorkflowProjectFacade;
     private final ComponentDefinitionService componentDefinitionService;
     private final ConnectedUserProjectService connectUserProjectService;
+    private final ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager;
     private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionService connectionService;
@@ -123,6 +115,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         AutomationWorkflowProjectFacade automationWorkflowProjectFacade,
         ComponentDefinitionService componentDefinitionService,
         ConnectedUserProjectService connectUserProjectService,
+        ConnectedUserProjectWorkflowManager connectedUserProjectWorkflowManager,
         ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
         ConnectedUserService connectedUserService, ConnectionService connectionService,
         @Lazy @Nullable CopilotWorkflowGenerator copilotWorkflowGenerator, EnvironmentService environmentService,
@@ -138,8 +131,9 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         this.automationWorkflowProjectFacade = automationWorkflowProjectFacade;
         this.componentDefinitionService = componentDefinitionService;
         this.connectUserProjectService = connectUserProjectService;
-        this.connectedUserService = connectedUserService;
+        this.connectedUserProjectWorkflowManager = connectedUserProjectWorkflowManager;
         this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
+        this.connectedUserService = connectedUserService;
         this.connectionService = connectionService;
         this.copilotWorkflowGenerator = copilotWorkflowGenerator;
         this.environmentService = environmentService;
@@ -162,24 +156,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
-
-        ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
-            connectedUserProject.getProjectId(), StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
-
-        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
-
-        connectedUserProjectWorkflow.setConnectedUserProjectId(connectedUserProject.getId());
-        connectedUserProjectWorkflow.setProjectWorkflowId(projectWorkflow.getId());
-
-        connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
-
-        List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
-        Map<String, ?> workflowMap = JsonUtils.readMap(definition);
-
-        checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
-
-        return projectWorkflow.getUuidAsString();
+        return connectedUserProjectWorkflowManager.createProjectWorkflow(externalUserId, definition, environment);
     }
 
     @Override
@@ -202,11 +179,12 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String createProjectWorkflow(
         String externalUserId, String prompt, Environment environment, boolean generate) {
 
         if (!generate) {
-            return createProjectWorkflow(externalUserId, prompt, environment);
+            return connectedUserProjectWorkflowManager.createProjectWorkflow(externalUserId, prompt, environment);
         }
 
         if (StringUtils.isBlank(prompt)) {
@@ -218,7 +196,10 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
         }
 
-        String workflowUuid = createProjectWorkflow(externalUserId, DEFAULT_DEFINITION, environment);
+        String definition = buildInitialDefinition(toWorkflowLabel(prompt));
+
+        String workflowUuid = connectedUserProjectWorkflowManager.createProjectWorkflow(
+            externalUserId, definition, environment);
         String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
@@ -230,7 +211,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment) {
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             connectedUserProject.getProjectId(), workflowUuid);
@@ -282,7 +264,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         long projectDeploymentId = projectDeploymentService.getProjectDeploymentId(
             connectedUserProject.getProjectId(), environment);
@@ -335,7 +318,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
             connectedUserProject.getProjectId(), workflowUuid);
@@ -354,7 +338,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
         String externalUserId, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         return getConnectedUserProjectWorkflows(connectedUserProject, environment);
     }
@@ -411,7 +396,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         Environment environment = environmentId == null
             ? Environment.PRODUCTION : environmentService.getEnvironment(environmentId);
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         String workflowId = projectWorkflowService
             .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
@@ -469,22 +455,18 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     public void updateProjectWorkflow(
         String externalUserId, String workflowUuid, String definition, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
-
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
-            connectedUserProject.getProjectId(), workflowUuid);
-
-        Workflow oldWorkflow = workflowService.getWorkflow(projectWorkflow.getWorkflowId());
-
-        workflowService.update(projectWorkflow.getWorkflowId(), definition, oldWorkflow.getVersion());
+        connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, definition,
+            environment);
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public String updateProjectWorkflow(
         String externalUserId, String workflowUuid, String prompt, Environment environment, boolean generate) {
 
         if (!generate) {
-            updateProjectWorkflow(externalUserId, workflowUuid, prompt, environment);
+            connectedUserProjectWorkflowManager.updateProjectWorkflow(externalUserId, workflowUuid, prompt,
+                environment);
 
             return workflowUuid;
         }
@@ -498,7 +480,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
                 "AI Copilot is not enabled. Set bytechef.ai.copilot.enabled=true to use workflow generation.");
         }
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
             connectedUserProject.getProjectId(), workflowUuid);
@@ -515,7 +498,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         String externalUserId, String workflowUuid, String workflowNodeName, String workflowConnectionKey,
         long connectionId, Environment environment) {
 
-        ConnectedUserProject connectedUserProject = checkConnectedUserProject(externalUserId, environment);
+        ConnectedUserProject connectedUserProject = connectedUserProjectWorkflowManager.getOrCreateConnectedUserProject(
+            externalUserId, environment);
 
         String workflowId = projectWorkflowService
             .fetchLastProjectWorkflowId(connectedUserProject.getProjectId(), workflowUuid)
@@ -525,57 +509,6 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
             workflowId, workflowNodeName, workflowConnectionKey, connectionId, environment.ordinal());
-    }
-
-    private ConnectedUserProject checkConnectedUserProject(String externalUserId, Environment environment) {
-        return connectUserProjectService
-            .fetchConnectUserProject(externalUserId, environment)
-            .orElseGet(() -> {
-                Project project = new Project();
-
-                project.setName(MARKER + externalUserId);
-                project.setWorkspaceId(Workspace.DEFAULT_WORKSPACE_ID);
-
-                project = projectService.create(project);
-
-                ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
-
-                return connectUserProjectService.create(connectedUser.getId(), project.getId());
-            });
-    }
-
-    private void checkWorkflowNodeConnection(
-        String map, List<Connection> connections, ProjectWorkflow projectWorkflow, String workflowNodeName,
-        long environmentId) {
-
-        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(map);
-
-        connections.stream()
-            .filter(connection -> Objects.equals(connection.getComponentName(), workflowNodeType.name()))
-            .findFirst()
-            .ifPresent(connection -> workflowTestConfigurationFacade.saveWorkflowTestConfigurationConnection(
-                projectWorkflow.getWorkflowId(), workflowNodeName, workflowNodeType.name(),
-                connection.getId(), environmentId));
-    }
-
-    private void checkWorkflowNodeConnections(
-        Map<String, ?> workflowMap, List<Connection> connections, ProjectWorkflow projectWorkflow, long environmentId) {
-
-        List<Map<String, ?>> triggers = MapUtils.getList(workflowMap, "triggers", new TypeReference<>() {}, List.of());
-
-        for (Map<String, ?> triggerMap : triggers) {
-            checkWorkflowNodeConnection(
-                MapUtils.getString(triggerMap, "type"), connections, projectWorkflow,
-                MapUtils.getString(triggerMap, "name"), environmentId);
-        }
-
-        List<Map<String, ?>> tasks = MapUtils.getList(workflowMap, "tasks", new TypeReference<>() {}, List.of());
-
-        for (Map<String, ?> taskMap : tasks) {
-            checkWorkflowNodeConnection(
-                MapUtils.getString(taskMap, "type"), connections, projectWorkflow, MapUtils.getString(taskMap, "name"),
-                environmentId);
-        }
     }
 
     private List<ConnectedUserProjectWorkflowDTO> getConnectedUserProjectWorkflows(
@@ -672,5 +605,21 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
             .forEach(allowedComponentNames::add);
 
         return allowedComponentNames;
+    }
+
+    private static String buildInitialDefinition(String label) {
+        Map<String, Object> definitionMap = new LinkedHashMap<>();
+
+        definitionMap.put("label", label);
+        definitionMap.put("description", "");
+        definitionMap.put("inputs", List.of());
+        definitionMap.put("triggers", List.of());
+        definitionMap.put("tasks", List.of());
+
+        return JsonUtils.write(definitionMap);
+    }
+
+    private static String toWorkflowLabel(String prompt) {
+        return StringUtils.abbreviate(StringUtils.normalizeSpace(prompt), 80);
     }
 }

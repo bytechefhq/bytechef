@@ -130,7 +130,7 @@ public record ConnectedUserIntegrationDTO(
     public record OAuth2(OAuth2AuthorizationParameters oAuth2AuthorizationParameters, String redirectUri) {
     }
 
-    public record McpToolInfo(String name, String description) {
+    public record McpToolInfo(Long id, String name, String description) {
     }
 
     public record McpWorkflowInfo(
@@ -163,7 +163,7 @@ public record ConnectedUserIntegrationDTO(
             .orElseThrow();
     }
 
-    private static String getWorkflowUuid(
+    private static @Nullable String getWorkflowUuid(
         List<IntegrationInstanceConfigurationWorkflowDTO> integrationInstanceConfigurationWorkflowDTOs,
         IntegrationInstanceWorkflow integrationInstanceWorkflow) {
 
@@ -174,7 +174,7 @@ public record ConnectedUserIntegrationDTO(
                 integrationInstanceWorkflow.getIntegrationInstanceConfigurationWorkflowId()))
             .map(IntegrationInstanceConfigurationWorkflowDTO::workflowUuid)
             .findFirst()
-            .orElseThrow();
+            .orElse(null);
     }
 
     private static List<ConnectedUserIntegrationInstanceWorkflow> toIntegrationInstanceWorkflows(
@@ -184,9 +184,17 @@ public record ConnectedUserIntegrationDTO(
         return integrationInstanceWorkflows.stream()
             .filter(integrationInstanceWorkflow -> Objects.equals(
                 integrationInstanceWorkflow.getIntegrationInstanceId(), integrationInstanceId))
-            .map(integrationInstanceWorkflow -> new ConnectedUserIntegrationInstanceWorkflow(
-                integrationInstanceWorkflow,
-                getWorkflowUuid(integrationInstanceConfigurationWorkflowDTOs, integrationInstanceWorkflow)))
+            .map(integrationInstanceWorkflow -> {
+                String workflowUuid = getWorkflowUuid(
+                    integrationInstanceConfigurationWorkflowDTOs, integrationInstanceWorkflow);
+
+                if (workflowUuid == null) {
+                    return null;
+                }
+
+                return new ConnectedUserIntegrationInstanceWorkflow(integrationInstanceWorkflow, workflowUuid);
+            })
+            .filter(Objects::nonNull)
             .toList();
     }
 }

@@ -46,7 +46,7 @@ class ConnectedUserProjectFacadeTest {
     @BeforeEach
     void setUp() {
         facade = new ConnectedUserProjectFacadeImpl(
-            null, componentDefinitionService, null, null, null, null, null, null,
+            null, componentDefinitionService, null, null, null, null, null, null, null,
             integrationInstanceConfigurationService, integrationService, null, null, null, null, null, null, null,
             null, null, null, null, null, null);
     }

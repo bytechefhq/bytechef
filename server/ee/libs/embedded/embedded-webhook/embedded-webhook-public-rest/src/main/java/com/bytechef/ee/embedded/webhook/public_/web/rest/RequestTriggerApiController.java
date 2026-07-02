@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.util.Objects;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -82,6 +83,7 @@ public class RequestTriggerApiController extends AbstractWebhookTriggerControlle
         this.environmentService = environmentService;
     }
 
+    @CrossOrigin
     @Override
     public ResponseEntity<Object> executeWorkflow(String workflowUuid, EnvironmentModel xEnvironment) {
         Environment environment = environmentService.getEnvironment(xEnvironment == null ? null : xEnvironment.name());

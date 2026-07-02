@@ -10,6 +10,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -28,6 +29,7 @@ import com.bytechef.ee.embedded.configuration.service.IntegrationWorkflowService
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.component.domain.Option;
+import com.bytechef.platform.component.facade.ComponentDefinitionFacade;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +47,7 @@ import org.junit.jupiter.api.Test;
  */
 class ConnectedUserIntegrationInstanceFacadeImplTest {
 
+    private static final long CONNECTION_ID = 42L;
     private static final String EXTERNAL_USER_ID = "external-user-id";
     private static final long INTEGRATION_INSTANCE_CONFIGURATION_ID = 9L;
     private static final long INTEGRATION_INSTANCE_ID = 7L;
@@ -52,9 +55,8 @@ class ConnectedUserIntegrationInstanceFacadeImplTest {
     private static final String WORKFLOW_ID = "wf-id";
     private static final String WORKFLOW_UUID = "wf-uuid";
 
+    private final ComponentDefinitionFacade componentDefinitionFacade = mock(ComponentDefinitionFacade.class);
     private final ConnectedUserService connectedUserService = mock(ConnectedUserService.class);
-    private final EmbeddedWorkflowInputOptionFacade embeddedWorkflowInputOptionFacade =
-        mock(EmbeddedWorkflowInputOptionFacade.class);
     private final IntegrationInstanceConfigurationService integrationInstanceConfigurationService =
         mock(IntegrationInstanceConfigurationService.class);
     private final IntegrationInstanceFacade integrationInstanceFacade = mock(IntegrationInstanceFacade.class);
@@ -63,50 +65,50 @@ class ConnectedUserIntegrationInstanceFacadeImplTest {
 
     private final ConnectedUserIntegrationInstanceFacadeImpl connectedUserIntegrationInstanceFacade =
         new ConnectedUserIntegrationInstanceFacadeImpl(
-            connectedUserService, embeddedWorkflowInputOptionFacade, integrationInstanceConfigurationService,
+            componentDefinitionFacade, connectedUserService, integrationInstanceConfigurationService,
             integrationInstanceService, integrationInstanceFacade, integrationWorkflowService);
 
     @Test
-    void testGetWorkflowInputOptionsAllowedForOwner() {
+    void testGetComponentInputOptionsAllowedForOwner() {
         setUpInstance(OWNING_CONNECTED_USER_ID, OWNING_CONNECTED_USER_ID);
 
         Option option = mock(Option.class);
 
-        when(embeddedWorkflowInputOptionFacade.getWorkflowInputOptions(
-            anyLong(), anyString(), anyString(), anyString(), any(), any()))
+        when(componentDefinitionFacade.executeWorkflowInputOptions(
+            anyString(), anyInt(), anyString(), anyString(), any(), any(), any(), anyLong()))
                 .thenReturn(List.of(option));
 
-        List<Option> options = connectedUserIntegrationInstanceFacade.getIntegrationInstanceWorkflowInputOptions(
-            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, "channel", "channelId", Map.of(), null);
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, "slack", 1, "channel", "channelId", Map.of(), null);
 
         assertEquals(1, options.size());
 
-        verify(embeddedWorkflowInputOptionFacade).getWorkflowInputOptions(
-            eq(INTEGRATION_INSTANCE_ID), eq(WORKFLOW_UUID), eq("channel"), eq("channelId"), any(), any());
+        verify(componentDefinitionFacade).executeWorkflowInputOptions(
+            eq("slack"), eq(1), eq("channel"), eq("channelId"), any(), any(), any(), eq(CONNECTION_ID));
     }
 
     @Test
-    void testGetWorkflowInputOptionsDeniedForNonOwner() {
+    void testGetComponentInputOptionsDeniedForNonOwner() {
         setUpInstance(OWNING_CONNECTED_USER_ID, 200L);
 
-        List<Option> options = connectedUserIntegrationInstanceFacade.getIntegrationInstanceWorkflowInputOptions(
-            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, "channel", "channelId", Map.of(), null);
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, "slack", 1, "channel", "channelId", Map.of(), null);
 
         assertEquals(List.of(), options);
 
-        verifyNoInteractions(embeddedWorkflowInputOptionFacade);
+        verifyNoInteractions(componentDefinitionFacade);
     }
 
     @Test
-    void testGetWorkflowInputOptionsDeniedWhenConnectedUserAbsent() {
+    void testGetComponentInputOptionsDeniedWhenConnectedUserAbsent() {
         setUpInstance(OWNING_CONNECTED_USER_ID, null);
 
-        List<Option> options = connectedUserIntegrationInstanceFacade.getIntegrationInstanceWorkflowInputOptions(
-            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, WORKFLOW_UUID, "channel", "channelId", Map.of(), null);
+        List<Option> options = connectedUserIntegrationInstanceFacade.getComponentInputOptions(
+            EXTERNAL_USER_ID, INTEGRATION_INSTANCE_ID, "slack", 1, "channel", "channelId", Map.of(), null);
 
         assertEquals(List.of(), options);
 
-        verifyNoInteractions(embeddedWorkflowInputOptionFacade);
+        verifyNoInteractions(componentDefinitionFacade);
     }
 
     @Test
@@ -189,6 +191,7 @@ class ConnectedUserIntegrationInstanceFacadeImplTest {
     private void setUpInstance(Long owningConnectedUserId, Long resolvedConnectedUserId) {
         IntegrationInstance integrationInstance = mock(IntegrationInstance.class);
 
+        when(integrationInstance.getConnectionId()).thenReturn(CONNECTION_ID);
         when(integrationInstance.getConnectedUserId()).thenReturn(owningConnectedUserId);
         when(integrationInstance.getIntegrationInstanceConfigurationId())
             .thenReturn(INTEGRATION_INSTANCE_CONFIGURATION_ID);

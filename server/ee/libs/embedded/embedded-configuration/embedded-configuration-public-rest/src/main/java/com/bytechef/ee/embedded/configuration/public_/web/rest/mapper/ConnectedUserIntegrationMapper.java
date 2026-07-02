@@ -15,6 +15,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.Co
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserIntegrationDTO.OAuth2;
 import com.bytechef.ee.embedded.configuration.dto.IntegrationInstanceConfigurationWorkflowDTO;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.mapper.config.EmbeddedConfigurationPublicMapperSpringConfig;
+import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentInputReferenceModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyGroupModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.ComponentPropertyModel;
 import com.bytechef.ee.embedded.configuration.public_.web.rest.model.InputModel;
@@ -43,6 +44,7 @@ import com.bytechef.platform.component.domain.PropertyGroup;
 import com.bytechef.platform.component.domain.StringProperty;
 import com.bytechef.platform.component.domain.TimeProperty;
 import com.bytechef.platform.component.domain.ValueProperty;
+import com.bytechef.platform.configuration.domain.WorkflowInput;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
@@ -164,12 +166,12 @@ public interface ConnectedUserIntegrationMapper {
             Map<String, PropertyGroup> resolvedGroups =
                 componentInputGroups == null ? Map.of() : componentInputGroups;
 
-            return workflow.getInputs()
+            return WorkflowInput.of(workflow)
                 .stream()
                 .map(input -> {
                     InputModel inputModel = map(input);
 
-                    PropertyGroup propertyGroup = resolvedGroups.get(input.name());
+                    PropertyGroup propertyGroup = resolvedGroups.get(input.getName());
 
                     if (propertyGroup != null && inputModel.getComponentReference() != null) {
                         inputModel.getComponentReference()
@@ -181,23 +183,23 @@ public interface ConnectedUserIntegrationMapper {
                 .toList();
         }
 
-        default InputModel map(Workflow.Input input) {
+        default InputModel map(WorkflowInput input) {
             InputModel inputModel = new InputModel()
-//                .internalOnly(input.internalOnly())
-                .label(input.label())
-                .name(input.name())
-//                .objectName(input.objectName())
-                .required(input.required())
-                .type(InputTypeModel.valueOf(StringUtils.upperCase(input.type())));
+                .internalOnly(input.isInternalOnly())
+                .label(input.getLabel())
+                .name(input.getName())
+                .objectName(input.getObjectName())
+                .required(input.isRequired())
+                .type(InputTypeModel.valueOf(StringUtils.upperCase(input.getType())));
 
-//            Workflow.ComponentInputReference componentReference = input.componentReference();
+            WorkflowInput.ComponentInputReference componentReference = input.getComponentInputReference();
 
-//            if (componentReference != null) {
-//                inputModel.componentReference(
-//                    new ComponentInputReferenceModel(
-//                        componentReference.componentName(), componentReference.componentVersion(),
-//                        componentReference.groupName()));
-//            }
+            if (componentReference != null) {
+                inputModel.componentReference(
+                    new ComponentInputReferenceModel(
+                        componentReference.componentName(), componentReference.componentVersion(),
+                        componentReference.groupName()));
+            }
 
             return inputModel;
         }
