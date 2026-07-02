@@ -801,12 +801,80 @@ public class ApplicationProperties {
              */
             private boolean enabled;
 
+            /**
+             * Copilot documentation configuration
+             */
+            private Docs docs = new Docs();
+
             public boolean isEnabled() {
                 return enabled;
             }
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public Docs getDocs() {
+                return docs;
+            }
+
+            public void setDocs(Docs docs) {
+                this.docs = docs;
+            }
+
+            /**
+             * Copilot documentation configuration.
+             */
+            public static class Docs {
+
+                /**
+                 * Copilot documentation embedding configuration
+                 */
+                private Embedding embedding = new Embedding();
+
+                public Embedding getEmbedding() {
+                    return embedding;
+                }
+
+                public void setEmbedding(Embedding embedding) {
+                    this.embedding = embedding;
+                }
+
+                /**
+                 * Copilot documentation embedding configuration.
+                 */
+                public static class Embedding {
+
+                    enum Provider {
+                        OPENAI
+                    }
+
+                    /**
+                     * The embedding provider key (e.g. openAi).
+                     */
+                    private Provider provider;
+
+                    /**
+                     *
+                     */
+                    private String apiKey;
+
+                    public Provider getProvider() {
+                        return provider;
+                    }
+
+                    public String getApiKey() {
+                        return apiKey;
+                    }
+
+                    public void setProvider(Provider provider) {
+                        this.provider = provider;
+                    }
+
+                    public void setApiKey(String apiKey) {
+                        this.apiKey = apiKey;
+                    }
+                }
             }
         }
 

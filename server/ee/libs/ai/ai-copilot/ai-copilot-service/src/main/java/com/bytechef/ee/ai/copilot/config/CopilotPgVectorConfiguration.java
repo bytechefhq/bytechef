@@ -16,9 +16,15 @@
 
 package com.bytechef.ee.ai.copilot.config;
 
+import com.bytechef.config.ApplicationProperties;
+import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
+import java.time.Duration;
+import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingModel;
+import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.observation.VectorStoreObservationConvention;
 import org.springframework.ai.vectorstore.pgvector.PgVectorStore;
@@ -48,6 +54,30 @@ public class CopilotPgVectorConfiguration {
         ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
         BatchingStrategy batchingStrategy) {
 
+        return buildVectorStore(
+            pgVectorJdbcTemplate, embeddingModel, properties, observationRegistry, customObservationConvention,
+            batchingStrategy);
+    }
+
+    @Bean
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.docs.embedding", name = "api-key")
+    public VectorStore copilotDocsLoaderVectorStore(
+        @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
+        PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy, ApplicationProperties applicationProperties) {
+
+        return buildVectorStore(
+            pgVectorJdbcTemplate, copilotDocsEmbeddingModel(applicationProperties), properties, observationRegistry,
+            customObservationConvention, batchingStrategy);
+    }
+
+    private static VectorStore buildVectorStore(
+        JdbcTemplate pgVectorJdbcTemplate, EmbeddingModel embeddingModel, PgVectorStoreProperties properties,
+        ObjectProvider<ObservationRegistry> observationRegistry,
+        ObjectProvider<VectorStoreObservationConvention> customObservationConvention,
+        BatchingStrategy batchingStrategy) {
+
         return PgVectorStore.builder(pgVectorJdbcTemplate, embeddingModel)
             .schemaName(properties.getSchemaName())
             .idType(properties.getIdType())
@@ -63,5 +93,29 @@ public class CopilotPgVectorConfiguration {
             .batchingStrategy(batchingStrategy)
             .maxDocumentBatchSize(properties.getMaxDocumentBatchSize())
             .build();
+    }
+
+    private static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Ai ai = applicationProperties.getAi();
+
+        String apiKey = ai.getCopilot()
+            .getDocs()
+            .getEmbedding()
+            .getApiKey();
+        String model = ai.getProvider()
+            .getEmbedding()
+            .getOpenAi()
+            .getOptions()
+            .getModel();
+
+        return new OpenAiEmbeddingModel(
+            OpenAIOkHttpClient.builder()
+                .apiKey(apiKey)
+                .timeout(Duration.ofSeconds(60))
+                .build(),
+            MetadataMode.ALL,
+            OpenAiEmbeddingOptions.builder()
+                .model(model)
+                .build());
     }
 }
