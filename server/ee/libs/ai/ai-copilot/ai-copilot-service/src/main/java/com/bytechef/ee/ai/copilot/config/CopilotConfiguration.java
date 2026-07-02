@@ -23,6 +23,7 @@ import com.bytechef.ee.ai.copilot.agent.ConverterSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CopilotChatClientResolver;
 import com.bytechef.ee.ai.copilot.agent.SkillsSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
+import com.bytechef.ee.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ee.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.ListConnectionsForComponentToolCallback;
@@ -35,6 +36,7 @@ import com.bytechef.ee.ai.copilot.tool.SelectConnectionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.SelectPropertyOptionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.SelectTriggerPropertyOptionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.ToolStateVisibilityMetrics;
+import com.bytechef.ee.ai.copilot.tool.WorkspaceCopilotConnectionLister;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.ee.automation.ai.tool.ReadSkillsTools;
@@ -103,6 +105,7 @@ public class CopilotConfiguration {
     private final TriggerDefinitionService triggerDefinitionService;
     private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final PropertyOptionsResolver propertyOptionsResolver;
+    private final ObjectProvider<CopilotConnectionLister> connectionListerProvider;
     private final JsonMapper jsonMapper = new JsonMapper();
 
     @SuppressFBWarnings("EI")
@@ -120,8 +123,10 @@ public class CopilotConfiguration {
         ConnectionDefinitionService connectionDefinitionService, WorkspaceConnectionFacade workspaceConnectionFacade,
         ComponentDefinitionService componentDefinitionService, ActionDefinitionService actionDefinitionService,
         ActionDefinitionFacade actionDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
-        TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver) {
+        TriggerDefinitionFacade triggerDefinitionFacade, PropertyOptionsResolver propertyOptionsResolver,
+        ObjectProvider<CopilotConnectionLister> connectionListerProvider) {
 
+        this.connectionListerProvider = connectionListerProvider;
         this.connectionDefinitionService = connectionDefinitionService;
         this.workspaceConnectionFacade = workspaceConnectionFacade;
         this.componentDefinitionService = componentDefinitionService;
@@ -241,10 +246,20 @@ public class CopilotConfiguration {
     }
 
     private List<ToolCallback> interactivePickerToolCallbacks() {
+        List<CopilotConnectionLister> connectionListers = new ArrayList<>();
+
+        connectionListers.add(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, propertyOptionsResolver));
+
+        CopilotConnectionLister embeddedConnectionLister = connectionListerProvider.getIfAvailable();
+
+        if (embeddedConnectionLister != null) {
+            connectionListers.add(embeddedConnectionLister);
+        }
+
         return List.of(
             new ListConnectionsForComponentToolCallback(
-                componentDefinitionService, connectionDefinitionService, workspaceConnectionFacade,
-                propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP),
+                componentDefinitionService, connectionDefinitionService, ToolStateVisibilityMetrics.NOOP,
+                connectionListers),
             new SelectConnectionToolCallback(componentDefinitionService),
             new LookupActionPropertyOptionsToolCallback(
                 actionDefinitionService, actionDefinitionFacade, propertyOptionsResolver,

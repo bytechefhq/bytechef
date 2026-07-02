@@ -26,6 +26,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -77,8 +78,8 @@ class ListConnectionsForComponentToolCallbackTest {
             new PropertyOptionsResolver(new SecurityContextRehydrator(userService, mock(AuthorityService.class)));
 
         ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
-            componentDefinitionService, connectionDefinitionService, workspaceConnectionFacade, resolver,
-            mock(ToolStateVisibilityMetrics.class));
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(workspaceConnectionFacade, resolver)));
 
         ToolContext toolContext = new ToolContext(
             new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
@@ -111,14 +112,14 @@ class ListConnectionsForComponentToolCallbackTest {
         when(componentDefinitionService.fetchComponentDefinition("noConnectionComponent", null))
             .thenReturn(Optional.of(mock(ComponentDefinition.class)));
         when(connectionDefinitionService.getConnectionDefinition("noConnectionComponent", 1))
-            .thenThrow(new RuntimeException("no connection definition"));
+            .thenThrow(new NoSuchElementException("no connection definition"));
 
         PropertyOptionsResolver resolver = new PropertyOptionsResolver(
             new SecurityContextRehydrator(mock(UserService.class), mock(AuthorityService.class)));
 
         ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
-            componentDefinitionService, connectionDefinitionService, mock(WorkspaceConnectionFacade.class), resolver,
-            mock(ToolStateVisibilityMetrics.class));
+            componentDefinitionService, connectionDefinitionService, mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(mock(WorkspaceConnectionFacade.class), resolver)));
 
         ToolContext toolContext = new ToolContext(
             new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
@@ -147,8 +148,8 @@ class ListConnectionsForComponentToolCallbackTest {
             new SecurityContextRehydrator(mock(UserService.class), mock(AuthorityService.class)));
 
         ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
-            componentDefinitionService, mock(ConnectionDefinitionService.class), mock(WorkspaceConnectionFacade.class),
-            resolver, mock(ToolStateVisibilityMetrics.class));
+            componentDefinitionService, mock(ConnectionDefinitionService.class), mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(mock(WorkspaceConnectionFacade.class), resolver)));
 
         ToolContext toolContext = new ToolContext(
             new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
@@ -173,7 +174,8 @@ class ListConnectionsForComponentToolCallbackTest {
 
         ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
             mock(ComponentDefinitionService.class), mock(ConnectionDefinitionService.class),
-            mock(WorkspaceConnectionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(mock(WorkspaceConnectionFacade.class), resolver)));
 
         String result = callback.call("{\"componentName\":\"slack\"}");
 
@@ -181,7 +183,7 @@ class ListConnectionsForComponentToolCallbackTest {
 
         assertThat(node.has("error")).isTrue();
         assertThat(node.get("error")
-            .asText()).contains("Workspace context unavailable");
+            .asText()).contains("Invocation context unavailable");
     }
 
     @Test
@@ -191,7 +193,8 @@ class ListConnectionsForComponentToolCallbackTest {
 
         ListConnectionsForComponentToolCallback callback = new ListConnectionsForComponentToolCallback(
             mock(ComponentDefinitionService.class), mock(ConnectionDefinitionService.class),
-            mock(WorkspaceConnectionFacade.class), resolver, mock(ToolStateVisibilityMetrics.class));
+            mock(ToolStateVisibilityMetrics.class),
+            List.of(new WorkspaceCopilotConnectionLister(mock(WorkspaceConnectionFacade.class), resolver)));
 
         ToolContext toolContext = new ToolContext(
             new AgentToolInvocationContext(1L, 10L, 0L, "thread-1", null).toToolContext());
