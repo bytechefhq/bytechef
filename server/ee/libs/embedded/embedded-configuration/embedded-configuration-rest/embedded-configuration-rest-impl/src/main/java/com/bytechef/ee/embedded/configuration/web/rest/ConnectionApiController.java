@@ -61,12 +61,10 @@ public class ConnectionApiController implements ConnectionApi {
     }
 
     @Override
-    public ResponseEntity<Long> createConnectedUserProjectWorkflowConnection(
-        Long connectedUserId, String workflowUuid, ConnectionModel connectionModel) {
-
+    public ResponseEntity<Long> createConnectedUserConnection(Long connectedUserId, ConnectionModel connectionModel) {
         return ResponseEntity.ok(
-            connectedUserConnectionFacade.createConnectedUserProjectWorkflowConnection(
-                connectedUserId, workflowUuid, conversionService.convert(connectionModel, ConnectionDTO.class)));
+            connectedUserConnectionFacade.createConnectedUserConnection(
+                connectedUserId, conversionService.convert(connectionModel, ConnectionDTO.class)));
     }
 
     @Override

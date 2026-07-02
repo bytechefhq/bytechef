@@ -42,5 +42,15 @@ public interface ConnectUserProjectRepository extends ListCrudRepository<Connect
     Optional<ConnectedUserProject> findFirstByEnvironmentAndExternalUserId(
         @Param("externalUserId") String externalUserId, @Param("environment") int environment);
 
+    @Query("""
+        SELECT cup.connected_user_id
+        FROM connected_user_project cup
+        JOIN project ON cup.project_id = project.id
+        JOIN project_deployment ON project.id = project_deployment.project_id
+        WHERE project_deployment.id = :projectDeploymentId
+        LIMIT 1
+        """)
+    Optional<Long> findConnectedUserIdByProjectDeploymentId(@Param("projectDeploymentId") long projectDeploymentId);
+
     Optional<ConnectedUserProject> findByConnectedUserId(Long connectedUserid);
 }

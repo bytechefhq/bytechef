@@ -14,7 +14,7 @@ import com.agui.core.message.BaseMessage;
 import com.agui.core.message.UserMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,7 +62,8 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
     }
 
     @Override
-    public void generateWorkflow(String workflowId, String prompt, Set<String> allowedComponentNames) {
+    public void generateWorkflow(
+        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames) {
         String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
 
         LocalAgent localAgent = localAgentMap.get(agentId);
@@ -76,13 +78,17 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", true);
 
-        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
 
         if (authentication != null) {
-            stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
+            stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
+        }
+
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, systemPrompt.strip());
         }
 
         if (allowedComponentNames != null && !allowedComponentNames.isEmpty()) {

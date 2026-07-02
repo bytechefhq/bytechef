@@ -60,6 +60,6 @@ public class CreateConnectedUserWorkflowFromPromptAction {
             inputParameters.getString(EmbeddedToolConstants.ENVIRONMENT));
         String prompt = inputParameters.getRequiredString(PROMPT);
 
-        return connectedUserProjectFacade.createProjectWorkflow(externalUserId, prompt, environment, true);
+        return connectedUserProjectFacade.createProjectWorkflow(externalUserId, prompt, null, environment, true);
     }
 }

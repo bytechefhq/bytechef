@@ -336,7 +336,7 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
         return ResponseEntity.ok(
             connectedUserProjectFacade.createProjectWorkflow(
                 OptionalUtils.get(SecurityUtils.fetchCurrentUserLogin(), "User not found"), requestModel.getPrompt(),
-                getEnvironment(xEnvironment), true));
+                requestModel.getSystemPrompt(), getEnvironment(xEnvironment), true));
     }
 
     @Override
@@ -346,7 +346,8 @@ public class ConnectedUserProjectWorkflowApiController implements ConnectedUserP
 
         return ResponseEntity.ok(
             connectedUserProjectFacade.createProjectWorkflow(
-                externalUserId, requestModel.getPrompt(), getEnvironment(xEnvironment), true));
+                externalUserId, requestModel.getPrompt(), requestModel.getSystemPrompt(), getEnvironment(xEnvironment),
+                true));
     }
 
     @Override

@@ -17,7 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -52,9 +52,9 @@ class CopilotChatClientResolverTest {
 
         State state = new State();
 
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
-        state.set(CopilotStateKeys.ENVIRONMENT_ID, "3");
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
 
         assertSame(catalogChatClient, resolver.resolve(state));
     }
@@ -64,8 +64,8 @@ class CopilotChatClientResolverTest {
         // No environment id → the catalog API key can't be resolved, so the resolver returns null without delegating.
         State state = new State();
 
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, OPENAI_MODEL);
 
         assertNull(resolver.resolve(state));
         verify(catalogChatClientResolver, never()).resolve(anyString(), anyString(), anyInt());
@@ -83,7 +83,7 @@ class CopilotChatClientResolverTest {
         // secondary layer to fall through to, so the resolver returns null with a warning.
         State state = new State();
 
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, OPENAI_KEY);
 
         assertNull(resolver.resolve(state));
     }

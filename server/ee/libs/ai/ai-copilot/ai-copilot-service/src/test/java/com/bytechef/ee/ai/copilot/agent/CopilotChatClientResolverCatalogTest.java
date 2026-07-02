@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,9 +38,9 @@ class CopilotChatClientResolverCatalogTest {
 
         State state = new State();
 
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, "ai.provider.openAi");
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, "gpt-4o");
-        state.set(CopilotStateKeys.ENVIRONMENT_ID, "3");
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER, "ai.provider.openAi");
+        state.set(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL, "gpt-4o");
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
 
         assertThat(resolver.resolve(state)).isSameAs(catalogChatClient);
     }

@@ -381,13 +381,13 @@ paths:
                 type: "array"
                 items:
                   $ref: "#/components/schemas/Connection"
-  /connected-users/{connectedUserId}/workflows/{workflowUuid}/connections:
+  /connected-users/{connectedUserId}/connections:
     post:
-      description: "Create a new connection for the connected user's project workflow."
-      summary: "Create a new connection for the connected user's project workflow"
+      description: "Create a new connection for the connected user."
+      summary: "Create a new connection for the connected user"
       tags:
         - "connection"
-      operationId: "createConnectedUserProjectWorkflowConnection"
+      operationId: "createConnectedUserConnection"
       parameters:
         - name: "connectedUserId"
           description: "The id of a connected user."
@@ -396,12 +396,6 @@ paths:
           schema:
             type: "integer"
             format: "int64"
-        - name: "workflowUuid"
-          description: "The workflow uuid."
-          in: "path"
-          required: true
-          schema:
-            type: "string"
       requestBody:
         content:
           application/json:

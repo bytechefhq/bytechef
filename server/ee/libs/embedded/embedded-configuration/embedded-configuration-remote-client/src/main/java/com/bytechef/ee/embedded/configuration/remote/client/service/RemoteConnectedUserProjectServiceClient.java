@@ -45,6 +45,11 @@ public class RemoteConnectedUserProjectServiceClient implements ConnectedUserPro
     }
 
     @Override
+    public Optional<Long> fetchConnectedUserId(long projectDeploymentId) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public Optional<ConnectedUserProject> fetchConnectUserProject(String externalUserId, Environment environment) {
         throw new UnsupportedOperationException();
     }

@@ -10,7 +10,7 @@ package com.bytechef.ee.ai.copilot.agent;
 import com.agui.core.state.State;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 // Gateway resolver path disabled for now — see the commented block at the bottom of this class.
 // import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
@@ -57,8 +57,8 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        String llmProvider = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER));
-        String llmModel = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_MODEL));
+        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
 
         if (llmProvider == null || llmModel == null) {
             if ((llmProvider == null) != (llmModel == null)) {
@@ -70,7 +70,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
 
         if (environmentId != null) {
             return catalogChatClientResolver.resolve(llmProvider, llmModel, environmentId.intValue());

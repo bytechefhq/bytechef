@@ -12,7 +12,7 @@ import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.user.domain.User;
@@ -71,9 +71,9 @@ public class CopilotApiController {
 
         User user = userService.getCurrentUser();
 
-        stateMap.put(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID, user.getId());
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, user.getId());
 
-        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 
         if (agentId.equals("workflow_editor")) {
             if (Mode.valueOf((String) mode) == Mode.BUILD) {

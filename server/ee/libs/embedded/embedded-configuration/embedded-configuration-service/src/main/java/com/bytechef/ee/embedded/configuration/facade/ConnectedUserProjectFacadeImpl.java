@@ -31,11 +31,11 @@ import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.ai.copilot.service.CopilotWorkflowGenerator;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
 import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -203,7 +203,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String createProjectWorkflow(
-        String externalUserId, String prompt, Environment environment, boolean generate) {
+        String externalUserId, String prompt, @Nullable String systemPrompt, Environment environment,
+        boolean generate) {
 
         if (!generate) {
             return createProjectWorkflow(externalUserId, prompt, environment);
@@ -223,7 +224,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, allowedComponentNames);
+        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, systemPrompt, allowedComponentNames);
 
         return workflowUuid;
     }
@@ -235,26 +236,13 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         List<ProjectWorkflow> projectWorkflows = projectWorkflowService.getProjectWorkflows(
             connectedUserProject.getProjectId(), workflowUuid);
 
-        Set<Long> connectionIds = new HashSet<>();
-
         for (ProjectWorkflow projectWorkflow : projectWorkflows) {
             connectedUserProjectWorkflowService
                 .fetchConnectedUserProjectWorkflow(connectedUserProject.getId(), projectWorkflow.getId())
-                .ifPresent(connectedUserProjectWorkflow -> {
-                    connectionIds.addAll(
-                        connectedUserProjectWorkflow.getConnections()
-                            .stream()
-                            .map(ConnectedUserProjectWorkflowConnection::getConnectionId)
-                            .toList());
-
-                    connectedUserProjectWorkflowService.delete(connectedUserProjectWorkflow.getId());
-                });
+                .ifPresent(connectedUserProjectWorkflow -> connectedUserProjectWorkflowService
+                    .delete(connectedUserProjectWorkflow.getId()));
 
             projectWorkflowFacade.deleteWorkflow(projectWorkflow.getWorkflowId());
-        }
-
-        for (Long connectionId : connectionIds) {
-            connectionService.delete(connectionId);
         }
     }
 
@@ -405,6 +393,19 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
     }
 
     @Override
+    public CopilotChatContextDTO prepareCopilotChat(
+        String externalUserId, String workflowUuid, Environment environment) {
+
+        getConnectedUserProjectWorkflow(externalUserId, workflowUuid, (long) environment.ordinal());
+
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
+
+        return new CopilotChatContextDTO(workflowId, allowedComponentNames);
+    }
+
+    @Override
     public void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId) {
 
@@ -505,7 +506,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        copilotWorkflowGenerator.generateWorkflow(projectWorkflow.getWorkflowId(), prompt, allowedComponentNames);
+        copilotWorkflowGenerator.generateWorkflow(projectWorkflow.getWorkflowId(), prompt, null, allowedComponentNames);
 
         return workflowUuid;
     }

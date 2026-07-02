@@ -2,7 +2,7 @@ import LoadingDots from '@/components/LoadingDots';
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable';
 import WorkflowBuilderHeader from '@/ee/pages/embedded/workflow-builder/components/workflow-builder-header/WorkflowBuilderHeader';
 import {useWorkflowBuilder} from '@/ee/pages/embedded/workflow-builder/hooks/useWorkflowBuilder';
-import {getCreateConnectedUserProjectWorkflowConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
+import {getCreateConnectedUserConnection} from '@/ee/shared/mutations/embedded/connections.mutations';
 import {
     ConnectionKeys,
     getConnectedUserConnectionsQuery,
@@ -47,7 +47,6 @@ const WorkflowBuilder = () => {
         updateWorkflowEditorMutation,
         updateWorkflowMutation,
         updateWorkflowNodeParameterMutation,
-        workflowUuid,
     } = useWorkflowBuilder();
 
     const {runDisabled} = useRun();
@@ -90,9 +89,8 @@ const WorkflowBuilder = () => {
                                 updateClusterElementParameterMutation,
                                 updateWorkflowMutation: updateWorkflowEditorMutation,
                                 updateWorkflowNodeParameterMutation,
-                                useCreateConnectionMutation: getCreateConnectedUserProjectWorkflowConnection(
-                                    connectedUserProjectWorkflow.connectedUserId!,
-                                    workflowUuid!
+                                useCreateConnectionMutation: getCreateConnectedUserConnection(
+                                    connectedUserProjectWorkflow.connectedUserId!
                                 ),
                                 useGetComponentDefinitionsQuery: useGetComponentDefinitionsQuery,
                                 useGetConnectionTagsQuery: useGetConnectionTagsQuery,

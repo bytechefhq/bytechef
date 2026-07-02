@@ -23,9 +23,7 @@ import org.springframework.stereotype.Component;
 public class RemoteConnectedUserConnectionFacadeClient implements ConnectedUserConnectionFacade {
 
     @Override
-    public long createConnectedUserProjectWorkflowConnection(
-        long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO) {
-
+    public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         throw new UnsupportedOperationException();
     }
 

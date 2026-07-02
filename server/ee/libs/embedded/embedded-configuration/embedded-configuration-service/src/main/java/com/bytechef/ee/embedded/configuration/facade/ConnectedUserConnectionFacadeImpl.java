@@ -7,15 +7,8 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.automation.configuration.domain.ProjectWorkflow;
-import com.bytechef.automation.configuration.service.ProjectWorkflowService;
-import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProject;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflow;
-import com.bytechef.ee.embedded.configuration.domain.ConnectedUserProjectWorkflowConnection;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstance;
-import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
-import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserConnectionService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
@@ -25,7 +18,9 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,42 +34,27 @@ import org.springframework.transaction.annotation.Transactional;
 @ConditionalOnEEVersion
 public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectionFacade {
 
+    private final ConnectedUserConnectionService connectedUserConnectionService;
     private final ConnectedUserService connectedUserService;
     private final ConnectionFacade connectionFacade;
-    private final ConnectedUserProjectService connectedUserProjectService;
-    private final ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService;
     private final IntegrationInstanceService integrationInstanceService;
-    private final ProjectWorkflowService projectWorkflowService;
 
     @SuppressFBWarnings("EI")
     public ConnectedUserConnectionFacadeImpl(
-        ConnectedUserService connectedUserService, ConnectionFacade connectionFacade,
-        ConnectedUserProjectService connectedUserProjectService,
-        ConnectedUserProjectWorkflowService connectedUserProjectWorkflowService,
-        IntegrationInstanceService integrationInstanceService, ProjectWorkflowService projectWorkflowService) {
+        ConnectedUserConnectionService connectedUserConnectionService, ConnectedUserService connectedUserService,
+        ConnectionFacade connectionFacade, IntegrationInstanceService integrationInstanceService) {
 
+        this.connectedUserConnectionService = connectedUserConnectionService;
         this.connectedUserService = connectedUserService;
         this.connectionFacade = connectionFacade;
-        this.connectedUserProjectService = connectedUserProjectService;
-        this.connectedUserProjectWorkflowService = connectedUserProjectWorkflowService;
         this.integrationInstanceService = integrationInstanceService;
-        this.projectWorkflowService = projectWorkflowService;
     }
 
     @Override
-    public long createConnectedUserProjectWorkflowConnection(
-        long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO) {
-
+    public long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO) {
         long connectionId = connectionFacade.create(connectionDTO, PlatformType.EMBEDDED);
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectedUserConnectedUserProject(
-            connectedUserId);
-
-        ProjectWorkflow projectWorkflow = projectWorkflowService.getLastProjectWorkflow(
-            connectedUserProject.getProjectId(), workflowUuid);
-
-        connectedUserProjectWorkflowService.addConnection(
-            connectedUserProject.getId(), projectWorkflow.getId(), connectionId);
+        connectedUserConnectionService.create(connectedUserId, connectionId);
 
         return connectionId;
     }
@@ -83,9 +63,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, String componentName, List<Long> connectionIds) {
 
-        List<Long> allConnectionIds = new ArrayList<>();
-
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        Set<Long> allConnectionIds = new LinkedHashSet<>();
 
         allConnectionIds.addAll(
             integrationInstanceService
@@ -94,28 +74,10 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
                 .map(IntegrationInstance::getConnectionId)
                 .toList());
 
-        ConnectedUserProject connectedUserProject = connectedUserProjectService.getConnectUserProject(
-            connectedUser.getExternalId(), connectedUser.getEnvironment());
+        allConnectionIds.addAll(connectedUserConnectionService.getConnectionIds(connectedUser.getId()));
+        allConnectionIds.addAll(connectionIds);
 
-        List<ConnectedUserProjectWorkflow> connectedUserProjectWorkflows = connectedUserProjectWorkflowService
-            .getConnectedUserProjectWorkflows(connectedUserProject.getId());
-
-        allConnectionIds.addAll(
-            connectedUserProjectWorkflows.stream()
-                .flatMap(connectedUserProjectWorkflow -> CollectionUtils.stream(
-                    connectedUserProjectWorkflow.getConnections()))
-                .map(ConnectedUserProjectWorkflowConnection::getConnectionId)
-                .toList());
-
-        List<ConnectionDTO> connectionDTOs = new ArrayList<>(
-            connectionFacade.getConnections(allConnectionIds, PlatformType.EMBEDDED));
-
-        connectionDTOs.addAll(
-            connectionIds.stream()
-                .map(connectionFacade::getConnection)
-                .toList());
-
-        return connectionDTOs
+        return connectionFacade.getConnections(new ArrayList<>(allConnectionIds), PlatformType.EMBEDDED)
             .stream()
             .filter(connectionDTO -> componentName.equals(connectionDTO.componentName()))
             .toList();

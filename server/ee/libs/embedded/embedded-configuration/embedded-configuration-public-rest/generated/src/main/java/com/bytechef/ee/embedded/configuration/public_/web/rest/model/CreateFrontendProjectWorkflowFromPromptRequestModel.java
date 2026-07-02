@@ -21,10 +21,12 @@ import jakarta.annotation.Generated;
  */
 
 @JsonTypeName("createFrontendProjectWorkflowFromPrompt_request")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:24.564853+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-02T07:47:45.088419+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class CreateFrontendProjectWorkflowFromPromptRequestModel {
 
   private String prompt;
+
+  private @Nullable String systemPrompt;
 
   public CreateFrontendProjectWorkflowFromPromptRequestModel() {
     super();
@@ -58,6 +60,27 @@ public class CreateFrontendProjectWorkflowFromPromptRequestModel {
     this.prompt = prompt;
   }
 
+  public CreateFrontendProjectWorkflowFromPromptRequestModel systemPrompt(@Nullable String systemPrompt) {
+    this.systemPrompt = systemPrompt;
+    return this;
+  }
+
+  /**
+   * Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt.
+   * @return systemPrompt
+   */
+  
+  @Schema(name = "systemPrompt", description = "Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("systemPrompt")
+  public @Nullable String getSystemPrompt() {
+    return systemPrompt;
+  }
+
+  @JsonProperty("systemPrompt")
+  public void setSystemPrompt(@Nullable String systemPrompt) {
+    this.systemPrompt = systemPrompt;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -67,12 +90,13 @@ public class CreateFrontendProjectWorkflowFromPromptRequestModel {
       return false;
     }
     CreateFrontendProjectWorkflowFromPromptRequestModel createFrontendProjectWorkflowFromPromptRequest = (CreateFrontendProjectWorkflowFromPromptRequestModel) o;
-    return Objects.equals(this.prompt, createFrontendProjectWorkflowFromPromptRequest.prompt);
+    return Objects.equals(this.prompt, createFrontendProjectWorkflowFromPromptRequest.prompt) &&
+        Objects.equals(this.systemPrompt, createFrontendProjectWorkflowFromPromptRequest.systemPrompt);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(prompt);
+    return Objects.hash(prompt, systemPrompt);
   }
 
   @Override
@@ -80,6 +104,7 @@ public class CreateFrontendProjectWorkflowFromPromptRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class CreateFrontendProjectWorkflowFromPromptRequestModel {\n");
     sb.append("    prompt: ").append(toIndentedString(prompt)).append("\n");
+    sb.append("    systemPrompt: ").append(toIndentedString(systemPrompt)).append("\n");
     sb.append("}");
     return sb.toString();
   }

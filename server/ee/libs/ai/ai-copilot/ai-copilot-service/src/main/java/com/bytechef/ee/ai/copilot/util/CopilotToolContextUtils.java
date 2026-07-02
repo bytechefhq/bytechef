@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.util;
 import com.agui.core.state.State;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
@@ -42,11 +43,11 @@ public final class CopilotToolContextUtils {
             toolContext.put(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY, allowedComponentNames);
         }
 
-        Long workspaceId = NumberUtils.asLong(state.get(CopilotStateKeys.WORKSPACE_ID));
-        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
-        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
-        String tenantId = StringUtils.asString(state.get(CopilotStateKeys.STATE_TENANT_ID));
-        Authentication authentication = state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication value
+        Long workspaceId = NumberUtils.asLong(state.get(CopilotConstants.STATE_WORKSPACE_ID));
+        Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
+        String tenantId = StringUtils.asString(state.get(CopilotConstants.STATE_TENANT_ID));
+        Authentication authentication = state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication value
             ? value : null;
 
         // An embedded run carries a connected-user Authentication (no backing platform user) and is authorized by the
