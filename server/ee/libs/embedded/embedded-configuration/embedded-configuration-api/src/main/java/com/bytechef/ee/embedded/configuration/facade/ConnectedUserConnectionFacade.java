@@ -17,8 +17,7 @@ import java.util.List;
  */
 public interface ConnectedUserConnectionFacade {
 
-    long createConnectedUserProjectWorkflowConnection(
-        long connectedUserId, String workflowUuid, ConnectionDTO connectionDTO);
+    long createConnectedUserConnection(long connectedUserId, ConnectionDTO connectionDTO);
 
     List<ConnectionDTO> getConnections(Long connectedUserId, String componentName, List<Long> connectionIds);
 }
