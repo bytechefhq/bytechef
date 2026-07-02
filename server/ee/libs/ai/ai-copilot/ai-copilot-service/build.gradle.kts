@@ -100,6 +100,7 @@ dependencies {
     implementation("com.openai:openai-java-client-okhttp")
     implementation("org.apache.commons:commons-lang3")
     implementation("org.springframework.ai:spring-ai-commons")
+    implementation("org.springframework.ai:spring-ai-ollama")
     implementation("org.springframework.ai:spring-ai-openai")
     implementation("org.springframework.ai:spring-ai-pgvector-store")
     implementation("org.springframework.ai:spring-ai-autoconfigure-vector-store-pgvector")

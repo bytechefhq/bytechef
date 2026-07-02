@@ -23,6 +23,9 @@ bytechef:
             reasoning-effect: medium
             verbosity: low
       embedding:
+        ollama:
+          options:
+            model: qwen3-embedding:8b
         openai:
           options:
             model: text-embedding-3-small

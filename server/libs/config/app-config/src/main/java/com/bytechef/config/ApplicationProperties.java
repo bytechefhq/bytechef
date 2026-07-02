@@ -845,8 +845,8 @@ public class ApplicationProperties {
                  */
                 public static class Embedding {
 
-                    enum Provider {
-                        OPENAI
+                    public enum Provider {
+                        OLLAMA, OPENAI
                     }
 
                     /**
@@ -1817,9 +1817,22 @@ public class ApplicationProperties {
             public static class Embedding {
 
                 /**
+                 * Ollama embedding model configuration
+                 */
+                private Ollama ollama = new Ollama();
+
+                /**
                  * OpenAI embedding model configuration
                  */
                 private OpenAi openAi = new OpenAi();
+
+                public Ollama getOllama() {
+                    return ollama;
+                }
+
+                public void setOllama(Ollama ollama) {
+                    this.ollama = ollama;
+                }
 
                 public OpenAi getOpenAi() {
                     return openAi;
@@ -1827,6 +1840,44 @@ public class ApplicationProperties {
 
                 public void setOpenAi(OpenAi openAi) {
                     this.openAi = openAi;
+                }
+
+                /**
+                 * Ollama embedding model configuration.
+                 */
+                public static class Ollama {
+
+                    /**
+                     * Embedding model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Ollama embedding model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Embedding model name (e.g., qwen3-embedding:8b)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
                 }
 
                 /**

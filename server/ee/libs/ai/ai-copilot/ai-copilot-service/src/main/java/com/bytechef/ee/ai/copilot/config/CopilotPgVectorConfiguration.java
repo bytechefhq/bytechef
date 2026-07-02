@@ -17,12 +17,16 @@
 package com.bytechef.ee.ai.copilot.config;
 
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Ai.Copilot.Docs.Embedding.Provider;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.BatchingStrategy;
 import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
 import org.springframework.ai.vectorstore.VectorStore;
@@ -60,7 +64,7 @@ public class CopilotPgVectorConfiguration {
     }
 
     @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.docs.embedding", name = "api-key")
+    @ConditionalOnProperty(prefix = "bytechef.ai.copilot.docs.embedding", name = "provider")
     public VectorStore copilotDocsLoaderVectorStore(
         @Qualifier("pgVectorJdbcTemplate") JdbcTemplate pgVectorJdbcTemplate,
         PgVectorStoreProperties properties, ObjectProvider<ObservationRegistry> observationRegistry,
@@ -98,10 +102,29 @@ public class CopilotPgVectorConfiguration {
     private static EmbeddingModel copilotDocsEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai ai = applicationProperties.getAi();
 
-        String apiKey = ai.getCopilot()
+        ApplicationProperties.Ai.Copilot.Docs.Embedding embedding = ai.getCopilot()
             .getDocs()
-            .getEmbedding()
-            .getApiKey();
+            .getEmbedding();
+
+        if (embedding.getProvider() == Provider.OLLAMA) {
+            String model = ai.getProvider()
+                .getEmbedding()
+                .getOllama()
+                .getOptions()
+                .getModel();
+
+            return OllamaEmbeddingModel.builder()
+                .ollamaApi(
+                    OllamaApi.builder()
+                        .build())
+                .options(
+                    OllamaEmbeddingOptions.builder()
+                        .model(model)
+                        .build())
+                .build();
+        }
+
+        String apiKey = embedding.getApiKey();
         String model = ai.getProvider()
             .getEmbedding()
             .getOpenAi()

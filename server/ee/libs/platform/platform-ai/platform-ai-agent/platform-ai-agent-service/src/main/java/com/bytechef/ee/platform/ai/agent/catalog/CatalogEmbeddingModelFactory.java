@@ -10,6 +10,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
+import com.bytechef.component.ai.llm.ollama.cluster.OllamaEmbedding;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.llm.Provider;
@@ -48,11 +49,8 @@ public class CatalogEmbeddingModelFactory {
     }
 
     private static @Nullable EmbeddingFunction resolveFactory(Provider provider) {
-        if (!provider.isEmbeddingSupported()) {
-            return null;
-        }
-
         return switch (provider) {
+            case OLLAMA -> OllamaEmbedding.EMBEDDING_MODEL;
             case OPEN_AI -> OpenAiEmbedding.EMBEDDING_MODEL;
             default -> null;
         };
