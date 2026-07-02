@@ -318,7 +318,7 @@ function App() {
 
             <Toaster />
 
-            {ff_2396 && (
+            {ff_2396 && searchOpen && (
                 <Suspense fallback={null}>
                     <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
                 </Suspense>
