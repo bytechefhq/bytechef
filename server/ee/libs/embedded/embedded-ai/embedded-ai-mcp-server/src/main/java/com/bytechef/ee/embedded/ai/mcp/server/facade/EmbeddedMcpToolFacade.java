@@ -60,7 +60,6 @@ import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.JobExecutionErrors;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -373,7 +372,7 @@ public class EmbeddedMcpToolFacade extends AbstractToolFacade {
                 new JobParametersDTO(integrationInstanceConfigurationWorkflow.getWorkflowId(), inputs),
                 integrationInstanceId, PlatformType.EMBEDDED);
 
-            Job job = jobCompletionAwaiter.await(jobId, Duration.ofSeconds(300))
+            Job job = jobCompletionAwaiter.await(jobId, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT)
                 .join();
 
             JobExecutionErrors.checkForError(job, taskExecutionService);

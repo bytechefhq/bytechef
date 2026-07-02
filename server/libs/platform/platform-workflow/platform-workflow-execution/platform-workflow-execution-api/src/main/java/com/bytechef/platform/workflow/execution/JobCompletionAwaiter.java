@@ -30,6 +30,13 @@ import java.util.concurrent.CompletableFuture;
 public interface JobCompletionAwaiter {
 
     /**
+     * Default maximum wait for a synchronous, request-scoped job — webhook sync execution and MCP tool invocation —
+     * before {@link #await(long, Duration)} times out. Shared by all synchronous callers so the bound cannot drift
+     * between paths.
+     */
+    Duration DEFAULT_SYNC_TIMEOUT = Duration.ofSeconds(300);
+
+    /**
      * Returns a future that completes with the job once it reaches a terminal status ({@code COMPLETED},
      * {@code FAILED}, or {@code STOPPED}; suspend maps to {@code STOPPED}). Completes exceptionally with
      * {@link java.util.concurrent.TimeoutException} if {@code timeout} elapses first.

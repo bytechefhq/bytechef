@@ -27,7 +27,6 @@ import com.bytechef.platform.webhook.executor.WebhookWorkflowSyncExecutor;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
-import java.time.Duration;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -37,8 +36,6 @@ import org.springframework.context.annotation.Configuration;
  */
 @Configuration
 public class WebhookConfiguration {
-
-    private static final Duration SYNC_EXECUTION_TIMEOUT = Duration.ofSeconds(300);
 
     @Bean
     SseStreamBridgeRegistry sseStreamBridgeRegistry() {
@@ -56,6 +53,6 @@ public class WebhookConfiguration {
         return new WebhookWorkflowExecutorImpl(
             eventPublisher, jobCompletionAwaiter, jobPrincipalAccessorRegistry, principalJobFacade,
             sseStreamBridgeRegistry, taskExecutionService, durableTaskFileStorage, triggerDefinitionService,
-            triggerSyncExecutor, workflowService, SYNC_EXECUTION_TIMEOUT);
+            triggerSyncExecutor, workflowService, JobCompletionAwaiter.DEFAULT_SYNC_TIMEOUT);
     }
 }
