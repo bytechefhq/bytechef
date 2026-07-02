@@ -104,9 +104,7 @@ public class ConnectedUserCopilotApiController {
             stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
         }
 
-        stateMap.remove(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
-
-        Object additionalSystemPromptValue = stateMap.remove("additionalSystemPrompt");
+        Object additionalSystemPromptValue = stateMap.remove(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
 
         if (additionalSystemPromptValue instanceof String additionalSystemPrompt && !additionalSystemPrompt.isBlank()) {
             String trimmed = additionalSystemPrompt.strip();
