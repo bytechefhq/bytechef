@@ -2743,8 +2743,8 @@ class WorkflowValidatorTest {
     }
 
     @Test
-    void validateWorkflowStructureMultipleTriggersAddsError() {
-        String invalidWorkflow = """
+    void validateWorkflowStructureMultipleTriggersAllowed() {
+        String workflow = """
             {
                 "label": "workflowName",
                 "description": "workflowDescription",
@@ -2767,9 +2767,9 @@ class WorkflowValidatorTest {
 
         StringBuilder errors = new StringBuilder();
 
-        WorkflowValidator.validateWorkflowStructure(invalidWorkflow, errors);
+        WorkflowValidator.validateWorkflowStructure(workflow, errors);
 
-        assertEquals("Field 'triggers' must contain one or less objects", errors.toString());
+        assertEquals("", errors.toString());
     }
 
     @Test
