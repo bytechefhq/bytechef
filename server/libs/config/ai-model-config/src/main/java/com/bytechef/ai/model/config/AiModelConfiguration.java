@@ -22,8 +22,13 @@ import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
 import java.time.Duration;
 import org.springframework.ai.document.MetadataMode;
+import org.springframework.ai.embedding.EmbeddingModel;
+import org.springframework.ai.ollama.OllamaEmbeddingModel;
+import org.springframework.ai.ollama.api.OllamaApi;
+import org.springframework.ai.ollama.api.OllamaEmbeddingOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -32,6 +37,7 @@ import org.springframework.context.annotation.Configuration;
  * @author Ivica Cardic
  */
 @Configuration
+@ConditionalOnCEVersion
 class AiModelConfiguration {
 
     private final String openAiApiKey;
@@ -45,7 +51,6 @@ class AiModelConfiguration {
     }
 
     @Bean
-    @ConditionalOnCEVersion
     @ConditionalOnProperty(prefix = "bytechef.ai.provider.openai", name = "api-key")
     OpenAiEmbeddingModel openAiEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai.Provider.Embedding.OpenAi.Options options = applicationProperties.getAi()
@@ -63,5 +68,26 @@ class AiModelConfiguration {
             OpenAiEmbeddingOptions.builder()
                 .model(options.getModel())
                 .build());
+    }
+
+    @Bean
+    @ConditionalOnMissingBean(EmbeddingModel.class)
+    @ConditionalOnProperty(prefix = "bytechef.ai.provider.embedding.ollama.options", name = "model")
+    OllamaEmbeddingModel ollamaEmbeddingModel(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Ai.Provider.Embedding.Ollama.Options options = applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
+            .getOllama()
+            .getOptions();
+
+        return OllamaEmbeddingModel.builder()
+            .ollamaApi(
+                OllamaApi.builder()
+                    .build())
+            .options(
+                OllamaEmbeddingOptions.builder()
+                    .model(options.getModel())
+                    .build())
+            .build();
     }
 }

@@ -46,6 +46,10 @@ public enum Provider {
     DEEPSEEK(17, "deepseek", "ai.provider.deepseek", "DeepSeek"),
     OLLAMA(18, "ollama", "ai.provider.ollama", "Ollama");
 
+    public static final Set<Provider> EMBEDDING_PROVIDERS = EnumSet.of(
+        OLLAMA,
+        OPEN_AI);
+
     public static final Set<Provider> CHAT_PROVIDERS = EnumSet.of(
         ANTHROPIC,
         DEEPSEEK,
@@ -56,8 +60,6 @@ public enum Provider {
         OPEN_AI,
         PERPLEXITY,
         VERTEX_GEMINI);
-
-    private static final Set<Provider> EMBEDDING_SUPPORTED_PROVIDERS = Set.of(OPEN_AI);
 
     private final int id;
     private final String label;
@@ -72,7 +74,7 @@ public enum Provider {
     }
 
     public boolean isEmbeddingSupported() {
-        return EMBEDDING_SUPPORTED_PROVIDERS.contains(this);
+        return EMBEDDING_PROVIDERS.contains(this);
     }
 
     public int getId() {

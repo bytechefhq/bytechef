@@ -55,7 +55,7 @@ class AiProviderFacadeTest {
     }
 
     @Test
-    void testOnlyOpenAiSupportsEmbeddings() {
+    void testEmbeddingProvidersSupportEmbeddings() {
         List<ComponentDefinition> componentDefinitions = buildComponentDefinitionsForAllProviders();
 
         when(componentDefinitionService.getComponentDefinitions()).thenReturn(componentDefinitions);
@@ -68,15 +68,16 @@ class AiProviderFacadeTest {
 
         List<AiProviderDTO> providers = facade.getAiProviders(ENVIRONMENT);
 
-        AiProviderDTO openAi = providers.stream()
-            .filter(provider -> provider.id() == Provider.OPEN_AI.getId())
-            .findFirst()
-            .orElseThrow();
+        for (AiProviderDTO provider : providers) {
+            Provider matchingProvider = Arrays.stream(Provider.values())
+                .filter(curProvider -> curProvider.getId() == provider.id())
+                .findFirst()
+                .orElseThrow();
 
-        assertThat(openAi.supportsEmbeddings()).isTrue();
-        assertThat(providers.stream()
-            .filter(provider -> provider.id() != Provider.OPEN_AI.getId())
-            .allMatch(provider -> !provider.supportsEmbeddings())).isTrue();
+            assertThat(provider.supportsEmbeddings())
+                .as("Provider %s supports embeddings iff in Provider.EMBEDDING_PROVIDERS", matchingProvider)
+                .isEqualTo(Provider.EMBEDDING_PROVIDERS.contains(matchingProvider));
+        }
     }
 
     private List<ComponentDefinition> buildComponentDefinitionsForAllProviders() {
