@@ -57,6 +57,7 @@ public class ZenRowsScrapeUrlAutoparseAction {
                     "Enable JavaScript rendering with a headless browser. Essential for modern web apps, SPAs, and " +
                         "sites with dynamic content.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url-autoparse")
         .output(
             outputSchema(
                 string()

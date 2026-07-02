@@ -66,6 +66,7 @@ public class ZenRowsScrapeUrlWithCssSelectorAction {
                                 .label("Value")
                                 .description("CSS selector that will be scraped.")
                                 .required(true))))
+        .help("", "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url-with-css-selectors")
         .output(
             outputSchema(
                 string()

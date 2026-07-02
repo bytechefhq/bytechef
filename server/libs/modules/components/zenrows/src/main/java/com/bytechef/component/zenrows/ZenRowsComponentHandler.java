@@ -22,7 +22,7 @@ import static com.bytechef.component.definition.ComponentDsl.tool;
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
-import com.bytechef.component.zenrows.action.ZenRowScrapeUrlAction;
+import com.bytechef.component.zenrows.action.ZenRowsScrapeUrlAction;
 import com.bytechef.component.zenrows.action.ZenRowsScrapeUrlAutoparseAction;
 import com.bytechef.component.zenrows.action.ZenRowsScrapeUrlWithCssSelectorAction;
 import com.bytechef.component.zenrows.connection.ZenRowsConnection;
@@ -36,18 +36,21 @@ public class ZenRowsComponentHandler implements ComponentHandler {
 
     private static final ComponentDefinition COMPONENT_DEFINITION = component("zenrows")
         .title("ZenRows")
+        .version(1)
         .description(
             "ZenRows is a web scraping service with an advanced toolkit and APIs that simplify data extraction from " +
                 "bot-protected websites.")
         .icon("path:assets/zenrows.svg")
         .categories(ComponentCategory.ANALYTICS)
         .connection(ZenRowsConnection.CONNECTION_DEFINITION)
+        .customAction(true)
+        .customActionHelp("", "https://docs.zenrows.com/first-steps/welcome")
         .actions(
-            ZenRowScrapeUrlAction.ACTION_DEFINITION,
+            ZenRowsScrapeUrlAction.ACTION_DEFINITION,
             ZenRowsScrapeUrlAutoparseAction.ACTION_DEFINITION,
             ZenRowsScrapeUrlWithCssSelectorAction.ACTION_DEFINITION)
         .clusterElements(
-            tool(ZenRowScrapeUrlAction.ACTION_DEFINITION),
+            tool(ZenRowsScrapeUrlAction.ACTION_DEFINITION),
             tool(ZenRowsScrapeUrlAutoparseAction.ACTION_DEFINITION),
             tool(ZenRowsScrapeUrlWithCssSelectorAction.ACTION_DEFINITION));
 

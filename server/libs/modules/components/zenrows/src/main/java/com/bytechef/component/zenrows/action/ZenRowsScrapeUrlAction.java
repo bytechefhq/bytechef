@@ -34,7 +34,7 @@ import com.bytechef.component.definition.TypeReference;
 /**
  * @author Nikolina Spehar
  */
-public class ZenRowScrapeUrlAction {
+public class ZenRowsScrapeUrlAction {
 
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("scrapeUrl")
         .title("Scrape URL")
@@ -56,13 +56,14 @@ public class ZenRowScrapeUrlAction {
                     "Enable JavaScript rendering with a headless browser. Essential for modern web apps, SPAs, and " +
                         "sites with dynamic content.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/zenrows_v1#scrape-url")
         .output(
             outputSchema(
                 string()
                     .description("Scraped data.")))
-        .perform(ZenRowScrapeUrlAction::perform);
+        .perform(ZenRowsScrapeUrlAction::perform);
 
-    private ZenRowScrapeUrlAction() {
+    private ZenRowsScrapeUrlAction() {
     }
 
     public static String perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
