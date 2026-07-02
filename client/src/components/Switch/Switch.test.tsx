@@ -51,44 +51,47 @@ describe('Switch - Variants', () => {
         render(<Switch checked={false} variant="default" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-5');
-        expect(switchElement).toHaveClass('w-9');
+        expect(switchElement).toHaveAttribute('data-size', 'default');
+        expect(switchElement).toHaveClass('data-[size=default]:h-5');
+        expect(switchElement).toHaveClass('data-[size=default]:w-9');
         expect(switchElement).toHaveClass('px-0.5');
         expect(switchElement).toHaveClass('rounded-full');
         expect(switchElement).toHaveClass('border-0');
     });
 
-    it('should render default variant with correct thumb sizing via arbitrary variants', () => {
+    it('should render default variant with default thumb size', () => {
         render(<Switch checked={false} variant="default" />);
 
+        // The shadcn thumb sizes itself from the parent switch data-size attribute.
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('[&>span]:size-4');
+        expect(switchElement).toHaveAttribute('data-size', 'default');
     });
 
     it('should render small variant with correct track dimensions', () => {
         render(<Switch checked={false} variant="small" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-[14px]');
-        expect(switchElement).toHaveClass('w-[26px]');
+        expect(switchElement).toHaveAttribute('data-size', 'sm');
         expect(switchElement).toHaveClass('px-px');
         expect(switchElement).toHaveClass('rounded-[7px]');
         expect(switchElement).toHaveClass('border-0');
     });
 
-    it('should render small variant with correct thumb sizing via arbitrary variants', () => {
+    it('should render small variant with small thumb size', () => {
         render(<Switch checked={false} variant="small" />);
 
+        // The shadcn thumb sizes itself from the parent switch data-size attribute.
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('[&>span]:size-3');
+        expect(switchElement).toHaveAttribute('data-size', 'sm');
     });
 
     it('should render box variant with correct track dimensions', () => {
         render(<Switch checked={false} variant="box" />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement).toHaveClass('h-5');
-        expect(switchElement).toHaveClass('w-9');
+        expect(switchElement).toHaveAttribute('data-size', 'default');
+        expect(switchElement).toHaveClass('data-[size=default]:h-5');
+        expect(switchElement).toHaveClass('data-[size=default]:w-9');
         expect(switchElement).toHaveClass('px-0.5');
         expect(switchElement).toHaveClass('rounded-full');
         expect(switchElement).toHaveClass('border-0');
@@ -193,7 +196,7 @@ describe('Switch - States', () => {
         render(<Switch checked={false} />);
 
         const switchElement = screen.getByRole('switch');
-        expect(switchElement.className).toMatch(/\[&>span\]:bg-surface-neutral-primary/);
+        expect(switchElement.className).toMatch(/\[&_\[data-slot=switch-thumb\]\]:bg-surface-neutral-primary/);
     });
 
     it('should override shadcn thumb shadow-sm with shadow-none', () => {
@@ -322,7 +325,7 @@ describe('Switch - className prop', () => {
 
         const switchElement = screen.getByRole('switch');
         expect(switchElement).toHaveClass('bg-red-500');
-        expect(switchElement).toHaveClass('h-[14px]');
+        expect(switchElement).toHaveAttribute('data-size', 'sm');
         expect(switchElement).toHaveClass('rounded-[7px]');
     });
 });
@@ -412,8 +415,7 @@ describe('Switch - Combined Props', () => {
         expect(screen.getByText('Small Switch')).toBeInTheDocument();
         expect(screen.getByText('Small Switch')).toHaveClass('text-xs');
         expect(screen.getByText('Small Switch')).toHaveClass('leading-4');
-        expect(screen.getByRole('switch')).toHaveClass('h-[14px]');
-        expect(screen.getByRole('switch')).toHaveClass('w-[26px]');
+        expect(screen.getByRole('switch')).toHaveAttribute('data-size', 'sm');
     });
 });
 

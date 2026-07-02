@@ -25,19 +25,19 @@ type AlignmentType = 'start' | 'end';
 
 type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 
-const variantConfig: Record<VariantType, {track: string; thumbOverrides: string}> = {
+const variantSizeConfig: Record<VariantType, {size: 'sm' | 'default'; track: string}> = {
     default: {
-        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-[12.8px]',
-        track: 'h-5 w-9 px-0.5 rounded-full border-0',
+        size: 'default',
+        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0',
     },
     // eslint-disable-next-line sort-keys
     box: {
-        thumbOverrides: '[&>span]:size-4 data-[state=checked]:[&>span]:translate-x-[12.8px]',
-        track: 'h-5 w-9 px-0.5 rounded-full border-0',
+        size: 'default',
+        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0',
     },
     small: {
-        thumbOverrides: '[&>span]:size-3 data-[state=checked]:[&>span]:translate-x-3',
-        track: 'h-[14px] w-[26px] px-px rounded-[7px] border-0',
+        size: 'sm',
+        track: 'px-px rounded-[7px] border-0',
     },
 };
 
@@ -90,15 +90,14 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
         },
         ref
     ) => {
-        const config = variantConfig[variant];
+        const config = variantSizeConfig[variant];
 
         const switchClasses = twMerge(
             config.track,
-            config.thumbOverrides,
             'shadow-none [&_.shadow-lg]:shadow-none',
             'data-[state=checked]:bg-surface-brand-primary data-[state=unchecked]:bg-surface-neutral-tertiary',
             'focus-visible:ring-2 focus-visible:ring-stroke-brand-focus focus-visible:ring-offset-0',
-            '[&>span]:bg-surface-neutral-primary',
+            '[&_[data-slot=switch-thumb]]:bg-surface-neutral-primary',
             className
         );
 
@@ -112,6 +111,7 @@ const Switch = forwardRef<ComponentRef<typeof ShadcnSwitch>, SwitchPropsType>(
                 id={id}
                 onCheckedChange={onCheckedChange}
                 ref={ref}
+                size={config.size}
                 {...props}
             />
         );
