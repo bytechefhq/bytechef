@@ -35,6 +35,7 @@ import com.bytechef.ee.embedded.configuration.domain.Integration;
 import com.bytechef.ee.embedded.configuration.domain.IntegrationInstanceConfiguration;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectWorkflowService;
 import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceConfigurationService;
@@ -387,6 +388,19 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(externalUserId, environment);
 
         return getConnectedUserProjects(connectedUser.getId(), environment);
+    }
+
+    @Override
+    public CopilotChatContextDTO prepareCopilotChat(
+        String externalUserId, String workflowUuid, Environment environment) {
+
+        getConnectedUserProjectWorkflow(externalUserId, workflowUuid, (long) environment.ordinal());
+
+        String workflowId = projectWorkflowService.getLastWorkflowId(workflowUuid);
+
+        Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
+
+        return new CopilotChatContextDTO(workflowId, allowedComponentNames);
     }
 
     @Override
