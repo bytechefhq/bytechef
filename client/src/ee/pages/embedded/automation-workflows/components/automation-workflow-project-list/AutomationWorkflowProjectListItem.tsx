@@ -258,6 +258,7 @@ const AutomationWorkflowProjectListItem = ({
 
                                         event.stopPropagation();
                                     }}
+                                    variant="destructive"
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>

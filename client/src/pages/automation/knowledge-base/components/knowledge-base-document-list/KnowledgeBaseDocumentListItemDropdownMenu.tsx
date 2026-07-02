@@ -37,6 +37,7 @@ const KnowledgeBaseDocumentListItemDropdownMenu = ({documentId}: KnowledgeBaseDo
 
                         handleDelete();
                     }}
+                    variant="destructive"
                 >
                     <Trash2Icon /> Delete
                 </DropdownMenuItem>

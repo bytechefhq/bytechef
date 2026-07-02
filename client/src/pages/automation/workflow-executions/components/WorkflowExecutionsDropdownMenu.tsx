@@ -62,6 +62,7 @@ const WorkflowExecutionsDropdownMenu = ({execution}: {execution: WorkflowExecuti
                     className="dropdown-menu-item-destructive"
                     disabled={disabled}
                     onClick={handleStopWorkflowExecutionClick}
+                    variant="destructive"
                 >
                     <CircleStopIcon /> Stop
                 </DropdownMenuItem>

@@ -367,9 +367,7 @@ const ConnectionTabConnectionSelect = ({
                         {!connectionDialogAllowed && !componentConnections?.length && <p>No connections available.</p>}
                     </div>
 
-                    <SelectContent
-                        className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0"
-                    >
+                    <SelectContent className="w-(--radix-select-trigger-width) max-w-(--radix-select-trigger-width) min-w-0">
                         {componentConnections &&
                             componentConnections.map((connection) => (
                                 <SelectItem

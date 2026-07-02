@@ -151,6 +151,7 @@ const IntegrationWorkflowListItem = ({
                             onClick={() => {
                                 setShowDeleteDialog(true);
                             }}
+                            variant="destructive"
                         >
                             <Trash2Icon /> Delete
                         </DropdownMenuItem>

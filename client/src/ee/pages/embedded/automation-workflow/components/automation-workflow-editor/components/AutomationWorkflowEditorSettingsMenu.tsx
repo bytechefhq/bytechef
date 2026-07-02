@@ -113,6 +113,7 @@ const AutomationWorkflowEditorSettingsMenu = ({
                                 setOpen(false);
                                 onDeleteWorkflowClick();
                             }}
+                            variant="destructive"
                         >
                             <Trash2Icon className="mr-2 size-4" />
                             Delete
@@ -172,6 +173,7 @@ const AutomationWorkflowEditorSettingsMenu = ({
                                 setOpen(false);
                                 onDeleteProjectClick();
                             }}
+                            variant="destructive"
                         >
                             <Trash2Icon className="mr-2 size-4" />
                             Delete

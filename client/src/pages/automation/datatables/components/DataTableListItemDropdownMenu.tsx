@@ -42,7 +42,11 @@ const DataTableListItemDropdownMenu = ({baseName, dataTableId}: DataTableListIte
 
                 <DropdownMenuSeparator className="m-0" />
 
-                <DropdownMenuItem className="dropdown-menu-item-destructive" onClick={handleDeleteClick}>
+                <DropdownMenuItem
+                    className="dropdown-menu-item-destructive"
+                    onClick={handleDeleteClick}
+                    variant="destructive"
+                >
                     <Trash2Icon /> Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
