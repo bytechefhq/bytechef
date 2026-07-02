@@ -11,7 +11,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.llm.Provider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,10 +22,12 @@ import org.junit.jupiter.api.Test;
  */
 class CatalogChatClientResolverTest {
 
+    private static final String OPEN_AI_KEY = Provider.OPEN_AI.getKey();
+
     private final CatalogChatModelFactory catalogChatModelFactory = mock(CatalogChatModelFactory.class);
-    private final ProviderApiKeyResolver providerApiKeyResolver = mock(ProviderApiKeyResolver.class);
+    private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogChatClientResolver resolver =
-        new CatalogChatClientResolverImpl(catalogChatModelFactory, providerApiKeyResolver);
+        new CatalogChatClientResolverImpl(catalogChatModelFactory, aiProviderFacade);
 
     @Test
     void testResolveReturnsNullForUnknownProviderKey() {
@@ -33,34 +36,34 @@ class CatalogChatClientResolverTest {
 
     @Test
     void testResolveReturnsNullForOutOfRangeEnvironment() {
-        // The range check short-circuits before any providerApiKeyResolver lookup, so no stubbing is needed (and a
-        // forged or out-of-range ordinal can never drive platform-API-key selection — fail closed).
-        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 99)).isNull();
-        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", -1)).isNull();
+        // The range check short-circuits before any API-key lookup, so no stubbing is needed (and a forged or
+        // out-of-range ordinal can never drive platform-API-key selection — fail closed).
+        assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 99)).isNull();
+        assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", -1)).isNull();
     }
 
     @Test
-    void testResolveReturnsNullWhenResolverReturnsNull() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn(null);
+    void testResolveReturnsNullWhenNoApiKey() {
+        when(aiProviderFacade.getApiKey(OPEN_AI_KEY, 1)).thenReturn(null);
 
-        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNull();
+        assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 1)).isNull();
     }
 
     @Test
-    void testResolveBuildsClientWhenResolverReturnsKey() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn("sk-test");
+    void testResolveBuildsClientWhenApiKeyResolves() {
+        when(aiProviderFacade.getApiKey(OPEN_AI_KEY, 1)).thenReturn("sk-test");
         when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
-        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNotNull();
+        assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 1)).isNotNull();
     }
 
     @Test
-    void testResolveBuildsClientWhenResolverReturnsFallbackKey() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 1)).thenReturn("sk-config");
+    void testResolveBuildsClientWhenApiKeyIsConfigFallback() {
+        when(aiProviderFacade.getApiKey(OPEN_AI_KEY, 1)).thenReturn("sk-config");
         when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config"))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
-        assertThat(resolver.resolve("ai.provider.openAi", "gpt-4o", 1)).isNotNull();
+        assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 1)).isNotNull();
     }
 }

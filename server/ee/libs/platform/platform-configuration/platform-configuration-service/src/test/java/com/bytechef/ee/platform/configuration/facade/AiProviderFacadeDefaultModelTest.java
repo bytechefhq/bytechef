@@ -15,11 +15,15 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.configuration.dto.AiDefaultModelDTO;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
+import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -126,6 +130,122 @@ class AiProviderFacadeDefaultModelTest {
         AiDefaultModelDTO result = facade.getAiDefaultChatModel(ENVIRONMENT);
 
         assertThat(result).isNull();
+    }
+
+    @Test
+    void testReturnsOpenAiEmbeddingModelWhenEnabled() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .getApiKey()).thenReturn("sk-openai");
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
+            .getOpenAi()
+            .getOptions()
+            .getModel()).thenReturn("text-embedding-3-small");
+
+        AiDefaultModelDTO result = facade.getAiDefaultEmbeddingModel(ENVIRONMENT);
+
+        assertThat(result).isNotNull();
+        assertThat(result.provider()).isEqualTo("ai.provider.openAi");
+        assertThat(result.model()).isEqualTo("text-embedding-3-small");
+    }
+
+    @Test
+    void testReturnsNullEmbeddingModelWhenNoProviderEnabled() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        AiDefaultModelDTO result = facade.getAiDefaultEmbeddingModel(ENVIRONMENT);
+
+        assertThat(result).isNull();
+    }
+
+    @Test
+    void testGetApiKeyReturnsStoredKeyWhenEnabled() {
+        Property property = mock(Property.class);
+
+        when(property.isEnabled()).thenReturn(true);
+        when(property.get("apiKey")).thenReturn("sk-stored");
+        when(propertyService.fetchProperty("ai.provider.openAi", Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.of(property));
+
+        String apiKey = facade.getApiKey("ai.provider.openAi", ENVIRONMENT);
+
+        assertThat(apiKey).isEqualTo("sk-stored");
+    }
+
+    @Test
+    void testGetApiKeyFallsBackToConfigKeyWhenNoStoredProperty() {
+        when(propertyService.fetchProperty("ai.provider.openAi", Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.empty());
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .getApiKey()).thenReturn("sk-openai");
+
+        String apiKey = facade.getApiKey("ai.provider.openAi", ENVIRONMENT);
+
+        assertThat(apiKey).isEqualTo("sk-openai");
+    }
+
+    @Test
+    void testReturnsChatModelApiKeyWhenActivated() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getAnthropic()
+            .getApiKey()).thenReturn("sk-anthropic");
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getChat()
+            .getAnthropic()
+            .getOptions()
+            .getModel()).thenReturn("claude-sonnet-4-6");
+        when(propertyService.fetchProperty("ai.provider.anthropic", Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.empty());
+
+        AiDefaultModelWithApiKeyDTO result = facade.getAiDefaultChatModelApiKey(ENVIRONMENT);
+
+        assertThat(result).isNotNull();
+        assertThat(result.provider()).isEqualTo(Provider.ANTHROPIC);
+        assertThat(result.model()).isEqualTo("claude-sonnet-4-6");
+        assertThat(result.apiKey()).isEqualTo("sk-anthropic");
+    }
+
+    @Test
+    void testReturnsNullChatModelApiKeyWhenNoProviderActivated() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        assertThat(facade.getAiDefaultChatModelApiKey(ENVIRONMENT)).isNull();
+    }
+
+    @Test
+    void testReturnsEmbeddingModelApiKeyWhenActivated() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .getApiKey()).thenReturn("sk-openai");
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
+            .getOpenAi()
+            .getOptions()
+            .getModel()).thenReturn("text-embedding-3-small");
+        when(propertyService.fetchProperty("ai.provider.openAi", Scope.PLATFORM, null, (long) ENVIRONMENT))
+            .thenReturn(Optional.empty());
+
+        AiDefaultModelWithApiKeyDTO result = facade.getAiDefaultEmbeddingModelApiKey(ENVIRONMENT);
+
+        assertThat(result).isNotNull();
+        assertThat(result.provider()).isEqualTo(Provider.OPEN_AI);
+        assertThat(result.model()).isEqualTo("text-embedding-3-small");
+        assertThat(result.apiKey()).isEqualTo("sk-openai");
     }
 
     private void stubProviderComponentsWithNoStoredProperties() {

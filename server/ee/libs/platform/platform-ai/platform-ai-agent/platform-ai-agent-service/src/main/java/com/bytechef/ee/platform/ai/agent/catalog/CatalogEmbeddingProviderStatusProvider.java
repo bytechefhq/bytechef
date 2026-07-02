@@ -7,16 +7,16 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.stereotype.Component;
 
 /**
- * EE {@link EmbeddingProviderStatusProvider}: embeddings are active for an environment when the OpenAI API key resolves
- * (from the activated provider property, falling back to static config) — the same predicate the runtime embedding
- * model uses.
+ * EE {@link EmbeddingProviderStatusProvider}: embeddings are active for an environment when a default embedding
+ * provider is activated and its API key resolves — the same predicate the runtime embedding model uses to build its
+ * delegate.
  *
  * @version ee
  *
@@ -26,17 +26,15 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CatalogEmbeddingProviderStatusProvider implements EmbeddingProviderStatusProvider {
 
-    private final ProviderApiKeyResolver providerApiKeyResolver;
+    private final AiProviderFacade aiProviderFacade;
 
     @SuppressFBWarnings("EI")
-    public CatalogEmbeddingProviderStatusProvider(ProviderApiKeyResolver providerApiKeyResolver) {
-        this.providerApiKeyResolver = providerApiKeyResolver;
+    public CatalogEmbeddingProviderStatusProvider(AiProviderFacade aiProviderFacade) {
+        this.aiProviderFacade = aiProviderFacade;
     }
 
     @Override
     public boolean isEmbeddingActive(int environment) {
-        String apiKey = providerApiKeyResolver.resolve(Provider.OPEN_AI, environment);
-
-        return apiKey != null && !apiKey.isBlank();
+        return aiProviderFacade.getAiDefaultEmbeddingModelApiKey(environment) != null;
     }
 }

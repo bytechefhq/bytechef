@@ -16,31 +16,17 @@
 
 package com.bytechef.ai.model.config;
 
-import com.anthropic.client.okhttp.AnthropicOkHttpClient;
-import com.anthropic.client.okhttp.AnthropicOkHttpClientAsync;
 import com.bytechef.config.ApplicationProperties;
-import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
+import com.bytechef.platform.annotation.ConditionalOnCEVersion;
 import com.openai.client.okhttp.OpenAIOkHttpClient;
-import com.openai.client.okhttp.OpenAIOkHttpClientAsync;
-import io.micrometer.observation.ObservationRegistry;
 import java.time.Duration;
-import org.springframework.ai.anthropic.AnthropicCacheOptions;
-import org.springframework.ai.anthropic.AnthropicCacheStrategy;
-import org.springframework.ai.anthropic.AnthropicChatModel;
-import org.springframework.ai.anthropic.AnthropicChatOptions;
-import org.springframework.ai.chat.observation.ChatModelObservationConvention;
 import org.springframework.ai.document.MetadataMode;
-import org.springframework.ai.model.tool.ToolCallingManager;
-import org.springframework.ai.openai.OpenAiChatModel;
-import org.springframework.ai.openai.OpenAiChatOptions;
 import org.springframework.ai.openai.OpenAiEmbeddingModel;
 import org.springframework.ai.openai.OpenAiEmbeddingOptions;
-import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 /**
  * @author Ivica Cardic
@@ -48,110 +34,18 @@ import org.springframework.context.annotation.Primary;
 @Configuration
 class AiModelConfiguration {
 
-    private final ApplicationProperties.Ai ai;
-    private final String anthropicApiKey;
     private final String openAiApiKey;
 
     AiModelConfiguration(ApplicationProperties applicationProperties) {
-        this.ai = applicationProperties.getAi();
-
-        ApplicationProperties.Ai.Provider provider = ai.getProvider();
-
-        Anthropic anthropic = provider.getAnthropic();
-
-        this.anthropicApiKey = anthropic.getApiKey();
-
-        OpenAi openAi = provider.getOpenAi();
+        OpenAi openAi = applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi();
 
         this.openAiApiKey = openAi.getApiKey();
     }
 
     @Bean
-    @Primary
-    @ConditionalOnProperty(prefix = "bytechef.ai.provider.anthropic", name = "api-key")
-    AnthropicChatModel anthropicChatModel(
-        ObjectProvider<ObservationRegistry> observationRegistryProvider,
-        ObjectProvider<ChatModelObservationConvention> observationConvention, ToolCallingManager toolCallingManager) {
-
-        ApplicationProperties.Ai.Provider.Chat.Anthropic.Options anthropicChatOptions = ai.getProvider()
-            .getChat()
-            .getAnthropic()
-            .getOptions();
-
-        var chatModel = AnthropicChatModel.builder()
-            .anthropicClient(
-                AnthropicOkHttpClient.builder()
-                    .apiKey(anthropicApiKey)
-                    .build())
-            .anthropicClientAsync(
-                AnthropicOkHttpClientAsync.builder()
-                    .apiKey(anthropicApiKey)
-                    .build())
-            .options(
-                AnthropicChatOptions.builder()
-                    .model(anthropicChatOptions.getModel())
-                    .temperature(anthropicChatOptions.getTemperature())
-                    .cacheOptions(
-                        AnthropicCacheOptions.builder()
-                            .strategy(AnthropicCacheStrategy.CONVERSATION_HISTORY)
-                            .build())
-                    .maxTokens(64000)
-                    .build())
-            .observationRegistry(observationRegistryProvider.getIfUnique(() -> ObservationRegistry.NOOP))
-            .toolCallingManager(toolCallingManager)
-            .build();
-
-        observationConvention.ifAvailable(chatModel::setObservationConvention);
-
-        return chatModel;
-    }
-
-    @Bean
-    @ConditionalOnProperty(prefix = "bytechef.ai.provider.openai", name = "api-key")
-    OpenAiChatModel openAiChatModel(
-        ObjectProvider<ObservationRegistry> observationRegistry,
-        ObjectProvider<ChatModelObservationConvention> observationConvention,
-        ToolCallingManager toolCallingManager) {
-
-        ApplicationProperties.Ai.Provider.Chat.OpenAi.Options openAiChatOptions = ai.getProvider()
-            .getChat()
-            .getOpenAi()
-            .getOptions();
-
-        var chatModel = OpenAiChatModel.builder()
-            .openAiClient(
-                OpenAIOkHttpClient.builder()
-                    .apiKey(openAiApiKey)
-                    .timeout(Duration.ofSeconds(60))
-                    .build())
-            .openAiClientAsync(
-                OpenAIOkHttpClientAsync.builder()
-                    .apiKey(openAiApiKey)
-                    .timeout(Duration.ofSeconds(60))
-                    .build())
-            .options(
-                OpenAiChatOptions.builder()
-                    .model(openAiChatOptions.getModel())
-                    .temperature(openAiChatOptions.getTemperature())
-                    .reasoningEffort(
-                        openAiChatOptions.getReasoningEffect()
-                            .name()
-                            .toLowerCase())
-                    .verbosity(
-                        openAiChatOptions.getVerbosity()
-                            .name()
-                            .toLowerCase())
-                    .build())
-            .toolCallingManager(toolCallingManager)
-            .observationRegistry(observationRegistry.getIfUnique(() -> ObservationRegistry.NOOP))
-            .build();
-
-        observationConvention.ifAvailable(chatModel::setObservationConvention);
-
-        return chatModel;
-    }
-
-    @Bean
+    @ConditionalOnCEVersion
     @ConditionalOnProperty(prefix = "bytechef.ai.provider.openai", name = "api-key")
     OpenAiEmbeddingModel openAiEmbeddingModel(ApplicationProperties applicationProperties) {
         ApplicationProperties.Ai.Provider.Embedding.OpenAi.Options options = applicationProperties.getAi()

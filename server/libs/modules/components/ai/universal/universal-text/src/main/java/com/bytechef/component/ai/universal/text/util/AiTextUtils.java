@@ -16,20 +16,19 @@
 
 package com.bytechef.component.ai.universal.text.util;
 
-import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
-import static com.bytechef.component.ai.llm.Provider.GROQ;
-import static com.bytechef.component.ai.llm.Provider.MISTRAL;
-import static com.bytechef.component.ai.llm.Provider.NVIDIA;
-import static com.bytechef.component.ai.llm.Provider.OLLAMA;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
-import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.platform.ai.llm.Provider.ANTHROPIC;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.DEEPSEEK;
+import static com.bytechef.platform.ai.llm.Provider.GROQ;
+import static com.bytechef.platform.ai.llm.Provider.MISTRAL;
+import static com.bytechef.platform.ai.llm.Provider.NVIDIA;
+import static com.bytechef.platform.ai.llm.Provider.OLLAMA;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.PERPLEXITY;
+import static com.bytechef.platform.ai.llm.Provider.VERTEX_GEMINI;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.constant.AnthropicConstants;
 import com.bytechef.component.ai.llm.gemini.constant.GeminiConstants;
 import com.bytechef.component.ai.llm.mistral.constant.MistralConstants;
@@ -40,6 +39,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties.Ai;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Anthropic;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
