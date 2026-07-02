@@ -5,6 +5,8 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.time.OffsetDateTime;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.lang.Nullable;
 import org.openapitools.jackson.nullable.JsonNullable;
 import java.time.OffsetDateTime;
@@ -22,12 +24,18 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ConnectedUserProjectWorkflow", description = "A group of tasks that make one logical workflow.")
 @JsonTypeName("ConnectedUserProjectWorkflow")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T23:56:54.981292+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ConnectedUserProjectWorkflowModel {
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime createdDate;
 
   private @Nullable String description;
 
   private @Nullable String definition;
+
+  @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+  private @Nullable OffsetDateTime lastModifiedDate;
 
   private @Nullable Boolean enabled;
 
@@ -36,6 +44,27 @@ public class ConnectedUserProjectWorkflowModel {
   private @Nullable String workflowUuid;
 
   private @Nullable Integer workflowVersion;
+
+  public ConnectedUserProjectWorkflowModel createdDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+    return this;
+  }
+
+  /**
+   * The created date of a workflow.
+   * @return createdDate
+   */
+  @Valid 
+  @Schema(name = "createdDate", description = "The created date of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("createdDate")
+  public @Nullable OffsetDateTime getCreatedDate() {
+    return createdDate;
+  }
+
+  @JsonProperty("createdDate")
+  public void setCreatedDate(@Nullable OffsetDateTime createdDate) {
+    this.createdDate = createdDate;
+  }
 
   public ConnectedUserProjectWorkflowModel description(@Nullable String description) {
     this.description = description;
@@ -77,6 +106,27 @@ public class ConnectedUserProjectWorkflowModel {
   @JsonProperty("definition")
   public void setDefinition(@Nullable String definition) {
     this.definition = definition;
+  }
+
+  public ConnectedUserProjectWorkflowModel lastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
+    return this;
+  }
+
+  /**
+   * The last modified date of a workflow.
+   * @return lastModifiedDate
+   */
+  @Valid 
+  @Schema(name = "lastModifiedDate", description = "The last modified date of a workflow.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("lastModifiedDate")
+  public @Nullable OffsetDateTime getLastModifiedDate() {
+    return lastModifiedDate;
+  }
+
+  @JsonProperty("lastModifiedDate")
+  public void setLastModifiedDate(@Nullable OffsetDateTime lastModifiedDate) {
+    this.lastModifiedDate = lastModifiedDate;
   }
 
   public ConnectedUserProjectWorkflowModel enabled(@Nullable Boolean enabled) {
@@ -172,8 +222,10 @@ public class ConnectedUserProjectWorkflowModel {
       return false;
     }
     ConnectedUserProjectWorkflowModel connectedUserProjectWorkflow = (ConnectedUserProjectWorkflowModel) o;
-    return Objects.equals(this.description, connectedUserProjectWorkflow.description) &&
+    return Objects.equals(this.createdDate, connectedUserProjectWorkflow.createdDate) &&
+        Objects.equals(this.description, connectedUserProjectWorkflow.description) &&
         Objects.equals(this.definition, connectedUserProjectWorkflow.definition) &&
+        Objects.equals(this.lastModifiedDate, connectedUserProjectWorkflow.lastModifiedDate) &&
         Objects.equals(this.enabled, connectedUserProjectWorkflow.enabled) &&
         Objects.equals(this.label, connectedUserProjectWorkflow.label) &&
         Objects.equals(this.workflowUuid, connectedUserProjectWorkflow.workflowUuid) &&
@@ -182,15 +234,17 @@ public class ConnectedUserProjectWorkflowModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(description, definition, enabled, label, workflowUuid, workflowVersion);
+    return Objects.hash(createdDate, description, definition, lastModifiedDate, enabled, label, workflowUuid, workflowVersion);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
     sb.append("class ConnectedUserProjectWorkflowModel {\n");
+    sb.append("    createdDate: ").append(toIndentedString(createdDate)).append("\n");
     sb.append("    description: ").append(toIndentedString(description)).append("\n");
     sb.append("    definition: ").append(toIndentedString(definition)).append("\n");
+    sb.append("    lastModifiedDate: ").append(toIndentedString(lastModifiedDate)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    label: ").append(toIndentedString(label)).append("\n");
     sb.append("    workflowUuid: ").append(toIndentedString(workflowUuid)).append("\n");
