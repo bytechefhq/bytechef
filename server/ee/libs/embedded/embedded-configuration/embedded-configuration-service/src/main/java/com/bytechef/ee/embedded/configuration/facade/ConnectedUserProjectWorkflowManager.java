@@ -99,8 +99,10 @@ public class ConnectedUserProjectWorkflowManager {
     public String createProjectWorkflow(String externalUserId, String definition, Environment environment) {
         ConnectedUserProject connectedUserProject = getOrCreateConnectedUserProject(externalUserId, environment);
 
+        String effectiveDefinition = StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition;
+
         ProjectWorkflow projectWorkflow = projectWorkflowFacade.addWorkflow(
-            connectedUserProject.getProjectId(), StringUtils.isEmpty(definition) ? DEFAULT_DEFINITION : definition);
+            connectedUserProject.getProjectId(), effectiveDefinition);
 
         ConnectedUserProjectWorkflow connectedUserProjectWorkflow = new ConnectedUserProjectWorkflow();
 
@@ -110,7 +112,7 @@ public class ConnectedUserProjectWorkflowManager {
         connectedUserProjectWorkflowService.create(connectedUserProjectWorkflow);
 
         List<Connection> connections = connectionService.getConnections(PlatformType.EMBEDDED);
-        Map<String, ?> workflowMap = JsonUtils.readMap(definition);
+        Map<String, ?> workflowMap = JsonUtils.readMap(effectiveDefinition);
 
         checkWorkflowNodeConnections(workflowMap, connections, projectWorkflow, environment.ordinal());
 
