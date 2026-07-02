@@ -78,13 +78,55 @@ export interface PropertyType {
     placeholder?: string;
 }
 
+export interface OptionType {
+    label: string;
+    value: string;
+}
+
+export interface ComponentPropertyType {
+    controlType?: string;
+    dynamicOptions?: boolean;
+    label?: string;
+    name: string;
+    options?: OptionType[];
+    optionsLookupDependsOn?: string[];
+    required?: boolean;
+    type?: string;
+}
+
+export interface ComponentPropertyGroupType {
+    label?: string;
+    name: string;
+    properties?: ComponentPropertyType[];
+}
+
+/**
+ * An all-or-nothing reference from a workflow input to a component-defined input group. Every component-defined input
+ * is a group (a lone property is a group with one property), so a reference always targets a group; `group` is the
+ * resolved group the SDK renders. Making this one nested object — present or absent — keeps illegal shapes (a dangling
+ * component name, a property/group mix) unrepresentable.
+ */
+export interface ComponentInputReferenceType {
+    componentName: string;
+    componentVersion: number;
+    group?: ComponentPropertyGroupType;
+    groupName: string;
+}
+
+/**
+ * A workflow input. When `componentReference` is set the input is component-defined and rendered as its resolved group
+ * by `renderWorkflowInput`; otherwise it is a plain input. For the group shape, `value` is a record of member name →
+ * member value; for a plain input it is a scalar (or multi-select array).
+ */
 export interface WorkflowInputType {
     name: string;
     label: string;
     type: 'string' | 'number' | 'boolean' | 'object' | 'array';
-    required?: boolean;
+    componentReference?: ComponentInputReferenceType;
     defaultValue?: unknown;
-    value?: string | number | readonly string[] | undefined;
+    internalOnly?: boolean;
+    required?: boolean;
+    value?: string | number | readonly string[] | Record<string, unknown> | undefined;
 }
 
 export interface FormType {
@@ -118,3 +160,12 @@ export interface CodePayloadI {
     code: string;
     [key: string]: string;
 }
+
+export type ApiFetch = <T>(
+    endpoint: string,
+    options?: {
+        method?: 'GET' | 'POST' | 'PUT' | 'DELETE';
+        body?: object;
+        headers?: Record<string, string>;
+    }
+) => Promise<T>;
