@@ -27,7 +27,7 @@ class CreateConnectedUserWorkflowFromPromptActionTest {
     void testPerformCreatesWorkflowFromPrompt() {
         ConnectedUserProjectFacade facade = mock(ConnectedUserProjectFacade.class);
 
-        when(facade.createProjectWorkflow("user-1", "build a thing", Environment.PRODUCTION, true))
+        when(facade.createProjectWorkflow("user-1", "build a thing", null, Environment.PRODUCTION, true))
             .thenReturn("wf-uuid");
 
         Parameters inputParameters = mock(Parameters.class);

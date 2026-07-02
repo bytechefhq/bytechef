@@ -8,6 +8,7 @@
 package com.bytechef.ee.ai.copilot.service;
 
 import java.util.Set;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -16,5 +17,6 @@ import java.util.Set;
  */
 public interface CopilotWorkflowGenerator {
 
-    void generateWorkflow(String workflowId, String prompt, Set<String> allowedComponentNames);
+    void generateWorkflow(
+        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames);
 }

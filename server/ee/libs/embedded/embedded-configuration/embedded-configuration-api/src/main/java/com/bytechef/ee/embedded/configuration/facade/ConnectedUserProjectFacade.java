@@ -12,6 +12,7 @@ import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDT
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
+import org.jspecify.annotations.Nullable;
 
 /**
  * @version ee
@@ -26,7 +27,8 @@ public interface ConnectedUserProjectFacade {
         String externalUserId, String definition, Environment environment);
 
     String createProjectWorkflow(
-        String externalUserId, String prompt, Environment environment, boolean generate);
+        String externalUserId, String prompt, @Nullable String systemPrompt, Environment environment,
+        boolean generate);
 
     void deleteProjectWorkflow(String externalUserId, String workflowUuid, Environment environment);
 

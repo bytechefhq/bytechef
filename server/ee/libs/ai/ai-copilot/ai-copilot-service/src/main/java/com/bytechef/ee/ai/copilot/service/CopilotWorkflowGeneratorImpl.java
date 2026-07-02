@@ -29,6 +29,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -61,7 +62,8 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
     }
 
     @Override
-    public void generateWorkflow(String workflowId, String prompt, Set<String> allowedComponentNames) {
+    public void generateWorkflow(
+        String workflowId, String prompt, @Nullable String systemPrompt, Set<String> allowedComponentNames) {
         String agentId = (Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name()).toLowerCase();
 
         LocalAgent localAgent = localAgentMap.get(agentId);
@@ -83,6 +85,10 @@ public class CopilotWorkflowGeneratorImpl implements CopilotWorkflowGenerator {
 
         if (authentication != null) {
             stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
+        }
+
+        if (systemPrompt != null && !systemPrompt.isBlank()) {
+            stateMap.put(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, systemPrompt.strip());
         }
 
         if (allowedComponentNames != null && !allowedComponentNames.isEmpty()) {

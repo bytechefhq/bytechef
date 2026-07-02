@@ -204,7 +204,8 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
     @Override
     public String createProjectWorkflow(
-        String externalUserId, String prompt, Environment environment, boolean generate) {
+        String externalUserId, String prompt, @Nullable String systemPrompt, Environment environment,
+        boolean generate) {
 
         if (!generate) {
             return createProjectWorkflow(externalUserId, prompt, environment);
@@ -224,7 +225,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, allowedComponentNames);
+        copilotWorkflowGenerator.generateWorkflow(workflowId, prompt, systemPrompt, allowedComponentNames);
 
         return workflowUuid;
     }
@@ -519,7 +520,7 @@ public class ConnectedUserProjectFacadeImpl implements ConnectedUserProjectFacad
 
         Set<String> allowedComponentNames = resolveAllowedComponentNames(environment);
 
-        copilotWorkflowGenerator.generateWorkflow(projectWorkflow.getWorkflowId(), prompt, allowedComponentNames);
+        copilotWorkflowGenerator.generateWorkflow(projectWorkflow.getWorkflowId(), prompt, null, allowedComponentNames);
 
         return workflowUuid;
     }
