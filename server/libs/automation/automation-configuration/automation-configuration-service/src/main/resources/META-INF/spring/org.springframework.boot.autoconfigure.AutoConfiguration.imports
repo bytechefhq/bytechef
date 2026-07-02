@@ -1,1 +1,2 @@
 com.bytechef.automation.configuration.config.AutomationConfigurationJdbcRepositoryConfiguration
+com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration
