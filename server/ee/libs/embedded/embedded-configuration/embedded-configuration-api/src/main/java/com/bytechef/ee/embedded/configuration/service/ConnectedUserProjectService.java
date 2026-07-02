@@ -28,6 +28,8 @@ public interface ConnectedUserProjectService {
 
     void delete(Long id);
 
+    Optional<Long> fetchConnectedUserId(long projectDeploymentId);
+
     Optional<ConnectedUserProject> fetchConnectUserProject(String externalUserId, Environment environment);
 
     ConnectedUserProject getConnectedUserProject(Long id);
