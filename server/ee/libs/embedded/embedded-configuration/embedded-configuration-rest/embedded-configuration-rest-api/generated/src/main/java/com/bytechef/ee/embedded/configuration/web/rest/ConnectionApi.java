@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:25.298245+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-02T07:47:45.422594+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "connection", description = "The Embedded Connection Internal API")
 public interface ConnectionApi {
@@ -44,20 +44,19 @@ public interface ConnectionApi {
         return Optional.empty();
     }
 
-    String PATH_CREATE_CONNECTED_USER_PROJECT_WORKFLOW_CONNECTION = "/connected-users/{connectedUserId}/workflows/{workflowUuid}/connections";
+    String PATH_CREATE_CONNECTED_USER_CONNECTION = "/connected-users/{connectedUserId}/connections";
     /**
-     * POST /connected-users/{connectedUserId}/workflows/{workflowUuid}/connections : Create a new connection for the connected user&#39;s project workflow
-     * Create a new connection for the connected user&#39;s project workflow.
+     * POST /connected-users/{connectedUserId}/connections : Create a new connection for the connected user
+     * Create a new connection for the connected user.
      *
      * @param connectedUserId The id of a connected user. (required)
-     * @param workflowUuid The workflow uuid. (required)
      * @param connectionModel  (required)
      * @return The connection id. (status code 200)
      */
     @Operation(
-        operationId = "createConnectedUserProjectWorkflowConnection",
-        summary = "Create a new connection for the connected user's project workflow",
-        description = "Create a new connection for the connected user's project workflow.",
+        operationId = "createConnectedUserConnection",
+        summary = "Create a new connection for the connected user",
+        description = "Create a new connection for the connected user.",
         tags = { "connection" },
         responses = {
             @ApiResponse(responseCode = "200", description = "The connection id.", content = {
@@ -67,13 +66,12 @@ public interface ConnectionApi {
     )
     @RequestMapping(
         method = RequestMethod.POST,
-        value = ConnectionApi.PATH_CREATE_CONNECTED_USER_PROJECT_WORKFLOW_CONNECTION,
+        value = ConnectionApi.PATH_CREATE_CONNECTED_USER_CONNECTION,
         produces = { "application/json" },
         consumes = { "application/json" }
     )
-    default ResponseEntity<Long> createConnectedUserProjectWorkflowConnection(
+    default ResponseEntity<Long> createConnectedUserConnection(
         @Parameter(name = "connectedUserId", description = "The id of a connected user.", required = true, in = ParameterIn.PATH) @PathVariable("connectedUserId") Long connectedUserId,
-        @Parameter(name = "workflowUuid", description = "The workflow uuid.", required = true, in = ParameterIn.PATH) @PathVariable("workflowUuid") String workflowUuid,
         @Parameter(name = "ConnectionModel", description = "", required = true) @Valid @RequestBody ConnectionModel connectionModel
     ) {
         return new ResponseEntity<>(HttpStatus.NOT_IMPLEMENTED);

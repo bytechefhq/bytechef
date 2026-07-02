@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "ComponentInputReference", description = "An all-or-nothing reference from a workflow input to a component-defined input group.")
 @JsonTypeName("ComponentInputReference")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T09:51:25.298245+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-02T07:47:45.422594+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class ComponentInputReferenceModel {
 
   private String componentName;
