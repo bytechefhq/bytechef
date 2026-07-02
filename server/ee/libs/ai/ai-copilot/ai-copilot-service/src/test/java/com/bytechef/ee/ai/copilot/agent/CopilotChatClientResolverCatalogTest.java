@@ -38,9 +38,9 @@ class CopilotChatClientResolverCatalogTest {
 
         State state = new State();
 
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER, "ai.provider.openAi");
-        state.set(CopilotStateKeys.USER_SELECTED_LLM_MODEL, "gpt-4o");
-        state.set(CopilotStateKeys.ENVIRONMENT_ID, "3");
+        state.set(CopilotStateKeys.STATE_USER_SELECTED_LLM_PROVIDER, "ai.provider.openAi");
+        state.set(CopilotStateKeys.STATE_USER_SELECTED_LLM_MODEL, "gpt-4o");
+        state.set(CopilotStateKeys.STATE_ENVIRONMENT_ID, "3");
 
         assertThat(resolver.resolve(state)).isSameAs(catalogChatClient);
     }
