@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.ai.copilot.agent;
 
+import com.agui.core.agent.RunAgentInput;
 import com.agui.core.context.Context;
 import com.agui.core.exception.AGUIException;
 import com.agui.core.message.BaseMessage;
@@ -14,7 +15,9 @@ import com.agui.core.message.SystemMessage;
 import com.agui.core.state.State;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -44,6 +47,11 @@ public class SkillsSpringAIAgent extends SpringAIAgent {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    protected Map<String, Object> toolContext(RunAgentInput input) {
+        return CopilotToolContextUtils.toToolContext(input.state());
     }
 
     @Override

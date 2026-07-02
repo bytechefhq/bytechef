@@ -46,7 +46,9 @@ import com.agui.core.type.EventType;
 import com.agui.server.EventFactory;
 import com.agui.server.LocalAgent;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
@@ -115,6 +117,11 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
     @Override
     protected void run(RunAgentInput input, AgentSubscriber subscriber) {
         super.run(input, new JsonExtractingSubscriber(subscriber));
+    }
+
+    @Override
+    protected Map<String, Object> toolContext(RunAgentInput input) {
+        return CopilotToolContextUtils.toToolContext(input.state());
     }
 
     @Override

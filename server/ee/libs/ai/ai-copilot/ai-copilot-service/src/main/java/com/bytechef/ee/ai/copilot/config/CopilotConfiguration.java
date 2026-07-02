@@ -152,6 +152,7 @@ public class CopilotConfiguration {
     CodeEditorSpringAIAgent codeEditorAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
         ComponentTools componentTools, Optional<FirecrawlTools> firecrawlTools,
+        SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
         String name = Source.CODE_EDITOR.name() + "_" + Mode.ASK.name();
 
@@ -165,7 +166,7 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorAskResource))
-            .tools(tools)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
@@ -175,6 +176,7 @@ public class CopilotConfiguration {
     CodeEditorSpringAIAgent codeEditorBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ScriptTools scriptTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools,
+        SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -185,10 +187,12 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptCodeEditorBuildResource))
-            .tools(
-                List.of(
-                    readProjectWorkflowTools, scriptTools, componentTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        readProjectWorkflowTools, scriptTools, componentTools, workflowValidatorTools,
+                        workflowInstructionTools)))
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
@@ -197,7 +201,7 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools,
+        ComponentTools componentTools, TaskTools taskTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
@@ -207,10 +211,12 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
-            .tools(
-                List.of(
-                    readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                        workflowInstructionTools)))
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
@@ -220,6 +226,7 @@ public class CopilotConfiguration {
     ClusterElementSpringAIAgent clusterElementBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ClusterElementTools clusterElementTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
+        SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -230,13 +237,31 @@ public class CopilotConfiguration {
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementBuildResource))
-            .tools(
-                List.of(
-                    readProjectWorkflowTools, clusterElementTools, componentTools, taskTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        readProjectWorkflowTools, clusterElementTools, componentTools, taskTools,
+                        workflowValidatorTools, workflowInstructionTools)))
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
+    }
+
+    private List<ToolCallback> wrapTools(SecurityContextRehydrator securityContextRehydrator, List<Object> tools) {
+        List<ToolCallback> toolCallbacks = new ArrayList<>();
+
+        for (Object tool : tools) {
+            if (tool instanceof ToolCallback toolCallback) {
+                toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+            } else {
+                for (ToolCallback toolCallback : ToolCallbacks.from(tool)) {
+                    toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
+                }
+            }
+        }
+
+        return toolCallbacks;
     }
 
     @Bean
@@ -283,6 +308,7 @@ public class CopilotConfiguration {
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor,
+        SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -303,7 +329,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorAskResource))
             .state(state)
-            .tools(tools)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .advisor(questionAnswerAdvisor)
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
@@ -322,20 +348,12 @@ public class CopilotConfiguration {
 
         String name = Source.WORKFLOW_EDITOR.name() + "_" + Mode.BUILD.name();
 
-        List<ToolCallback> toolCallbacks = new ArrayList<>();
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                projectTools, projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
+                workflowInstructionTools));
 
-        for (Object tool : List.of(
-            projectTools, projectWorkflowTools, componentTools, taskTools, scriptTools, workflowValidatorTools,
-            workflowInstructionTools)) {
-
-            for (ToolCallback toolCallback : ToolCallbacks.from(tool)) {
-                toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
-            }
-        }
-
-        for (ToolCallback toolCallback : interactivePickerToolCallbacks()) {
-            toolCallbacks.add(RehydrateContextToolCallback.wrap(toolCallback, securityContextRehydrator));
-        }
+        tools.addAll(interactivePickerToolCallbacks());
 
         return WorkflowEditorSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -343,7 +361,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptWorkflowEditorBuildResource))
             .state(state)
-            .toolCallbacks(toolCallbacks)
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
@@ -353,7 +371,8 @@ public class CopilotConfiguration {
     @Bean
     ConverterSpringAIAgent converterBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
-        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools)
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        SecurityContextRehydrator securityContextRehydrator)
         throws AGUIException {
 
         String name = Source.CONVERTER.name() + "_" + Mode.BUILD.name();
@@ -364,17 +383,20 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptConverterBuildResource))
             .state(state)
-            .tools(
-                List.of(
-                    projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                        workflowInstructionTools)))
             .build();
     }
 
     @Bean
     SkillsSpringAIAgent skillsAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools)
+        ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
+        SecurityContextRehydrator securityContextRehydrator)
         throws AGUIException {
 
         String name = Source.SKILLS.name() + "_" + Mode.ASK.name();
@@ -385,17 +407,20 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsAskResource))
             .state(state)
-            .tools(
-                List.of(
-                    readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                        workflowInstructionTools)))
             .build();
     }
 
     @Bean
     SkillsSpringAIAgent skillsBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools)
+        ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
+        SecurityContextRehydrator securityContextRehydrator)
         throws AGUIException {
 
         String name = Source.SKILLS.name() + "_" + Mode.BUILD.name();
@@ -406,18 +431,15 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsBuildResource))
             .state(state)
-            .tools(
-                List.of(
-                    skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                    workflowInstructionTools))
+            .toolCallbacks(
+                wrapTools(
+                    securityContextRehydrator,
+                    List.of(
+                        skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                        workflowInstructionTools)))
             .build();
     }
 
-    /**
-     * Stateless Code Editor ASK sub-agent {@link ChatClient}, consumed by {@code CodeEditorAgentToolCallback} on the AI
-     * Hub ASK agent. Same system prompt and tool catalog as {@link #codeEditorAskSpringAIAgent} (Firecrawl tools added
-     * when present in the deployment), no {@link ChatMemory}.
-     */
     @Bean
     ChatClient codeEditorAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
