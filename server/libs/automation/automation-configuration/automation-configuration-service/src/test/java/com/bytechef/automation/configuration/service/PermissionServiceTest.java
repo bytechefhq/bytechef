@@ -19,8 +19,16 @@ package com.bytechef.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.service.UserService;
+import java.util.List;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * @author Ivica Cardic
@@ -28,10 +36,26 @@ import org.junit.jupiter.api.Test;
 class PermissionServiceTest {
 
     private final PermissionService permissionService =
-        new PermissionServiceImpl(mock(UserService.class), java.util.List.of());
+        new PermissionServiceImpl(mock(UserService.class), List.of());
+
+    @BeforeEach
+    void setUp() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "user", "user", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
-    void testHasWorkspaceRoleAlwaysTrue() {
+    void testHasWorkspaceRoleTrueForAuthenticatedUser() {
         assertThat(permissionService.hasWorkspaceRole(1L, "ADMIN")).isTrue();
         assertThat(permissionService.hasWorkspaceRole(1L, "EDITOR")).isTrue();
         assertThat(permissionService.hasWorkspaceRole(1L, "VIEWER")).isTrue();
@@ -39,7 +63,7 @@ class PermissionServiceTest {
     }
 
     @Test
-    void testHasWorkspaceScopeAlwaysTrue() {
+    void testHasWorkspaceScopeTrueForAuthenticatedUser() {
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isTrue();
         assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_DELETE")).isTrue();
         assertThat(permissionService.hasWorkspaceScope(1L, "PROJECT_DELETE")).isTrue();
@@ -47,10 +71,36 @@ class PermissionServiceTest {
     }
 
     @Test
-    void testHasWorkspaceScopeForProjectAlwaysTrue() {
+    void testHasWorkspaceScopeForProjectTrueForAuthenticatedUser() {
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "PROJECT_DELETE")).isTrue();
         assertThat(permissionService.hasWorkspaceScopeForProject(1L, "ANY_UNRECOGNIZED_SCOPE")).isTrue();
+    }
+
+    @Test
+    void testWorkspaceChecksDenyUnauthenticatedCaller() {
+        SecurityContextHolder.clearContext();
+
+        assertThat(permissionService.hasWorkspaceRole(1L, "ADMIN")).isFalse();
+        assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkspaceScopeForProject(1L, "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasWorkflowScope("workflow-1", "WORKFLOW_VIEW")).isFalse();
+        assertThat(permissionService.hasResourceRole(1L, "project", "ADMIN")).isFalse();
+        assertThat(permissionService.isResourceOwner("project", 1L)).isFalse();
+    }
+
+    @Test
+    void testWorkspaceChecksDenyAnonymousCaller() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "anonymous", "anonymous", List.of(new SimpleGrantedAuthority(AuthorityConstants.ANONYMOUS))));
+
+        SecurityContextHolder.setContext(securityContext);
+
+        assertThat(permissionService.hasWorkspaceRole(1L, "ADMIN")).isFalse();
+        assertThat(permissionService.hasWorkspaceScope(1L, "WORKFLOW_VIEW")).isFalse();
     }
 
     @Test
