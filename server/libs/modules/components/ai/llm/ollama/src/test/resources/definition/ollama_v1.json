@@ -1975,6 +1975,57 @@
       "required": true
     },
     "workflowNodeDescription": null
+  }, {
+    "name": "embedding",
+    "description": "Ollama embedding.",
+    "element": { },
+    "help": null,
+    "outputDefinition": null,
+    "processErrorResponse": null,
+    "properties": [ {
+      "advancedOption": null,
+      "controlType": "SELECT",
+      "defaultValue": null,
+      "description": "ID of the model to use.",
+      "displayCondition": null,
+      "exampleValue": null,
+      "expressionEnabled": null,
+      "hidden": null,
+      "label": "Model",
+      "languageId": null,
+      "maxLength": null,
+      "metadata": { },
+      "minLength": null,
+      "name": "model",
+      "options": [ {
+        "description": null,
+        "label": "mxbai-embed-large",
+        "value": "mxbai-embed-large"
+      }, {
+        "description": null,
+        "label": "nomic-embed-text",
+        "value": "nomic-embed-text"
+      }, {
+        "description": null,
+        "label": "qwen3-embedding:8b",
+        "value": "qwen3-embedding:8b"
+      } ],
+      "optionsDataSource": null,
+      "optionsLoadedDynamically": null,
+      "placeholder": null,
+      "regex": null,
+      "required": true,
+      "type": "STRING"
+    } ],
+    "title": "Ollama Embedding",
+    "type": {
+      "name": "EMBEDDING",
+      "key": "embedding",
+      "label": "Embedding",
+      "multipleElements": false,
+      "required": true
+    },
+    "workflowNodeDescription": null
   } ],
   "componentCategories": [ {
     "name": "artificial-intelligence",
