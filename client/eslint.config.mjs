@@ -226,6 +226,7 @@ export default [
         files: [
             'src/components/Badge/Badge.tsx',
             'src/components/Button/Button.tsx',
+            'src/components/Select/Select.tsx',
             'src/components/Switch/Switch.tsx',
         ],
         rules: {
