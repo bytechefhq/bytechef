@@ -25,5 +25,11 @@ export const restrictedImports = {
             message: "Import Switch from '@/components/Switch/Switch' instead.",
             allowTypeImports: true,
         },
+        {
+            name: '@/components/ui/select',
+            message:
+                "Import Select primitives from '@/components/Select/Select' instead. The wrapper defaults SelectContent to position=\"popper\" so the dropdown renders below the trigger at the trigger width.",
+            allowTypeImports: true,
+        },
     ],
 };
