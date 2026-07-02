@@ -23,10 +23,13 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.document.MetadataMode;
 import org.springframework.ai.embedding.TokenCountBatchingStrategy;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
@@ -51,28 +54,40 @@ class CopilotVectorStoreLoaderConfiguration {
     private static final int MAX_TOKENS = 1536;
     private static final String NAME = "name";
 
+    private static final Logger log = LoggerFactory.getLogger(CopilotVectorStoreLoaderConfiguration.class);
+
     private final TokenCountBatchingStrategy batchingStrategy;
+    private final ObjectProvider<VectorStore> copilotDocsLoaderVectorStoreProvider;
     private final CopilotVectorStoreService copilotVectorStoreService;
     private final ResourcePatternResolver resourcePatternResolver;
-    private final VectorStore vectorStore;
 
     @SuppressFBWarnings(value = "EI")
     public CopilotVectorStoreLoaderConfiguration(
         CopilotVectorStoreService copilotVectorStoreService,
-        @Qualifier("copilotPgVectorStore") VectorStore vectorStore) {
+        @Qualifier("copilotDocsLoaderVectorStore") ObjectProvider<VectorStore> copilotDocsLoaderVectorStoreProvider) {
 
         this.batchingStrategy = new TokenCountBatchingStrategy(
             EncodingType.CL100K_BASE, 8191, 0.1, Document.DEFAULT_CONTENT_FORMATTER, MetadataMode.ALL);
+        this.copilotDocsLoaderVectorStoreProvider = copilotDocsLoaderVectorStoreProvider;
         this.copilotVectorStoreService = copilotVectorStoreService;
         this.resourcePatternResolver = new PathMatchingResourcePatternResolver();
-        this.vectorStore = vectorStore;
     }
 
     @EventListener(ApplicationStartedEvent.class)
     public void onApplicationStartedEvent() {
+        VectorStore vectorStore = copilotDocsLoaderVectorStoreProvider.getIfAvailable();
+
+        if (vectorStore == null) {
+            log.info(
+                "Skipping copilot documentation indexing: no internal Copilot embedding key " +
+                    "(bytechef.ai.copilot.docs.embedding.api-key) is set. Set it and restart to index copilot docs.");
+
+            return;
+        }
+
         List<Map<String, Object>> vectorsMetadataList = getVectorsMetadataList();
 
-        storeDocsDocuments(vectorsMetadataList);
+        storeDocsDocuments(vectorStore, vectorsMetadataList);
     }
 
     private void addDocumentChunks(
@@ -86,7 +101,7 @@ class CopilotVectorStoreLoaderConfiguration {
     }
 
     private void addToDocuments(
-        List<Map<String, Object>> vectorStoreMetadataList, String name, String content,
+        VectorStore vectorStore, List<Map<String, Object>> vectorStoreMetadataList, String name, String content,
         List<Document> documents) {
 
         String cleanedDocument = preprocessDocument(content);
@@ -105,7 +120,7 @@ class CopilotVectorStoreLoaderConfiguration {
                 int vectorHash = (int) fileMetadata.get("hash");
 
                 if (vectorHash != hash) {
-                    deleteFromVectorStore(name);
+                    deleteFromVectorStore(vectorStore, name);
 
                     addDocumentChunks(name, documents, cleanedDocument, hash);
                 }
@@ -120,7 +135,7 @@ class CopilotVectorStoreLoaderConfiguration {
             .anyMatch(map -> fileName.equals(map.get(NAME)) && DOCS.equals(map.get(CATEGORY)));
     }
 
-    private void deleteFromVectorStore(String name) {
+    private void deleteFromVectorStore(VectorStore vectorStore, String name) {
         vectorStore.delete(String.format("name == '%s' AND category == '%s'", name, DOCS));
     }
 
@@ -244,7 +259,7 @@ class CopilotVectorStoreLoaderConfiguration {
     }
 
     private void deleteStaleDocsFromVectorStore(
-        List<Map<String, Object>> vectorsMetadataList, Set<String> resourceNames) {
+        VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList, Set<String> resourceNames) {
 
         Set<String> deleted = new HashSet<>();
 
@@ -256,26 +271,27 @@ class CopilotVectorStoreLoaderConfiguration {
             String name = (String) metadata.get(NAME);
 
             if (name != null && !resourceNames.contains(name) && deleted.add(name)) {
-                deleteFromVectorStore(name);
+                deleteFromVectorStore(vectorStore, name);
             }
         }
     }
 
-    private void storeDocsDocuments(List<Map<String, Object>> vectorsMetadataList) {
+    private void storeDocsDocuments(VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList) {
         List<Document> documentList = new ArrayList<>();
         Set<String> resourceNames = new HashSet<>();
 
-        storeDocsFromClasspath(vectorsMetadataList, documentList, resourceNames);
+        storeDocsFromClasspath(vectorStore, vectorsMetadataList, documentList, resourceNames);
 
         for (List<Document> batch : batchingStrategy.batch(documentList)) {
             vectorStore.add(batch);
         }
 
-        deleteStaleDocsFromVectorStore(vectorsMetadataList, resourceNames);
+        deleteStaleDocsFromVectorStore(vectorStore, vectorsMetadataList, resourceNames);
     }
 
     private void storeDocsFromClasspath(
-        List<Map<String, Object>> vectorsMetadataList, List<Document> documentList, Set<String> resourceNames) {
+        VectorStore vectorStore, List<Map<String, Object>> vectorsMetadataList, List<Document> documentList,
+        Set<String> resourceNames) {
 
         try {
             Resource[] resources = resourcePatternResolver.getResources(CLASSPATH_DOCS_PATTERN);
@@ -287,7 +303,7 @@ class CopilotVectorStoreLoaderConfiguration {
                         String docName = extractDocName(resource);
 
                         resourceNames.add(docName);
-                        addToDocuments(vectorsMetadataList, docName, content, documentList);
+                        addToDocuments(vectorStore, vectorsMetadataList, docName, content, documentList);
                     }
                 }
             }
