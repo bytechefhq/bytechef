@@ -1,3 +1,30 @@
+const isPlainObject = (value: unknown): value is Record<string, unknown> =>
+    typeof value === 'object' && value !== null && !Array.isArray(value);
+
+/**
+ * Serializes a dependency-values record into a deterministic string: keys are sorted so that two records with the
+ * same entries always produce the same output regardless of insertion order, and values that `JSON.stringify` cannot
+ * handle (circular structures, BigInt) fall back to `String(value)` instead of throwing so option loading can never
+ * crash the UI over an exotic dependency value.
+ */
+export const stableSerialize = (record: Record<string, unknown>): string => {
+    const serializedEntries = Object.keys(record)
+        .sort()
+        .map((key) => {
+            let serializedValue: string;
+
+            try {
+                serializedValue = JSON.stringify(record[key]) ?? 'undefined';
+            } catch {
+                serializedValue = String(record[key]);
+            }
+
+            return `${JSON.stringify(key)}:${serializedValue}`;
+        });
+
+    return `{${serializedEntries.join(',')}}`;
+};
+
 /**
  * Builds the cache key under which a component-defined input's resolved options are stored in (and read from) the
  * `workflowInputOptions` map. The key mirrors the component-reference identity tuple
@@ -13,4 +40,28 @@ export const optionsCacheKey = (
     propertyName: string,
     dependencyValues: Record<string, unknown>
 ): string =>
-    `${componentName}:${componentVersion}:${groupName}:${propertyName}:${JSON.stringify(dependencyValues ?? {})}`;
+    `${componentName}:${componentVersion}:${groupName}:${propertyName}:${stableSerialize(dependencyValues ?? {})}`;
+
+/**
+ * Merges locally overridden workflow inputs over the server-side inputs one level deep: when both sides hold a plain
+ * object for the same input (a group input's member map), the member entries are merged instead of the override
+ * replacing the whole group — otherwise server-provided members the user never touched would be dropped on save.
+ */
+export const mergeWorkflowInputs = (
+    serverInputs: Record<string, unknown>,
+    overrides: Record<string, unknown> | undefined
+): Record<string, unknown> => {
+    const mergedInputs: Record<string, unknown> = {...serverInputs};
+
+    Object.entries(overrides ?? {}).forEach(([inputName, overrideValue]) => {
+        const serverValue = mergedInputs[inputName];
+
+        if (isPlainObject(serverValue) && isPlainObject(overrideValue)) {
+            mergedInputs[inputName] = {...serverValue, ...overrideValue};
+        } else {
+            mergedInputs[inputName] = overrideValue;
+        }
+    });
+
+    return mergedInputs;
+};

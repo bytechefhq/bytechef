@@ -34,19 +34,16 @@ describe('useWorkflowInputOptions', () => {
             rerender({id: 55});
         });
 
-        expect(apiFetch).toHaveBeenCalledWith(
-            '/api/embedded/v1/integration-instances/55/component-input-options',
-            {
-                body: {
-                    componentName: 'slack',
-                    componentVersion: 1,
-                    groupName: 'channel',
-                    lookupDependsOnValues: {},
-                    propertyName: 'channel',
-                },
-                method: 'POST',
-            }
-        );
+        expect(apiFetch).toHaveBeenCalledWith('/api/embedded/v1/integration-instances/55/component-input-options', {
+            body: {
+                componentName: 'slack',
+                componentVersion: 1,
+                groupName: 'channel',
+                lookupDependsOnValues: {},
+                propertyName: 'channel',
+            },
+            method: 'POST',
+        });
     });
 
     it('does not fetch when apiFetch is missing', () => {

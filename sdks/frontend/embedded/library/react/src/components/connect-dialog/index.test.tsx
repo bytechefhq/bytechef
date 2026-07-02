@@ -530,6 +530,62 @@ describe('useConnectDialog - group-member persistence', () => {
         );
     });
 
+    it('preserves server-side group members that the user did not touch', async () => {
+        const workflowUuid = '44444444-4444-4444-4444-444444444444';
+
+        global.fetch = vi.fn().mockResolvedValue({
+            ok: true,
+            headers: {get: () => '0'},
+            json: vi.fn().mockResolvedValue({
+                name: 'Test Integration',
+                workflows: [{label: 'Workflow 1', workflowUuid}],
+                integrationInstances: [
+                    {
+                        id: 55,
+                        workflows: [{enabled: true, inputs: {channel: {workspace: 'W1'}}, workflowUuid}],
+                    },
+                ],
+            }),
+        });
+
+        const renderMock = vi.fn();
+
+        vi.mocked(createRoot).mockReturnValue({
+            render: renderMock,
+            unmount: vi.fn(),
+        });
+
+        const {result} = renderHook(() =>
+            useConnectDialog({
+                baseUrl: 'https://api.example.com',
+                environment: 'DEVELOPMENT',
+                integrationId: '1234',
+                integrationInstanceId: '55',
+                jwtToken: 'ey',
+            })
+        );
+
+        await act(async () => result.current.openDialog());
+
+        const props = renderMock.mock.calls[renderMock.mock.calls.length - 1][0].props;
+
+        vi.mocked(global.fetch).mockClear();
+
+        act(() => props.handleWorkflowGroupInputChange(workflowUuid, 'channel', 'channelId', 'C1'));
+
+        await act(async () => {
+            vi.advanceTimersByTime(600);
+        });
+
+        expect(global.fetch).toHaveBeenCalledWith(
+            `https://api.example.com/api/embedded/v1/integration-instances/55/workflows/${workflowUuid}`,
+            expect.objectContaining({
+                method: 'PUT',
+                body: JSON.stringify({inputs: {channel: {workspace: 'W1', channelId: 'C1'}}}),
+            })
+        );
+    });
+
     it('passes a working MCP group handler that PUTs to the mcp-workflows endpoint', async () => {
         const workflowUuid = '22222222-2222-2222-2222-222222222222';
 
