@@ -120,6 +120,7 @@ const KnowledgeBaseListItem = ({knowledgeBase, remainingTags, tags}: KnowledgeBa
 
                                         handleShowDeleteDialog();
                                     }}
+                                    variant="destructive"
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>

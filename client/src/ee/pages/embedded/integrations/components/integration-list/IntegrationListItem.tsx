@@ -297,6 +297,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
                                 <DropdownMenuItem
                                     className="dropdown-menu-item-destructive"
                                     onClick={() => setShowDeleteDialog(true)}
+                                    variant="destructive"
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>

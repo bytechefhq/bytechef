@@ -86,6 +86,7 @@ const AppEventListItem = ({appEvent}: AppEventListItemProps) => {
                         <DropdownMenuItem
                             className="dropdown-menu-item-destructive"
                             onClick={() => setShowDeleteDialog(true)}
+                            variant="destructive"
                         >
                             <Trash2Icon /> Delete
                         </DropdownMenuItem>

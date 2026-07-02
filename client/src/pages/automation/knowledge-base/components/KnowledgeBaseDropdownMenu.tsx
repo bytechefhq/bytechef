@@ -45,7 +45,11 @@ const KnowledgeBaseDropdownMenu = ({knowledgeBase}: KnowledgeBaseDropdownMenuPro
 
                     <DropdownMenuSeparator className="m-0" />
 
-                    <DropdownMenuItem className="dropdown-menu-item-destructive" onClick={handleShowDeleteDialog}>
+                    <DropdownMenuItem
+                        className="dropdown-menu-item-destructive"
+                        onClick={handleShowDeleteDialog}
+                        variant="destructive"
+                    >
                         <Trash2Icon /> Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>

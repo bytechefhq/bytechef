@@ -586,6 +586,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                         event.stopPropagation();
                                     }}
+                                    variant="destructive"
                                 >
                                     <Trash2Icon /> Delete
                                 </DropdownMenuItem>

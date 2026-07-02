@@ -121,6 +121,7 @@ const AutomationWorkflowProjectWorkflowListItem = ({
 
                                 onDeleteWorkflow(workflow.workflowUuid);
                             }}
+                            variant="destructive"
                         >
                             <Trash2Icon /> Delete
                         </DropdownMenuItem>

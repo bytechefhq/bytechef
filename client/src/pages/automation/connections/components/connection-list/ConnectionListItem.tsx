@@ -242,6 +242,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                                             }
                                             disabled={connection.active}
                                             onClick={() => setShowDeleteDialog(true)}
+                                            variant="destructive"
                                         >
                                             <Trash2Icon /> Delete
                                         </DropdownMenuItem>

@@ -32,7 +32,11 @@ const KnowledgeBaseDocumentChunkListItemDropdownMenu = ({
 
                 <DropdownMenuSeparator className="m-0" />
 
-                <DropdownMenuItem className="dropdown-menu-item-destructive" onClick={handleDelete}>
+                <DropdownMenuItem
+                    className="dropdown-menu-item-destructive"
+                    onClick={handleDelete}
+                    variant="destructive"
+                >
                     <Trash2Icon /> Delete
                 </DropdownMenuItem>
             </DropdownMenuContent>
