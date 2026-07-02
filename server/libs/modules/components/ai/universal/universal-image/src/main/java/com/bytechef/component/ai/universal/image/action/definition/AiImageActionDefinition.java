@@ -16,14 +16,13 @@
 
 package com.bytechef.component.ai.universal.image.action.definition;
 
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
 import com.bytechef.component.ai.llm.ImageModel;
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiCreateImageAction;
 import com.bytechef.component.ai.llm.openai.action.OpenAiCreateImageAction;
 import com.bytechef.component.ai.llm.stability.action.StabilityCreateImageAction;
@@ -32,6 +31,7 @@ import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.ActionDefinition;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;

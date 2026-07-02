@@ -7,8 +7,9 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.component.ai.llm.Provider;
-import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
@@ -49,9 +50,8 @@ public class CatalogEmbeddingModel implements EmbeddingModel {
     private static final int MAX_CACHED_DELEGATES = 256;
     private static final Duration DELEGATE_CACHE_TTL = Duration.ofHours(1);
 
-    private final ProviderApiKeyResolver providerApiKeyResolver;
+    private final AiProviderFacade aiProviderFacade;
     private final CatalogEmbeddingModelFactory catalogEmbeddingModelFactory;
-    private final ApplicationProperties applicationProperties;
     private final Cache<String, EmbeddingModel> delegateCache = Caffeine.newBuilder()
         .maximumSize(MAX_CACHED_DELEGATES)
         .expireAfterAccess(DELEGATE_CACHE_TTL)
@@ -59,12 +59,10 @@ public class CatalogEmbeddingModel implements EmbeddingModel {
 
     @SuppressFBWarnings("EI")
     public CatalogEmbeddingModel(
-        ProviderApiKeyResolver providerApiKeyResolver, CatalogEmbeddingModelFactory catalogEmbeddingModelFactory,
-        ApplicationProperties applicationProperties) {
+        AiProviderFacade aiProviderFacade, CatalogEmbeddingModelFactory catalogEmbeddingModelFactory) {
 
-        this.providerApiKeyResolver = providerApiKeyResolver;
+        this.aiProviderFacade = aiProviderFacade;
         this.catalogEmbeddingModelFactory = catalogEmbeddingModelFactory;
-        this.applicationProperties = applicationProperties;
     }
 
     @Override
@@ -100,24 +98,23 @@ public class CatalogEmbeddingModel implements EmbeddingModel {
     private EmbeddingModel resolveDelegate() {
         Environment environment = EnvironmentContext.getCurrentEnvironment();
 
-        String model = applicationProperties.getAi()
-            .getProvider()
-            .getEmbedding()
-            .getOpenAi()
-            .getOptions()
-            .getModel();
+        int ordinal = environment.ordinal();
 
-        String apiKey = providerApiKeyResolver.resolve(Provider.OPEN_AI, environment.ordinal());
+        AiDefaultModelWithApiKeyDTO defaultModel = aiProviderFacade.getAiDefaultEmbeddingModelApiKey(ordinal);
 
-        if (apiKey == null || apiKey.isBlank()) {
+        if (defaultModel == null) {
             throw new IllegalStateException(
                 "No embedding provider is activated for environment " + environment + ". Activate the OpenAI " +
                     "provider in the UI (or set bytechef.ai.provider.openai.api-key) so the Knowledge Base can embed " +
                     "documents.");
         }
 
+        Provider provider = defaultModel.provider();
+        String model = defaultModel.model();
+        String apiKey = defaultModel.apiKey();
+
         return delegateCache.get(
-            environment.ordinal() + ":" + apiKey,
-            ignoredKey -> catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, model, apiKey));
+            ordinal + ":" + provider.getKey() + ":" + model + ":" + apiKey,
+            ignoredKey -> catalogEmbeddingModelFactory.createEmbeddingModel(provider, model, apiKey));
     }
 }

@@ -9,14 +9,14 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.llm.Provider;
-import com.bytechef.config.ApplicationProperties;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.configuration.context.EnvironmentContext;
 import com.bytechef.platform.configuration.domain.Environment;
 import org.junit.jupiter.api.AfterEach;
@@ -31,13 +31,15 @@ import org.springframework.ai.embedding.EmbeddingModel;
  */
 class CatalogEmbeddingModelTest {
 
-    private final ProviderApiKeyResolver providerApiKeyResolver = mock(ProviderApiKeyResolver.class);
+    private static final AiDefaultModelWithApiKeyDTO OPEN_AI_DEFAULT_MODEL =
+        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+
+    private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogEmbeddingModelFactory catalogEmbeddingModelFactory =
         mock(CatalogEmbeddingModelFactory.class);
-    private final ApplicationProperties applicationProperties = mock(ApplicationProperties.class, RETURNS_DEEP_STUBS);
 
     private final CatalogEmbeddingModel catalogEmbeddingModel = new CatalogEmbeddingModel(
-        providerApiKeyResolver, catalogEmbeddingModelFactory, applicationProperties);
+        aiProviderFacade, catalogEmbeddingModelFactory);
 
     @AfterEach
     void tearDown() {
@@ -45,16 +47,15 @@ class CatalogEmbeddingModelTest {
     }
 
     @Test
-    void testDelegatesEmbedWhenKeyResolved() {
-        stubModelName();
+    void testDelegatesEmbedWhenModelResolved() {
         EmbeddingModel delegate = mock(EmbeddingModel.class);
         Document document = new Document("hello");
 
         when(delegate.embed(document)).thenReturn(new float[] {
             0.1f
         });
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, Environment.PRODUCTION.ordinal()))
-            .thenReturn("sk-test");
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.PRODUCTION.ordinal()))
+            .thenReturn(OPEN_AI_DEFAULT_MODEL);
         when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
             .thenReturn(delegate);
 
@@ -64,10 +65,8 @@ class CatalogEmbeddingModelTest {
     }
 
     @Test
-    void testThrowsActionableErrorWhenNoKey() {
-        stubModelName();
-
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, Environment.PRODUCTION.ordinal()))
+    void testThrowsActionableErrorWhenNoProviderActivated() {
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(null);
 
         assertThatThrownBy(() -> catalogEmbeddingModel.embed(new Document("hello")))
@@ -79,7 +78,6 @@ class CatalogEmbeddingModelTest {
 
     @Test
     void testReadsEnvironmentFromContext() {
-        stubModelName();
         EmbeddingModel delegate = mock(EmbeddingModel.class);
         Document document = new Document("hello");
 
@@ -88,27 +86,26 @@ class CatalogEmbeddingModelTest {
         when(delegate.embed(document)).thenReturn(new float[] {
             0.2f
         });
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, Environment.STAGING.ordinal()))
-            .thenReturn("sk-staging");
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.STAGING.ordinal()))
+            .thenReturn(OPEN_AI_DEFAULT_MODEL);
         when(catalogEmbeddingModelFactory.createEmbeddingModel(
-            Provider.OPEN_AI, "text-embedding-3-small", "sk-staging"))
+            Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
                 .thenReturn(delegate);
 
         catalogEmbeddingModel.embed(document);
 
-        verify(providerApiKeyResolver).resolve(Provider.OPEN_AI, Environment.STAGING.ordinal());
+        verify(aiProviderFacade).getAiDefaultEmbeddingModelApiKey(Environment.STAGING.ordinal());
     }
 
     @Test
     void testCachesDelegatePerEnvironmentAndKey() {
-        stubModelName();
         EmbeddingModel delegate = mock(EmbeddingModel.class);
 
         when(delegate.embed(org.mockito.ArgumentMatchers.any(Document.class))).thenReturn(new float[] {
             0.3f
         });
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, Environment.PRODUCTION.ordinal()))
-            .thenReturn("sk-test");
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.PRODUCTION.ordinal()))
+            .thenReturn(OPEN_AI_DEFAULT_MODEL);
         when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
             .thenReturn(delegate);
 
@@ -117,14 +114,5 @@ class CatalogEmbeddingModelTest {
 
         verify(catalogEmbeddingModelFactory, times(1))
             .createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
-    }
-
-    private void stubModelName() {
-        when(applicationProperties.getAi()
-            .getProvider()
-            .getEmbedding()
-            .getOpenAi()
-            .getOptions()
-            .getModel()).thenReturn("text-embedding-3-small");
     }
 }

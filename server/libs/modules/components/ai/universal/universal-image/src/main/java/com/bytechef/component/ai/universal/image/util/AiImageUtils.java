@@ -16,19 +16,19 @@
 
 package com.bytechef.component.ai.universal.image.util;
 
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.azure.openai.constant.AzureOpenAiConstants;
 import com.bytechef.component.ai.llm.openai.constant.OpenAiConstants;
 import com.bytechef.component.definition.ActionContext;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties.Ai;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;

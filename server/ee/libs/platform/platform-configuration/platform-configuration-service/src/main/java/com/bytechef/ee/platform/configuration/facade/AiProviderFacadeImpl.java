@@ -7,11 +7,12 @@
 
 package com.bytechef.ee.platform.configuration.facade;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.configuration.dto.AiDefaultModelDTO;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderCatalogItemDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ComponentDefinition;
@@ -26,7 +27,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -127,6 +127,47 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .filter(Objects::nonNull)
             .findFirst()
             .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AiDefaultModelWithApiKeyDTO getAiDefaultChatModelApiKey(int environmentId) {
+        return resolveWithApiKey(getAiDefaultChatModel(environmentId), environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AiDefaultModelDTO getAiDefaultEmbeddingModel(int environmentId) {
+        return getAiProviders(environmentId)
+            .stream()
+            .filter(AiProviderDTO::enabled)
+            .filter(AiProviderDTO::supportsEmbeddings)
+            .map(aiProviderDTO -> {
+                Provider provider = getProvider(aiProviderDTO.id());
+
+                String model = resolveDefaultEmbeddingModel(provider);
+
+                if (model == null || model.isBlank()) {
+                    return null;
+                }
+
+                return new AiDefaultModelDTO(provider.getKey(), model);
+            })
+            .filter(Objects::nonNull)
+            .findFirst()
+            .orElse(null);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public AiDefaultModelWithApiKeyDTO getAiDefaultEmbeddingModelApiKey(int environmentId) {
+        return resolveWithApiKey(getAiDefaultEmbeddingModel(environmentId), environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getApiKey(String provider, int environment) {
+        return resolveApiKey(Provider.valueOfKey(provider), environment);
     }
 
     @Override
@@ -237,6 +278,44 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 .getModel();
             default -> null;
         };
+    }
+
+    private String resolveDefaultEmbeddingModel(Provider provider) {
+        ApplicationProperties.Ai.Provider.Embedding embedding = applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding();
+
+        return switch (provider) {
+            case OPEN_AI -> embedding.getOpenAi()
+                .getOptions()
+                .getModel();
+            default -> null;
+        };
+    }
+
+    private String resolveApiKey(Provider provider, int environment) {
+        return propertyService.fetchProperty(provider.getKey(), Scope.PLATFORM, null, (long) environment)
+            .filter(Property::isEnabled)
+            .map(property -> property.get("apiKey"))
+            .map(Object::toString)
+            .filter(apiKey -> !apiKey.isBlank())
+            .orElseGet(() -> getConfigApiKey(provider));
+    }
+
+    private AiDefaultModelWithApiKeyDTO resolveWithApiKey(AiDefaultModelDTO defaultModel, int environment) {
+        if (defaultModel == null) {
+            return null;
+        }
+
+        Provider provider = Provider.valueOfKey(defaultModel.provider());
+
+        String apiKey = resolveApiKey(provider, environment);
+
+        if (apiKey == null || apiKey.isBlank()) {
+            return null;
+        }
+
+        return new AiDefaultModelWithApiKeyDTO(provider, defaultModel.model(), apiKey);
     }
 
     private String getConfigApiKey(Provider provider) {

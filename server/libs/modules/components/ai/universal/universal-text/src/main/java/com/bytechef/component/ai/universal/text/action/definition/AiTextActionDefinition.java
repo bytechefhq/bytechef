@@ -16,21 +16,20 @@
 
 package com.bytechef.component.ai.universal.text.action.definition;
 
-import static com.bytechef.component.ai.llm.Provider.ANTHROPIC;
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.DEEPSEEK;
-import static com.bytechef.component.ai.llm.Provider.GROQ;
-import static com.bytechef.component.ai.llm.Provider.MISTRAL;
-import static com.bytechef.component.ai.llm.Provider.NVIDIA;
-import static com.bytechef.component.ai.llm.Provider.OLLAMA;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.PERPLEXITY;
-import static com.bytechef.component.ai.llm.Provider.VERTEX_GEMINI;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.Authorization.TOKEN;
+import static com.bytechef.platform.ai.llm.Provider.ANTHROPIC;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.DEEPSEEK;
+import static com.bytechef.platform.ai.llm.Provider.GROQ;
+import static com.bytechef.platform.ai.llm.Provider.MISTRAL;
+import static com.bytechef.platform.ai.llm.Provider.NVIDIA;
+import static com.bytechef.platform.ai.llm.Provider.OLLAMA;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.PERPLEXITY;
+import static com.bytechef.platform.ai.llm.Provider.VERTEX_GEMINI;
 
 import com.bytechef.component.ai.llm.ChatModel;
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
 import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
@@ -55,6 +54,7 @@ import com.bytechef.config.ApplicationProperties.Ai.Provider.Ollama;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.OpenAi;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.Perplexity;
 import com.bytechef.config.ApplicationProperties.Ai.Provider.VertexGemini;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.definition.AbstractActionDefinitionWrapper;
 import com.bytechef.platform.component.definition.ActionContextAware;
 import com.bytechef.platform.component.definition.ParametersFactory;

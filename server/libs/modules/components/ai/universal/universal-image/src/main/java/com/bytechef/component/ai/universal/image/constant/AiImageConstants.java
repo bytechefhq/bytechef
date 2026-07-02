@@ -16,12 +16,12 @@
 
 package com.bytechef.component.ai.universal.image.constant;
 
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PROVIDER;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
 import com.bytechef.component.ai.universal.image.util.AiImageUtils;
 import com.bytechef.component.definition.ActionDefinition;

@@ -7,7 +7,8 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
-import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,11 +21,6 @@ import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.stereotype.Component;
 
 /**
- * Default {@link CatalogChatClientResolver}: given a catalog provider key (e.g. {@code "ai.provider.openAi"}) + model
- * name, reads the environment-scoped platform API key and builds a Spring-AI {@link ChatModel} via
- * {@link CatalogChatModelFactory}. Returns {@code null} (caller falls back) when the key is unknown, the provider is
- * disabled, no API key is stored, or the factory can't build it.
- *
  * @version ee
  *
  * @author Ivica Cardic
@@ -34,14 +30,14 @@ import org.springframework.stereotype.Component;
 public class CatalogChatClientResolverImpl implements CatalogChatClientResolver {
 
     private final CatalogChatModelFactory catalogChatModelFactory;
-    private final ProviderApiKeyResolver providerApiKeyResolver;
+    private final AiProviderFacade aiProviderFacade;
 
     @SuppressFBWarnings("EI")
     public CatalogChatClientResolverImpl(
-        CatalogChatModelFactory catalogChatModelFactory, ProviderApiKeyResolver providerApiKeyResolver) {
+        CatalogChatModelFactory catalogChatModelFactory, AiProviderFacade aiProviderFacade) {
 
         this.catalogChatModelFactory = catalogChatModelFactory;
-        this.providerApiKeyResolver = providerApiKeyResolver;
+        this.aiProviderFacade = aiProviderFacade;
     }
 
     @Override
@@ -59,7 +55,7 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
             return null;
         }
 
-        String apiKey = providerApiKeyResolver.resolve(provider, environment);
+        String apiKey = aiProviderFacade.getApiKey(provider.getKey(), environment);
 
         if (apiKey == null || apiKey.isBlank()) {
             return null;

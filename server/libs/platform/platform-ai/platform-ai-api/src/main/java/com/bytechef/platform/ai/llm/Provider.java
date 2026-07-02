@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.bytechef.component.ai.llm;
+package com.bytechef.platform.ai.llm;
 
 import java.util.EnumSet;
 import java.util.Set;
@@ -89,5 +89,15 @@ public enum Provider {
 
     public String getName() {
         return name;
+    }
+
+    public static Provider valueOfKey(String key) {
+        for (Provider provider : values()) {
+            if (provider.key.equals(key)) {
+                return provider;
+            }
+        }
+
+        throw new IllegalArgumentException("No provider found for key: " + key);
     }
 }

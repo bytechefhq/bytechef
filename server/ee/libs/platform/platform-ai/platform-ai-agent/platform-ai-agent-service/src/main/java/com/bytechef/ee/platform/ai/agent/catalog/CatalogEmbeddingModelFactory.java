@@ -10,9 +10,9 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
 import com.bytechef.component.definition.Parameters;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction;

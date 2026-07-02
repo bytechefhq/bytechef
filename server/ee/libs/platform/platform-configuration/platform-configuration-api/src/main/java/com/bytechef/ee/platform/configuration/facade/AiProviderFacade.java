@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.configuration.facade;
 
 import com.bytechef.ee.platform.configuration.dto.AiDefaultModelDTO;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderCatalogItemDTO;
 import com.bytechef.ee.platform.configuration.dto.AiProviderDTO;
 import java.util.List;
@@ -23,9 +24,17 @@ public interface AiProviderFacade {
 
     AiDefaultModelDTO getAiDefaultChatModel(int environmentId);
 
+    AiDefaultModelWithApiKeyDTO getAiDefaultChatModelApiKey(int environmentId);
+
+    AiDefaultModelDTO getAiDefaultEmbeddingModel(int environmentId);
+
+    AiDefaultModelWithApiKeyDTO getAiDefaultEmbeddingModelApiKey(int environmentId);
+
     List<AiProviderCatalogItemDTO> getAiChatProviderCatalog(int environment);
 
     List<AiProviderDTO> getAiProviders(int environment);
+
+    String getApiKey(String provider, int environment);
 
     void updateAiProvider(int id, boolean enabled, int environment);
 

@@ -16,9 +16,6 @@
 
 package com.bytechef.component.ai.universal.image.action;
 
-import static com.bytechef.component.ai.llm.Provider.AZURE_OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.OPEN_AI;
-import static com.bytechef.component.ai.llm.Provider.STABILITY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.CONTENT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_MESSAGES;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.IMAGE_N_PROPERTY;
@@ -39,13 +36,16 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
 import static com.bytechef.component.definition.Property.ControlType.TEXT_AREA;
+import static com.bytechef.platform.ai.llm.Provider.AZURE_OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.OPEN_AI;
+import static com.bytechef.platform.ai.llm.Provider.STABILITY;
 
-import com.bytechef.component.ai.llm.Provider;
 import com.bytechef.component.ai.llm.openai.definition.Size;
 import com.bytechef.component.ai.universal.image.action.definition.AiImageActionDefinition;
 import com.bytechef.component.ai.universal.image.constant.AiImageConstants;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.config.ApplicationProperties;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.HashMap;

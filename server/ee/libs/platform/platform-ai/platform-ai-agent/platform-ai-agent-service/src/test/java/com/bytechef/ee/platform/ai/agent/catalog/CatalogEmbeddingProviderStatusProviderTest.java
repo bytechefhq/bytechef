@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelWithApiKeyDTO;
+import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
+import com.bytechef.platform.ai.llm.Provider;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -21,27 +23,23 @@ import org.junit.jupiter.api.Test;
  */
 class CatalogEmbeddingProviderStatusProviderTest {
 
-    private final ProviderApiKeyResolver providerApiKeyResolver = mock(ProviderApiKeyResolver.class);
+    private static final AiDefaultModelWithApiKeyDTO OPEN_AI_DEFAULT_MODEL =
+        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+
+    private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogEmbeddingProviderStatusProvider statusProvider =
-        new CatalogEmbeddingProviderStatusProvider(providerApiKeyResolver);
+        new CatalogEmbeddingProviderStatusProvider(aiProviderFacade);
 
     @Test
-    void testActiveWhenKeyResolves() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 2)).thenReturn("sk-test");
+    void testActiveWhenDefaultModelResolves() {
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(2)).thenReturn(OPEN_AI_DEFAULT_MODEL);
 
         assertThat(statusProvider.isEmbeddingActive(2)).isTrue();
     }
 
     @Test
-    void testInactiveWhenNoKey() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 2)).thenReturn(null);
-
-        assertThat(statusProvider.isEmbeddingActive(2)).isFalse();
-    }
-
-    @Test
-    void testInactiveWhenBlankKey() {
-        when(providerApiKeyResolver.resolve(Provider.OPEN_AI, 2)).thenReturn("   ");
+    void testInactiveWhenNoDefaultModel() {
+        when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(2)).thenReturn(null);
 
         assertThat(statusProvider.isEmbeddingActive(2)).isFalse();
     }

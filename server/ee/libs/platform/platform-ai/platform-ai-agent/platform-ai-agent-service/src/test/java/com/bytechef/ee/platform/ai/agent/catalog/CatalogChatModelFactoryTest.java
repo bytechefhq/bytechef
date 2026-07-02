@@ -9,7 +9,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.bytechef.component.ai.llm.Provider;
+import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
