@@ -127,8 +127,8 @@ public class SelectTriggerPropertyOptionToolCallback implements ToolCallback {
 
             AgentToolInvocationContext invocationContext = AgentToolInvocationContext.fromToolContext(toolContext);
 
-            if (invocationContext == null || invocationContext.workspaceId() == null) {
-                return toolError("Workspace context unavailable — open this chat from the AI Hub.");
+            if (invocationContext == null) {
+                return toolError("Invocation context unavailable.");
             }
 
             int componentVersion = input.componentVersion() == null ? 1 : input.componentVersion();
