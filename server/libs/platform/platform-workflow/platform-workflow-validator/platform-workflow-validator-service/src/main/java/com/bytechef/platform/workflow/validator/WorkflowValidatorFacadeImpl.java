@@ -19,6 +19,7 @@ package com.bytechef.platform.workflow.validator;
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
+import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.component.definition.ClusterElementDefinition;
 import com.bytechef.platform.component.domain.ActionDefinition;
 import com.bytechef.platform.component.domain.ArrayProperty;
@@ -27,6 +28,8 @@ import com.bytechef.platform.component.domain.FileEntryProperty;
 import com.bytechef.platform.component.domain.ObjectProperty;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.domain.TriggerDefinition;
+import com.bytechef.platform.component.facade.ActionDefinitionFacade;
+import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
@@ -41,10 +44,15 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.JsonNode;
 
 /**
  * @author Marko Kriskovic
@@ -52,26 +60,32 @@ import org.springframework.stereotype.Service;
 @Service
 public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
+    private static final Logger log = LoggerFactory.getLogger(WorkflowValidatorFacadeImpl.class);
+
+    private final ActionDefinitionFacade actionDefinitionFacade;
     private final ActionDefinitionService actionDefinitionService;
     private final ClusterElementDefinitionService clusterElementDefinitionService;
     private final ComponentDefinitionService componentDefinitionService;
     private final TaskDispatcherDefinitionService taskDispatcherDefinitionService;
+    private final TriggerDefinitionFacade triggerDefinitionFacade;
     private final TriggerDefinitionService triggerDefinitionService;
     private final WorkflowService workflowService;
 
     @SuppressFBWarnings("EI2")
     public WorkflowValidatorFacadeImpl(
-        ActionDefinitionService actionDefinitionService,
+        ActionDefinitionFacade actionDefinitionFacade, ActionDefinitionService actionDefinitionService,
         ClusterElementDefinitionService clusterElementDefinitionService,
         ComponentDefinitionService componentDefinitionService,
         TaskDispatcherDefinitionService taskDispatcherDefinitionService,
-        TriggerDefinitionService triggerDefinitionService,
+        TriggerDefinitionFacade triggerDefinitionFacade, TriggerDefinitionService triggerDefinitionService,
         WorkflowService workflowService) {
 
+        this.actionDefinitionFacade = actionDefinitionFacade;
         this.actionDefinitionService = actionDefinitionService;
         this.clusterElementDefinitionService = clusterElementDefinitionService;
         this.componentDefinitionService = componentDefinitionService;
         this.taskDispatcherDefinitionService = taskDispatcherDefinitionService;
+        this.triggerDefinitionFacade = triggerDefinitionFacade;
         this.triggerDefinitionService = triggerDefinitionService;
         this.workflowService = workflowService;
     }
@@ -83,8 +97,7 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
         WorkflowValidator.validateWorkflow(
             workflow, this::getTaskProperties, this::getTaskOutputProperty, this::getClusterElementTypes,
-            new HashMap<>(), new HashMap<>(), new HashMap<>(),
-            errors, warnings);
+            new HashMap<>(), new HashMap<>(), buildNodeOutputMap(workflow), new HashMap<>(), errors, warnings);
 
         String errorsString = errors.toString();
 
@@ -205,6 +218,84 @@ public class WorkflowValidatorFacadeImpl implements WorkflowValidatorFacade {
 
             return null;
         }
+    }
+
+    private Map<String, PropertyInfo> buildNodeOutputMap(String workflow) {
+        Map<String, PropertyInfo> nodeOutputMap = new HashMap<>();
+
+        try {
+            JsonNode workflowJsonNode = JsonUtils.readTree(workflow);
+
+            addNodeOutputs(workflowJsonNode.get("triggers"), true, nodeOutputMap);
+            addNodeOutputs(workflowJsonNode.get("tasks"), false, nodeOutputMap);
+        } catch (Exception e) {
+            log.debug("Failed to build config-aware node output map; falling back to static validation", e);
+        }
+
+        return nodeOutputMap;
+    }
+
+    private void addNodeOutputs(@Nullable JsonNode nodesJsonNode, boolean trigger, Map<String, PropertyInfo> map) {
+        if (nodesJsonNode == null || !nodesJsonNode.isArray()) {
+            return;
+        }
+
+        for (JsonNode nodeJsonNode : nodesJsonNode) {
+            if (!nodeJsonNode.has("name") || !nodeJsonNode.has("type")) {
+                continue;
+            }
+
+            PropertyInfo outputProperty = resolveDynamicOutput(
+                nodeJsonNode.get("type")
+                    .asString(),
+                trigger, toInputParameters(nodeJsonNode.get("parameters")));
+
+            if (outputProperty != null) {
+                map.put(
+                    nodeJsonNode.get("name")
+                        .asString(),
+                    outputProperty);
+            }
+        }
+    }
+
+    private @Nullable PropertyInfo resolveDynamicOutput(
+        String type, boolean trigger, Map<String, ?> inputParameters) {
+
+        try {
+            WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(type);
+
+            OutputResponse outputResponse;
+
+            if (trigger) {
+                outputResponse = triggerDefinitionFacade.executeOutput(
+                    workflowNodeType.name(), workflowNodeType.version(),
+                    Objects.requireNonNull(workflowNodeType.operation()), inputParameters, null);
+            } else if (workflowNodeType.operation() != null) {
+                outputResponse = actionDefinitionFacade.executeOutput(
+                    workflowNodeType.name(), workflowNodeType.version(), workflowNodeType.operation(), inputParameters,
+                    Map.of());
+            } else {
+                return null;
+            }
+
+            if (outputResponse != null && outputResponse.outputSchema() != null) {
+                return toPropertyInfo(outputResponse.outputSchema());
+            }
+        } catch (Exception e) {
+            // Best-effort: connection-needed or otherwise unresolvable dynamic output → fall back to the static path.
+            log.debug("Failed to resolve dynamic output for node type '{}'; falling back to the static path", type, e);
+        }
+
+        return null;
+    }
+
+    private static Map<String, ?> toInputParameters(@Nullable JsonNode parametersJsonNode) {
+        if (parametersJsonNode == null || !parametersJsonNode.isObject()) {
+            return Map.of();
+        }
+
+        return JsonUtils.read(JsonUtils.write(parametersJsonNode), new TypeReference<Map<String, Object>>() {});
     }
 
     @Nullable

@@ -81,6 +81,22 @@ public class WorkflowValidator {
         Map<String, PropertyInfo> taskOutputMap, Map<String, List<String>> clusterTypesMap,
         StringBuilder errors, StringBuilder warnings) {
 
+        validateWorkflow(
+            workflow, taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
+            taskOutputMap, Map.of(), clusterTypesMap, errors, warnings);
+    }
+
+    /**
+     * Same as {@link #validateWorkflow}, plus a config-aware per-node output map (node name to the schema the node
+     * produces for its configured input parameters) used to hard-fail references that don't exist in a dynamic output's
+     * config-resolved shape.
+     */
+    public static void validateWorkflow(
+        String workflow, TaskDefinitionProvider taskDefinitionProvider, TaskOutputProvider taskOutputProvider,
+        @Nullable ClusterTypesProvider clusterTypesProvider, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutputMap, Map<String, PropertyInfo> nodeOutputMap,
+        Map<String, List<String>> clusterTypesMap, StringBuilder errors, StringBuilder warnings) {
+
         try {
             validateWorkflowStructure(workflow, errors);
 
@@ -99,7 +115,8 @@ public class WorkflowValidator {
             processTasks(
                 taskDefinitionProvider, taskOutputProvider, clusterTypesProvider, taskDefinitionMap,
                 taskOutputMap, clusterTypesMap, workflowJsonNode, taskJsonNodes, errors, warnings);
-            validateWorkflowTasks(taskJsonNodes, taskDefinitionMap, taskOutputMap, clusterTypesMap, errors, warnings);
+            validateWorkflowTasks(
+                taskJsonNodes, taskDefinitionMap, taskOutputMap, nodeOutputMap, clusterTypesMap, errors, warnings);
         } catch (Exception e) {
             errors.append("Failed to validate workflow: ");
             errors.append(e.getMessage()
@@ -121,8 +138,17 @@ public class WorkflowValidator {
         Map<String, PropertyInfo> taskOutput, Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors,
         StringBuilder warnings) {
 
+        validateWorkflowTasks(
+            taskJsonNodes, taskDefinitionMap, taskOutput, Map.of(), clusterTypesProviderMap, errors, warnings);
+    }
+
+    public static void validateWorkflowTasks(
+        List<JsonNode> taskJsonNodes, Map<String, List<PropertyInfo>> taskDefinitionMap,
+        Map<String, PropertyInfo> taskOutput, Map<String, PropertyInfo> nodeOutputMap,
+        Map<String, List<String>> clusterTypesProviderMap, StringBuilder errors, StringBuilder warnings) {
+
         ValidationContext context = ValidationContext.of(
-            taskJsonNodes, taskDefinitionMap, taskOutput, clusterTypesProviderMap, errors, warnings);
+            taskJsonNodes, taskDefinitionMap, taskOutput, nodeOutputMap, clusterTypesProviderMap, errors, warnings);
 
         TaskValidator.validateAllTasks(context);
     }
