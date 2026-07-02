@@ -18,10 +18,14 @@ package com.bytechef.embedded.workflow.coordinator.trigger.dispatcher;
 
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.WorkflowExecutionId;
 import com.bytechef.platform.workflow.coordinator.trigger.dispatcher.TriggerDispatcherPreSendProcessor;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -45,11 +49,15 @@ public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
 
     @SuppressFBWarnings("EI")
     public ConnecteduserProjectTriggerDispatcherPreSendProcessor(
+        ConnectedUserProjectService connectedUserProjectService, EnvironmentService environmentService,
+        IntegrationInstanceService integrationInstanceService,
         ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         ProjectWorkflowService projectWorkflowService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
-        super(projectDeploymentWorkflowService);
+        super(
+            connectedUserProjectService, environmentService, integrationInstanceService,
+            projectDeploymentWorkflowService);
 
         this.projectWorkflowService = projectWorkflowService;
         this.jobPrincipalAccessorRegistry = jobPrincipalAccessorRegistry;
@@ -62,16 +70,20 @@ public class ConnecteduserProjectTriggerDispatcherPreSendProcessor
         String workflowId = projectWorkflowService.getProjectWorkflowWorkflowId(
             triggerExecution.getInstanceId(), workflowExecutionId.getWorkflowUuid());
 
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
+            .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(triggerExecution.getType());
+
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            workflowExecutionId.getJobPrincipalId(), workflowId, triggerExecution.getName());
+            workflowExecutionId.getJobPrincipalId(), workflowId, triggerExecution.getName(),
+            workflowNodeType.name(), environmentId);
 
         if (!connectionIdMap.isEmpty()) {
             triggerExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
         }
 
-        int environmentId = (int) jobPrincipalAccessorRegistry
-            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
-            .getEnvironmentId(workflowExecutionId.getJobPrincipalId());
         triggerExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return triggerExecution;

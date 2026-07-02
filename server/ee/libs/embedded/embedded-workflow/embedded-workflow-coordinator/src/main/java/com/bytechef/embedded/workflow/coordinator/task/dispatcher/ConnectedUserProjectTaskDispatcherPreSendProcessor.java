@@ -7,6 +7,7 @@
 
 package com.bytechef.embedded.workflow.coordinator.task.dispatcher;
 
+import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.task.dispatcher.TaskDispatcherPreSendProcessor;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.domain.TaskExecution;
@@ -15,10 +16,13 @@ import com.bytechef.automation.configuration.domain.ProjectDeploymentWorkflow;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.OptionalUtils;
 import com.bytechef.ee.embedded.configuration.service.ConnectedUserProjectService;
+import com.bytechef.ee.embedded.configuration.service.IntegrationInstanceService;
 import com.bytechef.embedded.workflow.coordinator.AbstractConnectedUserProjectDispatcherPreSendProcessor;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.constant.MetadataConstants;
+import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.definition.WorkflowNodeType;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
 import com.bytechef.platform.workflow.execution.service.PrincipalJobService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -46,11 +50,14 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
 
     @SuppressFBWarnings("EI")
     public ConnectedUserProjectTaskDispatcherPreSendProcessor(
-        ConnectedUserProjectService connectedUserProjectService, JobService jobService,
+        ConnectedUserProjectService connectedUserProjectService, EnvironmentService environmentService,
+        IntegrationInstanceService integrationInstanceService, JobService jobService,
         PrincipalJobService principalJobService, ProjectDeploymentWorkflowService projectDeploymentWorkflowService,
         JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry) {
 
-        super(projectDeploymentWorkflowService);
+        super(
+            connectedUserProjectService, environmentService, integrationInstanceService,
+            projectDeploymentWorkflowService);
 
         this.jobService = jobService;
         this.connectedUserProjectService = connectedUserProjectService;
@@ -68,8 +75,16 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
 
         taskExecution.putMetadata(MetadataConstants.JOB_PRINCIPAL_ID, projectDeploymentId);
 
+        int environmentId = (int) jobPrincipalAccessorRegistry
+            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
+            .getEnvironmentId(projectDeploymentId);
+
+        WorkflowTask workflowTask = taskExecution.getWorkflowTask();
+
+        WorkflowNodeType workflowNodeType = WorkflowNodeType.ofType(workflowTask.getType());
+
         Map<String, Long> connectionIdMap = getConnectionIdMap(
-            projectDeploymentId, job.getWorkflowId(), taskExecution.getName());
+            projectDeploymentId, job.getWorkflowId(), taskExecution.getName(), workflowNodeType.name(), environmentId);
 
         if (!connectionIdMap.isEmpty()) {
             taskExecution.putMetadata(MetadataConstants.CONNECTION_IDS, connectionIdMap);
@@ -84,9 +99,6 @@ public class ConnectedUserProjectTaskDispatcherPreSendProcessor
         taskExecution.putMetadata(MetadataConstants.TYPE, PlatformType.AUTOMATION);
         taskExecution.putMetadata(MetadataConstants.WORKFLOW_ID, job.getWorkflowId());
 
-        int environmentId = (int) jobPrincipalAccessorRegistry
-            .getJobPrincipalAccessor(PlatformType.AUTOMATION)
-            .getEnvironmentId(projectDeploymentId);
         taskExecution.putMetadata(MetadataConstants.ENVIRONMENT_ID, environmentId);
 
         return taskExecution;
