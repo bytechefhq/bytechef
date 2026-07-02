@@ -120,14 +120,14 @@ export default function useConnectDialog({
     const [formValues, setFormValues] = useState<Record<string, string>>({});
     const [formErrors, setFormErrors] = useState<Record<string, {message: string}>>({});
     const [enabledOverrides, setEnabledOverrides] = useState<Record<string, boolean | undefined>>({});
-    const [inputOverrides, setInputOverrides] = useState<Record<string, Record<string, string>>>({});
+    const [inputOverrides, setInputOverrides] = useState<Record<string, Record<string, unknown>>>({});
     const [mcpToolEnabledOverrides, setMcpToolEnabledOverrides] = useState<Record<number, boolean | undefined>>({});
-    const [mcpWorkflowEnabledOverrides, setMcpWorkflowEnabledOverrides] = useState<
-        Record<string, boolean | undefined>
-    >({});
-    const [mcpWorkflowInputOverrides, setMcpWorkflowInputOverrides] = useState<
-        Record<string, Record<string, string>>
-    >({});
+    const [mcpWorkflowEnabledOverrides, setMcpWorkflowEnabledOverrides] = useState<Record<string, boolean | undefined>>(
+        {}
+    );
+    const [mcpWorkflowInputOverrides, setMcpWorkflowInputOverrides] = useState<Record<string, Record<string, unknown>>>(
+        {}
+    );
     const [isLoading, setIsLoading] = useState(false);
     const [workflowsView, setWorkflowsView] = useState(!!integrationInstanceId);
     const [currentIntegrationInstanceId, setCurrentIntegrationInstanceId] = useState<number | undefined>(
@@ -166,13 +166,19 @@ export default function useConnectDialog({
                 ...workflow,
                 enabled: effectiveEnabled,
                 inputs: Array.isArray(workflow.inputs)
-                    ? workflow.inputs.map((input: WorkflowInputType) => ({
-                          ...input,
-                          value:
-                              workflowInputOverrides?.[input.name] ??
-                              (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ??
-                              '',
-                      }))
+                    ? workflow.inputs.map((input: WorkflowInputType) => {
+                          const isGroupInput = input.componentReference?.group != null;
+
+                          const overrideValue = workflowInputOverrides?.[input.name];
+                          const serverValue = (instanceWorkflow?.inputs as Record<string, unknown> | undefined)?.[
+                              input.name
+                          ];
+
+                          return {
+                              ...input,
+                              value: overrideValue ?? serverValue ?? (isGroupInput ? {} : ''),
+                          };
+                      })
                     : [],
             } as MergedWorkflowType;
         });
@@ -228,13 +234,19 @@ export default function useConnectDialog({
                 ...workflow,
                 enabled: effectiveEnabled,
                 inputs: Array.isArray(workflow.inputs)
-                    ? workflow.inputs.map((input: WorkflowInputType) => ({
-                          ...input,
-                          value:
-                              workflowInputOverrides?.[input.name] ??
-                              (instanceWorkflow?.inputs as Record<string, string> | undefined)?.[input.name] ??
-                              '',
-                      }))
+                    ? workflow.inputs.map((input: WorkflowInputType) => {
+                          const isGroupInput = input.componentReference?.group != null;
+
+                          const overrideValue = workflowInputOverrides?.[input.name];
+                          const serverValue = (instanceWorkflow?.inputs as Record<string, unknown> | undefined)?.[
+                              input.name
+                          ];
+
+                          return {
+                              ...input,
+                              value: overrideValue ?? serverValue ?? (isGroupInput ? {} : ''),
+                          };
+                      })
                     : [],
             } as MergedWorkflowType;
         });
@@ -259,13 +271,12 @@ export default function useConnectDialog({
                     }
                 );
 
-                const integrationData: IntegrationType = await fetch(
-                    `/api/embedded/v1/integrations/${integrationId}`
-                );
+                const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
 
-                const createdInstance = integrationData.integrationInstances?.find(
-                    (instance) => instance.id === newIntegrationInstanceId
-                ) || integrationData.integrationInstances?.[0];
+                const createdInstance =
+                    integrationData.integrationInstances?.find(
+                        (instance) => instance.id === newIntegrationInstanceId
+                    ) || integrationData.integrationInstances?.[0];
 
                 if (createdInstance) {
                     setCurrentIntegrationInstanceId(createdInstance.id);
@@ -295,13 +306,12 @@ export default function useConnectDialog({
                     }
                 );
 
-                const integrationData: IntegrationType = await fetch(
-                    `/api/embedded/v1/integrations/${integrationId}`
-                );
+                const integrationData: IntegrationType = await fetch(`/api/embedded/v1/integrations/${integrationId}`);
 
-                const createdInstance = integrationData.integrationInstances?.find(
-                    (instance) => instance.id === newIntegrationInstanceId
-                ) || integrationData.integrationInstances?.[0];
+                const createdInstance =
+                    integrationData.integrationInstances?.find(
+                        (instance) => instance.id === newIntegrationInstanceId
+                    ) || integrationData.integrationInstances?.[0];
 
                 if (createdInstance) {
                     setCurrentIntegrationInstanceId(createdInstance.id);
@@ -674,22 +684,8 @@ export default function useConnectDialog({
     integrationRef.current = integration;
     mcpWorkflowInputOverridesRef.current = mcpWorkflowInputOverrides;
 
-    const handleWorkflowInputChange = useCallback(
-        (workflowUuid: string, inputName: string, value: string) => {
-            setInputOverrides((previous) => {
-                const updated = {
-                    ...previous,
-                    [workflowUuid]: {
-                        ...previous[workflowUuid],
-                        [inputName]: value,
-                    },
-                };
-
-                inputOverridesRef.current = updated;
-
-                return updated;
-            });
-
+    const scheduleWorkflowInputsSave = useCallback(
+        (workflowUuid: string) => {
             if (!currentIntegrationInstanceIdRef.current || isNaN(currentIntegrationInstanceIdRef.current)) {
                 console.error('Invalid integration instance ID');
 
@@ -712,24 +708,20 @@ export default function useConnectDialog({
                     );
                     const serverInputs =
                         (currentInstance?.workflows?.find(
-                            (workflow: IntegrationInstanceWorkflowType) =>
-                                workflow.workflowUuid === workflowUuid
-                        )?.inputs as Record<string, string> | undefined) || {};
+                            (workflow: IntegrationInstanceWorkflowType) => workflow.workflowUuid === workflowUuid
+                        )?.inputs as Record<string, unknown> | undefined) || {};
 
                     const mergedInputs = {
                         ...serverInputs,
                         ...inputOverridesRef.current[workflowUuid],
                     };
 
-                    void fetch(
-                        `/api/embedded/v1/integration-instances/${instanceId}/workflows/${workflowUuid}`,
-                        {
-                            body: {
-                                inputs: mergedInputs,
-                            },
-                            method: 'PUT',
-                        }
-                    ).catch((error) => console.error('Failed to save workflow inputs:', error));
+                    void fetch(`/api/embedded/v1/integration-instances/${instanceId}/workflows/${workflowUuid}`, {
+                        body: {
+                            inputs: mergedInputs,
+                        },
+                        method: 'PUT',
+                    }).catch((error) => console.error('Failed to save workflow inputs:', error));
                 }, 600);
             }
 
@@ -738,9 +730,9 @@ export default function useConnectDialog({
         [fetch]
     );
 
-    const handleMcpWorkflowInputChange = useCallback(
-        (workflowUuid: string, inputName: string, value: string) => {
-            setMcpWorkflowInputOverrides((previous) => {
+    const handleWorkflowInputChange = useCallback(
+        (workflowUuid: string, inputName: string, value: unknown) => {
+            setInputOverrides((previous) => {
                 const updated = {
                     ...previous,
                     [workflowUuid]: {
@@ -749,11 +741,45 @@ export default function useConnectDialog({
                     },
                 };
 
-                mcpWorkflowInputOverridesRef.current = updated;
+                inputOverridesRef.current = updated;
 
                 return updated;
             });
 
+            scheduleWorkflowInputsSave(workflowUuid);
+        },
+        [scheduleWorkflowInputsSave]
+    );
+
+    const handleWorkflowGroupInputChange = useCallback(
+        (workflowUuid: string, inputName: string, memberName: string, value: string) => {
+            setInputOverrides((previous) => {
+                const existingGroupValue =
+                    (previous[workflowUuid]?.[inputName] as Record<string, unknown> | undefined) ?? {};
+
+                const updated = {
+                    ...previous,
+                    [workflowUuid]: {
+                        ...previous[workflowUuid],
+                        [inputName]: {
+                            ...existingGroupValue,
+                            [memberName]: value,
+                        },
+                    },
+                };
+
+                inputOverridesRef.current = updated;
+
+                return updated;
+            });
+
+            scheduleWorkflowInputsSave(workflowUuid);
+        },
+        [scheduleWorkflowInputsSave]
+    );
+
+    const scheduleMcpWorkflowInputsSave = useCallback(
+        (workflowUuid: string) => {
             if (!currentIntegrationInstanceIdRef.current || isNaN(currentIntegrationInstanceIdRef.current)) {
                 console.error('Invalid integration instance ID');
 
@@ -776,30 +802,74 @@ export default function useConnectDialog({
                     );
                     const serverInputs =
                         (currentInstance?.mcpWorkflows?.find(
-                            (workflow: IntegrationInstanceWorkflowType) =>
-                                workflow.workflowUuid === workflowUuid
-                        )?.inputs as Record<string, string> | undefined) || {};
+                            (workflow: IntegrationInstanceWorkflowType) => workflow.workflowUuid === workflowUuid
+                        )?.inputs as Record<string, unknown> | undefined) || {};
 
                     const mergedInputs = {
                         ...serverInputs,
                         ...mcpWorkflowInputOverridesRef.current[workflowUuid],
                     };
 
-                    void fetch(
-                        `/api/embedded/v1/integration-instances/${instanceId}/mcp-workflows/${workflowUuid}`,
-                        {
-                            body: {
-                                inputs: mergedInputs,
-                            },
-                            method: 'PUT',
-                        }
-                    ).catch((error) => console.error('Failed to save MCP workflow inputs:', error));
+                    void fetch(`/api/embedded/v1/integration-instances/${instanceId}/mcp-workflows/${workflowUuid}`, {
+                        body: {
+                            inputs: mergedInputs,
+                        },
+                        method: 'PUT',
+                    }).catch((error) => console.error('Failed to save MCP workflow inputs:', error));
                 }, 600);
             }
 
             debouncedFetchesRef.current[debouncedFetchKey]();
         },
         [fetch]
+    );
+
+    const handleMcpWorkflowInputChange = useCallback(
+        (workflowUuid: string, inputName: string, value: unknown) => {
+            setMcpWorkflowInputOverrides((previous) => {
+                const updated = {
+                    ...previous,
+                    [workflowUuid]: {
+                        ...previous[workflowUuid],
+                        [inputName]: value,
+                    },
+                };
+
+                mcpWorkflowInputOverridesRef.current = updated;
+
+                return updated;
+            });
+
+            scheduleMcpWorkflowInputsSave(workflowUuid);
+        },
+        [scheduleMcpWorkflowInputsSave]
+    );
+
+    const handleMcpWorkflowGroupInputChange = useCallback(
+        (workflowUuid: string, inputName: string, memberName: string, value: string) => {
+            setMcpWorkflowInputOverrides((previous) => {
+                const existingGroupValue =
+                    (previous[workflowUuid]?.[inputName] as Record<string, unknown> | undefined) ?? {};
+
+                const updated = {
+                    ...previous,
+                    [workflowUuid]: {
+                        ...previous[workflowUuid],
+                        [inputName]: {
+                            ...existingGroupValue,
+                            [memberName]: value,
+                        },
+                    },
+                };
+
+                mcpWorkflowInputOverridesRef.current = updated;
+
+                return updated;
+            });
+
+            scheduleMcpWorkflowInputsSave(workflowUuid);
+        },
+        [scheduleMcpWorkflowInputsSave]
     );
 
     // Create portal container only once
@@ -817,63 +887,77 @@ export default function useConnectDialog({
 
         // Cleanup on unmount
         return () => {
+            const root = rootRef.current;
+
+            rootRef.current = null;
+
+            // Defer the unmount to a microtask so it never runs synchronously while React is still
+            // rendering/committing the host tree, which would trigger React 19's
+            // synchronous-unmount-during-render warning.
+            if (root) {
+                queueMicrotask(() => root.unmount());
+            }
+
             if (portalContainerRef.current) {
                 document.body.removeChild(portalContainerRef.current);
             }
         };
     }, []);
 
-    // Handle creation and updates
+    // Render the dialog into a nested React root.
+    //
+    // The root is created lazily on first open and kept for the lifetime of the hook. We
+    // intentionally never unmount it on close: ConnectDialog renders null when isOpen is false, so
+    // toggling isOpen is enough. Unmounting the nested root here would run synchronously inside the
+    // host tree's render/commit (closeDialog is dispatched from within the nested root's own event
+    // handler), which triggers React 19's "Attempted to synchronously unmount a root while React was
+    // already rendering" warning. The root is unmounted once, deferred, on host unmount above.
     useEffect(() => {
-        // Clean up when closed
-        if (!isOpen) {
-            if (rootRef.current) {
-                rootRef.current.unmount();
-
-                rootRef.current = null;
+        if (!rootRef.current) {
+            if (!isOpen || !portalContainerRef.current) {
+                return;
             }
 
-            return;
-        }
-
-        // Create root if needed
-        if (!rootRef.current && portalContainerRef.current) {
             rootRef.current = createRoot(portalContainerRef.current);
         }
 
-        // Always render with current state
-        if (rootRef.current) {
-            rootRef.current.render(
-                <ConnectDialog
-                    closeDialog={closeDialog}
-                    form={form}
-                    handleClick={handleClick}
-                    handleMcpToolToggle={handleMcpToolToggle}
-                    handleMcpWorkflowToggle={handleMcpWorkflowToggle}
-                    handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
-                    handleWorkflowToggle={handleWorkflowToggle}
-                    handleWorkflowInputChange={handleWorkflowInputChange}
-                    integration={integration}
-                    isOAuth2={isOAuth2}
-                    isOpen={isOpen}
-                    loading={isLoading}
-                    mergedMcpTools={mergedMcpTools}
-                    mergedMcpWorkflows={mergedMcpWorkflows}
-                    mergedWorkflows={mergedWorkflows}
-                    properties={integration?.connectionConfig?.inputs}
-                    registerFormSubmit={registerFormSubmit}
-                    workflowsView={workflowsView}
-                />
-            );
-        }
+        rootRef.current.render(
+            <ConnectDialog
+                apiFetch={fetch}
+                closeDialog={closeDialog}
+                form={form}
+                handleClick={handleClick}
+                handleMcpToolToggle={handleMcpToolToggle}
+                handleMcpWorkflowToggle={handleMcpWorkflowToggle}
+                handleMcpWorkflowGroupInputChange={handleMcpWorkflowGroupInputChange}
+                handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
+                handleWorkflowGroupInputChange={handleWorkflowGroupInputChange}
+                handleWorkflowToggle={handleWorkflowToggle}
+                handleWorkflowInputChange={handleWorkflowInputChange}
+                integration={integration}
+                integrationInstanceId={currentIntegrationInstanceId}
+                isOAuth2={isOAuth2}
+                isOpen={isOpen}
+                loading={isLoading}
+                mergedMcpTools={mergedMcpTools}
+                mergedMcpWorkflows={mergedMcpWorkflows}
+                mergedWorkflows={mergedWorkflows}
+                properties={integration?.connectionConfig?.inputs}
+                registerFormSubmit={registerFormSubmit}
+                workflowsView={workflowsView}
+            />
+        );
     }, [
         isOpen,
+        fetch,
         form,
         formValues,
         handleClick,
         handleMcpToolToggle,
+        handleMcpWorkflowGroupInputChange,
         handleMcpWorkflowToggle,
         handleMcpWorkflowInputChange,
+        handleWorkflowGroupInputChange,
         handleWorkflowToggle,
         handleWorkflowInputChange,
         integration,

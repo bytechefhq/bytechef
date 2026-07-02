@@ -4,14 +4,34 @@ import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
 import styles from './styles.module.css';
 import {
+    ApiFetch,
+    ComponentPropertyGroupType,
     FormType,
     IntegrationType,
     MergedMcpToolType,
     MergedWorkflowType,
+    OptionType,
     PropertyType,
     RegisterFormSubmitFunction,
     WorkflowInputType,
 } from './types';
+import {optionsCacheKey} from './utils';
+import useWorkflowInputOptions from './useWorkflowInputOptions';
+
+type LoadWorkflowInputOptionsFunction = (
+    componentName: string,
+    componentVersion: number,
+    groupName: string,
+    propertyName: string,
+    dependencyValues: Record<string, unknown>
+) => void;
+
+type HandleWorkflowGroupInputChangeFunction = (
+    workflowUuid: string,
+    groupName: string,
+    memberName: string,
+    value: string
+) => void;
 
 interface ToggleProps {
     id: string;
@@ -42,16 +62,20 @@ const Toggle = ({id, pressed, onPressedChange}: ToggleProps) => (
 );
 
 interface DialogProps {
+    apiFetch?: ApiFetch;
     closeDialog: () => void;
     workflowsView?: boolean;
     form?: FormType;
     handleClick: (event: React.MouseEvent<HTMLButtonElement>) => void;
     handleMcpToolToggle?: (mcpToolId: number, pressed: boolean) => void;
     handleMcpWorkflowToggle?: (workflowUuid: string, pressed: boolean) => void;
-    handleMcpWorkflowInputChange?: (workflowUuid: string, inputName: string, value: string) => void;
+    handleMcpWorkflowInputChange?: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleMcpWorkflowGroupInputChange?: HandleWorkflowGroupInputChangeFunction;
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleWorkflowGroupInputChange?: HandleWorkflowGroupInputChangeFunction;
     integration?: IntegrationType;
+    integrationInstanceId?: number;
     isOAuth2?: boolean;
     isOpen: boolean;
     loading?: boolean;
@@ -63,6 +87,7 @@ interface DialogProps {
 }
 
 const ConnectDialog = ({
+    apiFetch,
     closeDialog,
     workflowsView = false,
     form,
@@ -70,9 +95,12 @@ const ConnectDialog = ({
     handleMcpToolToggle = () => {},
     handleMcpWorkflowToggle = () => {},
     handleMcpWorkflowInputChange = () => {},
+    handleMcpWorkflowGroupInputChange = () => {},
     handleWorkflowToggle,
     handleWorkflowInputChange,
+    handleWorkflowGroupInputChange = () => {},
     integration,
+    integrationInstanceId,
     isOAuth2 = false,
     isOpen,
     loading = false,
@@ -82,6 +110,10 @@ const ConnectDialog = ({
     properties,
     registerFormSubmit,
 }: DialogProps) => {
+    // Option reset on integration switch is handled inside useWorkflowInputOptions (keyed on integrationInstanceId),
+    // which resets during render — before the new fields load — instead of in an effect that would race the fetch.
+    const {loadOptions, optionsByKey} = useWorkflowInputOptions(apiFetch, integrationInstanceId);
+
     useEffect(() => {
         const handleKeyDown = (event: KeyboardEvent) => {
             if (event.key === 'Escape') {
@@ -119,14 +151,18 @@ const ConnectDialog = ({
                         handleMcpToolToggle={handleMcpToolToggle}
                         handleMcpWorkflowToggle={handleMcpWorkflowToggle}
                         handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
+                        handleMcpWorkflowGroupInputChange={handleMcpWorkflowGroupInputChange}
                         handleWorkflowToggle={handleWorkflowToggle}
                         handleWorkflowInputChange={handleWorkflowInputChange}
+                        handleWorkflowGroupInputChange={handleWorkflowGroupInputChange}
                         integration={integration}
+                        loadWorkflowInputOptions={loadOptions}
                         mergedMcpTools={mergedMcpTools}
                         mergedMcpWorkflows={mergedMcpWorkflows}
                         mergedWorkflows={mergedWorkflows}
                         properties={properties}
                         registerFormSubmit={registerFormSubmit}
+                        workflowInputOptions={optionsByKey}
                     />
                 ) : (
                     <main className={styles.dialogContentFallback}>
@@ -173,14 +209,20 @@ const DialogHeader = ({closeDialog, integration}: DialogHeaderProps) => (
 
 interface DialogWorkflowsContainerProps {
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleWorkflowGroupInputChange: HandleWorkflowGroupInputChangeFunction;
+    loadWorkflowInputOptions: LoadWorkflowInputOptionsFunction;
     mergedWorkflows: MergedWorkflowType[];
+    workflowInputOptions: Record<string, OptionType[]>;
 }
 
 const DialogWorkflowsContainer = ({
     handleWorkflowToggle,
     handleWorkflowInputChange,
+    handleWorkflowGroupInputChange,
+    loadWorkflowInputOptions,
     mergedWorkflows,
+    workflowInputOptions,
 }: DialogWorkflowsContainerProps) => {
     return (
         <div data-testid="workflows-container" className={styles.workflowsContainer}>
@@ -214,23 +256,20 @@ const DialogWorkflowsContainer = ({
                                         <p className={styles.noInputsMessage}>No inputs defined for this workflow.</p>
                                     ) : (
                                         <ul>
-                                            {inputs?.map((input: WorkflowInputType) => (
-                                                <li key={input.name}>
-                                                    <DialogInputField
-                                                        onChange={(event) =>
-                                                            handleWorkflowInputChange(
-                                                                workflowUuid,
-                                                                input.name,
-                                                                event.target.value
-                                                            )
-                                                        }
-                                                        label={input.label}
-                                                        name={input.name}
-                                                        required={input.required}
-                                                        field={{value: input.value}}
-                                                    />
-                                                </li>
-                                            ))}
+                                            {inputs
+                                                ?.filter((input: WorkflowInputType) => !input.internalOnly)
+                                                .map((input: WorkflowInputType) => (
+                                                    <li key={input.name}>
+                                                        {renderWorkflowInput({
+                                                            handleInputChange: handleWorkflowInputChange,
+                                                            handleWorkflowGroupInputChange,
+                                                            input,
+                                                            loadWorkflowInputOptions,
+                                                            workflowInputOptions,
+                                                            workflowUuid,
+                                                        })}
+                                                    </li>
+                                                ))}
                                         </ul>
                                     )}
                                 </div>
@@ -246,17 +285,23 @@ const DialogWorkflowsContainer = ({
 interface DialogToolsContainerProps {
     handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
     handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleWorkflowGroupInputChange: HandleWorkflowGroupInputChangeFunction;
+    loadWorkflowInputOptions: LoadWorkflowInputOptionsFunction;
     mergedMcpTools: MergedMcpToolType[];
     mergedMcpWorkflows: MergedWorkflowType[];
+    workflowInputOptions: Record<string, OptionType[]>;
 }
 
 const DialogToolsContainer = ({
     handleMcpToolToggle,
     handleMcpWorkflowToggle,
     handleMcpWorkflowInputChange,
+    handleWorkflowGroupInputChange,
+    loadWorkflowInputOptions,
     mergedMcpTools,
     mergedMcpWorkflows,
+    workflowInputOptions,
 }: DialogToolsContainerProps) => {
     return (
         <div data-testid="tools-container" className={styles.workflowsContainer}>
@@ -297,9 +342,7 @@ const DialogToolsContainer = ({
                                     <Toggle
                                         id={`mcp-workflow-${workflowUuid}`}
                                         pressed={enabled}
-                                        onPressedChange={(pressed) =>
-                                            handleMcpWorkflowToggle(workflowUuid, pressed)
-                                        }
+                                        onPressedChange={(pressed) => handleMcpWorkflowToggle(workflowUuid, pressed)}
                                     />
                                 </div>
 
@@ -313,23 +356,20 @@ const DialogToolsContainer = ({
                                             </p>
                                         ) : (
                                             <ul>
-                                                {inputs?.map((input: WorkflowInputType) => (
-                                                    <li key={input.name}>
-                                                        <DialogInputField
-                                                            onChange={(event) =>
-                                                                handleMcpWorkflowInputChange(
-                                                                    workflowUuid,
-                                                                    input.name,
-                                                                    event.target.value
-                                                                )
-                                                            }
-                                                            label={input.label}
-                                                            name={input.name}
-                                                            required={input.required}
-                                                            field={{value: input.value}}
-                                                        />
-                                                    </li>
-                                                ))}
+                                                {inputs
+                                                    ?.filter((input: WorkflowInputType) => !input.internalOnly)
+                                                    .map((input: WorkflowInputType) => (
+                                                        <li key={input.name}>
+                                                            {renderWorkflowInput({
+                                                                handleInputChange: handleMcpWorkflowInputChange,
+                                                                handleWorkflowGroupInputChange,
+                                                                input,
+                                                                loadWorkflowInputOptions,
+                                                                workflowInputOptions,
+                                                                workflowUuid,
+                                                            })}
+                                                        </li>
+                                                    ))}
                                             </ul>
                                         )}
                                     </div>
@@ -349,15 +389,19 @@ interface DialogContentProps {
     form?: FormType;
     handleMcpToolToggle: (mcpToolId: number, pressed: boolean) => void;
     handleMcpWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleMcpWorkflowInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleMcpWorkflowGroupInputChange?: HandleWorkflowGroupInputChangeFunction;
     handleWorkflowToggle: (workflowUuid: string, pressed: boolean) => void;
-    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: string) => void;
+    handleWorkflowInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleWorkflowGroupInputChange?: HandleWorkflowGroupInputChangeFunction;
     integration: IntegrationType;
+    loadWorkflowInputOptions?: LoadWorkflowInputOptionsFunction;
     mergedMcpTools?: MergedMcpToolType[];
     mergedMcpWorkflows?: MergedWorkflowType[];
     mergedWorkflows: MergedWorkflowType[];
     properties?: PropertyType[];
     registerFormSubmit?: RegisterFormSubmitFunction;
+    workflowInputOptions?: Record<string, OptionType[]>;
 }
 
 type TabType = 'tools' | 'workflows';
@@ -368,14 +412,18 @@ const DialogContent = ({
     handleMcpToolToggle,
     handleMcpWorkflowToggle,
     handleMcpWorkflowInputChange,
+    handleMcpWorkflowGroupInputChange = () => {},
     handleWorkflowToggle,
     handleWorkflowInputChange,
+    handleWorkflowGroupInputChange = () => {},
     integration,
+    loadWorkflowInputOptions = () => {},
     mergedMcpTools = [],
     mergedMcpWorkflows = [],
     mergedWorkflows,
     properties,
     registerFormSubmit,
+    workflowInputOptions = {},
 }: DialogContentProps) => {
     const [activeTab, setActiveTab] = useState<TabType>('workflows');
 
@@ -444,7 +492,10 @@ const DialogContent = ({
                 <DialogWorkflowsContainer
                     handleWorkflowToggle={handleWorkflowToggle}
                     handleWorkflowInputChange={handleWorkflowInputChange}
+                    handleWorkflowGroupInputChange={handleWorkflowGroupInputChange}
+                    loadWorkflowInputOptions={loadWorkflowInputOptions}
                     mergedWorkflows={mergedWorkflows}
+                    workflowInputOptions={workflowInputOptions}
                 />
             )}
 
@@ -453,8 +504,11 @@ const DialogContent = ({
                     handleMcpToolToggle={handleMcpToolToggle}
                     handleMcpWorkflowToggle={handleMcpWorkflowToggle}
                     handleMcpWorkflowInputChange={handleMcpWorkflowInputChange}
+                    handleWorkflowGroupInputChange={handleMcpWorkflowGroupInputChange}
+                    loadWorkflowInputOptions={loadWorkflowInputOptions}
                     mergedMcpTools={mergedMcpTools}
                     mergedMcpWorkflows={mergedMcpWorkflows}
+                    workflowInputOptions={workflowInputOptions}
                 />
             )}
         </main>
@@ -502,6 +556,221 @@ const DialogPoweredBy = () => (
         </span>
     </div>
 );
+
+const hasUnsatisfiedDependencies = (dependencyValues: Record<string, unknown>): boolean =>
+    Object.values(dependencyValues).some((value) => value === undefined || value === null || value === '');
+
+interface DialogDynamicSelectFieldProps {
+    dependencyValues: Record<string, unknown>;
+    label: string;
+    loadOptions: (dependencyValues: Record<string, unknown>) => void;
+    name: string;
+    onChange: (value: string) => void;
+    options?: OptionType[];
+    required?: boolean;
+    value?: string;
+}
+
+const DialogDynamicSelectField = ({
+    dependencyValues,
+    label,
+    loadOptions,
+    name,
+    onChange,
+    options,
+    required,
+    value,
+}: DialogDynamicSelectFieldProps) => {
+    const dependencyValuesKey = JSON.stringify(dependencyValues);
+    const dependenciesUnsatisfied = hasUnsatisfiedDependencies(dependencyValues);
+    const hasOptions = options !== undefined && options.length > 0;
+
+    useEffect(() => {
+        if (!dependenciesUnsatisfied) {
+            loadOptions(dependencyValues);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dependencyValuesKey, dependenciesUnsatisfied]);
+
+    return (
+        <fieldset className={styles.dialogInputField}>
+            <label htmlFor={name}>
+                {label}
+
+                {required && <span className={styles.requiredIndicator}>*</span>}
+            </label>
+
+            {dependenciesUnsatisfied ? (
+                <select id={name} disabled value="">
+                    <option value="">Select dependencies first</option>
+                </select>
+            ) : hasOptions ? (
+                <select id={name} value={value ?? ''} onChange={(event) => onChange(event.target.value)}>
+                    <option value="">Select {label}</option>
+
+                    {options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                            {option.label}
+                        </option>
+                    ))}
+                </select>
+            ) : (
+                <select id={name} disabled value="">
+                    <option value="">No options</option>
+                </select>
+            )}
+        </fieldset>
+    );
+};
+
+interface DialogGroupFieldProps {
+    componentName: string;
+    componentVersion: number;
+    group: ComponentPropertyGroupType;
+    groupName: string;
+    handleWorkflowGroupInputChange: HandleWorkflowGroupInputChangeFunction;
+    inputName: string;
+    loadWorkflowInputOptions: LoadWorkflowInputOptionsFunction;
+    memberValues: Record<string, unknown>;
+    workflowInputOptions: Record<string, OptionType[]>;
+    workflowUuid: string;
+}
+
+const DialogGroupField = ({
+    componentName,
+    componentVersion,
+    group,
+    groupName,
+    handleWorkflowGroupInputChange,
+    inputName,
+    loadWorkflowInputOptions,
+    memberValues,
+    workflowInputOptions,
+    workflowUuid,
+}: DialogGroupFieldProps) => (
+    <fieldset className={styles.workflowInputsContainer}>
+        {/* A single-property group's label just duplicates its lone member's label (e.g. Slack's "channel" group
+            with one "Channel" property), so only show the group label when the group bundles multiple members. */}
+        {(group.properties?.length ?? 0) > 1 && <label>{group.label ?? group.name}</label>}
+
+        {group.properties?.map((member) => {
+            if (member.dynamicOptions) {
+                const dependencyValues = collectDependencyValues(member.optionsLookupDependsOn, memberValues);
+
+                return (
+                    <DialogDynamicSelectField
+                        key={member.name}
+                        dependencyValues={dependencyValues}
+                        label={member.label ?? member.name}
+                        loadOptions={(dependencies) =>
+                            loadWorkflowInputOptions(
+                                componentName,
+                                componentVersion,
+                                groupName,
+                                member.name,
+                                dependencies
+                            )
+                        }
+                        name={`${group.name}.${member.name}`}
+                        onChange={(value) =>
+                            handleWorkflowGroupInputChange(workflowUuid, inputName, member.name, value)
+                        }
+                        options={
+                            workflowInputOptions[
+                                optionsCacheKey(
+                                    componentName,
+                                    componentVersion,
+                                    groupName,
+                                    member.name,
+                                    collectDependencyValues(member.optionsLookupDependsOn, memberValues)
+                                )
+                            ]
+                        }
+                        required={member.required}
+                        value={memberValues[member.name] as string | undefined}
+                    />
+                );
+            }
+
+            return (
+                <DialogInputField
+                    key={member.name}
+                    onChange={(event) =>
+                        handleWorkflowGroupInputChange(workflowUuid, inputName, member.name, event.target.value)
+                    }
+                    label={member.label ?? member.name}
+                    name={`${group.name}.${member.name}`}
+                    options={member.options?.map((option) => option.value)}
+                    required={member.required}
+                    field={{value: memberValues[member.name] as string | undefined}}
+                />
+            );
+        })}
+    </fieldset>
+);
+
+const collectDependencyValues = (
+    dependencyNames: string[] | undefined,
+    siblingValues: Record<string, unknown>
+): Record<string, unknown> => {
+    const dependencyValues: Record<string, unknown> = {};
+
+    dependencyNames?.forEach((dependencyName) => {
+        dependencyValues[dependencyName] = siblingValues[dependencyName];
+    });
+
+    return dependencyValues;
+};
+
+interface RenderWorkflowInputArgs {
+    handleInputChange: (workflowUuid: string, inputName: string, value: unknown) => void;
+    handleWorkflowGroupInputChange: HandleWorkflowGroupInputChangeFunction;
+    input: WorkflowInputType;
+    loadWorkflowInputOptions: LoadWorkflowInputOptionsFunction;
+    workflowInputOptions: Record<string, OptionType[]>;
+    workflowUuid: string;
+}
+
+const renderWorkflowInput = ({
+    handleInputChange,
+    handleWorkflowGroupInputChange,
+    input,
+    loadWorkflowInputOptions,
+    workflowInputOptions,
+    workflowUuid,
+}: RenderWorkflowInputArgs) => {
+    const componentReference = input.componentReference;
+    const group = componentReference?.group;
+
+    if (componentReference && group) {
+        const memberValues = (input.value as Record<string, unknown> | undefined) ?? {};
+
+        return (
+            <DialogGroupField
+                componentName={componentReference.componentName}
+                componentVersion={componentReference.componentVersion}
+                group={group}
+                groupName={componentReference.groupName}
+                handleWorkflowGroupInputChange={handleWorkflowGroupInputChange}
+                inputName={input.name}
+                loadWorkflowInputOptions={loadWorkflowInputOptions}
+                memberValues={memberValues}
+                workflowInputOptions={workflowInputOptions}
+                workflowUuid={workflowUuid}
+            />
+        );
+    }
+
+    return (
+        <DialogInputField
+            onChange={(event) => handleInputChange(workflowUuid, input.name, event.target.value)}
+            label={input.label}
+            name={input.name}
+            required={input.required}
+            field={{value: input.value as string | number | readonly string[] | undefined}}
+        />
+    );
+};
 
 interface DialogInputFieldsetProps {
     label: string;
