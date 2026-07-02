@@ -10,6 +10,7 @@ import {
     IntegrationInstanceWorkflowType,
     IntegrationType,
     IntegrationWorkflowType,
+    MapObjectFieldsType,
     McpIntegrationInstanceToolType,
     McpToolType,
     MergedMcpToolType,
@@ -19,7 +20,8 @@ import {
     TokenPayloadI,
     WorkflowInputType,
 } from './types';
-import {mergeWorkflowInputs} from './utils';
+import {decodeJwtSubject, mergeWorkflowInputs} from './utils';
+import useExecuteAction from './useExecuteAction';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
@@ -106,6 +108,7 @@ interface UseConnectDialogProps {
     integrationId: string;
     integrationInstanceId?: string;
     jwtToken: string;
+    mapObjectFields?: MapObjectFieldsType;
 }
 
 export default function useConnectDialog({
@@ -114,6 +117,7 @@ export default function useConnectDialog({
     integrationId,
     integrationInstanceId,
     jwtToken,
+    mapObjectFields,
 }: UseConnectDialogProps): ConnectionDialogHookReturnType {
     const [integration, setIntegration] = useState<IntegrationType | undefined>(undefined);
     const [isOAuth2, setIsOAuth2] = useState(false);
@@ -141,6 +145,10 @@ export default function useConnectDialog({
     const formSubmitRef = useRef<FormSubmitHandler | null>(null);
 
     const {fetch} = useMemo(() => createApiClient(baseUrl, environment, jwtToken), [baseUrl, environment, jwtToken]);
+
+    const externalUserId = useMemo(() => decodeJwtSubject(jwtToken), [jwtToken]);
+
+    const executeAction = useExecuteAction(fetch, externalUserId, currentIntegrationInstanceId);
 
     // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
     const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
@@ -923,6 +931,7 @@ export default function useConnectDialog({
             <ConnectDialog
                 apiFetch={fetch}
                 closeDialog={closeDialog}
+                executeAction={executeAction}
                 form={form}
                 handleClick={handleClick}
                 handleMcpToolToggle={handleMcpToolToggle}
@@ -937,6 +946,7 @@ export default function useConnectDialog({
                 isOAuth2={isOAuth2}
                 isOpen={isOpen}
                 loading={isLoading}
+                mapObjectFields={mapObjectFields}
                 mergedMcpTools={mergedMcpTools}
                 mergedMcpWorkflows={mergedMcpWorkflows}
                 mergedWorkflows={mergedWorkflows}
@@ -947,6 +957,7 @@ export default function useConnectDialog({
         );
     }, [
         isOpen,
+        executeAction,
         fetch,
         form,
         formValues,
@@ -961,6 +972,7 @@ export default function useConnectDialog({
         integration,
         integrationInstanceId,
         isOAuth2,
+        mapObjectFields,
         mergedMcpTools,
         mergedMcpWorkflows,
         mergedWorkflows,

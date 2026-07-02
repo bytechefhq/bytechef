@@ -26,6 +26,28 @@ export const stableSerialize = (record: Record<string, unknown>): string => {
 };
 
 /**
+ * Extracts the `sub` (external user id) claim from a JWT without verifying its signature. The SDK needs the external
+ * user id for action-execution URLs; the server independently verifies the token, so client-side decoding is safe to
+ * read claims from. Returns `undefined` when the token is malformed.
+ */
+export const decodeJwtSubject = (jwtToken: string): string | undefined => {
+    try {
+        const payloadSegment = jwtToken.split('.')[1];
+
+        if (!payloadSegment) {
+            return undefined;
+        }
+
+        const normalized = payloadSegment.replace(/-/g, '+').replace(/_/g, '/');
+        const payload = JSON.parse(atob(normalized)) as {sub?: string};
+
+        return payload.sub;
+    } catch {
+        return undefined;
+    }
+};
+
+/**
  * Builds the cache key under which a component-defined input's resolved options are stored in (and read from) the
  * `workflowInputOptions` map. The key mirrors the component-reference identity tuple
  * (`componentName`, `componentVersion`, `groupName`, the property/member name, and the resolved dependency values)
