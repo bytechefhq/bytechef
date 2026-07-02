@@ -10,6 +10,7 @@ package com.bytechef.ee.ai.copilot.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.agui.core.state.State;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
 import com.bytechef.platform.ai.tool.TaskTools;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ class CopilotToolContextUtilsTest {
     void testEmitsAgentToolInvocationContextKeys() {
         Map<String, Object> stateMap = new HashMap<>();
 
-        stateMap.put(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID, 42L);
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
         stateMap.put("workspaceId", 7L);
         stateMap.put("environmentId", "2");
 
@@ -76,8 +77,8 @@ class CopilotToolContextUtilsTest {
 
         Map<String, Object> stateMap = new HashMap<>();
 
-        stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
-        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, "acme");
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, "acme");
 
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));
 
@@ -93,7 +94,7 @@ class CopilotToolContextUtilsTest {
     void testDoesNotSkipAutomationAuthorizationWithoutCapturedAuthentication() {
         Map<String, Object> stateMap = new HashMap<>();
 
-        stateMap.put(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID, 42L);
+        stateMap.put(CopilotConstants.STATE_AUTHENTICATED_USER_ID, 42L);
         stateMap.put("workspaceId", 7L);
 
         Map<String, Object> toolContext = CopilotToolContextUtils.toToolContext(new State(stateMap));

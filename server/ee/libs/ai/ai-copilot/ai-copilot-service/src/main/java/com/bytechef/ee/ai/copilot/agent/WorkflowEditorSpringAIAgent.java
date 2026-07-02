@@ -20,8 +20,8 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.tool.SecurityContextRehydrator;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
 import com.bytechef.ee.ai.copilot.util.CopilotToolContextUtils;
 import com.bytechef.platform.configuration.dto.WorkflowNodeOutputDTO;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
@@ -155,7 +155,7 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     }
 
     static String appendAdditionalSystemPrompt(String message, State state) {
-        Object value = state == null ? null : state.get(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+        Object value = state == null ? null : state.get(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
 
         if (!(value instanceof String text) || text.isBlank()) {
             return message;
@@ -163,8 +163,8 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
 
         String trimmed = text.strip();
 
-        if (trimmed.length() > CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
-            trimmed = trimmed.substring(0, CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
+        if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
+            trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
         }
 
         return message + "\n\n" + ADDITIONAL_SYSTEM_PROMPT_HEADER + "\n\n" + trimmed;
@@ -175,10 +175,10 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
             return;
         }
 
-        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+        Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
 
         if (userId == null) {
-            if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication) {
+            if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication) {
                 return;
             }
 
@@ -194,13 +194,13 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     }
 
     private <T> T runWithCallerSecurityContext(State state, Supplier<T> action) {
-        Long userId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_AUTHENTICATED_USER_ID));
+        Long userId = NumberUtils.asLong(state.get(CopilotConstants.STATE_AUTHENTICATED_USER_ID));
 
         if (userId != null) {
             return securityContextRehydrator.withUserSecurityContext(userId, action);
         }
 
-        if (state.get(CopilotStateKeys.STATE_AUTHENTICATION) instanceof Authentication authentication) {
+        if (state.get(CopilotConstants.STATE_AUTHENTICATION) instanceof Authentication authentication) {
             return SecurityUtils.runAs(authentication, () -> callSkippingChecks(action));
         }
 
