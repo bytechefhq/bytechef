@@ -18,7 +18,7 @@ import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.AgentSubscriberParams;
 import com.agui.core.agent.RunAgentParameters;
 import com.agui.server.LocalAgent;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.tenant.TenantContext;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +45,7 @@ class CopilotWorkflowGeneratorTest {
 
         Map<String, Object> stateMap = captureState(localAgent);
 
-        assertThat(stateMap).containsEntry(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
     }
 
     @Test
@@ -58,7 +58,7 @@ class CopilotWorkflowGeneratorTest {
 
         Map<String, Object> stateMap = captureState(localAgent);
 
-        assertThat(stateMap).doesNotContainKey(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
     }
 
     private static LocalAgent newCompletingAgent() {
@@ -106,7 +106,7 @@ class CopilotWorkflowGeneratorTest {
         TenantContext.runWithTenantId("acme",
             () -> generator.generateWorkflow("wf-1", "build a thing", null, Set.of()));
 
-        assertThat(capturedState.get()).containsEntry(CopilotStateKeys.STATE_TENANT_ID, "acme");
+        assertThat(capturedState.get()).containsEntry(CopilotConstants.STATE_TENANT_ID, "acme");
     }
 
     private static Map<String, Object> captureState(LocalAgent localAgent) {

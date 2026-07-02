@@ -22,7 +22,7 @@ import com.agui.json.ObjectMapperFactory;
 import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;
@@ -139,8 +139,8 @@ public class ConnectedUserCopilotApiControllerIntTest {
         assertThat(stateMap).containsEntry("workflowId", "wf-99");
         assertThat(stateMap).containsEntry("mode", "BUILD");
         assertThat(stateMap).containsEntry("autonomous", false);
-        assertThat(stateMap).containsKey(CopilotStateKeys.STATE_TENANT_ID);
-        assertThat(stateMap).containsKey(CopilotStateKeys.STATE_AUTHENTICATION);
+        assertThat(stateMap).containsKey(CopilotConstants.STATE_TENANT_ID);
+        assertThat(stateMap).containsKey(CopilotConstants.STATE_AUTHENTICATION);
         assertThat(stateMap.get(TaskTools.TOOL_CONTEXT_ALLOWED_COMPONENT_NAMES_KEY))
             .isEqualTo(Set.of("slack"));
     }
@@ -175,7 +175,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
             .getState();
 
         // The untrusted short client key is consumed (trimmed) and re-applied under the authoritative key.
-        assertThat(stateMap).containsEntry(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
+        assertThat(stateMap).containsEntry(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
         assertThat(stateMap).doesNotContainKey("additionalSystemPrompt");
     }
 
@@ -210,7 +210,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
         // The canonical key must be absent — the controller drops any client-supplied canonical key before the
         // short-key sanitization block runs, so it can never be smuggled in directly.
-        assertThat(stateMap).doesNotContainKey(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
     }
 
     @Test

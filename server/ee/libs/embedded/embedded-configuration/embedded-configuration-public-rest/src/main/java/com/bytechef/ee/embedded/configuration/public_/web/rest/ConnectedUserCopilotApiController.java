@@ -13,7 +13,7 @@ import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.OptionalUtils;
-import com.bytechef.ee.ai.copilot.util.CopilotStateKeys;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.util.Mode;
 import com.bytechef.ee.ai.copilot.util.Source;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
@@ -95,27 +95,27 @@ public class ConnectedUserCopilotApiController {
         stateMap.put("workflowId", context.workflowId());
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", false);
-        stateMap.put(CopilotStateKeys.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
+        stateMap.put(CopilotConstants.STATE_TENANT_ID, TenantContext.getCurrentTenantId());
 
         Authentication authentication = SecurityContextHolder.getContext()
             .getAuthentication();
 
         if (authentication != null) {
-            stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
+            stateMap.put(CopilotConstants.STATE_AUTHENTICATION, authentication);
         }
 
-        stateMap.remove(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+        stateMap.remove(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
 
         Object additionalSystemPromptValue = stateMap.remove("additionalSystemPrompt");
 
         if (additionalSystemPromptValue instanceof String additionalSystemPrompt && !additionalSystemPrompt.isBlank()) {
             String trimmed = additionalSystemPrompt.strip();
 
-            if (trimmed.length() > CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
-                trimmed = trimmed.substring(0, CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
+            if (trimmed.length() > CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
+                trimmed = trimmed.substring(0, CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
             }
 
-            stateMap.put(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, trimmed);
+            stateMap.put(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, trimmed);
         }
 
         Set<String> allowedComponentNames = context.allowedComponentNames();

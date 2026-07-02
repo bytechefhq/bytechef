@@ -5,15 +5,16 @@
  * you may not use this file except in compliance with the Enterprise License.
  */
 
-package com.bytechef.ee.ai.copilot.util;
+package com.bytechef.ee.ai.copilot.constant;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-public final class CopilotStateKeys {
+public final class CopilotConstants {
 
+    public static final int ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH = 4000;
     public static final String STATE_AUTHENTICATED_USER_ID = "authenticatedUserId";
     public static final String STATE_AUTHENTICATION = "authentication";
     public static final String STATE_ADDITIONAL_SYSTEM_PROMPT = "additionalSystemPrompt";
@@ -23,8 +24,6 @@ public final class CopilotStateKeys {
     public static final String STATE_USER_SELECTED_LLM_MODEL = "userSelectedLlmModel";
     public static final String STATE_WORKSPACE_ID = "workspaceId";
 
-    public static final int ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH = 4000;
-
-    private CopilotStateKeys() {
+    private CopilotConstants() {
     }
 }
