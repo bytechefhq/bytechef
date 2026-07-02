@@ -19,6 +19,7 @@ import {
     TokenPayloadI,
     WorkflowInputType,
 } from './types';
+import {mergeWorkflowInputs} from './utils';
 
 const OAUTH2_TYPES = ['OAUTH2_AUTHORIZATION_CODE', 'OAUTH2_AUTHORIZATION_CODE_PKCE'];
 
@@ -711,10 +712,7 @@ export default function useConnectDialog({
                             (workflow: IntegrationInstanceWorkflowType) => workflow.workflowUuid === workflowUuid
                         )?.inputs as Record<string, unknown> | undefined) || {};
 
-                    const mergedInputs = {
-                        ...serverInputs,
-                        ...inputOverridesRef.current[workflowUuid],
-                    };
+                    const mergedInputs = mergeWorkflowInputs(serverInputs, inputOverridesRef.current[workflowUuid]);
 
                     void fetch(`/api/embedded/v1/integration-instances/${instanceId}/workflows/${workflowUuid}`, {
                         body: {
@@ -805,10 +803,10 @@ export default function useConnectDialog({
                             (workflow: IntegrationInstanceWorkflowType) => workflow.workflowUuid === workflowUuid
                         )?.inputs as Record<string, unknown> | undefined) || {};
 
-                    const mergedInputs = {
-                        ...serverInputs,
-                        ...mcpWorkflowInputOverridesRef.current[workflowUuid],
-                    };
+                    const mergedInputs = mergeWorkflowInputs(
+                        serverInputs,
+                        mcpWorkflowInputOverridesRef.current[workflowUuid]
+                    );
 
                     void fetch(`/api/embedded/v1/integration-instances/${instanceId}/mcp-workflows/${workflowUuid}`, {
                         body: {

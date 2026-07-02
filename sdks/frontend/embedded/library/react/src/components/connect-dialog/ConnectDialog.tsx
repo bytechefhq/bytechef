@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import Logo from './assets/logo.svg';
 import XIcon from './assets/x.svg';
 import SquareArrowOutUpRightIcon from './assets/square-arrow-out-up-right.svg';
@@ -15,7 +15,7 @@ import {
     RegisterFormSubmitFunction,
     WorkflowInputType,
 } from './types';
-import {optionsCacheKey} from './utils';
+import {optionsCacheKey, stableSerialize} from './utils';
 import useWorkflowInputOptions from './useWorkflowInputOptions';
 
 type LoadWorkflowInputOptionsFunction = (
@@ -581,15 +581,26 @@ const DialogDynamicSelectField = ({
     required,
     value,
 }: DialogDynamicSelectFieldProps) => {
-    const dependencyValuesKey = JSON.stringify(dependencyValues);
+    // `loadOptions` and `dependencyValues` are recreated on every parent render, so depending on them directly would
+    // refire the load effect each render. The refs always expose the latest values (synced by the dependency-free
+    // effect below, which runs before the load effect) while the serialized key keeps the load effect firing only
+    // when the dependency contents actually change.
+    const dependencyValuesRef = useRef(dependencyValues);
+    const loadOptionsRef = useRef(loadOptions);
+
+    const dependencyValuesKey = stableSerialize(dependencyValues);
     const dependenciesUnsatisfied = hasUnsatisfiedDependencies(dependencyValues);
     const hasOptions = options !== undefined && options.length > 0;
 
     useEffect(() => {
+        dependencyValuesRef.current = dependencyValues;
+        loadOptionsRef.current = loadOptions;
+    });
+
+    useEffect(() => {
         if (!dependenciesUnsatisfied) {
-            loadOptions(dependencyValues);
+            loadOptionsRef.current(dependencyValuesRef.current);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [dependencyValuesKey, dependenciesUnsatisfied]);
 
     return (
@@ -649,9 +660,9 @@ const DialogGroupField = ({
     workflowUuid,
 }: DialogGroupFieldProps) => (
     <fieldset className={styles.workflowInputsContainer}>
-        {/* A single-property group's label just duplicates its lone member's label (e.g. Slack's "channel" group
-            with one "Channel" property), so only show the group label when the group bundles multiple members. */}
-        {(group.properties?.length ?? 0) > 1 && <label>{group.label ?? group.name}</label>}
+        {/* A single-property group's title just duplicates its lone member's label (e.g. Slack's "channel" group
+            with one "Channel" property), so only show the group title when the group bundles multiple members. */}
+        {(group.properties?.length ?? 0) > 1 && <legend>{group.label ?? group.name}</legend>}
 
         {group.properties?.map((member) => {
             if (member.dynamicOptions) {
@@ -682,7 +693,7 @@ const DialogGroupField = ({
                                     componentVersion,
                                     groupName,
                                     member.name,
-                                    collectDependencyValues(member.optionsLookupDependsOn, memberValues)
+                                    dependencyValues
                                 )
                             ]
                         }

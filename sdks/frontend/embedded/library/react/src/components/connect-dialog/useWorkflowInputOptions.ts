@@ -102,7 +102,7 @@ export default function useWorkflowInputOptions(
                     setOptionsByInstance(optionsByInstanceRef.current);
                 })
                 .catch((error: unknown) => {
-                    console.error('Failed to load workflow input options:', (error as Error).message);
+                    console.error('Failed to load workflow input options:', error);
                 })
                 .finally(() => {
                     inFlightKeysRef.current.delete(inFlightKey);
@@ -139,7 +139,8 @@ export default function useWorkflowInputOptions(
 
     return {
         loadOptions,
-        optionsByKey: integrationInstanceId != null ? (optionsByInstance[integrationInstanceId] ?? EMPTY_OPTIONS) : EMPTY_OPTIONS,
+        optionsByKey:
+            integrationInstanceId != null ? (optionsByInstance[integrationInstanceId] ?? EMPTY_OPTIONS) : EMPTY_OPTIONS,
         resetOptions,
     };
 }

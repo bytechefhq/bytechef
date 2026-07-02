@@ -386,6 +386,12 @@ p {
     font-weight: bold;
 }
 
+.workflowInputsContainer legend {
+    font-size: 0.875rem;
+    margin: 0;
+    padding: 0;
+}
+
 .workflowInputsContainer ul {
     width: 100%;
     margin: 0;
