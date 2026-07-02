@@ -18,7 +18,9 @@ import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.constant.PlatformType;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,9 +63,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
     public List<ConnectionDTO> getConnections(
         Long connectedUserId, String componentName, List<Long> connectionIds) {
 
-        List<Long> allConnectionIds = new ArrayList<>();
-
         ConnectedUser connectedUser = connectedUserService.getConnectedUser(connectedUserId);
+
+        Set<Long> allConnectionIds = new LinkedHashSet<>();
 
         allConnectionIds.addAll(
             integrationInstanceService
@@ -73,16 +75,9 @@ public class ConnectedUserConnectionFacadeImpl implements ConnectedUserConnectio
                 .toList());
 
         allConnectionIds.addAll(connectedUserConnectionService.getConnectionIds(connectedUser.getId()));
+        allConnectionIds.addAll(connectionIds);
 
-        List<ConnectionDTO> connectionDTOs = new ArrayList<>(
-            connectionFacade.getConnections(allConnectionIds, PlatformType.EMBEDDED));
-
-        connectionDTOs.addAll(
-            connectionIds.stream()
-                .map(connectionFacade::getConnection)
-                .toList());
-
-        return connectionDTOs
+        return connectionFacade.getConnections(new ArrayList<>(allConnectionIds), PlatformType.EMBEDDED)
             .stream()
             .filter(connectionDTO -> componentName.equals(connectionDTO.componentName()))
             .toList();
