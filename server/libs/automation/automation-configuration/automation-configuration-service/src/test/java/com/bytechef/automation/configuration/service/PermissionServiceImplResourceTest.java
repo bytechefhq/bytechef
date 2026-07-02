@@ -21,12 +21,19 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver;
 import com.bytechef.automation.configuration.security.ResourceOwnershipResolver.ResourceOwner;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.User;
 import com.bytechef.platform.user.service.UserService;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 /**
  * Pins the CE behavior of {@code hasResourceScope}: owner-isolation for owner-carrying resources (PRIVATE), permissive
@@ -38,6 +45,22 @@ import org.mockito.Mockito;
 class PermissionServiceImplResourceTest {
 
     private final UserService userService = Mockito.mock(UserService.class);
+
+    @BeforeEach
+    void setUp() {
+        SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+
+        securityContext.setAuthentication(
+            new UsernamePasswordAuthenticationToken(
+                "user", "user", List.of(new SimpleGrantedAuthority(AuthorityConstants.USER))));
+
+        SecurityContextHolder.setContext(securityContext);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     private PermissionService permissionService(ResourceOwnershipResolver... resolvers) {
         return new PermissionServiceImpl(userService, List.of(resolvers));
@@ -125,5 +148,14 @@ class PermissionServiceImplResourceTest {
         PermissionService service = permissionService();
 
         assertThat(service.hasWorkflowScope("wf-uuid", "WORKFLOW_EDIT")).isTrue();
+    }
+
+    @Test
+    void testHasResourceScopeDeniesUnauthenticatedCaller() {
+        SecurityContextHolder.clearContext();
+
+        PermissionService service = permissionService(resolver("Connection", ResourceOwner.ofUser(7L)));
+
+        assertThat(service.hasResourceScope(1L, "Connection", "CONNECTION_DELETE")).isFalse();
     }
 }

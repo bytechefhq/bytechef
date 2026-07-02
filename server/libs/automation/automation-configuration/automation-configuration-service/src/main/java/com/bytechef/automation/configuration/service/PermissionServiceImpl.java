@@ -34,10 +34,13 @@ import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
 
 /**
- * Community Edition no-op implementation of {@link PermissionService}. RBAC (workspace roles, project scopes, custom
- * roles) is an Enterprise Edition feature — in CE every authenticated user is treated as having full access at the
- * service level, and access control is enforced solely by Spring Security's {@code ROLE_USER}/{@code ROLE_ADMIN}
- * authorities plus the client-side UI gating.
+ * Community Edition implementation of {@link PermissionService}. Fine-grained RBAC (workspace roles, project scopes,
+ * custom roles) is an Enterprise Edition feature, so in CE the workspace/role/scope checks grant access to any
+ * authenticated (non-anonymous) caller and deny unauthenticated ones. Resource-level access
+ * ({@link #hasResourceScope(Serializable, String, String)}) still fails closed: it denies unauthenticated callers and
+ * unknown resource types, and enforces owner isolation for user-owned resources. Coarse-grained access control is
+ * otherwise enforced by Spring Security's {@code ROLE_USER}/{@code ROLE_ADMIN} authorities plus the client-side UI
+ * gating.
  *
  * @author Ivica Cardic
  */
@@ -72,21 +75,25 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean hasWorkspaceRole(long workspaceId, String minimumRole) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
     public boolean hasWorkspaceScope(long workspaceId, String scope) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
     public boolean hasWorkspaceScopeForProject(long projectId, String scope) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
     public boolean hasResourceScope(Serializable id, String resourceType, String scope) {
+        if (!SecurityUtils.isAuthenticated()) {
+            return false;
+        }
+
         if (isTenantAdmin()) {
             return true;
         }
@@ -111,17 +118,17 @@ public class PermissionServiceImpl implements PermissionService {
 
     @Override
     public boolean isResourceOwner(String resourceType, long id) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
     public boolean hasResourceRole(long id, String resourceType, String minimumRole) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
     public boolean hasWorkflowScope(String workflowId, String scope) {
-        return true;
+        return SecurityUtils.isAuthenticated();
     }
 
     @Override
