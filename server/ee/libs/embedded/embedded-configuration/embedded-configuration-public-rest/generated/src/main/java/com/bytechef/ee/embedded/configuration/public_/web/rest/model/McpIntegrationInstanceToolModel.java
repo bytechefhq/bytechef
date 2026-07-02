@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "McpIntegrationInstanceTool", description = "Contains user configurations for the execution of a particular MCP tool.")
 @JsonTypeName("McpIntegrationInstanceTool")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-01T23:56:54.981292+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.470562+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class McpIntegrationInstanceToolModel {
 
   private Boolean enabled;
