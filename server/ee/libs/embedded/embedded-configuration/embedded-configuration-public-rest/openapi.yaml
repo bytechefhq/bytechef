@@ -67,6 +67,9 @@ paths:
                 prompt:
                   description: "Natural language description of the workflow to build."
                   type: "string"
+                systemPrompt:
+                  description: "Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt."
+                  type: "string"
         required: true
       responses:
         "200":
@@ -108,6 +111,9 @@ paths:
                 prompt:
                   description: "Natural language description of the workflow to build."
                   type: "string"
+                systemPrompt:
+                  description: "Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt."
+                  type: "string"
         required: true
       responses:
         "200":
@@ -148,6 +154,9 @@ paths:
               properties:
                 prompt:
                   description: "Natural language description of the workflow to build."
+                  type: "string"
+                systemPrompt:
+                  description: "Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt."
                   type: "string"
         required: true
       responses:
@@ -195,6 +204,9 @@ paths:
               properties:
                 prompt:
                   description: "Natural language description of the workflow to build."
+                  type: "string"
+                systemPrompt:
+                  description: "Optional additional instructions for the AI, merged as a non-overriding advisory block into the workflow-builder agent's system prompt."
                   type: "string"
         required: true
       responses:

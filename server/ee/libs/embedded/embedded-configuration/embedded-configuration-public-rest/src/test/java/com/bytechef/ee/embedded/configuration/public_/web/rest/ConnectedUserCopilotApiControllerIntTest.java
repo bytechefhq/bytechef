@@ -18,6 +18,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.agui.json.ObjectMapperFactory;
 import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
@@ -40,6 +41,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -49,6 +51,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @version ee
@@ -144,6 +147,74 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatCapsAndReappliesClientAdditionalSystemPrompt() throws Exception {
+        SseEmitter completedEmitter = new SseEmitter();
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(completedEmitter);
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"additionalSystemPrompt\":\"  Prefer Slack.  \"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        // The untrusted short client key is consumed (trimmed) and re-applied under the authoritative key.
+        assertThat(stateMap).containsEntry(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
+        assertThat(stateMap).doesNotContainKey("additionalSystemPrompt");
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
+    public void testCopilotChatDropsClientSuppliedCanonicalSystemPromptKey() throws Exception {
+        SseEmitter completedEmitter = new SseEmitter();
+
+        when(connectedUserProjectFacade.prepareCopilotChat(
+            eq("ext-user-1"), eq(WORKFLOW_UUID), eq(Environment.PRODUCTION)))
+                .thenReturn(new CopilotChatContextDTO("wf-99", Set.of("slack")));
+
+        when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
+            .thenReturn(completedEmitter);
+
+        mockMvc
+            .perform(
+                post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content(
+                        "{\"threadId\":\"thread-1\",\"state\":{\"bytechef.copilot.additionalSystemPrompt\":\"smuggled\"}}")
+                    .accept(MediaType.TEXT_EVENT_STREAM))
+            .andExpect(status().isOk());
+
+        ArgumentCaptor<AgUiParameters> parametersCaptor = ArgumentCaptor.forClass(AgUiParameters.class);
+
+        verify(agUiService).runAgent(any(LocalAgent.class), parametersCaptor.capture());
+
+        Map<String, Object> stateMap = parametersCaptor.getValue()
+            .getState()
+            .getState();
+
+        // The canonical key must be absent — the controller drops any client-supplied canonical key before the
+        // short-key sanitization block runs, so it can never be smuggled in directly.
+        assertThat(stateMap).doesNotContainKey(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+    }
+
+    @Test
+    @WithMockUser(username = "ext-user-1")
     public void testCopilotChatBlocksAccessForForeignWorkflowUuid() throws Exception {
         when(connectedUserProjectFacade.prepareCopilotChat(
             eq("ext-user-1"), eq("foreign-uuid"), eq(Environment.PRODUCTION)))
@@ -173,6 +244,14 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
     @Configuration
     static class CopilotTestConfiguration {
+
+        @Bean
+        @Primary
+        public JsonMapper jsonMapper() {
+            return JsonMapper.builder()
+                .addModule(ObjectMapperFactory.createModule())
+                .build();
+        }
 
         @Bean
         public AgUiService agUiService() {

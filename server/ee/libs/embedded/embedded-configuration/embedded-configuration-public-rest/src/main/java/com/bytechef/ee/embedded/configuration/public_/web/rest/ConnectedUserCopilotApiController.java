@@ -92,7 +92,6 @@ public class ConnectedUserCopilotApiController {
         State state = agUiParameters.getState();
         Map<String, Object> stateMap = state.getState();
 
-        // Server-authoritative state — never trust client-supplied values.
         stateMap.put("workflowId", context.workflowId());
         stateMap.put("mode", Mode.BUILD.name());
         stateMap.put("autonomous", false);
@@ -103,6 +102,20 @@ public class ConnectedUserCopilotApiController {
 
         if (authentication != null) {
             stateMap.put(CopilotStateKeys.STATE_AUTHENTICATION, authentication);
+        }
+
+        stateMap.remove(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT);
+
+        Object additionalSystemPromptValue = stateMap.remove("additionalSystemPrompt");
+
+        if (additionalSystemPromptValue instanceof String additionalSystemPrompt && !additionalSystemPrompt.isBlank()) {
+            String trimmed = additionalSystemPrompt.strip();
+
+            if (trimmed.length() > CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH) {
+                trimmed = trimmed.substring(0, CopilotStateKeys.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
+            }
+
+            stateMap.put(CopilotStateKeys.STATE_ADDITIONAL_SYSTEM_PROMPT, trimmed);
         }
 
         Set<String> allowedComponentNames = context.allowedComponentNames();

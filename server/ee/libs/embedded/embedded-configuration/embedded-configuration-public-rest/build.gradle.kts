@@ -66,4 +66,5 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
     testImplementation(project(":server:libs:test:test-int-support"))
     testImplementation(project(":server:libs:test:test-support"))
+    testImplementation(project(":spring-ai:spring-ag-ui:utils:json"))
 }
