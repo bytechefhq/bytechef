@@ -1,3 +1,5 @@
+import type {ExecuteActionFunction} from './useExecuteAction';
+
 export interface IntegrationType {
     description?: string;
     connectionConfig?: {
@@ -121,7 +123,8 @@ export interface ComponentInputReferenceType {
 export interface WorkflowInputType {
     name: string;
     label: string;
-    type: 'string' | 'number' | 'boolean' | 'object' | 'array';
+    objectName?: string;
+    type: 'string' | 'number' | 'boolean' | 'object' | 'array' | 'field_mapping';
     componentReference?: ComponentInputReferenceType;
     defaultValue?: unknown;
     internalOnly?: boolean;
@@ -169,3 +172,56 @@ export type ApiFetch = <T>(
         headers?: Record<string, string>;
     }
 ) => Promise<T>;
+
+export interface FieldMappingObjectListArgsType {
+    executeAction: ExecuteActionFunction;
+    search?: string;
+}
+
+export interface FieldMappingIntegrationFieldArgsType {
+    executeAction: ExecuteActionFunction;
+    objectType: string;
+    search?: string;
+}
+
+export interface FieldMappingApplicationFieldsType {
+    defaultFields?: string[];
+    fields: OptionType[];
+    userCanCreateFields?: boolean;
+    userCanRemoveMappings?: boolean;
+}
+
+export interface FieldMappingConfigType {
+    applicationFields: FieldMappingApplicationFieldsType;
+    integrationFields: {get: (args: FieldMappingIntegrationFieldArgsType) => Promise<OptionType[]>};
+    objectTypes: {get: (args: FieldMappingObjectListArgsType) => Promise<OptionType[]>};
+}
+
+export type MapObjectFieldsType = Record<string, FieldMappingConfigType>;
+
+// Component-facing config: identical to FieldMappingConfigType but with `executeAction` already bound into the
+// callbacks by ConnectDialog (Task B5), so FieldMappingField never sees or threads executeAction.
+export interface BoundFieldMappingObjectListArgsType {
+    search?: string;
+}
+
+export interface BoundFieldMappingIntegrationFieldArgsType {
+    objectType: string;
+    search?: string;
+}
+
+export interface BoundFieldMappingConfigType {
+    applicationFields: FieldMappingApplicationFieldsType;
+    integrationFields: {get: (args: BoundFieldMappingIntegrationFieldArgsType) => Promise<OptionType[]>};
+    objectTypes: {get: (args: BoundFieldMappingObjectListArgsType) => Promise<OptionType[]>};
+}
+
+export interface FieldMappingRowValueType {
+    applicationField: {custom: boolean; label: string; value: string};
+    integrationField: string;
+}
+
+export interface FieldMappingValueType {
+    mappings: FieldMappingRowValueType[];
+    objectType: string;
+}
