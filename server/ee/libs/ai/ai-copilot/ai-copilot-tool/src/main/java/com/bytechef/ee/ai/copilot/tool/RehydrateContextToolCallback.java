@@ -9,6 +9,8 @@ package com.bytechef.ee.ai.copilot.tool;
 
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.tenant.TenantContext;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -20,14 +22,12 @@ import org.springframework.ai.tool.definition.ToolDefinition;
 import org.springframework.security.core.Authentication;
 
 /**
- * Decorator that rehydrates the request's tenant and Spring Security principal from the
- * {@link AgentToolInvocationContext} carried on the Spring AI {@link ToolContext}, before delegating. Spring AI
- * dispatches tool calls on Reactor scheduler / worker threads that do not inherit the request thread's
- * {@code TenantContext} or SecurityContext thread-locals, so a tool that reads tenant-scoped data or hits a
- * {@code @PreAuthorize} method would otherwise see the {@code public} tenant and no principal. Each half is
- * independent: a missing tenant id leaves the tenant unchanged, and the security context is restored from either a
- * captured {@link Authentication} (preferred — works for principals with no backing platform user, such as the embedded
- * API-key principal) or, failing that, a user id rehydrated via {@link SecurityContextRehydrator}.
+ * Decorator that rehydrates the request's environment, tenant, and Spring Security principal from the
+ * {@link AgentToolInvocationContext} on the Spring AI {@link ToolContext} before delegating, since Spring AI runs tool
+ * calls on worker threads that do not inherit the {@code EnvironmentContext}, {@code TenantContext}, or SecurityContext
+ * thread-locals. Each part is independent; security is restored from a captured {@link Authentication} (preferred —
+ * supports principals with no backing platform user, such as the embedded API-key principal) or, failing that, a user
+ * id via {@link SecurityContextRehydrator}.
  *
  * @version ee
  *
@@ -44,10 +44,6 @@ public final class RehydrateContextToolCallback implements ToolCallback {
         this.securityContextRehydrator = securityContextRehydrator;
     }
 
-    /**
-     * Wraps {@code delegate} so each {@link #call(String, ToolContext)} runs under the invocation's tenant + principal.
-     * Idempotent — re-wrapping a callback already wrapped by this class returns it unchanged.
-     */
     public static ToolCallback wrap(ToolCallback delegate, SecurityContextRehydrator securityContextRehydrator) {
         if (delegate instanceof RehydrateContextToolCallback) {
             return delegate;
@@ -74,13 +70,30 @@ public final class RehydrateContextToolCallback implements ToolCallback {
             return delegate.call(toolInput, toolContext);
         }
 
-        String tenantId = invocationContext.tenantId();
+        return withEnvironment(
+            invocationContext.environmentId(),
+            () -> withTenant(
+                invocationContext.tenantId(),
+                () -> withSecurityContext(invocationContext, () -> delegate.call(toolInput, toolContext))));
+    }
 
-        Supplier<String> securedCall =
-            () -> withSecurityContext(invocationContext, () -> delegate.call(toolInput, toolContext));
+    private static String withEnvironment(@Nullable Long environmentId, Supplier<String> action) {
+        if (environmentId == null || environmentId < 0 || environmentId >= Environment.values().length) {
+            return action.get();
+        }
 
+        EnvironmentContext.set(environmentId.intValue());
+
+        try {
+            return action.get();
+        } finally {
+            EnvironmentContext.clear();
+        }
+    }
+
+    private static String withTenant(@Nullable String tenantId, Supplier<String> action) {
         if (tenantId == null) {
-            return securedCall.get();
+            return action.get();
         }
 
         String previousTenantId = TenantContext.getCurrentTenantId();
@@ -88,7 +101,7 @@ public final class RehydrateContextToolCallback implements ToolCallback {
         try {
             TenantContext.setCurrentTenantId(tenantId);
 
-            return securedCall.get();
+            return action.get();
         } finally {
             TenantContext.setCurrentTenantId(previousTenantId);
         }

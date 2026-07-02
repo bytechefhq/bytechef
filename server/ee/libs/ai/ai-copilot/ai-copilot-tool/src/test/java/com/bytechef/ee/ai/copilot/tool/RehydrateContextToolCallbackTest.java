@@ -12,10 +12,13 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.bytechef.automation.configuration.security.AutomationAuthorizationContext;
 import com.bytechef.ee.ai.copilot.tool.context.AgentToolInvocationContext;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.tenant.TenantContext;
 import java.util.Map;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.model.ToolContext;
 import org.springframework.ai.tool.ToolCallback;
@@ -50,6 +53,7 @@ class RehydrateContextToolCallbackTest {
         private String tenantSeenInside;
         private Authentication authenticationSeenInside;
         private boolean skipChecksSeenInside;
+        private Environment environmentSeenInside;
 
         @Override
         public ToolDefinition getToolDefinition() {
@@ -71,9 +75,15 @@ class RehydrateContextToolCallbackTest {
             authenticationSeenInside = SecurityContextHolder.getContext()
                 .getAuthentication();
             skipChecksSeenInside = AutomationAuthorizationContext.isSkipChecks();
+            environmentSeenInside = EnvironmentContext.getCurrentEnvironment();
 
             return "ok";
         }
+    }
+
+    @AfterEach
+    void tearDown() {
+        EnvironmentContext.clear();
     }
 
     @Test
@@ -158,6 +168,42 @@ class RehydrateContextToolCallbackTest {
         wrapped.call("{}", new ToolContext(map));
 
         assertThat(probe.skipChecksSeenInside).isFalse();
+    }
+
+    @Test
+    void testBindsEnvironmentInsideCallThenClears() {
+        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
+
+        ProbeToolCallback probe = new ProbeToolCallback();
+
+        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
+
+        Map<String, Object> map = new AgentToolInvocationContext(
+            null, 42L, (long) Environment.STAGING.ordinal(), null, "acme").toToolContext();
+
+        String result = wrapped.call("{}", new ToolContext(map));
+
+        assertThat(result).isEqualTo("ok");
+        // The Reactor worker thread sees the invocation's environment, not the unbound default.
+        assertThat(probe.environmentSeenInside).isEqualTo(Environment.STAGING);
+        // ... and the ThreadLocal returns to its unbound default (PRODUCTION) afterward.
+        assertThat(EnvironmentContext.getCurrentEnvironment()).isEqualTo(Environment.PRODUCTION);
+    }
+
+    @Test
+    void testLeavesEnvironmentUnboundWhenIdAbsent() {
+        TenantContext.setCurrentTenantId(TenantContext.DEFAULT_TENANT_ID);
+
+        ProbeToolCallback probe = new ProbeToolCallback();
+
+        ToolCallback wrapped = RehydrateContextToolCallback.wrap(probe, new RecordingRehydrator());
+
+        Map<String, Object> map = new AgentToolInvocationContext(null, 42L, null, null, "acme").toToolContext();
+
+        wrapped.call("{}", new ToolContext(map));
+
+        // No environment in the context → left unbound, resolving to the PRODUCTION default downstream.
+        assertThat(probe.environmentSeenInside).isEqualTo(Environment.PRODUCTION);
     }
 
     @Test
