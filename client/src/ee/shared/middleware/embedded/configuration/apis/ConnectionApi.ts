@@ -24,9 +24,8 @@ import {
     UpdateConnectionRequestToJSON,
 } from '../models/UpdateConnectionRequest';
 
-export interface CreateConnectedUserProjectWorkflowConnectionRequest {
+export interface CreateConnectedUserConnectionRequest {
     connectedUserId: number;
-    workflowUuid: string;
     connection: Omit<Connection, 'active'|'authorizationParameters'|'connectionParameters'|'createdBy'|'createdDate'|'id'|'lastModifiedBy'|'lastModifiedDate'>;
 }
 
@@ -66,27 +65,20 @@ export interface UpdateConnectionOperationRequest {
 export class ConnectionApi extends runtime.BaseAPI {
 
     /**
-     * Creates request options for createConnectedUserProjectWorkflowConnection without sending the request
+     * Creates request options for createConnectedUserConnection without sending the request
      */
-    async createConnectedUserProjectWorkflowConnectionRequestOpts(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest): Promise<runtime.RequestOpts> {
+    async createConnectedUserConnectionRequestOpts(requestParameters: CreateConnectedUserConnectionRequest): Promise<runtime.RequestOpts> {
         if (requestParameters['connectedUserId'] == null) {
             throw new runtime.RequiredError(
                 'connectedUserId',
-                'Required parameter "connectedUserId" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
-            );
-        }
-
-        if (requestParameters['workflowUuid'] == null) {
-            throw new runtime.RequiredError(
-                'workflowUuid',
-                'Required parameter "workflowUuid" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+                'Required parameter "connectedUserId" was null or undefined when calling createConnectedUserConnection().'
             );
         }
 
         if (requestParameters['connection'] == null) {
             throw new runtime.RequiredError(
                 'connection',
-                'Required parameter "connection" was null or undefined when calling createConnectedUserProjectWorkflowConnection().'
+                'Required parameter "connection" was null or undefined when calling createConnectedUserConnection().'
             );
         }
 
@@ -97,9 +89,8 @@ export class ConnectionApi extends runtime.BaseAPI {
         headerParameters['Content-Type'] = 'application/json';
 
 
-        let urlPath = `/connected-users/{connectedUserId}/workflows/{workflowUuid}/connections`;
+        let urlPath = `/connected-users/{connectedUserId}/connections`;
         urlPath = urlPath.replace('{connectedUserId}', encodeURIComponent(String(requestParameters['connectedUserId'])));
-        urlPath = urlPath.replace('{workflowUuid}', encodeURIComponent(String(requestParameters['workflowUuid'])));
 
         return {
             path: urlPath,
@@ -111,11 +102,11 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new connection for the connected user\'s project workflow.
-     * Create a new connection for the connected user\'s project workflow
+     * Create a new connection for the connected user.
+     * Create a new connection for the connected user
      */
-    async createConnectedUserProjectWorkflowConnectionRaw(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
-        const requestOptions = await this.createConnectedUserProjectWorkflowConnectionRequestOpts(requestParameters);
+    async createConnectedUserConnectionRaw(requestParameters: CreateConnectedUserConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<runtime.ApiResponse<number>> {
+        const requestOptions = await this.createConnectedUserConnectionRequestOpts(requestParameters);
         const response = await this.request(requestOptions, initOverrides);
 
         if (this.isJsonMime(response.headers.get('content-type'))) {
@@ -126,11 +117,11 @@ export class ConnectionApi extends runtime.BaseAPI {
     }
 
     /**
-     * Create a new connection for the connected user\'s project workflow.
-     * Create a new connection for the connected user\'s project workflow
+     * Create a new connection for the connected user.
+     * Create a new connection for the connected user
      */
-    async createConnectedUserProjectWorkflowConnection(requestParameters: CreateConnectedUserProjectWorkflowConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
-        const response = await this.createConnectedUserProjectWorkflowConnectionRaw(requestParameters, initOverrides);
+    async createConnectedUserConnection(requestParameters: CreateConnectedUserConnectionRequest, initOverrides?: RequestInit | runtime.InitOverrideFunction): Promise<number> {
+        const response = await this.createConnectedUserConnectionRaw(requestParameters, initOverrides);
         return await response.value();
     }
 
