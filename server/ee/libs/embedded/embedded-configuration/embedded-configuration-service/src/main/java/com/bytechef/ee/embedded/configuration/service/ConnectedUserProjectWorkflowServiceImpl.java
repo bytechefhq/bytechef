@@ -34,16 +34,6 @@ public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserPro
     }
 
     @Override
-    public void addConnection(long connectedUserProjectId, long projectWorkflowId, long connectionId) {
-        ConnectedUserProjectWorkflow connectedUserProjectWorkflow = getConnectedUserProjectWorkflow(
-            connectedUserProjectId, projectWorkflowId);
-
-        connectedUserProjectWorkflow.addConnection(connectionId);
-
-        connectedUserProjectWorkflowRepository.save(connectedUserProjectWorkflow);
-    }
-
-    @Override
     public ConnectedUserProjectWorkflow create(ConnectedUserProjectWorkflow connectedUserProjectWorkflow) {
         return connectedUserProjectWorkflowRepository.save(connectedUserProjectWorkflow);
     }
@@ -80,14 +70,6 @@ public class ConnectedUserProjectWorkflowServiceImpl implements ConnectedUserPro
         long connectedUserProjectId) {
 
         return connectedUserProjectWorkflowRepository.findAllByConnectedUserProjectId(connectedUserProjectId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
-    public boolean isConnectionUsed(long connectionId) {
-        return !connectedUserProjectWorkflowRepository
-            .findConnectedUserProjectWorkflowConnectionIdsByConnectionId(connectionId)
-            .isEmpty();
     }
 
     @Override

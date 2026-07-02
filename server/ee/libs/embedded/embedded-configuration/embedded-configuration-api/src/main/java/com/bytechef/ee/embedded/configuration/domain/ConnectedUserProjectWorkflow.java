@@ -9,10 +9,7 @@ package com.bytechef.ee.embedded.configuration.domain;
 
 import com.bytechef.automation.configuration.domain.ProjectWorkflow;
 import java.time.Instant;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -22,7 +19,6 @@ import org.springframework.data.annotation.PersistenceCreator;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.jdbc.core.mapping.AggregateReference;
 import org.springframework.data.relational.core.mapping.Column;
-import org.springframework.data.relational.core.mapping.MappedCollection;
 import org.springframework.data.relational.core.mapping.Table;
 
 /**
@@ -66,9 +62,6 @@ public class ConnectedUserProjectWorkflow {
     @Version
     private int version;
 
-    @MappedCollection(idColumn = "connected_user_project_workflow_id")
-    private Set<ConnectedUserProjectWorkflowConnection> connections = new HashSet<>();
-
     public ConnectedUserProjectWorkflow() {
     }
 
@@ -81,10 +74,6 @@ public class ConnectedUserProjectWorkflow {
         this.projectWorkflowId = AggregateReference.to(projectWorkflowId);
         this.workflowVersion = workflowVersion;
         this.version = version;
-    }
-
-    public void addConnection(long connectionId) {
-        connections.add(new ConnectedUserProjectWorkflowConnection(connectionId));
     }
 
     @Override
@@ -161,20 +150,6 @@ public class ConnectedUserProjectWorkflow {
         this.workflowVersion = workflowVersion;
     }
 
-    public List<ConnectedUserProjectWorkflowConnection> getConnections() {
-        return List.copyOf(connections);
-    }
-
-    public int getConnectionsCount() {
-        return connections.size();
-    }
-
-    public void setConnections(List<ConnectedUserProjectWorkflowConnection> connections) {
-        if (connections != null) {
-            this.connections = new HashSet<>(connections);
-        }
-    }
-
     @Override
     public String toString() {
         return "ConnectedUserProjectWorkflow{" +
@@ -187,7 +162,6 @@ public class ConnectedUserProjectWorkflow {
             ", lastModifiedBy='" + lastModifiedBy + '\'' +
             ", lastModifiedDate=" + lastModifiedDate +
             ", version=" + version +
-            ", connections=" + connections +
             '}';
     }
 }
