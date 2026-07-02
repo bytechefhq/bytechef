@@ -57,8 +57,8 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        String llmProvider = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_PROVIDER));
-        String llmModel = StringUtils.asString(state.get(CopilotStateKeys.USER_SELECTED_LLM_MODEL));
+        String llmProvider = StringUtils.asString(state.get(CopilotStateKeys.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotStateKeys.STATE_USER_SELECTED_LLM_MODEL));
 
         if (llmProvider == null || llmModel == null) {
             if ((llmProvider == null) != (llmModel == null)) {
@@ -70,7 +70,7 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.ENVIRONMENT_ID));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotStateKeys.STATE_ENVIRONMENT_ID));
 
         if (environmentId != null) {
             return catalogChatClientResolver.resolve(llmProvider, llmModel, environmentId.intValue());

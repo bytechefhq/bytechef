@@ -14,14 +14,14 @@ package com.bytechef.ee.ai.copilot.util;
  */
 public final class CopilotStateKeys {
 
-    public static final String ENVIRONMENT_ID = "environmentId";
     public static final String STATE_AUTHENTICATED_USER_ID = "authenticatedUserId";
     public static final String STATE_AUTHENTICATION = "authentication";
     public static final String STATE_ADDITIONAL_SYSTEM_PROMPT = "additionalSystemPrompt";
+    public static final String STATE_ENVIRONMENT_ID = "environmentId";
     public static final String STATE_TENANT_ID = "tenantId";
-    public static final String USER_SELECTED_LLM_PROVIDER = "userSelectedLlmProvider";
-    public static final String USER_SELECTED_LLM_MODEL = "userSelectedLlmModel";
-    public static final String WORKSPACE_ID = "workspaceId";
+    public static final String STATE_USER_SELECTED_LLM_PROVIDER = "userSelectedLlmProvider";
+    public static final String STATE_USER_SELECTED_LLM_MODEL = "userSelectedLlmModel";
+    public static final String STATE_WORKSPACE_ID = "workspaceId";
 
     public static final int ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH = 4000;
 
