@@ -1,7 +1,7 @@
 import Badge from '@/components/Badge/Badge';
 import DatePicker from '@/components/DatePicker/DatePicker';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Label} from '@/components/ui/label';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import ApprovalForm from '@/shared/components/approval-form/ApprovalForm';
 import {CheckCircle2Icon, CircleIcon, ClockIcon, UserIcon} from 'lucide-react';
 

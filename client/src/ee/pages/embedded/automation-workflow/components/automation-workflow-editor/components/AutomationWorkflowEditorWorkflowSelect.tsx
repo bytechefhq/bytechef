@@ -1,4 +1,4 @@
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {AutomationWorkflowProjectsQuery} from '@/shared/middleware/graphql';
 
 type AutomationWorkflowProjectWorkflowTemplateType =

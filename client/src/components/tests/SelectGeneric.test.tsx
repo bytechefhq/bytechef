@@ -1,4 +1,4 @@
-import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {fireEvent, render, screen} from '@/shared/util/test-utils';
 import {expect, it, vi} from 'vitest';
 

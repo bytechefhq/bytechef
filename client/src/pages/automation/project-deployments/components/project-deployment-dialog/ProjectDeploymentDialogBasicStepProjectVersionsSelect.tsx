@@ -1,4 +1,4 @@
-import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/ui/select';
+import {Select, SelectContent, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {ProjectStatus} from '@/shared/middleware/automation/configuration';
 import {useGetProjectVersionsQuery} from '@/shared/queries/automation/projectVersions.queries';
 import {CheckIcon} from 'lucide-react';

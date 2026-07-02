@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import RequiredMark from '@/components/RequiredMark';
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
     Dialog,
     DialogClose,
@@ -12,7 +13,6 @@ import {
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {WorkflowInputType} from '@/shared/types';
 import {RefObject, useEffect} from 'react';
 import {UseFormReturn, useWatch} from 'react-hook-form';

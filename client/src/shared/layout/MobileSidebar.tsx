@@ -1,6 +1,6 @@
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Avatar, AvatarFallback} from '@/components/ui/avatar';
 import {Dialog, DialogContent} from '@/components/ui/dialog';
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select';
 import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatformTypeStore';
 import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useEnvironmentsQuery} from '@/shared/middleware/graphql';
