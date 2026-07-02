@@ -147,7 +147,7 @@ public class ConnectedUserCopilotApiControllerIntTest {
 
     @Test
     @WithMockUser(username = "ext-user-1")
-    public void testCopilotChatCapsAndReappliesClientAdditionalSystemPrompt() throws Exception {
+    public void testCopilotChatTrimsClientAdditionalSystemPrompt() throws Exception {
         SseEmitter completedEmitter = new SseEmitter();
 
         when(connectedUserProjectFacade.prepareCopilotChat(
@@ -174,14 +174,13 @@ public class ConnectedUserCopilotApiControllerIntTest {
             .getState()
             .getState();
 
-        // The untrusted short client key is consumed (trimmed) and re-applied under the authoritative key.
+        // The client-supplied additionalSystemPrompt is trimmed before being forwarded to the agent.
         assertThat(stateMap).containsEntry(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT, "Prefer Slack.");
-        assertThat(stateMap).doesNotContainKey("additionalSystemPrompt");
     }
 
     @Test
     @WithMockUser(username = "ext-user-1")
-    public void testCopilotChatDropsClientSuppliedCanonicalSystemPromptKey() throws Exception {
+    public void testCopilotChatCapsOverlongAdditionalSystemPrompt() throws Exception {
         SseEmitter completedEmitter = new SseEmitter();
 
         when(connectedUserProjectFacade.prepareCopilotChat(
@@ -191,12 +190,14 @@ public class ConnectedUserCopilotApiControllerIntTest {
         when(agUiService.runAgent(any(LocalAgent.class), any(AgUiParameters.class)))
             .thenReturn(completedEmitter);
 
+        String overlongPrompt = "a".repeat(CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH + 100);
+
         mockMvc
             .perform(
                 post("/v1/automation/workflows/{workflowUuid}/copilot/chat", WORKFLOW_UUID)
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(
-                        "{\"threadId\":\"thread-1\",\"state\":{\"bytechef.copilot.additionalSystemPrompt\":\"smuggled\"}}")
+                        "{\"threadId\":\"thread-1\",\"state\":{\"additionalSystemPrompt\":\"" + overlongPrompt + "\"}}")
                     .accept(MediaType.TEXT_EVENT_STREAM))
             .andExpect(status().isOk());
 
@@ -208,9 +209,9 @@ public class ConnectedUserCopilotApiControllerIntTest {
             .getState()
             .getState();
 
-        // The canonical key must be absent — the controller drops any client-supplied canonical key before the
-        // short-key sanitization block runs, so it can never be smuggled in directly.
-        assertThat(stateMap).doesNotContainKey(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT);
+        // Oversized prompts are truncated to the maximum allowed length before reaching the agent.
+        assertThat((String) stateMap.get(CopilotConstants.STATE_ADDITIONAL_SYSTEM_PROMPT))
+            .hasSize(CopilotConstants.ADDITIONAL_SYSTEM_PROMPT_MAX_LENGTH);
     }
 
     @Test
