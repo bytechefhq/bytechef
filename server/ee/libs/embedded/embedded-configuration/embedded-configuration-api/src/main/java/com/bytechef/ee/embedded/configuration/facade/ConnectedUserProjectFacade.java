@@ -9,6 +9,7 @@ package com.bytechef.ee.embedded.configuration.facade;
 
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectDTO;
 import com.bytechef.ee.embedded.configuration.dto.ConnectedUserProjectWorkflowDTO;
+import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.platform.configuration.domain.Environment;
 import java.util.List;
 
@@ -45,6 +46,8 @@ public interface ConnectedUserProjectFacade {
     List<ConnectedUserProjectDTO> getConnectedUserProjects(Long connectedUserId, Environment environment);
 
     List<ConnectedUserProjectDTO> getConnectedUserProjects(String externalUserId, Environment environment);
+
+    CopilotChatContextDTO prepareCopilotChat(String externalUserId, String workflowUuid, Environment environment);
 
     void publishProjectWorkflow(
         String externalUserId, String workflowUuid, String description, Long environmentId);
