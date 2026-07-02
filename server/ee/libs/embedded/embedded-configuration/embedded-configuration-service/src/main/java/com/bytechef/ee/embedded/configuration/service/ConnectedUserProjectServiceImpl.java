@@ -61,6 +61,12 @@ public class ConnectedUserProjectServiceImpl implements ConnectedUserProjectServ
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<Long> fetchConnectedUserId(long projectDeploymentId) {
+        return connectUserProjectRepository.findConnectedUserIdByProjectDeploymentId(projectDeploymentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ConnectedUserProject getConnectedUserProject(Long id) {
         return OptionalUtils.get(connectUserProjectRepository.findById(id));
     }
