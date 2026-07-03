@@ -30,6 +30,7 @@ public class ProjectWorkflowToolErrorType extends AbstractErrorType {
     public static final ProjectWorkflowToolErrorType SEARCH_WORKFLOWS = new ProjectWorkflowToolErrorType(104);
     public static final ProjectWorkflowToolErrorType UPDATE_WORKFLOW = new ProjectWorkflowToolErrorType(105);
     public static final ProjectWorkflowToolErrorType VALIDATE_WORKFLOW = new ProjectWorkflowToolErrorType(106);
+    public static final ProjectWorkflowToolErrorType SAVE_TEST_CONNECTION = new ProjectWorkflowToolErrorType(107);
 
     private ProjectWorkflowToolErrorType(int errorKey) {
         super(ProjectWorkflowToolErrorType.class, errorKey);
