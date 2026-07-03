@@ -855,7 +855,8 @@ public class ApplicationProperties {
                     private Provider provider;
 
                     /**
-                     *
+                     * The API key used to authenticate with the Copilot documentation embedding provider. Applies only
+                     * to the OpenAI provider; Ollama runs locally and does not require a key.
                      */
                     private String apiKey;
 

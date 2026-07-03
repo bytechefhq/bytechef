@@ -286,6 +286,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .getEmbedding();
 
         return switch (provider) {
+            case OLLAMA -> embedding.getOllama()
+                .getOptions()
+                .getModel();
             case OPEN_AI -> embedding.getOpenAi()
                 .getOptions()
                 .getModel();
