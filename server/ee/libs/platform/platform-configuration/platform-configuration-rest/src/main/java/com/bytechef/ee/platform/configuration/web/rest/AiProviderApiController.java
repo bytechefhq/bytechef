@@ -80,7 +80,8 @@ public class AiProviderApiController implements AiProviderApi {
     public ResponseEntity<Void> updateAiProvider(
         Integer id, Integer environment, UpdateAiProviderRequestModel updateAiProviderRequestModel) {
 
-        aiProviderFacade.updateAiProvider(id, updateAiProviderRequestModel.getApiKey(), environment);
+        aiProviderFacade.updateAiProvider(
+            id, updateAiProviderRequestModel.getApiKey(), updateAiProviderRequestModel.getUrl(), environment);
 
         return ResponseEntity.noContent()
             .build();

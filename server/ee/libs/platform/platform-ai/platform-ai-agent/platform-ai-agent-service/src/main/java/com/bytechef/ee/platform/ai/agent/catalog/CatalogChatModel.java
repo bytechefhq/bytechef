@@ -79,9 +79,11 @@ public class CatalogChatModel implements ChatModel {
         Provider provider = defaultModel.provider();
         String model = defaultModel.model();
         String apiKey = defaultModel.apiKey();
+        String url = defaultModel.url();
 
-        String cacheKey = ordinal + ":" + provider.getKey() + ":" + model + ":" + apiKey;
+        String cacheKey = ordinal + ":" + provider.getKey() + ":" + model + ":" + apiKey + ":" + url;
 
-        return delegateCache.get(cacheKey, key -> catalogChatModelFactory.createChatModel(provider, model, apiKey));
+        return delegateCache.get(cacheKey,
+            key -> catalogChatModelFactory.createChatModel(provider, model, apiKey, url));
     }
 }

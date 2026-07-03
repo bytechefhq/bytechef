@@ -52,7 +52,7 @@ class CatalogChatClientResolverTest {
     @Test
     void testResolveBuildsClientWhenApiKeyResolves() {
         when(aiProviderFacade.getApiKey(OPEN_AI_KEY, 1)).thenReturn("sk-test");
-        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test"))
+        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test", null))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
         assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 1)).isNotNull();
@@ -61,7 +61,7 @@ class CatalogChatClientResolverTest {
     @Test
     void testResolveBuildsClientWhenApiKeyIsConfigFallback() {
         when(aiProviderFacade.getApiKey(OPEN_AI_KEY, 1)).thenReturn("sk-config");
-        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config"))
+        when(catalogChatModelFactory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-config", null))
             .thenReturn(mock(org.springframework.ai.chat.model.ChatModel.class));
 
         assertThat(resolver.resolve(OPEN_AI_KEY, "gpt-4o", 1)).isNotNull();

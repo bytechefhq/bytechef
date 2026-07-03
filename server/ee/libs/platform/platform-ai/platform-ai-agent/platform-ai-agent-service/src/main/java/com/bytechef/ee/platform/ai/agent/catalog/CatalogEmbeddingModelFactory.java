@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.ollama.cluster.OllamaEmbedding;
@@ -17,6 +18,7 @@ import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
 import com.bytechef.platform.component.definition.ai.vectorstore.EmbeddingFunction;
+import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.embedding.EmbeddingModel;
@@ -35,7 +37,9 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CatalogEmbeddingModelFactory {
 
-    public @Nullable EmbeddingModel createEmbeddingModel(Provider provider, String model, String apiKey) {
+    public @Nullable EmbeddingModel createEmbeddingModel(
+        Provider provider, String model, @Nullable String apiKey, @Nullable String url) {
+
         EmbeddingFunction embeddingFunction = resolveFactory(provider);
 
         if (embeddingFunction == null) {
@@ -43,9 +47,23 @@ public class CatalogEmbeddingModelFactory {
         }
 
         Parameters inputParameters = ParametersFactory.create(Map.of(MODEL, model));
-        Parameters connectionParameters = ParametersFactory.create(Map.of(TOKEN, apiKey));
+        Parameters connectionParameters = ParametersFactory.create(createConnectionParameters(apiKey, url));
 
         return embeddingFunction.apply(inputParameters, connectionParameters);
+    }
+
+    private static Map<String, Object> createConnectionParameters(@Nullable String apiKey, @Nullable String url) {
+        Map<String, Object> connectionParameters = new HashMap<>();
+
+        if (apiKey != null) {
+            connectionParameters.put(TOKEN, apiKey);
+        }
+
+        if (url != null && !url.isBlank()) {
+            connectionParameters.put(URL, url);
+        }
+
+        return connectionParameters;
     }
 
     private static @Nullable EmbeddingFunction resolveFactory(Provider provider) {

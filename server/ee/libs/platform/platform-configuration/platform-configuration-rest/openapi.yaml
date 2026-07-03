@@ -85,6 +85,9 @@ paths:
                 apiKey:
                   type: string
                   description: "The API key of an AI provider."
+                url:
+                  type: string
+                  description: "The base URL of an AI provider (used by Ollama; blank defaults to localhost)."
         required: true
       responses:
         "204":
@@ -186,6 +189,9 @@ components:
           readOnly: true
         apiKey:
           description: "The API key of an AI provider."
+          type: "string"
+        url:
+          description: "The base URL of an AI provider (used by Ollama; blank defaults to localhost)."
           type: "string"
         enabled:
           description: "The enabled status of an AI provider."

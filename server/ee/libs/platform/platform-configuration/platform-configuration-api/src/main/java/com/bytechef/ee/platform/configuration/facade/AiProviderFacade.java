@@ -36,7 +36,9 @@ public interface AiProviderFacade {
 
     String getApiKey(String provider, int environment);
 
+    String getUrl(String provider, int environment);
+
     void updateAiProvider(int id, boolean enabled, int environment);
 
-    void updateAiProvider(int id, String apiKey, int environment);
+    void updateAiProvider(int id, String apiKey, String url, int environment);
 }

@@ -34,7 +34,7 @@ class CatalogChatModelTest {
 
     private static final String ANTHROPIC_MODEL = "claude-sonnet-4-5";
     private static final AiDefaultModelWithApiKeyDTO ANTHROPIC_DEFAULT_MODEL =
-        new AiDefaultModelWithApiKeyDTO(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic");
+        new AiDefaultModelWithApiKeyDTO(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null);
 
     private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogChatModelFactory catalogChatModelFactory = mock(CatalogChatModelFactory.class);
@@ -56,7 +56,7 @@ class CatalogChatModelTest {
         when(delegate.call(prompt)).thenReturn(response);
         when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(ANTHROPIC_DEFAULT_MODEL);
-        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic"))
+        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null))
             .thenReturn(delegate);
 
         assertThat(catalogChatModel.call(prompt)).isSameAs(response);
@@ -84,7 +84,7 @@ class CatalogChatModelTest {
         when(delegate.call(prompt)).thenReturn(mock(ChatResponse.class));
         when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.STAGING.ordinal()))
             .thenReturn(ANTHROPIC_DEFAULT_MODEL);
-        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic"))
+        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null))
             .thenReturn(delegate);
 
         catalogChatModel.call(prompt);
@@ -100,13 +100,13 @@ class CatalogChatModelTest {
             .thenReturn(mock(ChatResponse.class));
         when(aiProviderFacade.getAiDefaultChatModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(ANTHROPIC_DEFAULT_MODEL);
-        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic"))
+        when(catalogChatModelFactory.createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null))
             .thenReturn(delegate);
 
         catalogChatModel.call(new Prompt("a"));
         catalogChatModel.call(new Prompt("b"));
 
         verify(catalogChatModelFactory, times(1))
-            .createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic");
+            .createChatModel(Provider.ANTHROPIC, ANTHROPIC_MODEL, "sk-anthropic", null);
     }
 }
