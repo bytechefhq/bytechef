@@ -32,7 +32,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 class CatalogEmbeddingModelTest {
 
     private static final AiDefaultModelWithApiKeyDTO OPEN_AI_DEFAULT_MODEL =
-        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test", null);
 
     private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogEmbeddingModelFactory catalogEmbeddingModelFactory =
@@ -56,8 +56,9 @@ class CatalogEmbeddingModelTest {
         });
         when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(OPEN_AI_DEFAULT_MODEL);
-        when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
-            .thenReturn(delegate);
+        when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test",
+            null))
+                .thenReturn(delegate);
 
         float[] result = catalogEmbeddingModel.embed(document);
 
@@ -89,7 +90,7 @@ class CatalogEmbeddingModelTest {
         when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.STAGING.ordinal()))
             .thenReturn(OPEN_AI_DEFAULT_MODEL);
         when(catalogEmbeddingModelFactory.createEmbeddingModel(
-            Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
+            Provider.OPEN_AI, "text-embedding-3-small", "sk-test", null))
                 .thenReturn(delegate);
 
         catalogEmbeddingModel.embed(document);
@@ -106,13 +107,14 @@ class CatalogEmbeddingModelTest {
         });
         when(aiProviderFacade.getAiDefaultEmbeddingModelApiKey(Environment.PRODUCTION.ordinal()))
             .thenReturn(OPEN_AI_DEFAULT_MODEL);
-        when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test"))
-            .thenReturn(delegate);
+        when(catalogEmbeddingModelFactory.createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test",
+            null))
+                .thenReturn(delegate);
 
         catalogEmbeddingModel.embed(new Document("a"));
         catalogEmbeddingModel.embed(new Document("b"));
 
         verify(catalogEmbeddingModelFactory, times(1))
-            .createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+            .createEmbeddingModel(Provider.OPEN_AI, "text-embedding-3-small", "sk-test", null);
     }
 }

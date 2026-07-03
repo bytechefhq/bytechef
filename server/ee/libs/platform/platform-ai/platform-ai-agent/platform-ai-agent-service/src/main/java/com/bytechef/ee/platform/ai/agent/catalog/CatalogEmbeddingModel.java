@@ -112,9 +112,10 @@ public class CatalogEmbeddingModel implements EmbeddingModel {
         Provider provider = defaultModel.provider();
         String model = defaultModel.model();
         String apiKey = defaultModel.apiKey();
+        String url = defaultModel.url();
 
         return delegateCache.get(
-            ordinal + ":" + provider.getKey() + ":" + model + ":" + apiKey,
-            ignoredKey -> catalogEmbeddingModelFactory.createEmbeddingModel(provider, model, apiKey));
+            ordinal + ":" + provider.getKey() + ":" + model + ":" + apiKey + ":" + url,
+            ignoredKey -> catalogEmbeddingModelFactory.createEmbeddingModel(provider, model, apiKey, url));
     }
 }

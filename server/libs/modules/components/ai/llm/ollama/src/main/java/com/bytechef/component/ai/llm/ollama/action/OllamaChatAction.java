@@ -197,12 +197,16 @@ public class OllamaChatAction {
                 .useNUMA(inputParameters.getBoolean(USE_NUMA))
                 .vocabOnly(inputParameters.getBoolean(VOCAB_ONLY));
 
-            Map<String, ?> response = inputParameters.getRequiredMap(RESPONSE);
+            // The response format is absent when the model is built outside the ask action (e.g. the AI Providers
+            // catalog), so read it optionally rather than requiring it.
+            Map<String, ?> response = inputParameters.getMap(RESPONSE);
 
-            Object responseFormat = response.get(RESPONSE_FORMAT);
+            if (response != null) {
+                Object responseFormat = response.get(RESPONSE_FORMAT);
 
-            if (!responseFormat.equals(ChatModel.ResponseFormat.TEXT.name())) {
-                ollamaChatOptionsBuilder.outputSchema((String) response.get(RESPONSE_SCHEMA));
+                if (!responseFormat.equals(ChatModel.ResponseFormat.TEXT.name())) {
+                    ollamaChatOptionsBuilder.outputSchema((String) response.get(RESPONSE_SCHEMA));
+                }
             }
 
             return OllamaChatModel.builder()

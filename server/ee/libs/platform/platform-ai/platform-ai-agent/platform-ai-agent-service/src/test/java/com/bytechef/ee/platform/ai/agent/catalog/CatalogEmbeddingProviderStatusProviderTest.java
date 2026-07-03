@@ -24,7 +24,7 @@ import org.junit.jupiter.api.Test;
 class CatalogEmbeddingProviderStatusProviderTest {
 
     private static final AiDefaultModelWithApiKeyDTO OPEN_AI_DEFAULT_MODEL =
-        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+        new AiDefaultModelWithApiKeyDTO(Provider.OPEN_AI, "text-embedding-3-small", "sk-test", null);
 
     private final AiProviderFacade aiProviderFacade = mock(AiProviderFacade.class);
     private final CatalogEmbeddingProviderStatusProvider statusProvider =

@@ -1570,12 +1570,27 @@ public class ApplicationProperties {
                  */
                 private String apiKey;
 
+                /**
+                 * Base URL of the Ollama server (e.g. http://localhost:11434). Serves as the fallback for both chat and
+                 * embedding models when no per-environment URL is configured in the AI Providers catalog. When blank,
+                 * the Ollama client defaults to http://localhost:11434.
+                 */
+                private String url;
+
                 public String getApiKey() {
                     return apiKey;
                 }
 
+                public String getUrl() {
+                    return url;
+                }
+
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
+                }
+
+                public void setUrl(String url) {
+                    this.url = url;
                 }
             }
 

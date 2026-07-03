@@ -57,11 +57,14 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
 
         String apiKey = aiProviderFacade.getApiKey(provider.getKey(), environment);
 
-        if (apiKey == null || apiKey.isBlank()) {
+        // Ollama runs locally and needs no API key, so a blank key is valid for it; all other providers require one.
+        if ((apiKey == null || apiKey.isBlank()) && provider != Provider.OLLAMA) {
             return null;
         }
 
-        ChatModel chatModel = catalogChatModelFactory.createChatModel(provider, model, apiKey);
+        String url = aiProviderFacade.getUrl(provider.getKey(), environment);
+
+        ChatModel chatModel = catalogChatModelFactory.createChatModel(provider, model, apiKey, url);
 
         if (chatModel == null) {
             return null;

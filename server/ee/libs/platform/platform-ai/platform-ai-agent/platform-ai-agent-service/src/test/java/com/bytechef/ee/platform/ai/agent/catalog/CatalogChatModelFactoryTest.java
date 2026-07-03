@@ -27,7 +27,7 @@ class CatalogChatModelFactoryTest {
     @Test
     void testCreateChatModelForOpenAiReturnsModel() {
         org.springframework.ai.chat.model.ChatModel chatModel =
-            factory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test-key");
+            factory.createChatModel(Provider.OPEN_AI, "gpt-4o", "sk-test-key", null);
 
         assertThat(chatModel).isNotNull();
     }
@@ -36,8 +36,17 @@ class CatalogChatModelFactoryTest {
     void testCreateChatModelForCatalogOnlyConnectionProviderReturnsNull() {
         // Azure needs a deployment endpoint the catalog doesn't store; v1 returns null -> caller falls back.
         org.springframework.ai.chat.model.ChatModel chatModel =
-            factory.createChatModel(Provider.AZURE_OPEN_AI, "gpt-4o", "sk-test-key");
+            factory.createChatModel(Provider.AZURE_OPEN_AI, "gpt-4o", "sk-test-key", null);
 
         assertThat(chatModel).isNull();
+    }
+
+    @Test
+    void testCreateChatModelForOllamaWithCustomUrlReturnsModel() {
+        // Ollama needs no API key and accepts a custom base URL threaded through the connection parameters.
+        org.springframework.ai.chat.model.ChatModel chatModel =
+            factory.createChatModel(Provider.OLLAMA, "llama3", null, "http://remote-host:11434");
+
+        assertThat(chatModel).isNotNull();
     }
 }

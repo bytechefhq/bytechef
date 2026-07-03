@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -123,6 +124,52 @@ class AiProviderFacadeProvidersTest {
 
         assertThat(openAi.apiKey()).isNull();
         assertThat(openAi.enabled()).isFalse();
+    }
+
+    @Test
+    void testGetUrlPrefersStoredUrlOverConfig() {
+        Property property = mock(Property.class);
+
+        when(property.isEnabled()).thenReturn(true);
+        when(property.get("url")).thenReturn("http://stored-host:11434");
+
+        when(propertyService.fetchProperty(
+            ArgumentMatchers.eq(Provider.OLLAMA.getKey()),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(Optional.of(property));
+
+        assertThat(facade.getUrl(Provider.OLLAMA.getKey(), ENVIRONMENT)).isEqualTo("http://stored-host:11434");
+    }
+
+    @Test
+    void testGetUrlFallsBackToConfigUrl() {
+        when(propertyService.fetchProperty(
+            ArgumentMatchers.eq(Provider.OLLAMA.getKey()),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(Optional.empty());
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getOllama()
+            .getUrl()).thenReturn("http://config-host:11434");
+
+        assertThat(facade.getUrl(Provider.OLLAMA.getKey(), ENVIRONMENT)).isEqualTo("http://config-host:11434");
+    }
+
+    @Test
+    void testGetUrlReturnsNullWhenNoStoredOrConfigUrl() {
+        when(propertyService.fetchProperty(
+            ArgumentMatchers.eq(Provider.OLLAMA.getKey()),
+            ArgumentMatchers.eq(Scope.PLATFORM),
+            ArgumentMatchers.isNull(),
+            ArgumentMatchers.eq((long) ENVIRONMENT)))
+                .thenReturn(Optional.empty());
+
+        assertThat(facade.getUrl(Provider.OLLAMA.getKey(), ENVIRONMENT)).isNull();
     }
 
     private AiProviderDTO findProvider(Provider provider) {

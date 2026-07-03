@@ -8,6 +8,7 @@
 package com.bytechef.ee.platform.ai.agent.catalog;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
+import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
@@ -23,6 +24,7 @@ import com.bytechef.component.definition.Parameters;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.component.definition.ParametersFactory;
+import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.model.ChatModel;
@@ -40,7 +42,9 @@ import org.springframework.stereotype.Component;
 @ConditionalOnEEVersion
 public class CatalogChatModelFactory {
 
-    public @Nullable ChatModel createChatModel(Provider provider, String model, String apiKey) {
+    public @Nullable ChatModel createChatModel(
+        Provider provider, String model, @Nullable String apiKey, @Nullable String url) {
+
         com.bytechef.component.ai.llm.ChatModel chatModelFactory = resolveFactory(provider);
 
         if (chatModelFactory == null) {
@@ -48,9 +52,23 @@ public class CatalogChatModelFactory {
         }
 
         Parameters inputParameters = ParametersFactory.create(Map.of(MODEL, model));
-        Parameters connectionParameters = ParametersFactory.create(Map.of(TOKEN, apiKey));
+        Parameters connectionParameters = ParametersFactory.create(createConnectionParameters(apiKey, url));
 
         return chatModelFactory.createChatModel(inputParameters, connectionParameters, false);
+    }
+
+    private static Map<String, Object> createConnectionParameters(@Nullable String apiKey, @Nullable String url) {
+        Map<String, Object> connectionParameters = new HashMap<>();
+
+        if (apiKey != null) {
+            connectionParameters.put(TOKEN, apiKey);
+        }
+
+        if (url != null && !url.isBlank()) {
+            connectionParameters.put(URL, url);
+        }
+
+        return connectionParameters;
     }
 
     private static com.bytechef.component.ai.llm.@Nullable ChatModel resolveFactory(Provider provider) {

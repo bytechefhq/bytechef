@@ -24,6 +24,7 @@ import com.bytechef.platform.configuration.service.PropertyService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -172,6 +173,12 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
     @Override
     @Transactional(readOnly = true)
+    public String getUrl(String provider, int environment) {
+        return resolveUrl(Provider.valueOfKey(provider), environment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public List<AiProviderDTO> getAiProviders(int environment) {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
 
@@ -210,10 +217,16 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                     apiKey = getConfigApiKey(provider);
                 }
 
+                String url = property != null ? (String) property.get("url") : null;
+
+                if (url == null || url.isBlank()) {
+                    url = getConfigUrl(provider);
+                }
+
                 boolean enabled = property != null ? property.isEnabled() : hasConfigApiKey(provider);
 
                 return new AiProviderDTO(
-                    provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, enabled,
+                    provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, url, enabled,
                     provider.isEmbeddingSupported());
             })
             .filter(Objects::nonNull)
@@ -228,10 +241,20 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
-    public void updateAiProvider(int id, String apiKey, int environment) {
+    public void updateAiProvider(int id, String apiKey, String url, int environment) {
         Provider provider = getProvider(id);
 
-        propertyService.save(provider.getKey(), Map.of("apiKey", apiKey), Scope.PLATFORM, null, (long) environment);
+        Map<String, Object> values = new HashMap<>();
+
+        if (apiKey != null) {
+            values.put("apiKey", apiKey);
+        }
+
+        if (url != null && !url.isBlank()) {
+            values.put("url", url);
+        }
+
+        propertyService.save(provider.getKey(), values, Scope.PLATFORM, null, (long) environment);
     }
 
     private static List<AiProviderCatalogItemDTO.Model> extractModelOptions(ActionDefinition actionDefinition) {
@@ -305,6 +328,15 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .orElseGet(() -> getConfigApiKey(provider));
     }
 
+    private String resolveUrl(Provider provider, int environment) {
+        return propertyService.fetchProperty(provider.getKey(), Scope.PLATFORM, null, (long) environment)
+            .filter(Property::isEnabled)
+            .map(property -> property.get("url"))
+            .map(Object::toString)
+            .filter(url -> !url.isBlank())
+            .orElseGet(() -> getConfigUrl(provider));
+    }
+
     private AiDefaultModelWithApiKeyDTO resolveWithApiKey(AiDefaultModelDTO defaultModel, int environment) {
         if (defaultModel == null) {
             return null;
@@ -314,11 +346,14 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
         String apiKey = resolveApiKey(provider, environment);
 
-        if (apiKey == null || apiKey.isBlank()) {
+        // Ollama runs locally and needs no API key, so a blank key is valid for it; all other providers require one.
+        if ((apiKey == null || apiKey.isBlank()) && provider != Provider.OLLAMA) {
             return null;
         }
 
-        return new AiDefaultModelWithApiKeyDTO(provider, defaultModel.model(), apiKey);
+        String url = resolveUrl(provider, environment);
+
+        return new AiDefaultModelWithApiKeyDTO(provider, defaultModel.model(), apiKey, url);
     }
 
     private String getConfigApiKey(Provider provider) {
@@ -344,6 +379,17 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
                 .getApiKey();
             case VERTEX_GEMINI -> configProvider.getVertexGemini()
                 .getApiKey();
+            default -> null;
+        };
+    }
+
+    private String getConfigUrl(Provider provider) {
+        ApplicationProperties.Ai.Provider configProvider = applicationProperties.getAi()
+            .getProvider();
+
+        return switch (provider) {
+            case OLLAMA -> configProvider.getOllama()
+                .getUrl();
             default -> null;
         };
     }

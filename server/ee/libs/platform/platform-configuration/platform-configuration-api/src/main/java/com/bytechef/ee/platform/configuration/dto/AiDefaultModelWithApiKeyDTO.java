@@ -14,5 +14,5 @@ import com.bytechef.platform.ai.llm.Provider;
  *
  * @author Ivica Cardic
  */
-public record AiDefaultModelWithApiKeyDTO(Provider provider, String model, String apiKey) {
+public record AiDefaultModelWithApiKeyDTO(Provider provider, String model, String apiKey, String url) {
 }

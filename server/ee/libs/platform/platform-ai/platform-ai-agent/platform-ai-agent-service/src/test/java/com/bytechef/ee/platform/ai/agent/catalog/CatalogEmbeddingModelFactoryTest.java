@@ -28,21 +28,30 @@ class CatalogEmbeddingModelFactoryTest {
     @Test
     void testBuildsOpenAiEmbeddingModel() {
         EmbeddingModel embeddingModel = factory.createEmbeddingModel(
-            Provider.OPEN_AI, "text-embedding-3-small", "sk-test");
+            Provider.OPEN_AI, "text-embedding-3-small", "sk-test", null);
 
         assertThat(embeddingModel).isNotNull();
     }
 
     @Test
     void testReturnsNullForProviderWithoutEmbeddingSupport() {
-        assertThat(factory.createEmbeddingModel(Provider.ANTHROPIC, "irrelevant", "sk-test")).isNull();
+        assertThat(factory.createEmbeddingModel(Provider.ANTHROPIC, "irrelevant", "sk-test", null)).isNull();
+    }
+
+    @Test
+    void testBuildsOllamaEmbeddingModelWithCustomUrl() {
+        // Ollama needs no API key and accepts a custom base URL threaded through the connection parameters.
+        EmbeddingModel embeddingModel = factory.createEmbeddingModel(
+            Provider.OLLAMA, "nomic-embed-text", null, "http://remote-host:11434");
+
+        assertThat(embeddingModel).isNotNull();
     }
 
     @Test
     void testEmbeddingSupportMatchesProviderCapability() {
         for (Provider provider : Provider.values()) {
             EmbeddingModel embeddingModel = factory.createEmbeddingModel(
-                provider, "text-embedding-3-small", "sk-test");
+                provider, "text-embedding-3-small", "sk-test", null);
 
             assertThat(embeddingModel != null)
                 .as("Provider %s: factory builds an embedding model iff Provider.isEmbeddingSupported()", provider)
