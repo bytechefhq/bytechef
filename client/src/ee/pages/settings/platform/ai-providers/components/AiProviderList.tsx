@@ -13,6 +13,11 @@ import InlineSVG from 'react-inlinesvg';
 
 import './AiProviderList.css';
 
+const isOllamaProvider = (aiProvider: AiProvider) => aiProvider.name?.toLowerCase() === 'ollama';
+
+// Ollama runs locally and needs no API key, so it counts as configured; other providers require an API key.
+const isConfigured = (aiProvider: AiProvider) => isOllamaProvider(aiProvider) || !!aiProvider.apiKey;
+
 const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; environment: number}) => {
     const [enabledItems, setEnabledItems] = useState<{[key: number]: boolean}>({});
     const [openItem, setOpenItem] = useState<string>();
@@ -39,11 +44,13 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
 
         setOpenItem(undefined);
 
-        if (!aiProvider.apiKey && value) {
+        const configured = isConfigured(aiProvider);
+
+        if (!configured && value) {
             setOpenItem(`item-${aiProvider.id}`);
         }
 
-        if (aiProvider.apiKey) {
+        if (configured) {
             enableAiProviderMutation.mutate({
                 enable: value,
                 environment,
@@ -58,7 +65,7 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
 
             aiProviders.forEach((aiProvider) => {
                 enabledItems[aiProvider.id!] = !!aiProvider.enabled;
-                showForm[aiProvider.id!] = !aiProvider.apiKey;
+                showForm[aiProvider.id!] = !isConfigured(aiProvider);
             });
 
             setEnabledItems(enabledItems);
@@ -112,21 +119,27 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                             <AccordionContent className="pb-3 pl-9">
                                 {showForm[aiProvider.id!] ? (
                                     <AiProviderForm
+                                        aiProvider={aiProvider}
                                         environment={environment}
-                                        id={aiProvider.id!}
                                         onClose={() =>
                                             setShowForm((prev) => ({
                                                 ...prev,
                                                 [aiProvider.id!]: false,
                                             }))
                                         }
-                                        showCancel={!!aiProvider.apiKey}
+                                        showCancel={isConfigured(aiProvider)}
                                     />
                                 ) : (
                                     <div className="flex items-center gap-2">
-                                        <span className="text-base text-muted-foreground">API Key: </span>
+                                        <span className="text-base text-muted-foreground">
+                                            {isOllamaProvider(aiProvider) ? 'Base URL: ' : 'API Key: '}
+                                        </span>
 
-                                        <span className="text-base">{aiProvider.apiKey}</span>
+                                        <span className="text-base">
+                                            {isOllamaProvider(aiProvider)
+                                                ? aiProvider.url || 'http://localhost:11434'
+                                                : aiProvider.apiKey}
+                                        </span>
 
                                         <Button
                                             onClick={() =>
