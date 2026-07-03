@@ -17,6 +17,7 @@
 package com.bytechef.platform.configuration.context;
 
 import com.bytechef.platform.configuration.domain.Environment;
+import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +62,15 @@ public final class EnvironmentContext {
         }
 
         return environment;
+    }
+
+    /**
+     * Returns the environment currently bound to the thread, or {@code null} when none is set. Unlike
+     * {@link #getCurrentEnvironment()}, this does not fall back to {@link Environment#PRODUCTION}, so callers can
+     * capture and later restore the exact prior binding (including "unset").
+     */
+    public static @Nullable Environment fetchCurrentEnvironment() {
+        return CONTEXT.get();
     }
 
     public static void clear() {

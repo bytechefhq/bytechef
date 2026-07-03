@@ -82,12 +82,18 @@ public final class RehydrateContextToolCallback implements ToolCallback {
             return action.get();
         }
 
+        Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
+
         EnvironmentContext.set(environmentId.intValue());
 
         try {
             return action.get();
         } finally {
-            EnvironmentContext.clear();
+            if (previousEnvironment == null) {
+                EnvironmentContext.clear();
+            } else {
+                EnvironmentContext.set(previousEnvironment);
+            }
         }
     }
 
