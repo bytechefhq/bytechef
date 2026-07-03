@@ -33,6 +33,8 @@ public class AiProviderModel {
 
   private @Nullable String apiKey;
 
+  private @Nullable String url;
+
   private @Nullable Boolean enabled;
 
   private @Nullable Boolean supportsEmbeddings;
@@ -132,6 +134,27 @@ public class AiProviderModel {
     this.apiKey = apiKey;
   }
 
+  public AiProviderModel url(@Nullable String url) {
+    this.url = url;
+    return this;
+  }
+
+  /**
+   * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
+   * @return url
+   */
+  
+  @Schema(name = "url", description = "The base URL of an AI provider (used by Ollama; blank defaults to localhost).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("url")
+  public @Nullable String getUrl() {
+    return url;
+  }
+
+  @JsonProperty("url")
+  public void setUrl(@Nullable String url) {
+    this.url = url;
+  }
+
   public AiProviderModel enabled(@Nullable Boolean enabled) {
     this.enabled = enabled;
     return this;
@@ -187,13 +210,14 @@ public class AiProviderModel {
         Objects.equals(this.name, aiProvider.name) &&
         Objects.equals(this.icon, aiProvider.icon) &&
         Objects.equals(this.apiKey, aiProvider.apiKey) &&
+        Objects.equals(this.url, aiProvider.url) &&
         Objects.equals(this.enabled, aiProvider.enabled) &&
         Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, icon, apiKey, enabled, supportsEmbeddings);
+    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsEmbeddings);
   }
 
   @Override
@@ -204,6 +228,7 @@ public class AiProviderModel {
     sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("    icon: ").append(toIndentedString(icon)).append("\n");
     sb.append("    apiKey: ").append(toIndentedString(apiKey)).append("\n");
+    sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
     sb.append("    supportsEmbeddings: ").append(toIndentedString(supportsEmbeddings)).append("\n");
     sb.append("}");
