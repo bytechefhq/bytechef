@@ -38,8 +38,11 @@ export const decodeJwtSubject = (jwtToken: string): string | undefined => {
             return undefined;
         }
 
-        const normalized = payloadSegment.replace(/-/g, '+').replace(/_/g, '/');
-        const payload = JSON.parse(atob(normalized)) as {sub?: string};
+        const base64 = payloadSegment.replace(/-/g, '+').replace(/_/g, '/');
+        // JWTs are base64url-encoded and commonly omit `=` padding; `atob` requires the length to be a multiple of 4,
+        // so restore the padding before decoding to avoid throwing on otherwise valid tokens.
+        const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
+        const payload = JSON.parse(atob(padded)) as {sub?: string};
 
         return payload.sub;
     } catch {

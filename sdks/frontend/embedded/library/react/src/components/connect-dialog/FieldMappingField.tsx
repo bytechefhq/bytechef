@@ -40,6 +40,11 @@ const FieldMappingField = ({config, label, onChange, required, value}: FieldMapp
         [fetchedForObjectType, fetchedIntegrationFieldOptions, objectType]
     );
 
+    // The label can contain spaces or other characters that are invalid in an HTML `id`, which would break
+    // `<label htmlFor>` association; sanitize it to a stable, valid base and suffix rows with their index to keep ids
+    // unique even when two sanitized field values would otherwise collide.
+    const fieldIdBase = useMemo(() => label.replace(/[^a-zA-Z0-9_-]+/g, '-') || 'field-mapping', [label]);
+
     useEffect(() => {
         let cancelled = false;
 
@@ -120,9 +125,14 @@ const FieldMappingField = ({config, label, onChange, required, value}: FieldMapp
     };
 
     const handleCreateField = () => {
-        const fieldLabel = window.prompt('New field name');
+        const fieldLabel = window.prompt('New field name')?.trim();
 
         if (!fieldLabel) {
+            return;
+        }
+
+        // Reject duplicates so a repeated name cannot overwrite an existing row/mapping or collide on a DOM id.
+        if (rows.some((row) => row.value === fieldLabel)) {
             return;
         }
 
@@ -142,10 +152,10 @@ const FieldMappingField = ({config, label, onChange, required, value}: FieldMapp
             </label>
 
             <fieldset className={styles.dialogInputField}>
-                <label htmlFor={`${label}-objectType`}>Object type</label>
+                <label htmlFor={`${fieldIdBase}-objectType`}>Object type</label>
 
                 <select
-                    id={`${label}-objectType`}
+                    id={`${fieldIdBase}-objectType`}
                     onChange={(event) => handleObjectTypeChange(event.target.value)}
                     value={objectType}
                 >
@@ -159,13 +169,13 @@ const FieldMappingField = ({config, label, onChange, required, value}: FieldMapp
                 </select>
             </fieldset>
 
-            {rows.map((row) => (
+            {rows.map((row, index) => (
                 <fieldset className={styles.dialogInputField} key={row.value}>
-                    <label htmlFor={`${label}-${row.value}`}>{row.label}</label>
+                    <label htmlFor={`${fieldIdBase}-row-${index}`}>{row.label}</label>
 
                     <select
                         disabled={!objectType}
-                        id={`${label}-${row.value}`}
+                        id={`${fieldIdBase}-row-${index}`}
                         onChange={(event) => handleRowChange(row.value, event.target.value)}
                         value={mappings[row.value] ?? ''}
                     >
