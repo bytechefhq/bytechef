@@ -12,6 +12,7 @@ import {
     LockIcon,
     LockOpenIcon,
     RedoIcon,
+    StickyNoteIcon,
     UndoIcon,
     ZoomInIcon,
     ZoomOutIcon,
@@ -25,10 +26,15 @@ import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 
 interface WorkflowEditorToolbarPropsI {
     enableUndoRedo?: boolean;
+    onAddStickyNote?: () => void;
     readOnly?: boolean;
 }
 
-const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: WorkflowEditorToolbarPropsI) => {
+const WorkflowEditorToolbar = ({
+    enableUndoRedo = false,
+    onAddStickyNote,
+    readOnly = false,
+}: WorkflowEditorToolbarPropsI) => {
     const nodes = useWorkflowDataStore((state) => state.nodes);
 
     const {layoutDirection, setLayoutDirection} = useLayoutDirectionStore(
@@ -181,6 +187,26 @@ const WorkflowEditorToolbar = ({enableUndoRedo = false, readOnly = false}: Workf
                             Reset layout
                         </TooltipContent>
                     </Tooltip>
+
+                    {!readOnly && onAddStickyNote && (
+                        <Tooltip>
+                            <TooltipTrigger asChild>
+                                <Button
+                                    icon={<StickyNoteIcon />}
+                                    onClick={onAddStickyNote}
+                                    size="icon"
+                                    variant="outline"
+                                />
+                            </TooltipTrigger>
+
+                            <TooltipContent
+                                className="rounded-lg bg-surface-tooltip text-content-onsurface-primary"
+                                side="top"
+                            >
+                                Add note
+                            </TooltipContent>
+                        </Tooltip>
+                    )}
 
                     {!readOnly && (
                         <Tooltip>
