@@ -1,0 +1,16 @@
+mutation updateAiHubPersonalAgent($input: UpdateAiHubPersonalAgentInput!) {
+    updateAiHubPersonalAgent(input: $input) {
+        id
+        workspaceId
+        userId
+        name
+        title
+        description
+        instructions
+        environmentId
+        llmProvider
+        llmModel
+        createdAt
+        updatedAt
+    }
+}

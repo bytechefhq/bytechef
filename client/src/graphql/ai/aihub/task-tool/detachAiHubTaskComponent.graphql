@@ -1,0 +1,3 @@
+mutation detachAiHubTaskComponent($workspaceId: ID!, $taskComponentId: ID!) {
+    detachAiHubTaskComponent(workspaceId: $workspaceId, taskComponentId: $taskComponentId)
+}

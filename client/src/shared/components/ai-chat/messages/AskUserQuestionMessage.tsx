@@ -32,13 +32,39 @@ export const COMBOBOX_OPTION_THRESHOLD = 8;
 const isOtherLabel = (label: string) => /^other\b/i.test(label.trim());
 
 /**
- * Renders the LLM's askUserQuestion tool result: one question is a single card, multiple become a wizard
- * that collects all answers and submits them as one combined user message (persisted to Spring AI chat
- * memory, so picks survive a refresh). An "Other" option opens a free-form input, deduplicated against any
- * "Other" the LLM already supplied. Answers are keyed in {@link useAiChatAskedQuestionsStore} by a
- * fingerprint of the questions array so re-mounting replays the summary instead of re-prompting.
+ * Renders the LLM's askUserQuestion tool result. With one question it's a plain single-step card; with two
+ * or more it's a wizard that walks the user through one question at a time and submits all answers as a
+ * single combined user message at the end (a user message, not system, so Spring AI chat memory persists
+ * it and the pick survives a page refresh). The wizard pattern fixes two prior UX bugs in the
+ * answer-each-inline approach:
+ *
+ * <ol>
+ * <li>Visual confusion: a per-question card could look dim or "disabled" after the user answered one (whether
+ *     from a parent {@code opacity-60} or from the agent's response landing as a new message), making the
+ *     remaining questions feel canceled even when they were still clickable.</li>
+ * <li>Premature agent turns: appending one "User picked:" system message per answer made the agent start
+ *     reasoning after the first pick — usually before the user had finished the other questions. Batching
+ *     into one final system message keeps the agent's next turn well-informed.</li>
+ * </ol>
+ *
+ * <p>
+ * The {@code "Other"} affordance is deduplicated: if the LLM already included an {@code "Other"} option in
+ * its option list, clicking that opens the free-form text input; we don't inject our own "Other…" button on
+ * top of it. If the LLM didn't include one, we inject our own so the user always has a free-form escape
+ * hatch.
+ * </p>
+ *
+ * <p>
+ * Answers are persisted in {@link useAiChatAskedQuestionsStore} keyed by a fingerprint over the whole
+ * questions array, so reloading or re-mounting the message replays the summary card instead of re-prompting.
+ * The transcript message reads
+ * {@code "User picked:\n- <question text> → <answer>\n..."} so the agent's next turn parses each answer
+ * back to its question without us having to issue correlation ids.
+ * </p>
  */
 const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionDataI>) => {
+    // Stabilise the questions reference so downstream useMemo dependencies don't churn every render.
+    // `data.questions ?? []` would allocate a fresh empty array on each call.
     const questions = useMemo(() => data.questions ?? [], [data.questions]);
 
     const fingerprint = useMemo(() => fingerprintQuestions(questions), [questions]);
@@ -80,6 +106,11 @@ const AskUserQuestionMessage = ({data}: DataMessagePartProps<AskUserQuestionData
 
         markAnswered(fingerprint, summary);
 
+        // Append as a USER message (not 'system'). Both drive the agent's next turn identically, but Spring
+        // AI chat memory persists only user/assistant messages — system messages are dropped from history,
+        // so a 'system' answer vanished on a page refresh (the ephemeral answered-store also resets, and the
+        // question card itself isn't persisted). As a user message the pick survives reload and rehydrates
+        // as plain text on the user side — where it already renders live.
         threadRuntime.append({
             content: [{text: messageText, type: 'text'}],
             role: 'user',
@@ -426,10 +457,20 @@ const AnsweredSummary = ({persistedAnswer}: {persistedAnswer?: string}) => {
     );
 };
 
+/**
+ * Build a labeled summary "- <question> → <answer>" lines for the system message and the persisted summary.
+ * Keeping the question text in the line lets the agent map each answer back to its question without us
+ * having to issue server-side correlation ids.
+ */
 function buildAnswerSummary(questions: AskUserQuestionDataI['questions'], answers: Record<number, string>): string {
     return questions.map((question, index) => `- ${question.question} → ${answers[index] ?? ''}`).join('\n');
 }
 
+/**
+ * Stable fingerprint over the WHOLE questions array so the wizard's "already answered" check survives
+ * re-renders and message-list re-walks. Answering the wizard marks one fingerprint; siblings inside the
+ * data part are part of the same wizard, not independent units.
+ */
 function fingerprintQuestions(questions: AskUserQuestionDataI['questions']): string {
     return questions
         .map((question) => `${question.question}::${question.options.map((option) => option.label).join(',')}`)

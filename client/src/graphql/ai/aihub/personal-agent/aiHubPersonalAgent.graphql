@@ -1,0 +1,60 @@
+query aiHubPersonalAgent($workspaceId: ID!, $id: ID!) {
+    aiHubPersonalAgent(workspaceId: $workspaceId, id: $id) {
+        id
+        workspaceId
+        userId
+        name
+        title
+        description
+        instructions
+        environmentId
+        llmProvider
+        llmModel
+        tools {
+            id
+            aiHubPersonalAgentId
+            componentName
+            componentVersion
+            operationName
+            connectionId
+            parameters
+            createdAt
+        }
+        resources {
+            id
+            aiHubPersonalAgentId
+            kind
+            resourceId
+            resourceName
+            createdAt
+        }
+        schedule {
+            ...AiHubPersonalAgentScheduleFields
+        }
+        createdAt
+        updatedAt
+    }
+}
+
+fragment AiHubPersonalAgentScheduleFields on AiHubPersonalAgentSchedule {
+    id
+    aiHubPersonalAgentId
+    title
+    prompt
+    frequencyKind
+    intervalMinutes
+    minuteOfHour
+    timeOfDay
+    dayOfWeek
+    dayOfMonth
+    cronExpression
+    effectiveCronExpression
+    zoneId
+    startDate
+    lifecycleKind
+    maxRuns
+    remainingRuns
+    enabled
+    lastRunAt
+    nextRunAt
+}

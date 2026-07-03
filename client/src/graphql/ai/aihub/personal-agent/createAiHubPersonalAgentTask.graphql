@@ -1,0 +1,20 @@
+mutation createAiHubPersonalAgentTask($input: CreateAiHubPersonalAgentTaskInput!) {
+    createAiHubPersonalAgentTask(input: $input) {
+        id
+        workspaceId
+        userId
+        threadId
+        title
+        lastPreview
+        messageCount
+        status
+        environmentId
+        createdAt
+        updatedAt
+        kind
+        workflowExecutionId
+        projectDeploymentId
+        aiHubPersonalAgentId
+        autoTitled
+    }
+}

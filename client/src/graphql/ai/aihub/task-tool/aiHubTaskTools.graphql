@@ -1,0 +1,13 @@
+query aiHubTaskTools($workspaceId: ID!, $taskId: ID!) {
+    aiHubTaskTools(workspaceId: $workspaceId, taskId: $taskId) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        taskComponentId
+        taskId
+        taskToolId
+        environment
+        parameters
+    }
+}

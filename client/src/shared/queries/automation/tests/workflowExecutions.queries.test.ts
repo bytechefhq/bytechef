@@ -1,6 +1,21 @@
 import {describe, expect, it} from 'vitest';
 
-import {WorkflowExecutionKeys} from '../workflowExecutions.queries';
+import {WorkflowExecutionKeys, getNextWorkflowExecutionsPageParam} from '../workflowExecutions.queries';
+
+describe('getNextWorkflowExecutionsPageParam', () => {
+    it('returns the next page number while more pages remain', () => {
+        expect(getNextWorkflowExecutionsPageParam({number: 0, totalPages: 6} as never)).toBe(1);
+        expect(getNextWorkflowExecutionsPageParam({number: 4, totalPages: 6} as never)).toBe(5);
+    });
+
+    it('returns undefined on the last page', () => {
+        expect(getNextWorkflowExecutionsPageParam({number: 5, totalPages: 6} as never)).toBeUndefined();
+    });
+
+    it('returns undefined when totals are missing', () => {
+        expect(getNextWorkflowExecutionsPageParam({} as never)).toBeUndefined();
+    });
+});
 
 describe('workflowExecutions.queries', () => {
     describe('WorkflowExecutionKeys', () => {

@@ -1,0 +1,13 @@
+mutation setAiHubMcpServerToolEnabled(
+    $workspaceId: ID!
+    $mcpServerId: ID!
+    $toolName: String!
+    $enabled: Boolean!
+) {
+    setAiHubMcpServerToolEnabled(
+        workspaceId: $workspaceId
+        mcpServerId: $mcpServerId
+        toolName: $toolName
+        enabled: $enabled
+    )
+}

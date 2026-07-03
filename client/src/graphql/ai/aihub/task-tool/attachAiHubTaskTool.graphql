@@ -1,0 +1,13 @@
+mutation attachAiHubTaskTool($input: AttachAiHubTaskToolInput!) {
+    attachAiHubTaskTool(input: $input) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        taskComponentId
+        taskId
+        taskToolId
+        environment
+        parameters
+    }
+}

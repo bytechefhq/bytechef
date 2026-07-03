@@ -369,7 +369,8 @@
     line-height: 1rem;
 }
 
-.aui-thread-root .aui-md-h3 {
+.aui-thread-root .aui-md-h3,
+.aui-cc-thread-root .aui-md-h3 {
     font-size: 1.05rem !important;
 }
 
@@ -387,27 +388,32 @@
     line-height: 1.5rem;
 }
 
-.aui-thread-root .aui-md-h1 {
+.aui-thread-root .aui-md-h1,
+.aui-cc-thread-root .aui-md-h1 {
     font-size: 1.4rem !important;
     line-height: 2.25rem !important;
 }
 
-.aui-thread-root .aui-md-h2 {
+.aui-thread-root .aui-md-h2,
+.aui-cc-thread-root .aui-md-h2 {
     font-size: 1.3rem !important;
     line-height: 2rem !important;
 }
 
-.aui-thread-root .aui-md-h3 {
+.aui-thread-root .aui-md-h3,
+.aui-cc-thread-root .aui-md-h3 {
     font-size: 1.25rem !important;
     line-height: 1.75rem !important;
 }
 
-.aui-thread-root .aui-md-h4 {
+.aui-thread-root .aui-md-h4,
+.aui-cc-thread-root .aui-md-h4 {
     font-size: 1.125rem !important;
     line-height: 1.75rem !important;
 }
 
-.aui-thread-root .aui-md-h5 {
+.aui-thread-root .aui-md-h5,
+.aui-cc-thread-root .aui-md-h5 {
     font-size: 1rem !important;
     line-height: 1.5rem !important;
 }

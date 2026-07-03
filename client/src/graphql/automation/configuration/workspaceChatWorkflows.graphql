@@ -3,7 +3,9 @@ query workspaceChatWorkflows($workspaceId: ID!, $environmentId: ID!) {
         projectDeploymentId
         projectId
         projectName
+        projectWorkflowId
         workflowExecutionId
+        workflowId
         workflowLabel
     }
 }

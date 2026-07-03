@@ -1,0 +1,3 @@
+mutation deleteAiHubTask($workspaceId: ID!, $id: ID!) {
+    deleteAiHubTask(workspaceId: $workspaceId, id: $id)
+}

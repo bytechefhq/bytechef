@@ -1,0 +1,15 @@
+mutation addAiHubMcpServer(
+    $workspaceId: ID!
+    $name: String!
+    $url: String!
+    $authToken: String
+    $environment: Int!
+) {
+    addAiHubMcpServer(
+        workspaceId: $workspaceId
+        name: $name
+        url: $url
+        authToken: $authToken
+        environment: $environment
+    )
+}

@@ -8,6 +8,7 @@ describe('applicationInfoStore', () => {
 
             expect(ai.copilot.enabled).toBe(false);
             expect(ai.gateway.enabled).toBe(false);
+            expect(ai.hub.enabled).toBe(false);
             expect(ai.knowledgeBase.enabled).toBe(false);
         });
     });

@@ -1,0 +1,12 @@
+mutation addAiHubPersonalAgentTool($input: AddAiHubPersonalAgentToolInput!) {
+    addAiHubPersonalAgentTool(input: $input) {
+        id
+        aiHubPersonalAgentId
+        componentName
+        componentVersion
+        operationName
+        connectionId
+        parameters
+        createdAt
+    }
+}

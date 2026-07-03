@@ -1,15 +1,22 @@
 /**
- * Surface-agnostic mapper for interactive tool-result payloads, reusable across any chat surface (AI Hub,
- * Copilot, etc.). Returns:
- *   - `{ok: true, data, type}` — payload parsed and validated successfully.
- *   - `{ok: false, errorMessage, toolName}` — payload unparseable or failed kind/shape validation.
- *   - `undefined` — `toolCallName` is not one of the interactive tool names handled here.
+ * Surface-agnostic mapper for interactive tool-result payloads. Encapsulates the parse + validate logic
+ * that was previously inlined in `AiHubRuntimeProvider`'s `onToolCallResultEvent` handler, making it
+ * reusable across any chat surface (AI Hub, copilot, etc.).
+ *
+ * Returns:
+ *   - `{ok: true, data, type}` — payload was parsed and validated successfully.
+ *   - `{ok: false, errorMessage, toolName}` — payload was unparseable or failed kind/shape validation.
+ *   - `undefined` — `toolCallName` is not one of the four interactive tool names handled here.
  */
 
 export type ToolResultDataPartType =
     | {data: Record<string, unknown>; ok: true; type: string}
     | {errorMessage: string; ok: false; toolName: string};
 
+/**
+ * Parses a JSON string, returning the parsed value or `null` on failure. Logs a structured warning so
+ * regressions in tool/LLM serializers are visible in production logs rather than silently swallowed.
+ */
 export const parseJson = <T>(content: string, contextLabel: string): T | null => {
     try {
         return JSON.parse(content) as T;

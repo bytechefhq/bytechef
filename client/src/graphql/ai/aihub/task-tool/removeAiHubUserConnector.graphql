@@ -1,0 +1,3 @@
+mutation removeAiHubUserConnector($workspaceId: ID!, $connectorId: ID!) {
+    removeAiHubUserConnector(workspaceId: $workspaceId, connectorId: $connectorId)
+}

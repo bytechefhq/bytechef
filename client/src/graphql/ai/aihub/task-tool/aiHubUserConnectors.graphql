@@ -1,0 +1,20 @@
+query aiHubUserConnectors($workspaceId: ID!) {
+    aiHubUserConnectors(workspaceId: $workspaceId) {
+        componentName
+        componentVersion
+        connectionId
+        connectionRequired
+        description
+        enabled
+        icon
+        id
+        title
+        tools {
+            description
+            enabled
+            name
+            parameters
+            title
+        }
+    }
+}

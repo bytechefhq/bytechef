@@ -1,0 +1,7 @@
+query aiHubTaskMessages($workspaceId: ID!, $id: ID!) {
+    aiHubTaskMessages(workspaceId: $workspaceId, id: $id) {
+        role
+        content
+        timestamp
+    }
+}

@@ -7,6 +7,7 @@ import ProjectBreadcrumb from '@/pages/automation/project/components/project-hea
 import ProjectSkeleton from '@/pages/automation/project/components/project-header/components/ProjectSkeleton';
 import PublishPopover from '@/pages/automation/project/components/project-header/components/PublishPopover';
 import WorkflowActionsButton from '@/pages/automation/project/components/project-header/components/WorkflowActionsButton';
+import WorkflowSelect from '@/pages/automation/project/components/project-header/components/WorkflowSelect';
 import SettingsMenu from '@/pages/automation/project/components/project-header/components/settings-menu/SettingsMenu';
 import {useProjectHeader} from '@/pages/automation/project/components/project-header/hooks/useProjectHeader';
 import useProjectsLeftSidebarStore from '@/pages/automation/project/stores/useProjectsLeftSidebarStore';
@@ -25,9 +26,12 @@ interface ProjectHeaderProps {
     bottomResizablePanelRef: RefObject<PanelImperativeHandle | null>;
     chatTrigger?: boolean;
     embedded?: boolean;
+    onWorkflowChange?: (projectWorkflowId: number) => void;
     projectId: number;
     projectWorkflowId: number;
     runDisabled: boolean;
+    showPublishDeploy?: boolean;
+    showWorkflowSelect?: boolean;
     updateWorkflowMutation: UpdateWorkflowMutationType;
 }
 
@@ -35,9 +39,12 @@ const ProjectHeader = ({
     bottomResizablePanelRef,
     chatTrigger,
     embedded,
+    onWorkflowChange,
     projectId,
     projectWorkflowId,
     runDisabled,
+    showPublishDeploy,
+    showWorkflowSelect,
     updateWorkflowMutation,
 }: ProjectHeaderProps) => {
     const copilotLayoutShifted = useCopilotLayoutShifted();
@@ -90,15 +97,35 @@ const ProjectHeader = ({
             )}
         >
             <div className="flex items-center">
-                <LeftSidebarButton onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)} />
+                {/* The embedded AI Hub workflow editor opens each workflow as its own resource-panel tab and
+                 * has no project tree, so the breadcrumb, workflow selector, and the project-sidebar toggle
+                 * are all redundant there — hidden behind `embedded`. The full-screen Project page keeps them. */}
 
-                <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
+                {!embedded && (
+                    <>
+                        <LeftSidebarButton
+                            onLeftSidebarOpenClick={() => setProjectLeftSidebarOpen(!projectLeftSidebarOpen)}
+                        />
 
-                {projectWorkflows && (
-                    <ProjectBreadcrumb
-                        currentWorkflow={workflow}
-                        onProjectWorkflowValueChange={handleProjectWorkflowValueChange}
-                        project={project}
+                        <Separator className="mr-4 ml-2 h-4" orientation="vertical" />
+
+                        {projectWorkflows && (
+                            <ProjectBreadcrumb
+                                currentWorkflow={workflow}
+                                onProjectWorkflowValueChange={handleProjectWorkflowValueChange}
+                                project={project}
+                                projectWorkflowId={projectWorkflowId}
+                                projectWorkflows={projectWorkflows}
+                            />
+                        )}
+                    </>
+                )}
+
+                {embedded && showWorkflowSelect && projectWorkflows && (
+                    <WorkflowSelect
+                        currentWorkflowLabel={workflow?.label}
+                        onValueChange={onWorkflowChange ?? handleProjectWorkflowValueChange}
+                        projectId={projectId}
                         projectWorkflowId={projectWorkflowId}
                         projectWorkflows={projectWorkflows}
                     />
@@ -108,7 +135,13 @@ const ProjectHeader = ({
             <div className="flex items-center">
                 <LoadingIndicator isFetching={isFetching} isOnline={isOnline} />
 
-                <SettingsMenu project={project} updateWorkflowMutation={updateWorkflowMutation} workflow={workflow} />
+                {!embedded && (
+                    <SettingsMenu
+                        project={project}
+                        updateWorkflowMutation={updateWorkflowMutation}
+                        workflow={workflow}
+                    />
+                )}
 
                 <OutputPanelButton onShowOutputClick={handleShowOutputClick} />
 
@@ -120,15 +153,29 @@ const ProjectHeader = ({
                     workflowIsRunning={workflowIsRunning}
                 />
 
-                <ButtonGroup>
-                    <PublishPopover
-                        disabled={!hasUnpublishedChanges}
-                        isPending={publishProjectMutationIsPending}
-                        onPublishProjectSubmit={handlePublishProjectSubmit}
-                    />
+                {!embedded && (
+                    <ButtonGroup>
+                        <PublishPopover
+                            disabled={!hasUnpublishedChanges}
+                            isPending={publishProjectMutationIsPending}
+                            onPublishProjectSubmit={handlePublishProjectSubmit}
+                        />
 
-                    <DeployButton project={project} />
-                </ButtonGroup>
+                        <DeployButton project={project} />
+                    </ButtonGroup>
+                )}
+
+                {embedded && showPublishDeploy && (
+                    <ButtonGroup>
+                        <PublishPopover
+                            disabled={!hasUnpublishedChanges}
+                            isPending={publishProjectMutationIsPending}
+                            onPublishProjectSubmit={handlePublishProjectSubmit}
+                        />
+
+                        <DeployButton project={project} />
+                    </ButtonGroup>
+                )}
             </div>
         </header>
     );

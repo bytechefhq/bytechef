@@ -1,0 +1,8 @@
+mutation setAiHubPersonalAgentSchedule($input: SetAiHubPersonalAgentScheduleInput!) {
+    setAiHubPersonalAgentSchedule(input: $input) {
+        id
+        schedule {
+            ...AiHubPersonalAgentScheduleFields
+        }
+    }
+}

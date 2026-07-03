@@ -1,0 +1,3 @@
+mutation deleteAiHubTaskArtifact($input: DeleteAiHubTaskArtifactInput!) {
+    deleteAiHubTaskArtifact(input: $input)
+}

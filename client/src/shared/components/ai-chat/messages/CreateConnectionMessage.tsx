@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ConnectionDialog from '@/shared/components/connection/ConnectionDialog';
 import {Connection} from '@/shared/middleware/automation/configuration';
 import {useCreateConnectionMutation} from '@/shared/mutations/automation/connections.mutations';
@@ -19,18 +20,33 @@ export interface CreateConnectionDataI {
 }
 
 /**
- * Renders the LLM's createConnection tool result as a single "Connect &lt;Component&gt;" button that opens
- * the ConnectionDialog. Companion to {@code SelectConnectionMessage} (the "pick an existing connection"
- * intent): splitting the two intents across separate tools keeps each UI unambiguous — this one only
- * creates, never offers a picker.
+ * Renders the LLM's createConnection tool result as a single "Connect &lt;Component&gt;" button that
+ * opens the ConnectionDialog. Companion to {@code SelectConnectionMessage}, which renders a dropdown
+ * of EXISTING connections for the "pick" intent. Splitting the two intents under separate tools means
+ * each UI is unambiguous: this component never offers a picker (use selectConnection for that), and the
+ * select-connection message never offers a create affordance.
+ *
+ * <ul>
+ * <li><b>Create a new connection</b> — what createConnection should mean. A single button is the cleanest
+ * affordance: one click, dialog opens, user fills it in.</li>
+ * <li><b>Pick an existing connection</b> — separate intent the LLM expresses via {@code selectConnection},
+ * which renders {@code SelectConnectionMessage}'s dropdown.</li>
+ * </ul>
+ *
+ * <p>
+ * Keeping createConnection narrowly scoped to "create new" also means the button is unambiguous when the
+ * workspace has many existing connections of the same component (e.g. multiple Slack workspaces) — there's
+ * no risk of the user clicking the wrong dropdown item.
+ * </p>
  */
 const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDataI>) => {
     const [createdConnection, setCreatedConnection] = useState<{id: number; name: string} | undefined>();
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
 
-    const connectionTagsQueryResult = useGetConnectionTagsQuery();
+    const connectionTagsQueryResult = useGetConnectionTagsQuery(currentWorkspaceId!);
 
     const queryClient = useQueryClient();
 
@@ -44,7 +60,16 @@ const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDa
         connectionDefinitions: true,
     });
 
+    // Fetch the full ComponentDefinition (not just the basic list shape) for the requested component
+    // so the dialog opens directly to the configuration step pre-selected on this component, instead
+    // of forcing the user back to the "pick a component" step. We've already established WHICH
+    // component to connect via the LLM's `createConnection` tool call — making the user pick again
+    // would be redundant and error-prone (long catalogs, name collisions across versions).
     const {data: targetComponentDefinition} = useGetComponentDefinitionQuery(
+        // No componentVersion in the LLM's `createConnection` payload — connections are versioned
+        // independently from components, and the dialog only needs the component definition to render
+        // its connection-config step. Pass the latest known version (1) which the server's
+        // GetComponentDefinitionRequest treats as "latest" via the connection-definition lookup.
         {componentName: data.componentName, componentVersion: 1},
         Boolean(data.componentName)
     );
@@ -52,6 +77,9 @@ const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDa
     const handleConnectionCreate = async (newConnectionId: number) => {
         await queryClient.invalidateQueries({queryKey: ConnectionKeys.connections});
 
+        // The dialog returns only the new id, not the new object. Use the LLM's suggested name (or fall
+        // back to the component label) for the confirmation row — the user just typed the actual name
+        // into the dialog, so showing it back as a bare id would read worse than the suggestion.
         const fallbackName = data.suggestedName || `${data.componentLabel} connection`;
 
         setCreatedConnection({id: newConnectionId, name: fallbackName});
@@ -61,6 +89,9 @@ const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDa
         return null;
     }
 
+    // Distinguish "still loading" from "load failed". Without this branch, a flaky/erroring component-definitions
+    // endpoint silently disables the entire connect flow — the user sees an empty space where the
+    // "Connect <Component>" button should be and has no idea the agent's tool call ever fired.
     if (componentDefinitionsIsError || !componentDefinitions) {
         return (
             <div className="mt-2 flex items-center gap-2">
@@ -95,7 +126,7 @@ const CreateConnectionMessage = ({data}: DataMessagePartProps<CreateConnectionDa
                     componentDefinition={targetComponentDefinition}
                     componentDefinitions={componentDefinitions}
                     connection={{environmentId: currentEnvironmentId} as Connection}
-                    connectionTagsQueryKey={ConnectionKeys.connectionTags}
+                    connectionTagsQueryKey={ConnectionKeys.connectionTags(currentWorkspaceId!)}
                     connectionsQueryKey={ConnectionKeys.connections}
                     onClose={() => setDialogOpen(false)}
                     onConnectionCreate={handleConnectionCreate}

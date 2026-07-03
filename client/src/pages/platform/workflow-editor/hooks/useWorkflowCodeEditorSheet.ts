@@ -40,7 +40,7 @@ type UseWorkflowCodeEditorSheetReturnType = {
     handleValidate: (markers: editor.IMarkerData[]) => void;
     handleWorkflowTestConfigurationDialog: (open: boolean) => void;
     hasErrors: boolean;
-    projectName: string;
+    projectName: string | null;
     setErrorPanelRef: Ref<PanelImperativeHandle | null>;
     setErrorsAccordionOpen: (open: boolean) => void;
     showWorkflowTestConfigurationDialog: boolean;

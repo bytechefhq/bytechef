@@ -7,9 +7,10 @@ import {devtools} from 'zustand/middleware';
  * - `running` — request in flight
  * - `success` — completed normally
  * - `error` — completed with a real failure (server error, network failure, parse error)
- * - `aborted` — call terminated by the task-switch cleanup ritual; NOT a real error. Kept distinct from
- *   `error` so renderers show a neutral "Switched away" affordance and a late aborted callback can't flip a
- *   failed call back to success.
+ * - `aborted` — cleanup ritual on task switch terminated the call; NOT a real error. Renderers should show
+ *   a neutral "Switched away" affordance, not an error indicator. Distinguishing this from `error` prevents the
+ *   flapping bug where `failAllRunning` would set `error` and a late SSE `onComplete({kind:'aborted'})` callback
+ *   would then flip back to `success` — leaving a misleading or oscillating UI.
  */
 export type ToolCallStatusType = 'running' | 'success' | 'error' | 'aborted';
 
@@ -20,25 +21,46 @@ export interface SubagentProgressEntryI {
     timestamp: number;
 }
 
+/**
+ * Tool call entry. The {@link ToolCallStatusType} discriminator implies a contract: {@code result} is set only
+ * after a terminal status ({@code success}/{@code error}/{@code aborted}). The flat shape leaves {@code result}
+ * representable while {@code status} is still {@code 'running'}, which is illegal-but-representable; the
+ * {@link isRunningToolCall} / {@link isTerminalToolCall} type predicates below let callers narrow at runtime so
+ * they don't accidentally read a stale result on an in-flight entry. Project ESLint rules (interfaces must end
+ * in {@code I}/{@code Props}; type aliases must end in {@code Type}) prevent expressing this as a discriminated
+ * type-alias union without renaming every consumer; the predicates plus the contract docstring are the
+ * pragmatic compromise.
+ */
 export interface ToolCallEntryI {
     args?: Record<string, unknown>;
+    /** AG-UI thread/task id this entry belongs to. Used to scope reset on task switch. */
     taskId?: string;
+    /** Index into the messages array of the assistant message that owns this tool call. */
     messageIndex: number;
     progress: SubagentProgressEntryI[];
     progressiveOutput: string;
+    /**
+     * Set by {@code completeToolCall} / {@code failAllRunning} when {@code status} transitions to a terminal
+     * value. Readers MUST gate on {@link isTerminalToolCall} (or check {@code status !== 'running'}) before
+     * dereferencing — a {@code running} entry's {@code result} is meaningless.
+     */
     result?: unknown;
     status: ToolCallStatusType;
     toolCallId: string;
     toolName: string;
 }
 
+/** Discriminated alias of {@link ToolCallEntryI} where {@code status} is narrowed to {@code 'running'}. */
 export type RunningToolCallEntryType = ToolCallEntryI & {status: 'running'};
 
+/** Discriminated alias where {@code status} is narrowed to a terminal value; {@code result} may be present. */
 export type TerminalToolCallEntryType = ToolCallEntryI & {status: TerminalToolCallStatusType};
 
+/** Type predicate narrowing to {@link RunningToolCallEntryType} so callers can branch without re-asserting status. */
 export const isRunningToolCall = (entry: ToolCallEntryI): entry is RunningToolCallEntryType =>
     entry.status === 'running';
 
+/** Type predicate narrowing to {@link TerminalToolCallEntryType}. */
 export const isTerminalToolCall = (entry: ToolCallEntryI): entry is TerminalToolCallEntryType =>
     entry.status !== 'running';
 
@@ -46,11 +68,33 @@ interface ToolCallStateI {
     addProgress: (toolCallId: string, text: string) => void;
     appendProgressiveOutput: (toolCallId: string, chunk: string) => void;
     completeToolCall: (toolCallId: string, result: unknown, isError: boolean) => void;
+    /**
+     * Force any tool calls still in `running` state to a terminal status. The default `aborted` is correct for the
+     * task-switch cleanup ritual — it prevents the flapping race where `error` would be later overwritten by
+     * a successful `completeToolCall` from a late SSE callback. Pass `error` for genuine failures (e.g. agent throw).
+     */
     failAllRunning: (errorResult: unknown, status?: 'aborted' | 'error') => void;
+    /**
+     * Task-scoped sibling of {@link failAllRunning}: terminates only entries whose {@code taskId}
+     * matches. Used by {@code onRunFinishedEvent} / {@code onRunErrorEvent} in the runtime provider so a tool call
+     * that started but never received its matching {@code ToolCallResultEvent} stops spinning at end-of-run, without
+     * clobbering parallel tasks' legitimate in-flight cards.
+     */
     failRunningInTask: (taskId: string, errorResult: unknown, status?: 'aborted' | 'error') => void;
+    /**
+     * Returns the most-recently-started running tool call matching {@code toolName}. Pass {@code taskId} so a
+     * late breadcrumb arriving for a switched-away task cannot land on the wrong card. The cleanup ritual
+     * already flips entries from prior tasks to 'error' on switch — this filter is defense in depth against
+     * any race window where two tasks briefly share a running call with the same toolName.
+     */
     findRunningToolCallByName: (toolName: string, taskId?: string) => RunningToolCallEntryType | undefined;
+    /** Insertion order of tool-call ids — used to project them into the assistant message in arrival order. */
     order: string[];
     reset: () => void;
+    /**
+     * Drop only the entries belonging to {@code taskId}. Used by the runtime provider on task
+     * switch so we don't nuke entries that already arrived for the NEW task in a re-mount race.
+     */
     resetForTask: (taskId: string | undefined) => void;
     startToolCall: (toolCallId: string, toolName: string, messageIndex: number, taskId?: string) => void;
     toolCalls: Record<string, ToolCallEntryI>;
@@ -113,10 +157,16 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
                     return state;
                 }
 
+                // If the cleanup ritual already terminated this call as `aborted`, do not let a late SSE callback
+                // flap the status back to success/error. `aborted` is terminal once set — the user switched away
+                // and must not see misleading post-hoc state on a card they can no longer act on.
                 if (existing.status === 'aborted') {
                     return state;
                 }
 
+                // Rebuild into TerminalToolCallEntryType explicitly. Spreading existing then overriding `result`
+                // and `status` is the natural pattern, but it lets stale fields from the prior shape leak; the
+                // explicit shape lock confirms exactly which fields land on the terminal entry.
                 const completed: TerminalToolCallEntryType = {
                     args: existing.args,
                     taskId: existing.taskId,
@@ -142,6 +192,8 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
             set((state) => {
                 const existing = state.toolCalls[toolCallId];
 
+                // Guard: never mutate an entry that has already been marked success/error.
+                // Late chunks arriving after onComplete would otherwise flip the status indicator.
                 if (!existing || existing.status !== 'running') {
                     return state;
                 }
@@ -272,6 +324,8 @@ export const aiChatToolCallStore = create<ToolCallStateI>()(
         resetForTask: (taskId) =>
             set((state) => {
                 if (!taskId) {
+                    // Untracked entries (callers without a taskId) — fall through to a hard reset so we
+                    // don't leave them lingering forever.
                     return {order: [], toolCalls: {}};
                 }
 

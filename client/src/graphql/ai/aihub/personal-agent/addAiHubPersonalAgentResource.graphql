@@ -1,0 +1,10 @@
+mutation addAiHubPersonalAgentResource($input: AddAiHubPersonalAgentResourceInput!) {
+    addAiHubPersonalAgentResource(input: $input) {
+        id
+        aiHubPersonalAgentId
+        kind
+        resourceId
+        resourceName
+        createdAt
+    }
+}

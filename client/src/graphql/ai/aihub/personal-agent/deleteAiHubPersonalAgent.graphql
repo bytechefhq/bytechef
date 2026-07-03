@@ -1,0 +1,3 @@
+mutation deleteAiHubPersonalAgent($workspaceId: ID!, $id: ID!) {
+    deleteAiHubPersonalAgent(workspaceId: $workspaceId, id: $id)
+}

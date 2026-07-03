@@ -1,0 +1,12 @@
+mutation recordReferencedAiHubTaskArtifact($input: RecordReferencedAiHubTaskArtifactInput!) {
+    recordReferencedAiHubTaskArtifact(input: $input) {
+        id
+        taskId
+        kind
+        status
+        artifactId
+        artifactName
+        environmentId
+        createdAt
+    }
+}

@@ -1,0 +1,13 @@
+query aiHubWorkspaceSettings($workspaceId: ID!) {
+    aiHubWorkspaceSettings(workspaceId: $workspaceId) {
+        workspaceId
+        voiceWebhookUrl
+    }
+}
+
+mutation updateAiHubVoiceWebhookUrl($input: UpdateAiHubVoiceWebhookUrlInput!) {
+    updateAiHubVoiceWebhookUrl(input: $input) {
+        workspaceId
+        voiceWebhookUrl
+    }
+}

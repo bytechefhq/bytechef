@@ -9,6 +9,7 @@ import {Outlet, useLocation} from 'react-router-dom';
 interface SettingsProps {
     sidebarNavItems: {
         href?: string;
+        subgroup?: boolean;
         title: string;
     }[];
     title?: string;
@@ -86,6 +87,13 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
                                 key={navItem.href}
                                 toLink={navItem.href}
                             />
+                        ) : navItem.subgroup ? (
+                            <h4
+                                className="px-2 pt-1 pb-1 text-sm font-medium text-muted-foreground"
+                                key={navItem.title}
+                            >
+                                {navItem.title}
+                            </h4>
                         ) : (
                             <h3
                                 className="px-2 pt-4 pb-1 text-sm font-semibold text-muted-foreground"

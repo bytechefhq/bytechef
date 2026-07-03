@@ -1,0 +1,17 @@
+mutation updateAiHubTaskToolParameters($workspaceId: ID!, $taskToolId: ID!, $parameters: Any!) {
+    updateAiHubTaskToolParameters(
+        workspaceId: $workspaceId
+        taskToolId: $taskToolId
+        parameters: $parameters
+    ) {
+        clusterElementName
+        componentName
+        componentVersion
+        connectionId
+        taskComponentId
+        taskId
+        taskToolId
+        environment
+        parameters
+    }
+}

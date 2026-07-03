@@ -1,0 +1,32 @@
+mutation createWorkflowChatAiHubTask(
+    $workspaceId: ID!
+    $environment: Int!
+    $workflowExecutionId: String!
+    $projectDeploymentId: ID!
+    $title: String
+) {
+    createWorkflowChatAiHubTask(
+        workspaceId: $workspaceId
+        environment: $environment
+        workflowExecutionId: $workflowExecutionId
+        projectDeploymentId: $projectDeploymentId
+        title: $title
+    ) {
+        id
+        workspaceId
+        userId
+        threadId
+        title
+        lastPreview
+        messageCount
+        status
+        environmentId
+        createdAt
+        updatedAt
+        kind
+        workflowExecutionId
+        projectDeploymentId
+        aiHubPersonalAgentId
+        autoTitled
+    }
+}

@@ -1,0 +1,13 @@
+mutation setAiHubUserConnectorToolEnabled(
+    $workspaceId: ID!
+    $connectorId: ID!
+    $toolName: String!
+    $enabled: Boolean!
+) {
+    setAiHubUserConnectorToolEnabled(
+        workspaceId: $workspaceId
+        connectorId: $connectorId
+        toolName: $toolName
+        enabled: $enabled
+    )
+}

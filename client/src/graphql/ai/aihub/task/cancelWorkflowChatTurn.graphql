@@ -1,0 +1,3 @@
+mutation cancelWorkflowChatTurn($workspaceId: ID!, $id: ID!) {
+    cancelWorkflowChatTurn(workspaceId: $workspaceId, id: $id)
+}

@@ -1,0 +1,3 @@
+mutation bulkArchiveWorkflowChatAiHubTasks($workspaceId: ID!, $environment: Int!) {
+    bulkArchiveWorkflowChatAiHubTasks(workspaceId: $workspaceId, environment: $environment)
+}

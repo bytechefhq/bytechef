@@ -17,10 +17,12 @@ export interface SelectPropertyOptionDataI {
 }
 
 /**
- * Renders the selectPropertyOption / selectTriggerPropertyOption tool result as a searchable picker of all
- * options the tool fetched from the connection (taken straight from the tool result, not re-emitted by the
- * LLM). On pick, the option's real value is submitted as a system message "User picked: <label> (value:
- * <value>)" so the agent writes the value (e.g. a channel id) into the workflow.
+ * Renders the selectPropertyOption / selectTriggerPropertyOption tool result as a searchable picker of ALL options the
+ * tool fetched from the connection. The options come straight from the tool result (not re-emitted by the LLM), so the
+ * full list is always shown. On pick, the option's real value is submitted as a system message
+ * "User picked: <label> (value: <value>)" so the agent writes the value (e.g. a channel id) into the workflow.
+ * Surface-agnostic: depends only on the assistant-ui thread runtime + the data prop, so it can later move to a shared
+ * module reused by Copilot.
  */
 const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectPropertyOptionDataI>) => {
     const [picked, setPicked] = useState<SelectPropertyOptionItemI | undefined>();
@@ -60,12 +62,11 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
         );
     }
 
-    const items = options.map((option) => ({label: option.label, optionValue: option.value, value: option.label}));
+    const items = options.map((option) => ({label: option.label, value: option.label}));
 
     return (
-        <div className={`mt-2 flex w-full min-w-0 flex-col gap-1 ${superseded ? 'opacity-60' : ''}`}>
+        <div className={`mt-2 flex w-full min-w-0 flex-col gap-1${superseded ? 'opacity-60' : ''}`}>
             <ComboBox
-                disabled={superseded}
                 emptyMessage="No match"
                 items={items}
                 onChange={(item) => {
@@ -73,7 +74,7 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
                         return;
                     }
 
-                    const option = options.find((candidate) => candidate.value === item.optionValue);
+                    const option = options.find((candidate) => candidate.label === item.value);
 
                     if (!option) {
                         return;
