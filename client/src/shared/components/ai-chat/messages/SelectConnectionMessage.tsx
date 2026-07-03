@@ -94,7 +94,7 @@ const SelectConnectionMessage = ({data}: DataMessagePartProps<SelectConnectionDa
     }
 
     return (
-        <div className={`mt-2 flex w-full min-w-0 items-center gap-2${supersededByLaterMessage ? 'opacity-60' : ''}`}>
+        <div className={`mt-2 flex w-full min-w-0 items-center gap-2 ${supersededByLaterMessage ? 'opacity-60' : ''}`}>
             <Select disabled={supersededByLaterMessage} onValueChange={handleSelectChange}>
                 <div className="min-w-0 flex-1">
                     <SelectTrigger>

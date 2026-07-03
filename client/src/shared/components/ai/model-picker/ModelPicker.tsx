@@ -329,7 +329,11 @@ const ModelPicker = ({
                     sortedProviders.map((provider) => (
                         <DropdownMenuSub key={provider.key}>
                             <DropdownMenuSubTrigger>
-                                <InlineSVG className="size-4 shrink-0" src={provider.icon ?? ''} />
+                                {provider.icon ? (
+                                    <InlineSVG className="size-4 shrink-0" src={provider.icon} />
+                                ) : (
+                                    <BrainCircuitIcon className="size-4 shrink-0 text-muted-foreground" />
+                                )}
 
                                 <span className="truncate">{provider.name}</span>
                             </DropdownMenuSubTrigger>
@@ -353,39 +357,45 @@ const ModelPicker = ({
                                                 </DropdownMenuItem>
                                             ))}
 
-                                            {provider.models.length > 0 && <DropdownMenuSeparator />}
+                                            {provider.supportsModelById && (
+                                                <>
+                                                    {provider.models.length > 0 && <DropdownMenuSeparator />}
 
-                                            {modelByIdProvider === provider.key ? (
-                                                <div className="px-2 py-1.5">
-                                                    <input
-                                                        aria-label="Model id"
-                                                        autoFocus
-                                                        className="w-full rounded-sm border border-input bg-background px-2 py-1 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
-                                                        onChange={(event) => setModelByIdValue(event.target.value)}
-                                                        onKeyDown={(event) => {
-                                                            event.stopPropagation();
+                                                    {modelByIdProvider === provider.key ? (
+                                                        <div className="px-2 py-1.5">
+                                                            <input
+                                                                aria-label="Model id"
+                                                                autoFocus
+                                                                className="w-full rounded-sm border border-input bg-background px-2 py-1 text-sm focus:ring-1 focus:ring-ring focus:outline-none"
+                                                                onChange={(event) =>
+                                                                    setModelByIdValue(event.target.value)
+                                                                }
+                                                                onKeyDown={(event) => {
+                                                                    event.stopPropagation();
 
-                                                            if (event.key === 'Enter') {
-                                                                handleModelByIdSubmit(provider.key);
-                                                            }
-                                                        }}
-                                                        placeholder="model-id"
-                                                        type="text"
-                                                        value={modelByIdValue}
-                                                    />
-                                                </div>
-                                            ) : (
-                                                <DropdownMenuItem
-                                                    onSelect={(event) => {
-                                                        event.preventDefault();
-                                                        setModelByIdProvider(provider.key);
-                                                        setModelByIdValue('');
-                                                    }}
-                                                >
-                                                    <PlusIcon className="text-muted-foreground" />
+                                                                    if (event.key === 'Enter') {
+                                                                        handleModelByIdSubmit(provider.key);
+                                                                    }
+                                                                }}
+                                                                placeholder="model-id"
+                                                                type="text"
+                                                                value={modelByIdValue}
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <DropdownMenuItem
+                                                            onSelect={(event) => {
+                                                                event.preventDefault();
+                                                                setModelByIdProvider(provider.key);
+                                                                setModelByIdValue('');
+                                                            }}
+                                                        >
+                                                            <PlusIcon className="text-muted-foreground" />
 
-                                                    <span>Choose model by ID</span>
-                                                </DropdownMenuItem>
+                                                            <span>Choose model by ID</span>
+                                                        </DropdownMenuItem>
+                                                    )}
+                                                </>
                                             )}
                                         </>
                                     )}
