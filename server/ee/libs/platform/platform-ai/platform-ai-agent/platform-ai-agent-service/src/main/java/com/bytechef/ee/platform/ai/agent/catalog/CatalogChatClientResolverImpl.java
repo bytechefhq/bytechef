@@ -57,8 +57,7 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
 
         String apiKey = aiProviderFacade.getApiKey(provider.getKey(), environment);
 
-        // Ollama runs locally and needs no API key, so a blank key is valid for it; all other providers require one.
-        if ((apiKey == null || apiKey.isBlank()) && provider != Provider.OLLAMA) {
+        if ((apiKey == null || apiKey.isBlank()) && provider.requiresApiKey()) {
             return null;
         }
 
