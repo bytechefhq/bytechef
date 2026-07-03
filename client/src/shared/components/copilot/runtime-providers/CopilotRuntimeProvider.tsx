@@ -94,12 +94,7 @@ export function CopilotRuntimeProvider({
             ...contextWithoutError,
             ...useCopilotStateContributorRegistry.getState().contribute(),
             environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
-            // The connection/property picker tools resolve options against this workspace. userId is NOT
-            // sent — the server derives it from the authenticated request (never trust the client for it).
             ...(currentWorkspaceId != null ? {workspaceId: String(currentWorkspaceId)} : {}),
-            // Drop half-set picker values client-side rather than sending them. The server
-            // tolerates partial input (logs once, falls back to workspace default), but omitting
-            // here keeps the wire format clean and reserves the warning log for genuinely-broken state.
             ...(selectedLlmProvider != null && selectedLlmModel != null
                 ? {userSelectedLlmModel: selectedLlmModel, userSelectedLlmProvider: selectedLlmProvider}
                 : {}),
@@ -107,17 +102,10 @@ export function CopilotRuntimeProvider({
 
         agent.setState(stateToSend);
 
-        // Prepare an empty assistant message to stream into
-        addMessage({content: '', role: 'assistant'});
-
-        // Tracks the tool name per tool-call id so the result handler can map the result payload to the
-        // right shared data-part renderer (the result event carries only the id, not the name).
         const toolCallNamesById = new Map<string, string>();
 
         const subscriber: AgentSubscriber = {
             onRunErrorEvent: ({event}) => {
-                // Surface a whole-run failure inline as a distinct red callout bubble (shared RunErrorMessage),
-                // humanized to strip Java FQCNs / unwrap provider JSON envelopes — same treatment AI Hub gives it.
                 const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
                 const message =
                     rawMessage.length > 0

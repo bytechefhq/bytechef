@@ -60,11 +60,12 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
         );
     }
 
-    const items = options.map((option) => ({label: option.label, value: option.label}));
+    const items = options.map((option) => ({label: option.label, optionValue: option.value, value: option.label}));
 
     return (
-        <div className={`mt-2 flex w-full min-w-0 flex-col gap-1${superseded ? 'opacity-60' : ''}`}>
+        <div className={`mt-2 flex w-full min-w-0 flex-col gap-1 ${superseded ? 'opacity-60' : ''}`}>
             <ComboBox
+                disabled={superseded}
                 emptyMessage="No match"
                 items={items}
                 onChange={(item) => {
@@ -72,7 +73,7 @@ const SelectPropertyOptionMessage = ({data}: DataMessagePartProps<SelectProperty
                         return;
                     }
 
-                    const option = options.find((candidate) => candidate.label === item.value);
+                    const option = options.find((candidate) => candidate.value === item.optionValue);
 
                     if (!option) {
                         return;
