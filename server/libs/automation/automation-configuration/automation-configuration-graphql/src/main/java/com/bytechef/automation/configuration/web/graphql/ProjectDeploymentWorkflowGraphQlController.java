@@ -261,10 +261,18 @@ public class ProjectDeploymentWorkflowGraphQlController {
 
             Project project = projectMap.get(projectDeployment.getProjectId());
 
+            // projectWorkflowMap is keyed on workflow.id (see workflowIds loader above) and is the same
+            // lookup resolveStaticWebhookExecutionId already did successfully — otherwise we would have
+            // continued past that step. Reusing it here gives the client the (projectId, projectWorkflowId)
+            // pair it needs to open the workflow's definition tab in the AI Hub right panel without an
+            // extra round-trip.
+            ProjectWorkflow projectWorkflow = projectWorkflowMap.get(workflow.getId());
+
             chatWorkflows.add(
                 new ChatWorkflow(
                     projectDeploymentWorkflow.getProjectDeploymentId(), projectDeployment.getProjectId(),
-                    project == null ? "Untitled Project" : project.getName(), webhookExecutionId,
+                    project == null ? "Untitled Project" : project.getName(), projectWorkflow.getId(),
+                    webhookExecutionId, workflow.getId(),
                     workflow.getLabel() == null ? "Untitled Workflow" : workflow.getLabel()));
         }
 
@@ -335,8 +343,8 @@ public class ProjectDeploymentWorkflowGraphQlController {
     }
 
     public record ChatWorkflow(
-        long projectDeploymentId, long projectId, String projectName, String workflowExecutionId,
-        String workflowLabel) {
+        long projectDeploymentId, long projectId, String projectName, long projectWorkflowId,
+        String workflowExecutionId, String workflowId, String workflowLabel) {
     }
 
     private record TriggerDefinitionKey(String name, int version, String operation) {
