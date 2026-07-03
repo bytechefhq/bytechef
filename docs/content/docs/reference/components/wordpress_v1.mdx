@@ -562,6 +562,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Post ID
+
+To find the Post ID, click [here](/reference/components/wordpress_v1#how-to-find-your-post-id).
 
 
 
@@ -762,6 +765,9 @@ Type: OBJECT
 }
 ```
 
+#### Find Post ID
+
+To find the Post ID, click [here](/reference/components/wordpress_v1#how-to-find-your-post-id).
 
 
 
@@ -836,3 +842,34 @@ If this component doesn't have the action you need, you can use **Custom Action*
 
 To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
 
+<hr />
+
+# Additional Instructions
+
+### How to find your Post ID
+
+- **Method 1: Find the Post ID from the Posts List**
+
+1. In your WordPress dashboard, go to **Posts → All Posts**.
+2. Hover your mouse over the post title (do not click it).
+3. Look at the URL displayed in your browser's status bar. It will contain a parameter similar to:
+
+```text
+post=123
+```
+
+The number after `post=` is the **Post ID**.
+
+---
+
+- **Method 2: Find the Post ID from the Edit Screen**
+
+1. In your WordPress dashboard, go to **Posts → All Posts**.
+2. Click **Edit** on the post you want.
+3. Check the URL in your browser's address bar. It will look similar to:
+
+```text
+https://yourwebsite.com/wp-admin/post.php?post=123&action=edit
+```
+
+The number after `post=` is the **Post ID**.
