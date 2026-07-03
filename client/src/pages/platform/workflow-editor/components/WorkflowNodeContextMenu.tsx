@@ -200,6 +200,7 @@ const WorkflowNodeContextMenu = ({
                                     <ContextMenuItem
                                         className="dropdown-menu-item-destructive gap-2"
                                         onClick={handleDeleteClick}
+                                        variant="destructive"
                                     >
                                         <Trash2Icon className="size-4 shrink-0" />
                                         Delete
