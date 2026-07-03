@@ -54,8 +54,17 @@ interface CopilotStateI {
     appendToLastAssistantMessage: (text: string) => void;
     editUserMessage: (index: number, content: string) => void;
     resetMessages: () => void;
+    selectedLlmProvider: string | null;
+    selectedLlmModel: string | null;
+    setSelectedLlm: (provider: string | null, model: string | null) => void;
 
-    savedState: {conversationId: string | undefined; context: ContextType; messages: ThreadMessageLike[]} | null;
+    savedState: {
+        conversationId: string | undefined;
+        context: ContextType;
+        messages: ThreadMessageLike[];
+        selectedLlmProvider: string | null;
+        selectedLlmModel: string | null;
+    } | null;
     saveConversationState: () => void;
     restoreConversationState: () => void;
 }
@@ -64,7 +73,10 @@ export const useCopilotStore = create<CopilotStateI>()(
     devtools((set) => ({
         conversationId: generateRandomId(),
         generateConversationId: () => {
-            set({conversationId: generateRandomId()});
+            // New conversation = reset the picker too. The picker is "per conversation" by design, so a
+            // user who picked GPT-4o in one conversation lands on the workspace default in the next one
+            // rather than carrying the selection across unrelated threads.
+            set({conversationId: generateRandomId(), selectedLlmModel: null, selectedLlmProvider: null});
         },
 
         context: {
@@ -139,6 +151,13 @@ export const useCopilotStore = create<CopilotStateI>()(
             }),
         resetMessages: () => set({messages: []}),
 
+        // Per-conversation LLM picker selection. Stored as nullable strings; the runtime provider injects
+        // both into the AG-UI state on every chat request when set. Null means "no override — server uses
+        // the workspace @Primary ChatModel."
+        selectedLlmProvider: null,
+        selectedLlmModel: null,
+        setSelectedLlm: (provider, model) => set({selectedLlmModel: model, selectedLlmProvider: provider}),
+
         savedState: null,
         saveConversationState: () =>
             set((state) => ({
@@ -147,6 +166,8 @@ export const useCopilotStore = create<CopilotStateI>()(
                     conversationId: state.conversationId,
                     context: state.context,
                     messages: state.messages,
+                    selectedLlmModel: state.selectedLlmModel,
+                    selectedLlmProvider: state.selectedLlmProvider,
                 },
             })),
         restoreConversationState: () =>
@@ -161,6 +182,8 @@ export const useCopilotStore = create<CopilotStateI>()(
                     context: state.savedState.context,
                     messages: state.savedState.messages,
                     savedState: null,
+                    selectedLlmModel: state.savedState.selectedLlmModel,
+                    selectedLlmProvider: state.savedState.selectedLlmProvider,
                 };
             }),
     }))

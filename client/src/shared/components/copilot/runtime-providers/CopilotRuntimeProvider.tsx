@@ -32,17 +32,27 @@ export function CopilotRuntimeProvider({
 }>) {
     const [isRunning, setIsRunning] = useState(false);
 
-    const {addMessage, appendToLastAssistantMessage, context, conversationId, editUserMessage, messages} =
-        useCopilotStore(
-            useShallow((state) => ({
-                addMessage: state.addMessage,
-                appendToLastAssistantMessage: state.appendToLastAssistantMessage,
-                context: state.context,
-                conversationId: state.conversationId,
-                editUserMessage: state.editUserMessage,
-                messages: state.messages,
-            }))
-        );
+    const {
+        addMessage,
+        appendToLastAssistantMessage,
+        context,
+        conversationId,
+        editUserMessage,
+        messages,
+        selectedLlmModel,
+        selectedLlmProvider,
+    } = useCopilotStore(
+        useShallow((state) => ({
+            addMessage: state.addMessage,
+            appendToLastAssistantMessage: state.appendToLastAssistantMessage,
+            context: state.context,
+            conversationId: state.conversationId,
+            editUserMessage: state.editUserMessage,
+            messages: state.messages,
+            selectedLlmModel: state.selectedLlmModel,
+            selectedLlmProvider: state.selectedLlmProvider,
+        }))
+    );
 
     const sourceKey = sourceProp ?? context?.source ?? Source.WORKFLOW_EDITOR;
 
@@ -75,6 +85,12 @@ export function CopilotRuntimeProvider({
         const stateToSend = {
             ...contextWithoutError,
             ...useCopilotStateContributorRegistry.getState().contribute(),
+            // Drop half-set picker values client-side rather than sending them. The server
+            // tolerates partial input (logs once, falls back to workspace default), but omitting
+            // here keeps the wire format clean and reserves the warning log for genuinely-broken state.
+            ...(selectedLlmProvider != null && selectedLlmModel != null
+                ? {userSelectedLlmModel: selectedLlmModel, userSelectedLlmProvider: selectedLlmProvider}
+                : {}),
         };
 
         agent.setState(stateToSend);
