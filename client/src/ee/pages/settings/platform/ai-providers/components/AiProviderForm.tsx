@@ -94,7 +94,7 @@ const AiProviderForm = ({
                                     <Input placeholder="API Key" {...field} />
                                 </FormControl>
 
-                                <FormDescription>This is your AI provider&apos;`s API key.</FormDescription>
+                                <FormDescription>This is your AI provider&apos;s API key.</FormDescription>
 
                                 <FormMessage />
                             </FormItem>
