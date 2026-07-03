@@ -3,6 +3,7 @@ import {Thread} from '@/components/assistant-ui/thread';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
+import {aiChatDataComponents} from '@/shared/components/ai-chat/messages/aiChatDataComponents';
 import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
 import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBoundary';
@@ -11,6 +12,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+import {type SuggestionConfig} from '@assistant-ui/react';
 import {BotMessageSquareIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useLocation} from 'react-router-dom';
@@ -18,6 +20,29 @@ import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const ANIMATION_DURATION_MS = 300;
+
+const COPILOT_SUGGESTIONS: SuggestionConfig[] = [
+    {
+        label: 'does end-to-end.',
+        prompt: 'Describe what this workflow does end-to-end.',
+        title: 'Describe what this workflow',
+    },
+    {
+        label: 'of this action are required?',
+        prompt: 'Which properties of this action are required?',
+        title: 'Which properties',
+    },
+    {
+        label: 'that can send an email',
+        prompt: 'Search for an action that can send an email',
+        title: 'Search for an action',
+    },
+    {
+        label: 'conditional branching in workflows?',
+        prompt: 'How do I implement conditional branching in workflows?',
+        title: 'How do I implement',
+    },
+];
 
 interface CopilotPanelProps {
     className?: string;
@@ -109,7 +134,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
             </div>
 
             <div className="absolute inset-x-0 top-16 bottom-0 -mx-1">
-                <CopilotRuntimeProvider source={source}>
+                <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
                     <Thread
                         composerActions={
                             !source ? (
@@ -121,6 +146,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                                 />
                             ) : null
                         }
+                        dataComponents={aiChatDataComponents}
                         leadingComposerActions={
                             currentWorkspaceId != null ? (
                                 <ModelPicker

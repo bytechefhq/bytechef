@@ -1,6 +1,11 @@
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
+import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
+import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
@@ -82,9 +87,15 @@ export function CopilotRuntimeProvider({
 
         delete contextWithoutError.workflowExecutionError;
 
+        const currentWorkspaceId = useWorkspaceStore.getState().currentWorkspaceId;
+
         const stateToSend = {
             ...contextWithoutError,
             ...useCopilotStateContributorRegistry.getState().contribute(),
+            environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
+            // The connection/property picker tools resolve options against this workspace. userId is NOT
+            // sent — the server derives it from the authenticated request (never trust the client for it).
+            ...(currentWorkspaceId != null ? {workspaceId: String(currentWorkspaceId)} : {}),
             // Drop half-set picker values client-side rather than sending them. The server
             // tolerates partial input (logs once, falls back to workspace default), but omitting
             // here keeps the wire format clean and reserves the warning log for genuinely-broken state.
@@ -98,12 +109,65 @@ export function CopilotRuntimeProvider({
         // Prepare an empty assistant message to stream into
         addMessage({content: '', role: 'assistant'});
 
+        // Tracks the tool name per tool-call id so the result handler can map the result payload to the
+        // right shared data-part renderer (the result event carries only the id, not the name).
+        const toolCallNamesById = new Map<string, string>();
+
         const subscriber: AgentSubscriber = {
+            onRunErrorEvent: ({event}) => {
+                // Surface a whole-run failure inline as a distinct red callout bubble (shared RunErrorMessage),
+                // humanized to strip Java FQCNs / unwrap provider JSON envelopes — same treatment AI Hub gives it.
+                const rawMessage = typeof event?.message === 'string' ? event.message.trim() : '';
+                const message =
+                    rawMessage.length > 0
+                        ? humanizeAgentErrorMessage(rawMessage)
+                        : 'The agent run failed before completing this turn.';
+
+                addMessage({content: [{data: {message}, type: 'data-run-error'}], role: 'assistant'});
+            },
             onTextMessageContentEvent: ({event, textMessageBuffer}) => {
                 appendToLastAssistantMessage(textMessageBuffer + event.delta);
             },
             onTextMessageEndEvent: ({textMessageBuffer}) => {
                 appendToLastAssistantMessage(textMessageBuffer);
+            },
+            onToolCallResultEvent: ({event}) => {
+                const toolCallName = toolCallNamesById.get(event.toolCallId);
+
+                toolCallNamesById.delete(event.toolCallId);
+
+                const dataPart = toToolResultDataPart(toolCallName ?? '', event.content);
+
+                if (!dataPart) {
+                    return;
+                }
+
+                if (!dataPart.ok) {
+                    const errorEnvelope = parseJson<{error?: unknown}>(
+                        event.content,
+                        'copilot tool-result error envelope'
+                    );
+                    const envelopeError =
+                        errorEnvelope != null && typeof errorEnvelope.error === 'string' ? errorEnvelope.error : null;
+
+                    aiChatToolCallStore
+                        .getState()
+                        .completeToolCall(event.toolCallId, {error: envelopeError ?? dataPart.errorMessage}, true);
+
+                    if (envelopeError == null) {
+                        toast.error(dataPart.errorMessage);
+                    }
+
+                    return;
+                }
+
+                addMessage({
+                    content: [{data: dataPart.data, type: dataPart.type as `data-${string}`}],
+                    role: 'assistant',
+                });
+            },
+            onToolCallStartEvent: ({event}) => {
+                toolCallNamesById.set(event.toolCallId, event.toolCallName);
             },
         };
 
