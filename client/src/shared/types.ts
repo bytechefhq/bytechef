@@ -261,9 +261,28 @@ export type WorkflowDefinitionType = {
     description?: string;
     label?: string;
     inputs?: Array<WorkflowInput>;
+    metadata?: WorkflowDefinitionMetadataType;
     outputs?: Array<WorkflowOutputType>;
     tasks?: Array<WorkflowTaskType>;
     triggers?: Array<WorkflowTriggerType>;
+};
+
+/** Workflow-level custom UI data, mirroring the per-task `metadata.ui` convention */
+export type WorkflowDefinitionMetadataType = {
+    ui?: {
+        stickyNotes?: Array<WorkflowStickyNoteType>;
+    };
+};
+
+export type WorkflowStickyNotePresetColorType = 'blue' | 'gray' | 'green' | 'orange' | 'pink' | 'purple' | 'yellow';
+
+export type WorkflowStickyNoteType = {
+    /** A preset color name or a custom `#rrggbb` hex value */
+    color?: string;
+    content: string;
+    id: string;
+    position: {x: number; y: number};
+    size?: {height: number; width: number};
 };
 
 export type WorkflowOutputType = {
