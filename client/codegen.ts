@@ -89,6 +89,7 @@ const config: CodegenConfig = {
         '../server/libs/automation/automation-configuration/automation-configuration-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-search/automation-search-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/automation/automation-task/automation-task-graphql/src/main/resources/graphql/*.graphqls',
+        '../server/ee/libs/automation/automation-ai/automation-ai-gateway/automation-ai-gateway-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-security/platform-security-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/platform/platform-component/platform-component-log/platform-component-log-graphql/src/main/resources/graphql/*.graphqls',
         '../server/libs/ai/mcp/mcp-server-configuration/mcp-server-configuration-graphql/src/main/resources/graphql/*.graphqls',
