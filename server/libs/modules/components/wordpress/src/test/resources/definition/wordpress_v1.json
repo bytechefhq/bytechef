@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new page.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wordpress_v1#create-page"
+    },
     "metadata": {
       "path": "/wp/v2/pages",
       "mimeType": "application/json",
@@ -3739,7 +3742,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new post.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wordpress_v1#create-post"
+    },
     "metadata": {
       "path": "/wp/v2/posts",
       "mimeType": "application/json",
@@ -7701,7 +7707,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Get a post by post ID.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wordpress_v1#get-post"
+    },
     "metadata": {
       "method": "GET",
       "path": "/wp/v2/posts/{postId}"
@@ -11160,7 +11169,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Update a post.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wordpress_v1#update-post"
+    },
     "metadata": {
       "path": "/wp/v2/posts/{postId}",
       "mimeType": "application/json",
@@ -32382,14 +32394,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/sendfox_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.wordpress.org/rest-api/"
+  },
   "description": "WordPress is a web content management system.",
   "icon": "path:assets/wordpress.svg",
   "inputs": null,
@@ -32404,7 +32422,10 @@
     "deprecated": null,
     "description": "Triggers when a new post is added.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/wordpress_v1#new-post"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "newPost",
