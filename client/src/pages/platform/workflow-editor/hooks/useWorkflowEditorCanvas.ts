@@ -24,10 +24,12 @@ import WorkflowEdge from '../edges/WorkflowEdge';
 import useHandleDrop from '../hooks/useHandleDrop';
 import useLayout from '../hooks/useLayout';
 import useOverlayPanelsViewport from '../hooks/useOverlayPanelsViewport';
+import useStickyNotes from '../hooks/useStickyNotes';
 import AiAgentNode from '../nodes/AiAgentNode';
 import PlaceholderNode from '../nodes/PlaceholderNode';
 import ReadOnlyNode from '../nodes/ReadOnlyNode';
 import ReadOnlyPlaceholderNode from '../nodes/ReadOnlyPlaceholderNode';
+import StickyNoteNode from '../nodes/StickyNoteNode';
 import TaskDispatcherBottomGhostNode from '../nodes/TaskDispatcherBottomGhostNode';
 import TaskDispatcherLeftGhostNode from '../nodes/TaskDispatcherLeftGhostNode';
 import TaskDispatcherTopGhostNode from '../nodes/TaskDispatcherTopGhostNode';
@@ -45,6 +47,7 @@ import {
 import {containsNodePosition} from '../utils/postDagreConstraints';
 import resolveTargetTriggerName from '../utils/resolveTargetTriggerName';
 import saveWorkflowNodesPosition from '../utils/saveWorkflowNodesPosition';
+import {STICKY_NOTE_NODE_TYPE, compensateStickyNotePosition, updateStickyNote} from '../utils/stickyNoteUtils';
 import {isWorkflowMutating} from '../utils/workflowMutationGuard';
 
 interface UseWorkflowEditorCanvasParamsI {
@@ -95,6 +98,8 @@ const useWorkflowEditorCanvas = ({
 
     const {invalidateWorkflowQueries: editorInvalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
+    const {handleAddStickyNote} = useStickyNotes({readOnly: !!readOnlyWorkflow});
+
     const [
         handleDropOnPlaceholderNode,
         handleDropOnWorkflowEdge,
@@ -116,6 +121,7 @@ const useWorkflowEditorCanvas = ({
             placeholder: PlaceholderNode,
             readonly: ReadOnlyNode,
             readonlyPlaceholder: ReadOnlyPlaceholderNode,
+            stickyNote: StickyNoteNode,
             taskDispatcherBottomGhostNode: TaskDispatcherBottomGhostNode,
             taskDispatcherLeftGhostNode: TaskDispatcherLeftGhostNode,
             taskDispatcherTopGhostNode: TaskDispatcherTopGhostNode,
@@ -293,6 +299,10 @@ const useWorkflowEditorCanvas = ({
         (_event: MouseEvent | TouchEvent, node: Node) => {
             setIsNodeDragging(true);
 
+            if (node.type === STICKY_NOTE_NODE_TYPE) {
+                return;
+            }
+
             const nodeData = node.data as NodeDataType;
             const {edges: currentEdges, nodes: currentNodes} = useWorkflowDataStore.getState();
 
@@ -424,6 +434,18 @@ const useWorkflowEditorCanvas = ({
     const handleNodeDragStop = useCallback(
         (_event: MouseEvent | TouchEvent, draggedNode: Node) => {
             setIsNodeDragging(false);
+
+            if (draggedNode.type === STICKY_NOTE_NODE_TYPE) {
+                if (updateWorkflowMutation) {
+                    updateStickyNote({
+                        id: draggedNode.id,
+                        patch: {position: compensateStickyNotePosition(draggedNode.position)},
+                        updateWorkflowMutation,
+                    });
+                }
+
+                return;
+            }
 
             if (updateWorkflowMutation) {
                 // Pre-compensate positions for the current cross-axis shift so that
@@ -584,6 +606,7 @@ const useWorkflowEditorCanvas = ({
 
     return {
         edgeTypes,
+        handleAddStickyNote,
         handleNodeDragStart,
         handleNodeDragStop,
         handleNodesChange,
