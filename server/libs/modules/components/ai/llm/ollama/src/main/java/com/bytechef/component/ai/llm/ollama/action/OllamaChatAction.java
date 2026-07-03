@@ -204,7 +204,7 @@ public class OllamaChatAction {
             if (response != null) {
                 Object responseFormat = response.get(RESPONSE_FORMAT);
 
-                if (!responseFormat.equals(ChatModel.ResponseFormat.TEXT.name())) {
+                if (responseFormat != null && !responseFormat.equals(ChatModel.ResponseFormat.TEXT.name())) {
                     ollamaChatOptionsBuilder.outputSchema((String) response.get(RESPONSE_SCHEMA));
                 }
             }

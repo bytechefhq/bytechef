@@ -148,7 +148,7 @@ public class ListConnectionsForComponentToolCallback implements ToolCallback {
             } catch (NoSuchElementException exception) {
                 metrics.recordStateVisibility(TOOL_NAME, "empty");
 
-                log.warn(
+                log.debug(
                     "Component {} v{} exposes no connection definition; treating as no connections available.",
                     componentName, componentVersion);
 
