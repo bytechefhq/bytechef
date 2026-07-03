@@ -10,7 +10,8 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
-| `BYTECHEF_AI_COPILOT_PROVIDER` | The AI provider to use for copilot (OPENAI, ANTHROPIC) | `ANTHROPIC` |
+| `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_PROVIDER` | Embedding provider for the Copilot documentation index (OLLAMA, OPENAI) | - |
+| `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_APIKEY` | API key for the Copilot documentation embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
 ## AI Firecrawl Configuration
 
@@ -41,6 +42,11 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_MEMORY_PROVIDER` | Memory storage provider for chat-style interactions (AWS, IN_MEMORY, JDBC, REDIS) | `JDBC` |
+| `BYTECHEF_AI_MEMORY_AWS_BUCKETPREFIX` | Prefix used to derive the per-tenant S3 bucket name (provider `AWS`) | `bytechef-chat-memory` |
+| `BYTECHEF_AI_MEMORY_AWS_REGION` | AWS region for S3-backed chat memory (provider `AWS`) | - |
+| `BYTECHEF_AI_MEMORY_AWS_ACCESSKEYID` | AWS access key ID for S3-backed chat memory (sensitive) | - |
+| `BYTECHEF_AI_MEMORY_AWS_SECRETACCESSKEY` | AWS secret access key for S3-backed chat memory (sensitive) | - |
+| `BYTECHEF_AI_MEMORY_AWS_KEYPREFIX` | Key prefix prepended to every stored object key (provider `AWS`) | - |
 
 ## AI Provider API Keys
 
@@ -52,6 +58,8 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_PROVIDER_GROQ_APIKEY`          | Groq API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_MISTRAL_APIKEY`       | Mistral API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_NVIDIA_APIKEY`        | NVIDIA API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OLLAMA_APIKEY`        | Ollama API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OLLAMA_URL`           | Ollama server base URL; fallback for chat and embedding models (defaults to `http://localhost:11434` when blank) | - |
 | `BYTECHEF_AI_PROVIDER_OPENAI_APIKEY`        | OpenAI API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_PERPLEXITY_APIKEY`    | Perplexity API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_STABILITY_APIKEY`     | Stability API key (sensitive) | - |
@@ -72,6 +80,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name | `qwen3-embedding:8b` |
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_OPENAI_OPTIONS_MODEL` | OpenAI embedding model name | `text-embedding-3-small` |
 
 ## AI Vectorstore Configuration
