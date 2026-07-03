@@ -1,5 +1,6 @@
 dependencies {
     implementation("org.apache.commons:commons-lang3")
+    implementation("org.assertj:assertj-core")
     implementation("org.junit.jupiter:junit-jupiter")
     implementation(libs.org.json)
     implementation("org.skyscreamer:jsonassert")
