@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
 import {Input} from '@/components/ui/input';
+import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {useUpdateAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/shared/queries/platform/aiProviders.queries';
 import {WorkflowNodeOptionKeys} from '@/shared/queries/platform/workflowNodeOptions.queries';
@@ -9,26 +10,28 @@ import {useQueryClient} from '@tanstack/react-query';
 import {useForm} from 'react-hook-form';
 import {z} from 'zod';
 
-const formSchema = z.object({
-    apiKey: z.string().min(1, {
-        message: 'API Key is required.',
-    }),
-});
-
 const AiProviderForm = ({
+    aiProvider,
     environment,
-    id,
     onClose,
     showCancel = false,
 }: {
+    aiProvider: AiProvider;
     environment: number;
-    id: number;
     onClose: () => void;
     showCancel: boolean;
 }) => {
+    const isOllama = aiProvider.name?.toLowerCase() === 'ollama';
+
+    const formSchema = z.object({
+        apiKey: isOllama ? z.string().optional() : z.string().min(1, {message: 'API Key is required.'}),
+        url: z.string().optional(),
+    });
+
     const form = useForm<z.infer<typeof formSchema>>({
         defaultValues: {
             apiKey: '',
+            url: aiProvider.url ?? '',
         },
         resolver: zodResolver(formSchema),
     });
@@ -51,33 +54,53 @@ const AiProviderForm = ({
     function handleSubmit(values: z.infer<typeof formSchema>) {
         updateAiProviderMutation.mutate({
             environment,
-            id,
-            updateAiProviderRequest: {
-                apiKey: values.apiKey,
-            },
+            id: aiProvider.id!,
+            updateAiProviderRequest: isOllama ? {url: values.url} : {apiKey: values.apiKey},
         });
     }
 
     return (
         <Form {...form}>
             <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
-                <FormField
-                    control={form.control}
-                    name="apiKey"
-                    render={({field}) => (
-                        <FormItem>
-                            <FormLabel>API Key</FormLabel>
+                {isOllama ? (
+                    <FormField
+                        control={form.control}
+                        name="url"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>Base URL</FormLabel>
 
-                            <FormControl>
-                                <Input placeholder="API Key" {...field} />
-                            </FormControl>
+                                <FormControl>
+                                    <Input placeholder="http://localhost:11434" {...field} />
+                                </FormControl>
 
-                            <FormDescription>This is your AI provider&apos;`s API key.</FormDescription>
+                                <FormDescription>
+                                    The base URL of your Ollama server. Leave blank to use http://localhost:11434.
+                                </FormDescription>
 
-                            <FormMessage />
-                        </FormItem>
-                    )}
-                />
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                ) : (
+                    <FormField
+                        control={form.control}
+                        name="apiKey"
+                        render={({field}) => (
+                            <FormItem>
+                                <FormLabel>API Key</FormLabel>
+
+                                <FormControl>
+                                    <Input placeholder="API Key" {...field} />
+                                </FormControl>
+
+                                <FormDescription>This is your AI provider&apos;`s API key.</FormDescription>
+
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                )}
 
                 <div className="flex gap-1">
                     {showCancel && (

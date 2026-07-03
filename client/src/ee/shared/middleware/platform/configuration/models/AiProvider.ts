@@ -44,6 +44,12 @@ export interface AiProvider {
      */
     apiKey?: string;
     /**
+     * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
+     * @type {string}
+     * @memberof AiProvider
+     */
+    url?: string;
+    /**
      * The enabled status of an AI provider.
      * @type {boolean}
      * @memberof AiProvider
@@ -79,6 +85,7 @@ export function AiProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'name': json['name'],
         'icon': json['icon'] == null ? undefined : json['icon'],
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
+        'url': json['url'] == null ? undefined : json['url'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
         'supportsEmbeddings': json['supportsEmbeddings'] == null ? undefined : json['supportsEmbeddings'],
     };
@@ -96,6 +103,7 @@ export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon
     return {
         
         'apiKey': value['apiKey'],
+        'url': value['url'],
         'enabled': value['enabled'],
     };
 }

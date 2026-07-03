@@ -25,6 +25,12 @@ export interface UpdateAiProviderRequest {
      * @memberof UpdateAiProviderRequest
      */
     apiKey?: string;
+    /**
+     * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
+     * @type {string}
+     * @memberof UpdateAiProviderRequest
+     */
+    url?: string;
 }
 
 /**
@@ -45,6 +51,7 @@ export function UpdateAiProviderRequestFromJSONTyped(json: any, ignoreDiscrimina
     return {
         
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
+        'url': json['url'] == null ? undefined : json['url'],
     };
 }
 
@@ -60,6 +67,7 @@ export function UpdateAiProviderRequestToJSONTyped(value?: UpdateAiProviderReque
     return {
         
         'apiKey': value['apiKey'],
+        'url': value['url'],
     };
 }
 

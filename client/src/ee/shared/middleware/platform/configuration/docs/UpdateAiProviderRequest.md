@@ -7,6 +7,7 @@
 Name | Type
 ------------ | -------------
 `apiKey` | string
+`url` | string
 
 ## Example
 
@@ -16,6 +17,7 @@ import type { UpdateAiProviderRequest } from ''
 // TODO: Update the object below with actual values
 const example = {
   "apiKey": null,
+  "url": null,
 } satisfies UpdateAiProviderRequest
 
 console.log(example)

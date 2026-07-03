@@ -1,6 +1,6 @@
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {createTestQueryClientWrapper} from '@/shared/util/test-utils';
-import {render, screen} from '@testing-library/react';
+import {fireEvent, render, screen} from '@testing-library/react';
 import {ReactNode} from 'react';
 import {describe, expect, it, vi} from 'vitest';
 
@@ -73,6 +73,45 @@ describe('AiProviderList', () => {
 
         expect(screen.getByText('Open AI')).toBeInTheDocument();
         expect(screen.getByText('Anthropic')).toBeInTheDocument();
+    });
+
+    it('shows the Base URL row with the localhost default for Ollama when no URL is set', async () => {
+        const ollamaProviders: AiProvider[] = [
+            {
+                enabled: false,
+                icon: '/icons/ollama.svg',
+                id: 3,
+                name: 'Ollama',
+                supportsEmbeddings: true,
+            },
+        ];
+
+        renderWithProviders(<AiProviderList aiProviders={ollamaProviders} environment={1} />);
+
+        fireEvent.click(screen.getByText('Ollama'));
+
+        expect(await screen.findByText('Base URL:')).toBeInTheDocument();
+        expect(screen.getByText('http://localhost:11434')).toBeInTheDocument();
+    });
+
+    it('shows the configured Base URL for Ollama', async () => {
+        const ollamaProviders: AiProvider[] = [
+            {
+                enabled: true,
+                icon: '/icons/ollama.svg',
+                id: 3,
+                name: 'Ollama',
+                supportsEmbeddings: true,
+                url: 'http://remote-host:11434',
+            },
+        ];
+
+        renderWithProviders(<AiProviderList aiProviders={ollamaProviders} environment={1} />);
+
+        fireEvent.click(screen.getByText('Ollama'));
+
+        expect(await screen.findByText('Base URL:')).toBeInTheDocument();
+        expect(screen.getByText('http://remote-host:11434')).toBeInTheDocument();
     });
 
     it('does not render the Embeddings badge when no provider supports embeddings', () => {
