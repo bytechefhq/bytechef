@@ -61,6 +61,9 @@ public enum Provider {
         PERPLEXITY,
         VERTEX_GEMINI);
 
+    // Providers that authenticate against a self-hosted server rather than an API key.
+    public static final Set<Provider> KEYLESS_PROVIDERS = EnumSet.of(OLLAMA);
+
     private final int id;
     private final String label;
     private final String key;
@@ -75,6 +78,10 @@ public enum Provider {
 
     public boolean isEmbeddingSupported() {
         return EMBEDDING_PROVIDERS.contains(this);
+    }
+
+    public boolean requiresApiKey() {
+        return !KEYLESS_PROVIDERS.contains(this);
     }
 
     public int getId() {
