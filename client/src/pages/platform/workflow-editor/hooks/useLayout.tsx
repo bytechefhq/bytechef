@@ -53,6 +53,7 @@ import {
     getTaskAncestry,
 } from '../utils/layoutUtils';
 import {containsNodePosition} from '../utils/postDagreConstraints';
+import {buildStickyNoteNodes} from '../utils/stickyNoteUtils';
 import {forEachNestedTaskGroup} from '../utils/taskTraversalUtils';
 
 /**
@@ -798,6 +799,18 @@ export default function useLayout({
 
         const savedPositionCrossAxisShift = useWorkflowDataStore.getState().savedPositionCrossAxisShift;
 
+        const buildCurrentStickyNoteNodes = () =>
+            buildStickyNoteNodes({
+                crossAxis: layoutDirection === 'TB' ? 'x' : 'y',
+                crossAxisShift: savedPositionCrossAxisShift,
+                definition: readOnlyWorkflow
+                    ? readOnlyWorkflow.definition
+                    : useWorkflowDataStore.getState().workflow.definition,
+                readOnly: !!readOnlyWorkflow,
+            });
+
+        const stickyNoteNodes = buildCurrentStickyNoteNodes();
+
         // Cancel any in-flight animation immediately so competing effects
         // (e.g. panel-shift animation) don't visibly move nodes while the worker runs
         if (cancelAnimationRef.current) {
@@ -811,7 +824,7 @@ export default function useLayout({
         // Immediately remove nodes that are no longer part of the layout so that
         // deleted task dispatcher children disappear at the same time as the parent,
         // rather than lingering until the async layout calculation resolves.
-        const newNodeIds = new Set(layoutNodes.map((node) => node.id));
+        const newNodeIds = new Set([...layoutNodes, ...stickyNoteNodes].map((node) => node.id));
         const prunedNodes = frozenNodes.filter((node) => newNodeIds.has(node.id));
 
         if (prunedNodes.length < frozenNodes.length) {
@@ -834,7 +847,7 @@ export default function useLayout({
                 return;
             }
 
-            const targetNodes: Node[] = elements.nodes;
+            const targetNodes: Node[] = [...elements.nodes, ...buildCurrentStickyNoteNodes()];
 
             if (isInitialLayoutRef.current || readOnlyWorkflow) {
                 setNodes(targetNodes);

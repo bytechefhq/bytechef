@@ -261,9 +261,26 @@ export type WorkflowDefinitionType = {
     description?: string;
     label?: string;
     inputs?: Array<WorkflowInput>;
+    metadata?: WorkflowDefinitionMetadataType;
     outputs?: Array<WorkflowOutputType>;
     tasks?: Array<WorkflowTaskType>;
     triggers?: Array<WorkflowTriggerType>;
+};
+
+export type WorkflowDefinitionMetadataType = {
+    ui?: {
+        stickyNotes?: Array<WorkflowStickyNoteType>;
+    };
+};
+
+export type WorkflowStickyNotePresetColorType = 'blue' | 'gray' | 'green' | 'orange' | 'pink' | 'purple' | 'yellow';
+
+export type WorkflowStickyNoteType = {
+    color?: string;
+    content: string;
+    id: string;
+    position: {x: number; y: number};
+    size?: {height: number; width: number};
 };
 
 export type WorkflowOutputType = {
