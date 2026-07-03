@@ -137,7 +137,7 @@ public interface AiProviderApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true }, { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"enabled\" : true } ]";
+                    String exampleString = "[ { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"url\" : \"url\", \"enabled\" : true }, { \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"url\" : \"url\", \"enabled\" : true } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

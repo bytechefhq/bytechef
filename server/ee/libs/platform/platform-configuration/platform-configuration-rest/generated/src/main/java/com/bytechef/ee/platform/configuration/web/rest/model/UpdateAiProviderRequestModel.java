@@ -26,6 +26,8 @@ public class UpdateAiProviderRequestModel {
 
   private @Nullable String apiKey;
 
+  private @Nullable String url;
+
   public UpdateAiProviderRequestModel apiKey(@Nullable String apiKey) {
     this.apiKey = apiKey;
     return this;
@@ -47,6 +49,27 @@ public class UpdateAiProviderRequestModel {
     this.apiKey = apiKey;
   }
 
+  public UpdateAiProviderRequestModel url(@Nullable String url) {
+    this.url = url;
+    return this;
+  }
+
+  /**
+   * The base URL of an AI provider (used by Ollama; blank defaults to localhost).
+   * @return url
+   */
+  
+  @Schema(name = "url", description = "The base URL of an AI provider (used by Ollama; blank defaults to localhost).", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("url")
+  public @Nullable String getUrl() {
+    return url;
+  }
+
+  @JsonProperty("url")
+  public void setUrl(@Nullable String url) {
+    this.url = url;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -56,12 +79,13 @@ public class UpdateAiProviderRequestModel {
       return false;
     }
     UpdateAiProviderRequestModel updateAiProviderRequest = (UpdateAiProviderRequestModel) o;
-    return Objects.equals(this.apiKey, updateAiProviderRequest.apiKey);
+    return Objects.equals(this.apiKey, updateAiProviderRequest.apiKey) &&
+        Objects.equals(this.url, updateAiProviderRequest.url);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(apiKey);
+    return Objects.hash(apiKey, url);
   }
 
   @Override
@@ -69,6 +93,7 @@ public class UpdateAiProviderRequestModel {
     StringBuilder sb = new StringBuilder();
     sb.append("class UpdateAiProviderRequestModel {\n");
     sb.append("    apiKey: ").append(toIndentedString(apiKey)).append("\n");
+    sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("}");
     return sb.toString();
   }
