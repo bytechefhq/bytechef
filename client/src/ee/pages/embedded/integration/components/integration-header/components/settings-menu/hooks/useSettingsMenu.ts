@@ -102,6 +102,7 @@ export const useSettingsMenu = ({integration, workflow}: {integration: Integrati
     };
 
     return {
+        deleteIntegrationMutationPending: deleteIntegrationMutation.isPending,
         handleDeleteIntegrationAlertDialogClick,
         handleDeleteWorkflowAlertDialogClick,
         handleImportWorkflow,

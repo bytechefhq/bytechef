@@ -1,12 +1,12 @@
 import Switch from '@/components/Switch/Switch';
 import {Label} from '@/components/ui/label';
 import IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemConnections';
-import IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs from '@/ee/pages/embedded/integration-instance-configurations/components/integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs';
 import {useWorkflowsEnabledStore} from '@/ee/pages/embedded/integration-instance-configurations/stores/useWorkflowsEnabledStore';
 import {ComponentConnection, IntegrationInstanceConfiguration} from '@/ee/shared/middleware/embedded/configuration';
+import InputConfigurationList from '@/shared/components/InputConfigurationList';
 import {Workflow} from '@/shared/middleware/automation/configuration';
 import {useEffect} from 'react';
-import {Control, FormState, UseFormSetValue} from 'react-hook-form';
+import {Control, FieldValues, FormState, UseFormSetValue, useWatch} from 'react-hook-form';
 import {useShallow} from 'zustand/react/shallow';
 
 export interface IntegrationInstanceConfigurationDialogWorkflowListItemProps {
@@ -39,6 +39,22 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
         .concat((workflow?.triggers ?? []).flatMap((trigger) => trigger.connections ?? []))
         .filter((connection) => connection.componentName !== componentName);
 
+    // Inputs referencing the integration's own component are configured through the connect flow.
+    // Only internalOnly inputs are configured here (the admin dialog); end-user inputs render in the ConnectDialog.
+    // The REST inputs[] already carry componentReference/internalOnly (populated server-side by the workflow mappers).
+    const inputs = (workflow.inputs ?? []).filter(
+        (input) => input.componentReference?.componentName !== componentName && input.internalOnly
+    );
+
+    const watchedConnections = useWatch({
+        control,
+        name: `integrationInstanceConfigurationWorkflows.${workflowIndex}.connections`,
+    });
+
+    const configuredConnectionIds = componentConnections.map(
+        (componentConnection, connectionIndex) => watchedConnections?.[connectionIndex]?.connectionId
+    );
+
     useEffect(() => {
         setValue(`integrationInstanceConfigurationWorkflows.${workflowIndex!}.workflowId`, workflow.id!);
 
@@ -66,11 +82,14 @@ const IntegrationInstanceConfigurationDialogWorkflowsStepItem = ({
                     <li className="flex flex-col gap-3">
                         <Label className="text-base font-semibold">Inputs</Label>
 
-                        <IntegrationInstanceConfigurationDialogWorkflowsStepItemInputs
-                            control={control}
-                            formState={formState}
-                            workflow={workflow}
-                            workflowIndex={workflowIndex}
+                        <InputConfigurationList
+                            componentConnections={componentConnections}
+                            configuredConnectionIds={configuredConnectionIds}
+                            control={control as unknown as Control<FieldValues>}
+                            controlPath={`integrationInstanceConfigurationWorkflows.${workflowIndex}.inputs`}
+                            formState={formState as unknown as FormState<FieldValues>}
+                            inputs={inputs}
+                            workflowId={workflow.id}
                         />
                     </li>
 

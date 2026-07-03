@@ -1,3 +1,4 @@
+import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -9,7 +10,15 @@ import {
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
-const DeleteIntegrationAlertDialog = ({onClose, onDelete}: {onClose: () => void; onDelete: () => void}) => (
+const DeleteIntegrationAlertDialog = ({
+    isPending,
+    onClose,
+    onDelete,
+}: {
+    isPending?: boolean;
+    onClose: () => void;
+    onDelete: () => void;
+}) => (
     <AlertDialog open>
         <AlertDialogContent>
             <AlertDialogHeader>
@@ -22,13 +31,17 @@ const DeleteIntegrationAlertDialog = ({onClose, onDelete}: {onClose: () => void;
             </AlertDialogHeader>
 
             <AlertDialogFooter>
-                <AlertDialogCancel onClick={() => onClose()}>Cancel</AlertDialogCancel>
+                <AlertDialogCancel disabled={isPending} onClick={() => onClose()}>
+                    Cancel
+                </AlertDialogCancel>
 
                 <AlertDialogAction
                     aria-label="Confirm Integration Deletion"
                     className="bg-surface-destructive-primary shadow-none hover:bg-surface-destructive-primary-hover active:bg-surface-destructive-primary-active"
+                    disabled={isPending}
                     onClick={() => onDelete()}
                 >
+                    {isPending && <LoadingIcon />}
                     Delete
                 </AlertDialogAction>
             </AlertDialogFooter>
