@@ -20,6 +20,7 @@ import com.bytechef.commons.util.JsonUtils;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import tools.jackson.databind.json.JsonMapper;
 
 /**
  * @author Ivica Cardic
@@ -72,5 +73,48 @@ public final class ToolErrors {
         Class<? extends RuntimeException> exceptionClass = exception.getClass();
 
         return toolError(toolName + " failed (" + exceptionClass.getSimpleName() + ")");
+    }
+
+    /**
+     * {@link JsonMapper}-based variant of {@link #toolError(String)} for callers (e.g. AI Hub tool callbacks) that
+     * already carry an injected mapper. Serialises the same {@code {"error": <message>}} payload.
+     *
+     * @param jsonMapper the configured Jackson mapper
+     * @param message    the human-readable error message
+     * @return a JSON string of the form {@code {"error":"<message>"}} or the fallback {@code {"error":"serialization
+     *         failure"}}
+     */
+    public static String toolError(JsonMapper jsonMapper, String message) {
+        try {
+            return jsonMapper.writeValueAsString(Map.of("error", message));
+        } catch (RuntimeException exception) {
+            log.error(
+                "Failed to serialise tool error response for message '{}': {}", message, exception.toString(),
+                exception);
+
+            return "{\"error\":\"serialization failure\"}";
+        }
+    }
+
+    /**
+     * {@link JsonMapper}-based variant of {@link #runtimeFailure(Class, String, RuntimeException)} for callers that
+     * already carry an injected mapper.
+     *
+     * @param jsonMapper  the Jackson mapper used to serialise the response
+     * @param sourceClass the calling tool callback's class — used to resolve the SLF4J log
+     * @param toolName    human-readable tool name surfaced to the LLM in the error payload
+     * @param exception   the runtime exception that escaped the callback's main try block
+     * @return a JSON string of the form {@code {"error":"<toolName> failed (<simpleName>)"}}
+     */
+    public static String runtimeFailure(
+        JsonMapper jsonMapper, Class<?> sourceClass, String toolName, RuntimeException exception) {
+
+        Logger sourceLogger = LoggerFactory.getLogger(sourceClass);
+
+        sourceLogger.warn("{} failed: {}", toolName, exception.toString(), exception);
+
+        Class<? extends RuntimeException> exceptionClass = exception.getClass();
+
+        return toolError(jsonMapper, toolName + " failed (" + exceptionClass.getSimpleName() + ")");
     }
 }
