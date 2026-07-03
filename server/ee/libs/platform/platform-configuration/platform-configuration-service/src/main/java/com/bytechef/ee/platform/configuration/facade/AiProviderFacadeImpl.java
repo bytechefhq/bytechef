@@ -116,7 +116,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .map(aiProviderDTO -> getProvider(aiProviderDTO.id()))
             .filter(Provider.CHAT_PROVIDERS::contains)
             .map(provider -> {
-                String model = resolveDefaultModel(provider);
+                String model = resolveDefaultChatModel(provider);
 
                 if (model == null || model.isBlank()) {
                     return null;
@@ -264,7 +264,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .orElse(List.of());
     }
 
-    private String resolveDefaultModel(Provider provider) {
+    private String resolveDefaultChatModel(Provider provider) {
         ApplicationProperties.Ai.Provider.Chat chat = applicationProperties.getAi()
             .getProvider()
             .getChat();
