@@ -125,6 +125,13 @@ public class CopilotPgVectorConfiguration {
         }
 
         String apiKey = embedding.getApiKey();
+
+        if (apiKey == null || apiKey.isBlank()) {
+            throw new IllegalStateException(
+                "Copilot docs embedding provider is set to OPENAI but 'bytechef.ai.copilot.docs.embedding.api-key' " +
+                    "is not configured");
+        }
+
         String model = ai.getProvider()
             .getEmbedding()
             .getOpenAi()
