@@ -1,0 +1,10 @@
+## Connection Setup
+
+1. Install LiteLLM: `pip install litellm`.
+2. Create a config file (`litellm_config.yaml`) with your model providers.
+3. Start the proxy: `litellm --config litellm_config.yaml --port 4000`.
+4. In ByteChef, set the **Base URL** to your proxy address (e.g., `http://localhost:4000/v1`).
+5. If your proxy requires authentication, enter your **Master Key** as the API key.
+6. Done.
+
+For more details, see the [LiteLLM Proxy documentation](https://docs.litellm.ai/docs/simple_proxy).
