@@ -1,0 +1,13 @@
+query aiProviderCatalog($environment: ID!) {
+    aiProviderCatalog(environment: $environment) {
+        key
+        name
+        icon
+        enabled
+        supportsModelById
+        models {
+            name
+            label
+        }
+    }
+}

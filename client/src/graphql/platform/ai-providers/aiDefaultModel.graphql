@@ -1,0 +1,6 @@
+query aiDefaultModel($environment: ID!) {
+    aiDefaultModel(environment: $environment) {
+        provider
+        model
+    }
+}
