@@ -1,11 +1,16 @@
 import Button from '@/components/Button/Button';
 import {Thread} from '@/components/assistant-ui/thread';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import ModeSwitch from '@/shared/components/ModeSwitch/ModeSwitch';
+import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
+import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import CopilotPanelBoundary from '@/shared/components/copilot/CopilotPanelBoundary';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {BotMessageSquareIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
 import {useLocation} from 'react-router-dom';
@@ -23,16 +28,31 @@ interface CopilotPanelProps {
 }
 
 const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit<CopilotPanelProps, 'open'>) => {
-    const {context, generateConversationId, resetMessages, setContext} = useCopilotStore(
+    const {
+        context,
+        generateConversationId,
+        resetMessages,
+        selectedLlmModel,
+        selectedLlmProvider,
+        setContext,
+        setSelectedLlm,
+    } = useCopilotStore(
         useShallow((state) => ({
             context: state.context,
             generateConversationId: state.generateConversationId,
             resetMessages: state.resetMessages,
+            selectedLlmModel: state.selectedLlmModel,
+            selectedLlmProvider: state.selectedLlmProvider,
             setContext: state.setContext,
+            setSelectedLlm: state.setSelectedLlm,
         }))
     );
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
+
+    const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -97,6 +117,25 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                                     build={context?.mode === MODE.BUILD}
                                     onBuildChange={(build) =>
                                         setContext({...context, mode: build ? MODE.BUILD : MODE.ASK})
+                                    }
+                                />
+                            ) : null
+                        }
+                        leadingComposerActions={
+                            currentWorkspaceId != null ? (
+                                <ModelPicker
+                                    defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
+                                    defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
+                                    environment={currentEnvironmentId}
+                                    onChange={(provider, model) => {
+                                        writeLastUsedModel(currentWorkspaceId, provider, model);
+                                        setSelectedLlm(provider, model);
+                                    }}
+                                    selectedModel={
+                                        selectedLlmModel ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
+                                    }
+                                    selectedProvider={
+                                        selectedLlmProvider ?? readLastUsedModel(currentWorkspaceId)?.provider ?? null
                                     }
                                 />
                             ) : null
