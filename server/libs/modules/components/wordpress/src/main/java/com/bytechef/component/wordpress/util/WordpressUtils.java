@@ -20,6 +20,7 @@ import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.Context.Http.responseType;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
@@ -39,10 +40,7 @@ public class WordpressUtils extends AbstractWordpressUtils {
 
         List<Option<Long>> options = new ArrayList<>();
 
-        List<Map<String, Object>> categories = context.http(http -> http.get("/wp/v2/categories"))
-            .configuration(responseType(ResponseType.JSON))
-            .execute()
-            .getBody(new TypeReference<>() {});
+        List<Map<String, Object>> categories = fetchAllCategoryPages(context);
 
         for (Map<String, Object> category : categories) {
             if (category.get("id") instanceof Integer categoryId) {
@@ -52,5 +50,28 @@ public class WordpressUtils extends AbstractWordpressUtils {
         }
 
         return options;
+    }
+
+    private static List<Map<String, Object>> fetchAllCategoryPages(Context context) {
+        int page = 1;
+        int totalPages;
+
+        List<Map<String, Object>> categories = new ArrayList<>();
+
+        do {
+            Response response = context.http(http -> http.get("/wp/v2/categories"))
+                .queryParameters("per_page", "100", "page", page)
+                .configuration(responseType(ResponseType.JSON))
+                .execute();
+
+            categories.addAll(response.getBody(new TypeReference<>() {}));
+
+            List<String> headers = response.getHeader("X-WP-TotalPages");
+            totalPages = Integer.parseInt(headers.getFirst());
+
+            page++;
+        } while (page <= totalPages);
+
+        return categories;
     }
 }

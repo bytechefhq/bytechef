@@ -17,6 +17,7 @@
 package com.bytechef.component.wordpress.util;
 
 import static com.bytechef.component.definition.ComponentDsl.option;
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
@@ -49,6 +50,7 @@ import org.mockito.ArgumentCaptor;
 class WordpressUtilsTest {
 
     private static final Parameters mockedParameters = mock(Parameters.class);
+    private final ArgumentCaptor<Object[]> objectsArgumentCaptor = forClass(Object[].class);
     private static final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -59,9 +61,13 @@ class WordpressUtilsTest {
 
         when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
+        when(mockedExecutor.queryParameters(objectsArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(List.of(Map.of("name", "category1", "id", 1),
                 Map.of("name", "category2", "id", 2)));
+        when(mockedResponse.getHeader(stringArgumentCaptor.capture()))
+            .thenReturn(List.of("1"));
 
         List<Option<Long>> result = WordpressUtils.getCategoriesOptions(
             mockedParameters, mockedParameters, Map.of(), "", mockedContext);
@@ -72,7 +78,13 @@ class WordpressUtilsTest {
 
         assertEquals(expected, result);
         assertNotNull(httpFunctionArgumentCaptor.getValue());
-        assertEquals("/wp/v2/categories", stringArgumentCaptor.getValue());
+        assertEquals(List.of("/wp/v2/categories", "X-WP-TotalPages"), stringArgumentCaptor.getAllValues());
+
+        Object[] queryParameters = {
+            "per_page", "100", "page", 1
+        };
+
+        assertArrayEquals(queryParameters, objectsArgumentCaptor.getValue());
 
         ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
         Configuration configuration = configurationBuilder.build();
