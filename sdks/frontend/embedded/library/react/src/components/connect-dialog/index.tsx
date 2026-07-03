@@ -148,7 +148,10 @@ export default function useConnectDialog({
 
     const externalUserId = useMemo(() => decodeJwtSubject(jwtToken), [jwtToken]);
 
-    const executeAction = useExecuteAction(fetch, externalUserId, currentIntegrationInstanceId);
+    const executeActionFn = useExecuteAction(fetch, externalUserId, currentIntegrationInstanceId);
+    // Only expose the action executor once its prerequisites exist; otherwise `FieldMappingField` would mount and
+    // fetch empty object types/fields (the executor resolves to `[]`) and never recover until the dialog reopens.
+    const executeAction = externalUserId && currentIntegrationInstanceId ? executeActionFn : undefined;
 
     // Merge integration workflows with instance workflows to get complete workflow data, because the backend is incomplete
     const mergedWorkflows: MergedWorkflowType[] = useMemo(() => {
