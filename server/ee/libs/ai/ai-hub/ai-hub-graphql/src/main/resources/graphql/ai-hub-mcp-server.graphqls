@@ -1,0 +1,50 @@
+# User-registered external MCP (Model Context Protocol) servers. The AI Hub agent connects OUT to each
+# server's URL as an MCP client. The optional bearer token is stored encrypted server-side and is NEVER
+# returned — the client only learns whether a token is set via hasAuthToken.
+
+type AiHubMcpServer {
+    id: ID!
+    name: String!
+    url: String!
+    enabled: Boolean!
+    hasAuthToken: Boolean!
+}
+
+# A tool discovered live from an MCP server, with its persisted on/off state.
+type AiHubMcpServerTool {
+    name: String!
+    description: String
+    enabled: Boolean!
+}
+
+extend type Query {
+    """The current user's registered MCP servers for the workspace."""
+    aiHubMcpServers(workspaceId: ID!): [AiHubMcpServer!]!
+
+    """
+    The tools of one MCP server, discovered by connecting to it, each joined with its persisted enabled state.
+    Errors if the server is unreachable.
+    """
+    aiHubMcpServerTools(workspaceId: ID!, mcpServerId: ID!): [AiHubMcpServerTool!]!
+}
+
+extend type Mutation {
+    """
+    Register a new MCP server for the current user. authToken is optional (sent as a bearer token); it is
+    encrypted at rest. Returns the new server id.
+    """
+    addAiHubMcpServer(
+        workspaceId: ID!, name: String!, url: String!, authToken: String, environment: Int!
+    ): ID!
+
+    """Remove an MCP server. Idempotent — returns false when not found/owned."""
+    removeAiHubMcpServer(workspaceId: ID!, mcpServerId: ID!): Boolean!
+
+    """Toggle an MCP server on/off."""
+    setAiHubMcpServerEnabled(workspaceId: ID!, mcpServerId: ID!, enabled: Boolean!): Boolean!
+
+    """Toggle a single tool of an MCP server on/off."""
+    setAiHubMcpServerToolEnabled(
+        workspaceId: ID!, mcpServerId: ID!, toolName: String!, enabled: Boolean!
+    ): Boolean!
+}

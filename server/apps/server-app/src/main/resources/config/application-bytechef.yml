@@ -5,6 +5,8 @@ bytechef:
     firecrawl:
       base-url: https://api.firecrawl.dev/v2
       enabled: false
+    hub:
+      enabled: false
     knowledge-base:
       enabled: false
     memory:
@@ -51,6 +53,19 @@ bytechef:
         openai:
           options:
             model: dall-e-3
+      stt:
+        deepgram:
+          options:
+            model: nova-3
+        elevenlabs:
+          options:
+            model: scribe_v1
+        openai:
+          options:
+            model: gpt-4o-mini-transcribe
+    stt:
+      # Active speech-to-text provider (openai | deepgram | elevenlabs)
+      provider: openai
     vectorstore:
       provider: pgvector
   analytics:

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+    <!--
+        Per-tool on/off state for a registered MCP server's tools. A tool with no row is enabled by default;
+        toggling it off persists a row with enabled=false so the agent's MCP tool bridge filters it out. The
+        tool list itself is discovered live from the server, so this table only records deviations from the
+        all-tools-enabled default.
+    -->
+    <changeSet id="20260702000002" author="Ivica Cardic">
+        <createTable tableName="ai_hub_mcp_server_tool">
+            <column name="id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="mcp_server_id" type="BIGINT">
+                <constraints nullable="false"
+                             foreignKeyName="fk_ahmst_mcp_server"
+                             references="ai_hub_mcp_server(id)"
+                             deleteCascade="true"/>
+            </column>
+            <column name="name" type="VARCHAR(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="enabled" type="BOOLEAN" defaultValueBoolean="true">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="VARCHAR(50)"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_by" type="VARCHAR(50)"/>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="version" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addUniqueConstraint
+            tableName="ai_hub_mcp_server_tool"
+            constraintName="uk_ahmst_server_tool"
+            columnNames="mcp_server_id, name"/>
+    </changeSet>
+</databaseChangeLog>

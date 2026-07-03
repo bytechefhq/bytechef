@@ -1,0 +1,37 @@
+"Scheduled run configuration for a personal agent. At most one row per agent."
+type AiHubPersonalAgentSchedule {
+    id: ID!
+    aiHubPersonalAgentId: ID!
+    title: String!
+    prompt: String!
+    frequencyKind: ScheduleFrequencyKind!
+    intervalMinutes: Int
+    minuteOfHour: Int
+    timeOfDay: String
+    dayOfWeek: Int
+    dayOfMonth: Int
+    cronExpression: String
+    effectiveCronExpression: String!
+    zoneId: String!
+    startDate: String
+    lifecycleKind: ScheduleLifecycleKind!
+    maxRuns: Int
+    remainingRuns: Int
+    enabled: Boolean!
+    lastRunAt: String
+    nextRunAt: String
+}
+
+enum ScheduleFrequencyKind {
+    EVERY_X_MINUTES
+    HOURLY
+    DAILY
+    WEEKLY
+    MONTHLY
+    CUSTOM_CRON
+}
+
+enum ScheduleLifecycleKind {
+    RECURRING
+    NUMBER_OF_RUNS
+}

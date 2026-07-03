@@ -1,0 +1,271 @@
+enum AiHubPersonalAgentResourceKind {
+    WORKFLOW
+    FILE
+    DATA_TABLE
+    KNOWLEDGE_BASE
+    MCP_SERVER
+    API_COLLECTION
+    WORKFLOW_EXECUTION
+    TASK
+}
+
+type AiHubPersonalAgentResource {
+    id: ID!
+    aiHubPersonalAgentId: Long!
+    kind: AiHubPersonalAgentResourceKind!
+    """
+    The referenced entity's id (a workflow id, file id, …). String because composer resource ids are strings and
+    workflow ids are non-numeric.
+    """
+    resourceId: String!
+    resourceName: String!
+    createdAt: Long
+}
+
+type AiHubPersonalAgent {
+    id: ID!
+    workspaceId: Long!
+    userId: Long!
+    name: String!
+    title: String
+    description: String
+    instructions: String
+    environmentId: Long!
+    """
+    Optional per-agent LLM provider override (e.g. "openai", "anthropic"). Both llmProvider and llmModel must be
+    set together or both null. Null/null means "use workspace default LLM." Service validation rejects half-set.
+    """
+    llmProvider: String
+    """
+    Optional per-agent LLM model id (provider-specific, e.g. "gpt-4o-mini", "claude-3-5-sonnet-20241022"). Paired
+    with llmProvider. The (provider, model) pair must resolve to a workspace-enabled provider at run time; otherwise
+    the agent falls back to the workspace default with a warn log.
+    """
+    llmModel: String
+    """
+    The agent's tool template. Each entry is a (componentName, componentVersion, operationName) triple the
+    agent declares as available. When a task is created against this agent, these tools are auto-attached
+    to the ai_hub_task_tool table so the LLM sees them on the very first turn — same UX as AI Agent simple mode.
+    """
+    tools: [AiHubPersonalAgentTool!]!
+    """
+    The agent's resource template. Each entry is a (kind, resourceId, resourceName) reference. When a task is
+    created against this agent, these are copied into ai_hub_task_artifact as *_REFERENCED artifacts.
+    """
+    resources: [AiHubPersonalAgentResource!]!
+    """
+    Optional one-to-one schedule. Null when the user has not enabled scheduling for this agent.
+    Read-only here — mutate via setAiHubPersonalAgentSchedule.
+    """
+    schedule: AiHubPersonalAgentSchedule
+    createdAt: Long
+    updatedAt: Long
+}
+
+type AiHubPersonalAgentTool {
+    id: ID!
+    aiHubPersonalAgentId: Long!
+    componentName: String!
+    componentVersion: Int!
+    operationName: String!
+    """
+    Optional pinned connection. When set, aiHubTasks spawned from this agent attach the tool's component to
+    this specific connection so the LLM doesn't have to re-pick at first invocation. Null when the agent's
+    template leaves connection picking to the user (matches pre-config behaviour).
+    """
+    connectionId: Long
+    """
+    Pre-set invocation parameters. Merged with LLM-supplied call arguments at dispatch time (LLM args win on
+    conflict). Empty map when the agent's template doesn't pre-bind any defaults.
+    """
+    parameters: Any
+    createdAt: Long
+}
+
+extend type Query {
+    """
+    Lists the current user's personal agents in the workspace, scoped to the supplied environment so
+    DEVELOPMENT-only agents do not appear in PRODUCTION sessions. Ordered by updatedAt DESC.
+    """
+    aiHubPersonalAgents(workspaceId: ID!, environment: Int!): [AiHubPersonalAgent!]!
+
+    """
+    Returns a single personal agent by id, verifying ownership against (workspaceId, currentUserId). Returns
+    null when missing or owned by another user — uniform shape so probing cannot enumerate ids.
+    """
+    aiHubPersonalAgent(workspaceId: ID!, id: ID!): AiHubPersonalAgent
+}
+
+extend type Mutation {
+    """
+    Creates a new personal agent. The name field is auto-slugified server-side; pass the user's free text and
+    let the service produce the canonical slug. Conflict on a duplicate slug throws a typed error so the client
+    can prompt the user for a different name.
+    """
+    createAiHubPersonalAgent(input: CreateAiHubPersonalAgentInput!): AiHubPersonalAgent!
+
+    """
+    Partial update of an existing personal agent's editable fields (title, description, instructions). The
+    name is intentionally NOT mutable — chat URLs and tool references key off it; renames need a dedicated
+    operation that doesn't yet exist.
+    """
+    updateAiHubPersonalAgent(input: UpdateAiHubPersonalAgentInput!): AiHubPersonalAgent!
+
+    """
+    Deletes a personal agent. Tasks bound to the agent are NOT cascaded — past chat history remains
+    accessible, but new turns degrade to plain ai-hub behaviour. Returns true on success; throws when the
+    agent does not exist or is owned by another user.
+    """
+    deleteAiHubPersonalAgent(workspaceId: ID!, id: ID!): Boolean!
+
+    """
+    Creates a fresh personal-agent task row for the current user (always-new semantics, May 2026). Past
+    aiHubTasks bound to the same agent remain reachable through the aiHubTasks list. Returns the new row
+    along with any tool template rows auto-attached from the agent's `tools` list.
+    """
+    createAiHubPersonalAgentTask(input: CreateAiHubPersonalAgentTaskInput!): AiHubTask!
+
+    """
+    Adds a (componentName, componentVersion, operationName) triple to the agent's tool template. Idempotent — adding
+    the same tool twice returns the existing row rather than producing a duplicate. Future aiHubTasks spawned
+    from this agent will start with this tool attached.
+    """
+    addAiHubPersonalAgentTool(input: AddAiHubPersonalAgentToolInput!): AiHubPersonalAgentTool!
+
+    """
+    Removes a tool from the agent's template by id. Already-attached aiHubTasks keep their copied tool rows;
+    only future aiHubTasks are affected. Idempotent — removing a non-existent id is a no-op.
+    """
+    removeAiHubPersonalAgentTool(workspaceId: ID!, toolId: ID!): Boolean!
+
+    """
+    Adds a (kind, resourceId) reference to the agent's resource template. Idempotent — adding the same resource
+    twice returns the existing row. Future tasks spawned from this agent start with this resource attached.
+    """
+    addAiHubPersonalAgentResource(input: AddAiHubPersonalAgentResourceInput!): AiHubPersonalAgentResource!
+
+    """
+    Removes a resource from the agent's template by row id. Already-spawned tasks keep their copied artifact rows;
+    only future tasks are affected. Idempotent — removing a non-existent id is a no-op.
+    """
+    removeAiHubPersonalAgentResource(workspaceId: ID!, id: ID!): Boolean!
+
+    """
+    Updates the per-tool config (pinned connection + pre-set parameters) on an existing tool template row.
+    Tasks already spawned from this agent keep their copied config — only future aiHubTasks pick up
+    the new values. Both fields are independently nullable in the input: omit `connectionId` to clear the pin;
+    omit `parameters` to preserve the existing map (pass an explicit empty map to reset).
+    """
+    updateAiHubPersonalAgentToolConfig(input: UpdateAiHubPersonalAgentToolConfigInput!): AiHubPersonalAgentTool!
+
+    """
+    Upserts or deletes the agent's single schedule.
+    - input.schedule != null  → upsert (insert if absent, update if present).
+    - input.schedule == null  → delete any existing schedule + cancel Quartz.
+    Returns the agent with its (possibly null) schedule field populated.
+    """
+    setAiHubPersonalAgentSchedule(input: SetAiHubPersonalAgentScheduleInput!): AiHubPersonalAgent!
+}
+
+input CreateAiHubPersonalAgentInput {
+    workspaceId: ID!
+    environment: Int!
+    name: String!
+    title: String
+    description: String
+    instructions: String
+    """
+    Optional per-agent LLM provider override. Must be paired with llmModel; setting only one throws a typed
+    validation error. Null/null = use workspace default LLM.
+    """
+    llmProvider: String
+    """
+    Optional per-agent LLM model id. See llmProvider docs.
+    """
+    llmModel: String
+}
+
+input UpdateAiHubPersonalAgentInput {
+    id: ID!
+    workspaceId: ID!
+    title: String
+    description: String
+    instructions: String
+    """
+    Tri-state on the (llmProvider, llmModel) pair:
+    - both null on the input: leave the existing override untouched.
+    - both empty strings: clear the override (revert to workspace default).
+    - both non-empty: apply the new override after the both-set-or-both-null guard.
+    - only one set: typed validation error.
+    """
+    llmProvider: String
+    llmModel: String
+}
+
+input CreateAiHubPersonalAgentTaskInput {
+    workspaceId: ID!
+    environment: Int!
+    aiHubPersonalAgentId: ID!
+    title: String
+}
+
+input AddAiHubPersonalAgentToolInput {
+    workspaceId: ID!
+    aiHubPersonalAgentId: ID!
+    componentName: String!
+    componentVersion: Int!
+    operationName: String!
+}
+
+input AddAiHubPersonalAgentResourceInput {
+    workspaceId: ID!
+    aiHubPersonalAgentId: ID!
+    kind: AiHubPersonalAgentResourceKind!
+    """
+    The referenced entity's id (a workflow id, file id, …) — NOT the personal-agent-resource row id.
+    """
+    resourceId: String!
+    resourceName: String!
+}
+
+input UpdateAiHubPersonalAgentToolConfigInput {
+    workspaceId: ID!
+    toolId: ID!
+    """
+    Pinned connection id. Null clears the existing pin so subsequent aiHubTasks let the user pick at
+    first invocation.
+    """
+    connectionId: Long
+    """
+    Pre-set parameters map. Null preserves the existing map; pass an empty object to reset. Stored verbatim
+    — no shape validation against the action's input schema, since LLM-supplied invocation args still merge
+    on top at dispatch.
+    """
+    parameters: Any
+}
+
+input SetAiHubPersonalAgentScheduleInput {
+    workspaceId: ID!
+    aiHubPersonalAgentId: ID!
+    """
+    Null clears the schedule. Non-null upserts.
+    """
+    schedule: AiHubPersonalAgentScheduleInput
+}
+
+input AiHubPersonalAgentScheduleInput {
+    enabled: Boolean!
+    title: String!
+    prompt: String!
+    frequencyKind: ScheduleFrequencyKind!
+    intervalMinutes: Int
+    minuteOfHour: Int
+    timeOfDay: String
+    dayOfWeek: Int
+    dayOfMonth: Int
+    cronExpression: String
+    zoneId: String!
+    startDate: String
+    lifecycleKind: ScheduleLifecycleKind!
+    maxRuns: Int
+}

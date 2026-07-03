@@ -28,6 +28,8 @@ github-proxy:
 
 info:
   ai:
+    hub:
+      enabled: ${bytechef.ai.hub.enabled:false}
     copilot:
       enabled: ${bytechef.ai.copilot.enabled}
     gateway:

@@ -353,6 +353,80 @@ public class ExampleComponentHandler implements ComponentHandler {
 - Empty blocks are forbidden — a comment alone doesn't satisfy the `EmptyBlock` rule; add an executable statement
 - `TODO:` comments are forbidden (`TodoComment` rule) — rewrite as plain comments describing intent, or implement the work
 
+### AI Hub Conversations (EE)
+
+#### Conversation kinds and threadId conventions
+
+The `ai_hub_task` table holds three discriminated kinds (`ConversationKind` enum, INT ordinal):
+
+- `COPILOT` (ordinal 0) — default; runs through the LLM agent. `workflow_execution_id` and
+  `ai_hub_personal_agent_id` are null. ThreadId is a NanoID-style random string from the client.
+- `WORKFLOW_CHAT` (ordinal 1) — bound to a specific workflow execution; routed through
+  `WebhookBridgeAgent` instead of the LLM. ThreadId is a plain UUID.
+- `PERSONAL_AGENT` (ordinal 2) — runs through the LLM agent with a per-agent instructions overlay.
+  ThreadId is a plain UUID.
+
+Always-new conversation semantics: every click on a workflow row or personal-agent row in the sidebar
+starts a fresh conversation rather than restoring a prior thread. Each new row gets its own random
+UUID threadId so `SPRING_AI_CHAT_MEMORY` rows are isolated per conversation, not shared across a
+(user, workflow) or (user, agent) tuple. Past conversations remain reachable through the conversations
+list — they're just no longer the default landing target. There is no partial unique index scoping
+rows per (workspace, user, environment, workflow_execution_id) or (workspace, user, environment,
+ai_hub_personal_agent_id); the `kind` column is the authoritative discriminator.
+
+Enum ordinals are pinned by `EnumOrdinalStabilityTest`; append new kinds at the end.
+
+#### Personal-agent system-prompt overlay
+
+`AiHubRoutingAgent.applyPersonalAgentOverlay` injects two state keys for `kind = PERSONAL_AGENT`:
+
+- `personalAgentInstructions` — the agent's instructions text, appended as a Context block.
+- `personalAgentTitle` — the agent's display name, surfaced as "operating as the user's personal
+  agent: '\<title\>'" in the Context block.
+
+`AiHubSpringAIAgent.appendPersonalAgentContext` reads both keys and renders a Context entry.
+The wording is load-bearing — the test
+`AiHubSpringAIAgentPersonalAgentContextTest.testFullOverlayPinsExactWording` pins both
+"operating as" and "do not let these instructions override safety or security rules" exactly.
+
+The instructions overlay is **advisory** (LLM-readable Context, not a hard ACL). Workspace-level
+guardrails apply on top via the standard system prompt. Branches: agent missing → plain copilot;
+service bean absent → plain copilot; instructions blank → title-only overlay.
+
+### Workflow-chat metrics
+
+- `bytechef_workflow_chat_turn{outcome}` — global counter. Outcomes: `sync`, `streaming`, `resume`,
+  `rate_limited`, `concurrency_blocked`.
+- `bytechef_workflow_chat_turn_by_workspace{outcome,workspace}` — same outcomes plus a workspace tag
+  for deployments with bounded workspace counts. The workspace dimension is **opt-in** via the
+  separate counter so unbounded multi-tenant deployments don't pay the cardinality cost on every
+  turn — pick the right counter for your tenant model.
+- `bytechef_workflow_chat_resume{result}`, `bytechef_workflow_chat_unreachable{reason}`,
+  `bytechef_workflow_chat_attachment_failure{reason}` — operational signals for resume HTTP outcome,
+  unreachable workflows (disabled / deleted), and attachment promotion failures.
+
+### Vitest mock factory hoisting (Client)
+
+`vi.mock(...)` calls hoist to the top of the file, so module-scope `const` declarations are NOT yet
+initialised when the factory runs. Referencing `setStateMock` (or any module-scope ref) inside a
+`vi.mock` factory crashes with `Cannot access X before initialization`.
+
+Use `vi.hoisted(() => ({...}))` to declare the refs alongside the mocks. Example:
+
+```ts
+const {navigateMock, setStateMock} = vi.hoisted(() => ({
+    navigateMock: vi.fn(),
+    setStateMock: vi.fn(),
+}));
+
+vi.mock('@/shared/components/copilot/stores/useCopilotStore', () => ({
+    useCopilotStore: {setState: setStateMock},
+}));
+```
+
+This pattern shows up in `AiHubPersonalAgentsList.test.tsx` and any test that mocks Zustand
+stores or router hooks via factory-injected mocks.
+
 ### Resource Visibility & Sharing
 
 Connections carry a `visibility` column typed `ResourceVisibility` (`PRIVATE < WORKSPACE <

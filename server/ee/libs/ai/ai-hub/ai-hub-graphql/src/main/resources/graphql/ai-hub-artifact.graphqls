@@ -1,0 +1,117 @@
+"""
+Audit/undo log row for a AI Hub mutation. Mirrors {@link AiHubTaskArtifact}: id is the primary
+key, taskId pins the row to a task, kind/status are ordinal-pinned enums, environmentId is
+denormalised from the parent task at write time so analytics queries do not need a join.
+"""
+type AiHubTaskArtifact {
+    id: ID!
+    taskId: ID!
+    kind: AiHubTaskArtifactKind!
+    status: AiHubTaskArtifactStatus!
+    artifactId: String!
+    artifactName: String!
+    metadataJson: String
+    environmentId: Long!
+    createdAt: Long
+    statusChangedAt: Long
+}
+
+enum AiHubTaskArtifactKind {
+    FILE_CREATED
+    BINARY_FILE_CREATED
+    WORKFLOW_CREATED
+    WORKFLOW_UPDATED
+    DATA_TABLE_ROW_ADDED
+    DATA_TABLE_ROW_UPDATED
+    DATA_TABLE_ROW_DELETED
+    DATA_TABLE_COLUMN_ADDED
+    KB_DOCUMENT_ADDED
+    KB_DOCUMENT_DELETED
+    WORKFLOW_EXECUTION_STARTED
+    MEMORY_CREATED
+    MEMORY_UPDATED
+    MEMORY_DELETED
+    MEMORY_RENAMED
+    FILE_REFERENCED
+    WORKFLOW_REFERENCED
+    DATA_TABLE_REFERENCED
+    KB_REFERENCED
+}
+
+enum AiHubTaskArtifactStatus {
+    APPLIED
+    EXPIRED
+    IRREVERSIBLE
+}
+
+"""
+Paginated artifact listing. {@code totalCount} is the total across all pages so the UI can render an
+accurate "showing N of M" hint; {@code hasMore} is a derived convenience for pagination controls so the
+client does not have to compute it from page+size.
+"""
+type AiHubTaskArtifactPage {
+    items: [AiHubTaskArtifact!]!
+    totalCount: Long!
+    hasMore: Boolean!
+    pageClamped: Boolean!
+    sizeClamped: Boolean!
+}
+
+extend type Query {
+    """
+    Paginated, filtered audit listing across all aiHubTasks in the workspace. Admin-only — gated by
+    ADMIN authority on AiHubTaskArtifactFacade. {@code page} and {@code size} are silently
+    clamped to internal bounds (10_000 and 500 respectively); {@code pageClamped}/{@code sizeClamped} on the
+    response surface the silent truncation so dashboards/tests can detect a mismatch between requested and
+    served values. Negative {@code page} or {@code size < 1} are hard errors — those are malformed, not just
+    out-of-range.
+    """
+    aiHubTaskArtifacts(
+        workspaceId: ID!,
+        environment: Int,
+        userId: ID,
+        kind: AiHubTaskArtifactKind,
+        from: Long,
+        to: Long,
+        page: Int,
+        size: Int
+    ): AiHubTaskArtifactPage!
+}
+
+extend type Mutation {
+    """
+    Records a user-attached reference (file / workflow / data table / knowledge base) as a task
+    artifact so it appears in the sidebar artifact list. Idempotent — re-attaching the same resource hits
+    the existing row instead of creating a duplicate. Used by the composer plus-button menu when the user
+    references an artifact in a task.
+    """
+    recordReferencedAiHubTaskArtifact(input: RecordReferencedAiHubTaskArtifactInput!): AiHubTaskArtifact!
+
+    """
+    Removes a user-attached reference artifact (FILE_REFERENCED / WORKFLOW_REFERENCED /
+    DATA_TABLE_REFERENCED / KB_REFERENCED) from a task. Returns `true` on success or when the row was
+    already gone (idempotent). Throws on ownership / workspace mismatch and on any non-reference kind —
+    those are agent-driven audit rows that the user cannot delete via this surface.
+    """
+    deleteAiHubTaskArtifact(input: DeleteAiHubTaskArtifactInput!): Boolean!
+}
+
+input RecordReferencedAiHubTaskArtifactInput {
+    workspaceId: ID!
+    taskId: ID!
+    kind: AiHubTaskArtifactKind!
+    artifactId: String!
+    artifactName: String!
+    """
+    Optional JSON map of side-channel context the artifact needs to be quick-openable from the sidebar.
+    For WORKFLOW_REFERENCED this carries `projectId` and `projectWorkflowId` so the sidebar row can open
+    the workflow tab (which routes by parent project); for other kinds it's currently unused but
+    schema-symmetric with the agent-driven `record(...)` path. Persisted as-is in `metadata_json`.
+    """
+    metadataJson: String
+}
+
+input DeleteAiHubTaskArtifactInput {
+    workspaceId: ID!
+    artifactId: ID!
+}

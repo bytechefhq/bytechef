@@ -1,0 +1,19 @@
+extend type Query {
+    aiHubWorkspaceSettings(workspaceId: ID!): AiHubWorkspaceSettings
+}
+
+extend type Mutation {
+    updateAiHubVoiceWebhookUrl(input: UpdateAiHubVoiceWebhookUrlInput!): AiHubWorkspaceSettings
+}
+
+type AiHubWorkspaceSettings {
+    workspaceId: ID!
+
+    # Path A — workflow-routed voice
+    voiceWebhookUrl: String
+}
+
+input UpdateAiHubVoiceWebhookUrlInput {
+    workspaceId: ID!
+    voiceWebhookUrl: String
+}
