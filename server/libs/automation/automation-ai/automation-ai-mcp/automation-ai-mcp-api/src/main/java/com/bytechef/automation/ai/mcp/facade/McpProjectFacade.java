@@ -54,4 +54,25 @@ public interface McpProjectFacade {
      * @return the updated MCP project
      */
     McpProject updateMcpProject(long mcpProjectId, List<String> selectedWorkflowIds);
+
+    /**
+     * Clones an existing MCP project onto the supplied {@code targetMcpServerId}, reusing the source's projectId,
+     * projectVersion, and exposed workflow set. Internally this is equivalent to
+     * {@link #createMcpProject(long, long, int, List)} with the same inputs, so a fresh
+     * {@link com.bytechef.automation.configuration.domain.ProjectDeployment} is provisioned for the clone — both source
+     * and clone reference the same project version but each has its own deployment row.
+     *
+     * <p>
+     * The MCP project's underlying deployment is implicitly bound to {@code Environment.DEVELOPMENT} by
+     * {@link #createMcpProject}, so this clone does not move across environments. The useful axis is the MCP server: an
+     * MCP server is per-tenant scoped, so duplicating an MCP project onto a different server lets the user expose the
+     * same workflow set under different MCP authority/auth without having to hand-rebuild the project + workflow
+     * bindings.
+     * </p>
+     *
+     * @param mcpProjectId      id of the source MCP project (must exist)
+     * @param targetMcpServerId destination MCP server (may equal the source's server for an in-place duplicate)
+     * @return the persisted clone
+     */
+    McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId);
 }

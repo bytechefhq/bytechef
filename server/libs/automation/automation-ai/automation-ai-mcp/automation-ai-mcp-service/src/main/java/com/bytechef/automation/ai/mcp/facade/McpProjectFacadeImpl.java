@@ -29,6 +29,7 @@ import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowSe
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.mcp.domain.McpServer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -186,5 +187,56 @@ public class McpProjectFacadeImpl implements McpProjectFacade {
         }
 
         return mcpProject;
+    }
+
+    @Override
+    public McpProject cloneMcpProject(long mcpProjectId, long targetMcpServerId) {
+        // Resolve the source first so a forged mcpProjectId or stale id surfaces a typed IllegalArgumentException
+        // before we try to provision the deployment for the clone — failing fast keeps the rollback surface small.
+        McpProject source = mcpProjectService.fetchMcpProject(mcpProjectId)
+            .orElseThrow(() -> new IllegalArgumentException("McpProject not found: " + mcpProjectId));
+
+        Long sourceProjectDeploymentId = source.getProjectDeploymentId();
+
+        if (sourceProjectDeploymentId == null) {
+            throw new IllegalStateException(
+                "Source McpProject " + mcpProjectId + " has no project deployment to clone from");
+        }
+
+        ProjectDeployment sourceDeployment = projectDeploymentService.getProjectDeployment(sourceProjectDeploymentId);
+
+        // Walk the McpProjectWorkflow → ProjectDeploymentWorkflow chain to recover the exposed workflowIds. We can't
+        // just reuse McpProjectWorkflow rows because each is bound to a specific projectDeploymentId; the clone needs
+        // its own deployment with its own deployment-workflow rows pointing at the same logical workflowIds.
+        List<McpProjectWorkflow> sourceMcpProjectWorkflows =
+            mcpProjectWorkflowService.getMcpProjectMcpProjectWorkflows(mcpProjectId);
+
+        List<ProjectDeploymentWorkflow> sourceDeploymentWorkflows =
+            projectDeploymentWorkflowService.getProjectDeploymentWorkflows(sourceProjectDeploymentId);
+
+        Map<Long, ProjectDeploymentWorkflow> deploymentWorkflowById = new HashMap<>();
+
+        for (ProjectDeploymentWorkflow projectDeploymentWorkflow : sourceDeploymentWorkflows) {
+            deploymentWorkflowById.put(projectDeploymentWorkflow.getId(), projectDeploymentWorkflow);
+        }
+
+        List<String> selectedWorkflowIds = new ArrayList<>(sourceMcpProjectWorkflows.size());
+
+        for (McpProjectWorkflow mcpProjectWorkflow : sourceMcpProjectWorkflows) {
+            ProjectDeploymentWorkflow projectDeploymentWorkflow =
+                deploymentWorkflowById.get(mcpProjectWorkflow.getProjectDeploymentWorkflowId());
+
+            // A null match would mean the source's McpProjectWorkflow points at a deployment-workflow that doesn't
+            // belong to the source's deployment — corrupt data. Skip rather than fail the whole clone; better to
+            // produce a slightly thinner clone than to leave the user without a recovery path. The user can run
+            // updateMcpProject afterwards to reconcile.
+            if (projectDeploymentWorkflow != null) {
+                selectedWorkflowIds.add(projectDeploymentWorkflow.getWorkflowId());
+            }
+        }
+
+        return createMcpProject(
+            targetMcpServerId, sourceDeployment.getProjectId(), sourceDeployment.getProjectVersion(),
+            selectedWorkflowIds);
     }
 }
