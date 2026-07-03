@@ -1148,6 +1148,20 @@ export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables =
 
 export type UpdateMcpIntegrationInstanceConfigurationWorkflowMutation = { updateMcpIntegrationInstanceConfigurationWorkflow: { id: string, mcpIntegrationInstanceConfigurationId: any, integrationInstanceConfigurationWorkflowId: any, parameters: any } | null };
 
+export type AiDefaultModelQueryVariables = Exact<{
+  environment: string | number;
+}>;
+
+
+export type AiDefaultModelQuery = { aiDefaultModel: { provider: string, model: string } | null };
+
+export type AiProviderCatalogQueryVariables = Exact<{
+  environment: string | number;
+}>;
+
+
+export type AiProviderCatalogQuery = { aiProviderCatalog: Array<{ key: string, name: string, icon: string | null, enabled: boolean, supportsModelById: boolean, models: Array<{ name: string, label: string }> }> };
+
 export type ApiConnectorQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -5816,6 +5830,63 @@ export const useUpdateMcpIntegrationInstanceConfigurationWorkflowMutation = <
       {
     mutationKey: ['updateMcpIntegrationInstanceConfigurationWorkflow'],
     mutationFn: (variables?: UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables) => fetcher<UpdateMcpIntegrationInstanceConfigurationWorkflowMutation, UpdateMcpIntegrationInstanceConfigurationWorkflowMutationVariables>(UpdateMcpIntegrationInstanceConfigurationWorkflowDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const AiDefaultModelDocument = new TypedDocumentString(`
+    query aiDefaultModel($environment: ID!) {
+  aiDefaultModel(environment: $environment) {
+    provider
+    model
+  }
+}
+    `);
+
+export const useAiDefaultModelQuery = <
+      TData = AiDefaultModelQuery,
+      TError = unknown
+    >(
+      variables: AiDefaultModelQueryVariables,
+      options?: Omit<UseQueryOptions<AiDefaultModelQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDefaultModelQuery, TError, TData>['queryKey'] }
+    ) => {
+
+    return useQuery<AiDefaultModelQuery, TError, TData>(
+      {
+    queryKey: ['aiDefaultModel', variables],
+    queryFn: fetcher<AiDefaultModelQuery, AiDefaultModelQueryVariables>(AiDefaultModelDocument, variables),
+    ...options
+  }
+    )};
+
+export const AiProviderCatalogDocument = new TypedDocumentString(`
+    query aiProviderCatalog($environment: ID!) {
+  aiProviderCatalog(environment: $environment) {
+    key
+    name
+    icon
+    enabled
+    supportsModelById
+    models {
+      name
+      label
+    }
+  }
+}
+    `);
+
+export const useAiProviderCatalogQuery = <
+      TData = AiProviderCatalogQuery,
+      TError = unknown
+    >(
+      variables: AiProviderCatalogQueryVariables,
+      options?: Omit<UseQueryOptions<AiProviderCatalogQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiProviderCatalogQuery, TError, TData>['queryKey'] }
+    ) => {
+
+    return useQuery<AiProviderCatalogQuery, TError, TData>(
+      {
+    queryKey: ['aiProviderCatalog', variables],
+    queryFn: fetcher<AiProviderCatalogQuery, AiProviderCatalogQueryVariables>(AiProviderCatalogDocument, variables),
     ...options
   }
     )};
