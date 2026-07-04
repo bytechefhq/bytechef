@@ -13,10 +13,13 @@ import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.JwtTokenService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.embedded.security.web.authentication.EmbeddedApiKeyAuthenticationProvider;
+import com.bytechef.ee.embedded.security.web.filter.EmbeddedAutomationAuthorizationSkipFilter;
 import com.bytechef.platform.security.service.ApiKeyService;
 import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
  * @version ee
@@ -37,6 +40,13 @@ public class EmbeddedApiKeySecurityConfigurer extends AbstractApiKeyHttpConfigur
                     request.getHeader("Authorization") != null),
             new EmbeddedApiKeyAuthenticationConverter(jwtTokenService, signingKeyService),
             new EmbeddedApiKeyAuthenticationProvider(apiKeyService, connectedUserService));
+    }
+
+    @Override
+    public void configure(HttpSecurity http) {
+        super.configure(http);
+
+        http.addFilterAfter(new EmbeddedAutomationAuthorizationSkipFilter(), BasicAuthenticationFilter.class);
     }
 
     @Override
