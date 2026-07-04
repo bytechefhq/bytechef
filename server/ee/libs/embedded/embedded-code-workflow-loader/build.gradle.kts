@@ -1,0 +1,41 @@
+val guestSdk: Configuration by configurations.creating
+
+dependencies {
+    api(project(":sdks:backend:embedded:integration-api"))
+    api(project(":sdks:backend:java:workflow-api"))
+
+    api(project(":server:ee:libs:platform:platform-code-workflow:platform-code-workflow-configuration:platform-code-workflow-configuration-api"))
+
+    implementation(rootProject.libs.org.graalvm.polyglot.polyglot)
+    implementation(rootProject.libs.org.graalvm.polyglot.java)
+    implementation(rootProject.libs.org.graalvm.polyglot.js)
+    implementation(rootProject.libs.org.graalvm.polyglot.python)
+    implementation(rootProject.libs.org.graalvm.polyglot.ruby)
+    implementation(project(":server:libs:core:class-loader:class-loader-api"))
+
+    guestSdk(project(":sdks:backend:embedded:integration-api"))
+    guestSdk(project(":sdks:backend:java:workflow-api"))
+}
+
+tasks.test {
+    // GraalVM Espresso's internal `assert` statements fire spuriously while the guest JVM boots when host
+    // assertions are enabled, and Gradle test tasks enable them by default.
+    enableAssertions = false
+}
+
+tasks.processResources {
+    from(guestSdk) {
+        into("META-INF/guest-sdk/embedded")
+    }
+
+    doLast {
+        val guestSdkDir = File(destinationDir, "META-INF/guest-sdk/embedded")
+
+        val jarNames = guestSdkDir.listFiles { file: File -> file.name.endsWith(".jar") }
+            .orEmpty()
+            .map { it.name }
+            .sorted()
+
+        File(guestSdkDir, "index.txt").writeText(jarNames.joinToString("\n"))
+    }
+}

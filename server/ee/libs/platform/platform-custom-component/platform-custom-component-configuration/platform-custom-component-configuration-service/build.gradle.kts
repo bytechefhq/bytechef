@@ -7,6 +7,7 @@ dependencies {
     implementation("org.springframework:spring-context")
     implementation("org.springframework:spring-tx")
     implementation("org.springframework.security:spring-security-core")
+    implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:platform:platform-api"))
 

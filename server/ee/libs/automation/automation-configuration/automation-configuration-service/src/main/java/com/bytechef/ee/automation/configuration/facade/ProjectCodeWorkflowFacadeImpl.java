@@ -12,10 +12,14 @@ import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.automation.project.definition.ProjectDefinition;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
+import com.bytechef.ee.automation.configuration.exception.CodeWorkflowErrorType;
 import com.bytechef.ee.automation.configuration.service.ProjectCodeWorkflowService;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer.Language;
 import com.bytechef.ee.platform.codeworkflow.configuration.facade.CodeWorkflowContainerFacade;
+import com.bytechef.exception.ConfigurationException;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
@@ -47,11 +51,13 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     private final ProjectWorkflowService projectWorkflowService;
     private final CodeWorkflowContainerFacade codeWorkflowContainerFacade;
     private final ProjectCodeWorkflowService projectCodeWorkflowService;
+    private final boolean javaEnabled;
+    private final ProjectHandlerLoader.JavaLoader javaLoader;
 
     @SuppressFBWarnings("EI")
     public ProjectCodeWorkflowFacadeImpl(
-        CacheManager cacheManager, ProjectService projectService, ProjectWorkflowService projectWorkflowService,
-        CodeWorkflowContainerFacade codeWorkflowContainerFacade,
+        ApplicationProperties applicationProperties, CacheManager cacheManager, ProjectService projectService,
+        ProjectWorkflowService projectWorkflowService, CodeWorkflowContainerFacade codeWorkflowContainerFacade,
         ProjectCodeWorkflowService projectCodeWorkflowService) {
 
         this.cacheManager = cacheManager;
@@ -59,6 +65,20 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
         this.projectWorkflowService = projectWorkflowService;
         this.codeWorkflowContainerFacade = codeWorkflowContainerFacade;
         this.projectCodeWorkflowService = projectCodeWorkflowService;
+        this.javaEnabled = applicationProperties.getWorkflow()
+            .getCodeWorkflow()
+            .isJavaEnabled();
+        this.javaLoader = toLoaderJavaLoader(applicationProperties);
+    }
+
+    private static ProjectHandlerLoader.JavaLoader toLoaderJavaLoader(ApplicationProperties applicationProperties) {
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        return codeWorkflow.getJavaLoader() == CodeWorkflow.JavaLoader.ESPRESSO
+            ? ProjectHandlerLoader.JavaLoader.ESPRESSO
+            : ProjectHandlerLoader.JavaLoader.CLASS_LOADER;
     }
 
     /**
@@ -69,6 +89,12 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
     @Override
     @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void save(long workspaceId, byte[] bytes, Language language) {
+        if (!javaEnabled && language == Language.JAVA) {
+            throw new ConfigurationException(
+                "Uploading of Java code workflows is disabled",
+                CodeWorkflowErrorType.JAVA_CODE_WORKFLOW_UPLOAD_DISABLED);
+        }
+
         ProjectDefinition projectDefinition;
 
         try {
@@ -122,7 +148,7 @@ public class ProjectCodeWorkflowFacadeImpl implements ProjectCodeWorkflowFacade 
 
         try {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
-                uri.toURL(), language, uri.toString() + UUID.randomUUID(), cacheManager);
+                uri.toURL(), language, javaLoader, uri.toString() + UUID.randomUUID(), cacheManager);
 
             return projectHandler.getDefinition();
         } finally {

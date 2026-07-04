@@ -9,9 +9,13 @@ package com.bytechef.ee.component.codeworkflow.task;
 
 import com.bytechef.automation.project.ProjectHandler;
 import com.bytechef.commons.util.EncodingUtils;
+import com.bytechef.config.ApplicationProperties;
+import com.bytechef.config.ApplicationProperties.Workflow.CodeWorkflow;
+import com.bytechef.ee.embedded.codeworkflow.loader.IntegrationHandlerLoader;
 import com.bytechef.ee.platform.codeworkflow.configuration.domain.CodeWorkflowContainer;
 import com.bytechef.ee.platform.codeworkflow.configuration.service.CodeWorkflowContainerService;
 import com.bytechef.ee.platform.codeworkflow.file.storage.CodeWorkflowFileStorage;
+import com.bytechef.embedded.integration.IntegrationHandler;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.codeworkflow.loader.automation.ProjectHandlerLoader;
 import com.bytechef.platform.constant.PlatformType;
@@ -35,15 +39,22 @@ public class CodeWorkflowTaskExecutor {
     private final CacheManager cacheManager;
     private final CodeWorkflowFileStorage codeWorkflowFileStorage;
     private final CodeWorkflowContainerService codeWorkflowContainerService;
+    private final CodeWorkflow.JavaLoader javaLoader;
 
     @SuppressFBWarnings("EI")
     public CodeWorkflowTaskExecutor(
-        CacheManager cacheManager, CodeWorkflowFileStorage codeWorkflowFileStorage,
-        CodeWorkflowContainerService codeWorkflowContainerService) {
+        ApplicationProperties applicationProperties, CacheManager cacheManager,
+        CodeWorkflowFileStorage codeWorkflowFileStorage, CodeWorkflowContainerService codeWorkflowContainerService) {
 
         this.cacheManager = cacheManager;
         this.codeWorkflowFileStorage = codeWorkflowFileStorage;
         this.codeWorkflowContainerService = codeWorkflowContainerService;
+
+        ApplicationProperties.Workflow workflow = applicationProperties.getWorkflow();
+
+        CodeWorkflow codeWorkflow = workflow.getCodeWorkflow();
+
+        this.javaLoader = codeWorkflow.getJavaLoader();
     }
 
     public Object executePerform(
@@ -79,12 +90,23 @@ public class CodeWorkflowTaskExecutor {
             ProjectHandler projectHandler = ProjectHandlerLoader.loadProjectHandler(
                 codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflows()),
                 codeWorkflowContainer.getLanguage(),
+                javaLoader == CodeWorkflow.JavaLoader.ESPRESSO
+                    ? ProjectHandlerLoader.JavaLoader.ESPRESSO
+                    : ProjectHandlerLoader.JavaLoader.CLASS_LOADER,
                 EncodingUtils.base64EncodeToString(codeWorkflowContainer.toString()), cacheManager);
 
             workflows = projectHandler.getWorkflows();
-        }
+        } else if (PlatformType.EMBEDDED.equals(type)) {
+            IntegrationHandler integrationHandler = IntegrationHandlerLoader.loadIntegrationHandler(
+                codeWorkflowFileStorage.getCodeWorkflowFileURL(codeWorkflowContainer.getWorkflows()),
+                codeWorkflowContainer.getLanguage(),
+                javaLoader == CodeWorkflow.JavaLoader.ESPRESSO
+                    ? IntegrationHandlerLoader.JavaLoader.ESPRESSO
+                    : IntegrationHandlerLoader.JavaLoader.CLASS_LOADER,
+                EncodingUtils.base64EncodeToString(codeWorkflowContainer.toString()), cacheManager);
 
-        // } else {TODO integration}
+            workflows = integrationHandler.getWorkflows();
+        }
 
         return workflows;
     }
