@@ -4,6 +4,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3")
     implementation(libs.jjwt.api)
     implementation("org.springframework.security:spring-security-web")
+    implementation(project(":server:libs:automation:automation-configuration:automation-configuration-api"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
