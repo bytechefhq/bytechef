@@ -4,6 +4,7 @@ import {ReactFlowProvider} from '@xyflow/react';
 import {beforeEach, describe, expect, it} from 'vitest';
 
 import {WorkflowMockProvider} from '../providers/workflowEditorProvider';
+import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
@@ -47,5 +48,55 @@ describe('WorkflowEditorToolbar - lock button', () => {
 
         expect(useWorkflowEditorStore.getState().nodesLocked).toBe(false);
         expect(screen.getByLabelText('Lock node movement')).toBeInTheDocument();
+    });
+});
+
+describe('WorkflowEditorToolbar - layout engine button', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({edges: [], nodes: []});
+        useLayoutEngineStore.setState({layoutEngine: 'dagre'});
+    });
+
+    it('renders enabled for a condition-only workflow and toggles the engine', async () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+                    id: 'condition_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+        });
+
+        const user = userEvent.setup();
+
+        renderToolbar(false);
+
+        const layoutEngineButton = screen.getByLabelText('Switch to experimental layout engine');
+
+        expect(layoutEngineButton).toBeEnabled();
+
+        await user.click(layoutEngineButton);
+
+        expect(useLayoutEngineStore.getState().layoutEngine).toBe('elk');
+        expect(screen.getByLabelText('Switch to standard layout engine')).toBeInTheDocument();
+    });
+
+    it('is disabled when the workflow contains an unsupported dispatcher', () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+                    id: 'loop_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+        });
+
+        renderToolbar(false);
+
+        expect(screen.getByLabelText('Switch to experimental layout engine')).toBeDisabled();
     });
 });

@@ -301,7 +301,7 @@ export const positionTriggerPlaceholder = (nodes: Node[], direction: LayoutDirec
     }
 };
 
-interface GetLayoutElementsProps {
+export interface GetLayoutElementsProps {
     canvasHeight?: number;
     canvasWidth: number;
     direction?: LayoutDirectionType;
@@ -686,6 +686,105 @@ export const getClusterElementsLayoutElements = ({
     };
 };
 
+/**
+ * Engine-independent edge post-processing shared by the dagre and ELK layout
+ * paths: prioritizes task edges over ghost/placeholder edges per source, keeps
+ * a single edge per source unless the source legitimately fans out (ghosts,
+ * cluster roots, branch, fork-join), dedupes by endpoint+handle key, and drops
+ * edges referencing nodes that no longer exist.
+ */
+export function filterAndDedupeLayoutEdges(allNodes: Node[], edges: Edge[]): Edge[] {
+    const sourceEdgeMap = new Map<string, Edge[]>();
+
+    // Sort edges to prioritize task connections over ghost connections
+    const sortedEdges = [...edges].sort((firstEdge, secondEdge) => {
+        const isFirstEdgeToAuxiliaryNode =
+            firstEdge.target.includes('ghost') || firstEdge.target.includes('placeholder');
+
+        const isSecondEdgeToAuxiliaryNode =
+            secondEdge.target.includes('ghost') || secondEdge.target.includes('placeholder');
+
+        if (isFirstEdgeToAuxiliaryNode && !isSecondEdgeToAuxiliaryNode) {
+            return 1;
+        }
+
+        if (!isFirstEdgeToAuxiliaryNode && isSecondEdgeToAuxiliaryNode) {
+            return -1;
+        }
+
+        return 0;
+    });
+
+    // Group edges by source
+    sortedEdges.forEach((edge) => {
+        if (!sourceEdgeMap.has(edge.source)) {
+            sourceEdgeMap.set(edge.source, []);
+        }
+
+        sourceEdgeMap.get(edge.source)?.push(edge);
+    });
+
+    const filteredEdges: Edge[] = [];
+
+    // Filter edges so that only one edge is kept for each source node
+    sourceEdgeMap.forEach((sourceEdges, source) => {
+        const sourceNode = allNodes.find((node) => node.id === source);
+
+        if (sourceEdges.length === 0 || !sourceNode) {
+            return;
+        }
+
+        const multipleEdgesAllowed = [
+            {
+                condition: sourceNode.type === 'taskDispatcherTopGhostNode',
+            },
+            {
+                condition: sourceNode.type === 'taskDispatcherBottomGhostNode',
+            },
+            {
+                condition: sourceNode.data.clusterRoot,
+            },
+            {
+                condition: sourceNode.data.componentName === 'branch',
+            },
+            {
+                condition: sourceNode.data.componentName === 'fork-join',
+            },
+        ];
+
+        if (multipleEdgesAllowed.some(({condition}) => condition)) {
+            filteredEdges.push(...sourceEdges);
+        } else {
+            filteredEdges.push(sourceEdges[0]);
+        }
+    });
+
+    const dedupedEdges = filteredEdges.reduce(
+        (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
+            const {source, target} = edge;
+
+            const targetHandle = edge.targetHandle ? `-${edge.targetHandle}` : '';
+            const sourceHandle = edge.sourceHandle ? `-${edge.sourceHandle}` : '';
+
+            const edgeKey = `${source}=>${target}${targetHandle}${sourceHandle}`;
+
+            if (!uniqueEdges.map.has(edgeKey)) {
+                uniqueEdges.map.set(edgeKey, true);
+
+                uniqueEdges.edges.push(edge);
+            }
+
+            return uniqueEdges;
+        },
+        {edges: [], map: new Map<string, boolean>()}
+    ).edges;
+
+    // Remove edges that reference non-existent nodes
+    const nodeIds = new Set(allNodes.map((node) => node.id));
+
+    return dedupedEdges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+}
+
 export const getLayoutElements = async ({
     canvasHeight,
     canvasWidth,
@@ -835,95 +934,7 @@ export const getLayoutElements = async ({
         centerDispatcherChildrenOnMainAxis(allNodes, edges, mainAxis);
     }
 
-    const sourceEdgeMap = new Map<string, Edge[]>();
-
-    // Sort edges to prioritize task connections over ghost connections
-    const sortedEdges = [...edges].sort((firstEdge, secondEdge) => {
-        const isFirstEdgeToAuxiliaryNode =
-            firstEdge.target.includes('ghost') || firstEdge.target.includes('placeholder');
-
-        const isSecondEdgeToAuxiliaryNode =
-            secondEdge.target.includes('ghost') || secondEdge.target.includes('placeholder');
-
-        if (isFirstEdgeToAuxiliaryNode && !isSecondEdgeToAuxiliaryNode) {
-            return 1;
-        }
-
-        if (!isFirstEdgeToAuxiliaryNode && isSecondEdgeToAuxiliaryNode) {
-            return -1;
-        }
-
-        return 0;
-    });
-
-    // Group edges by source
-    sortedEdges.forEach((edge) => {
-        if (!sourceEdgeMap.has(edge.source)) {
-            sourceEdgeMap.set(edge.source, []);
-        }
-
-        sourceEdgeMap.get(edge.source)?.push(edge);
-    });
-
-    const filteredEdges: Edge[] = [];
-
-    // Filter edges so that only one edge is kept for each source node
-    sourceEdgeMap.forEach((sourceEdges, source) => {
-        const sourceNode = allNodes.find((node) => node.id === source);
-
-        if (sourceEdges.length === 0 || !sourceNode) {
-            return;
-        }
-
-        const multipleEdgesAllowed = [
-            {
-                condition: sourceNode.type === 'taskDispatcherTopGhostNode',
-            },
-            {
-                condition: sourceNode.type === 'taskDispatcherBottomGhostNode',
-            },
-            {
-                condition: sourceNode.data.clusterRoot,
-            },
-            {
-                condition: sourceNode.data.componentName === 'branch',
-            },
-            {
-                condition: sourceNode.data.componentName === 'fork-join',
-            },
-        ];
-
-        if (multipleEdgesAllowed.some(({condition}) => condition)) {
-            filteredEdges.push(...sourceEdges);
-        } else {
-            filteredEdges.push(sourceEdges[0]);
-        }
-    });
-
-    edges = filteredEdges.reduce(
-        (uniqueEdges: {edges: Edge[]; map: Map<string, boolean>}, edge: Edge) => {
-            const {source, target} = edge;
-
-            const targetHandle = edge.targetHandle ? `-${edge.targetHandle}` : '';
-            const sourceHandle = edge.sourceHandle ? `-${edge.sourceHandle}` : '';
-
-            const edgeKey = `${source}=>${target}${targetHandle}${sourceHandle}`;
-
-            if (!uniqueEdges.map.has(edgeKey)) {
-                uniqueEdges.map.set(edgeKey, true);
-
-                uniqueEdges.edges.push(edge);
-            }
-
-            return uniqueEdges;
-        },
-        {edges: [], map: new Map<string, boolean>()}
-    ).edges;
-
-    // Remove edges that reference non-existent nodes
-    const nodeIds = new Set(allNodes.map((node) => node.id));
-
-    edges = edges.filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target));
+    edges = filterAndDedupeLayoutEdges(allNodes, edges);
 
     return {edges, nodes: allNodes};
 };

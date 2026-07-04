@@ -27,6 +27,7 @@ import {useStoreWithEqualityFn} from 'zustand/traditional';
 
 import useDataPillPanelStore from '../stores/useDataPillPanelStore';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useRightSidebarStore from '../stores/useRightSidebarStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
@@ -49,7 +50,9 @@ import createOnErrorEdges, {hasTaskInOnErrorBranches} from '../utils/createOnErr
 import createOnErrorNode from '../utils/createOnErrorNode';
 import createParallelEdges from '../utils/createParallelEdges';
 import createParallelNode from '../utils/createParallelNode';
+import {getElkLayoutElements} from '../utils/elkLayoutUtils';
 import extractDefinitionPositions from '../utils/extractDefinitionPositions';
+import isElkLayoutSupported from '../utils/isElkLayoutSupported';
 import {
     buildTriggerNodes,
     collectTaskDispatcherData,
@@ -122,6 +125,7 @@ export default function useLayout({
 }: UseLayoutProps) {
     const storeDirection = useLayoutDirectionStore((state) => state.layoutDirection);
     const layoutDirection = directionProp || storeDirection;
+    const layoutEngine = useLayoutEngineStore((state) => state.layoutEngine);
 
     // Selective subscriptions with structural equality — prevents re-renders on parameter-only
     // changes (typing). Only re-renders when task graph structure changes (add/delete node).
@@ -949,7 +953,10 @@ export default function useLayout({
             setEdges(currentEdges.filter((edge) => newNodeIds.has(edge.source) && newNodeIds.has(edge.target)));
         }
 
-        getLayoutElements({
+        const layoutFunction =
+            layoutEngine === 'elk' && isElkLayoutSupported(layoutNodes) ? getElkLayoutElements : getLayoutElements;
+
+        layoutFunction({
             canvasHeight: canvasHeightRef.current,
             canvasWidth: canvasWidthRef.current,
             direction: layoutDirection,
@@ -1003,7 +1010,7 @@ export default function useLayout({
         };
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [layoutDirection, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
+    }, [layoutDirection, layoutEngine, layoutResetCounter, tasks, triggers, isWorkflowLoaded]);
 
     useEffect(() => {
         if (canvasWidth > 0 && !isWorkflowLoaded && !readOnlyWorkflow) {
