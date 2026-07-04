@@ -109,6 +109,11 @@ public class RemoteUserServiceClient implements UserService {
     }
 
     @Override
+    public User getUser(String login) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public User findOrCreateSocialUser(
         String email, String firstName, String lastName, String imageUrl, String authProvider, String providerId,
         boolean autoProvision, String defaultAuthority) {
