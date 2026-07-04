@@ -7,25 +7,43 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
-import com.bytechef.automation.configuration.domain.WorkspaceUser;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.bytechef.ee.automation.configuration.domain.WorkspaceUser;
+import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @version ee
  *
  * @author Ivica Cardic
  */
-@SuppressFBWarnings("NM")
-public interface WorkspaceUserService extends com.bytechef.automation.configuration.service.WorkspaceUserService {
+public interface WorkspaceUserService {
 
-    WorkspaceUser create(long userId, long workspaceId);
+    WorkspaceUser addWorkspaceUser(long userId, long workspaceId, WorkspaceRole workspaceRole);
 
-    void delete(long id);
+    /**
+     * Returns the number of workspace memberships currently backed by the given custom role. Used by
+     * {@code CustomRoleService} to refuse deletion of a custom role that is still in use.
+     */
+    long countByCustomRoleId(long customRoleId);
+
+    Optional<WorkspaceUser> fetchWorkspaceUser(long userId, long workspaceId);
 
     List<WorkspaceUser> getUserWorkspaceUsers(long userId);
 
     List<WorkspaceUser> getWorkspaceWorkspaceUsers(long workspaceId);
 
-    void deleteWorkspaceUser(long userId);
+    /**
+     * Removes the given user from the given workspace.
+     *
+     * <p>
+     * Authorization: caller must hold {@code WorkspaceRole.ADMIN} on the workspace. Refuses to remove the last admin
+     * (would otherwise lock the workspace out). Evicts the impacted {@code (userId, workspaceId)} scope cache entry so
+     * subsequent permission checks miss the cache and re-resolve from the (now-removed) membership.
+     *
+     * @return {@code true} if a row was removed, {@code false} if the user was not a member of the workspace.
+     */
+    boolean removeWorkspaceUser(long userId, long workspaceId);
+
+    WorkspaceUser updateWorkspaceUserRole(long userId, long workspaceId, WorkspaceRole workspaceRole);
 }
