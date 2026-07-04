@@ -599,6 +599,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public User getUser(String login) {
+        return userRepository.findByLogin(login)
+            .orElseThrow(UserNotFoundException::new);
+    }
+
+    @Override
     public void save(User user) {
         userRepository.save(user);
     }
