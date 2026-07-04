@@ -17,7 +17,8 @@
 package com.bytechef.automation.configuration.security.constant;
 
 /**
- * Marker interface for workspace role enums. See {@link PermissionScopeType} for the rationale.
+ * Marker interface for workspace role enums. Lets CE/api-tier code reference role enums (defined in EE) abstractly
+ * through the {@code name()} contract without depending on the concrete enum.
  *
  * @author Ivica Cardic
  */
