@@ -16,6 +16,7 @@ import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
 import com.bytechef.automation.ai.tool.ProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
@@ -84,7 +85,8 @@ class ManagementMcpServerToolCallbackProviderTest {
             .as("toolCallbackProvider() must not be a @Bean or the ChatModel tool-calling cycle returns")
             .isFalse();
 
-        Method mcpAsyncServerMethod = ManagementMcpServerConfiguration.class.getDeclaredMethod("mcpAsyncServer");
+        Method mcpAsyncServerMethod = ManagementMcpServerConfiguration.class.getDeclaredMethod(
+            "mcpAsyncServer", ApplicationProperties.class);
 
         assertThat(mcpAsyncServerMethod.isAnnotationPresent(Bean.class))
             .as("mcpAsyncServer() must remain a @Bean so the MCP endpoint is wired")

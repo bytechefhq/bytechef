@@ -35,4 +35,11 @@ public class PlatformConfigurationAuthorizeHttpRequestContributor implements Aut
         // controller, so anonymous form loads failed.
         return List.of("/api/automation/internal/trigger-form/**");
     }
+
+    @Override
+    public List<String> getPermitAllRequestMatcherPaths() {
+        // Component icons are static product assets served to anonymous consumers (e.g. the MCP App workflow viewer
+        // widget in a sandboxed iframe); see ComponentIconController.
+        return List.of("/icons/**");
+    }
 }
