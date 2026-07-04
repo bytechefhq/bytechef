@@ -5,6 +5,7 @@ import {beforeEach, describe, expect, it, vi} from 'vitest';
 
 import {WorkflowEditorProvider, WorkflowEditorStateI, WorkflowMockProvider} from '../providers/workflowEditorProvider';
 import useLayoutDirectionStore from '../stores/useLayoutDirectionStore';
+import useLayoutEngineStore from '../stores/useLayoutEngineStore';
 import useWorkflowDataStore from '../stores/useWorkflowDataStore';
 import useWorkflowEditorStore from '../stores/useWorkflowEditorStore';
 import {clearAllWorkflowMutations} from '../utils/workflowMutationGuard';
@@ -130,5 +131,55 @@ describe('WorkflowEditorToolbar - layout direction button', () => {
 
         expect(useLayoutDirectionStore.getState().layoutDirection).toBe('LR');
         expect(useWorkflowDataStore.getState().workflow.definition).toBe(definition);
+    });
+});
+
+describe('WorkflowEditorToolbar - layout engine button', () => {
+    beforeEach(() => {
+        useWorkflowDataStore.setState({edges: [], nodes: []});
+        useLayoutEngineStore.setState({layoutEngine: 'dagre'});
+    });
+
+    it('renders enabled for a condition-only workflow and toggles the engine', async () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: {componentName: 'condition', taskDispatcher: true, taskDispatcherId: 'condition_1'},
+                    id: 'condition_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+        });
+
+        const user = userEvent.setup();
+
+        renderToolbar(false);
+
+        const layoutEngineButton = screen.getByLabelText('Switch to experimental layout engine');
+
+        expect(layoutEngineButton).toBeEnabled();
+
+        await user.click(layoutEngineButton);
+
+        expect(useLayoutEngineStore.getState().layoutEngine).toBe('elk');
+        expect(screen.getByLabelText('Switch to standard layout engine')).toBeInTheDocument();
+    });
+
+    it('is disabled when the workflow contains an unsupported dispatcher', () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: {componentName: 'loop', taskDispatcher: true, taskDispatcherId: 'loop_1'},
+                    id: 'loop_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+        });
+
+        renderToolbar(false);
+
+        expect(screen.getByLabelText('Switch to experimental layout engine')).toBeDisabled();
     });
 });
