@@ -26,6 +26,7 @@ import java.util.stream.Stream;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,6 +37,12 @@ import org.springframework.security.core.userdetails.UserDetails;
  * @author Ivica Cardic
  */
 public final class SecurityUtils {
+
+    /**
+     * Login of the synthetic principal used by background flows (Quartz scheduler jobs, message consumers) that run
+     * without an originating HTTP request and therefore have no authenticated user of their own.
+     */
+    public static final String SYSTEM_LOGIN = "system";
 
     private SecurityUtils() {
     }
@@ -134,6 +141,16 @@ public final class SecurityUtils {
         } finally {
             SecurityContextHolder.setContext(originalContext);
         }
+    }
+
+    /**
+     * Executes the supplied {@code supplier} as the system principal ({@link #SYSTEM_LOGIN}) with
+     * {@link AuthorityConstants#ADMIN} authority, restoring the original context on completion. Use for background
+     * flows that own no user identity yet must invoke code guarded by authenticated/owner-or-admin checks (e.g. a
+     * Quartz scheduler job refreshing an OAuth2 connection token).
+     */
+    public static <T> T runAsSystem(Supplier<T> supplier) {
+        return runAs(SYSTEM_LOGIN, List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN)), supplier);
     }
 
     /**

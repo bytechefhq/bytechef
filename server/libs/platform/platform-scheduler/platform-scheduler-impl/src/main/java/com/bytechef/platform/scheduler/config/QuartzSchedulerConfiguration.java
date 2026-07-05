@@ -21,6 +21,7 @@ import com.bytechef.platform.scheduler.ConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.QuartzConnectionRefreshScheduler;
 import com.bytechef.platform.scheduler.QuartzTriggerScheduler;
 import com.bytechef.platform.scheduler.TriggerScheduler;
+import org.quartz.Job;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.spi.JobFactory;
@@ -91,6 +92,10 @@ public class QuartzSchedulerConfiguration {
             final Object job = super.createJobInstance(bundle);
 
             beanFactory.autowireBean(job);
+
+            if (job instanceof Job quartzJob) {
+                return new SystemSecurityContextJob(quartzJob);
+            }
 
             return job;
         }

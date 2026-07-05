@@ -208,6 +208,46 @@ class SecurityUtilsTest {
     }
 
     @Test
+    void testRunAsSystemGrantsAuthenticatedAdminIdentity() {
+        // No prior context - mirrors a Quartz worker thread with no HTTP-derived SecurityContext.
+        boolean[] ran = {
+            false
+        };
+
+        SecurityUtils.runAsSystem(() -> {
+            ran[0] = true;
+
+            assertThat(SecurityUtils.isAuthenticated()).isTrue();
+            assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo(SecurityUtils.SYSTEM_LOGIN);
+            assertThat(SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)).isTrue();
+
+            return null;
+        });
+
+        assertThat(ran[0]).isTrue();
+    }
+
+    @Test
+    void testRunAsSystemRestoresContextEvenWhenSupplierThrows() {
+        SecurityContext originalContext = SecurityContextHolder.createEmptyContext();
+
+        originalContext.setAuthentication(new UsernamePasswordAuthenticationToken("original-user", ""));
+
+        SecurityContextHolder.setContext(originalContext);
+
+        try {
+            SecurityUtils.runAsSystem(() -> {
+                throw new RuntimeException("supplier failure");
+            });
+        } catch (RuntimeException ignored) {
+            // expected
+        }
+
+        assertThat(SecurityUtils.getCurrentUserLogin()).isEqualTo("original-user");
+        assertThat(SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN)).isFalse();
+    }
+
+    @Test
     void testHasCurrentUserNoneOfAuthorities() {
         SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
         Collection<GrantedAuthority> authorities = new ArrayList<>();
