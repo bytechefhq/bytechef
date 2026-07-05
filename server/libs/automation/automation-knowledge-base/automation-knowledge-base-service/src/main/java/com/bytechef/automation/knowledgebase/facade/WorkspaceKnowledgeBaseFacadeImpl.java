@@ -22,11 +22,13 @@ import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseTagFacade;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -52,6 +54,7 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseFacade knowledgeBaseFacade;
     private final KnowledgeBaseService knowledgeBaseService;
+    private final KnowledgeBaseStorageService knowledgeBaseStorageService;
     private final KnowledgeBaseTagFacade knowledgeBaseTagFacade;
     private final WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService;
 
@@ -59,13 +62,15 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
     public WorkspaceKnowledgeBaseFacadeImpl(
         KnowledgeBaseDocumentFacade knowledgeBaseDocumentFacade,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService, KnowledgeBaseFacade knowledgeBaseFacade,
-        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseTagFacade knowledgeBaseTagFacade,
+        KnowledgeBaseService knowledgeBaseService, KnowledgeBaseStorageService knowledgeBaseStorageService,
+        KnowledgeBaseTagFacade knowledgeBaseTagFacade,
         WorkspaceKnowledgeBaseService workspaceKnowledgeBaseService) {
 
         this.knowledgeBaseDocumentFacade = knowledgeBaseDocumentFacade;
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseFacade = knowledgeBaseFacade;
         this.knowledgeBaseService = knowledgeBaseService;
+        this.knowledgeBaseStorageService = knowledgeBaseStorageService;
         this.knowledgeBaseTagFacade = knowledgeBaseTagFacade;
         this.workspaceKnowledgeBaseService = workspaceKnowledgeBaseService;
     }
@@ -199,5 +204,11 @@ public class WorkspaceKnowledgeBaseFacadeImpl implements WorkspaceKnowledgeBaseF
         workspaceKnowledgeBaseService.removeKnowledgeBaseFromWorkspace(knowledgeBaseId);
 
         knowledgeBaseService.deleteKnowledgeBase(knowledgeBaseId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public KnowledgeBaseStorageUsage getStorageUsage() {
+        return knowledgeBaseStorageService.getUsage();
     }
 }

@@ -17,6 +17,7 @@
 package com.bytechef.platform.knowledgebase.web.rest;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -65,7 +66,8 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument = createMockDocument(1L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument);
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class)))
+                .thenReturn(mockDocument);
 
         MockMultipartFile file = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));
@@ -76,7 +78,7 @@ class KnowledgeBaseDocumentApiControllerIntTest {
             .andExpect(jsonPath("$.name").value(filename));
 
         verify(knowledgeBaseDocumentFacade).createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class));
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class));
     }
 
     @Test
@@ -89,7 +91,8 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument = createMockDocument(1L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument);
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class)))
+                .thenReturn(mockDocument);
 
         MockMultipartFile file = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));
@@ -98,7 +101,7 @@ class KnowledgeBaseDocumentApiControllerIntTest {
             .andExpect(status().isOk());
 
         verify(knowledgeBaseDocumentFacade).createKnowledgeBaseDocument(
-            eq(knowledgeBaseId), eq(filename), eq(contentType), any(InputStream.class));
+            eq(knowledgeBaseId), eq(filename), eq(contentType), anyLong(), any(InputStream.class));
     }
 
     @Test
@@ -111,9 +114,9 @@ class KnowledgeBaseDocumentApiControllerIntTest {
         KnowledgeBaseDocument mockDocument2 = createMockDocument(2L, filename);
 
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(1L), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument1);
+            eq(1L), eq(filename), eq(contentType), anyLong(), any(InputStream.class))).thenReturn(mockDocument1);
         when(knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            eq(2L), eq(filename), eq(contentType), any(InputStream.class))).thenReturn(mockDocument2);
+            eq(2L), eq(filename), eq(contentType), anyLong(), any(InputStream.class))).thenReturn(mockDocument2);
 
         MockMultipartFile file1 = new MockMultipartFile(
             "file", filename, contentType, content.getBytes(StandardCharsets.UTF_8));

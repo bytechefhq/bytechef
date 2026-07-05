@@ -52,6 +52,9 @@ public class KnowledgeBaseDocument {
 
     private int status;
 
+    @Column("document_size")
+    private Long documentSize;
+
     @Column("source_id")
     private AggregateReference<KnowledgeBaseSource, Long> sourceId;
 
@@ -131,6 +134,14 @@ public class KnowledgeBaseDocument {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public Long getDocumentSize() {
+        return documentSize;
+    }
+
+    public void setDocumentSize(Long documentSize) {
+        this.documentSize = documentSize;
     }
 
     public Long getSourceId() {
@@ -256,6 +267,7 @@ public class KnowledgeBaseDocument {
             ", name='" + name + '\'' +
             ", document=" + document +
             ", status=" + status +
+            ", documentSize=" + documentSize +
             ", sourceId=" + sourceId +
             ", sourceRecordId='" + sourceRecordId + '\'' +
             ", syncedPayloadHash='" + syncedPayloadHash + '\'' +

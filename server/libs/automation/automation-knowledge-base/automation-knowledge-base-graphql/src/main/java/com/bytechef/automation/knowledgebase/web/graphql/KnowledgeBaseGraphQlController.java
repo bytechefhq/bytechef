@@ -22,6 +22,7 @@ import com.bytechef.platform.configuration.service.EnvironmentService;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseStorageUsage;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -103,6 +104,11 @@ class KnowledgeBaseGraphQlController {
     @QueryMapping
     public boolean knowledgeBaseEmbeddingActive(@Argument Integer environment) {
         return resolveEmbeddingActive(embeddingProviderStatusProvider, environment);
+    }
+
+    @QueryMapping
+    public KnowledgeBaseStorageUsage knowledgeBaseStorageUsage() {
+        return workspaceKnowledgeBaseFacade.getStorageUsage();
     }
 
     static boolean resolveEmbeddingActive(

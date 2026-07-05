@@ -2,6 +2,7 @@ extend type Query {
     knowledgeBases(environmentId: ID!, workspaceId: ID!): [KnowledgeBase]
     knowledgeBase(id: ID!): KnowledgeBase
     knowledgeBaseEmbeddingActive(environment: Int!): Boolean!
+    knowledgeBaseStorageUsage: KnowledgeBaseStorageUsage!
     knowledgeBaseTags(workspaceId: ID!): [Tag!]
     knowledgeBaseTagsByKnowledgeBase: [KnowledgeBaseTagsEntry!]
     searchKnowledgeBase(id: ID!, query: String!, metadataFilters: String): [KnowledgeBaseDocumentChunk]
@@ -42,4 +43,11 @@ input UpdateKnowledgeBaseTagsInput {
 type KnowledgeBaseTagsEntry {
     knowledgeBaseId: ID!
     tags: [Tag!]!
+}
+
+type KnowledgeBaseStorageUsage {
+    usedBytes: Long!
+    limitBytes: Long!
+    percentage: Float!
+    unlimited: Boolean!
 }

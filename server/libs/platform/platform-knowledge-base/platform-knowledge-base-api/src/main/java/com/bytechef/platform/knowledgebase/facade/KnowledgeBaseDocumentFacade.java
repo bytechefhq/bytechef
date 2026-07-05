@@ -33,11 +33,12 @@ public interface KnowledgeBaseDocumentFacade {
      * @param knowledgeBaseId the ID of the knowledge base to add the document to
      * @param filename        the name of the file
      * @param contentType     the content type of the file
+     * @param size            the size of the file content, in bytes
      * @param inputStream     the input stream of the file content
      * @return the created knowledge base document
      */
     KnowledgeBaseDocument createKnowledgeBaseDocument(
-        Long knowledgeBaseId, String filename, String contentType, InputStream inputStream);
+        Long knowledgeBaseId, String filename, String contentType, long size, InputStream inputStream);
 
     /**
      * Deletes a knowledge base document including its stored file.

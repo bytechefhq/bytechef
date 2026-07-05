@@ -24,8 +24,10 @@ import com.bytechef.platform.data.table.configuration.service.DataTableTagServic
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService;
 import com.bytechef.platform.data.table.configuration.service.DataTableWebhookService.Webhook;
 import com.bytechef.platform.data.table.domain.ColumnSpec;
+import com.bytechef.platform.data.table.domain.DataTableStorageUsage;
 import com.bytechef.platform.data.table.execution.domain.DataTableRow;
 import com.bytechef.platform.data.table.execution.service.DataTableRowService;
+import com.bytechef.platform.data.table.execution.service.DataTableStorageService;
 import com.bytechef.platform.tag.domain.Tag;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -46,6 +48,7 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
 
     private final DataTableRowService dataTableRowService;
     private final DataTableService dataTableService;
+    private final DataTableStorageService dataTableStorageService;
     private final DataTableTagService dataTableTagService;
     private final DataTableWebhookService dataTableWebhookService;
     private final WorkspaceDataTableService workspaceDataTableService;
@@ -53,11 +56,12 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @SuppressFBWarnings("EI")
     public WorkspaceDataTableFacadeImpl(
         DataTableRowService dataTableRowService, DataTableService dataTableService,
-        DataTableTagService dataTableTagService, DataTableWebhookService dataTableWebhookService,
-        WorkspaceDataTableService workspaceDataTableService) {
+        DataTableStorageService dataTableStorageService, DataTableTagService dataTableTagService,
+        DataTableWebhookService dataTableWebhookService, WorkspaceDataTableService workspaceDataTableService) {
 
         this.dataTableRowService = dataTableRowService;
         this.dataTableService = dataTableService;
+        this.dataTableStorageService = dataTableStorageService;
         this.dataTableTagService = dataTableTagService;
         this.dataTableWebhookService = dataTableWebhookService;
         this.workspaceDataTableService = workspaceDataTableService;
@@ -193,5 +197,11 @@ public class WorkspaceDataTableFacadeImpl implements WorkspaceDataTableFacade {
     @PreAuthorize("hasPermission(#dataTableId, 'DataTable', 'DATA_TABLE_VIEW')")
     public List<Webhook> listWebhooks(long dataTableId, long environmentId) {
         return dataTableWebhookService.listWebhooks(dataTableService.getBaseNameById(dataTableId), environmentId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DataTableStorageUsage getStorageUsage() {
+        return dataTableStorageService.getUsage();
     }
 }

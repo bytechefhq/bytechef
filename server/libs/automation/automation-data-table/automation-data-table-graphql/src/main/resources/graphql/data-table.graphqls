@@ -1,5 +1,6 @@
 extend type Query {
     dataTables(environmentId: ID!, workspaceId: ID!): [DataTable!]!
+    dataTableStorageUsage: DataTableStorageUsage!
     dataTableTags(workspaceId: ID!): [Tag!]!
     dataTableTagsByTable: [DataTableTagsEntry!]!
     dataTableWebhooks(environmentId: ID!, tableId: ID!): [DataTableWebhook!]!
@@ -28,6 +29,13 @@ type DataTableColumn {
     id: ID!
     name: String!
     type: ColumnType!
+}
+
+type DataTableStorageUsage {
+    usedBytes: Long!
+    limitBytes: Long!
+    percentage: Float!
+    unlimited: Boolean!
 }
 
 type DataTableTagsEntry {

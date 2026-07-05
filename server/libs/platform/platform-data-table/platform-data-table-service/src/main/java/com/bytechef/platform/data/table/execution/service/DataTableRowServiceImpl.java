@@ -60,12 +60,17 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     private static final Logger log = LoggerFactory.getLogger(DataTableRowServiceImpl.class);
 
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final DataTableStorageService dataTableStorageService;
     private final JdbcTemplate jdbcTemplate;
 
     @SuppressFBWarnings("EI")
-    public DataTableRowServiceImpl(ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate) {
+    public DataTableRowServiceImpl(
+        ApplicationEventPublisher applicationEventPublisher, JdbcTemplate jdbcTemplate,
+        DataTableStorageService dataTableStorageService) {
+
         this.applicationEventPublisher = applicationEventPublisher;
         this.jdbcTemplate = jdbcTemplate;
+        this.dataTableStorageService = dataTableStorageService;
     }
 
     /**
@@ -196,6 +201,9 @@ public class DataTableRowServiceImpl implements DataTableRowService {
 
     @Override
     public void importCsv(String baseName, String csv, long environmentId) {
+        dataTableStorageService.checkWithinLimit(
+            csv == null ? 0 : csv.getBytes(java.nio.charset.StandardCharsets.UTF_8).length);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -286,6 +294,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow insertRow(String baseName, Map<String, Object> values, long environmentId) {
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);
@@ -428,6 +438,8 @@ public class DataTableRowServiceImpl implements DataTableRowService {
     @Override
     @SuppressFBWarnings("SQL_INJECTION_SPRING_JDBC")
     public DataTableRow updateRow(String baseName, long id, Map<String, Object> values, long environmentId) {
+        dataTableStorageService.checkWithinLimit(0);
+
         validateBaseName(baseName);
 
         String physicalName = buildPhysicalName(environmentId, baseName);

@@ -50,6 +50,6 @@ class KnowledgeBaseDocumentApiController {
 
         return ResponseEntity.ok(
             knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-                id, file.getOriginalFilename(), file.getContentType(), file.getInputStream()));
+                id, file.getOriginalFilename(), file.getContentType(), file.getSize(), file.getInputStream()));
     }
 }

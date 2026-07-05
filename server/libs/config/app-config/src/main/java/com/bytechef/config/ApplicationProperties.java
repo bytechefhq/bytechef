@@ -99,6 +99,11 @@ public class ApplicationProperties {
     private DataStorage dataStorage;
 
     /**
+     * Data table storage configuration
+     */
+    private DataTable dataTable = new DataTable();
+
+    /**
      * Service discovery configuration
      */
     private DiscoveryService discoveryService = new DiscoveryService();
@@ -264,6 +269,10 @@ public class ApplicationProperties {
         return dataStorage;
     }
 
+    public DataTable getDataTable() {
+        return dataTable;
+    }
+
     public DiscoveryService getDiscoveryService() {
         return discoveryService;
     }
@@ -406,6 +415,10 @@ public class ApplicationProperties {
 
     public void setDataStorage(DataStorage dataStorage) {
         this.dataStorage = dataStorage;
+    }
+
+    public void setDataTable(DataTable dataTable) {
+        this.dataTable = dataTable;
     }
 
     public void setDiscoveryService(DiscoveryService discoveryService) {
@@ -1298,6 +1311,11 @@ public class ApplicationProperties {
             private boolean enabled;
 
             /**
+             * Maximum total size in bytes of all knowledge base documents in a tenant. 0 means unlimited. Default 1 GB.
+             */
+            private long maxSizeBytes = 1_073_741_824L;
+
+            /**
              * OCR configuration
              */
             private Ocr ocr = new Ocr();
@@ -1313,6 +1331,14 @@ public class ApplicationProperties {
 
             public void setEnabled(boolean enabled) {
                 this.enabled = enabled;
+            }
+
+            public long getMaxSizeBytes() {
+                return maxSizeBytes;
+            }
+
+            public void setMaxSizeBytes(long maxSizeBytes) {
+                this.maxSizeBytes = maxSizeBytes;
             }
 
             public Ocr getOcr() {
@@ -4001,6 +4027,25 @@ public class ApplicationProperties {
 
         public void setProvider(Provider provider) {
             this.provider = provider;
+        }
+    }
+
+    /**
+     * Data table storage configuration.
+     */
+    public static class DataTable {
+
+        /**
+         * Maximum total size in bytes of all data tables in a tenant. 0 means unlimited. Default 50 MB.
+         */
+        private long maxSizeBytes = 52_428_800L;
+
+        public long getMaxSizeBytes() {
+            return maxSizeBytes;
+        }
+
+        public void setMaxSizeBytes(long maxSizeBytes) {
+            this.maxSizeBytes = maxSizeBytes;
         }
     }
 

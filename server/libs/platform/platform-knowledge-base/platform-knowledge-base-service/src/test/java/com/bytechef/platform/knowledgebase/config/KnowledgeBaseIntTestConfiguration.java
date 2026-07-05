@@ -24,6 +24,7 @@ import com.bytechef.commons.data.jdbc.converter.FileEntryToStringConverter;
 import com.bytechef.commons.data.jdbc.converter.MapWrapperToPGObjectConverter;
 import com.bytechef.commons.data.jdbc.converter.PGobjectToMapWrapperConverter;
 import com.bytechef.commons.data.jdbc.converter.StringToFileEntryConverter;
+import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.FileStorageServiceRegistry;
 import com.bytechef.file.storage.service.FileStorageService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
@@ -37,6 +38,7 @@ import java.util.List;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.ComponentScan.Filter;
@@ -63,6 +65,7 @@ import tools.jackson.databind.json.JsonMapper;
     "org.springframework.ai.model.openai.autoconfigure.OpenAiModerationAutoConfiguration",
     "org.springframework.ai.vectorstore.pgvector.autoconfigure.PgVectorStoreAutoConfiguration"
 })
+@EnableConfigurationProperties(ApplicationProperties.class)
 @Import(LiquibaseConfiguration.class)
 @Configuration
 public class KnowledgeBaseIntTestConfiguration {

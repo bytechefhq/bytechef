@@ -103,7 +103,8 @@ class KnowledgeBaseDocumentFacadeIntTest {
         when(knowledgeBaseFileStorage.storeDocument(eq(filename), any(InputStream.class))).thenReturn(mockFileEntry);
 
         KnowledgeBaseDocument document = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), filename, contentType, inputStream);
+            knowledgeBase.getId(), filename, contentType, content.getBytes(StandardCharsets.UTF_8).length,
+            inputStream);
 
         assertThat(document).isNotNull();
         assertThat(document.getId()).isNotNull();
@@ -111,6 +112,7 @@ class KnowledgeBaseDocumentFacadeIntTest {
         assertThat(document.getKnowledgeBaseId()).isEqualTo(knowledgeBase.getId());
         assertThat(document.getStatus()).isEqualTo(KnowledgeBaseDocument.STATUS_UPLOADED);
         assertThat(document.getDocument()).isEqualTo(mockFileEntry);
+        assertThat(document.getDocumentSize()).isEqualTo(content.getBytes(StandardCharsets.UTF_8).length);
 
         verify(knowledgeBaseFileStorage).storeDocument(eq(filename), any(InputStream.class));
     }
@@ -229,11 +231,11 @@ class KnowledgeBaseDocumentFacadeIntTest {
         when(knowledgeBaseFileStorage.storeDocument(eq("doc2.txt"), any(InputStream.class))).thenReturn(mockFileEntry2);
 
         KnowledgeBaseDocument document1 = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), "doc1.txt", "text/plain",
+            knowledgeBase.getId(), "doc1.txt", "text/plain", "Content 1".getBytes(StandardCharsets.UTF_8).length,
             new ByteArrayInputStream("Content 1".getBytes(StandardCharsets.UTF_8)));
 
         KnowledgeBaseDocument document2 = knowledgeBaseDocumentFacade.createKnowledgeBaseDocument(
-            knowledgeBase.getId(), "doc2.txt", "text/plain",
+            knowledgeBase.getId(), "doc2.txt", "text/plain", "Content 2".getBytes(StandardCharsets.UTF_8).length,
             new ByteArrayInputStream("Content 2".getBytes(StandardCharsets.UTF_8)));
 
         assertThat(document1.getId()).isNotEqualTo(document2.getId());
