@@ -174,6 +174,19 @@ class PermissionServiceTest {
     }
 
     @Test
+    void testHasWorkspaceRoleFailsClosedOnInvalidRoleOrdinal() {
+        // A corrupted or legacy workspace_role ordinal hydrated via Spring Data JDBC (which bypasses the constructor's
+        // range validation) must fail closed — deny — rather than throw ArrayIndexOutOfBoundsException as a 500.
+        WorkspaceUser corrupted = mock(WorkspaceUser.class);
+
+        when(corrupted.getWorkspaceRole()).thenReturn(999);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(corrupted));
+
+        assertThat(permissionService.hasWorkspaceRole(WORKSPACE_ID, "VIEWER")).isFalse();
+    }
+
+    @Test
     void testHasWorkspaceScopeShortCircuitsForTenantAdmin() {
         securityUtilsMock.when(() -> SecurityUtils.hasCurrentUserThisAuthority(AuthorityConstants.ADMIN))
             .thenReturn(true);
@@ -339,6 +352,18 @@ class PermissionServiceTest {
     void testGetMyWorkspaceRoleReturnsNullForNonMember() {
         when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
             .thenReturn(Optional.empty());
+
+        assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
+    }
+
+    @Test
+    void testGetMyWorkspaceRoleNullOnInvalidRoleOrdinal() {
+        // Symmetric to hasWorkspaceRole: an out-of-range ordinal must fail closed to a null role rather than throw.
+        WorkspaceUser corrupted = mock(WorkspaceUser.class);
+
+        when(corrupted.getWorkspaceRole()).thenReturn(999);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(corrupted));
 
         assertThat(permissionService.getMyWorkspaceRole(WORKSPACE_ID)).isNull();
     }

@@ -164,6 +164,15 @@ public class WorkspaceScopeCacheService {
     private Set<String> resolveBuiltInScopes(int ordinal) {
         WorkspaceRole[] values = WorkspaceRole.values();
 
+        if (ordinal < 0 || ordinal >= values.length) {
+            log.error(
+                "Invalid workspace_role ordinal={} — outside the range [0, {}). Denying all scopes (fail closed). " +
+                    "This indicates a corrupted or legacy workspace_role value.",
+                ordinal, values.length);
+
+            return Collections.emptySet();
+        }
+
         return permissionScopeRegistry.getScopeNames(values[ordinal]);
     }
 

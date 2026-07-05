@@ -41,7 +41,9 @@ public interface WorkspaceUserService {
      * (would otherwise lock the workspace out). Evicts the impacted {@code (userId, workspaceId)} scope cache entry so
      * subsequent permission checks miss the cache and re-resolve from the (now-removed) membership.
      *
-     * @return {@code true} if a row was removed, {@code false} if the user was not a member of the workspace.
+     * @return {@code true} once the membership row has been removed
+     * @throws com.bytechef.exception.ConfigurationException if the user is not a member of the workspace, or if
+     *                                                       removing them would leave the workspace without an admin
      */
     boolean removeWorkspaceUser(long userId, long workspaceId);
 

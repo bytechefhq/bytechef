@@ -17,6 +17,7 @@
 package com.bytechef.automation.configuration.facade;
 
 import com.bytechef.automation.configuration.domain.Workspace;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.automation.configuration.service.WorkspaceService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
@@ -31,10 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 public class WorkspaceFacadeImpl implements WorkspaceFacade {
 
+    private final PermissionService permissionService;
     private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceFacadeImpl(WorkspaceService workspaceService) {
+    public WorkspaceFacadeImpl(PermissionService permissionService, WorkspaceService workspaceService) {
+        this.permissionService = permissionService;
         this.workspaceService = workspaceService;
     }
 
@@ -42,6 +45,14 @@ public class WorkspaceFacadeImpl implements WorkspaceFacade {
     @Transactional(readOnly = true)
     @PreAuthorize("isTenantAdmin() or isCurrentUser(#id)")
     public List<Workspace> getUserWorkspaces(long id) {
-        return workspaceService.getWorkspaces();
+        List<Workspace> workspaces = workspaceService.getWorkspaces();
+
+        if (permissionService.isTenantAdmin()) {
+            return workspaces;
+        }
+
+        return workspaces.stream()
+            .filter(workspace -> permissionService.getMyWorkspaceRole(workspace.getId()) != null)
+            .toList();
     }
 }

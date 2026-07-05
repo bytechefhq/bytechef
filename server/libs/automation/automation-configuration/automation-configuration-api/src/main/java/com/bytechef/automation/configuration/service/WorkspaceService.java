@@ -24,5 +24,11 @@ import java.util.List;
  */
 public interface WorkspaceService {
 
+    /**
+     * Returns every workspace in the current tenant, without any user-based filtering. Callers that must respect
+     * per-user visibility should filter the result through {@code PermissionService} membership checks.
+     *
+     * @return all workspaces in the tenant
+     */
     List<Workspace> getWorkspaces();
 }
