@@ -115,6 +115,22 @@ class WorkspaceScopeCacheServiceTest {
     }
 
     @Test
+    void testGetWorkspaceScopesFailsClosedOnInvalidRoleOrdinal() {
+        // A corrupted or legacy workspace_role ordinal hydrated via Spring Data JDBC (which bypasses the constructor's
+        // range validation) must fail closed — deny all scopes — rather than surface an ArrayIndexOutOfBoundsException
+        // as a 500 during permission evaluation.
+        WorkspaceUser corrupted = mock(WorkspaceUser.class);
+
+        when(corrupted.getWorkspaceRole()).thenReturn(999);
+        when(workspaceUserRepository.findByUserIdAndWorkspaceId(USER_ID, WORKSPACE_ID))
+            .thenReturn(Optional.of(corrupted));
+
+        assertThat(service.getWorkspaceScopes(USER_ID, WORKSPACE_ID)).isEmpty();
+
+        verify(permissionScopeRegistry, never()).getScopeNames(any());
+    }
+
+    @Test
     void testGetWorkspaceScopesThrowsOnXorCorruption() {
         // Both workspaceRole and customRoleId null violates the chk_workspace_user_role_xor CHECK constraint. The XOR
         // constructor forbids constructing such a row, so mock the getters to simulate a corrupted DB read — the
