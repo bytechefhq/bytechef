@@ -33,7 +33,7 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
             return isFeatureFlagEnabled('ff-1024');
         }
 
-        if (navItem.href === 'api-keys') {
+        if (navItem.href === 'workspace-api-keys') {
             return (
                 (currentType === PlatformType.AUTOMATION &&
                     (isFeatureFlagEnabled('ff-1025') || isFeatureFlagEnabled('ff-1039'))) ||
