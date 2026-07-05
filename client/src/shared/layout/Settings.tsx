@@ -36,7 +36,9 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
         if (navItem.href === 'workspace-api-keys') {
             return (
                 (currentType === PlatformType.AUTOMATION &&
-                    (isFeatureFlagEnabled('ff-1025') || isFeatureFlagEnabled('ff-1039'))) ||
+                    (isFeatureFlagEnabled('ff-1025') ||
+                        isFeatureFlagEnabled('ff-1039') ||
+                        isFeatureFlagEnabled('ff-4814'))) ||
                 (currentType === PlatformType.EMBEDDED && isFeatureFlagEnabled('ff-520'))
             );
         }
