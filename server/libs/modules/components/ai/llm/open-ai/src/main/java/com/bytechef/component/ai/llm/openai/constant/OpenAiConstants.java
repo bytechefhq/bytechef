@@ -45,6 +45,8 @@ import com.openai.models.audio.AudioModel;
 import com.openai.models.audio.speech.SpeechModel;
 import com.openai.models.embeddings.EmbeddingModel;
 import com.openai.models.images.ImageModel;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -64,9 +66,7 @@ public final class OpenAiConstants {
         toModelMap(Arrays.stream(ImageModel.Known.values())
             .map(ImageModel.Known::name)));
 
-    public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(
-        toModelMap(Arrays.stream(ChatModel.Known.values())
-            .map(ChatModel.Known::name)));
+    public static final List<Option<String>> CHAT_MODELS = ModelUtils.getEnumOptions(toChatModelMap());
 
     public static final List<Option<String>> EMBEDDING_MODELS = ModelUtils.getEnumOptions(
         toModelMap(Arrays.stream(EmbeddingModel.Known.values())
@@ -115,5 +115,24 @@ public final class OpenAiConstants {
             .map(name -> name.toLowerCase()
                 .replace('_', '-'))
             .collect(Collectors.toMap(Function.identity(), Function.identity(), (a, b) -> a));
+    }
+
+    /**
+     * Chat model ids contain version dots (e.g. {@code gpt-3.5-turbo}) that the enum-name to '-' transform corrupts, so
+     * read the real wire value straight off the SDK's {@link ChatModel} constants via {@link ChatModel#asString()}.
+     */
+    private static Map<String, String> toChatModelMap() {
+        return Arrays.stream(ChatModel.class.getFields())
+            .filter(field -> Modifier.isStatic(field.getModifiers()) && field.getType() == ChatModel.class)
+            .map(OpenAiConstants::resolveChatModelValue)
+            .collect(Collectors.toMap(Function.identity(), Function.identity(), (a, b) -> a));
+    }
+
+    private static String resolveChatModelValue(Field field) {
+        try {
+            return ((ChatModel) field.get(null)).asString();
+        } catch (IllegalAccessException exception) {
+            throw new IllegalStateException(exception);
+        }
     }
 }
