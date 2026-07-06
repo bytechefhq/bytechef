@@ -1,12 +1,12 @@
 import '@/shared/styles/dropdownMenu.css';
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
 import {
-    ContextMenu,
-    ContextMenuContent,
-    ContextMenuItem,
-    ContextMenuSeparator,
-    ContextMenuTrigger,
-} from '@/components/ui/context-menu';
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {getWorkflowNodeMenuItems} from '@/pages/platform/workflow-editor/utils/getWorkflowNodeMenuItems';
 import {NodeDataType} from '@/shared/types';
@@ -14,15 +14,15 @@ import {ReactNode, useCallback, useMemo, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
-interface WorkflowNodeContextMenuProps {
+interface WorkflowNodeDropdownMenuProps {
     canPaste?: boolean;
-    children: ReactNode;
     data: NodeDataType;
     hasSavedPosition: boolean;
     onCopy?: () => void;
     onCut?: () => void;
     onDelete: () => void;
     onInfo?: () => void;
+    onOpenChange?: (open: boolean) => void;
     onPaste?: () => void;
     onRename: () => void;
     onResetPosition: () => void;
@@ -33,17 +33,18 @@ interface WorkflowNodeContextMenuProps {
     showInfoAction?: boolean;
     showRenameAction?: boolean;
     showReplaceAction?: boolean;
+    trigger: ReactNode;
 }
 
-const WorkflowNodeContextMenu = ({
+const WorkflowNodeDropdownMenu = ({
     canPaste = false,
-    children,
     data,
     hasSavedPosition,
     onCopy,
     onCut,
     onDelete,
     onInfo,
+    onOpenChange,
     onPaste,
     onRename,
     onResetPosition,
@@ -54,24 +55,15 @@ const WorkflowNodeContextMenu = ({
     showInfoAction = false,
     showRenameAction = false,
     showReplaceAction = false,
-}: WorkflowNodeContextMenuProps) => {
+    trigger,
+}: WorkflowNodeDropdownMenuProps) => {
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [menuReady, setMenuReady] = useState(false);
 
     const copiedNode = useWorkflowEditorStore(useShallow((state) => state.copiedNode));
 
     const handleDeleteClick = useCallback(() => setDeleteDialogOpen(true), []);
 
     const handleDeleteCancel = useCallback(() => setDeleteDialogOpen(false), []);
-
-    const handleOpenChange = (open: boolean) => {
-        if (open) {
-            setMenuReady(false);
-            setTimeout(() => setMenuReady(true), 200);
-        } else {
-            setMenuReady(false);
-        }
-    };
 
     const menuItems = useMemo(
         () =>
@@ -119,17 +111,15 @@ const WorkflowNodeContextMenu = ({
 
     return (
         <>
-            <ContextMenu onOpenChange={handleOpenChange}>
-                <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+            <DropdownMenu modal={false} onOpenChange={onOpenChange}>
+                <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
 
-                <ContextMenuContent
-                    className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}
-                >
+                <DropdownMenuContent align="start" className="w-workflow-node-context-menu-width p-0" side="right">
                     {menuItems.map((menuItem) =>
                         menuItem.type === 'separator' ? (
-                            <ContextMenuSeparator className="m-0" key={menuItem.key} />
+                            <DropdownMenuSeparator className="m-0" key={menuItem.key} />
                         ) : (
-                            <ContextMenuItem
+                            <DropdownMenuItem
                                 className={twMerge(
                                     menuItem.variant === 'destructive'
                                         ? 'dropdown-menu-item-destructive'
@@ -137,7 +127,7 @@ const WorkflowNodeContextMenu = ({
                                     menuItem.key === 'paste' ? 'w-full' : 'gap-2'
                                 )}
                                 key={menuItem.key}
-                                onClick={menuItem.onSelect}
+                                onSelect={menuItem.onSelect}
                                 variant={menuItem.variant}
                             >
                                 {menuItem.key === 'paste' ? (
@@ -148,11 +138,11 @@ const WorkflowNodeContextMenu = ({
                                         {menuItem.label}
                                     </>
                                 )}
-                            </ContextMenuItem>
+                            </DropdownMenuItem>
                         )
                     )}
-                </ContextMenuContent>
-            </ContextMenu>
+                </DropdownMenuContent>
+            </DropdownMenu>
 
             {!data.trigger && showDeleteAction && (
                 <DeleteAlertDialog
@@ -166,4 +156,4 @@ const WorkflowNodeContextMenu = ({
     );
 };
 
-export default WorkflowNodeContextMenu;
+export default WorkflowNodeDropdownMenu;

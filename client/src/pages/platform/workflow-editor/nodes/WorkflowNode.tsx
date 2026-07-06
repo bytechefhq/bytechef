@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
+import WorkflowNodeDropdownMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu';
 import WorkflowNodesPopoverMenu from '@/pages/platform/workflow-editor/components/WorkflowNodesPopoverMenu';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {getNodeLabel} from '@/pages/platform/workflow-editor/utils/getNodeLabel';
@@ -11,8 +12,8 @@ import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {ClusterElementsType, NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon, XIcon} from 'lucide-react';
-import {KeyboardEvent, forwardRef, memo, useCallback, useMemo, useState} from 'react';
+import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
+import {KeyboardEvent, ReactNode, forwardRef, memo, useCallback, useMemo, useState} from 'react';
 import sanitize from 'sanitize-html';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
@@ -61,6 +62,8 @@ interface WorkflowNodeContentProps extends Omit<React.HTMLAttributes<HTMLDivElem
     isSelected: boolean;
     nodeDescription: string | undefined;
     nodeLabel: string | undefined;
+    nodeMenuOpen?: boolean;
+    nodeMenuTrigger?: ReactNode;
     nodeWidth: number;
     onInfoClose: () => void;
     parentClusterRootId: string | undefined;
@@ -93,6 +96,8 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             isSelected,
             nodeDescription,
             nodeLabel,
+            nodeMenuOpen,
+            nodeMenuTrigger,
             nodeWidth,
             onInfoClose,
             parentClusterRootId,
@@ -109,7 +114,7 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             ref={ref}
             {...rest}
             className={twMerge(
-                'relative flex min-w-60 cursor-pointer justify-center',
+                'group relative flex min-w-60 cursor-pointer justify-center',
                 !data.taskDispatcher && 'items-center',
                 (data.trigger || isMainRootClusterElement) && 'nodrag',
                 isClusterElement && !isNestedClusterRoot && 'w-[72px] min-w-[72px] flex-col items-center gap-1',
@@ -119,6 +124,19 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
             data-nodetype={data.trigger ? 'trigger' : 'task'}
             key={id}
         >
+            {nodeMenuTrigger && (
+                <div
+                    className={twMerge(
+                        'nodrag invisible absolute top-0 -left-8 z-10 group-hover:visible data-[open=true]:visible',
+                        isClusterElement && !isNestedClusterRoot && 'top-0 left-12'
+                    )}
+                    data-open={nodeMenuOpen}
+                    onMouseDown={(event) => event.stopPropagation()}
+                >
+                    {nodeMenuTrigger}
+                </div>
+            )}
+
             {!isMainRootClusterElement && !isClusterElement && data.trigger && (
                 <WorkflowNodesPopoverMenu
                     hideActionComponents
@@ -422,6 +440,7 @@ WorkflowNodeContent.displayName = 'WorkflowNodeContent';
 
 const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [infoCardOpen, setInfoCardOpen] = useState(false);
+    const [nodeMenuOpen, setNodeMenuOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const [switchPopoverOpen, setSwitchPopoverOpen] = useState(false);
 
@@ -757,6 +776,58 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         return null;
     }
 
+    const kebabButton = (
+        <Button
+            aria-label={`${data.workflowNodeName} node actions`}
+            className="nodrag size-6 rounded-md border border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 shadow-sm [&_svg]:size-4"
+            icon={<EllipsisVerticalIcon />}
+            size="iconXs"
+            title="Node actions"
+            variant="ghost"
+        />
+    );
+
+    const regularNodeMenuTrigger = (
+        <WorkflowNodeDropdownMenu
+            canPaste={canPaste}
+            data={data}
+            hasSavedPosition={!!hasSavedNodePosition}
+            onCopy={handleCopyNode}
+            onCut={handleCutNode}
+            onDelete={handleDelete}
+            onInfo={() => setInfoCardOpen(true)}
+            onOpenChange={setNodeMenuOpen}
+            onPaste={handlePasteNode}
+            onRename={handleStartRename}
+            onResetPosition={handleResetPosition}
+            onSwitch={handleSwitch}
+            showCopyAction
+            showCutAction
+            showDeleteAction
+            showInfoAction
+            showRenameAction
+            trigger={kebabButton}
+        />
+    );
+
+    const clusterElementMenuTrigger = (
+        <WorkflowNodeDropdownMenu
+            data={data}
+            hasSavedPosition={!!hasSavedClusterElementPosition}
+            onDelete={handleDelete}
+            onInfo={() => setInfoCardOpen(true)}
+            onOpenChange={setNodeMenuOpen}
+            onRename={handleStartRename}
+            onResetPosition={() => handleRemoveSavedClusterElementPosition(data.workflowNodeName)}
+            onSwitch={handleSwitch}
+            showDeleteAction
+            showInfoAction
+            showRenameAction
+            showReplaceAction={!data.multipleClusterElementsNode}
+            trigger={kebabButton}
+        />
+    );
+
     const sharedContentProps = {
         clusterElementTypesCount,
         data,
@@ -777,6 +848,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
         isSelected,
         nodeDescription,
         nodeLabel,
+        nodeMenuOpen,
         nodeWidth,
         onInfoClose: () => setInfoCardOpen(false),
         parentClusterRootId,
@@ -807,7 +879,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 showInfoAction
                 showRenameAction
             >
-                <WorkflowNodeContent {...sharedContentProps} />
+                <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={regularNodeMenuTrigger} />
             </WorkflowNodeContextMenu>
         );
     }
@@ -827,7 +899,7 @@ const WorkflowNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 showRenameAction
                 showReplaceAction={!data.multipleClusterElementsNode}
             >
-                <WorkflowNodeContent {...sharedContentProps} />
+                <WorkflowNodeContent {...sharedContentProps} nodeMenuTrigger={clusterElementMenuTrigger} />
             </WorkflowNodeContextMenu>
         );
     }
