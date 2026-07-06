@@ -1,5 +1,9 @@
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
+import McpIntegrationInstanceConfigurationWorkflowDialog from '@/ee/pages/embedded/mcp-servers/components/McpIntegrationInstanceConfigurationWorkflowDialog';
 import {McpServer} from '@/shared/middleware/graphql';
+import {WorkflowIcon} from 'lucide-react';
 
 import McpIntegrationInstanceConfigurationListItem from './McpIntegrationInstanceConfigurationListItem';
 import useMcpIntegrationInstanceConfigurationList from './hooks/useMcpIntegrationInstanceConfigurationList';
@@ -35,14 +39,28 @@ const McpIntegrationInstanceConfigurationList = ({mcpServer}: McpIntegrationInst
         );
     }
 
-    return (
-        <div className="flex flex-col gap-1.5 py-2">
+    return mcpIntegrationInstanceConfigurations && mcpIntegrationInstanceConfigurations.length > 0 ? (
+        <div className="flex flex-col gap-1.5">
             {mcpIntegrationInstanceConfigurations?.map((mcpIntegrationInstanceConfiguration) => (
                 <McpIntegrationInstanceConfigurationListItem
                     key={mcpIntegrationInstanceConfiguration.id}
                     mcpIntegrationInstanceConfiguration={mcpIntegrationInstanceConfiguration}
                 />
             ))}
+        </div>
+    ) : (
+        <div className="flex justify-center py-8">
+            <EmptyList
+                button={
+                    <McpIntegrationInstanceConfigurationWorkflowDialog
+                        mcpServer={mcpServer}
+                        triggerNode={<Button label="Add Workflows" />}
+                    />
+                }
+                icon={<WorkflowIcon className="size-24 text-gray-300" />}
+                message="No MCP integrations found for this server."
+                title="No MCP Integrations"
+            />
         </div>
     );
 };

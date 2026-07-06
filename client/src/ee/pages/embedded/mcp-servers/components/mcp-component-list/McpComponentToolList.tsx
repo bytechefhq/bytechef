@@ -1,8 +1,9 @@
 import Button from '@/components/Button/Button';
 import EmptyList from '@/components/EmptyList';
 import {McpComponent, McpTool} from '@/shared/middleware/graphql';
+import {useGetComponentDefinitionQuery} from '@/shared/queries/platform/componentDefinitions.queries';
 import {ComponentIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useMemo, useState} from 'react';
 
 import McpComponentDialog from '../mcp-component-dialog/McpComponentDialog';
 import McpComponentToolListItem from './McpComponentToolListItem';
@@ -26,7 +27,23 @@ const McpComponentToolList = ({
 }: McpComponentToolListProps) => {
     const [showEditDialog, setShowEditDialog] = useState(false);
 
+    const {data: componentDefinition} = useGetComponentDefinitionQuery({componentName, componentVersion});
+
     const tools = mcpTools?.filter((tool): tool is McpTool => tool !== null && tool.name !== null) || [];
+
+    const toolDescriptionsByName = useMemo(() => {
+        const descriptions: Record<string, string> = {};
+
+        componentDefinition?.clusterElements
+            ?.filter((element) => element.type === 'TOOLS')
+            .forEach((element) => {
+                if (element.description) {
+                    descriptions[element.name] = element.description;
+                }
+            });
+
+        return descriptions;
+    }, [componentDefinition?.clusterElements]);
 
     return tools.length > 0 ? (
         <div className="flex flex-col gap-1">
@@ -35,6 +52,7 @@ const McpComponentToolList = ({
                     componentName={componentName}
                     componentVersion={componentVersion}
                     connectionId={connectionId}
+                    description={toolDescriptionsByName[tool.name]}
                     key={tool.name}
                     mcpTool={tool}
                 />

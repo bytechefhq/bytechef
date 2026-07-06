@@ -64,7 +64,7 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
                                         <TabsTrigger value="connect">Connect</TabsTrigger>
                                     </TabsList>
 
-                                    <TabsContent value="tools">
+                                    <TabsContent className="py-2" value="tools">
                                         <McpServerToolsContent mcpServer={mcpServer} />
                                     </TabsContent>
 

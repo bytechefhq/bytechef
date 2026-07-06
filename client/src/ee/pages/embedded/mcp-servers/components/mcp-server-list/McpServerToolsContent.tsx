@@ -50,9 +50,11 @@ const McpServerToolsContent = ({mcpServer}: {mcpServer: McpServer}) => {
 
     return (
         <McpActivePopoverProvider>
-            <McpComponentList mcpServer={mcpServer} />
+            <div className="flex flex-col gap-1.5">
+                <McpComponentList mcpServer={mcpServer} />
 
-            <McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />
+                <McpIntegrationInstanceConfigurationList mcpServer={mcpServer} />
+            </div>
         </McpActivePopoverProvider>
     );
 };
