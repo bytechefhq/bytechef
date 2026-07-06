@@ -17,12 +17,12 @@ const IntegrationList = ({
     taskDispatcherDefinitions?: TaskDispatcherDefinition[];
 }) => {
     return (
-        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             {integrations.map((integration) => {
                 const integrationTagIds = integration.tags?.map((tag) => tag.id);
 
                 return (
-                    <Collapsible className="group" key={integration.id}>
+                    <Collapsible className="group mb-2 rounded border border-border/50" key={integration.id}>
                         <IntegrationListItem
                             integration={integration}
                             key={integration.id}

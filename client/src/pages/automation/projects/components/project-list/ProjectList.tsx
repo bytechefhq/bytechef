@@ -39,7 +39,7 @@ const ProjectList = ({
 
                 return (
                     <Collapsible
-                        className="group"
+                        className="group mb-2 rounded border border-border/50"
                         key={project.id}
                         onOpenChange={(open) => {
                             setOpenCollapsibles((prev) => {

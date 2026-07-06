@@ -57,7 +57,7 @@ const IntegrationInstanceConfigurationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="p-3">
             <h3 className="flex justify-start px-2 text-sm font-semibold text-gray-400 uppercase">Workflows</h3>
 
             <ul className="divide-y divide-gray-100">

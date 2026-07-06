@@ -36,10 +36,10 @@ const AutomationWorkflowProjectList = ({
     const [openProjectIds, setOpenProjectIds] = useState<Set<string>>(new Set());
 
     return (
-        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             {projects.map((project) => (
                 <Collapsible
-                    className="group"
+                    className="group mb-2 rounded border border-border/50"
                     key={project.id}
                     onOpenChange={(open) => {
                         setOpenProjectIds((previousOpenProjectIds) => {

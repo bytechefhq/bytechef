@@ -165,10 +165,10 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
                 onClick={(event) => handleIntegrationListItemClick(event)}
             >
-                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="relative flex items-center gap-2">

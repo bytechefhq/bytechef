@@ -15,10 +15,10 @@ const DataTableListItem = ({remainingTags, table, tags}: DataTableListItemProps)
 
     return (
         <div
-            className="group flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+            className="group mb-2 flex w-full cursor-pointer items-center justify-between rounded border border-border/50 px-3 hover:bg-destructive-foreground"
             onClick={handleRowClick}
         >
-            <div className="flex flex-1 items-center py-5">
+            <div className="flex flex-1 items-center py-3">
                 <div className="flex-1">
                     <div className="flex items-center gap-2">
                         <span className="text-base font-semibold">{table.baseName}</span>

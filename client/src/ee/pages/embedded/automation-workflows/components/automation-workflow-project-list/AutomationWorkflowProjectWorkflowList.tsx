@@ -31,7 +31,7 @@ const AutomationWorkflowProjectWorkflowList = ({
     );
 
     return (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="p-3">
             {workflows.length > 0 ? (
                 <>
                     <h3 className="flex justify-start pl-2 text-sm heading-tertiary">Workflows</h3>

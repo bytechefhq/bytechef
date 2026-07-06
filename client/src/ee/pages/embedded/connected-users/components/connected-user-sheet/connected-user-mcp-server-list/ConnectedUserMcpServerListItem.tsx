@@ -119,7 +119,7 @@ const ConnectedUserMcpServerListItem = ({
 
                 <CollapsibleContent>
                     {toolCount > 0 ? (
-                        <div className="flex w-full flex-col gap-y-3 py-3 pl-4">
+                        <div className="flex w-full flex-col gap-y-3 p-3">
                             <h3 className="flex justify-start px-2 text-sm font-semibold text-muted-foreground uppercase">
                                 Tools
                             </h3>

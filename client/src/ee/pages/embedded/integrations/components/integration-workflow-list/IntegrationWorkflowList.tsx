@@ -46,7 +46,7 @@ const IntegrationWorkflowList = ({
     });
 
     return !componentDefinitions || !taskDispatcherDefinitions || isIntegrationWorkflowsLoading ? (
-        <div className="space-y-3 py-2">
+        <div className="space-y-3 p-3">
             <Skeleton className="h-5 w-40" />
 
             {[1, 2].map((value) => (
@@ -66,7 +66,7 @@ const IntegrationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="p-3">
             {workflows && workflows.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">

@@ -42,7 +42,11 @@ const McpIntegrationInstanceConfigurationListItem = ({
 
     return (
         <>
-            <Collapsible className="group rounded-md border border-border" onOpenChange={setExpanded} open={expanded}>
+            <Collapsible
+                className="group rounded-md border border-border/50"
+                onOpenChange={setExpanded}
+                open={expanded}
+            >
                 <div className="flex items-center gap-2.5 px-3 py-2.5">
                     <CollapsibleTrigger asChild>
                         <button
@@ -105,7 +109,7 @@ const McpIntegrationInstanceConfigurationListItem = ({
                 </div>
 
                 <CollapsibleContent>
-                    <div className="border-t border-border px-3 py-2 pl-10">
+                    <div className="border-t border-border/50 px-3 py-2 pl-10">
                         <McpIntegrationInstanceConfigurationWorkflowList
                             componentName={mcpIntegrationInstanceConfiguration.integration?.componentName || ''}
                             mcpIntegrationInstanceConfigurationWorkflows={
