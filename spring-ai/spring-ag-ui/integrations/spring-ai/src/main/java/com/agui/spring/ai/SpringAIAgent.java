@@ -201,6 +201,10 @@ public class SpringAIAgent extends LocalAgent {
         return Collections.emptyList();
     }
 
+    protected Map<String, Object> advisorParams(RunAgentInput input) {
+        return Collections.emptyMap();
+    }
+
     /**
      * Handles individual chat response events from the streaming response.
      *
@@ -374,6 +378,16 @@ public class SpringAIAgent extends LocalAgent {
                 chatRequest = chatRequest.advisors(this.advisors);
             } catch (RuntimeException e) {
                 throw new AGUIException("Could not add advisors", e);
+            }
+        }
+
+        Map<String, Object> advisorParameters = this.advisorParams(input);
+
+        if (advisorParameters != null && !advisorParameters.isEmpty()) {
+            try {
+                chatRequest = chatRequest.advisors(advisorSpec -> advisorSpec.params(advisorParameters));
+            } catch (RuntimeException e) {
+                throw new AGUIException("Could not add advisor params", e);
             }
         }
 

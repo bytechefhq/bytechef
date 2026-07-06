@@ -120,6 +120,19 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected Map<String, Object> advisorParams(RunAgentInput input) {
+        State inputState = input.state();
+
+        Object environmentId = inputState.get(CopilotConstants.STATE_ENVIRONMENT_ID);
+
+        if (environmentId == null) {
+            return Map.of();
+        }
+
+        return Map.of(CopilotConstants.STATE_ENVIRONMENT_ID, environmentId);
+    }
+
+    @Override
     protected SystemMessage createSystemMessage(State state, List<Context> contexts) {
         String workflowId = (String) state.get("workflowId");
 
