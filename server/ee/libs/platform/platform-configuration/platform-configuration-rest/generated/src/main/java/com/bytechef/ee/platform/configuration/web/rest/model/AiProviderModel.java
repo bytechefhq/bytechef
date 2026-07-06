@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T18:25:47.807213+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T23:46:41.082636+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -42,6 +42,8 @@ public class AiProviderModel {
   private @Nullable Boolean supportsImage;
 
   private @Nullable Boolean supportsEmbeddings;
+
+  private @Nullable Boolean copilotDocsProvider;
 
   public AiProviderModel() {
     super();
@@ -243,6 +245,27 @@ public class AiProviderModel {
     this.supportsEmbeddings = supportsEmbeddings;
   }
 
+  public AiProviderModel copilotDocsProvider(@Nullable Boolean copilotDocsProvider) {
+    this.copilotDocsProvider = copilotDocsProvider;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider is the one used to embed the shared Copilot documentation.
+   * @return copilotDocsProvider
+   */
+  
+  @Schema(name = "copilotDocsProvider", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider is the one used to embed the shared Copilot documentation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("copilotDocsProvider")
+  public @Nullable Boolean getCopilotDocsProvider() {
+    return copilotDocsProvider;
+  }
+
+  @JsonProperty("copilotDocsProvider")
+  public void setCopilotDocsProvider(@Nullable Boolean copilotDocsProvider) {
+    this.copilotDocsProvider = copilotDocsProvider;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) {
@@ -260,12 +283,13 @@ public class AiProviderModel {
         Objects.equals(this.enabled, aiProvider.enabled) &&
         Objects.equals(this.supportsText, aiProvider.supportsText) &&
         Objects.equals(this.supportsImage, aiProvider.supportsImage) &&
-        Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings);
+        Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings) &&
+        Objects.equals(this.copilotDocsProvider, aiProvider.copilotDocsProvider);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsText, supportsImage, supportsEmbeddings);
+    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsText, supportsImage, supportsEmbeddings, copilotDocsProvider);
   }
 
   @Override
@@ -281,6 +305,7 @@ public class AiProviderModel {
     sb.append("    supportsText: ").append(toIndentedString(supportsText)).append("\n");
     sb.append("    supportsImage: ").append(toIndentedString(supportsImage)).append("\n");
     sb.append("    supportsEmbeddings: ").append(toIndentedString(supportsEmbeddings)).append("\n");
+    sb.append("    copilotDocsProvider: ").append(toIndentedString(copilotDocsProvider)).append("\n");
     sb.append("}");
     return sb.toString();
   }
