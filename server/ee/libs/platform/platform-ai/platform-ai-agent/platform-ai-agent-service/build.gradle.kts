@@ -6,6 +6,7 @@ dependencies {
     implementation(project(":server:libs:config:app-config"))
     implementation(project(":server:libs:modules:components:ai:llm"))
     implementation(project(":server:libs:modules:components:ai:llm:anthropic"))
+    implementation(project(":server:libs:modules:components:ai:llm:azure-open-ai"))
     implementation(project(":server:libs:modules:components:ai:llm:deepseek"))
     implementation(project(":server:libs:modules:components:ai:llm:gemini"))
     implementation(project(":server:libs:modules:components:ai:llm:groq"))

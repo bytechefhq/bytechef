@@ -7,11 +7,13 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
+import static com.bytechef.component.ai.llm.constant.LLMConstants.ENDPOINT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
 import com.bytechef.component.ai.llm.anthropic.action.AnthropicChatAction;
+import com.bytechef.component.ai.llm.azure.openai.action.AzureOpenAiChatAction;
 import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
 import com.bytechef.component.ai.llm.gemini.action.GeminiChatAction;
 import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
@@ -51,6 +53,10 @@ public class CatalogChatModelFactory {
             return null;
         }
 
+        if (provider.requiresEndpoint() && (url == null || url.isBlank())) {
+            return null;
+        }
+
         Parameters inputParameters = ParametersFactory.create(Map.of(MODEL, model));
         Parameters connectionParameters = ParametersFactory.create(createConnectionParameters(apiKey, url));
 
@@ -66,6 +72,7 @@ public class CatalogChatModelFactory {
 
         if (url != null && !url.isBlank()) {
             connectionParameters.put(URL, url);
+            connectionParameters.put(ENDPOINT, url);
         }
 
         return connectionParameters;
@@ -74,6 +81,7 @@ public class CatalogChatModelFactory {
     private static com.bytechef.component.ai.llm.@Nullable ChatModel resolveFactory(Provider provider) {
         return switch (provider) {
             case ANTHROPIC -> AnthropicChatAction.CHAT_MODEL;
+            case AZURE_OPEN_AI -> AzureOpenAiChatAction.CHAT_MODEL;
             case DEEPSEEK -> DeepSeekChatAction.CHAT_MODEL;
             case GROQ -> GroqChatAction.CHAT_MODEL;
             case MISTRAL -> MistralChatAction.CHAT_MODEL;
@@ -82,7 +90,6 @@ public class CatalogChatModelFactory {
             case OPEN_AI -> OpenAiChatAction.CHAT_MODEL;
             case PERPLEXITY -> PerplexityChatAction.CHAT_MODEL;
             case VERTEX_GEMINI -> GeminiChatAction.CHAT_MODEL;
-            // AZURE_OPEN_AI and HUGGING_FACE need extra connection params not stored in the catalog.
             default -> null;
         };
     }
