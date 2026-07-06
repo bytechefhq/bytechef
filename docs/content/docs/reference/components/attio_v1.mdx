@@ -305,6 +305,9 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Record ID
+
+To find the Record ID, click [here](/reference/components/attio_v1#how-to-find-your-record-id).
 
 
 
@@ -388,3 +391,112 @@ Type: OBJECT
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find your Record ID
+
+Many Attio API endpoints require a `record_id`, but in most integrations you only have another unique identifier (such as an email, company domain, or external ID).
+
+The recommended approach is:
+
+1. Query records using a filter.
+2. Read the `data[].id.record_id` field from the response.
+3. Use that `record_id` in subsequent API requests.
+
+
+#### Query Records
+
+**Endpoint**
+
+```http
+POST /v2/objects/{object}/records/query
+```
+
+Replace `{object}` with your object slug, for example:
+
+- `people`
+- `companies`
+- `deals`
+- your custom object slug
+
+#### Example
+
+```bash
+curl --request POST \
+  --url https://api.attio.com/v2/objects/people/records/query \
+  --header "Authorization: Bearer YOUR_API_TOKEN" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "filter": {
+      "email_addresses": "john@example.com"
+    },
+    "limit": 1
+  }'
+```
+
+#### Response
+
+```json
+{
+  "data": [
+    {
+      "id": {
+        "workspace_id": "14beef7a-99f7-4534-a87e-70b564330a4c",
+        "object_id": "97052eb9-e65e-443f-a297-f2d9a4a7f795",
+        "record_id": "bf071e1f-6035-429d-b874-d83ea64ea13b"
+      },
+      "created_at": "2022-11-21T13:22:49.061281000Z",
+      "values": {}
+    }
+  ]
+}
+```
+
+The value you need is:
+
+```text
+data[0].id.record_id
+```
+
+Example:
+
+```text
+bf071e1f-6035-429d-b874-d83ea64ea13b
+```
+
+#### Common Lookup Examples
+
+#### Find a person by email
+
+```json
+{
+  "filter": {
+    "email_addresses": "john@example.com"
+  },
+  "limit": 1
+}
+```
+
+#### Find a company by domain
+
+```json
+{
+  "filter": {
+    "domains": "acme.com"
+  },
+  "limit": 1
+}
+```
+
+#### References
+
+- Attio REST API — List Records. :contentReference[oaicite:0]{index=0}
+- Attio REST API — Get a Record. :contentReference[oaicite:1]{index=1}
