@@ -13,13 +13,15 @@ import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/
 import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
-import {BotMessageSquareIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
+import {BotMessageSquareIcon, BrainCircuitIcon, MessageSquareXIcon, XIcon} from 'lucide-react';
 import {useEffect, useRef, useState} from 'react';
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
 const ANIMATION_DURATION_MS = 300;
+
+const AI_PROVIDERS_SETTINGS_PATH = '/automation/settings/ai-providers';
 
 const COPILOT_SUGGESTIONS: SuggestionConfig[] = [
     {
@@ -76,8 +78,13 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
     const setCopilotPanelOpen = useCopilotPanelStore((state) => state.setCopilotPanelOpen);
     const location = useLocation();
+    const navigate = useNavigate();
 
-    const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
+    const {data: defaultModelData, isPending: isDefaultModelPending} = useAiDefaultModelQuery({
+        environment: String(currentEnvironmentId),
+    });
+
+    const hasEnabledProvider = defaultModelData?.aiDefaultModel != null;
 
     const handleCleanMessages = () => {
         resetMessages();
@@ -134,40 +141,58 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
             </div>
 
             <div className="absolute inset-x-0 top-16 -bottom-3 -mx-1">
-                <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
-                    <Thread
-                        composerActions={
-                            !source ? (
-                                <ModeSwitch
-                                    build={context?.mode === MODE.BUILD}
-                                    onBuildChange={(build) =>
-                                        setContext({...context, mode: build ? MODE.BUILD : MODE.ASK})
-                                    }
-                                />
-                            ) : null
-                        }
-                        dataComponents={aiChatDataComponents}
-                        leadingComposerActions={
-                            currentWorkspaceId != null ? (
-                                <ModelPicker
-                                    defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
-                                    defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
-                                    environment={currentEnvironmentId}
-                                    onChange={(provider, model) => {
-                                        writeLastUsedModel(currentWorkspaceId, provider, model);
-                                        setSelectedLlm(provider, model);
-                                    }}
-                                    selectedModel={
-                                        selectedLlmModel ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
-                                    }
-                                    selectedProvider={
-                                        selectedLlmProvider ?? readLastUsedModel(currentWorkspaceId)?.provider ?? null
-                                    }
-                                />
-                            ) : null
-                        }
-                    />
-                </CopilotRuntimeProvider>
+                {!isDefaultModelPending && !hasEnabledProvider ? (
+                    <div className="flex h-full flex-col items-center justify-center gap-4 px-8 text-center">
+                        <BrainCircuitIcon className="size-10 text-content-neutral-secondary" />
+
+                        <div className="flex flex-col gap-1">
+                            <p className="text-sm font-medium text-content-neutral-primary">No AI providers enabled</p>
+
+                            <p className="text-sm text-content-neutral-secondary">
+                                Enable an AI provider to start using the AI Copilot.
+                            </p>
+                        </div>
+
+                        <Button onClick={() => navigate(AI_PROVIDERS_SETTINGS_PATH)}>Go to AI Providers</Button>
+                    </div>
+                ) : (
+                    <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
+                        <Thread
+                            composerActions={
+                                !source ? (
+                                    <ModeSwitch
+                                        build={context?.mode === MODE.BUILD}
+                                        onBuildChange={(build) =>
+                                            setContext({...context, mode: build ? MODE.BUILD : MODE.ASK})
+                                        }
+                                    />
+                                ) : null
+                            }
+                            dataComponents={aiChatDataComponents}
+                            leadingComposerActions={
+                                currentWorkspaceId != null ? (
+                                    <ModelPicker
+                                        defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
+                                        defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
+                                        environment={currentEnvironmentId}
+                                        onChange={(provider, model) => {
+                                            writeLastUsedModel(currentWorkspaceId, provider, model);
+                                            setSelectedLlm(provider, model);
+                                        }}
+                                        selectedModel={
+                                            selectedLlmModel ?? readLastUsedModel(currentWorkspaceId)?.model ?? null
+                                        }
+                                        selectedProvider={
+                                            selectedLlmProvider ??
+                                            readLastUsedModel(currentWorkspaceId)?.provider ??
+                                            null
+                                        }
+                                    />
+                                ) : null
+                            }
+                        />
+                    </CopilotRuntimeProvider>
+                )}
             </div>
         </div>
     );
