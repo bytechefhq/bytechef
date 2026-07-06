@@ -437,7 +437,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
                     controlType,
                     custom: true,
                     defaultValue: parameterItemValue,
-                    expressionEnabled: true,
+                    expressionEnabled: matchingItem?.expressionEnabled ?? true,
                     key: crypto.randomUUID(),
                     label,
                     name: index.toString(),
