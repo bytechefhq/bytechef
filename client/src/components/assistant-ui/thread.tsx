@@ -330,7 +330,7 @@ const ComposerAction: FC<ComposerActionProps> = ({
         {leadingComposerActions}
         <ComposerAddAttachment />
       </div>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-3">
         {composerActions}
         <AuiIf condition={(s) => s.thread.capabilities.dictation}>
           <AuiIf condition={(s) => s.composer.dictation == null}>
