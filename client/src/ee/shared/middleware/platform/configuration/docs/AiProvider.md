@@ -13,6 +13,8 @@ Name | Type
 `apiKey` | string
 `url` | string
 `enabled` | boolean
+`supportsText` | boolean
+`supportsImage` | boolean
 `supportsEmbeddings` | boolean
 
 ## Example
@@ -28,6 +30,8 @@ const example = {
   "apiKey": null,
   "url": null,
   "enabled": null,
+  "supportsText": null,
+  "supportsImage": null,
   "supportsEmbeddings": null,
 } satisfies AiProvider
 
