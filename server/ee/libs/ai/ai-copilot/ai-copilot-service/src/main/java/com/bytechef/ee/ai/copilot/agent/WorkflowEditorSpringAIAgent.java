@@ -34,9 +34,6 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -49,9 +46,7 @@ import org.springframework.security.core.Authentication;
  *
  * @author Ivica Cardic
  */
-public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
-
-    private static final Logger log = LoggerFactory.getLogger(WorkflowEditorSpringAIAgent.class);
+public class WorkflowEditorSpringAIAgent extends CopilotSpringAIAgent {
 
     private static final String ADDITIONAL_RULES =
         """
@@ -73,45 +68,22 @@ public class WorkflowEditorSpringAIAgent extends SpringAIAgent {
     private final WorkflowNodeOutputFacade workflowNodeOutputFacade;
     private final PermissionService permissionService;
     private final SecurityContextRehydrator securityContextRehydrator;
-    private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
 
     protected WorkflowEditorSpringAIAgent(final Builder builder, final WorkflowService workflowService,
         final WorkflowNodeOutputFacade workflowNodeOutputFacade, final PermissionService permissionService,
         final SecurityContextRehydrator securityContextRehydrator)
         throws AGUIException {
 
-        super(builder);
+        super(builder, builder.overrideChatClientResolver);
 
         this.workflowService = workflowService;
         this.workflowNodeOutputFacade = workflowNodeOutputFacade;
         this.permissionService = permissionService;
         this.securityContextRehydrator = securityContextRehydrator;
-        this.overrideChatClientResolver = builder.overrideChatClientResolver;
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    @Override
-    protected ChatClient resolveChatClient(RunAgentInput input) {
-        if (overrideChatClientResolver == null) {
-            return super.resolveChatClient(input);
-        }
-
-        try {
-            ChatClient override = overrideChatClientResolver.resolve(input.state());
-
-            if (override != null) {
-                return override;
-            }
-        } catch (RuntimeException exception) {
-            log.warn(
-                "WorkflowEditorSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
-                exception.getMessage());
-        }
-
-        return super.resolveChatClient(input);
     }
 
     @Override

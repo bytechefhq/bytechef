@@ -22,9 +22,6 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
 import org.jspecify.annotations.Nullable;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -35,9 +32,7 @@ import org.springframework.ai.tool.ToolCallback;
  *
  * @author Ivica Cardic
  */
-public class ClusterElementSpringAIAgent extends SpringAIAgent {
-
-    private static final Logger log = LoggerFactory.getLogger(ClusterElementSpringAIAgent.class);
+public class ClusterElementSpringAIAgent extends CopilotSpringAIAgent {
 
     private static final String ADDITIONAL_RULES =
         """
@@ -47,42 +42,12 @@ public class ClusterElementSpringAIAgent extends SpringAIAgent {
             - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
             """;
 
-    private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
-
     protected ClusterElementSpringAIAgent(final Builder builder) throws AGUIException {
-        super(builder);
-
-        this.overrideChatClientResolver = builder.overrideChatClientResolver;
+        super(builder, builder.overrideChatClientResolver);
     }
 
     public static Builder builder() {
         return new Builder();
-    }
-
-    /**
-     * Returns the per-request {@link ChatClient}. Consults the override resolver first (for the user-selected
-     * (provider, model) supplied via AG-UI state); falls back to the builder-time default whenever the resolver is
-     * absent, returns {@code null}, or throws. Mirrors the same hook on {@code AiHubSpringAIAgent.resolveChatClient}.
-     */
-    @Override
-    protected ChatClient resolveChatClient(RunAgentInput input) {
-        if (overrideChatClientResolver == null) {
-            return super.resolveChatClient(input);
-        }
-
-        try {
-            ChatClient override = overrideChatClientResolver.resolve(input.state());
-
-            if (override != null) {
-                return override;
-            }
-        } catch (RuntimeException exception) {
-            log.warn(
-                "ClusterElementSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
-                exception.getMessage());
-        }
-
-        return super.resolveChatClient(input);
     }
 
     @Override
