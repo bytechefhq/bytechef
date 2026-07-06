@@ -1,7 +1,12 @@
 import {Thread} from '@/components/assistant-ui/thread';
+import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
+import ModelPicker from '@/shared/components/ai/model-picker/ModelPicker';
+import {readLastUsedModel, writeLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import {CopilotRuntimeProvider} from '@/shared/components/copilot/runtime-providers/CopilotRuntimeProvider';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {type SuggestionConfig} from '@assistant-ui/react';
 import {useQueryClient} from '@tanstack/react-query';
 import {useEffect} from 'react';
@@ -52,6 +57,14 @@ const AiSkillCreateWithAi = () => {
     const setContext = useCopilotStore((state) => state.setContext);
     const resetMessages = useCopilotStore((state) => state.resetMessages);
     const generateConversationId = useCopilotStore((state) => state.generateConversationId);
+    const selectedLlmModel = useCopilotStore((state) => state.selectedLlmModel);
+    const selectedLlmProvider = useCopilotStore((state) => state.selectedLlmProvider);
+    const setSelectedLlm = useCopilotStore((state) => state.setSelectedLlm);
+
+    const currentWorkspaceId = useWorkspaceStore((state) => state.currentWorkspaceId);
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {data: defaultModelData} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
 
     const origin: CreateWithAiOriginType = (location.state as CreateWithAiLocationStateI | null)?.origin ?? 'list';
 
@@ -84,7 +97,26 @@ const AiSkillCreateWithAi = () => {
     return (
         <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col overflow-hidden">
             <CopilotRuntimeProvider source={Source.SKILLS} suggestions={SKILL_SUGGESTIONS}>
-                <Thread transparent />
+                <Thread
+                    leadingComposerActions={
+                        currentWorkspaceId != null ? (
+                            <ModelPicker
+                                defaultModel={defaultModelData?.aiDefaultModel?.model ?? null}
+                                defaultProvider={defaultModelData?.aiDefaultModel?.provider ?? null}
+                                environment={currentEnvironmentId}
+                                onChange={(provider, model) => {
+                                    writeLastUsedModel(currentWorkspaceId, provider, model);
+                                    setSelectedLlm(provider, model);
+                                }}
+                                selectedModel={selectedLlmModel ?? readLastUsedModel(currentWorkspaceId)?.model ?? null}
+                                selectedProvider={
+                                    selectedLlmProvider ?? readLastUsedModel(currentWorkspaceId)?.provider ?? null
+                                }
+                            />
+                        ) : null
+                    }
+                    transparent
+                />
             </CopilotRuntimeProvider>
         </div>
     );
