@@ -97,10 +97,8 @@ class AiProviderFacadeCatalogTest {
             .map(AiProviderCatalogItemDTO::key)
             .toList();
 
-        // STABILITY is image-only; HUGGING_FACE is no longer supported by Spring AI; AZURE_OPEN_AI needs an
-        // endpoint the catalog doesn't store.
-        assertThat(keys).doesNotContain(
-            "ai.provider.stability", "ai.provider.huggingFace", "ai.provider.azureOpenAi");
+        // STABILITY is image-only; HUGGING_FACE is no longer supported by Spring AI.
+        assertThat(keys).doesNotContain("ai.provider.stability", "ai.provider.huggingFace");
     }
 
     @Test

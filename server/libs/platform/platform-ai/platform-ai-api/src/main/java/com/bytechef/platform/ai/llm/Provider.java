@@ -71,6 +71,9 @@ public enum Provider {
     // Providers that authenticate against a self-hosted server rather than an API key.
     public static final Set<Provider> KEYLESS_PROVIDERS = EnumSet.of(OLLAMA);
 
+    // Providers that require a per-deployment endpoint URL in addition to their credentials.
+    public static final Set<Provider> ENDPOINT_PROVIDERS = EnumSet.of(AZURE_OPEN_AI);
+
     private final int id;
     private final String label;
     private final String key;
@@ -97,6 +100,10 @@ public enum Provider {
 
     public boolean requiresApiKey() {
         return !KEYLESS_PROVIDERS.contains(this);
+    }
+
+    public boolean requiresEndpoint() {
+        return ENDPOINT_PROVIDERS.contains(this);
     }
 
     public int getId() {

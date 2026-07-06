@@ -33,12 +33,19 @@ class CatalogChatModelFactoryTest {
     }
 
     @Test
-    void testCreateChatModelForCatalogOnlyConnectionProviderReturnsNull() {
-        // Azure needs a deployment endpoint the catalog doesn't store; v1 returns null -> caller falls back.
+    void testCreateChatModelForAzureWithoutEndpointReturnsNull() {
         org.springframework.ai.chat.model.ChatModel chatModel =
             factory.createChatModel(Provider.AZURE_OPEN_AI, "gpt-4o", "sk-test-key", null);
 
         assertThat(chatModel).isNull();
+    }
+
+    @Test
+    void testCreateChatModelForAzureWithEndpointReturnsModel() {
+        org.springframework.ai.chat.model.ChatModel chatModel = factory.createChatModel(
+            Provider.AZURE_OPEN_AI, "gpt-4o", "sk-test-key", "https://test-resource.openai.azure.com");
+
+        assertThat(chatModel).isNotNull();
     }
 
     @Test
