@@ -21,6 +21,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.function.Function;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -33,6 +37,8 @@ import org.springframework.ai.tool.ToolCallback;
  */
 public class SkillsSpringAIAgent extends SpringAIAgent {
 
+    private static final Logger log = LoggerFactory.getLogger(SkillsSpringAIAgent.class);
+
     private static final String ADDITIONAL_RULES =
         """
             ## Additional Rules
@@ -41,12 +47,37 @@ public class SkillsSpringAIAgent extends SpringAIAgent {
             - If state.workflowExecutionError is not empty, there is an error and you must instruct the user on how to fix it. The user can't modify the code, only the input parameters. If it's impossible to fix the error, instruct the user to raise an issue on our GitHub https://github.com/bytechefhq/bytechef/issues.
             """;
 
+    private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
+
     protected SkillsSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
+
+        this.overrideChatClientResolver = builder.overrideChatClientResolver;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    protected ChatClient resolveChatClient(RunAgentInput input) {
+        if (overrideChatClientResolver == null) {
+            return super.resolveChatClient(input);
+        }
+
+        try {
+            ChatClient override = overrideChatClientResolver.resolve(input.state());
+
+            if (override != null) {
+                return override;
+            }
+        } catch (RuntimeException exception) {
+            log.warn(
+                "SkillsSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
+                exception.getMessage());
+        }
+
+        return super.resolveChatClient(input);
     }
 
     @Override
@@ -75,6 +106,14 @@ public class SkillsSpringAIAgent extends SpringAIAgent {
     }
 
     public static class Builder extends SpringAIAgent.Builder {
+
+        private @Nullable OverrideChatClientResolver overrideChatClientResolver;
+
+        public Builder overrideChatClientResolver(@Nullable OverrideChatClientResolver overrideChatClientResolver) {
+            this.overrideChatClientResolver = overrideChatClientResolver;
+
+            return this;
+        }
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);

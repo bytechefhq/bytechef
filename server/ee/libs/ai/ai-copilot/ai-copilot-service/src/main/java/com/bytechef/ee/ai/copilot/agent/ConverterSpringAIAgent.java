@@ -54,6 +54,10 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -63,6 +67,8 @@ import org.springframework.ai.tool.ToolCallback;
  * @author Ivona Pavela
  */
 public class ConverterSpringAIAgent extends SpringAIAgent {
+
+    private static final Logger log = LoggerFactory.getLogger(ConverterSpringAIAgent.class);
 
     private static final String ADDITIONAL_RULES =
         """
@@ -106,12 +112,37 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
     private static final Pattern LABEL_PATTERN = Pattern.compile(
         "\\{\\s*\"label\"[\\s\\S]*\\}", Pattern.DOTALL);
 
+    private final @Nullable OverrideChatClientResolver overrideChatClientResolver;
+
     protected ConverterSpringAIAgent(final Builder builder) throws AGUIException {
         super(builder);
+
+        this.overrideChatClientResolver = builder.overrideChatClientResolver;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    protected ChatClient resolveChatClient(RunAgentInput input) {
+        if (overrideChatClientResolver == null) {
+            return super.resolveChatClient(input);
+        }
+
+        try {
+            ChatClient override = overrideChatClientResolver.resolve(input.state());
+
+            if (override != null) {
+                return override;
+            }
+        } catch (RuntimeException exception) {
+            log.warn(
+                "ConverterSpringAIAgent: override ChatClient resolver threw; falling back to default. {}",
+                exception.getMessage());
+        }
+
+        return super.resolveChatClient(input);
     }
 
     @Override
@@ -325,6 +356,14 @@ public class ConverterSpringAIAgent extends SpringAIAgent {
     }
 
     public static class Builder extends SpringAIAgent.Builder {
+
+        private @Nullable OverrideChatClientResolver overrideChatClientResolver;
+
+        public Builder overrideChatClientResolver(@Nullable OverrideChatClientResolver overrideChatClientResolver) {
+            this.overrideChatClientResolver = overrideChatClientResolver;
+
+            return this;
+        }
 
         public Builder chatModel(ChatModel chatModel) {
             super.chatModel(chatModel);
