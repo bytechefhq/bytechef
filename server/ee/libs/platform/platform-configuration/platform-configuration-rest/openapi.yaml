@@ -208,6 +208,10 @@ components:
           description: "Whether this AI provider can be used for embeddings."
           type: "boolean"
           readOnly: true
+        copilotDocsProvider:
+          description: "Whether this AI provider is the one used to embed the shared Copilot documentation."
+          type: "boolean"
+          readOnly: true
     GitConfiguration:
       description: "The git configuration."
       required:

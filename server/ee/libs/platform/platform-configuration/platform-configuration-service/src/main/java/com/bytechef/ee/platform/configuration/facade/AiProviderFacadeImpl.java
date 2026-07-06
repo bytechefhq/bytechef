@@ -227,7 +227,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, url, enabled,
-                    provider.isChatSupported(), provider.isImageSupported(), provider.isEmbeddingSupported());
+                    provider.isChatSupported(), provider.isImageSupported(), provider.isEmbeddingSupported(),
+                    isCopilotDocsProvider(provider));
             })
             .filter(Objects::nonNull)
             .toList();
@@ -276,6 +277,22 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .filter(curProvider -> curProvider.getId() == id)
             .findFirst()
             .orElseThrow(() -> new IllegalArgumentException("Provider not found for id: " + id));
+    }
+
+    private boolean isCopilotDocsProvider(Provider provider) {
+        ApplicationProperties.Ai.Copilot.Docs.Embedding.Provider docsProvider = applicationProperties.getAi()
+            .getCopilot()
+            .getDocs()
+            .getEmbedding()
+            .getProvider();
+
+        if (docsProvider == null || !provider.isEmbeddingSupported()) {
+            return false;
+        }
+
+        return provider.name()
+            .replace("_", "")
+            .equalsIgnoreCase(docsProvider.name());
     }
 
     private static List<AiProviderCatalogItemDTO.Model> readChatModels(ComponentDefinition componentDefinition) {
