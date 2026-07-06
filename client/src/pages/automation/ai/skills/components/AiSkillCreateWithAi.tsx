@@ -95,7 +95,7 @@ const AiSkillCreateWithAi = () => {
     }, [navigate, origin, queryClient]);
 
     return (
-        <div className="mx-auto flex min-h-0 w-full max-w-2xl flex-1 flex-col overflow-hidden">
+        <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden">
             <CopilotRuntimeProvider source={Source.SKILLS} suggestions={SKILL_SUGGESTIONS}>
                 <Thread
                     leadingComposerActions={
