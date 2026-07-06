@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new record.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#create-record"
+    },
     "metadata": null,
     "name": "createRecord",
     "outputDefinition": {
@@ -1200,7 +1203,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a new task.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#create-task"
+    },
     "metadata": null,
     "name": "createTask",
     "outputDefinition": {
@@ -2282,7 +2288,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Updates a record.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#update-record"
+    },
     "metadata": null,
     "name": "updateRecord",
     "outputDefinition": {
@@ -7042,14 +7051,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developers.attio.com/docs/getting-started"
+  },
   "description": "Attio is the AI-native CRM that builds, scales and grows your company to the next level.",
   "icon": "path:assets/attio.svg",
   "inputs": null,
@@ -7064,7 +7079,10 @@
     "deprecated": null,
     "description": "Triggers when new record is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#record-created"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "recordCreated",
@@ -7437,7 +7455,10 @@
     "deprecated": null,
     "description": "Triggers when new task is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/attio_v1#task-created"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "taskCreated",
