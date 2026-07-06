@@ -17,6 +17,7 @@ import com.bytechef.automation.ai.tool.ReadProjectTools;
 import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
+import com.bytechef.automation.configuration.service.PermissionService;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.ConverterSpringAIAgent;
@@ -308,7 +309,7 @@ public class CopilotConfiguration {
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
         WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor,
-        SecurityContextRehydrator securityContextRehydrator,
+        PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -333,6 +334,8 @@ public class CopilotConfiguration {
             .advisor(questionAnswerAdvisor)
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .permissionService(permissionService)
+            .securityContextRehydrator(securityContextRehydrator)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -342,7 +345,7 @@ public class CopilotConfiguration {
         ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
         ProjectWorkflowTools projectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         ScriptTools scriptTools, WorkflowService workflowService, WorkflowNodeOutputFacade workflowNodeOutputFacade,
-        SecurityContextRehydrator securityContextRehydrator,
+        PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
@@ -364,6 +367,8 @@ public class CopilotConfiguration {
             .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .workflowService(workflowService)
             .workflowNodeOutputFacade(workflowNodeOutputFacade)
+            .permissionService(permissionService)
+            .securityContextRehydrator(securityContextRehydrator)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }

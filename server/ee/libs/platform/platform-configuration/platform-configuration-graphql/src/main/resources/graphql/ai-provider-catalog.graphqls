@@ -1,0 +1,26 @@
+extend type Query {
+    aiProviderCatalog(environment: ID!): [AiProviderCatalogItem!]!
+}
+
+type AiProviderCatalogItem {
+    key: String!
+    name: String!
+    icon: String
+    enabled: Boolean!
+    supportsModelById: Boolean!
+    models: [AiProviderModel!]!
+}
+
+type AiProviderModel {
+    name: String!
+    label: String!
+}
+
+extend type Query {
+    aiDefaultModel(environment: ID!): AiDefaultModel
+}
+
+type AiDefaultModel {
+    provider: String!
+    model: String!
+}
