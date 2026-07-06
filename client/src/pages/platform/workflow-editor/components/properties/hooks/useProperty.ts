@@ -1494,11 +1494,20 @@ export const useProperty = ({
                     mentionInputValueRef.current = undefined;
                 }
             } else {
-                setInputValue('');
-                setSelectValue('');
-                setMultiSelectValue([]);
+                const authoritativeValue = parameterValueRef.current;
 
-                setPropertyParameterValue('');
+                const hasAuthoritativeValue =
+                    authoritativeValue !== undefined && authoritativeValue !== null && authoritativeValue !== '';
+
+                if (hasAuthoritativeValue) {
+                    setPropertyParameterValue(authoritativeValue as never);
+                } else {
+                    setInputValue('');
+                    setSelectValue('');
+                    setMultiSelectValue([]);
+
+                    setPropertyParameterValue('');
+                }
             }
 
             return;
@@ -1567,7 +1576,7 @@ export const useProperty = ({
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps -- omit mentionInputValue/inputValue to avoid feedback loop
-    }, [propertyParameterValue, mentionInput, controlType]);
+    }, [propertyParameterValue, parameterValue, mentionInput, controlType]);
 
     // Set options lookup dependencies from the saved workflow parameters. When `control`
     // is provided (array item / dialog form), FormLookupValuesWatcher subscribes to

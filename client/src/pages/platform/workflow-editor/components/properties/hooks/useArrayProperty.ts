@@ -503,6 +503,43 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    // Mount hydration runs once, so after a save updates currentComponent.parameters each item's
+    // cached defaultValue would stay stale and override the user's selection on the next render.
+    // Re-sync existing items' defaultValue from the saved parameters whenever they change.
+    useEffect(() => {
+        if (!currentComponent?.parameters || !name || !path) {
+            return;
+        }
+
+        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedBasePath = encodePath(path);
+
+        setArrayItems((previousItems) => {
+            let changed = false;
+
+            const refreshedItems = previousItems.map((previousItem, index) => {
+                if (Array.isArray(previousItem)) {
+                    return previousItem;
+                }
+
+                const savedValue = safeResolvePath(encodedParameters, `${encodedBasePath}[${index}]`);
+
+                if (savedValue === undefined || savedValue === null || savedValue === previousItem.defaultValue) {
+                    return previousItem;
+                }
+
+                changed = true;
+
+                return {
+                    ...previousItem,
+                    defaultValue: savedValue,
+                };
+            });
+
+            return changed ? refreshedItems : previousItems;
+        });
+    }, [currentComponent?.parameters, name, path]);
+
     return {
         arrayConstraintHint,
         arrayItems,
