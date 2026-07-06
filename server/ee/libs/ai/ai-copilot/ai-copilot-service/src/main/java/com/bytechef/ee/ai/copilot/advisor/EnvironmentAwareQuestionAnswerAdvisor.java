@@ -14,6 +14,8 @@ import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClientRequest;
 import org.springframework.ai.chat.client.ChatClientResponse;
 import org.springframework.ai.chat.client.advisor.api.AdvisorChain;
@@ -28,6 +30,8 @@ import reactor.core.scheduler.Scheduler;
  * @author Ivica Cardic
  */
 public class EnvironmentAwareQuestionAnswerAdvisor implements BaseAdvisor {
+
+    private static final Logger log = LoggerFactory.getLogger(EnvironmentAwareQuestionAnswerAdvisor.class);
 
     private final QuestionAnswerAdvisor delegate;
     private final EmbeddingProviderStatusProvider embeddingProviderStatusProvider;
@@ -48,7 +52,14 @@ public class EnvironmentAwareQuestionAnswerAdvisor implements BaseAdvisor {
     public ChatClientRequest before(ChatClientRequest chatClientRequest, AdvisorChain advisorChain) {
         Integer environment = resolveEnvironment(chatClientRequest);
 
-        if (environment == null || !embeddingProviderStatusProvider.isEmbeddingActive(environment)) {
+        boolean embeddingActive = environment != null && embeddingProviderStatusProvider.isEmbeddingActive(environment);
+        Map<String, @Nullable Object> context = chatClientRequest.context();
+
+        log.trace(
+            "Copilot RAG: advisorContextKeys={}, {}={}, resolvedEnvironment={}, embeddingActive={}", context.keySet(),
+            environmentParamKey, context.get(environmentParamKey), environment, embeddingActive);
+
+        if (!embeddingActive) {
             return chatClientRequest;
         }
 

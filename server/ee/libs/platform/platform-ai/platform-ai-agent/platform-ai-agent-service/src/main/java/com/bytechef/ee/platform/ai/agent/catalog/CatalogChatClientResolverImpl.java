@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.ai.agent.catalog;
 
+import com.bytechef.ee.platform.configuration.dto.AiDefaultModelDTO;
 import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.platform.ai.llm.Provider;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
@@ -74,5 +75,20 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
                 ChatOptions.builder()
                     .model(model))
             .build();
+    }
+
+    @Override
+    public @Nullable ChatClient resolveDefault(int environment) {
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = aiProviderFacade.getAiDefaultChatModel(environment);
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolve(defaultModel.provider(), defaultModel.model(), environment);
     }
 }

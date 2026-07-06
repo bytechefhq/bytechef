@@ -57,26 +57,26 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             return null;
         }
 
-        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
-        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
+        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
 
-        if (llmProvider == null || llmModel == null) {
-            if ((llmProvider == null) != (llmModel == null)) {
-                log.warn(
-                    "Copilot user-selected LLM half-set (provider={}, model={}); falling back to workspace default",
-                    llmProvider, llmModel);
-            }
-
+        if (environmentId == null) {
             return null;
         }
 
-        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
+        String llmProvider = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_PROVIDER));
+        String llmModel = StringUtils.asString(state.get(CopilotConstants.STATE_USER_SELECTED_LLM_MODEL));
 
-        if (environmentId != null) {
+        if (llmProvider != null && llmModel != null) {
             return catalogChatClientResolver.resolve(llmProvider, llmModel, environmentId.intValue());
         }
 
-        return null;
+        if ((llmProvider == null) != (llmModel == null)) {
+            log.warn(
+                "Copilot user-selected LLM half-set (provider={}, model={}); using the environment default",
+                llmProvider, llmModel);
+        }
+
+        return catalogChatClientResolver.resolveDefault(environmentId.intValue());
     }
 
     // ---------------------------------------------------------------------------------------------------------------
