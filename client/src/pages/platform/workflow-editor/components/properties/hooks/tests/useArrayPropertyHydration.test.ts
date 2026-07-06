@@ -202,4 +202,60 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         expect(items[1].defaultValue).toBe('wqewqe');
         expect(items[2].defaultValue).toBe('rrrr');
     });
+
+    it('preserves expressionEnabled:false from the item definition on hydration (skills scenario)', async () => {
+        // Regression for the skillsTool "Dynamic" toggle: the item definition
+        // (integer(SKILL_ID).expressionEnabled(false)) must survive hydration so
+        // Property.tsx hides the dynamic/expression toggle. The scalar hydration
+        // branch previously hardcoded expressionEnabled: true, clobbering it.
+        hoisted.storeState.currentComponent = {
+            componentName: 'aiAgentUtils',
+            metadata: {
+                ui: {
+                    dynamicPropertyTypes: {
+                        'skills[0]': 'INTEGER',
+                        'skills[1]': 'INTEGER',
+                    },
+                },
+            },
+            parameters: {
+                skills: [1, 2],
+            },
+            workflowNodeName: 'aiAgentUtils_1',
+        };
+
+        const {useArrayProperty} = await import('../useArrayProperty');
+
+        const {result} = renderHook(() =>
+            useArrayProperty({
+                onDeleteClick: vi.fn(),
+                path: 'skills',
+                property: {
+                    controlType: 'ARRAY_BUILDER',
+                    items: [
+                        {
+                            controlType: 'SELECT',
+                            expressionEnabled: false,
+                            label: 'Skill',
+                            name: 'skillId',
+                            type: 'INTEGER',
+                        },
+                    ],
+                    name: 'skills',
+                    type: 'ARRAY',
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any,
+            })
+        );
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        const items = result.current.arrayItems as Array<{expressionEnabled: boolean}>;
+
+        expect(items).toHaveLength(2);
+        expect(items[0].expressionEnabled).toBe(false);
+        expect(items[1].expressionEnabled).toBe(false);
+    });
 });
