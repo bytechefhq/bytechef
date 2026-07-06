@@ -73,6 +73,12 @@ export interface AiProvider {
      * @memberof AiProvider
      */
     readonly supportsEmbeddings?: boolean;
+    /**
+     * Whether this AI provider is the one used to embed the shared Copilot documentation.
+     * @type {boolean}
+     * @memberof AiProvider
+     */
+    readonly copilotDocsProvider?: boolean;
 }
 
 /**
@@ -102,6 +108,7 @@ export function AiProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'supportsText': json['supportsText'] == null ? undefined : json['supportsText'],
         'supportsImage': json['supportsImage'] == null ? undefined : json['supportsImage'],
         'supportsEmbeddings': json['supportsEmbeddings'] == null ? undefined : json['supportsEmbeddings'],
+        'copilotDocsProvider': json['copilotDocsProvider'] == null ? undefined : json['copilotDocsProvider'],
     };
 }
 
@@ -109,7 +116,7 @@ export function AiProviderToJSON(json: any): AiProvider {
     return AiProviderToJSONTyped(json, false);
 }
 
-export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'|'supportsText'|'supportsImage'|'supportsEmbeddings'> | null, ignoreDiscriminator: boolean = false): any {
+export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'|'supportsText'|'supportsImage'|'supportsEmbeddings'|'copilotDocsProvider'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }

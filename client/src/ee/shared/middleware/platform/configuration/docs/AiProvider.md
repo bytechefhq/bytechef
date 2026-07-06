@@ -16,6 +16,7 @@ Name | Type
 `supportsText` | boolean
 `supportsImage` | boolean
 `supportsEmbeddings` | boolean
+`copilotDocsProvider` | boolean
 
 ## Example
 
@@ -33,6 +34,7 @@ const example = {
   "supportsText": null,
   "supportsImage": null,
   "supportsEmbeddings": null,
+  "copilotDocsProvider": null,
 } satisfies AiProvider
 
 console.log(example)
