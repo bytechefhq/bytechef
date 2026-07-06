@@ -110,6 +110,14 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                                     weight="semibold"
                                                 />
                                             )}
+
+                                            {aiProvider.copilotDocsProvider && (
+                                                <Badge
+                                                    label="Copilot Docs"
+                                                    styleType="primary-outline"
+                                                    weight="semibold"
+                                                />
+                                            )}
                                         </span>
 
                                         <span className="text-xs text-muted-foreground">
