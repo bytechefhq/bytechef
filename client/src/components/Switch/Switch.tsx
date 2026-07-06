@@ -28,12 +28,12 @@ type SwitchPropsType = LabeledSwitchProps | PlainSwitchProps;
 const variantSizeConfig: Record<VariantType, {size: 'sm' | 'default'; track: string}> = {
     default: {
         size: 'default',
-        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0',
+        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0 [&_[data-slot=switch-thumb][data-state=checked]]:translate-x-full',
     },
     // eslint-disable-next-line sort-keys
     box: {
         size: 'default',
-        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0',
+        track: 'data-[size=default]:h-5 data-[size=default]:w-9 px-0.5 rounded-full border-0 [&_[data-slot=switch-thumb][data-state=checked]]:translate-x-full',
     },
     small: {
         size: 'sm',
