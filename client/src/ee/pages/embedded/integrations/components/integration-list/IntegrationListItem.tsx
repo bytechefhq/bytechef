@@ -46,7 +46,7 @@ import {
     UploadIcon,
     WorkflowIcon,
 } from 'lucide-react';
-import {ChangeEvent, useRef, useState} from 'react';
+import {ChangeEvent, useCallback, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link, useNavigate, useSearchParams} from 'react-router-dom';
 import {toast} from 'sonner';
@@ -63,6 +63,7 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
 
     const hiddenFileInputRef = useRef<HTMLInputElement>(null);
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const {captureIntegrationWorkflowCreated, captureIntegrationWorkflowImported} = useAnalytics();
 
@@ -136,9 +137,37 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
         }
     };
 
+    const handleIntegrationListItemClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+            'button',
+            'input',
+            'svg',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+
+        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        workflowsCollapsibleTriggerRef.current?.click();
+    }, []);
+
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                onClick={(event) => handleIntegrationListItemClick(event)}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -175,7 +204,10 @@ const IntegrationListItem = ({integration, remainingTags}: IntegrationItemProps)
 
                         <div className="relative mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground">
+                                <CollapsibleTrigger
+                                    className="group mr-4 flex items-center text-xs font-semibold text-muted-foreground"
+                                    ref={workflowsCollapsibleTriggerRef}
+                                >
                                     <div className="mr-1">
                                         {integration.integrationWorkflowIds?.length === 1
                                             ? `${integration.integrationWorkflowIds?.length} workflow`

@@ -5,7 +5,7 @@ import {
     useUpdateMcpServerTagsMutation,
 } from '@/shared/middleware/graphql';
 import {useQueryClient} from '@tanstack/react-query';
-import {useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 
 const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -14,6 +14,8 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
     const [showWorkflowDialog, setShowWorkflowDialog] = useState(false);
     const [isPending, setIsPending] = useState(false);
     const [isEnablePending, setIsEnablePending] = useState(false);
+
+    const toolsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const mcpServerTagIds = mcpServer.tags?.map((tag) => tag?.id);
 
@@ -28,6 +30,31 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
             queryClient.invalidateQueries({queryKey: ['mcpServerTags']});
         },
     });
+
+    const handleMcpServerListItemClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+            'button',
+            'input',
+            'svg',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+
+        if (toolsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        toolsCollapsibleTriggerRef.current?.click();
+    }, []);
 
     const handleOnCheckedChange = async (value: boolean) => {
         setIsEnablePending(true);
@@ -75,6 +102,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
 
     return {
         handleDeleteClick,
+        handleMcpServerListItemClick,
         handleOnCheckedChange,
         isEnablePending,
         isPending,
@@ -87,6 +115,7 @@ const useMcpServerListItem = (mcpServer: McpServer) => {
         showEditDialog,
         showMcpComponentDialog,
         showWorkflowDialog,
+        toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     };
 };
