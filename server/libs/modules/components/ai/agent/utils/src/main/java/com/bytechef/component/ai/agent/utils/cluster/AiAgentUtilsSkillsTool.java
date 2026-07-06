@@ -107,11 +107,13 @@ public class AiAgentUtilsSkillsTool implements AiAgentUtilsClusterElementContrib
                         .label("Skills")
                         .description("Select skills to make available to the agent.")
                         .placeholder("Choose a skill...")
+                        .expressionEnabled(false)
                         .items(
                             integer(SKILL_ID)
                                 .label("Skill")
                                 .options(
                                     (ClusterElementDefinition.OptionsFunction<Long>) this::getSkillOptions)
+                                .expressionEnabled(false)
                                 .required(true)))
                 .object(() -> this::apply);
     }
