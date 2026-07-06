@@ -34,7 +34,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T18:25:47.807213+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T23:46:41.082636+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "ai-provider", description = "The Platform AI Provider Internal API")
 public interface AiProviderApi {
@@ -137,7 +137,7 @@ public interface AiProviderApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "[ { \"supportsImage\" : true, \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"supportsText\" : true, \"url\" : \"url\", \"enabled\" : true }, { \"supportsImage\" : true, \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"id\" : 0, \"supportsText\" : true, \"url\" : \"url\", \"enabled\" : true } ]";
+                    String exampleString = "[ { \"supportsImage\" : true, \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"copilotDocsProvider\" : true, \"id\" : 0, \"supportsText\" : true, \"url\" : \"url\", \"enabled\" : true }, { \"supportsImage\" : true, \"apiKey\" : \"apiKey\", \"supportsEmbeddings\" : true, \"name\" : \"name\", \"icon\" : \"icon\", \"copilotDocsProvider\" : true, \"id\" : 0, \"supportsText\" : true, \"url\" : \"url\", \"enabled\" : true } ]";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
