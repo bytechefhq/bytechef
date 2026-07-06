@@ -18,6 +18,7 @@ import com.bytechef.automation.ai.tool.ReadProjectWorkflowTools;
 import com.bytechef.automation.ai.tool.ScriptTools;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.ai.copilot.advisor.EnvironmentAwareQuestionAnswerAdvisor;
 import com.bytechef.ee.ai.copilot.agent.ClusterElementSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.CodeEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.ConverterSpringAIAgent;
@@ -25,6 +26,7 @@ import com.bytechef.ee.ai.copilot.agent.CopilotChatClientResolver;
 import com.bytechef.ee.ai.copilot.agent.SkillsSpringAIAgent;
 import com.bytechef.ee.ai.copilot.agent.WorkflowEditorSpringAIAgent;
 import com.bytechef.ee.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.ai.copilot.tool.AskUserQuestionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ee.ai.copilot.tool.ListConnectionsForComponentToolCallback;
@@ -53,6 +55,7 @@ import com.bytechef.platform.component.service.ActionDefinitionService;
 import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
+import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -62,7 +65,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.support.ToolCallbacks;
@@ -266,9 +269,11 @@ public class CopilotConfiguration {
     }
 
     @Bean
-    QuestionAnswerAdvisor questionAnswerAdvisor(VectorStore copilotPgVectorStore) {
-        return QuestionAnswerAdvisor.builder(copilotPgVectorStore)
-            .build();
+    Advisor questionAnswerAdvisor(
+        VectorStore copilotPgVectorStore, EmbeddingProviderStatusProvider embeddingProviderStatusProvider) {
+
+        return new EnvironmentAwareQuestionAnswerAdvisor(
+            copilotPgVectorStore, embeddingProviderStatusProvider, CopilotConstants.STATE_ENVIRONMENT_ID);
     }
 
     private List<ToolCallback> interactivePickerToolCallbacks() {
@@ -308,7 +313,7 @@ public class CopilotConfiguration {
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
         Optional<FirecrawlTools> firecrawlTools, WorkflowService workflowService,
-        WorkflowNodeOutputFacade workflowNodeOutputFacade, QuestionAnswerAdvisor questionAnswerAdvisor,
+        WorkflowNodeOutputFacade workflowNodeOutputFacade, Advisor questionAnswerAdvisor,
         PermissionService permissionService, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
@@ -482,7 +487,7 @@ public class CopilotConfiguration {
     ChatClient workflowEditorAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ComponentTools componentTools, TaskTools taskTools,
-        Optional<FirecrawlTools> firecrawlTools, QuestionAnswerAdvisor questionAnswerAdvisor) {
+        Optional<FirecrawlTools> firecrawlTools, Advisor questionAnswerAdvisor) {
 
         ChatClient.Builder builder = ChatClient.builder(chatModel)
             .defaultSystem(getSystemPrompt(promptWorkflowEditorAskResource))
