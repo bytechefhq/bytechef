@@ -31,8 +31,6 @@ const McpComponentToolList = ({
 
     const tools = mcpTools?.filter((tool): tool is McpTool => tool !== null && tool.name !== null) || [];
 
-    // Tool descriptions aren't persisted on the McpTool row; resolve them from the component definition's
-    // TOOLS cluster elements (matched by name), the same source the tool-selection dialog uses.
     const toolDescriptionsByName = useMemo(() => {
         const descriptions: Record<string, string> = {};
 
