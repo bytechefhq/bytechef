@@ -18,7 +18,7 @@ import TagList from '@/shared/components/TagList';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useState} from 'react';
+import {useCallback, useRef, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 
 import IntegrationInstanceConfigurationDialog from '../integration-instance-configuration-dialog/IntegrationInstanceConfigurationDialog';
@@ -40,6 +40,8 @@ const IntegrationInstanceConfigurationListItem = ({
     const setIntegrationInstanceConfigurationEnabled = useIntegrationInstanceConfigurationsEnabledStore(
         ({setIntegrationInstanceConfigurationEnabled}) => setIntegrationInstanceConfigurationEnabled
     );
+
+    const workflowsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const workflowCount = integrationInstanceConfiguration.integrationInstanceConfigurationWorkflows?.length ?? 0;
 
@@ -79,6 +81,31 @@ const IntegrationInstanceConfigurationListItem = ({
         },
     });
 
+    const handleIntegrationInstanceConfigurationListItemClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+            'button',
+            'input',
+            'svg',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+
+        if (workflowsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        workflowsCollapsibleTriggerRef.current?.click();
+    }, []);
+
     const handleOnCheckedChange = (value: boolean) => {
         enableIntegrationInstanceConfigurationMutation.mutate(
             {
@@ -99,7 +126,10 @@ const IntegrationInstanceConfigurationListItem = ({
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                onClick={(event) => handleIntegrationInstanceConfigurationListItemClick(event)}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -125,6 +155,7 @@ const IntegrationInstanceConfigurationListItem = ({
                                     <CollapsibleTrigger
                                         className="group mr-4 flex text-xs font-semibold text-muted-foreground"
                                         disabled={workflowCount === 0}
+                                        ref={workflowsCollapsibleTriggerRef}
                                     >
                                         <span className="mr-1">
                                             {workflowCount === 1 ? `1 workflow` : `${workflowCount} workflows`}

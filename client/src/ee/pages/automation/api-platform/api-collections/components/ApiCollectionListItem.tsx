@@ -18,7 +18,7 @@ import {useEnableProjectDeploymentMutation} from '@/shared/mutations/automation/
 import {useGetProjectDeploymentQuery} from '@/shared/queries/automation/projectDeployments.queries';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChevronDownIcon} from 'lucide-react';
-import {useMemo, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 
 interface ApiCollectionListItemProps {
     apiCollection: ApiCollection;
@@ -34,6 +34,8 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
     const setApiCollectionEnabled = useApiCollectionsEnabledStore(
         ({setApiCollectionEnabled}) => setApiCollectionEnabled
     );
+
+    const endpointsCollapsibleTriggerRef = useRef<HTMLButtonElement | null>(null);
 
     const apiCollectionTagIds = apiCollection.tags?.map((tag) => tag.id);
 
@@ -68,6 +70,31 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
         },
     });
 
+    const handleApiCollectionListItemClick = useCallback((event: React.MouseEvent) => {
+        const target = event.target as HTMLElement;
+
+        const interactiveSelectors = [
+            '[data-interactive]',
+            '.dropdown-menu-item',
+            '[data-radix-dropdown-menu-item]',
+            '[data-radix-dropdown-menu-trigger]',
+            '[data-radix-collapsible-trigger]',
+            'button',
+            'input',
+            'svg',
+        ].join(', ');
+
+        if (target.closest(interactiveSelectors)) {
+            return;
+        }
+
+        if (endpointsCollapsibleTriggerRef.current?.contains(target)) {
+            return;
+        }
+
+        endpointsCollapsibleTriggerRef.current?.click();
+    }, []);
+
     const handleOnCheckedChange = (value: boolean) => {
         enableProjectDeploymentMutation.mutate(
             {
@@ -98,7 +125,10 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                onClick={(event) => handleApiCollectionListItemClick(event)}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -119,7 +149,10 @@ const ApiCollectionListItem = ({apiCollection, tags}: ApiCollectionListItemProps
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-gray-700">
+                                <CollapsibleTrigger
+                                    className="group mr-4 flex text-xs font-semibold text-gray-700"
+                                    ref={endpointsCollapsibleTriggerRef}
+                                >
                                     <span className="mr-1">
                                         {apiCollection.endpoints?.length === 1
                                             ? `1 endpoint`

@@ -23,6 +23,7 @@ interface McpServerListItemProps {
 const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpServer, tags}: McpServerListItemProps) => {
     const {
         handleDeleteClick,
+        handleMcpServerListItemClick,
         handleOnCheckedChange,
         isEnablePending,
         mcpServerTagIds,
@@ -34,12 +35,16 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
         showEditDialog,
         showMcpComponentDialog,
         showWorkflowDialog,
+        toolsCollapsibleTriggerRef,
         updateMcpServerTagsMutation,
     } = useMcpServerListItem(mcpServer);
 
     return (
         <>
-            <div className="flex w-full items-center justify-between rounded-md px-2 hover:bg-gray-50">
+            <div
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-gray-50"
+                onClick={(event) => handleMcpServerListItemClick(event)}
+            >
                 <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
@@ -54,7 +59,10 @@ const McpServerListItem = ({mcpIntegrationInstanceConfigurationWorkflows, mcpSer
 
                         <div className="mt-2 sm:flex sm:items-center sm:justify-between">
                             <div className="flex items-center">
-                                <CollapsibleTrigger className="group mr-4 flex text-xs font-semibold text-muted-foreground">
+                                <CollapsibleTrigger
+                                    className="group mr-4 flex text-xs font-semibold text-muted-foreground"
+                                    ref={toolsCollapsibleTriggerRef}
+                                >
                                     <span className="mr-1">
                                         {mcpServer.mcpComponents?.length === 1
                                             ? `1 component`
