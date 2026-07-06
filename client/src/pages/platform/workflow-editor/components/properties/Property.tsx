@@ -288,14 +288,17 @@ const Property = ({
                                                 />
                                             )}
 
-                                            {!showInputTypeSwitchButton && control && isToolsClusterElement && (
-                                                <PropertyInputTypeSwitch
-                                                    handleClick={() =>
-                                                        handleControlledModeSwitch(!controlledDynamicMode)
-                                                    }
-                                                    mentionInput={controlledDynamicMode}
-                                                />
-                                            )}
+                                            {!showInputTypeSwitchButton &&
+                                                control &&
+                                                isToolsClusterElement &&
+                                                expressionEnabled !== false && (
+                                                    <PropertyInputTypeSwitch
+                                                        handleClick={() =>
+                                                            handleControlledModeSwitch(!controlledDynamicMode)
+                                                        }
+                                                        mentionInput={controlledDynamicMode}
+                                                    />
+                                                )}
 
                                             {deletePropertyButton}
                                         </div>
@@ -644,7 +647,7 @@ const Property = ({
                                         optionsLoadedDynamically={optionsLoadedDynamically}
                                         path={calculatedPath}
                                         required={required}
-                                        showInputTypeSwitchButton={isToolsClusterElement}
+                                        showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                         workflowId={workflow.id!}
                                         workflowNodeName={currentNode?.name ?? ''}
@@ -683,7 +686,7 @@ const Property = ({
                                             {label: 'True', value: 'true'},
                                             {label: 'False', value: 'false'},
                                         ]}
-                                        showInputTypeSwitchButton={isToolsClusterElement}
+                                        showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
                                         value={fieldValue !== undefined ? fieldValue : selectValue}
                                     />
                                 )}
@@ -735,7 +738,7 @@ const Property = ({
                                     optionsDataSource={optionsDataSource}
                                     path={calculatedPath}
                                     property={property}
-                                    showInputTypeSwitchButton={isToolsClusterElement}
+                                    showInputTypeSwitchButton={isToolsClusterElement && expressionEnabled !== false}
                                     value={(value as string[]) || []}
                                     workflowId={workflow.id!}
                                 />
