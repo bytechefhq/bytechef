@@ -256,10 +256,10 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
         <>
             <div
                 aria-label={`${project.name}_container`}
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
                 onClick={(event) => handleProjectListItemClick(event)}
             >
-                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div
                         aria-label={project.id?.toString() ?? project.name}
                         className="flex-1"

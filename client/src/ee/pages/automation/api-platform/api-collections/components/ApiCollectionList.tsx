@@ -9,7 +9,7 @@ const ApiCollectionList = ({apiCollections, tags}: {apiCollections: ApiCollectio
         <>
             {apiCollections.map((apiCollection) => {
                 return (
-                    <Collapsible className="group" key={apiCollection.id}>
+                    <Collapsible className="group mb-2 rounded border border-border/50" key={apiCollection.id}>
                         <ApiCollectionListItem apiCollection={apiCollection} tags={tags} />
 
                         <CollapsibleContent>

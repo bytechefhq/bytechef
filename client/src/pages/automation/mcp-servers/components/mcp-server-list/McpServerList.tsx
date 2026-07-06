@@ -36,16 +36,16 @@ const McpServerList = ({mcpServers, tags}: McpServerListProps) => {
     const workflowReadOnlyValue = useMemo(() => ({useGetComponentDefinitionsQuery}), []);
 
     return (
-        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             <WorkflowReadOnlyProvider value={workflowReadOnlyValue}>
                 {sortedMcpServers.map((mcpServer) => {
                     const handleRefresh = createHandleRefresh(mcpServer.id!);
 
                     return (
-                        <Collapsible className="group" key={mcpServer.id}>
+                        <Collapsible className="group mb-2 rounded border border-border/50" key={mcpServer.id}>
                             <McpServerListItemWithWorkflows key={mcpServer.id} mcpServer={mcpServer} tags={tags} />
 
-                            <CollapsibleContent className="mt-1">
+                            <CollapsibleContent className="mx-3 mt-1">
                                 <Tabs defaultValue="tools">
                                     <TabsList>
                                         <TabsTrigger value="tools">Tools</TabsTrigger>

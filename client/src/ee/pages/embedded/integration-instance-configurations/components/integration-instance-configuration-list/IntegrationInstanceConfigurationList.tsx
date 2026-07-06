@@ -62,7 +62,10 @@ const IntegrationInstanceConfigurationList = ({
                         }
 
                         return (
-                            <Collapsible className="group" key={integrationInstanceConfiguration.id}>
+                            <Collapsible
+                                className="group mb-2 rounded border border-border/50"
+                                key={integrationInstanceConfiguration.id}
+                            >
                                 <IntegrationInstanceConfigurationListItem
                                     integrationInstanceConfiguration={integrationInstanceConfiguration}
                                     key={integrationInstanceConfiguration.id}

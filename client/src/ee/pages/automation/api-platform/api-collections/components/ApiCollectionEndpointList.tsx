@@ -30,7 +30,7 @@ const ApiCollectionEndpointList = ({
     const {data: projectDeployment} = useGetProjectDeploymentQuery(projectDeploymentId);
 
     return (
-        <div className="border-b border-b-border/50 py-3 pl-4">
+        <div className="p-3">
             {apiCollectionEndpoints && apiCollectionEndpoints.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">

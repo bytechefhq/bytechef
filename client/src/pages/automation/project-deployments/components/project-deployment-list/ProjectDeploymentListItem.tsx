@@ -111,10 +111,10 @@ const ProjectDeploymentListItem = ({projectDeployment, remainingTags}: ProjectDe
     return (
         <>
             <div
-                className="flex w-full cursor-pointer items-center justify-between rounded-md px-2 hover:bg-destructive-foreground"
+                className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 hover:bg-destructive-foreground"
                 onClick={(event) => handleProjectDeploymentListItemClick(event)}
             >
-                <div className="flex flex-1 items-center py-5 group-data-[state='open']:border-none">
+                <div className="flex flex-1 items-center py-3 group-data-[state='open']:border-none">
                     <div className="flex-1">
                         <div className="flex items-center justify-between">
                             <div className="flex w-full items-center gap-2">

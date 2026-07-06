@@ -128,10 +128,10 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     };
 
     return (
-        <li key={connection.id}>
+        <li className="mb-2 rounded border border-border/50" key={connection.id}>
             <>
-                <div className="group flex items-center rounded-md bg-white px-2 hover:bg-gray-50">
-                    <div className="flex flex-1 items-center py-5">
+                <div className="group flex items-center rounded-md bg-white px-3 hover:bg-gray-50">
+                    <div className="flex flex-1 items-center py-3">
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
                                 <div className="relative flex items-center gap-2">
@@ -150,10 +150,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
                             </div>
 
                             <div className="mt-2 sm:flex sm:items-center sm:justify-between">
-                                <div
-                                    className="flex h-connection-list-item-taglist-height items-center"
-                                    onClick={(event) => event.preventDefault()}
-                                >
+                                <div className="flex items-center" onClick={(event) => event.preventDefault()}>
                                     {connection.tags && (
                                         <TagList
                                             getRequest={(id, tags) => ({

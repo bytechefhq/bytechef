@@ -40,7 +40,7 @@ const ProjectDeploymentWorkflowList = ({
 
     if (!componentDefinitions || !taskDispatcherDefinitions || isProjectWorkflowsLoading) {
         return (
-            <div className="space-y-3 py-2">
+            <div className="space-y-3 p-3">
                 <Skeleton className="h-5 w-40" />
 
                 {[1, 2].map((value) => (
@@ -113,7 +113,7 @@ const ProjectDeploymentWorkflowList = ({
     });
 
     return (
-        <div className="border-b border-b-gray-100 py-3 pl-4">
+        <div className="p-3">
             <h3 className="flex justify-start pl-2 text-sm heading-tertiary">Workflows</h3>
 
             {enabledWorkflows.length === 0 ? (

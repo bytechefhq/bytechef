@@ -16,7 +16,7 @@ const KnowledgeBaseList = ({allTags, knowledgeBases, tagsByKnowledgeBaseData}: K
     });
 
     return (
-        <div className="w-full divide-y divide-border/50 px-4 3xl:mx-auto 3xl:w-4/5">
+        <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
             {sortedKnowledgeBases.map((knowledgeBase) => {
                 const currentTags = tagsByKnowledgeBaseMap.get(knowledgeBase.id) || [];
 
