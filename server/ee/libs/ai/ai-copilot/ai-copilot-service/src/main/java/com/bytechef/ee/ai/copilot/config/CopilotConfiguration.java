@@ -382,7 +382,8 @@ public class CopilotConfiguration {
     ConverterSpringAIAgent converterBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ProjectTools projectTools,
         ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
-        SecurityContextRehydrator securityContextRehydrator)
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
         String name = Source.CONVERTER.name() + "_" + Mode.BUILD.name();
@@ -399,6 +400,7 @@ public class CopilotConfiguration {
                     List.of(
                         projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                         workflowInstructionTools)))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
 
@@ -406,7 +408,8 @@ public class CopilotConfiguration {
     SkillsSpringAIAgent skillsAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
-        SecurityContextRehydrator securityContextRehydrator)
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
         String name = Source.SKILLS.name() + "_" + Mode.ASK.name();
@@ -423,6 +426,7 @@ public class CopilotConfiguration {
                     List.of(
                         readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
                         workflowInstructionTools)))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
 
@@ -430,7 +434,8 @@ public class CopilotConfiguration {
     SkillsSpringAIAgent skillsBuildSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, SkillsTools skillsTools,
-        SecurityContextRehydrator securityContextRehydrator)
+        SecurityContextRehydrator securityContextRehydrator,
+        ObjectProvider<CopilotChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
         String name = Source.SKILLS.name() + "_" + Mode.BUILD.name();
@@ -447,6 +452,7 @@ public class CopilotConfiguration {
                     List.of(
                         skillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
                         workflowInstructionTools)))
+            .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
 
