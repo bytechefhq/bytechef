@@ -258,4 +258,65 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         expect(items[0].expressionEnabled).toBe(false);
         expect(items[1].expressionEnabled).toBe(false);
     });
+
+    it('re-syncs an item defaultValue from parameters after a save changes it', async () => {
+        // Regression for the skills reset: mount hydration runs once, so after a save updates
+        // currentComponent.parameters the cached defaultValue must re-sync, otherwise the stale
+        // value overrides the user's selection and the row appears to revert.
+        hoisted.storeState.currentComponent = {
+            componentName: 'aiAgentUtils',
+            metadata: {
+                ui: {
+                    dynamicPropertyTypes: {
+                        'skills[0]': 'INTEGER',
+                        'skills[1]': 'INTEGER',
+                    },
+                },
+            },
+            parameters: {
+                skills: [1057, 1060],
+            },
+            workflowNodeName: 'aiAgentUtils_1',
+        };
+
+        const {useArrayProperty} = await import('../useArrayProperty');
+
+        const {rerender, result} = renderHook(() =>
+            useArrayProperty({
+                onDeleteClick: vi.fn(),
+                path: 'skills',
+                property: {
+                    controlType: 'ARRAY_BUILDER',
+                    items: [{controlType: 'SELECT', name: 'skillId', type: 'INTEGER'}],
+                    name: 'skills',
+                    type: 'ARRAY',
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                } as any,
+            })
+        );
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        let items = result.current.arrayItems as Array<{defaultValue: unknown}>;
+
+        expect(items[0].defaultValue).toBe(1057);
+
+        hoisted.storeState.currentComponent = {
+            ...hoisted.storeState.currentComponent,
+            parameters: {skills: [1099, 1060]},
+        };
+
+        rerender();
+
+        await act(async () => {
+            await Promise.resolve();
+        });
+
+        items = result.current.arrayItems as Array<{defaultValue: unknown}>;
+
+        expect(items[0].defaultValue).toBe(1099);
+        expect(items[1].defaultValue).toBe(1060);
+    });
 });
