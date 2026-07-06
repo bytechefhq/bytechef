@@ -1,12 +1,17 @@
+import Button from '@/components/Button/Button';
+import EmptyList from '@/components/EmptyList';
 import {Skeleton} from '@/components/ui/skeleton';
 import McpComponentListItem from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/McpComponentListItem';
 import useMcpComponentList from '@/ee/pages/embedded/mcp-servers/components/mcp-component-list/hooks/useMcpComponentList';
+import McpComponentDialog from '@/pages/automation/mcp-servers/components/mcp-component-dialog/McpComponentDialog';
 import {McpComponentsByServerIdQuery, McpServer} from '@/shared/middleware/graphql';
-import {useMemo} from 'react';
+import {ComponentIcon} from 'lucide-react';
+import {useMemo, useState} from 'react';
 
 type McpComponentItemType = NonNullable<NonNullable<McpComponentsByServerIdQuery['mcpComponentsByServerId']>[number]>;
 
 const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
+    const [showAddDialog, setShowAddDialog] = useState(false);
     const {data, isMcpComponentsLoading} = useMcpComponentList(mcpServer.id!);
 
     const sortedComponents = useMemo<McpComponentItemType[]>(
@@ -46,10 +51,30 @@ const McpComponentList = ({mcpServer}: {mcpServer: McpServer}) => {
     }
 
     return (
-        <div className="flex flex-col gap-1.5 py-2">
-            {sortedComponents.map((mcpComponent) => (
-                <McpComponentListItem key={mcpComponent.id} mcpComponent={mcpComponent} mcpServer={mcpServer} />
-            ))}
+        <div>
+            {sortedComponents.length > 0 ? (
+                <div className="flex flex-col gap-1.5">
+                    {sortedComponents.map((mcpComponent) => (
+                        <McpComponentListItem key={mcpComponent.id} mcpComponent={mcpComponent} mcpServer={mcpServer} />
+                    ))}
+                </div>
+            ) : (
+                <div className="flex justify-center py-8">
+                    <EmptyList
+                        button={<Button label="Add Component" onClick={() => setShowAddDialog(true)} />}
+                        icon={<ComponentIcon className="size-24 text-gray-300" />}
+                        message="Get started by creating a new component."
+                        title="No Components"
+                    />
+
+                    <McpComponentDialog
+                        mcpComponent={undefined}
+                        mcpServerId={mcpServer.id!}
+                        onOpenChange={setShowAddDialog}
+                        open={showAddDialog}
+                    />
+                </div>
+            )}
         </div>
     );
 };

@@ -12,6 +12,7 @@ interface McpComponentToolListItemProps {
     componentName: string;
     componentVersion: number;
     connectionId?: string | null;
+    description?: string | null;
     mcpTool: McpTool;
 }
 
@@ -19,6 +20,7 @@ const McpComponentToolListItem = ({
     componentName,
     componentVersion,
     connectionId,
+    description,
     mcpTool,
 }: McpComponentToolListItemProps) => {
     const {handleConfirmDelete, setShowDeleteDialog, showDeleteDialog} = useMcpComponentToolDropdownMenu({mcpTool});
@@ -34,7 +36,11 @@ const McpComponentToolListItem = ({
         <>
             <Popover onOpenChange={(open) => !open && closePopover()} open={isPopoverOpen}>
                 <div className="flex items-center gap-2 py-0.5">
-                    <span className="min-w-0 flex-1 truncate text-sm font-medium">{mcpTool.title || mcpTool.name}</span>
+                    <div className="flex min-w-0 flex-1 flex-col">
+                        <span className="truncate text-sm font-medium">{mcpTool.title || mcpTool.name}</span>
+
+                        {description && <span className="truncate text-xs text-muted-foreground">{description}</span>}
+                    </div>
 
                     <div className="flex shrink-0 items-center gap-0.5">
                         <PopoverAnchor asChild>
