@@ -52,6 +52,7 @@ public enum Provider {
 
     public static final Set<Provider> CHAT_PROVIDERS = EnumSet.of(
         ANTHROPIC,
+        AZURE_OPEN_AI,
         DEEPSEEK,
         GROQ,
         MISTRAL,
@@ -59,6 +60,12 @@ public enum Provider {
         OLLAMA,
         OPEN_AI,
         PERPLEXITY,
+        VERTEX_GEMINI);
+
+    public static final Set<Provider> IMAGE_PROVIDERS = EnumSet.of(
+        AZURE_OPEN_AI,
+        OPEN_AI,
+        STABILITY,
         VERTEX_GEMINI);
 
     // Providers that authenticate against a self-hosted server rather than an API key.
@@ -78,6 +85,14 @@ public enum Provider {
 
     public boolean isEmbeddingSupported() {
         return EMBEDDING_PROVIDERS.contains(this);
+    }
+
+    public boolean isChatSupported() {
+        return CHAT_PROVIDERS.contains(this);
+    }
+
+    public boolean isImageSupported() {
+        return IMAGE_PROVIDERS.contains(this);
     }
 
     public boolean requiresApiKey() {
