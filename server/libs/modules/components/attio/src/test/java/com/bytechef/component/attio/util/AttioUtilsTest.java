@@ -25,6 +25,7 @@ import static com.bytechef.component.attio.constant.AttioConstants.USERS;
 import static com.bytechef.component.attio.constant.AttioConstants.WORKSPACES;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -32,55 +33,67 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class AttioUtilsTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final ActionContext mockedActionContext = mock(ActionContext.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of());
-    private final Response mockedResponse = mock(Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetCompanyIdOptions() throws Exception {
+    void testGetCompanyIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) throws Exception {
+
         Map<String, List<Object>> body = Map.of("data", List.of(
             Map.of("id", Map.of("option_id", "test_id"), "title", "test_title")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(body);
 
         List<? extends Option<String>> options = AttioUtils.getCompanyIdOptions("attribute")
-            .apply(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            .apply(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("test_title", "test_id"));
 
         assertEquals(expected, options);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/objects/companies/attributes/attribute/options", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
@@ -94,29 +107,40 @@ class AttioUtilsTest {
     }
 
     @Test
-    void testGetDealStageIdOptions() {
+    void testGetDealStageIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, List<Object>> mockedBody = Map.of(
             "data", List.of(Map.of("id", Map.of("status_id", "test_id"), "title", "test_title")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedBody);
 
         List<Option<String>> result = AttioUtils.getDealStageIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("test_title", "test_id"));
 
         assertEquals(expected, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/objects/deals/attributes/stage/statuses", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetTargetActorIdOptions() {
+    void testGetTargetActorIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, List<Object>> mockedBody = Map.of(
             DATA, List.of(
                 Map.of(
@@ -126,114 +150,138 @@ class AttioUtilsTest {
                     "id", Map.of("record_id", "record2"),
                     "values", Map.of("primary_email_address", List.of(Map.of("email_address", "email2"))))));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedBody);
 
         List<Option<String>> targetObjectOptions = AttioUtils.getTargetActorIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expectedOptions = List.of(option("email1", "record1"), option("email2", "record2"));
 
         assertEquals(expectedOptions, targetObjectOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/objects/users/records/query", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetTargetObjectOptions() {
+    void testGetTargetObjectOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, List<Object>> mockedBody = Map.of(DATA, List.of(
             Map.of("singular_noun", "test1", "api_slug", "1"),
             Map.of("singular_noun", "test2", "api_slug", "2")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedBody);
 
         List<Option<String>> targetObjectOptions = AttioUtils.getTargetObjectOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expectedOptions = List.of(
             option("test1", "1"),
             option("test2", "2"));
 
         assertEquals(expectedOptions, targetObjectOptions);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/objects", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetTargetRecordIdOptions() throws Exception {
+    void testGetTargetRecordIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) throws Exception {
+
         Map<String, List<Object>> mockedBody = Map.of(
             "data", List.of(
                 Map.of(
                     "id", Map.of("record_id", "test_id"),
                     "values", Map.of("name", List.of(Map.of("value", "test_value"))))));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedBody);
 
         List<? extends Option<String>> result = AttioUtils.getTargetRecordIdOptions("targetObject")
-            .apply(mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            .apply(mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("test_value", "test_id"));
 
         assertEquals(expected, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/objects/targetObject/records/query", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetWorkSpaceMemberIdOptions() {
+    void testGetWorkSpaceMemberIdOptions(
+        ActionContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         Map<String, List<Object>> mockedBody = Map.of(
             "data", List.of(
                 Map.of("id", Map.of("workspace_member_id", "test_id"),
                     "first_name", "first", "last_name", "last")));
 
-        when(mockedActionContext.http(any()))
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(mockedBody);
 
         List<Option<String>> result = AttioUtils.getWorkSpaceMemberIdOptions(
-            mockedParameters, mockedParameters, Map.of(), "", mockedActionContext);
+            mockedParameters, mockedParameters, Map.of(), "", mockedContext);
 
         List<Option<String>> expected = List.of(option("first last", "test_id"));
 
         assertEquals(expected, result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/workspace_members", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testSubscribeWebhook() {
-        when(mockedTriggerContext.http(any()))
+    void testSubscribeWebhook(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of(ID, Map.of("webhook_id", "123"))));
 
         String testEvent = "testEvent";
         String testWebhookUrl = "testWebhookUrl";
 
-        String id = AttioUtils.subscribeWebhook(testEvent, mockedTriggerContext, testWebhookUrl);
+        String id = AttioUtils.subscribeWebhook(testEvent, mockedContext, testWebhookUrl);
 
         assertEquals("123", id);
 
@@ -245,19 +293,31 @@ class AttioUtilsTest {
                 "subscriptions", List.of(Map.of("event_type", testEvent, "filter", Map.of("$and", List.of())))));
 
         assertEquals(expectedBody, body.getContent());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
+
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testUnsubscribeWebhook() {
-        when(mockedTriggerContext.http(any()))
+    void testUnsubscribeWebhook(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
-        AttioUtils.unsubscribeWebhook(mockedTriggerContext, "123");
+        AttioUtils.unsubscribeWebhook(mockedContext, "123");
 
-        verify(mockedTriggerContext, times(1)).http(any());
+        verify(mockedContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).execute();
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhooks/123", stringArgumentCaptor.getValue());
     }
 
     @Test
