@@ -133,7 +133,7 @@ const CopilotPanelContent = ({className, headerClassName, onClose, source}: Omit
                 </div>
             </div>
 
-            <div className="absolute inset-x-0 top-16 bottom-0 -mx-1">
+            <div className="absolute inset-x-0 top-16 -bottom-3 -mx-1">
                 <CopilotRuntimeProvider source={source} suggestions={COPILOT_SUGGESTIONS}>
                     <Thread
                         composerActions={
