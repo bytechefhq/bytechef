@@ -196,6 +196,14 @@ components:
         enabled:
           description: "The enabled status of an AI provider."
           type: "boolean"
+        supportsText:
+          description: "Whether this AI provider can be used for text (chat) generation."
+          type: "boolean"
+          readOnly: true
+        supportsImage:
+          description: "Whether this AI provider can be used for image generation."
+          type: "boolean"
+          readOnly: true
         supportsEmbeddings:
           description: "Whether this AI provider can be used for embeddings."
           type: "boolean"

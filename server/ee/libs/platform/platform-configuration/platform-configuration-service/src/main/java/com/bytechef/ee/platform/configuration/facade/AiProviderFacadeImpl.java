@@ -227,7 +227,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, url, enabled,
-                    provider.isEmbeddingSupported());
+                    provider.isChatSupported(), provider.isImageSupported(), provider.isEmbeddingSupported());
             })
             .filter(Objects::nonNull)
             .toList();
