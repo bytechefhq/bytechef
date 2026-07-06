@@ -95,6 +95,14 @@ const AiProviderList = ({aiProviders, environment}: {aiProviders: AiProvider[]; 
                                         <span className="flex items-center gap-2">
                                             <span className="text-sm font-semibold">{aiProvider.name}</span>
 
+                                            {aiProvider.supportsText && (
+                                                <Badge label="Text" styleType="secondary-outline" weight="semibold" />
+                                            )}
+
+                                            {aiProvider.supportsImage && (
+                                                <Badge label="Image" styleType="secondary-outline" weight="semibold" />
+                                            )}
+
                                             {aiProvider.supportsEmbeddings && (
                                                 <Badge
                                                     label="Embeddings"
