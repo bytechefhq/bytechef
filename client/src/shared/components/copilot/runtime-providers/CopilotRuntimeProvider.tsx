@@ -2,6 +2,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {humanizeAgentErrorMessage} from '@/shared/components/ai-chat/messages/humanizeAgentErrorMessage';
 import {parseJson, toToolResultDataPart} from '@/shared/components/ai-chat/messages/toToolResultDataPart';
 import {aiChatToolCallStore} from '@/shared/components/ai-chat/stores/useAiChatToolCallStore';
+import {readLastUsedModel} from '@/shared/components/ai/model-picker/lastUsedModel';
 import useCopilotPostTurnRegistry from '@/shared/components/copilot/stores/useCopilotPostTurnRegistry';
 import useCopilotStateContributorRegistry from '@/shared/components/copilot/stores/useCopilotStateContributorRegistry';
 import {Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
@@ -90,13 +91,19 @@ export function CopilotRuntimeProvider({
 
         const currentWorkspaceId = useWorkspaceStore.getState().currentWorkspaceId;
 
+        // Fall back to the persisted last-used model so a refreshed/new conversation still sends the model the composer
+        // displays (the store selection is reset per conversation).
+        const lastUsedModel = currentWorkspaceId != null ? readLastUsedModel(currentWorkspaceId) : null;
+        const userSelectedLlmProvider = selectedLlmProvider ?? lastUsedModel?.provider ?? null;
+        const userSelectedLlmModel = selectedLlmModel ?? lastUsedModel?.model ?? null;
+
         const stateToSend = {
             ...contextWithoutError,
             ...useCopilotStateContributorRegistry.getState().contribute(),
             environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
             ...(currentWorkspaceId != null ? {workspaceId: String(currentWorkspaceId)} : {}),
-            ...(selectedLlmProvider != null && selectedLlmModel != null
-                ? {userSelectedLlmModel: selectedLlmModel, userSelectedLlmProvider: selectedLlmProvider}
+            ...(userSelectedLlmProvider != null && userSelectedLlmModel != null
+                ? {userSelectedLlmModel, userSelectedLlmProvider}
                 : {}),
         };
 
