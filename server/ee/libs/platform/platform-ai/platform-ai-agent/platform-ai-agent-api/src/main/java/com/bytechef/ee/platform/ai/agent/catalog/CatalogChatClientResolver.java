@@ -33,4 +33,14 @@ public interface CatalogChatClientResolver {
      */
     @Nullable
     ChatClient resolve(String providerKey, String model, int environment);
+
+    /**
+     * Resolves a {@link ChatClient} bound to the environment's default (first enabled) chat provider, resolved eagerly
+     * for that environment so the model call does not depend on the thread-local {@code EnvironmentContext}.
+     *
+     * @param environment the environment ordinal
+     * @return a configured {@link ChatClient}, or {@code null} when no chat provider is enabled for the environment
+     */
+    @Nullable
+    ChatClient resolveDefault(int environment);
 }
