@@ -3,13 +3,14 @@ import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import WorkflowNodeContextMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeContextMenu';
+import WorkflowNodeDropdownMenu from '@/pages/platform/workflow-editor/components/WorkflowNodeDropdownMenu';
 import {CLUSTER_ROOT_NODE_LABEL_WIDTH} from '@/shared/constants';
 import {useGetWorkflowNodeDescriptionQuery} from '@/shared/queries/platform/workflowNodeDescriptions.queries';
 import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
 import {NodeDataType} from '@/shared/types';
 import {useQueryClient} from '@tanstack/react-query';
 import {Handle, Position} from '@xyflow/react';
-import {CheckIcon, ComponentIcon, PinOffIcon, TrashIcon, XIcon} from 'lucide-react';
+import {CheckIcon, ComponentIcon, EllipsisVerticalIcon, XIcon} from 'lucide-react';
 import {ChangeEvent, FocusEvent, KeyboardEvent, memo, useCallback, useMemo, useState} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import sanitize from 'sanitize-html';
@@ -34,6 +35,7 @@ import styles from './NodeTypes.module.css';
 
 const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const [infoCardOpen, setInfoCardOpen] = useState(false);
+    const [nodeMenuOpen, setNodeMenuOpen] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const layoutDirection = useLayoutDirectionStore((state) => state.layoutDirection);
 
@@ -297,6 +299,38 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const isHorizontal = layoutDirection === 'LR';
 
+    const nodeMenuTrigger = (
+        <WorkflowNodeDropdownMenu
+            canPaste={canPaste}
+            data={data}
+            hasSavedPosition={!!hasSavedNodePosition}
+            onCopy={handleCopyNode}
+            onCut={handleCutNode}
+            onDelete={handleDelete}
+            onInfo={() => setInfoCardOpen(true)}
+            onOpenChange={setNodeMenuOpen}
+            onPaste={handlePasteNode}
+            onRename={handleStartRename}
+            onResetPosition={handleResetPosition}
+            onSwitch={handleSwitch}
+            showCopyAction
+            showCutAction
+            showDeleteAction
+            showInfoAction
+            showRenameAction
+            trigger={
+                <Button
+                    aria-label={`${data.workflowNodeName} node actions`}
+                    className="nodrag size-6 rounded-md border border-stroke-neutral-tertiary bg-surface-neutral-primary p-1 shadow-sm [&_svg]:size-4"
+                    icon={<EllipsisVerticalIcon />}
+                    size="iconXs"
+                    title="Node actions"
+                    variant="ghost"
+                />
+            }
+        />
+    );
+
     return (
         <WorkflowNodeContextMenu
             canPaste={canPaste}
@@ -325,33 +359,15 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                 data-nodetype="clusterRoot"
                 key={id}
             >
-                <div
-                    className={twMerge(
-                        'invisible absolute top-0 left-workflow-node-popover-hover pr-4',
-                        !suppressHover && 'group-hover:visible'
-                    )}
-                >
-                    <div className="flex flex-col gap-1">
-                        <Button
-                            className="opacity-100"
-                            icon={<TrashIcon />}
-                            onClick={() => handleDeleteNodeClick(data)}
-                            size="iconSm"
-                            title="Delete a node"
-                            variant="destructiveGhost"
-                        />
-
-                        {hasSavedNodePosition && (
-                            <Button
-                                icon={<PinOffIcon />}
-                                onClick={() => handleRemoveNodePosition(data.name)}
-                                size="iconSm"
-                                title="Remove saved node position"
-                                variant="ghost"
-                            />
-                        )}
+                {!suppressHover && (
+                    <div
+                        className="nodrag invisible absolute top-0 -left-8 z-10 group-hover:visible data-[open=true]:visible"
+                        data-open={nodeMenuOpen}
+                        onMouseDown={(event) => event.stopPropagation()}
+                    >
+                        {nodeMenuTrigger}
                     </div>
-                </div>
+                )}
 
                 <Popover
                     onOpenChange={(open) => {
@@ -442,7 +458,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
                         side="right"
                     >
                         <div className="mb-2 flex items-center justify-between gap-2">
-                            <span className="font-semibold">{nodeLabel}</span>
+                            <h3 className="text-lg font-semibold">{nodeLabel}</h3>
 
                             <Button
                                 className="hover:bg-transparent active:bg-transparent"

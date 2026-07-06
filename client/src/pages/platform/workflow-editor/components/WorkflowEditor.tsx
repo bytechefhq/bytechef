@@ -10,6 +10,7 @@ import {Background, BackgroundVariant, ReactFlow} from '@xyflow/react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useWorkflowEditorCanvas from '../hooks/useWorkflowEditorCanvas';
+import NodeActionsHint from './NodeActionsHint';
 import WorkflowEditorToolbar from './WorkflowEditorToolbar';
 
 type ConditionalWorkflowEditorPropsType =
@@ -81,6 +82,8 @@ const WorkflowEditor = ({
                 zoomOnScroll={false}
             >
                 <Background color={CANVAS_BACKGROUND_COLOR} size={2} variant={BackgroundVariant.Dots} />
+
+                {!readOnlyWorkflow && nodes.length > 0 && <NodeActionsHint />}
 
                 <WorkflowEditorToolbar enableUndoRedo={enableUndoRedo} readOnly={!!readOnlyWorkflow} />
             </ReactFlow>
