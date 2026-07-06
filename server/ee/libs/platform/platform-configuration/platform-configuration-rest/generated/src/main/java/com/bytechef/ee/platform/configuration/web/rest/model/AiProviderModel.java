@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-03T17:58:15.209180+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T18:25:47.807213+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -36,6 +36,10 @@ public class AiProviderModel {
   private @Nullable String url;
 
   private @Nullable Boolean enabled;
+
+  private @Nullable Boolean supportsText;
+
+  private @Nullable Boolean supportsImage;
 
   private @Nullable Boolean supportsEmbeddings;
 
@@ -176,6 +180,48 @@ public class AiProviderModel {
     this.enabled = enabled;
   }
 
+  public AiProviderModel supportsText(@Nullable Boolean supportsText) {
+    this.supportsText = supportsText;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider can be used for text (chat) generation.
+   * @return supportsText
+   */
+  
+  @Schema(name = "supportsText", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider can be used for text (chat) generation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("supportsText")
+  public @Nullable Boolean getSupportsText() {
+    return supportsText;
+  }
+
+  @JsonProperty("supportsText")
+  public void setSupportsText(@Nullable Boolean supportsText) {
+    this.supportsText = supportsText;
+  }
+
+  public AiProviderModel supportsImage(@Nullable Boolean supportsImage) {
+    this.supportsImage = supportsImage;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider can be used for image generation.
+   * @return supportsImage
+   */
+  
+  @Schema(name = "supportsImage", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider can be used for image generation.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("supportsImage")
+  public @Nullable Boolean getSupportsImage() {
+    return supportsImage;
+  }
+
+  @JsonProperty("supportsImage")
+  public void setSupportsImage(@Nullable Boolean supportsImage) {
+    this.supportsImage = supportsImage;
+  }
+
   public AiProviderModel supportsEmbeddings(@Nullable Boolean supportsEmbeddings) {
     this.supportsEmbeddings = supportsEmbeddings;
     return this;
@@ -212,12 +258,14 @@ public class AiProviderModel {
         Objects.equals(this.apiKey, aiProvider.apiKey) &&
         Objects.equals(this.url, aiProvider.url) &&
         Objects.equals(this.enabled, aiProvider.enabled) &&
+        Objects.equals(this.supportsText, aiProvider.supportsText) &&
+        Objects.equals(this.supportsImage, aiProvider.supportsImage) &&
         Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsEmbeddings);
+    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsText, supportsImage, supportsEmbeddings);
   }
 
   @Override
@@ -230,6 +278,8 @@ public class AiProviderModel {
     sb.append("    apiKey: ").append(toIndentedString(apiKey)).append("\n");
     sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    supportsText: ").append(toIndentedString(supportsText)).append("\n");
+    sb.append("    supportsImage: ").append(toIndentedString(supportsImage)).append("\n");
     sb.append("    supportsEmbeddings: ").append(toIndentedString(supportsEmbeddings)).append("\n");
     sb.append("}");
     return sb.toString();
