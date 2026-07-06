@@ -22,10 +22,11 @@ const AiProviderForm = ({
     showCancel: boolean;
 }) => {
     const isOllama = aiProvider.name?.toLowerCase() === 'ollama';
+    const isAzure = aiProvider.name?.toLowerCase() === 'azure open ai';
 
     const formSchema = z.object({
         apiKey: isOllama ? z.string().optional() : z.string().min(1, {message: 'API Key is required.'}),
-        url: z.string().optional(),
+        url: isAzure ? z.string().min(1, {message: 'Endpoint is required.'}) : z.string().optional(),
     });
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -55,7 +56,11 @@ const AiProviderForm = ({
         updateAiProviderMutation.mutate({
             environment,
             id: aiProvider.id!,
-            updateAiProviderRequest: isOllama ? {url: values.url} : {apiKey: values.apiKey},
+            updateAiProviderRequest: isOllama
+                ? {url: values.url}
+                : isAzure
+                  ? {apiKey: values.apiKey, url: values.url}
+                  : {apiKey: values.apiKey},
         });
     }
 
@@ -83,23 +88,45 @@ const AiProviderForm = ({
                         )}
                     />
                 ) : (
-                    <FormField
-                        control={form.control}
-                        name="apiKey"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormLabel>API Key</FormLabel>
+                    <>
+                        {isAzure && (
+                            <FormField
+                                control={form.control}
+                                name="url"
+                                render={({field}) => (
+                                    <FormItem>
+                                        <FormLabel>Endpoint</FormLabel>
 
-                                <FormControl>
-                                    <Input placeholder="API Key" {...field} />
-                                </FormControl>
+                                        <FormControl>
+                                            <Input placeholder="https://<resource>.openai.azure.com" {...field} />
+                                        </FormControl>
 
-                                <FormDescription>This is your AI provider&apos;s API key.</FormDescription>
+                                        <FormDescription>Your Azure OpenAI resource endpoint.</FormDescription>
 
-                                <FormMessage />
-                            </FormItem>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
                         )}
-                    />
+
+                        <FormField
+                            control={form.control}
+                            name="apiKey"
+                            render={({field}) => (
+                                <FormItem>
+                                    <FormLabel>API Key</FormLabel>
+
+                                    <FormControl>
+                                        <Input placeholder="API Key" {...field} />
+                                    </FormControl>
+
+                                    <FormDescription>This is your AI provider&apos;s API key.</FormDescription>
+
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                    </>
                 )}
 
                 <div className="flex gap-1">
