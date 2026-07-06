@@ -115,9 +115,14 @@ export const useCopilotStore = create<CopilotStateI>()(
             set((state) => {
                 const messages = [...state.messages];
 
-                // find last assistant message
+                // Scan back from the end for this turn's streaming assistant message, stopping at the latest user
+                // message so we never reach into a previous turn and overwrite its reply (issue #5348).
                 for (let i = messages.length - 1; i >= 0; i--) {
                     const message = messages[i] as ThreadMessageLike;
+
+                    if (message.role === 'user') {
+                        break;
+                    }
 
                     if (message.role === 'assistant' && typeof message.content === 'string') {
                         messages[i] = {...message, content: text} as ThreadMessageLike;
@@ -126,7 +131,7 @@ export const useCopilotStore = create<CopilotStateI>()(
                     }
                 }
 
-                // no assistant message yet; create one
+                // No assistant message for the current turn yet; create one.
                 messages.push({role: 'assistant', content: text} as ThreadMessageLike);
 
                 return {...state, messages};
