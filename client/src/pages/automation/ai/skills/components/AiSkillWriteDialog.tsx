@@ -62,7 +62,7 @@ const AiSkillWriteDialog = ({onCreated, onOpenChange, open}: AiSkillWriteDialogP
                         <Label htmlFor="skill-instructions">Instructions</Label>
 
                         <Textarea
-                            className="min-h-[200px]"
+                            className="max-h-[400px] min-h-[200px] overflow-y-auto"
                             id="skill-instructions"
                             onChange={(event) => setInstructions(event.target.value)}
                             placeholder="Enter skill instructions..."
