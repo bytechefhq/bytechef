@@ -27,6 +27,7 @@ import com.bytechef.component.ai.llm.deepseek.action.DeepSeekChatAction;
 import com.bytechef.component.ai.llm.gemini.action.GeminiChatAction;
 import com.bytechef.component.ai.llm.groq.action.GroqChatAction;
 import com.bytechef.component.ai.llm.mistral.action.MistralChatAction;
+import com.bytechef.component.ai.llm.mistral.cluster.MistralAiEmbedding;
 import com.bytechef.component.ai.llm.nvidia.action.NvidiaChatAction;
 import com.bytechef.component.ai.llm.ollama.action.OllamaChatAction;
 import com.bytechef.component.ai.llm.ollama.cluster.OllamaEmbedding;
@@ -229,10 +230,23 @@ class AiModelConfiguration {
      * Embedding-specific configuration check, distinct from {@link #isConfigured(Provider)}: OpenAI is considered
      * configured from its generic api-key (same credential used for chat), while Ollama is considered configured only
      * when its dedicated embedding model option is set -- Ollama's generic url/api-key alone does not opt it into
-     * embeddings, since a self-hosted server may be reachable without hosting an embedding model.
+     * embeddings, since a self-hosted server may be reachable without hosting an embedding model. Mistral, like Ollama,
+     * opts in only when its dedicated embedding model option is set (and its api-key is present), so an existing
+     * Mistral chat deployment is never silently selected for embeddings.
      */
     private boolean isEmbeddingConfigured(Provider provider) {
         return switch (provider) {
+            case MISTRAL -> {
+                String model = applicationProperties.getAi()
+                    .getProvider()
+                    .getEmbedding()
+                    .getMistral()
+                    .getOptions()
+                    .getModel();
+                String apiKey = getApiKey(provider);
+
+                yield model != null && !model.isBlank() && apiKey != null && !apiKey.isBlank();
+            }
             case OPEN_AI -> openAiApiKey != null && !openAiApiKey.isBlank();
             case OLLAMA -> {
                 String model = applicationProperties.getAi()
@@ -375,6 +389,9 @@ class AiModelConfiguration {
             .getEmbedding();
 
         return switch (provider) {
+            case MISTRAL -> embedding.getMistral()
+                .getOptions()
+                .getModel();
             case OLLAMA -> embedding.getOllama()
                 .getOptions()
                 .getModel();
@@ -418,6 +435,7 @@ class AiModelConfiguration {
 
     private static @Nullable EmbeddingFunction resolveEmbeddingFactory(Provider provider) {
         return switch (provider) {
+            case MISTRAL -> MistralAiEmbedding.EMBEDDING_MODEL;
             case OLLAMA -> OllamaEmbedding.EMBEDDING_MODEL;
             case OPEN_AI -> OpenAiEmbedding.EMBEDDING_MODEL;
             default -> null;

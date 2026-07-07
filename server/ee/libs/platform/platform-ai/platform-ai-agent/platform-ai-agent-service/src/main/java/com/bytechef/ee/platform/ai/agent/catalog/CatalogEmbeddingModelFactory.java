@@ -11,6 +11,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.ollama.constant.OllamaConstants.URL;
 import static com.bytechef.component.definition.Authorization.TOKEN;
 
+import com.bytechef.component.ai.llm.mistral.cluster.MistralAiEmbedding;
 import com.bytechef.component.ai.llm.ollama.cluster.OllamaEmbedding;
 import com.bytechef.component.ai.llm.openai.cluster.OpenAiEmbedding;
 import com.bytechef.component.definition.Parameters;
@@ -68,6 +69,7 @@ public class CatalogEmbeddingModelFactory {
 
     private static @Nullable EmbeddingFunction resolveFactory(Provider provider) {
         return switch (provider) {
+            case MISTRAL -> MistralAiEmbedding.EMBEDDING_MODEL;
             case OLLAMA -> OllamaEmbedding.EMBEDDING_MODEL;
             case OPEN_AI -> OpenAiEmbedding.EMBEDDING_MODEL;
             default -> null;
