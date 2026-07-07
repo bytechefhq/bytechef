@@ -6,15 +6,12 @@ import {
     ReactFlow,
     ReactFlowProvider,
     type Viewport,
-    useReactFlow,
-    useStore,
-    useUpdateNodeInternals,
 } from '@xyflow/react';
 
 import '@xyflow/react/dist/style.css';
 import {CANVAS_BACKGROUND_COLOR, DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM} from '@/shared/constants';
 import {BrushCleaningIcon} from 'lucide-react';
-import {useCallback, useEffect} from 'react';
+import {useCallback, useEffect, useState} from 'react';
 import {useShallow} from 'zustand/react/shallow';
 
 import useClusterElementsWorkflowEditor from '../hooks/useClusterElementsWorkflowEditor';
@@ -22,35 +19,9 @@ import useClusterElementsDataStore from '../stores/useClusterElementsDataStore';
 
 const SETTLE_DELAY = 350;
 
-export const RemeasureClusterNodes = () => {
-    const updateNodeInternals = useUpdateNodeInternals();
-    const {getNodes} = useReactFlow();
-    const nodeCount = useStore((state) => state.nodes.length);
-
-    useEffect(() => {
-        const remeasure = () => {
-            for (const node of getNodes()) {
-                updateNodeInternals(node.id);
-            }
-        };
-
-        // Remeasure immediately, on the next frame after the dialog open
-        // transition begins, and once more after it settles.
-        remeasure();
-
-        const rafId = requestAnimationFrame(remeasure);
-        const timeoutId = setTimeout(remeasure, SETTLE_DELAY);
-
-        return () => {
-            cancelAnimationFrame(rafId);
-            clearTimeout(timeoutId);
-        };
-    }, [nodeCount, getNodes, updateNodeInternals]);
-
-    return null;
-};
-
 const ClusterElementsWorkflowEditor = () => {
+    const [canvasReady, setCanvasReady] = useState(false);
+
     const {onEdgesChange, setCanvasZoom} = useClusterElementsDataStore(
         useShallow((state) => ({
             onEdgesChange: state.onEdgesChange,
@@ -68,11 +39,22 @@ const ClusterElementsWorkflowEditor = () => {
         [setCanvasZoom]
     );
 
+    // Mount ReactFlow only after the hosting dialog's open transition settles. ReactFlow measures
+    // handle positions once on mount; mounting it into a not-yet-settled layout caches wrong bounds
+    // and renders edges non-vertical until a later remeasure corrects them (a visible snap on reopen).
+    useEffect(() => {
+        const timeoutId = setTimeout(() => setCanvasReady(true), SETTLE_DELAY);
+
+        return () => clearTimeout(timeoutId);
+    }, []);
+
+    if (!canvasReady) {
+        return <div className="size-full" />;
+    }
+
     return (
         <div className="size-full">
             <ReactFlowProvider>
-                <RemeasureClusterNodes />
-
                 <ReactFlow
                     defaultViewport={{x: 0, y: 0, zoom: DEFAULT_CLUSTER_ELEMENT_CANVAS_ZOOM}}
                     edgeTypes={clusterElementsEdgeTypes}

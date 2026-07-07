@@ -139,15 +139,6 @@ const ClusterElementsCanvasDialog = ({
                 <DialogDescription />
             </DialogHeader>
 
-            {/*
-              No scale (zoom) entry/exit animation: this dialog hosts a ReactFlow canvas, and ReactFlow
-              measures handle positions with getBoundingClientRect, which returns scaled values while a
-              scale animation runs — caching cluster-root handle bounds at the wrong offset and rendering
-              edges non-vertical. The base DialogContent hardcodes zoom-in-95/zoom-out-95 and twMerge does
-              not dedupe the tw-animate-css zoom utilities, so the scale is pinned to 1 via inline style
-              (inline beats the utility classes deterministically). Fade/slide still animate.
-            */}
-
             <DialogContent
                 className="absolute top-12 bottom-4 left-16 flex h-[calc(100vh-64px)] w-[calc(100vw-80px)] max-w-none translate-x-0 translate-y-0 flex-col gap-2 overflow-hidden bg-surface-main p-0 duration-300 data-[state=closed]:slide-out-to-left-0 data-[state=closed]:slide-out-to-top-0 data-[state=open]:slide-in-from-left-0 data-[state=open]:slide-in-from-top-0 sm:max-w-none"
                 onPointerDownOutside={handlePointerDownOutside}
