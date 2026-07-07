@@ -81,17 +81,22 @@ class CreateConnectionToolCallbackTest {
     }
 
     @Test
-    void testCallUnknownComponentReturnsErrorWithSuggestions() throws Exception {
+    void testCallAmbiguousComponentReturnsErrorWithSuggestions() throws Exception {
         ComponentDefinition googleMail = mock(ComponentDefinition.class);
+        ComponentDefinition googleDrive = mock(ComponentDefinition.class);
 
         when(googleMail.getName()).thenReturn("googleMail");
         when(googleMail.getTitle()).thenReturn("Gmail");
+        when(googleDrive.getName()).thenReturn("googleDrive");
+        when(googleDrive.getTitle()).thenReturn("Google Drive");
 
-        when(componentDefinitionService.fetchComponentDefinition(eq("gmail"), any()))
+        // "google" matches two components, so there is no single unambiguous slug to auto-resolve to — fail loud with
+        // candidates rather than opening the wrong Connect dialog.
+        when(componentDefinitionService.fetchComponentDefinition(eq("google"), any()))
             .thenReturn(Optional.empty());
-        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail));
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail, googleDrive));
 
-        String result = callback.call("{\"componentName\":\"gmail\"}");
+        String result = callback.call("{\"componentName\":\"google\"}");
 
         JsonNode node = jsonMapper.readTree(result);
 
@@ -101,8 +106,48 @@ class CreateConnectionToolCallbackTest {
         String error = node.get("error")
             .asText();
 
-        assertThat(error).contains("gmail");
+        assertThat(error).contains("google");
         assertThat(error).contains("googleMail (Gmail)");
+        assertThat(error).contains("googleDrive (Google Drive)");
+    }
+
+    @Test
+    void testCallAutoResolvesSingleFuzzyMatch() throws Exception {
+        assertAutoResolves("gmail");
+    }
+
+    @Test
+    void testCallAutoResolvesHyphenatedName() throws Exception {
+        // "google-mail" used to match nothing (the hyphen broke the substring match); normalized matching now resolves
+        // it to the single googleMail slug instead of forcing the agent to retry.
+        assertAutoResolves("google-mail");
+    }
+
+    private void assertAutoResolves(String requestedComponentName) throws Exception {
+        ComponentDefinition googleMail = mock(ComponentDefinition.class);
+
+        when(googleMail.getName()).thenReturn("googleMail");
+        when(googleMail.getTitle()).thenReturn("Gmail");
+
+        when(componentDefinitionService.fetchComponentDefinition(eq(requestedComponentName), any()))
+            .thenReturn(Optional.empty());
+        when(componentDefinitionService.getComponentDefinitions()).thenReturn(List.of(googleMail));
+        when(componentDefinitionService.fetchComponentDefinition(eq("googleMail"), any()))
+            .thenReturn(Optional.of(googleMail));
+
+        String result = callback.call("{\"componentName\":\"" + requestedComponentName + "\"}");
+
+        JsonNode node = jsonMapper.readTree(result);
+
+        assertThat(node.has("error")).isFalse();
+        assertThat(node.get("kind")
+            .asText()).isEqualTo("create-connection");
+        assertThat(node.get("componentName")
+            .asText()).isEqualTo("googleMail");
+        assertThat(node.get("componentLabel")
+            .asText()).isEqualTo("Gmail");
+        assertThat(node.get("resolvedFromComponentName")
+            .asText()).isEqualTo(requestedComponentName);
     }
 
     @Test
