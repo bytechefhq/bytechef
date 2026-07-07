@@ -7,7 +7,7 @@ const ConnectedUserProjectWorkflowList = ({
     connectedUserProjectWorkflows: ConnectedUserProjectWorkflow[];
 }) => {
     return (
-        <ul className="divide-y">
+        <ul>
             {connectedUserProjectWorkflows.map((connectedUserProjectWorkflow) => (
                 <ConnectedUserProjectWorkflowListItem
                     connectedUserProjectWorkflow={connectedUserProjectWorkflow}

@@ -36,7 +36,7 @@ const AiSkillListItem = ({deleteSkill, onDownload, onUpdate, skill}: AiSkillList
     return (
         <>
             <div
-                className="flex cursor-pointer items-center justify-between gap-6 rounded-md px-2 py-4 hover:bg-gray-50"
+                className="mb-2 flex cursor-pointer items-center justify-between gap-6 rounded border border-border/50 px-2 py-4 hover:bg-destructive-foreground"
                 onClick={handleClick}
             >
                 <div className="flex min-w-0 flex-1 items-center gap-3">

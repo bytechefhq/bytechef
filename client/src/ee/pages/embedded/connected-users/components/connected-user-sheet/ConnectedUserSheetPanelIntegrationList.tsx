@@ -17,7 +17,7 @@ const ConnectedUserSheetPanelIntegrationList = ({
     });
 
     return connectedUserIntegrationInstances.length > 0 ? (
-        <div className="divide-y">
+        <div>
             {connectedUserIntegrationInstances.map((connectedUserIntegrationInstance) => {
                 const componentDefinition = componentDefinitions?.find(
                     (componentDefinition) => componentDefinition.name === connectedUserIntegrationInstance.componentName

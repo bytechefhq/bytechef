@@ -130,7 +130,7 @@ const ConnectionListItem = memo(({componentDefinitions, connection, remainingTag
     return (
         <li className="mb-2 rounded border border-border/50" key={connection.id}>
             <>
-                <div className="group flex items-center rounded-md bg-white px-3 hover:bg-gray-50">
+                <div className="group flex items-center rounded-md bg-white px-3 hover:bg-destructive-foreground">
                     <div className="flex flex-1 items-center py-3">
                         <div className="flex-1">
                             <div className="flex items-center justify-between">
