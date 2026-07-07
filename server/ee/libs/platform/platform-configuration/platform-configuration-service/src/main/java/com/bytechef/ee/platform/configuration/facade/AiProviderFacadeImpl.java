@@ -310,10 +310,34 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .getChat();
 
         return switch (provider) {
+            case ANTHROPIC -> chat.getAnthropic()
+                .getOptions()
+                .getModel();
+            case AZURE_OPEN_AI -> chat.getAzureOpenAi()
+                .getOptions()
+                .getModel();
+            case DEEPSEEK -> chat.getDeepSeek()
+                .getOptions()
+                .getModel();
+            case GROQ -> chat.getGroq()
+                .getOptions()
+                .getModel();
+            case MISTRAL -> chat.getMistral()
+                .getOptions()
+                .getModel();
+            case NVIDIA -> chat.getNvidia()
+                .getOptions()
+                .getModel();
+            case OLLAMA -> chat.getOllama()
+                .getOptions()
+                .getModel();
             case OPEN_AI -> chat.getOpenAi()
                 .getOptions()
                 .getModel();
-            case ANTHROPIC -> chat.getAnthropic()
+            case PERPLEXITY -> chat.getPerplexity()
+                .getOptions()
+                .getModel();
+            case VERTEX_GEMINI -> chat.getVertexGemini()
                 .getOptions()
                 .getModel();
             default -> null;

@@ -19,11 +19,11 @@ package com.bytechef.server;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
+import com.bytechef.ai.copilot.config.CopilotConfiguration;
+import com.bytechef.ai.copilot.config.CopilotPgVectorConfiguration;
+import com.bytechef.ai.copilot.service.CopilotVectorStoreService;
 import com.bytechef.automation.knowledgebase.facade.WorkspaceKnowledgeBaseFacade;
 import com.bytechef.automation.knowledgebase.service.WorkspaceKnowledgeBaseService;
-import com.bytechef.ee.ai.copilot.config.CopilotConfiguration;
-import com.bytechef.ee.ai.copilot.config.CopilotPgVectorConfiguration;
-import com.bytechef.ee.ai.copilot.service.CopilotVectorStoreService;
 import com.bytechef.ee.ai.copilot.web.rest.CopilotApiController;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentChunkFacade;
 import com.bytechef.platform.knowledgebase.facade.KnowledgeBaseDocumentFacade;

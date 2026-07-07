@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.agui.core.state.State;
-import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
+import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

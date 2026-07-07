@@ -8,9 +8,10 @@
 package com.bytechef.ee.ai.copilot.agent;
 
 import com.agui.core.state.State;
+import com.bytechef.ai.copilot.agent.OverrideChatClientResolver;
+import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.commons.util.NumberUtils;
 import com.bytechef.commons.util.StringUtils;
-import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.platform.ai.agent.catalog.CatalogChatClientResolver;
 // Gateway resolver path disabled for now — see the commented block at the bottom of this class.
 // import com.bytechef.ee.automation.ai.gateway.domain.WorkspaceAiGatewayProvider;
