@@ -1,5 +1,8 @@
 dependencies {
+    annotationProcessor(rootProject.libs.com.google.auto.service.auto.service)
+
     implementation("org.slf4j:slf4j-api")
+    implementation(rootProject.libs.com.google.auto.service.auto.service.annotations)
     implementation(libs.org.springaicommunity.spring.ai.agent.utils)
     implementation("org.springframework.security:spring-security-core")
     implementation("org.springframework.ai:spring-ai-client-chat")

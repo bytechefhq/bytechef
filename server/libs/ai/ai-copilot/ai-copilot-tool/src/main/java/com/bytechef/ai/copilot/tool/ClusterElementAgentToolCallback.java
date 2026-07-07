@@ -16,7 +16,7 @@
 
 package com.bytechef.ai.copilot.tool;
 
-import com.bytechef.ai.agent.tool.Agent;
+import com.bytechef.ai.agent.tool.AgentType;
 import com.bytechef.ai.agent.tool.CurrentAgentContext;
 import com.bytechef.ai.agent.tool.CurrentAgentContext.AgentBinding;
 import com.bytechef.ai.agent.tool.ToolErrors;
@@ -96,12 +96,12 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
             }
 
             AgentBinding parent = CurrentAgentContext.current();
-            Agent parentAgent = parent != null ? parent.agentName() : null;
+            AgentType parentAgent = parent != null ? parent.agentName() : null;
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
             String result = CurrentAgentContext.callWith(
-                Agent.CLUSTER_ELEMENT_AGENT, parentAgent,
+                CopilotAgentType.CLUSTER_ELEMENT_AGENT, parentAgent,
                 () -> clusterElementChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()

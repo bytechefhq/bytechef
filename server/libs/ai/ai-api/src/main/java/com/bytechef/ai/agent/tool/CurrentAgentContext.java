@@ -31,7 +31,7 @@ public final class CurrentAgentContext {
      * Immutable two-tuple of the agent and (optionally) the parent agent. {@code parentAgent} is {@code null} for
      * top-level ai_hub calls.
      */
-    public record AgentBinding(Agent agentName, @Nullable Agent parentAgent) {
+    public record AgentBinding(AgentType agentName, @Nullable AgentType parentAgent) {
     }
 
     private static final InheritableThreadLocal<AgentBinding> HOLDER = new InheritableThreadLocal<>();
@@ -50,7 +50,7 @@ public final class CurrentAgentContext {
      * Pushes a binding for the duration of {@code runnable}. The previous binding (if any) is restored even if the
      * runnable throws.
      */
-    public static void runWith(Agent agentName, @Nullable Agent parentAgent, Runnable runnable) {
+    public static void runWith(AgentType agentName, @Nullable AgentType parentAgent, Runnable runnable) {
         AgentBinding previous = HOLDER.get();
 
         HOLDER.set(new AgentBinding(agentName, parentAgent));
@@ -67,9 +67,9 @@ public final class CurrentAgentContext {
     }
 
     /**
-     * Variant of {@link #runWith(Agent, Agent, Runnable)} that returns the supplier's value.
+     * Variant of {@link #runWith(AgentType, AgentType, Runnable)} that returns the supplier's value.
      */
-    public static <T> T callWith(Agent agentName, @Nullable Agent parentAgent, Supplier<T> supplier) {
+    public static <T> T callWith(AgentType agentName, @Nullable AgentType parentAgent, Supplier<T> supplier) {
         AgentBinding previous = HOLDER.get();
 
         HOLDER.set(new AgentBinding(agentName, parentAgent));
