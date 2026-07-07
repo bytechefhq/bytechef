@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.service;
 
+import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -49,12 +50,14 @@ public class PermissionScopeRegistry {
 
         for (PermissionScopeProvider permissionScopeProvider : permissionScopeProviders) {
             for (ScopeDefinition scopeDefinition : permissionScopeProvider.scopeDefinitions()) {
+                PermissionScopeType permissionScopeType = scopeDefinition.scopeType();
+
                 WorkspaceRole existing = minimumRoleByScope.putIfAbsent(
-                    scopeDefinition.name(), scopeDefinition.minimumRole());
+                    permissionScopeType.name(), scopeDefinition.minimumRole());
 
                 if (existing != null && existing != scopeDefinition.minimumRole()) {
                     throw new IllegalStateException(
-                        "Permission scope '" + scopeDefinition.name() +
+                        "Permission scope '" + permissionScopeType.name() +
                             "' declared with conflicting minimum roles " + existing + " and " +
                             scopeDefinition.minimumRole());
                 }

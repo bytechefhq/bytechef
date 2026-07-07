@@ -10,6 +10,7 @@ package com.bytechef.ee.automation.configuration.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider;
 import com.bytechef.ee.automation.configuration.security.PermissionScopeProvider.ScopeDefinition;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
@@ -38,12 +39,12 @@ class PermissionScopeRegistryTest {
     private final PermissionScopeRegistry permissionScopeRegistry = new PermissionScopeRegistry(
         List.<PermissionScopeProvider>of(
             () -> Set.of(
-                new ScopeDefinition("ALPHA_VIEW", WorkspaceRole.VIEWER),
-                new ScopeDefinition("ALPHA_EDIT", WorkspaceRole.EDITOR),
-                new ScopeDefinition("ALPHA_MANAGE", WorkspaceRole.ADMIN)),
+                new ScopeDefinition(TestPermissionScope.ALPHA_VIEW, WorkspaceRole.VIEWER),
+                new ScopeDefinition(TestPermissionScope.ALPHA_EDIT, WorkspaceRole.EDITOR),
+                new ScopeDefinition(TestPermissionScope.ALPHA_MANAGE, WorkspaceRole.ADMIN)),
             () -> Set.of(
-                new ScopeDefinition("BETA_VIEW", WorkspaceRole.VIEWER),
-                new ScopeDefinition("BETA_DELETE", WorkspaceRole.EDITOR))));
+                new ScopeDefinition(TestPermissionScope.BETA_VIEW, WorkspaceRole.VIEWER),
+                new ScopeDefinition(TestPermissionScope.BETA_DELETE, WorkspaceRole.EDITOR))));
 
     @Test
     void testBuiltInRoleTiers() {
@@ -79,8 +80,10 @@ class PermissionScopeRegistryTest {
 
     @Test
     void testConflictingMinimumRoleFailsFast() {
-        PermissionScopeProvider first = () -> Set.of(new ScopeDefinition("X_SCOPE", WorkspaceRole.VIEWER));
-        PermissionScopeProvider second = () -> Set.of(new ScopeDefinition("X_SCOPE", WorkspaceRole.ADMIN));
+        PermissionScopeProvider first =
+            () -> Set.of(new ScopeDefinition(TestPermissionScope.X_SCOPE, WorkspaceRole.VIEWER));
+        PermissionScopeProvider second =
+            () -> Set.of(new ScopeDefinition(TestPermissionScope.X_SCOPE, WorkspaceRole.ADMIN));
 
         assertThatThrownBy(() -> new PermissionScopeRegistry(List.of(first, second)))
             .isInstanceOf(IllegalStateException.class);
@@ -89,5 +92,17 @@ class PermissionScopeRegistryTest {
     private static Set<String> union(Set<String> first, Set<String> second) {
         return Stream.concat(first.stream(), second.stream())
             .collect(Collectors.toUnmodifiableSet());
+    }
+
+    // Synthetic scope enum kept local to the test so aggregation/tiering is exercised without coupling to the
+    // production scope catalog (the real security.scope.* enums are contributed and verified separately).
+    private enum TestPermissionScope implements PermissionScopeType {
+
+        ALPHA_VIEW,
+        ALPHA_EDIT,
+        ALPHA_MANAGE,
+        BETA_VIEW,
+        BETA_DELETE,
+        X_SCOPE
     }
 }
