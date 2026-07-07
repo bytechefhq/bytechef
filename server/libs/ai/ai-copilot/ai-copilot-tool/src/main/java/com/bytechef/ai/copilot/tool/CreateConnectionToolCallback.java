@@ -106,16 +106,33 @@ public class CreateConnectionToolCallback implements ToolCallback {
             Optional<ComponentDefinition> componentDefinition = componentDefinitionService.fetchComponentDefinition(
                 componentName, null);
 
+            String resolvedFromComponentName = null;
+
             if (componentDefinition.isEmpty()) {
-                return toolError(
-                    ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
+                String resolvedComponentName = ComponentSlugUtils.resolveSingleMatch(
+                    componentName, componentDefinitionService);
+
+                if (resolvedComponentName == null) {
+                    return toolError(ComponentSlugUtils.unknownComponentMessage(componentName,
+                        componentDefinitionService));
+                }
+
+                resolvedFromComponentName = componentName;
+                componentName = resolvedComponentName;
+                componentDefinition = componentDefinitionService.fetchComponentDefinition(componentName, null);
+
+                if (componentDefinition.isEmpty()) {
+                    return toolError(
+                        ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
+                }
             }
 
             String componentLabel = resolveComponentLabel(componentDefinition.get(), componentName);
 
             return JsonUtils.write(
                 new CreateConnectionOutput(
-                    "create-connection", componentName, componentLabel, input.suggestedName()));
+                    "create-connection", componentName, componentLabel, resolvedFromComponentName,
+                    input.suggestedName()));
         } catch (JacksonException exception) {
             log.warn(
                 "createConnection rejected malformed tool input: {} — first 200 chars of input: {}",
@@ -143,7 +160,7 @@ public class CreateConnectionToolCallback implements ToolCallback {
     }
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
-    public record CreateConnectionOutput(
-        String kind, String componentName, String componentLabel, @Nullable String suggestedName) {
+    public record CreateConnectionOutput(String kind, String componentName, String componentLabel,
+        @Nullable String resolvedFromComponentName, @Nullable String suggestedName) {
     }
 }
