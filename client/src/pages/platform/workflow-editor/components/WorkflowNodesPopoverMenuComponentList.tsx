@@ -1,5 +1,5 @@
+import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
-import {Input} from '@/components/ui/input';
 import WorkflowNodesTabs from '@/pages/platform/workflow-editor/components/workflow-nodes-tabs/WorkflowNodesTabs';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import {TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';

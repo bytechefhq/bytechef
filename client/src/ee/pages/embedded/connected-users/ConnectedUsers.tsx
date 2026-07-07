@@ -1,12 +1,12 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
 import EmptyList from '@/components/EmptyList';
+import {Input} from '@/components/Input/Input';
 import PageLoader from '@/components/PageLoader';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import TablePagination from '@/components/TablePagination';
 import {Calendar} from '@/components/ui/calendar';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import ConnectedUserTable from '@/ee/pages/embedded/connected-users/components/ConnectedUserTable';
 import ConnectedUsersFilterTitle from '@/ee/pages/embedded/connected-users/components/ConnectedUsersFilterTitle';

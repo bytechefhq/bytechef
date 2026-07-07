@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {useState} from 'react';
 

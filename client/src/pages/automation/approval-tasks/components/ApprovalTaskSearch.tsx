@@ -1,4 +1,4 @@
-import {Input} from '@/components/ui/input';
+import {Input} from '@/components/Input/Input';
 import {SearchIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 

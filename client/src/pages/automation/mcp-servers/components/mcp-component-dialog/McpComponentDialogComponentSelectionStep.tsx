@@ -1,6 +1,6 @@
+import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
-import {Input} from '@/components/ui/input';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {PackageIcon} from 'lucide-react';
 import InlineSVG from 'react-inlinesvg';

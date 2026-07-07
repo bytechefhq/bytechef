@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox/ComboBox';
+import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
-import {Input} from '@/components/ui/input';
 import {useAiChatAskedQuestionsStore} from '@/shared/components/ai-chat/stores/useAiChatAskedQuestionsStore';
 import {DataMessagePartProps, useThreadRuntime} from '@assistant-ui/react';
 import {ArrowLeftIcon, CheckIcon, XIcon} from 'lucide-react';

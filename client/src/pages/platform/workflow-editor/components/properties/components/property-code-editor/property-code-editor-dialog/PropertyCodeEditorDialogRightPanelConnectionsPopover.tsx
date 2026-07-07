@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
 import ComboBox from '@/components/ComboBox';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {XIcon} from 'lucide-react';

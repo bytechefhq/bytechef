@@ -1,5 +1,5 @@
+import {Input} from '@/components/Input/Input';
 import PageLoader from '@/components/PageLoader';
-import {Input} from '@/components/ui/input';
 import useAiSkillsLeftSidebar from '@/pages/automation/ai/skills/hooks/useAiSkillsLeftSidebar';
 import getSkillColor from '@/pages/automation/ai/skills/utils/getSkillColor';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';

@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/ui/input';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import useKnowledgeBaseSearchInterface from '@/pages/automation/knowledge-base/components/hooks/useKnowledgeBaseSearchInterface';
 import {SearchIcon} from 'lucide-react';

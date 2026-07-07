@@ -1,5 +1,5 @@
+import {Input} from '@/components/Input/Input';
 import PageLoader from '@/components/PageLoader';
-import {Input} from '@/components/ui/input';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
 
 import useDataTableLeftSidebar from '../hooks/useDataTableLeftSidebar';
