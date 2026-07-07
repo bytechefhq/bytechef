@@ -30,11 +30,11 @@ const ApiCollectionEndpointList = ({
     const {data: projectDeployment} = useGetProjectDeploymentQuery(projectDeploymentId);
 
     return (
-        <div className="p-3">
+        <div className="pt-3">
             {apiCollectionEndpoints && apiCollectionEndpoints.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-2 text-sm font-semibold text-gray-400 uppercase">
+                        <h3 className="flex justify-start pl-3 text-sm font-semibold text-gray-400 uppercase">
                             Endpoints
                         </h3>
                     </div>
@@ -42,7 +42,7 @@ const ApiCollectionEndpointList = ({
                     <ul className="divide-y divide-gray-100">
                         {apiCollectionEndpoints?.map((apiCollectionEndpoint) => (
                             <li
-                                className="flex items-center justify-between rounded-md p-2 hover:bg-gray-50"
+                                className="flex items-center justify-between rounded-md p-2 px-3 hover:bg-gray-50"
                                 key={apiCollectionEndpoint.id}
                             >
                                 {apiCollectionEndpoint &&

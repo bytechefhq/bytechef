@@ -102,10 +102,10 @@ const ProjectWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="p-3">
+        <div className="pt-3">
             {workflows && workflows.length > 0 ? (
                 <>
-                    <h3 className="flex justify-start pl-2 text-sm heading-tertiary">Workflows</h3>
+                    <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
 
                     <ul className="divide-y divide-gray-100">
                         {workflows

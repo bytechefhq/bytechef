@@ -66,11 +66,11 @@ const IntegrationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="p-3">
+        <div className="pt-3">
             {workflows && workflows.length > 0 ? (
                 <>
                     <div className="mb-1 flex items-center justify-between">
-                        <h3 className="flex justify-start pl-2 text-sm font-semibold text-content-neutral-secondary uppercase">
+                        <h3 className="flex justify-start pl-3 text-sm font-semibold text-content-neutral-secondary uppercase">
                             Workflows
                         </h3>
                     </div>

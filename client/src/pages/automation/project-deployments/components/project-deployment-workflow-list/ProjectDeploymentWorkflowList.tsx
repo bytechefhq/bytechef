@@ -113,11 +113,11 @@ const ProjectDeploymentWorkflowList = ({
     });
 
     return (
-        <div className="p-3">
-            <h3 className="flex justify-start pl-2 text-sm heading-tertiary">Workflows</h3>
+        <div className="pt-3">
+            <h3 className="flex justify-start pl-3 text-sm heading-tertiary">Workflows</h3>
 
             {enabledWorkflows.length === 0 ? (
-                <p className="py-4 pl-2 text-sm text-muted-foreground">
+                <p className="py-4 pl-3 text-sm text-muted-foreground">
                     No enabled workflows. Enable a workflow in the project to run it in this deployment.
                 </p>
             ) : (
@@ -151,7 +151,7 @@ const ProjectDeploymentWorkflowList = ({
 
             {disabledWorkflows.length > 0 && (
                 <Collapsible className="group">
-                    <CollapsibleTrigger className="flex w-full items-center space-x-2 rounded-md p-2 hover:bg-surface-neutral-primary-hover [&[data-state=open]>svg]:rotate-180">
+                    <CollapsibleTrigger className="flex w-full items-center space-x-2 rounded-md p-2 px-3 hover:bg-surface-neutral-primary-hover [&[data-state=open]>svg]:rotate-180">
                         <h3 className="flex justify-start text-sm text-muted-foreground">Disabled Workflows</h3>
 
                         <ChevronDownIcon className="size-4 shrink-0 transition-transform duration-300" />
