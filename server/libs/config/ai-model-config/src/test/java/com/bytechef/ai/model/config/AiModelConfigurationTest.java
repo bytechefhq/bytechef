@@ -143,16 +143,16 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveReturnsNullWhenNoProviderConfigured() {
+    void resolveChatModelReturnsNullWhenNoProviderConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        assertThat(aiModelConfiguration.resolve()).isNull();
+        assertThat(aiModelConfiguration.resolveChatModel()).isNull();
     }
 
     @Test
-    void resolveThrowsWhenEnabledProviderHasNoModelConfigured() {
+    void resolveChatModelThrowsWhenEnabledProviderHasNoModelConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -162,13 +162,13 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        assertThatThrownBy(aiModelConfiguration::resolve)
+        assertThatThrownBy(aiModelConfiguration::resolveChatModel)
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining(Provider.OPEN_AI.getKey());
     }
 
     @Test
-    void resolveBuildsChatModelUsingProviderOwnChatModelOption() {
+    void resolveChatModelBuildsChatModelUsingProviderOwnChatModelOption() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -184,13 +184,13 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        ChatModel chatModel = aiModelConfiguration.resolve();
+        ChatModel chatModel = aiModelConfiguration.resolveChatModel();
 
         assertThat(chatModel).isNotNull();
     }
 
     @Test
-    void resolveEmbeddingProviderReturnsNullWhenNoneConfigured() {
+    void resolveChatModelEmbeddingModelProviderReturnsNullWhenNoneConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
@@ -199,7 +199,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingProviderSelectsOpenAiWhenApiKeyConfigured() {
+    void resolveChatModelEmbeddingModelProviderSelectsOpenAiWhenApiKeyConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -213,7 +213,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingProviderSelectsOllamaWhenEmbeddingModelConfigured() {
+    void resolveChatModelEmbeddingProviderSelectsOllamaWhenEmbeddingModelModelConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -229,7 +229,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingProviderDoesNotSelectOllamaFromGenericUrlAlone() {
+    void resolveChatModelEmbeddingModelProviderDoesNotSelectOllamaFromGenericUrlAlone() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -243,7 +243,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingProviderPrefersOpenAiOverOllamaWhenBothConfigured() {
+    void resolveChatModelEmbeddingModelProviderPrefersOpenAiOverOllamaWhenBothConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -263,16 +263,16 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingReturnsNullWhenNoProviderConfigured() {
+    void resolveChatModelEmbeddingModelReturnsNullWhenNoProviderConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        assertThat(aiModelConfiguration.resolveEmbedding()).isNull();
+        assertThat(aiModelConfiguration.resolveEmbeddingModel()).isNull();
     }
 
     @Test
-    void resolveEmbeddingThrowsWhenEnabledProviderHasNoModelConfigured() {
+    void resolveChatModelEmbeddingModelThrowsWhenEnabledProviderHasNoModelConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -282,13 +282,13 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        assertThatThrownBy(aiModelConfiguration::resolveEmbedding)
+        assertThatThrownBy(aiModelConfiguration::resolveEmbeddingModel)
             .isInstanceOf(IllegalStateException.class)
             .hasMessageContaining(Provider.OPEN_AI.getKey());
     }
 
     @Test
-    void resolveEmbeddingBuildsEmbeddingModelForOpenAi() {
+    void resolveChatModelEmbeddingBuildsEmbeddingModelModelForOpenAi() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -304,13 +304,13 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbedding();
+        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbeddingModel();
 
         assertThat(embeddingModel).isNotNull();
     }
 
     @Test
-    void resolveEmbeddingBuildsEmbeddingModelForOllama() {
+    void resolveChatModelEmbeddingBuildsEmbeddingModelModelForOllama() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -322,13 +322,13 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbedding();
+        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbeddingModel();
 
         assertThat(embeddingModel).isNotNull();
     }
 
     @Test
-    void resolveEmbeddingProviderSelectsMistralWhenEmbeddingModelAndApiKeyConfigured() {
+    void resolveChatModelEmbeddingProviderSelectsMistralWhenEmbeddingModelModelAndApiKeyConfigured() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -348,7 +348,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingProviderDoesNotSelectMistralFromApiKeyAlone() {
+    void resolveChatModelEmbeddingModelProviderDoesNotSelectMistralFromApiKeyAlone() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -362,7 +362,7 @@ class AiModelConfigurationTest {
     }
 
     @Test
-    void resolveEmbeddingBuildsEmbeddingModelForMistral() {
+    void resolveChatModelEmbeddingBuildsEmbeddingModelModelForMistral() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 
         applicationProperties.getAi()
@@ -378,7 +378,7 @@ class AiModelConfigurationTest {
 
         AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
 
-        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbedding();
+        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbeddingModel();
 
         assertThat(embeddingModel).isNotNull();
     }

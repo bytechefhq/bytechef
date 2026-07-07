@@ -45,6 +45,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -77,17 +78,11 @@ class AiModelConfiguration {
         this.openAiApiKey = openAi.getApiKey();
     }
 
-    /**
-     * Registered only when {@link #resolveEmbeddingProvider()} would return a non-{@code null} provider (see
-     * {@link EmbeddingProviderConfiguredCondition}), so this bean method never returns {@code null}. When no embedding
-     * provider is configured, the bean is simply absent -- CE then has no embedding model until either a provider is
-     * configured or the EE catalog supplies one.
-     */
     @Bean
     @ConditionalOnMissingBean(EmbeddingModel.class)
     @Conditional(EmbeddingProviderConfiguredCondition.class)
     EmbeddingModel embeddingModel() {
-        EmbeddingModel embeddingModel = resolveEmbedding();
+        EmbeddingModel embeddingModel = resolveEmbeddingModel();
 
         if (embeddingModel == null) {
             throw new IllegalStateException(
@@ -98,18 +93,11 @@ class AiModelConfiguration {
         return embeddingModel;
     }
 
-    /**
-     * Registered only when {@link #resolveProvider()} would return a non-{@code null} provider (see
-     * {@link CopilotProviderConfiguredCondition}), so this bean method never returns {@code null} and never produces a
-     * Spring {@code NullBean} that would collide with {@code CopilotConfiguration}'s non-{@link java.util.Optional}
-     * {@code ChatModel} constructor parameters. When no provider is configured, the bean is simply absent — CE copilot
-     * then has no chat model until either a provider is configured or the EE catalog supplies one.
-     */
     @Bean
-    @ConditionalOnMissingBean(org.springframework.ai.chat.model.ChatModel.class)
+    @ConditionalOnMissingBean(ChatModel.class)
     @Conditional(CopilotProviderConfiguredCondition.class)
-    org.springframework.ai.chat.model.ChatModel copilotChatModel() {
-        org.springframework.ai.chat.model.ChatModel chatModel = resolve();
+    ChatModel copilotChatModel() {
+        ChatModel chatModel = resolveChatModel();
 
         if (chatModel == null) {
             throw new IllegalStateException(
@@ -120,11 +108,6 @@ class AiModelConfiguration {
         return chatModel;
     }
 
-    /**
-     * Returns the configured chat {@link Provider}, preferring an explicit {@code bytechef.ai.copilot.provider}
-     * override, otherwise the first {@link Provider#CHAT_PROVIDERS chat-capable provider} whose credentials/endpoint
-     * are present in {@link ApplicationProperties}. Returns {@code null} when nothing is configured.
-     */
     @Nullable
     Provider resolveProvider() {
         String explicitProviderKey = applicationProperties.getAi()
@@ -144,11 +127,7 @@ class AiModelConfiguration {
         return null;
     }
 
-    /**
-     * Builds a Spring-AI {@link org.springframework.ai.chat.model.ChatModel} for the resolved provider, reusing the
-     * provider component's static {@code CHAT_MODEL} factory. Returns {@code null} when no provider is configured.
-     */
-    org.springframework.ai.chat.model.@Nullable ChatModel resolve() {
+    org.springframework.ai.chat.model.@Nullable ChatModel resolveChatModel() {
         Provider provider = resolveProvider();
 
         if (provider == null) {
@@ -176,11 +155,6 @@ class AiModelConfiguration {
         return chatModelFactory.createChatModel(inputParameters, connectionParameters, false);
     }
 
-    /**
-     * Returns the configured embedding {@link Provider}, i.e. the first {@link Provider#EMBEDDING_PROVIDERS
-     * embedding-capable provider} whose credentials are present in {@link ApplicationProperties}. Returns {@code null}
-     * when nothing is configured.
-     */
     @Nullable
     Provider resolveEmbeddingProvider() {
         for (Provider provider : Provider.EMBEDDING_PROVIDERS) {
@@ -192,12 +166,8 @@ class AiModelConfiguration {
         return null;
     }
 
-    /**
-     * Builds a Spring-AI {@link EmbeddingModel} for the resolved embedding provider, reusing the provider component's
-     * static {@code EMBEDDING_MODEL} factory. Returns {@code null} when no embedding provider is configured.
-     */
     @Nullable
-    EmbeddingModel resolveEmbedding() {
+    EmbeddingModel resolveEmbeddingModel() {
         Provider provider = resolveEmbeddingProvider();
 
         if (provider == null) {
@@ -226,14 +196,6 @@ class AiModelConfiguration {
         return embeddingFactory.apply(inputParameters, connectionParameters);
     }
 
-    /**
-     * Embedding-specific configuration check, distinct from {@link #isConfigured(Provider)}: OpenAI is considered
-     * configured from its generic api-key (same credential used for chat), while Ollama is considered configured only
-     * when its dedicated embedding model option is set -- Ollama's generic url/api-key alone does not opt it into
-     * embeddings, since a self-hosted server may be reachable without hosting an embedding model. Mistral, like Ollama,
-     * opts in only when its dedicated embedding model option is set (and its api-key is present), so an existing
-     * Mistral chat deployment is never silently selected for embeddings.
-     */
     private boolean isEmbeddingConfigured(Provider provider) {
         return switch (provider) {
             case MISTRAL -> {
@@ -331,12 +293,6 @@ class AiModelConfiguration {
         };
     }
 
-    /**
-     * Resolves the chat model name for the given provider from its dedicated
-     * {@code bytechef.ai.provider.chat.<provider>.options.model} property. Returns {@code null} when it is not
-     * configured -- callers must treat that as a misconfiguration rather than fall back to a hardcoded default, since
-     * model names change too frequently to live in source.
-     */
     private @Nullable String getModel(Provider provider) {
         ApplicationProperties.Ai.Provider.Chat chat = applicationProperties.getAi()
             .getProvider()
@@ -377,12 +333,6 @@ class AiModelConfiguration {
         };
     }
 
-    /**
-     * Resolves the embedding model name for the given provider from its dedicated
-     * {@code bytechef.ai.provider.embedding.<provider>.options.model} property. Returns {@code null} when it is not
-     * configured -- callers must treat that as a misconfiguration rather than fall back to a hardcoded default, since
-     * model names change too frequently to live in source.
-     */
     private @Nullable String getEmbeddingModel(Provider provider) {
         ApplicationProperties.Ai.Provider.Embedding embedding = applicationProperties.getAi()
             .getProvider()
