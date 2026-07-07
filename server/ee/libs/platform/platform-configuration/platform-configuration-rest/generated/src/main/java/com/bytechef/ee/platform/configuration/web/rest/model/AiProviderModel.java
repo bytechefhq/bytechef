@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "AiProvider", description = "An AI provider.")
 @JsonTypeName("AiProvider")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-06T23:46:41.082636+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-07T19:00:48.664497+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class AiProviderModel {
 
   private @Nullable Integer id;
@@ -36,6 +36,10 @@ public class AiProviderModel {
   private @Nullable String url;
 
   private @Nullable Boolean enabled;
+
+  private @Nullable Boolean requiresApiKey;
+
+  private @Nullable Boolean requiresEndpoint;
 
   private @Nullable Boolean supportsText;
 
@@ -182,6 +186,48 @@ public class AiProviderModel {
     this.enabled = enabled;
   }
 
+  public AiProviderModel requiresApiKey(@Nullable Boolean requiresApiKey) {
+    this.requiresApiKey = requiresApiKey;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider requires an API key.
+   * @return requiresApiKey
+   */
+  
+  @Schema(name = "requiresApiKey", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider requires an API key.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("requiresApiKey")
+  public @Nullable Boolean getRequiresApiKey() {
+    return requiresApiKey;
+  }
+
+  @JsonProperty("requiresApiKey")
+  public void setRequiresApiKey(@Nullable Boolean requiresApiKey) {
+    this.requiresApiKey = requiresApiKey;
+  }
+
+  public AiProviderModel requiresEndpoint(@Nullable Boolean requiresEndpoint) {
+    this.requiresEndpoint = requiresEndpoint;
+    return this;
+  }
+
+  /**
+   * Whether this AI provider requires a per-deployment endpoint URL.
+   * @return requiresEndpoint
+   */
+  
+  @Schema(name = "requiresEndpoint", accessMode = Schema.AccessMode.READ_ONLY, description = "Whether this AI provider requires a per-deployment endpoint URL.", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+  @JsonProperty("requiresEndpoint")
+  public @Nullable Boolean getRequiresEndpoint() {
+    return requiresEndpoint;
+  }
+
+  @JsonProperty("requiresEndpoint")
+  public void setRequiresEndpoint(@Nullable Boolean requiresEndpoint) {
+    this.requiresEndpoint = requiresEndpoint;
+  }
+
   public AiProviderModel supportsText(@Nullable Boolean supportsText) {
     this.supportsText = supportsText;
     return this;
@@ -281,6 +327,8 @@ public class AiProviderModel {
         Objects.equals(this.apiKey, aiProvider.apiKey) &&
         Objects.equals(this.url, aiProvider.url) &&
         Objects.equals(this.enabled, aiProvider.enabled) &&
+        Objects.equals(this.requiresApiKey, aiProvider.requiresApiKey) &&
+        Objects.equals(this.requiresEndpoint, aiProvider.requiresEndpoint) &&
         Objects.equals(this.supportsText, aiProvider.supportsText) &&
         Objects.equals(this.supportsImage, aiProvider.supportsImage) &&
         Objects.equals(this.supportsEmbeddings, aiProvider.supportsEmbeddings) &&
@@ -289,7 +337,7 @@ public class AiProviderModel {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, name, icon, apiKey, url, enabled, supportsText, supportsImage, supportsEmbeddings, copilotDocsProvider);
+    return Objects.hash(id, name, icon, apiKey, url, enabled, requiresApiKey, requiresEndpoint, supportsText, supportsImage, supportsEmbeddings, copilotDocsProvider);
   }
 
   @Override
@@ -302,6 +350,8 @@ public class AiProviderModel {
     sb.append("    apiKey: ").append(toIndentedString(apiKey)).append("\n");
     sb.append("    url: ").append(toIndentedString(url)).append("\n");
     sb.append("    enabled: ").append(toIndentedString(enabled)).append("\n");
+    sb.append("    requiresApiKey: ").append(toIndentedString(requiresApiKey)).append("\n");
+    sb.append("    requiresEndpoint: ").append(toIndentedString(requiresEndpoint)).append("\n");
     sb.append("    supportsText: ").append(toIndentedString(supportsText)).append("\n");
     sb.append("    supportsImage: ").append(toIndentedString(supportsImage)).append("\n");
     sb.append("    supportsEmbeddings: ").append(toIndentedString(supportsEmbeddings)).append("\n");
