@@ -24,6 +24,13 @@ public interface AiProviderFacade {
 
     AiDefaultModelDTO getAiDefaultChatModel(int environmentId);
 
+    /**
+     * Resolves the default chat model for a specific provider, applying the same eligibility rules as
+     * {@link #getAiDefaultChatModel(int)} (provider must be enabled, a chat provider, and have a configured model) but
+     * scoped to a single provider key. Returns {@code null} when the provider is not eligible in the environment.
+     */
+    AiDefaultModelDTO getAiDefaultChatModel(String providerKey, int environmentId);
+
     AiDefaultModelWithApiKeyDTO getAiDefaultChatModelApiKey(int environmentId);
 
     AiDefaultModelDTO getAiDefaultEmbeddingModel(int environmentId);

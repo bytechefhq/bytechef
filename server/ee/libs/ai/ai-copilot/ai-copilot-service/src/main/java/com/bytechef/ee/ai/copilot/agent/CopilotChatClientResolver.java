@@ -26,6 +26,7 @@ import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -46,10 +47,15 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
     private static final Logger log = LoggerFactory.getLogger(CopilotChatClientResolver.class);
 
     private final CatalogChatClientResolver catalogChatClientResolver;
+    private final String defaultProvider;
 
     @SuppressFBWarnings("EI")
-    public CopilotChatClientResolver(CatalogChatClientResolver catalogChatClientResolver) {
+    public CopilotChatClientResolver(
+        CatalogChatClientResolver catalogChatClientResolver,
+        @Value("${bytechef.ai.copilot.provider:}") String defaultProvider) {
+
         this.catalogChatClientResolver = catalogChatClientResolver;
+        this.defaultProvider = defaultProvider;
     }
 
     @Override
@@ -75,6 +81,20 @@ public class CopilotChatClientResolver implements OverrideChatClientResolver {
             log.warn(
                 "Copilot user-selected LLM half-set (provider={}, model={}); using the environment default",
                 llmProvider, llmModel);
+        }
+
+        if (defaultProvider != null && !defaultProvider.isBlank()) {
+            ChatClient preferred =
+                catalogChatClientResolver.resolvePreferred(defaultProvider, environmentId.intValue());
+
+            if (preferred != null) {
+                return preferred;
+            }
+
+            log.warn(
+                "Copilot default provider '{}' (bytechef.ai.copilot.provider) is not usable in environment {} "
+                    + "(disabled or no configured chat model); falling back to the first enabled chat provider",
+                defaultProvider, environmentId);
         }
 
         return catalogChatClientResolver.resolveDefault(environmentId.intValue());

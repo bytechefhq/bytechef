@@ -43,4 +43,16 @@ public interface CatalogChatClientResolver {
      */
     @Nullable
     ChatClient resolveDefault(int environment);
+
+    /**
+     * Resolves a {@link ChatClient} for a specific preferred provider, using that provider's configured default chat
+     * model. Returns {@code null} (caller falls back to {@link #resolveDefault(int)}) when the provider key is blank,
+     * or the provider is disabled, unconfigured, or has no default model in the environment.
+     *
+     * @param providerKey the catalog provider key to prefer (e.g. {@code "anthropic"})
+     * @param environment the environment ordinal
+     * @return a configured {@link ChatClient}, or {@code null} when the preferred provider can't be resolved
+     */
+    @Nullable
+    ChatClient resolvePreferred(String providerKey, int environment);
 }

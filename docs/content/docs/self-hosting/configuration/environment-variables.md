@@ -10,7 +10,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
-| `BYTECHEF_AI_COPILOT_PROVIDER` | Explicit CE chat-model provider key (e.g. `openai`) to use for Copilot, overriding auto-detection from the configured provider API keys/endpoints. Ignored when the EE AI Providers catalog is active. | - |
+| `BYTECHEF_AI_COPILOT_PROVIDER` | Chat-model provider key (e.g. `anthropic`, `openAi`) to prefer for Copilot. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE it is used as the environment default provider when set, provided that provider is enabled and has a configured chat model (`BYTECHEF_AI_PROVIDER_CHAT_<PROVIDER>_OPTIONS_MODEL`); otherwise Copilot falls back to the first enabled chat provider. A per-turn model picked in the Copilot toolbar always overrides this. | - |
 | `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_PROVIDER` | Embedding provider for the Copilot documentation index (OLLAMA, OPENAI) | - |
 | `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_APIKEY` | API key for the Copilot documentation embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
