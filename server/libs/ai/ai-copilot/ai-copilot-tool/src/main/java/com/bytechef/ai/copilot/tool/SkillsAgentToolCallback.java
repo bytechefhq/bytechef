@@ -99,7 +99,8 @@ public class SkillsAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.SKILLS, parentAgent,
+            String result = CurrentAgentContext.callWith(
+                Agent.SKILLS, parentAgent,
                 () -> skillsChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()

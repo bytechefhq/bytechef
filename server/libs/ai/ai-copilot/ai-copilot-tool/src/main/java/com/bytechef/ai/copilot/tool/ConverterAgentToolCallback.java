@@ -99,7 +99,8 @@ public class ConverterAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.CONVERTER_AGENT, parentAgent,
+            String result = CurrentAgentContext.callWith(
+                Agent.CONVERTER_AGENT, parentAgent,
                 () -> converterChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
