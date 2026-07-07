@@ -127,7 +127,8 @@ class AiModelConfiguration {
         return null;
     }
 
-    org.springframework.ai.chat.model.@Nullable ChatModel resolveChatModel() {
+    @Nullable
+    ChatModel resolveChatModel() {
         Provider provider = resolveProvider();
 
         if (provider == null) {
