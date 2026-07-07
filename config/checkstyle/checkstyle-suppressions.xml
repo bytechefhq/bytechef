@@ -31,4 +31,7 @@
     <suppress message="Missing a Javadoc comment"/>
 
     <suppress files="[/\\]generated[/\\]" checks=".*" />
+
+    <!-- Central @ConfigurationProperties aggregator; its deliberate per-provider structure exceeds FileLength. -->
+    <suppress files="ApplicationProperties\.java" checks="FileLength"/>
 </suppressions>
