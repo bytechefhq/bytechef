@@ -13,6 +13,8 @@ Name | Type
 `apiKey` | string
 `url` | string
 `enabled` | boolean
+`requiresApiKey` | boolean
+`requiresEndpoint` | boolean
 `supportsText` | boolean
 `supportsImage` | boolean
 `supportsEmbeddings` | boolean
@@ -31,6 +33,8 @@ const example = {
   "apiKey": null,
   "url": null,
   "enabled": null,
+  "requiresApiKey": null,
+  "requiresEndpoint": null,
   "supportsText": null,
   "supportsImage": null,
   "supportsEmbeddings": null,

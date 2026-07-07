@@ -56,6 +56,18 @@ export interface AiProvider {
      */
     enabled?: boolean;
     /**
+     * Whether this AI provider requires an API key.
+     * @type {boolean}
+     * @memberof AiProvider
+     */
+    readonly requiresApiKey?: boolean;
+    /**
+     * Whether this AI provider requires a per-deployment endpoint URL.
+     * @type {boolean}
+     * @memberof AiProvider
+     */
+    readonly requiresEndpoint?: boolean;
+    /**
      * Whether this AI provider can be used for text (chat) generation.
      * @type {boolean}
      * @memberof AiProvider
@@ -105,6 +117,8 @@ export function AiProviderFromJSONTyped(json: any, ignoreDiscriminator: boolean)
         'apiKey': json['apiKey'] == null ? undefined : json['apiKey'],
         'url': json['url'] == null ? undefined : json['url'],
         'enabled': json['enabled'] == null ? undefined : json['enabled'],
+        'requiresApiKey': json['requiresApiKey'] == null ? undefined : json['requiresApiKey'],
+        'requiresEndpoint': json['requiresEndpoint'] == null ? undefined : json['requiresEndpoint'],
         'supportsText': json['supportsText'] == null ? undefined : json['supportsText'],
         'supportsImage': json['supportsImage'] == null ? undefined : json['supportsImage'],
         'supportsEmbeddings': json['supportsEmbeddings'] == null ? undefined : json['supportsEmbeddings'],
@@ -116,7 +130,7 @@ export function AiProviderToJSON(json: any): AiProvider {
     return AiProviderToJSONTyped(json, false);
 }
 
-export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'|'supportsText'|'supportsImage'|'supportsEmbeddings'|'copilotDocsProvider'> | null, ignoreDiscriminator: boolean = false): any {
+export function AiProviderToJSONTyped(value?: Omit<AiProvider, 'id'|'name'|'icon'|'requiresApiKey'|'requiresEndpoint'|'supportsText'|'supportsImage'|'supportsEmbeddings'|'copilotDocsProvider'> | null, ignoreDiscriminator: boolean = false): any {
     if (value == null) {
         return value;
     }
