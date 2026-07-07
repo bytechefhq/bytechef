@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.embedded.configuration.facade;
 
-import com.bytechef.ee.ai.copilot.connection.CopilotConnectionLister;
+import com.bytechef.ai.copilot.connection.CopilotConnectionLister;
 import com.bytechef.ee.embedded.connected.user.domain.ConnectedUser;
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;

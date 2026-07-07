@@ -22,7 +22,7 @@ import com.agui.json.ObjectMapperFactory;
 import com.agui.server.LocalAgent;
 import com.agui.server.spring.AgUiParameters;
 import com.agui.server.spring.AgUiService;
-import com.bytechef.ee.ai.copilot.constant.CopilotConstants;
+import com.bytechef.ai.copilot.constant.CopilotConstants;
 import com.bytechef.ee.embedded.configuration.dto.CopilotChatContextDTO;
 import com.bytechef.ee.embedded.configuration.facade.AutomationWorkflowProjectFacade;
 import com.bytechef.ee.embedded.configuration.facade.ConnectedUserProjectFacade;

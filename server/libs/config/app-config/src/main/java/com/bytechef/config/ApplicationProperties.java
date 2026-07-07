@@ -806,6 +806,12 @@ public class ApplicationProperties {
              */
             private Docs docs = new Docs();
 
+            /**
+             * Explicit CE chat-model provider key (e.g. openAi) to use for Copilot, overriding auto-detection from the
+             * configured provider API keys/endpoints. Ignored when the EE AI Providers catalog is active.
+             */
+            private String provider;
+
             public boolean isEnabled() {
                 return enabled;
             }
@@ -820,6 +826,14 @@ public class ApplicationProperties {
 
             public void setDocs(Docs docs) {
                 this.docs = docs;
+            }
+
+            public String getProvider() {
+                return provider;
+            }
+
+            public void setProvider(String provider) {
+                this.provider = provider;
             }
 
             /**
@@ -1480,12 +1494,25 @@ public class ApplicationProperties {
                  */
                 private String apiKey;
 
+                /**
+                 * Per-deployment Azure OpenAI resource endpoint (e.g. https://my-resource.openai.azure.com).
+                 */
+                private String endpoint;
+
                 public String getApiKey() {
                     return apiKey;
                 }
 
                 public void setApiKey(String apiKey) {
                     this.apiKey = apiKey;
+                }
+
+                public String getEndpoint() {
+                    return endpoint;
+                }
+
+                public void setEndpoint(String endpoint) {
+                    this.endpoint = endpoint;
                 }
             }
 
@@ -1677,9 +1704,49 @@ public class ApplicationProperties {
                 private Anthropic anthropic = new Anthropic();
 
                 /**
+                 * Azure OpenAI chat model configuration
+                 */
+                private AzureOpenAi azureOpenAi = new AzureOpenAi();
+
+                /**
+                 * DeepSeek chat model configuration
+                 */
+                private DeepSeek deepSeek = new DeepSeek();
+
+                /**
+                 * Groq chat model configuration
+                 */
+                private Groq groq = new Groq();
+
+                /**
+                 * Mistral AI chat model configuration
+                 */
+                private Mistral mistral = new Mistral();
+
+                /**
+                 * NVIDIA AI chat model configuration
+                 */
+                private Nvidia nvidia = new Nvidia();
+
+                /**
+                 * Ollama chat model configuration
+                 */
+                private Ollama ollama = new Ollama();
+
+                /**
                  * OpenAI chat model configuration
                  */
                 private OpenAi openAi = new OpenAi();
+
+                /**
+                 * Perplexity AI chat model configuration
+                 */
+                private Perplexity perplexity = new Perplexity();
+
+                /**
+                 * Google Vertex AI Gemini chat model configuration
+                 */
+                private VertexGemini vertexGemini = new VertexGemini();
 
                 public Anthropic getAnthropic() {
                     return anthropic;
@@ -1689,12 +1756,76 @@ public class ApplicationProperties {
                     this.anthropic = anthropic;
                 }
 
+                public AzureOpenAi getAzureOpenAi() {
+                    return azureOpenAi;
+                }
+
+                public void setAzureOpenAi(AzureOpenAi azureOpenAi) {
+                    this.azureOpenAi = azureOpenAi;
+                }
+
+                public DeepSeek getDeepSeek() {
+                    return deepSeek;
+                }
+
+                public void setDeepSeek(DeepSeek deepSeek) {
+                    this.deepSeek = deepSeek;
+                }
+
+                public Groq getGroq() {
+                    return groq;
+                }
+
+                public void setGroq(Groq groq) {
+                    this.groq = groq;
+                }
+
+                public Mistral getMistral() {
+                    return mistral;
+                }
+
+                public void setMistral(Mistral mistral) {
+                    this.mistral = mistral;
+                }
+
+                public Nvidia getNvidia() {
+                    return nvidia;
+                }
+
+                public void setNvidia(Nvidia nvidia) {
+                    this.nvidia = nvidia;
+                }
+
+                public Ollama getOllama() {
+                    return ollama;
+                }
+
+                public void setOllama(Ollama ollama) {
+                    this.ollama = ollama;
+                }
+
                 public OpenAi getOpenAi() {
                     return openAi;
                 }
 
                 public void setOpenAi(OpenAi openAi) {
                     this.openAi = openAi;
+                }
+
+                public Perplexity getPerplexity() {
+                    return perplexity;
+                }
+
+                public void setPerplexity(Perplexity perplexity) {
+                    this.perplexity = perplexity;
+                }
+
+                public VertexGemini getVertexGemini() {
+                    return vertexGemini;
+                }
+
+                public void setVertexGemini(VertexGemini vertexGemini) {
+                    this.vertexGemini = vertexGemini;
                 }
 
                 /**
@@ -1744,6 +1875,234 @@ public class ApplicationProperties {
 
                         public void setTemperature(Double temperature) {
                             this.temperature = temperature;
+                        }
+                    }
+                }
+
+                /**
+                 * Azure OpenAI chat model configuration.
+                 */
+                public static class AzureOpenAi {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Azure OpenAI chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., gpt-4o)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * DeepSeek chat model configuration.
+                 */
+                public static class DeepSeek {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * DeepSeek chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., deepseek-chat)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * Groq chat model configuration.
+                 */
+                public static class Groq {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Groq chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., llama-3.3-70b-versatile)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * Mistral AI chat model configuration.
+                 */
+                public static class Mistral {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Mistral AI chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., mistral-large-latest)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * NVIDIA AI chat model configuration.
+                 */
+                public static class Nvidia {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * NVIDIA AI chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., meta/llama-3.1-70b-instruct)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * Ollama chat model configuration.
+                 */
+                public static class Ollama {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Ollama chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., llama3.1)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
                         }
                     }
                 }
@@ -1822,6 +2181,82 @@ public class ApplicationProperties {
 
                         public void setVerbosity(Setting setting) {
                             this.verbosity = setting;
+                        }
+                    }
+                }
+
+                /**
+                 * Perplexity AI chat model configuration.
+                 */
+                public static class Perplexity {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Perplexity AI chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., sonar)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+
+                /**
+                 * Google Vertex AI Gemini chat model configuration.
+                 */
+                public static class VertexGemini {
+
+                    /**
+                     * Chat model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Google Vertex AI Gemini chat model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Chat model name (e.g., gemini-1.5-pro)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
                         }
                     }
                 }

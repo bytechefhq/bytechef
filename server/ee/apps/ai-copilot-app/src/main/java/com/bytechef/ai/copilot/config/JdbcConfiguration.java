@@ -16,10 +16,10 @@
 
 package com.bytechef.ai.copilot.config;
 
-import com.bytechef.ee.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.MapToPGObjectConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
-import com.bytechef.ee.ai.copilot.repository.converter.PGobjectToMapConverter;
+import com.bytechef.ai.copilot.repository.converter.ListDoubleToPGObjectConverter;
+import com.bytechef.ai.copilot.repository.converter.MapToPGObjectConverter;
+import com.bytechef.ai.copilot.repository.converter.PGObjectToListDoubleConverter;
+import com.bytechef.ai.copilot.repository.converter.PGobjectToMapConverter;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.List;
