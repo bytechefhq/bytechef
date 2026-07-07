@@ -16,5 +16,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
  */
 @SuppressFBWarnings("EI")
 public record AiProviderDTO(int id, String name, String icon, String apiKey, String url, boolean enabled,
-    boolean supportsText, boolean supportsImage, boolean supportsEmbeddings, boolean copilotDocsProvider) {
+    boolean requiresApiKey, boolean requiresEndpoint, boolean supportsText, boolean supportsImage,
+    boolean supportsEmbeddings, boolean copilotDocsProvider) {
 }
