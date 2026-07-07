@@ -26,6 +26,6 @@ public class AiGatewayPermissionScopeProvider implements PermissionScopeProvider
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("AI_GATEWAY_VIEW", WorkspaceRole.VIEWER));
+            new ScopeDefinition(AiGatewayPermissionScope.AI_GATEWAY_VIEW, WorkspaceRole.VIEWER));
     }
 }

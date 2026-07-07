@@ -26,8 +26,8 @@ public class WorkspacePermissionScopeProvider implements PermissionScopeProvider
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("WORKSPACE_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("WORKSPACE_MANAGE", WorkspaceRole.ADMIN),
-            new ScopeDefinition("WORKSPACE_MEMBER_MANAGE", WorkspaceRole.ADMIN));
+            new ScopeDefinition(WorkspacePermissionScope.WORKSPACE_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(WorkspacePermissionScope.WORKSPACE_MANAGE, WorkspaceRole.ADMIN),
+            new ScopeDefinition(WorkspacePermissionScope.WORKSPACE_MEMBER_MANAGE, WorkspaceRole.ADMIN));
     }
 }

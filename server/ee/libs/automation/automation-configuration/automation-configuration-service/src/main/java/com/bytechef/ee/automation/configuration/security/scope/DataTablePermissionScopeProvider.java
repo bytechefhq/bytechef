@@ -29,8 +29,8 @@ public class DataTablePermissionScopeProvider implements PermissionScopeProvider
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("DATA_TABLE_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("DATA_TABLE_CREATE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("DATA_TABLE_EDIT", WorkspaceRole.EDITOR));
+            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DataTablePermissionScope.DATA_TABLE_EDIT, WorkspaceRole.EDITOR));
     }
 }

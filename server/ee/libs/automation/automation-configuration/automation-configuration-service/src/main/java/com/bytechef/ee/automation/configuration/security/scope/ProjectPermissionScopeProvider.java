@@ -26,8 +26,8 @@ public class ProjectPermissionScopeProvider implements PermissionScopeProvider {
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("PROJECT_CREATE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("PROJECT_SETTINGS", WorkspaceRole.ADMIN),
-            new ScopeDefinition("PROJECT_DELETE", WorkspaceRole.ADMIN));
+            new ScopeDefinition(ProjectPermissionScope.PROJECT_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(ProjectPermissionScope.PROJECT_SETTINGS, WorkspaceRole.ADMIN),
+            new ScopeDefinition(ProjectPermissionScope.PROJECT_DELETE, WorkspaceRole.ADMIN));
     }
 }

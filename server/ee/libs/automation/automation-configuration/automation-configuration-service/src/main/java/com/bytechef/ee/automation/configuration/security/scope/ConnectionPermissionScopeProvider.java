@@ -25,9 +25,9 @@ public class ConnectionPermissionScopeProvider implements PermissionScopeProvide
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("CONNECTION_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("CONNECTION_EDIT", WorkspaceRole.EDITOR),
-            new ScopeDefinition("CONNECTION_DELETE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("CONNECTION_USE", WorkspaceRole.EDITOR));
+            new ScopeDefinition(ConnectionPermissionScope.CONNECTION_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(ConnectionPermissionScope.CONNECTION_EDIT, WorkspaceRole.EDITOR),
+            new ScopeDefinition(ConnectionPermissionScope.CONNECTION_DELETE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(ConnectionPermissionScope.CONNECTION_USE, WorkspaceRole.EDITOR));
     }
 }

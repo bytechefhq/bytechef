@@ -25,8 +25,8 @@ public class ApiKeyPermissionScopeProvider implements PermissionScopeProvider {
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("API_KEY_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("API_KEY_CREATE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("API_KEY_DELETE", WorkspaceRole.EDITOR));
+            new ScopeDefinition(ApiKeyPermissionScope.API_KEY_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(ApiKeyPermissionScope.API_KEY_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(ApiKeyPermissionScope.API_KEY_DELETE, WorkspaceRole.EDITOR));
     }
 }

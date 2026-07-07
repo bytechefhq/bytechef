@@ -25,7 +25,7 @@ public class ExecutionPermissionScopeProvider implements PermissionScopeProvider
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("EXECUTION_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("EXECUTION_DELETE", WorkspaceRole.EDITOR));
+            new ScopeDefinition(ExecutionPermissionScope.EXECUTION_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(ExecutionPermissionScope.EXECUTION_DELETE, WorkspaceRole.EDITOR));
     }
 }

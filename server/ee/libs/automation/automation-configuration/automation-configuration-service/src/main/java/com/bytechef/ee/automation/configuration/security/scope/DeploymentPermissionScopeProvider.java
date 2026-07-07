@@ -25,9 +25,9 @@ public class DeploymentPermissionScopeProvider implements PermissionScopeProvide
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("DEPLOYMENT_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("DEPLOYMENT_PUSH", WorkspaceRole.EDITOR),
-            new ScopeDefinition("DEPLOYMENT_PULL", WorkspaceRole.EDITOR),
-            new ScopeDefinition("DEPLOYMENT_EDIT", WorkspaceRole.EDITOR));
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_PUSH, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_PULL, WorkspaceRole.EDITOR),
+            new ScopeDefinition(DeploymentPermissionScope.DEPLOYMENT_EDIT, WorkspaceRole.EDITOR));
     }
 }

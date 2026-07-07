@@ -29,8 +29,8 @@ public class KnowledgeBasePermissionScopeProvider implements PermissionScopeProv
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("KNOWLEDGE_BASE_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("KNOWLEDGE_BASE_CREATE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("KNOWLEDGE_BASE_EDIT", WorkspaceRole.EDITOR));
+            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(KnowledgeBasePermissionScope.KNOWLEDGE_BASE_EDIT, WorkspaceRole.EDITOR));
     }
 }

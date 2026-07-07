@@ -25,9 +25,9 @@ public class WorkflowPermissionScopeProvider implements PermissionScopeProvider 
     @Override
     public Set<ScopeDefinition> scopeDefinitions() {
         return Set.of(
-            new ScopeDefinition("WORKFLOW_VIEW", WorkspaceRole.VIEWER),
-            new ScopeDefinition("WORKFLOW_CREATE", WorkspaceRole.EDITOR),
-            new ScopeDefinition("WORKFLOW_EDIT", WorkspaceRole.EDITOR),
-            new ScopeDefinition("WORKFLOW_DELETE", WorkspaceRole.EDITOR));
+            new ScopeDefinition(WorkflowPermissionScope.WORKFLOW_VIEW, WorkspaceRole.VIEWER),
+            new ScopeDefinition(WorkflowPermissionScope.WORKFLOW_CREATE, WorkspaceRole.EDITOR),
+            new ScopeDefinition(WorkflowPermissionScope.WORKFLOW_EDIT, WorkspaceRole.EDITOR),
+            new ScopeDefinition(WorkflowPermissionScope.WORKFLOW_DELETE, WorkspaceRole.EDITOR));
     }
 }
