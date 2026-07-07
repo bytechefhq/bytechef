@@ -21,12 +21,12 @@ const AiProviderForm = ({
     onClose: () => void;
     showCancel: boolean;
 }) => {
-    const isOllama = aiProvider.name?.toLowerCase() === 'ollama';
-    const isAzure = aiProvider.name?.toLowerCase() === 'azure open ai';
+    const requiresApiKey = aiProvider.requiresApiKey ?? true;
+    const requiresEndpoint = aiProvider.requiresEndpoint ?? false;
 
     const formSchema = z.object({
-        apiKey: isOllama ? z.string().optional() : z.string().min(1, {message: 'API Key is required.'}),
-        url: isAzure ? z.string().min(1, {message: 'Endpoint is required.'}) : z.string().optional(),
+        apiKey: requiresApiKey ? z.string().min(1, {message: 'API Key is required.'}) : z.string().optional(),
+        url: requiresEndpoint ? z.string().min(1, {message: 'Endpoint is required.'}) : z.string().optional(),
     });
 
     const form = useForm<z.infer<typeof formSchema>>({
@@ -56,9 +56,9 @@ const AiProviderForm = ({
         updateAiProviderMutation.mutate({
             environment,
             id: aiProvider.id!,
-            updateAiProviderRequest: isOllama
+            updateAiProviderRequest: !requiresApiKey
                 ? {url: values.url}
-                : isAzure
+                : requiresEndpoint
                   ? {apiKey: values.apiKey, url: values.url}
                   : {apiKey: values.apiKey},
         });
@@ -67,7 +67,7 @@ const AiProviderForm = ({
     return (
         <Form {...form}>
             <form className="space-y-4" onSubmit={form.handleSubmit(handleSubmit)}>
-                {isOllama ? (
+                {!requiresApiKey ? (
                     <FormField
                         control={form.control}
                         name="url"
@@ -89,7 +89,7 @@ const AiProviderForm = ({
                     />
                 ) : (
                     <>
-                        {isAzure && (
+                        {requiresEndpoint && (
                             <FormField
                                 control={form.control}
                                 name="url"
