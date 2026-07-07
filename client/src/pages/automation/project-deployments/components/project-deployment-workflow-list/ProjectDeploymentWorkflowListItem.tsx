@@ -119,7 +119,7 @@ const ProjectDeploymentWorkflowListItem = ({
     };
 
     return (
-        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-gray-50">
+        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-gray-50">
             <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
                 <span className={twMerge('w-80 text-sm font-semibold', !enabled && 'text-muted-foreground')}>
                     {workflow.label}

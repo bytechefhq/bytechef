@@ -57,8 +57,8 @@ const IntegrationInstanceConfigurationWorkflowList = ({
             ))}
         </div>
     ) : (
-        <div className="p-3">
-            <h3 className="flex justify-start px-2 text-sm font-semibold text-gray-400 uppercase">Workflows</h3>
+        <div className="pt-3">
+            <h3 className="flex justify-start px-3 text-sm font-semibold text-gray-400 uppercase">Workflows</h3>
 
             <ul className="divide-y divide-gray-100">
                 {workflows &&
