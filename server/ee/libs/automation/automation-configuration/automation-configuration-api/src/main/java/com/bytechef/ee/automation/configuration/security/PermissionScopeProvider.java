@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.automation.configuration.security;
 
+import com.bytechef.automation.configuration.security.constant.PermissionScopeType;
 import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.Set;
 
@@ -23,16 +24,16 @@ import java.util.Set;
 public interface PermissionScopeProvider {
 
     /**
-     * The scopes this module owns. Must be unique across all providers; a name declared by two providers (or twice with
-     * different {@link ScopeDefinition#minimumRole()}) is a registration error.
+     * The scopes this module owns. Must be unique across all providers; a scope declared by two providers (or twice
+     * with different {@link ScopeDefinition#minimumRole()}) is a registration error.
      */
     Set<ScopeDefinition> scopeDefinitions();
 
     /**
-     * A single scope: its persisted name and the lowest built-in {@link WorkspaceRole} that is granted it. Higher-
-     * privilege roles inherit it by rank (VIEWER-min &rArr; VIEWER/EDITOR/ADMIN; EDITOR-min &rArr; EDITOR/ADMIN;
+     * A single scope: its {@link PermissionScopeType} and the lowest built-in {@link WorkspaceRole} that is granted it.
+     * Higher-privilege roles inherit it by rank (VIEWER-min &rArr; VIEWER/EDITOR/ADMIN; EDITOR-min &rArr; EDITOR/ADMIN;
      * ADMIN-min &rArr; ADMIN only), which keeps the VIEWER &sub; EDITOR &sub; ADMIN invariant by construction.
      */
-    record ScopeDefinition(String name, WorkspaceRole minimumRole) {
+    record ScopeDefinition(PermissionScopeType scopeType, WorkspaceRole minimumRole) {
     }
 }
