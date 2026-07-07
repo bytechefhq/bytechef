@@ -41,7 +41,7 @@ class CopilotChatClientResolverTest {
     void setUp() {
         catalogChatClientResolver = mock(CatalogChatClientResolver.class);
 
-        resolver = new CopilotChatClientResolver(catalogChatClientResolver);
+        resolver = new CopilotChatClientResolver(catalogChatClientResolver, "");
     }
 
     @Test
@@ -91,5 +91,60 @@ class CopilotChatClientResolverTest {
     @Test
     void testNullStateReturnsNull() {
         assertNull(resolver.resolve(null));
+    }
+
+    @Test
+    void testDefaultProviderPreferredWhenNoUserSelection() {
+        // bytechef.ai.copilot.provider is set and resolvable → Copilot uses it as the environment default instead of
+        // the first-enabled-provider pick.
+        ChatClient preferredChatClient = mock(ChatClient.class);
+
+        when(catalogChatClientResolver.resolvePreferred("anthropic", 3)).thenReturn(preferredChatClient);
+
+        CopilotChatClientResolver preferringResolver =
+            new CopilotChatClientResolver(catalogChatClientResolver, "anthropic");
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
+
+        assertSame(preferredChatClient, preferringResolver.resolve(state));
+
+        verify(catalogChatClientResolver, never()).resolveDefault(anyInt());
+    }
+
+    @Test
+    void testDefaultProviderFallsBackWhenNotResolvable() {
+        // bytechef.ai.copilot.provider names a provider that is disabled or has no configured model in this
+        // environment → Copilot falls back to the first enabled chat provider.
+        ChatClient defaultChatClient = mock(ChatClient.class);
+
+        when(catalogChatClientResolver.resolvePreferred("anthropic", 3)).thenReturn(null);
+        when(catalogChatClientResolver.resolveDefault(3)).thenReturn(defaultChatClient);
+
+        CopilotChatClientResolver preferringResolver =
+            new CopilotChatClientResolver(catalogChatClientResolver, "anthropic");
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
+
+        assertSame(defaultChatClient, preferringResolver.resolve(state));
+    }
+
+    @Test
+    void testNoDefaultProviderUsesEnvironmentDefault() {
+        // bytechef.ai.copilot.provider is blank → keep the existing first-enabled-provider behavior.
+        ChatClient defaultChatClient = mock(ChatClient.class);
+
+        when(catalogChatClientResolver.resolveDefault(3)).thenReturn(defaultChatClient);
+
+        State state = new State();
+
+        state.set(CopilotConstants.STATE_ENVIRONMENT_ID, "3");
+
+        assertSame(defaultChatClient, resolver.resolve(state));
+
+        verify(catalogChatClientResolver, never()).resolvePreferred(anyString(), anyInt());
     }
 }

@@ -34,7 +34,7 @@ class CopilotChatClientResolverCatalogTest {
 
         when(catalogChatClientResolver.resolve("ai.provider.openAi", "gpt-4o", 3)).thenReturn(catalogChatClient);
 
-        CopilotChatClientResolver resolver = new CopilotChatClientResolver(catalogChatClientResolver);
+        CopilotChatClientResolver resolver = new CopilotChatClientResolver(catalogChatClientResolver, "");
 
         State state = new State();
 

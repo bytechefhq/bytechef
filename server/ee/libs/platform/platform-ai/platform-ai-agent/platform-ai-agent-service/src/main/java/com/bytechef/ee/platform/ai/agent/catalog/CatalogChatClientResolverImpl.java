@@ -91,4 +91,23 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
 
         return resolve(defaultModel.provider(), defaultModel.model(), environment);
     }
+
+    @Override
+    public @Nullable ChatClient resolvePreferred(String providerKey, int environment) {
+        if (providerKey == null || providerKey.isBlank()) {
+            return null;
+        }
+
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = aiProviderFacade.getAiDefaultChatModel(providerKey, environment);
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolve(defaultModel.provider(), defaultModel.model(), environment);
+    }
 }
