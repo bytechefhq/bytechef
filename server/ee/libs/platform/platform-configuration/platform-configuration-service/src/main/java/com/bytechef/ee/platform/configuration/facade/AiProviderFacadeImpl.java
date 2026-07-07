@@ -227,8 +227,8 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
 
                 return new AiProviderDTO(
                     provider.getId(), provider.getLabel(), componentDefinition.getIcon(), apiKey, url, enabled,
-                    provider.isChatSupported(), provider.isImageSupported(), provider.isEmbeddingSupported(),
-                    isCopilotDocsProvider(provider));
+                    provider.requiresApiKey(), provider.requiresEndpoint(), provider.isChatSupported(),
+                    provider.isImageSupported(), provider.isEmbeddingSupported(), isCopilotDocsProvider(provider));
             })
             .filter(Objects::nonNull)
             .toList();

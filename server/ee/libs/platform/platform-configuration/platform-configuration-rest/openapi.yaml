@@ -196,6 +196,14 @@ components:
         enabled:
           description: "The enabled status of an AI provider."
           type: "boolean"
+        requiresApiKey:
+          description: "Whether this AI provider requires an API key."
+          type: "boolean"
+          readOnly: true
+        requiresEndpoint:
+          description: "Whether this AI provider requires a per-deployment endpoint URL."
+          type: "boolean"
+          readOnly: true
         supportsText:
           description: "Whether this AI provider can be used for text (chat) generation."
           type: "boolean"
