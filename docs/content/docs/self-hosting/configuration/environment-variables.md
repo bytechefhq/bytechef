@@ -10,6 +10,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
+| `BYTECHEF_AI_COPILOT_PROVIDER` | Explicit CE chat-model provider key (e.g. `openai`) to use for Copilot, overriding auto-detection from the configured provider API keys/endpoints. Ignored when the EE AI Providers catalog is active. | - |
 | `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_PROVIDER` | Embedding provider for the Copilot documentation index (OLLAMA, OPENAI) | - |
 | `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_APIKEY` | API key for the Copilot documentation embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
@@ -54,6 +55,7 @@ ByteChef can be configured using environment variables. This page documents all 
 |---------------------------------------------|---|---|
 | `BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY`     | Anthropic API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_APIKEY`  | Azure OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_ENDPOINT` | Azure OpenAI resource endpoint, e.g. `https://my-resource.openai.azure.com` | - |
 | `BYTECHEF_AI_PROVIDER_DEEP_SEEK_APIKEY`     | DeepSeek API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_GROQ_APIKEY`          | Groq API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_MISTRAL_APIKEY`       | Mistral API key (sensitive) | - |
@@ -71,15 +73,24 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_AI_PROVIDER_CHAT_ANTHROPIC_OPTIONS_MODEL` | Anthropic chat model name | `claude-sonnet-4-6` |
 | `BYTECHEF_AI_PROVIDER_CHAT_ANTHROPIC_OPTIONS_TEMPERATURE` | Anthropic chat temperature (0.0-1.0) | `0.5` |
+| `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPENAI_OPTIONS_MODEL` | Azure OpenAI chat model name (e.g., `gpt-4o`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_DEEP_SEEK_OPTIONS_MODEL` | DeepSeek chat model name (e.g., `deepseek-chat`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_GROQ_OPTIONS_MODEL` | Groq chat model name (e.g., `llama-3.3-70b-versatile`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_MISTRAL_OPTIONS_MODEL` | Mistral chat model name (e.g., `mistral-large-latest`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_NVIDIA_OPTIONS_MODEL` | NVIDIA chat model name (e.g., `meta/llama-3.1-70b-instruct`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `llama3.1`) | - |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONINGEFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_VERBOSITY` | OpenAI response verbosity (NONE, LOW, MEDIUM, HIGH) | `LOW` |
+| `BYTECHEF_AI_PROVIDER_CHAT_PERPLEXITY_OPTIONS_MODEL` | Perplexity chat model name (e.g., `sonar`) | - |
+| `BYTECHEF_AI_PROVIDER_CHAT_VERTEX_GEMINI_OPTIONS_MODEL` | Vertex Gemini chat model name (e.g., `gemini-1.5-pro`) | - |
 
 ## AI Embedding Model Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_AI_PROVIDER_EMBEDDING_MISTRAL_OPTIONS_MODEL` | Mistral embedding model name (e.g., `mistral-embed`) | - |
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` | Ollama embedding model name | `qwen3-embedding:8b` |
 | `BYTECHEF_AI_PROVIDER_EMBEDDING_OPENAI_OPTIONS_MODEL` | OpenAI embedding model name | `text-embedding-3-small` |
 
