@@ -247,7 +247,7 @@ const WorkflowNodesTabs = ({
         .join(' ');
 
     return (
-        <Tabs className="flex h-full flex-col" onValueChange={setActiveTab} value={activeTab}>
+        <Tabs className="flex h-full flex-col gap-0" onValueChange={setActiveTab} value={activeTab}>
             <div className="px-2">
                 <TabsList className="my-2 flex w-full justify-between bg-surface-neutral-secondary">
                     {!hideTriggerComponents && (

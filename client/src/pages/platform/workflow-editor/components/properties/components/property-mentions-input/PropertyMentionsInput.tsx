@@ -263,25 +263,25 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
 
                 <div
                     className={twMerge(
-                        'relative flex items-center rounded-md border-gray-200 shadow-xs transition-colors',
+                        'relative flex items-center rounded-md transition-colors',
                         error && 'border-rose-300 text-rose-900 ring-rose-300 focus-within:ring-rose-300',
-                        isFocused && 'ring-2 ring-blue-500',
+                        isFocused && 'ring-2 ring-ring',
                         label && 'mt-1',
-                        leadingIcon && 'rounded-md border'
+                        leadingIcon && 'rounded-md border border-stroke-neutral-secondary'
                     )}
                     onDragEnter={handleDragEnter}
                     onDragOver={handleDragOver}
                     title={controlType}
                 >
                     {leadingIcon && (
-                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r bg-gray-100 px-3">
+                        <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3">
                             {isFormulaMode ? <SquareFunctionIcon className="size-4" /> : leadingIcon}
                         </span>
                     )}
 
                     <div
                         className={twMerge(
-                            'property-mentions-editor flex h-full min-h-[34px] w-full rounded-md bg-white',
+                            'property-mentions-editor flex h-full min-h-9 w-full rounded-md bg-white',
                             leadingIcon && 'border-0 pr-0.5 pl-10',
                             className
                         )}

@@ -176,7 +176,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         ref={ref}
                         {...props}
                         className={twMerge(
-                            'flex h-auto w-full items-center justify-between rounded-md border border-input bg-surface-neutral-primary px-4 py-2 text-sm font-normal text-primary hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
+                            'flex h-auto w-full items-center justify-between rounded-md border border-stroke-neutral-secondary bg-surface-neutral-primary px-4 py-2 text-sm font-normal text-primary hover:bg-surface-neutral-primary active:bg-surface-neutral-primary [&_svg]:pointer-events-auto',
                             leadingIcon && 'relative',
                             optionsLoading && 'min-h-10 cursor-not-allowed',
                             className
@@ -185,7 +185,7 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                         onClick={handleTogglePopover}
                     >
                         {leadingIcon && (
-                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border-r border-gray-200 bg-gray-100 px-3">
+                            <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md bg-surface-neutral-secondary px-3">
                                 {leadingIcon}
                             </div>
                         )}
@@ -195,7 +195,9 @@ export const MultiSelect = forwardRef<HTMLButtonElement, MultiSelectProps>(
                                 <div className={twMerge('flex flex-wrap items-center gap-y-2', leadingIcon && 'pl-9')}>
                                     {selectedValues.slice(0, maxCount).map((value) => {
                                         const option = options.find((o) => o.value === value);
+
                                         const IconComponent = option?.icon;
+
                                         const badgeStyleType =
                                             variant === 'destructive' ? 'destructive-filled' : 'secondary-filled';
 

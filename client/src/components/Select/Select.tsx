@@ -15,6 +15,8 @@ import {twMerge} from 'tailwind-merge';
 
 type SelectContentPropsType = ComponentProps<typeof ShadcnSelectContent>;
 
+type SelectTriggerPropsType = ComponentProps<typeof ShadcnSelectTrigger>;
+
 /**
  * Wrapper around the shadcn SelectContent that defaults to `position="popper"`.
  *
@@ -36,6 +38,18 @@ function SelectContent({className, position = 'popper', ...props}: SelectContent
 
 SelectContent.displayName = 'SelectContent';
 
+/**
+ * Wrapper around the shadcn SelectTrigger that overrides the base `shadow-xs` with `shadow-none`.
+ *
+ * The shadcn base applies `shadow-xs`, which is inconsistent with the flat inputs used across the
+ * property panels. `shadow-none` wins the twMerge cascade, and can still be overridden per usage.
+ */
+function SelectTrigger({className, ...props}: SelectTriggerPropsType) {
+    return <ShadcnSelectTrigger className={twMerge('shadow-none', className)} {...props} />;
+}
+
+SelectTrigger.displayName = 'SelectTrigger';
+
 const Select = ShadcnSelect;
 const SelectGroup = ShadcnSelectGroup;
 const SelectItem = ShadcnSelectItem;
@@ -43,7 +57,6 @@ const SelectLabel = ShadcnSelectLabel;
 const SelectScrollDownButton = ShadcnSelectScrollDownButton;
 const SelectScrollUpButton = ShadcnSelectScrollUpButton;
 const SelectSeparator = ShadcnSelectSeparator;
-const SelectTrigger = ShadcnSelectTrigger;
 const SelectValue = ShadcnSelectValue;
 
 export {
