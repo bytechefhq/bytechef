@@ -56,8 +56,8 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
             }
         } catch (RuntimeException exception) {
             log.warn(
-                "{}: override ChatClient resolver threw; falling back to default. {}", getClass().getSimpleName(),
-                exception.getMessage());
+                "{}: override ChatClient resolver threw; falling back to default.", getClass().getSimpleName(),
+                exception);
         }
 
         return super.resolveChatClient(input);
