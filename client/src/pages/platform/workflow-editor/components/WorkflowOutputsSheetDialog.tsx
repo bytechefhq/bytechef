@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
 import {
     Dialog,
@@ -11,7 +12,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import PropertyMentionsInput from '@/pages/platform/workflow-editor/components/properties/components/property-mentions-input/PropertyMentionsInput';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import {SPACE} from '@/shared/constants';

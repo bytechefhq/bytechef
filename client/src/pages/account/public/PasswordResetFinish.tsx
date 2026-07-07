@@ -1,7 +1,7 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {usePasswordResetStore} from '@/pages/account/public/stores/usePasswordResetStore';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';
 import {zodResolver} from '@hookform/resolvers/zod';

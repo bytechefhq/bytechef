@@ -1,4 +1,4 @@
-import {Input} from '@/components/ui/input';
+import {Input} from '@/components/Input/Input';
 import {Label} from '@/components/ui/label';
 import {KeyboardEvent, useEffect, useRef, useState} from 'react';
 

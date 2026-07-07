@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {usePasswordStore} from '@/pages/account/settings/stores/usePasswordStore';
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useEffect} from 'react';

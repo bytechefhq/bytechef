@@ -1,5 +1,6 @@
 import Button from '@/components/Button/Button';
 import CreatableSelect from '@/components/CreatableSelect/CreatableSelect';
+import {Input} from '@/components/Input/Input';
 import {
     Dialog,
     DialogClose,
@@ -12,7 +13,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {Textarea} from '@/components/ui/textarea';
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';

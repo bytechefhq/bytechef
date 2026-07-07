@@ -1,4 +1,4 @@
-import {Input} from '@/components/ui/input';
+import {Input} from '@/components/Input/Input';
 import {useTemplatesStore} from '@/pages/automation/templates/stores/useTemplatesStore';
 import {Search} from 'lucide-react';
 import {ChangeEvent} from 'react';

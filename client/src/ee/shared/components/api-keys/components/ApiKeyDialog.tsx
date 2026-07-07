@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {
     Dialog,
     DialogClose,
@@ -10,7 +11,6 @@ import {
     DialogTrigger,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import useApiKeys from '@/ee/shared/components/api-keys/hooks/useApiKeys';
 import {useApiKeysStore} from '@/ee/shared/components/api-keys/stores/useApiKeysStore';
 import {zodResolver} from '@hookform/resolvers/zod';

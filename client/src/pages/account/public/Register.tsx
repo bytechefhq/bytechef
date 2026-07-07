@@ -1,8 +1,8 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {Card, CardContent, CardDescription, CardHeader, CardTitle} from '@/components/ui/card';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {useRegisterStore} from '@/pages/account/public/stores/useRegisterStore';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import PublicLayoutContainer from '@/shared/layout/PublicLayoutContainer';

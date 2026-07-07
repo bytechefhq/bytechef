@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {GitConfiguration} from '@/ee/shared/middleware/platform/configuration';
 import {useUpdateWorkspaceGitConfigurationMutation} from '@/ee/shared/mutations/platform/gitConfiguration.mutations';
 import {GitConfigurationKeys} from '@/ee/shared/queries/platform/gitConfiguration.queries';

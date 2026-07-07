@@ -1,10 +1,10 @@
 import Badge from '@/components/Badge/Badge';
+import {Input} from '@/components/Input/Input';
 import {Note} from '@/components/Note';
 import ReadOnlyInput from '@/components/ReadOnlyInput/ReadOnlyInput';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {Empty} from '@/components/ui/empty';
 import {FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {Skeleton} from '@/components/ui/skeleton';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Textarea} from '@/components/ui/textarea';

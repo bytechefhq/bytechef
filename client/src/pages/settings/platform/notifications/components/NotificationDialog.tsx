@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {MultiSelect} from '@/components/MultiSelect/MultiSelect';
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/Select/Select';
 import {
@@ -12,7 +13,6 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {Notification, NotificationTypeEnum} from '@/shared/middleware/platform/notification';
 import {UseFormReturn} from 'react-hook-form';
 

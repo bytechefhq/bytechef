@@ -1,7 +1,7 @@
 import ComboBox, {ComboBoxItemType} from '@/components/ComboBox/ComboBox';
+import {Input} from '@/components/Input/Input';
 import LazyLoadSVG from '@/components/LazyLoadSVG/LazyLoadSVG';
 import {FormControl, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {ComponentDefinition, ComponentDefinitionBasic} from '@/shared/middleware/platform/configuration';
 import {ControllerRenderProps} from 'react-hook-form';
 import {twMerge} from 'tailwind-merge';

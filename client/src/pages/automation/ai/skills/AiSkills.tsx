@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -6,7 +7,6 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import AiSidebarNav from '@/pages/automation/ai/components/AiSidebarNav';
 import AiSkillsPanel from '@/pages/automation/ai/skills/AiSkillsPanel';

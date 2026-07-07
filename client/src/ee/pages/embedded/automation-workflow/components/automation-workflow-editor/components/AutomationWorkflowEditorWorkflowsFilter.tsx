@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
-import {Input} from '@/components/ui/input';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {SORT_OPTIONS} from '@/shared/constants';
 import {CheckIcon, ListFilterIcon, SearchIcon} from 'lucide-react';

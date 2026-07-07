@@ -1,4 +1,5 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import LoadingIcon from '@/components/LoadingIcon';
 import {
     AlertDialog,
@@ -11,7 +12,6 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import {Input} from '@/components/ui/input';
 import {ShieldCheckIcon, ShieldOffIcon} from 'lucide-react';
 
 import {useAccountProfileMfa} from './hooks/useAccountProfileMfa';

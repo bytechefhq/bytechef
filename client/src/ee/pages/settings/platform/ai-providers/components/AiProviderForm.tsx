@@ -1,6 +1,6 @@
 import Button from '@/components/Button/Button';
+import {Input} from '@/components/Input/Input';
 import {Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage} from '@/components/ui/form';
-import {Input} from '@/components/ui/input';
 import {AiProvider} from '@/ee/shared/middleware/platform/configuration';
 import {useUpdateAiProviderMutation} from '@/ee/shared/mutations/platform/aiProvider.mutations';
 import {AiProviderKeys} from '@/ee/shared/queries/platform/aiProviders.queries';

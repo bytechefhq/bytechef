@@ -1,5 +1,5 @@
 import Button from '@/components/Button/Button';
-import {Input} from '@/components/ui/input';
+import {Input} from '@/components/Input/Input';
 import {LayoutDirectionType} from '@/shared/constants';
 import {EdgeLabelRenderer} from '@xyflow/react';
 import {CheckIcon, PenIcon, PlusIcon, TrashIcon} from 'lucide-react';

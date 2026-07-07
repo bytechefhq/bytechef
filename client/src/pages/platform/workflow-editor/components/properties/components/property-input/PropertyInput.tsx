@@ -1,5 +1,5 @@
+import {Input} from '@/components/Input/Input';
 import RequiredMark from '@/components/RequiredMark';
-import {Input} from '@/components/ui/input';
 import {Label} from '@/components/ui/label';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
