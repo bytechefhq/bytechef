@@ -47,6 +47,7 @@ public enum Provider {
     OLLAMA(18, "ollama", "ai.provider.ollama", "Ollama");
 
     public static final Set<Provider> EMBEDDING_PROVIDERS = EnumSet.of(
+        MISTRAL,
         OLLAMA,
         OPEN_AI);
 

@@ -36,12 +36,14 @@ import org.springframework.ai.mistralai.api.MistralAiApi;
  */
 public class MistralAiEmbedding {
 
+    public static final EmbeddingFunction EMBEDDING_MODEL = MistralAiEmbedding::apply;
+
     public static final ClusterElementDefinition<?> CLUSTER_ELEMENT_DEFINITION =
         ComponentDsl.<EmbeddingFunction>clusterElement("embedding")
             .title("Mistral Embedding")
             .description("Mistral embedding.")
             .type(EMBEDDING)
-            .object(() -> MistralAiEmbedding::apply)
+            .object(() -> EMBEDDING_MODEL)
             .properties(
                 string(MODEL)
                     .label("Model")

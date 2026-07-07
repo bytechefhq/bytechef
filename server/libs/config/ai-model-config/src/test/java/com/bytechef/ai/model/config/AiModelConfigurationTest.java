@@ -326,4 +326,60 @@ class AiModelConfigurationTest {
 
         assertThat(embeddingModel).isNotNull();
     }
+
+    @Test
+    void resolveEmbeddingProviderSelectsMistralWhenEmbeddingModelAndApiKeyConfigured() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getMistral()
+            .setApiKey("test-api-key");
+        applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
+            .getMistral()
+            .getOptions()
+            .setModel("mistral-embed");
+
+        AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
+
+        assertThat(aiModelConfiguration.resolveEmbeddingProvider()).isEqualTo(Provider.MISTRAL);
+    }
+
+    @Test
+    void resolveEmbeddingProviderDoesNotSelectMistralFromApiKeyAlone() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getMistral()
+            .setApiKey("test-api-key");
+
+        AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
+
+        assertThat(aiModelConfiguration.resolveEmbeddingProvider()).isNull();
+    }
+
+    @Test
+    void resolveEmbeddingBuildsEmbeddingModelForMistral() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getMistral()
+            .setApiKey("test-api-key");
+        applicationProperties.getAi()
+            .getProvider()
+            .getEmbedding()
+            .getMistral()
+            .getOptions()
+            .setModel("mistral-embed");
+
+        AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
+
+        EmbeddingModel embeddingModel = aiModelConfiguration.resolveEmbedding();
+
+        assertThat(embeddingModel).isNotNull();
+    }
 }

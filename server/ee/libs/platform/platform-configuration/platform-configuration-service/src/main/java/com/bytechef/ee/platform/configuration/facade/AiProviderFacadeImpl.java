@@ -350,6 +350,9 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
             .getEmbedding();
 
         return switch (provider) {
+            case MISTRAL -> embedding.getMistral()
+                .getOptions()
+                .getModel();
             case OLLAMA -> embedding.getOllama()
                 .getOptions()
                 .getModel();

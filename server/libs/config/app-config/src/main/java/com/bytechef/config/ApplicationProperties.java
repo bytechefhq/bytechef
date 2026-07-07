@@ -2268,6 +2268,11 @@ public class ApplicationProperties {
             public static class Embedding {
 
                 /**
+                 * Mistral embedding model configuration
+                 */
+                private Mistral mistral = new Mistral();
+
+                /**
                  * Ollama embedding model configuration
                  */
                 private Ollama ollama = new Ollama();
@@ -2276,6 +2281,14 @@ public class ApplicationProperties {
                  * OpenAI embedding model configuration
                  */
                 private OpenAi openAi = new OpenAi();
+
+                public Mistral getMistral() {
+                    return mistral;
+                }
+
+                public void setMistral(Mistral mistral) {
+                    this.mistral = mistral;
+                }
 
                 public Ollama getOllama() {
                     return ollama;
@@ -2291,6 +2304,44 @@ public class ApplicationProperties {
 
                 public void setOpenAi(OpenAi openAi) {
                     this.openAi = openAi;
+                }
+
+                /**
+                 * Mistral embedding model configuration.
+                 */
+                public static class Mistral {
+
+                    /**
+                     * Embedding model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * Mistral embedding model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Embedding model name (e.g., mistral-embed)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
                 }
 
                 /**
