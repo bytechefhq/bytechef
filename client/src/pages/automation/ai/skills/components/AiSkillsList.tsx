@@ -11,7 +11,7 @@ const AiSkillsList = ({skills}: AiSkillsListProps) => {
 
     return (
         <div className="flex flex-1 flex-col">
-            <div className="flex-1 divide-y divide-border/50">
+            <div className="flex-1">
                 {filteredSkills.length > 0 ? (
                     filteredSkills.map((skill) => (
                         <AiSkillListItem

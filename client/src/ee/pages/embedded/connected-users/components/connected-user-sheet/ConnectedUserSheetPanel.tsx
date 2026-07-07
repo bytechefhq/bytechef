@@ -16,7 +16,7 @@ interface ConnectedUserSheetPanelProps {
 
 const ConnectedUserSheetPanel = ({connectedUser}: ConnectedUserSheetPanelProps) => {
     return (
-        <div className="flex size-full flex-col space-y-10 pt-4">
+        <div className="flex min-h-full w-full shrink-0 flex-col space-y-10 rounded-lg bg-background p-3">
             <div className="w-full space-y-2">
                 <div className="text-base font-semibold">Profile</div>
 

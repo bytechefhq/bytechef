@@ -28,7 +28,7 @@ const AutomationWorkflowProjectWorkflowListItem = ({
         : undefined;
 
     return (
-        <li className="flex items-center justify-between rounded-md px-2 py-1 hover:bg-destructive-foreground">
+        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground">
             <div
                 className="flex flex-1 cursor-pointer items-center gap-2"
                 onClick={() => onSelectWorkflow(workflow.workflowUuid)}

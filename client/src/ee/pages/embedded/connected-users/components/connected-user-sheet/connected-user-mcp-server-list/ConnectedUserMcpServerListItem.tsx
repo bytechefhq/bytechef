@@ -48,7 +48,7 @@ const ConnectedUserMcpServerListItem = ({
     return (
         <>
             <Collapsible key={mcpServer.id}>
-                <div className="flex w-full items-center justify-between px-2 hover:bg-muted/50">
+                <div className="mb-2 flex items-center justify-between rounded border border-border/50 p-3">
                     <CollapsibleTrigger className="flex-1 py-3">
                         <div className="flex flex-col items-start justify-center gap-y-2">
                             <div
