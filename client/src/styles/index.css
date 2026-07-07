@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import "tw-shimmer";
+@import 'tw-shimmer';
 
 @config '../../tailwind.config.js';
 
@@ -94,7 +94,7 @@
         --primary: 220.9 39.3% 11%;
         --primary-foreground: 210 20% 98%;
         --radius: 0.5rem;
-        --ring: 213 87% 48%;
+        --ring: 217 61% 60%;
         --secondary: 220 14.3% 95.9%;
         --secondary-foreground: 220.9 39.3% 11%;
         --skeleton: 220 9% 93%;
@@ -432,4 +432,3 @@
         margin-bottom: 0.25rem !important;
     }
 }
-

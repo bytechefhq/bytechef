@@ -4,7 +4,6 @@
     @apply border;
     @apply border-input!;
     @apply rounded-md!;
-    @apply shadow-xs!;
     @apply sm:text-sm;
     min-height: 36px;
 }

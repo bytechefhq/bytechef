@@ -123,20 +123,20 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                 >
                     <div
                         className={twMerge(
-                            'focus:ring-2 focus:ring-blue-500 focus-visible:outline-hidden',
+                            'focus:ring-2 focus:ring-ring focus-visible:outline-hidden',
                             leadingIcon && 'relative rounded-md',
                             type === 'hidden' && 'border-0',
                             error && 'ring-rose-300',
                             trailingAction &&
-                                'flex h-9 items-center rounded-md border border-input shadow-xs focus-within:ring-2 focus-within:ring-blue-500'
+                                'flex h-9 items-center rounded-md border border-stroke-neutral-secondary focus-within:ring-2 focus-within:ring-ring'
                         )}
                     >
                         {type !== 'hidden' && leadingIcon && (
                             <div
                                 className={twMerge(
-                                    'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-gray-200 bg-gray-100 px-3',
+                                    'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-r-0 border-stroke-neutral-secondary bg-surface-neutral-secondary px-3',
                                     trailingAction && 'border-y-0 border-l-0',
-                                    error && 'border-r-0 border-rose-300 text-rose-900 placeholder-rose-300'
+                                    error && 'border-rose-300 text-rose-900 placeholder-rose-300'
                                 )}
                             >
                                 {leadingIcon}
@@ -146,13 +146,13 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                         {inputOverlay || (
                             <Input
                                 className={twMerge(
-                                    'bg-background outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:outline-hidden',
+                                    'shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
                                     error &&
                                         'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
                                     disabled && 'bg-gray-100 text-content-neutral-secondary',
                                     leadingIcon && 'pl-property-input-position leading-relaxed',
                                     trailingAction &&
-                                        'h-full flex-1 border-0 shadow-none focus-visible:ring-0 focus-visible:ring-offset-0',
+                                        'h-full flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0',
                                     className
                                 )}
                                 disabled={disabled}
