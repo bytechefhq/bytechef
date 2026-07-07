@@ -354,8 +354,13 @@ export const splitSubflowDeploymentValues = (
     return {ownValues, subflowValuesByUuid};
 };
 
-const isSubflowWorkflow = (workflow?: Workflow): boolean =>
-    !!workflow?.workflowTriggerComponentNames?.includes('workflow');
+/**
+ * A workflow is only a "subflow" (nested under a parent, no toggle of its own) if some workflow in this same set
+ * actually invokes it via a `subflow` task. A workflow merely having the `workflow` component's "New Workflow Call"
+ * trigger is not sufficient — MCP tool workflows use that trigger too, but are top-level entries, not subflows.
+ */
+const isSubflowWorkflow = (workflow: Workflow | undefined, reachableSubflowUuids: Set<string>): boolean =>
+    !!workflow?.workflowUuid && reachableSubflowUuids.has(workflow.workflowUuid);
 
 /**
  * Maps the form's projectDeploymentWorkflow entries into the array sent to the backend. Subflows are nested under their
@@ -373,10 +378,12 @@ export const buildDeploymentWorkflows = (
 
     const workflowsById = new Map(workflows.map((workflow) => [workflow.id, workflow]));
 
+    const reachableSubflowUuids = getReachableSubflowUuids(workflows, workflows);
+
     const enabledParentWorkflows = formWorkflows
         .filter((formWorkflow) => formWorkflow.enabled)
         .map((formWorkflow) => workflowsById.get(formWorkflow.workflowId))
-        .filter((workflow): workflow is Workflow => !!workflow && !isSubflowWorkflow(workflow));
+        .filter((workflow): workflow is Workflow => !!workflow && !isSubflowWorkflow(workflow, reachableSubflowUuids));
 
     const enabledSubflowUuids = getReachableSubflowUuids(enabledParentWorkflows, workflows);
 
