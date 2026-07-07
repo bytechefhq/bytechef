@@ -2,6 +2,8 @@ import ProjectDeploymentDialogWorkflowsStepItem from '@/pages/automation/project
 import {Connection, ProjectDeployment, Workflow} from '@/shared/middleware/automation/configuration';
 import {Control, FormState, UseFormSetValue} from 'react-hook-form';
 
+import {getReachableSubflowUuids} from './projectDeploymentDialog-utils';
+
 export interface ProjectDeploymentDialogWorkflowsStepProps {
     connections?: Connection[];
     connectionsGrouped?: boolean;
@@ -19,8 +21,10 @@ const ProjectDeploymentDialogWorkflowsStep = ({
     setValue,
     workflows,
 }: ProjectDeploymentDialogWorkflowsStepProps) => {
+    const reachableSubflowUuids = getReachableSubflowUuids(workflows, workflows);
+
     const nonSubflowWorkflows = workflows.filter(
-        (workflow) => !workflow.workflowTriggerComponentNames?.includes('workflow')
+        (workflow) => !(workflow.workflowUuid && reachableSubflowUuids.has(workflow.workflowUuid))
     );
 
     return (
