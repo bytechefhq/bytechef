@@ -6,7 +6,7 @@ val copyDocs = tasks.register<Copy>("copyDocs") {
         include("**/*.md", "**/*.mdx")
         exclude("reference/components/**", "reference/flow-controls/**")
     }
-    into(layout.projectDirectory.dir("src/main/resources/docs"))
+    into(layout.buildDirectory.dir("generated-resources/docs"))
 }
 
 val copyComponentDocs = tasks.register<Copy>("copyComponentDocs") {
@@ -21,7 +21,7 @@ val copyComponentDocs = tasks.register<Copy>("copyComponentDocs") {
         }
         includeEmptyDirs = false
     }
-    into(layout.projectDirectory.dir("src/main/resources/docs/reference/components"))
+    into(layout.buildDirectory.dir("generated-resources/docs/reference/components"))
 }
 
 val copyEeComponentDocs = tasks.register<Copy>("copyEeComponentDocs") {
@@ -36,7 +36,7 @@ val copyEeComponentDocs = tasks.register<Copy>("copyEeComponentDocs") {
         }
         includeEmptyDirs = false
     }
-    into(layout.projectDirectory.dir("src/main/resources/docs/reference/components"))
+    into(layout.buildDirectory.dir("generated-resources/docs/reference/components"))
 }
 
 val copyTaskDispatcherDocs = tasks.register<Copy>("copyTaskDispatcherDocs") {
@@ -51,7 +51,7 @@ val copyTaskDispatcherDocs = tasks.register<Copy>("copyTaskDispatcherDocs") {
         }
         includeEmptyDirs = false
     }
-    into(layout.projectDirectory.dir("src/main/resources/docs/reference/task-dispatchers"))
+    into(layout.buildDirectory.dir("generated-resources/docs/reference/task-dispatchers"))
 }
 
 val copyEeTaskDispatcherDocs = tasks.register<Copy>("copyEeTaskDispatcherDocs") {
@@ -66,7 +66,7 @@ val copyEeTaskDispatcherDocs = tasks.register<Copy>("copyEeTaskDispatcherDocs") 
         }
         includeEmptyDirs = false
     }
-    into(layout.projectDirectory.dir("src/main/resources/docs/reference/task-dispatchers"))
+    into(layout.buildDirectory.dir("generated-resources/docs/reference/task-dispatchers"))
 }
 
 val copyAllDocs = tasks.register("copyAllDocs") {
@@ -82,6 +82,14 @@ tasks.compileJava {
 
 tasks.processResources {
     dependsOn(copyAllDocs)
+}
+
+sourceSets {
+    named("main") {
+        resources {
+            srcDir(layout.buildDirectory.dir("generated-resources"))
+        }
+    }
 }
 
 spotless {
