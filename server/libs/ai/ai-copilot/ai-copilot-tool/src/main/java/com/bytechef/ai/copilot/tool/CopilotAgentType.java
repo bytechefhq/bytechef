@@ -14,16 +14,18 @@
  * limitations under the License.
  */
 
-package com.bytechef.ai.agent.tool;
+package com.bytechef.ai.copilot.tool;
+
+import com.bytechef.ai.agent.tool.AgentType;
 
 /**
+ * The copilot-owned agent types: the workflow-editor, code-editor and cluster-element chat flows (each with its
+ * ASK/BUILD variants and a coarse fallback), plus the copilot subagents invoked as tools.
+ *
  * @author Ivica Cardic
  */
-public enum Agent {
+public enum CopilotAgentType implements AgentType {
 
-    AI_HUB_ASK("ai_hub_ask", false),
-    AI_HUB_BUILD("ai_hub_build", false),
-    AI_HUB("ai_hub", true),
     WORKFLOW_EDITOR_ASK("workflow_editor_ask", false),
     WORKFLOW_EDITOR_BUILD("workflow_editor_build", false),
     WORKFLOW_EDITOR("workflow_editor", true),
@@ -33,13 +35,6 @@ public enum Agent {
     CLUSTER_ELEMENT_ASK("cluster_element_ask", false),
     CLUSTER_ELEMENT_BUILD("cluster_element_build", false),
     CLUSTER_ELEMENT("cluster_element", true),
-    FILES("files", true),
-    RESEARCH("research", false),
-    DATA_ANALYST("data_analyst", false),
-    IMAGE_GENERATOR("image_generator", false),
-    SLIDE_BUILDER("slide_builder", false),
-    WORKFLOW_BUILDER("workflow_builder", false),
-    UNKNOWN("unknown", true),
     SKILLS("skills", false),
     CLUSTER_ELEMENT_AGENT("cluster_element_agent", false),
     CODE_EDITOR_AGENT("code_editor_agent", false),
@@ -50,40 +45,18 @@ public enum Agent {
     private final String key;
     private final boolean fallback;
 
-    Agent(String key, boolean fallback) {
+    CopilotAgentType(String key, boolean fallback) {
         this.key = key;
         this.fallback = fallback;
     }
 
-    /**
-     * The wire-format key for this agent — matches the {@code agentId} routed by the chat REST controller.
-     */
+    @Override
     public String key() {
         return key;
     }
 
-    /**
-     * Whether this enum value represents a coarse fallback emitted because no {@link CurrentAgentContext.AgentBinding}
-     * was bound.
-     */
+    @Override
     public boolean isFallback() {
         return fallback;
-    }
-
-    /**
-     * Resolves an {@link Agent} from its wire-format key (case-sensitive).
-     */
-    public static Agent fromKey(String key) {
-        if (key == null) {
-            return UNKNOWN;
-        }
-
-        for (Agent agent : values()) {
-            if (agent.key.equals(key)) {
-                return agent;
-            }
-        }
-
-        return UNKNOWN;
     }
 }
