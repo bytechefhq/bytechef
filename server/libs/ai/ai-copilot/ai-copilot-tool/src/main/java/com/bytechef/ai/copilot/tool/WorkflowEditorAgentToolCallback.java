@@ -100,7 +100,8 @@ public class WorkflowEditorAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.WORKFLOW_EDITOR_AGENT, parentAgent,
+            String result = CurrentAgentContext.callWith(
+                Agent.WORKFLOW_EDITOR_AGENT, parentAgent,
                 () -> workflowEditorChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()

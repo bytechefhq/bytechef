@@ -99,7 +99,8 @@ public class CodeEditorAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.CODE_EDITOR_AGENT, parentAgent,
+            String result = CurrentAgentContext.callWith(
+                Agent.CODE_EDITOR_AGENT, parentAgent,
                 () -> codeEditorChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()

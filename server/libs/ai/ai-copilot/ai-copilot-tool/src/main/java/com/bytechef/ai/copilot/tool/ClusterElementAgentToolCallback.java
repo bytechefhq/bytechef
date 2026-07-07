@@ -100,7 +100,8 @@ public class ClusterElementAgentToolCallback implements ToolCallback {
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
 
-            String result = CurrentAgentContext.callWith(Agent.CLUSTER_ELEMENT_AGENT, parentAgent,
+            String result = CurrentAgentContext.callWith(
+                Agent.CLUSTER_ELEMENT_AGENT, parentAgent,
                 () -> clusterElementChatClient.prompt(request)
                     .toolContext(forwardedContext)
                     .call()
