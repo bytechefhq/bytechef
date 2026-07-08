@@ -3,7 +3,7 @@ import {Label} from '@/components/ui/label';
 import {Textarea} from '@/components/ui/textarea';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
-import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ChangeEvent, ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -87,7 +87,7 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     <Textarea
                         className={twMerge(
                             error &&
-                                'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500',
+                                'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary focus:border-rose-500 focus:ring-rose-500',
                             disabled && 'bg-gray-100 text-content-neutral-secondary',
                             leadingIcon && 'pl-12 leading-relaxed',
                             trailingAction &&
@@ -104,12 +104,6 @@ const PropertyTextArea = forwardRef<HTMLTextAreaElement, PropertyTextAreaProps>(
                     />
 
                     {trailingAction && <div className="flex items-start pt-1 pr-1">{trailingAction}</div>}
-
-                    {error && (
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
-                        </div>
-                    )}
                 </div>
             </div>
 

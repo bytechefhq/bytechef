@@ -48,6 +48,6 @@ describe('PropertyTextArea', () => {
         render(<PropertyTextArea error={true} errorMessage="Something went wrong" label="Broken" name="broken" />);
 
         // Error icon should be present (TriangleAlertIcon)
-        expect(screen.getByRole('textbox')).toHaveClass('border-rose-300');
+        expect(screen.getByRole('textbox')).toHaveClass('border-stroke-destructive-secondary');
     });
 });

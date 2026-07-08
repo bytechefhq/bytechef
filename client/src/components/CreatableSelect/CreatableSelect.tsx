@@ -3,7 +3,6 @@ import {twMerge} from 'tailwind-merge';
 
 import './CreatableSelect.css';
 
-import {TriangleAlertIcon} from 'lucide-react';
 import {ControllerRenderProps, FieldPath, FieldValues} from 'react-hook-form';
 import {GroupBase} from 'react-select';
 
@@ -56,12 +55,6 @@ const CreatableSelect = <
 
         <div className={twMerge([label && 'mt-1'])}>
             <ReactSelectCreatable {...field} classNamePrefix="react-select" isMulti={isMulti} {...props} />
-
-            {error && (
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
-                </div>
-            )}
         </div>
 
         {error && (
