@@ -57,6 +57,11 @@ public class ApplicationProperties {
      */
     private Analytics analytics = new Analytics();
 
+       /**
+        * Billing configuration
+        */
+    private Billing billing = new Billing();
+
     /**
      * Cache provider configuration
      */
@@ -216,6 +221,10 @@ public class ApplicationProperties {
         return analytics;
     }
 
+    public Billing getBilling() {
+        return billing;
+    }
+
     public Cache getCache() {
         return cache;
     }
@@ -346,6 +355,10 @@ public class ApplicationProperties {
 
     public void setAnalytics(Analytics analytics) {
         this.analytics = analytics;
+    }
+
+    public void setBilling(Billing billing) {
+        this.billing = billing;
     }
 
     public void setCache(Cache cache) {
@@ -2600,6 +2613,110 @@ public class ApplicationProperties {
 
         public void setEnabled(boolean enabled) {
             this.enabled = enabled;
+        }
+    }
+
+    /**
+     * Billing configuration for Stripe-based subscription management.
+     */
+    public static class Billing {
+
+        private Stripe stripe = new Stripe();
+
+        public Stripe getStripe() {
+            return stripe;
+        }
+
+        public void setStripe(Stripe stripe) {
+            this.stripe = stripe;
+        }
+
+        /**
+         * Stripe-specific billing configuration.
+         */
+        public static class Stripe {
+
+            private String secretKey;
+            private String customerPortalUrl;
+            private String productStarterId;
+            private String productGrowthId;
+            private String productUsageId;
+            private String meterEventName;
+            private String webhookSecret;
+            private String successUrl;
+            private String cancelUrl;
+
+            public String getSecretKey() {
+                return secretKey;
+            }
+
+            public void setSecretKey(String secretKey) {
+                this.secretKey = secretKey;
+            }
+
+            public String getCustomerPortalUrl() {
+                return customerPortalUrl;
+            }
+
+            public void setCustomerPortalUrl(String customerPortalUrl) {
+                this.customerPortalUrl = customerPortalUrl;
+            }
+
+            public String getProductStarterId() {
+                return productStarterId;
+            }
+
+            public void setProductStarterId(String productStarterId) {
+                this.productStarterId = productStarterId;
+            }
+
+            public String getProductGrowthId() {
+                return productGrowthId;
+            }
+
+            public void setProductGrowthId(String productGrowthId) {
+                this.productGrowthId = productGrowthId;
+            }
+
+            public String getProductUsageId() {
+                return productUsageId;
+            }
+
+            public void setProductUsageId(String productUsageId) {
+                this.productUsageId = productUsageId;
+            }
+
+            public String getMeterEventName() {
+                return meterEventName;
+            }
+
+            public void setMeterEventName(String meterEventName) {
+                this.meterEventName = meterEventName;
+            }
+
+            public String getWebhookSecret() {
+                return webhookSecret;
+            }
+
+            public void setWebhookSecret(String webhookSecret) {
+                this.webhookSecret = webhookSecret;
+            }
+
+            public String getSuccessUrl() {
+                return successUrl;
+            }
+
+            public void setSuccessUrl(String successUrl) {
+                this.successUrl = successUrl;
+            }
+
+            public String getCancelUrl() {
+                return cancelUrl;
+            }
+
+            public void setCancelUrl(String cancelUrl) {
+                this.cancelUrl = cancelUrl;
+            }
         }
     }
 

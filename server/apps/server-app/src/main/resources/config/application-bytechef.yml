@@ -55,6 +55,17 @@ bytechef:
       provider: pgvector
   analytics:
     enabled: false
+  billing:
+    stripe:
+      customer-portal-url: https://billing.stripe.com/p/login/test_8x214mfs66RX9fP6BV3Je00
+      secret-key:
+      product-starter-id: prod_UQkzkfmlljRg3J
+      product-usage-id: prod_UQlAqLdV50vcMc
+      product-growth-id: prod_UQl6ZIubWx3VS4
+      meter-event-name: tenant_task_executions
+      webhook-secret:
+      success-url: http://localhost:5173/automation/settings/billing?checkout=success
+      cancel-url: http://localhost:5173/automation/settings/billing
   cache:
     # Cache provider (redis | caffeine) default: caffeine
     provider: caffeine
