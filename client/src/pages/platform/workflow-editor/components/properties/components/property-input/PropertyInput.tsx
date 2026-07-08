@@ -186,7 +186,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                 </div>
 
                 {error && (
-                    <p className="mt-2 text-sm text-rose-600" id={`${name}-error`} role="alert">
+                    <p className="mt-2 text-sm text-content-destructive-primary" id={`${name}-error`} role="alert">
                         {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
                     </p>
                 )}
