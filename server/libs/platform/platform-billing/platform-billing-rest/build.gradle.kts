@@ -12,7 +12,23 @@ val generateOpenAPISpring by tasks.registering(org.openapitools.generator.gradle
         )
     )
     generatorName.set("spring")
-    inputSpec.set( "$projectDir/openapi.yaml")
+    inputSpec.set("$projectDir/openapi.yaml")
+    modelNameSuffix.set("Model")
+    modelPackage.set("com.bytechef.platform.billing.web.rest.model")
+    outputDir.set("$projectDir/generated")
+}
+
+val generateOpenAPIWebhookSpring by tasks.registering(org.openapitools.generator.gradle.plugin.tasks.GenerateTask::class) {
+    apiPackage.set("com.bytechef.platform.billing.web.rest")
+    configOptions.set(
+        mapOf(
+            "interfaceOnly" to "true",
+            "useSpringBoot3" to "true",
+            "useTags" to "true"
+        )
+    )
+    generatorName.set("spring")
+    inputSpec.set("$projectDir/openapi-webhook.yaml")
     modelNameSuffix.set("Model")
     modelPackage.set("com.bytechef.platform.billing.web.rest.model")
     outputDir.set("$projectDir/generated")
@@ -25,7 +41,7 @@ val generateOpenAPITypeScriptFetch by tasks.registering(org.openapitools.generat
 }
 
 tasks.register("generateOpenAPI") {
-    dependsOn(generateOpenAPISpring, generateOpenAPITypeScriptFetch)
+    dependsOn(generateOpenAPISpring, generateOpenAPIWebhookSpring, generateOpenAPITypeScriptFetch)
 }
 
 sourceSets {
