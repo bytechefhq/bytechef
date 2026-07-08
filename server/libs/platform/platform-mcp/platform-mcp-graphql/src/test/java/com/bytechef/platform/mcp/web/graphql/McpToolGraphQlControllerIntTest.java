@@ -222,6 +222,36 @@ public class McpToolGraphQlControllerIntTest {
         verify(mcpToolService).create(any(McpTool.class));
     }
 
+    @Test
+    void testUpdateMcpToolEnabled() {
+        // Given
+        McpTool mockTool = createMockMcpTool(1L, "test-tool", Map.of("param1", "value1"), 1L);
+
+        mockTool.setEnabled(false);
+
+        when(mcpToolService.fetchMcpTool(1L)).thenReturn(Optional.of(mockTool));
+
+        // When & Then
+        this.graphQlTester
+            .document("""
+                mutation {
+                    updateMcpToolEnabled(id: "1", enabled: false) {
+                        id
+                        enabled
+                    }
+                }
+                """)
+            .execute()
+            .path("updateMcpToolEnabled.id")
+            .entity(String.class)
+            .isEqualTo("1")
+            .path("updateMcpToolEnabled.enabled")
+            .entity(Boolean.class)
+            .isEqualTo(false);
+
+        verify(mcpToolService).updateEnabled(1L, false);
+    }
+
     private McpTool createMockMcpTool(Long id, String name, Map<String, String> parameters, long mcpComponentId) {
         McpTool tool = new McpTool(name, parameters, mcpComponentId);
 

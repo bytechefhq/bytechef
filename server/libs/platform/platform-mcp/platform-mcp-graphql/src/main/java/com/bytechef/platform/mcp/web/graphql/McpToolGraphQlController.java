@@ -91,6 +91,14 @@ public class McpToolGraphQlController {
         return mcpToolService.update(mcpTool);
     }
 
+    @MutationMapping
+    public McpTool updateMcpToolEnabled(@Argument long id, @Argument boolean enabled) {
+        mcpToolService.updateEnabled(id, enabled);
+
+        return mcpToolService.fetchMcpTool(id)
+            .orElseThrow(() -> new IllegalArgumentException("MCP tool not found: " + id));
+    }
+
     @SuppressFBWarnings("EI")
     public record McpToolInput(Long mcpComponentId, String name, Map<String, Object> parameters, Integer version) {
     }

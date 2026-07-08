@@ -18,6 +18,8 @@ package com.bytechef.automation.ai.mcp.server.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
@@ -26,17 +28,22 @@ import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.tool.definition.ToolDefinition;
+import org.springframework.ai.tool.function.FunctionToolCallback;
 import org.springframework.beans.factory.ObjectProvider;
 
 /**
@@ -144,6 +151,46 @@ class AutomationMcpServerConfigurationTest {
                 providers, workspaceMcpServerService);
 
         assertThat(specifications).isEmpty();
+    }
+
+    @Test
+    void testBuildToolSpecificationsExcludesDisabledTools() {
+        McpComponent mcpComponent = mock(McpComponent.class);
+
+        when(mcpComponent.getId()).thenReturn(10L);
+        when(mcpComponentService.getMcpServerMcpComponents(MCP_SERVER_ID)).thenReturn(List.of(mcpComponent));
+
+        McpTool enabledTool = new McpTool("enabled-tool", Map.of(), 10L);
+
+        enabledTool.setId(1L);
+
+        McpTool disabledTool = new McpTool("disabled-tool", Map.of(), 10L);
+
+        disabledTool.setId(2L);
+        disabledTool.setEnabled(false);
+
+        when(mcpToolService.getMcpComponentMcpTools(10L)).thenReturn(List.of(enabledTool, disabledTool));
+
+        FunctionToolCallback<Map<String, Object>, Object> enabledCallback = FunctionToolCallback
+            .builder("enabled-tool", (Function<Map<String, Object>, Object>) input -> "ok")
+            .inputType(Map.class)
+            .build();
+
+        when(mcpToolFacade.getFunctionToolCallback(enabledTool)).thenReturn(enabledCallback);
+        when(workspaceMcpServerService.fetchWorkspaceIdByMcpServerId(MCP_SERVER_ID)).thenReturn(Optional.empty());
+
+        List<McpServerFeatures.AsyncToolSpecification> specifications =
+            AutomationMcpServerConfiguration.buildToolSpecifications(
+                SECRET_KEY, mcpComponentService, mcpProjectService, mcpServerService, mcpToolService, mcpToolFacade,
+                stubProvider(List.of()), workspaceMcpServerService);
+
+        assertThat(specifications)
+            .extracting(specification -> specification.tool()
+                .name())
+            .containsExactly("enabled-tool");
+
+        verify(mcpToolFacade).getFunctionToolCallback(enabledTool);
+        verify(mcpToolFacade, never()).getFunctionToolCallback(disabledTool);
     }
 
     private static ToolCallback stubCallback(String name) {

@@ -32,6 +32,7 @@ import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.mcp.domain.McpServer;
+import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.mcp.server.McpAppWorkflowViewer;
@@ -147,6 +148,7 @@ public class AutomationMcpServerConfiguration {
             .flatMap(
                 mcpComponent -> CollectionUtils.stream(
                     mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
+            .filter(McpTool::isEnabled)
             .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
             .forEach(tools::add);
 

@@ -107,6 +107,25 @@ public class McpToolServiceIntTest {
     }
 
     @Test
+    public void testCreateDefaultsToEnabled() {
+        McpTool mcpTool = mcpToolService.create(getMcpTool());
+
+        assertThat(mcpTool.isEnabled()).isTrue();
+    }
+
+    @Test
+    public void testUpdateEnabled() {
+        McpTool mcpTool = mcpToolRepository.save(getMcpTool());
+
+        mcpToolService.updateEnabled(mcpTool.getId(), false);
+
+        assertThat(mcpToolRepository.findById(mcpTool.getId()))
+            .get()
+            .extracting(McpTool::isEnabled)
+            .isEqualTo(false);
+    }
+
+    @Test
     public void testDelete() {
         McpTool mcpTool = mcpToolRepository.save(getMcpTool());
 

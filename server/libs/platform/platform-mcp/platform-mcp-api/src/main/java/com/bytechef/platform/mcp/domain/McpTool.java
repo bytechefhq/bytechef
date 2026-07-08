@@ -47,6 +47,9 @@ public final class McpTool {
     @Column
     private MapWrapper parameters;
 
+    @Column
+    private boolean enabled;
+
     @Column("mcp_component_id")
     private AggregateReference<McpComponent, Long> mcpComponentId;
 
@@ -75,12 +78,14 @@ public final class McpTool {
     public McpTool(String name, Map<String, ?> parameters) {
         this.name = name;
         this.parameters = new MapWrapper(parameters);
+        this.enabled = true;
     }
 
     public McpTool(String name, Map<String, ?> parameters, long mcpComponentId) {
         this.name = name;
         this.parameters = new MapWrapper(parameters);
         this.mcpComponentId = AggregateReference.to(mcpComponentId);
+        this.enabled = true;
     }
 
     public McpTool(Long id, String name, Map<String, ?> parameters, Long mcpComponentId) {
@@ -88,6 +93,7 @@ public final class McpTool {
         this.name = name;
         this.parameters = new MapWrapper(parameters);
         this.mcpComponentId = AggregateReference.to(mcpComponentId);
+        this.enabled = true;
     }
 
     public String getCreatedBy() {
@@ -96,6 +102,10 @@ public final class McpTool {
 
     public Instant getCreatedDate() {
         return createdDate;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public Long getId() {
@@ -158,6 +168,10 @@ public final class McpTool {
         this.mcpComponentId = AggregateReference.to(mcpComponentId);
     }
 
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -172,6 +186,7 @@ public final class McpTool {
             "id=" + id +
             ", name='" + name + '\'' +
             ", parameters='" + parameters + '\'' +
+            ", enabled=" + enabled +
             ", mcpComponentId=" + mcpComponentId +
             ", version=" + version +
             ", createdBy='" + createdBy + '\'' +

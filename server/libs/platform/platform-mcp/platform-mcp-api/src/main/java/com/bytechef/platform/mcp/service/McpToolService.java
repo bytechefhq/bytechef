@@ -44,6 +44,14 @@ public interface McpToolService {
     McpTool update(McpTool mcpTool);
 
     /**
+     * Updates the enabled state of an MCP tool.
+     *
+     * @param mcpToolId the ID of the MCP tool
+     * @param enabled   the new enabled state
+     */
+    void updateEnabled(long mcpToolId, boolean enabled);
+
+    /**
      * Deletes an MCP tool by ID.
      *
      * @param mcpTool the MCP tool to delete
