@@ -8,10 +8,10 @@
 package com.bytechef.ee.platform.user.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.domain.IdentityProviderDomain;
 import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.domain.IdentityProviderDomain;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;

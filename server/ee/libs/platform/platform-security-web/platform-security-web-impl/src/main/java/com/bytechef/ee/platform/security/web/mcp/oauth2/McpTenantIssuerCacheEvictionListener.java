@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.platform.security.web.mcp.oauth2;
 
+import com.bytechef.ee.platform.user.event.IdentityProviderChangedEvent;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.user.event.IdentityProviderChangedEvent;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;

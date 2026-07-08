@@ -12,8 +12,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.ee.embedded.ai.mcp.server.web.config.EmbeddedMcpDiscoveryIntTestConfiguration;
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.domain.TenantKey;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -42,9 +42,7 @@ import org.springframework.boot.test.web.server.LocalServerPort;
 class EmbeddedMcpDiscoveryIntTest {
 
     private static final String PATH_SECRET = String.valueOf(TenantKey.of("acme"));
-    // A distinct tenant for the no-provider case: the shared issuer cache is keyed by tenant, so this test must not
-    // reuse the tenant a data-returning test cached.
-    private static final String NO_PROVIDER_PATH_SECRET = String.valueOf(TenantKey.of("no-provider"));
+    private static final String NO_PROVIDER_PATH_SECRET = String.valueOf(TenantKey.of("noprovider"));
 
     @Autowired
     private IdentityProviderService identityProviderService;

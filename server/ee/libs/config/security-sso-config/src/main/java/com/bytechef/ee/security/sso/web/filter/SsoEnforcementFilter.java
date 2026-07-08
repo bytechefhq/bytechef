@@ -7,8 +7,8 @@
 
 package com.bytechef.ee.security.sso.web.filter;
 
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

@@ -14,6 +14,8 @@ import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSec
 import com.bytechef.ee.platform.security.web.config.McpTenantTrustResolutionConfigurerContributor;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.TenantIdpFederatedIssuerAuthenticator;
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.security.service.ApiKeyService;
@@ -26,9 +28,7 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpAudienceValidator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthenticator;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
-import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;

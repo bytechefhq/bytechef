@@ -14,10 +14,10 @@ import com.bytechef.ee.embedded.ai.mcp.server.security.web.configurer.EmbeddedMc
 import com.bytechef.ee.embedded.connected.user.service.ConnectedUserService;
 import com.bytechef.ee.embedded.security.service.SigningKeyService;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.servlet.http.HttpServletRequest;

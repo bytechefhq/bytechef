@@ -15,6 +15,7 @@ import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationM
 import com.bytechef.ee.platform.security.web.config.McpTenantTrustResolutionConfigurerContributor;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.TenantIdpFederatedIssuerAuthenticator;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.liquibase.config.LiquibaseConfiguration;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
 import com.bytechef.platform.mcp.service.McpServerService;
@@ -28,7 +29,6 @@ import com.bytechef.platform.security.web.mcp.oauth2.McpFederatedIssuerAuthentic
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtDecoderFactory;
 import com.bytechef.platform.security.web.mcp.oauth2.McpJwtIdentityMapper;
 import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.test.config.jdbc.AbstractIntTestJdbcConfiguration;
 import io.modelcontextprotocol.common.McpTransportContext;

@@ -11,10 +11,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties;
 import com.bytechef.platform.security.web.config.McpResourceServerProperties.Issuer;
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.domain.TenantKey;
 import java.util.List;
 import java.util.Optional;

@@ -7,10 +7,9 @@
 
 package com.bytechef.ee.platform.security.web.mcp.oauth2;
 
+import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.security.web.mcp.oauth2.McpTenantIssuer;
-
-import com.bytechef.platform.user.domain.IdentityProvider;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.tenant.TenantContext;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;

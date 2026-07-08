@@ -7,6 +7,8 @@
 
 package com.bytechef.ee.security.sso.config;
 
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.security.sso.oauth2.CustomOidcUserService;
 import com.bytechef.ee.security.sso.oauth2.SsoOAuth2AuthenticationFailureHandler;
 import com.bytechef.ee.security.sso.oauth2.SsoOAuth2AuthenticationSuccessHandler;
 import com.bytechef.ee.security.sso.saml2.DynamicRelyingPartyRegistrationRepository;
@@ -19,10 +21,8 @@ import com.bytechef.platform.security.web.config.AuthorizeHttpRequestContributor
 import com.bytechef.platform.security.web.config.OAuth2LoginCustomizer;
 import com.bytechef.platform.security.web.config.Saml2LoginCustomizer;
 import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.user.service.UserService;
 import com.bytechef.security.web.oauth2.CustomOAuth2UserService;
-import com.bytechef.security.web.oauth2.CustomOidcUserService;
 import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

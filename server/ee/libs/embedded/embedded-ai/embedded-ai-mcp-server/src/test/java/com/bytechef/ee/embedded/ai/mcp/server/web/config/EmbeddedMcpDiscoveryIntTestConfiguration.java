@@ -12,7 +12,7 @@ import static org.mockito.Mockito.mock;
 import com.bytechef.ee.embedded.ai.mcp.server.web.EmbeddedMcpProtectedResourceMetadataController;
 import com.bytechef.ee.embedded.ai.mcp.server.web.EmbeddedMcpProtectedResourceMetadataResolver;
 import com.bytechef.ee.platform.security.web.mcp.oauth2.McpTenantIssuerResolver;
-import com.bytechef.platform.user.service.IdentityProviderService;
+import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

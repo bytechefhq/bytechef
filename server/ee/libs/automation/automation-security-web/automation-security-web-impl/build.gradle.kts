@@ -8,6 +8,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-security:platform-security-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    testImplementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("jakarta.servlet:jakarta.servlet-api")
     testImplementation("io.modelcontextprotocol.sdk:mcp:${libs.versions.io.modelcontextprotocol.sdk.get()}")

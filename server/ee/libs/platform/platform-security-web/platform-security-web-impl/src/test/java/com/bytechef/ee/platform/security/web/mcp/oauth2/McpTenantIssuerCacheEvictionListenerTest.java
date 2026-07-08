@@ -10,7 +10,7 @@ package com.bytechef.ee.platform.security.web.mcp.oauth2;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
-import com.bytechef.platform.user.event.IdentityProviderChangedEvent;
+import com.bytechef.ee.platform.user.event.IdentityProviderChangedEvent;
 import org.junit.jupiter.api.Test;
 
 /**
