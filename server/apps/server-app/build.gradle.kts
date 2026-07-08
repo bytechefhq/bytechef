@@ -184,6 +184,8 @@ dependencies {
     implementation(project(":server:libs:core:rest:rest-impl"))
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:core:tenant:tenant-single-service"))
+    implementation(project(":server:libs:platform:platform-billing:platform-billing-rest"))
+    implementation(project(":server:libs:platform:platform-billing:platform-billing-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-context:platform-component-context-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-graphql"))
