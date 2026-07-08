@@ -6,6 +6,7 @@ import {Label} from '@/components/ui/label';
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useClusterElementContext} from '@/pages/platform/workflow-editor/components/properties/ClusterElementContext';
+import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {useClusterElementOptionsQuery} from '@/shared/middleware/graphql';
 import {
     WorkflowNodeOptionKeys,
@@ -48,6 +49,8 @@ interface PropertyComboBoxProps {
     defaultValue?: string;
     deletePropertyButton?: ReactNode;
     description?: string;
+    error?: boolean;
+    errorMessage?: string;
     handleInputTypeSwitchButtonClick?: () => void;
     label?: string;
     lookupDependsOnPaths?: Array<string>;
@@ -74,6 +77,8 @@ const PropertyComboBox = ({
     defaultValue,
     deletePropertyButton,
     description,
+    error,
+    errorMessage,
     handleInputTypeSwitchButtonClick,
     label,
     leadingIcon,
@@ -339,6 +344,18 @@ const PropertyComboBox = ({
         [options, value]
     );
 
+    const defaultOptionLabel = useMemo(() => {
+        if (defaultValue === undefined || defaultValue === null || defaultValue === '') {
+            return undefined;
+        }
+
+        const defaultOption = (options as Array<ComboBoxItemType>)?.find(
+            (option) => String(option.value) === String(defaultValue)
+        );
+
+        return typeof defaultOption?.label === 'string' ? defaultOption.label : String(defaultValue);
+    }, [defaultValue, options]);
+
     const missingConnection = useMemo(
         () =>
             currentNode?.connections?.length &&
@@ -507,6 +524,8 @@ const PropertyComboBox = ({
                 {optionsLoadedDynamically && name && (
                     <PopoverTrigger aria-label={`Select options for property ${label ?? name}`} asChild onBlur={onBlur}>
                         <PropertyInput
+                            error={error}
+                            errorMessage={errorMessage}
                             leadingIcon={leadingIcon}
                             name={name}
                             onChange={(event) => handleInputValueChange(event.target.value)}
@@ -524,7 +543,9 @@ const PropertyComboBox = ({
                             aria-expanded={open}
                             className={twMerge(
                                 'relative h-auto min-h-9 w-full justify-between font-normal whitespace-normal',
-                                showInputTypeSwitchButton && 'mt-0'
+                                showInputTypeSwitchButton && 'mt-0',
+                                error &&
+                                    'border-stroke-destructive-secondary ring-[3px] ring-stroke-destructive-secondary focus-visible:border-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary'
                             )}
                             disabled={
                                 !options.length &&
@@ -581,7 +602,11 @@ const PropertyComboBox = ({
                                         </span>
                                     ) : (
                                         !(isRefetching || isClusterElementNodeOptionsRefetching) && (
-                                            <span className={placeholderClassName}>{memoizedPlaceholder}</span>
+                                            <span className={placeholderClassName}>
+                                                {defaultOptionLabel
+                                                    ? `Default (${defaultOptionLabel})`
+                                                    : memoizedPlaceholder}
+                                            </span>
                                         )
                                     )}
                                 </>
@@ -676,7 +701,9 @@ const PropertyComboBox = ({
                                         }}
                                         value=""
                                     >
-                                        <span>Select...</span>
+                                        <span>
+                                            {defaultOptionLabel ? `Default (${defaultOptionLabel})` : 'Select...'}
+                                        </span>
 
                                         {value === '' && <CheckIcon className="ml-auto size-4" />}
                                     </CommandItem>
@@ -686,6 +713,12 @@ const PropertyComboBox = ({
                     </Command>
                 </PopoverContent>
             </Popover>
+
+            {error && !optionsLoadedDynamically && (
+                <p className="mt-2 text-sm text-content-destructive-primary" id={`${name}-error`} role="alert">
+                    {errorMessage || ERROR_MESSAGES.PROPERTY.FIELD_REQUIRED}
+                </p>
+            )}
         </fieldset>
     );
 };

@@ -624,6 +624,8 @@ const Property = ({
                                         defaultValue={defaultValue}
                                         deletePropertyButton={deletePropertyButton}
                                         description={description}
+                                        error={hasError}
+                                        errorMessage={errorMessage}
                                         handleInputTypeSwitchButtonClick={() => {
                                             onChange('=');
                                             handleControlledModeSwitch(true);
@@ -825,6 +827,8 @@ const Property = ({
                             defaultValue={defaultValue}
                             deletePropertyButton={deletePropertyButton}
                             description={description}
+                            error={hasError}
+                            errorMessage={errorMessage}
                             handleInputTypeSwitchButtonClick={handleInputTypeSwitchButtonClick}
                             label={label || name}
                             leadingIcon={typeIcon}
