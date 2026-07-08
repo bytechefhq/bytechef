@@ -5,7 +5,6 @@ extend type Mutation {
 enum PropertyCopilotMode {
     TEXT
     FORMULA
-    JSON_SCHEMA
 }
 
 input GeneratePropertyValueInput {

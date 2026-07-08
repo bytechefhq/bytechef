@@ -78,18 +78,4 @@ class PropertyCopilotPromptBuilderTest {
         assertThat(prompt).contains("=");
         assertThat(prompt).contains("trigger_1");
     }
-
-    @Test
-    void testBuildJsonSchemaModeAsksForSchemaOnlyAndOmitsOutputs() {
-        PropertyCopilotRequest request = new PropertyCopilotRequest(
-            "an order with an id and a list of line items", PropertyCopilotMode.JSON_SCHEMA, "wf1", "node2",
-            "responseSchema", "STRING", true, 0);
-
-        String prompt = promptBuilder.build(request, "trigger_1: {\"city\":\"paris\"}\n", "");
-
-        assertThat(prompt).contains("an order with an id and a list of line items");
-        assertThat(prompt).contains("JSON Schema");
-        assertThat(prompt).doesNotContain("trigger_1");
-        assertThat(prompt).doesNotContain("${");
-    }
 }

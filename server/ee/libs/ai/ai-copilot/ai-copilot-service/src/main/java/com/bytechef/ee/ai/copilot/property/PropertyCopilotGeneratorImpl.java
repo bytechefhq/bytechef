@@ -30,7 +30,6 @@ import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.ObjectMapper;
 
 /**
  * @version ee
@@ -43,7 +42,6 @@ import tools.jackson.databind.ObjectMapper;
 @SuppressFBWarnings("EI")
 public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
 
-    private static final ObjectMapper JSON_OBJECT_MAPPER = new ObjectMapper();
     private static final Pattern DATA_PILL_PATTERN = Pattern.compile("\\$\\{[^}]+}");
 
     private final ChatModel chatModel;
@@ -90,12 +88,6 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
     }
 
     private PropertyCopilotResult doGenerate(PropertyCopilotRequest request) {
-        // JSON_SCHEMA generation depends only on the user's prompt, so skip the previous-step output
-        // and function-catalog lookups (both involve real service calls) that TEXT/FORMULA need.
-        if (request.mode() == PropertyCopilotMode.JSON_SCHEMA) {
-            return generateJsonSchema(request, promptBuilder.build(request, "", ""));
-        }
-
         String availableOutputs = buildAvailableOutputs(request);
         String functionCatalog =
             request.mode() == PropertyCopilotMode.FORMULA ? buildFunctionCatalog() : "";
@@ -166,44 +158,6 @@ public class PropertyCopilotGeneratorImpl implements PropertyCopilotGenerator {
 
         return new PropertyCopilotResult(
             repaired, false, "The generated value references outputs that could not be resolved; please review it.");
-    }
-
-    private PropertyCopilotResult generateJsonSchema(PropertyCopilotRequest request, String prompt) {
-        String value = clean(call(prompt));
-
-        if (isValidJsonObject(value)) {
-            record(request, "success");
-
-            return new PropertyCopilotResult(value, true, null);
-        }
-
-        String repaired = clean(call(prompt +
-            "\n\nThe previous attempt was not valid JSON. Return ONLY a valid JSON Schema object."));
-
-        if (isValidJsonObject(repaired)) {
-            record(request, "success");
-
-            return new PropertyCopilotResult(repaired, true, null);
-        }
-
-        record(request, "invalid_json");
-
-        return new PropertyCopilotResult(
-            repaired, false, "The generated JSON schema could not be parsed; please review it.");
-    }
-
-    private static boolean isValidJsonObject(String value) {
-        if (value == null || value.isBlank()) {
-            return false;
-        }
-
-        try {
-            JSON_OBJECT_MAPPER.readValue(value, Map.class);
-
-            return true;
-        } catch (Exception exception) {
-            return false;
-        }
     }
 
     private String buildAvailableOutputs(PropertyCopilotRequest request) {

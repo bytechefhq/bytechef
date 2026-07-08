@@ -14,5 +14,5 @@ package com.bytechef.ee.ai.copilot.property;
  */
 public enum PropertyCopilotMode {
 
-    TEXT, FORMULA, JSON_SCHEMA
+    TEXT, FORMULA
 }

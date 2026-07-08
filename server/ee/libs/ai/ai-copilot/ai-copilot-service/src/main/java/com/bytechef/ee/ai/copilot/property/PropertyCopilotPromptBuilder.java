@@ -25,19 +25,6 @@ public class PropertyCopilotPromptBuilder {
     public String build(PropertyCopilotRequest request, String availableOutputs, String functionCatalog) {
         StringBuilder builder = new StringBuilder();
 
-        if (request.mode() == PropertyCopilotMode.JSON_SCHEMA) {
-            builder.append(
-                "You generate a JSON Schema (draft 2020-12) describing the structure the user wants.\n\n");
-            builder.append("User request: ")
-                .append(request.prompt())
-                .append("\n\n");
-            builder.append(
-                "Return ONLY a single JSON Schema object. It must be valid JSON with a top-level \"type\" " +
-                    "(usually \"object\") and a \"properties\" map. No explanation, no markdown, no code fences.");
-
-            return builder.toString();
-        }
-
         String prompt = request.prompt();
 
         if (prompt == null || prompt.isBlank()) {

@@ -120,6 +120,12 @@ public class CopilotApiController {
             } else {
                 agentId = "skills_ask";
             }
+        } else if (agentId.equals("json_schema_builder")) {
+            if (Mode.valueOf((String) mode) == Mode.BUILD) {
+                agentId = "json_schema_builder_build";
+            } else {
+                agentId = "json_schema_builder_ask";
+            }
         }
 
         LocalAgent localAgent = localAgentMap.get(agentId);
