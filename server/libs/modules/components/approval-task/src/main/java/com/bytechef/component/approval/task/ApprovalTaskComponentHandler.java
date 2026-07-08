@@ -21,7 +21,6 @@ import static com.bytechef.component.definition.ComponentDsl.component;
 
 import com.bytechef.automation.task.facade.ApprovalTaskFacade;
 import com.bytechef.component.ComponentHandler;
-import com.bytechef.component.approval.task.action.ApproveAction;
 import com.bytechef.component.approval.task.cluster.ApprovalTaskApprovalChannel;
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.ComponentDefinition;
@@ -41,7 +40,6 @@ public class ApprovalTaskComponentHandler implements ComponentHandler {
             .description("Approval Task component for manual approval workflows.")
             .icon("path:assets/approval-task.svg")
             .categories(ComponentCategory.HELPERS)
-            .actions(ApproveAction.ACTION_DEFINITION)
             .clusterElements(ApprovalTaskApprovalChannel.of(approvalTaskFacade));
     }
 
