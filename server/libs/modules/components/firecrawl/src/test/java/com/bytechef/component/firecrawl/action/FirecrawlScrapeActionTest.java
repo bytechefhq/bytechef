@@ -18,12 +18,13 @@ package com.bytechef.component.firecrawl.action;
 
 import static com.bytechef.component.definition.Context.ContextFunction;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMATS;
+import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMATS_SCHEMA;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.ONLY_MAIN_CONTENT;
-import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.TIMEOUT;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.URL;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
@@ -51,8 +52,7 @@ class FirecrawlScrapeActionTest {
 
     private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final Parameters mockedParameters = MockParametersFactory.create(
-        Map.of(URL, "https://example.com", FORMATS, List.of("markdown", "html"), ONLY_MAIN_CONTENT, true,
-            TIMEOUT, 5000));
+        Map.of(URL, "https://example.com", FORMATS, List.of("markdown", "html"), ONLY_MAIN_CONTENT, true));
     private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
@@ -80,7 +80,40 @@ class FirecrawlScrapeActionTest {
         assertEquals(ResponseType.JSON, configuration.getResponseType());
         assertEquals(
             Body.of(URL, "https://example.com", FORMATS, List.of(Map.of("type", "markdown"), Map.of("type", "html")),
-                ONLY_MAIN_CONTENT, true, TIMEOUT, 5000),
+                ONLY_MAIN_CONTENT, true),
+            bodyArgumentCaptor.getValue());
+    }
+
+    @Test
+    void testPerformParsesJsonSchemaIntoObject(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        Parameters jsonParameters = MockParametersFactory.create(
+            Map.of(
+                URL, "https://example.com", FORMATS, List.of("json"), FORMATS_SCHEMA, "{\"type\":\"object\"}",
+                ONLY_MAIN_CONTENT, true));
+        Map<String, Object> schemaMap = Map.of("type", "object");
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedExecutor.body(bodyArgumentCaptor.capture()))
+            .thenReturn(mockedExecutor);
+        when(mockedResponse.getBody())
+            .thenReturn(Map.of("success", true));
+        when(mockedContext.json(any()))
+            .thenReturn(schemaMap);
+
+        Object result = FirecrawlScrapeAction.perform(jsonParameters, null, mockedContext);
+
+        assertEquals(Map.of("success", true), result);
+
+        // The JSON schema must be sent as a parsed object, not the raw schema string.
+        assertEquals(
+            Body.of(
+                URL, "https://example.com", FORMATS, List.of(Map.of("type", "json", "schema", schemaMap)),
+                ONLY_MAIN_CONTENT, true),
             bodyArgumentCaptor.getValue());
     }
 }

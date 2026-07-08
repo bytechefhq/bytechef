@@ -24,6 +24,7 @@ import static com.bytechef.component.definition.ComponentDsl.object;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static com.bytechef.component.definition.ComponentDsl.outputSchema;
 import static com.bytechef.component.definition.ComponentDsl.string;
+import static com.bytechef.component.definition.Property.ControlType.JSON_SCHEMA_BUILDER;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.BLOCK_ADS;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.EXCLUDE_TAGS;
 import static com.bytechef.component.firecrawl.constant.FirecrawlConstants.FORMATS;
@@ -82,12 +83,13 @@ public class FirecrawlScrapeAction {
                     option("JSON", "json"),
                     option("Branding", "branding")))
                 .required(false),
-            object(FORMATS_SCHEMA)
+            string(FORMATS_SCHEMA)
                 .label("JSON Schema")
                 .description("The schema to use for the JSON output. Must conform to JSON Schema.")
+                .controlType(JSON_SCHEMA_BUILDER)
                 .displayCondition("contains(formats, 'json')")
                 .required(false),
-            object(FORMATS_PROMPT)
+            string(FORMATS_PROMPT)
                 .label("JSON Prompt")
                 .description("The prompt to use for the JSON output")
                 .displayCondition("contains(formats, 'json')")
@@ -247,19 +249,27 @@ public class FirecrawlScrapeAction {
     }
 
     public static Object perform(Parameters inputParameters, Parameters connectionParameters, Context context) {
-        List<?> formatsList = inputParameters.getList(FORMATS);
-        List<Object> formatObjectList = new ArrayList<>();
+        List<?> formats = inputParameters.getList(FORMATS);
+        List<Object> formatItems = new ArrayList<>();
 
-        for (Object format : formatsList) {
-            Map<String, Object> jsonSchemaMap = new HashMap<>();
-            jsonSchemaMap.put("type", format.toString());
+        for (Object format : formats) {
+            Map<String, Object> formatItem = new HashMap<>();
 
-            if (formatsList.contains("json")) {
-                jsonSchemaMap.put("schema", inputParameters.get(FORMATS_SCHEMA));
-                jsonSchemaMap.put("prompt", inputParameters.get(FORMATS_PROMPT));
+            formatItem.put("type", format.toString());
+
+            if (formats.contains("json")) {
+                String schema = inputParameters.getString(FORMATS_SCHEMA);
+
+                if (schema != null && !schema.isBlank()) {
+                    formatItem.put("schema", context.json(json -> json.read(schema)));
+                }
+
+                if (inputParameters.containsKey(FORMATS_PROMPT)) {
+                    formatItem.put("prompt", inputParameters.get(FORMATS_PROMPT));
+                }
             }
 
-            formatObjectList.add(jsonSchemaMap);
+            formatItems.add(formatItem);
         }
 
         return context
@@ -267,7 +277,7 @@ public class FirecrawlScrapeAction {
             .body(
                 Http.Body.of(
                     URL, inputParameters.getRequiredString(URL),
-                    FORMATS, formatObjectList,
+                    FORMATS, formatItems,
                     ONLY_MAIN_CONTENT, inputParameters.getBoolean(ONLY_MAIN_CONTENT),
                     INCLUDE_TAGS, inputParameters.getList(INCLUDE_TAGS),
                     EXCLUDE_TAGS, inputParameters.getList(EXCLUDE_TAGS),
