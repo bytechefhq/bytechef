@@ -22,6 +22,9 @@ type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
     trigger: boolean;
 };
 
+const HIDDEN_ACTION_COMPONENT_NAMES = new Set(['approvalLink']);
+const HIDDEN_TASK_DISPATCHER_NAMES = new Set(['waitForApproval']);
+
 interface WorkflowNodesTabsProps {
     actionComponentDefinitions: Array<ComponentDefinitionBasic>;
     clusterElementComponentDefinitions?: Array<ComponentDefinitionBasic>;
@@ -86,8 +89,16 @@ const WorkflowNodesTabs = ({
 
     const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
+    const visibleActionComponentDefinitions = useMemo(
+        () =>
+            actionComponentDefinitions.filter(
+                (componentDefinition) => !HIDDEN_ACTION_COMPONENT_NAMES.has(componentDefinition.name)
+            ),
+        [actionComponentDefinitions]
+    );
+
     const actionFiltering = useComponentFiltering({
-        componentDefinitions: actionComponentDefinitions,
+        componentDefinitions: visibleActionComponentDefinitions,
     });
 
     const triggerFiltering = useComponentFiltering({
@@ -175,7 +186,7 @@ const WorkflowNodesTabs = ({
     }, [triggerFiltering.filteredComponents]);
 
     const availableTaskDispatchers = useMemo(() => {
-        const filteredDefinitions = ff_1057
+        const baseDefinitions = ff_1057
             ? taskDispatcherDefinitions
             : taskDispatcherDefinitions.filter(
                   (taskDispatcherDefinition) =>
@@ -183,6 +194,10 @@ const WorkflowNodesTabs = ({
                       taskDispatcherDefinition.name === 'condition' ||
                       taskDispatcherDefinition.name === 'loop'
               );
+
+        const filteredDefinitions = baseDefinitions.filter(
+            (taskDispatcherDefinition) => !HIDDEN_TASK_DISPATCHER_NAMES.has(taskDispatcherDefinition.name)
+        );
 
         return filteredDefinitions.map(
             (dispatcher) =>
@@ -295,7 +310,7 @@ const WorkflowNodesTabs = ({
 
             {activeTab === 'components' && (
                 <ComponentsFilter
-                    componentDefinitions={actionComponentDefinitions}
+                    componentDefinitions={visibleActionComponentDefinitions}
                     deselectAllCategories={actionFiltering.deselectAllCategories}
                     filterConfig={{
                         label: 'actions',
