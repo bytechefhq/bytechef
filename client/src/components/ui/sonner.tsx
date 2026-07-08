@@ -15,6 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      closeButton
       icons={{
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,
@@ -24,8 +25,11 @@ const Toaster = ({ ...props }: ToasterProps) => {
       }}
       toastOptions={{
         classNames: {
+          description:
+            "max-h-40 overflow-y-auto overflow-x-hidden break-words whitespace-pre-wrap",
           error:
             "group-[.toaster]:bg-destructive group-[.toaster]:text-destructive-foreground group-[.toaster]:border-destructive [&_[data-title]]:text-destructive-foreground! [&_[data-description]]:text-destructive-foreground! [&_[data-icon]]:text-destructive-foreground!",
+          title: "break-words",
         },
       }}
       style={
