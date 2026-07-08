@@ -1,0 +1,3 @@
+query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
+    workflowNodeMissingRequiredProperties(workflowId: $workflowId, workflowNodeName: $workflowNodeName)
+}

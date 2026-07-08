@@ -16,7 +16,7 @@ import {
     WorkflowNodeOutput,
 } from '@/shared/middleware/platform/configuration';
 import {UpdateWorkflowMutationType} from '@/shared/types';
-import {ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
+import {ChevronDownIcon, ExternalLinkIcon, InfoIcon, XIcon} from 'lucide-react';
 import {ReactNode} from 'react';
 import InlineSVG from 'react-inlinesvg';
 import {Link} from 'react-router-dom';
@@ -60,6 +60,9 @@ const WorkflowNodeDetailsPanel = ({
         currentWorkflowNode,
         currentWorkflowNodeConnections,
         currentWorkflowNodeOperations,
+        errors,
+        errorsAccordionOpen,
+        errorsLoading,
         filteredClusterElementOperations,
         getNodeVersion,
         handleOperationSelectChange,
@@ -71,6 +74,7 @@ const WorkflowNodeDetailsPanel = ({
         outputFunctionDefined,
         rootClusterElementNodeData,
         setActiveTab,
+        setErrorsAccordionOpen,
         tabDataExists,
         workflow,
         workflowNodeDetailsPanelOpen,
@@ -205,6 +209,61 @@ const WorkflowNodeDetailsPanel = ({
                                     triggerSelect={currentNode?.trigger}
                                     value={currentOperationName}
                                 />
+                            )}
+
+                            {errors.length > 0 && (
+                                <div className="border-b p-2">
+                                    <div className="flex shrink-0 flex-col overflow-hidden rounded-lg border border-stroke-destructive-primary bg-surface-destructive-secondary">
+                                        <Button
+                                            aria-busy={errorsLoading}
+                                            aria-expanded={errorsAccordionOpen}
+                                            className={twMerge(
+                                                'h-auto w-full shrink-0 justify-start rounded-none px-3 py-2 text-content-neutral-primary hover:bg-transparent',
+                                                errorsLoading && 'opacity-60'
+                                            )}
+                                            disabled={errorsLoading}
+                                            onClick={() => setErrorsAccordionOpen(!errorsAccordionOpen)}
+                                            variant="ghost"
+                                        >
+                                            <InfoIcon className="size-4 shrink-0 text-content-destructive-primary" />
+
+                                            <span className="text-sm">
+                                                {errorsLoading ? 'Checking errors…' : `Errors (${errors.length})`}
+                                            </span>
+
+                                            {!errorsLoading && (
+                                                <span className="ml-auto flex items-center gap-1 text-xs">
+                                                    Show all
+                                                    <ChevronDownIcon
+                                                        className={twMerge(
+                                                            'transition-all',
+                                                            errorsAccordionOpen && 'rotate-180'
+                                                        )}
+                                                    />
+                                                </span>
+                                            )}
+                                        </Button>
+
+                                        {errorsAccordionOpen && !errorsLoading && (
+                                            <ScrollArea className="max-h-[132px]">
+                                                <ul className="flex flex-col gap-2 px-3 pt-0 pb-2">
+                                                    {errors.map((error, index) => (
+                                                        <li
+                                                            className="space-x-1 rounded-md bg-surface-neutral-primary px-3 py-1.5 text-sm"
+                                                            key={`${error}_${index}`}
+                                                        >
+                                                            <span className="font-light">
+                                                                Missing required property:
+                                                            </span>
+
+                                                            <span>{error}</span>
+                                                        </li>
+                                                    ))}
+                                                </ul>
+                                            </ScrollArea>
+                                        )}
+                                    </div>
+                                </div>
                             )}
 
                             {tabDataExists && (

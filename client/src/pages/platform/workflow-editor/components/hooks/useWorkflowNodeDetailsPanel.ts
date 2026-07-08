@@ -9,6 +9,10 @@ import {
     TASK_DISPATCHER_DATA_KEY_MAP,
 } from '@/shared/constants';
 import {
+    useClusterElementMissingRequiredPropertiesQuery,
+    useWorkflowNodeMissingRequiredPropertiesQuery,
+} from '@/shared/middleware/graphql';
+import {
     ActionDefinition,
     ActionDefinitionApi,
     ClusterElementDefinition,
@@ -123,6 +127,7 @@ export default function useWorkflowNodeDetailsPanel({
     const [clusterElementComponentOperations, setClusterElementComponentOperations] = useState<Array<WorkflowNodeType>>(
         []
     );
+    const [errorsAccordionOpen, setErrorsAccordionOpen] = useState(false);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -130,6 +135,7 @@ export default function useWorkflowNodeDetailsPanel({
         activeTab,
         currentComponent,
         currentNode,
+        operationChangeInProgress,
         setActiveTab,
         setCurrentComponent,
         setCurrentNode,
@@ -140,6 +146,7 @@ export default function useWorkflowNodeDetailsPanel({
             activeTab: state.activeTab,
             currentComponent: state.currentComponent,
             currentNode: state.currentNode,
+            operationChangeInProgress: state.operationChangeInProgress,
             setActiveTab: state.setActiveTab,
             setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
@@ -382,6 +389,57 @@ export default function useWorkflowNodeDetailsPanel({
     const activeDisplayConditionsQuery = currentNode?.clusterElementType
         ? clusterElementDisplayConditionsQuery
         : displayConditionsQuery;
+
+    const {
+        data: workflowNodeMissingRequiredPropertiesData,
+        isFetching: workflowNodeMissingRequiredPropertiesFetching,
+        refetch: refetchWorkflowNodeMissingRequiredProperties,
+    } = useWorkflowNodeMissingRequiredPropertiesQuery(
+        {
+            workflowId: workflow.id!,
+            workflowNodeName: currentNodeName!,
+        },
+        {
+            enabled:
+                !!workflow.id &&
+                !!currentNodeName &&
+                currentNodeName !== 'manual' &&
+                currentNodeName !== currentClusterElementName &&
+                !currentNode?.clusterElementType,
+        }
+    );
+
+    const {
+        data: clusterElementMissingRequiredPropertiesData,
+        isFetching: clusterElementMissingRequiredPropertiesFetching,
+        refetch: refetchClusterElementMissingRequiredProperties,
+    } = useClusterElementMissingRequiredPropertiesQuery(
+        {
+            clusterElementType: currentNode?.clusterElementType || '',
+            clusterElementWorkflowNodeName: currentNode?.workflowNodeName || '',
+            workflowId: workflow.id!,
+            workflowNodeName: rootClusterElementNodeData?.workflowNodeName as string,
+        },
+        {
+            enabled:
+                !!workflow.id &&
+                !!currentNode &&
+                !!currentNodeName &&
+                currentNodeName !== 'manual' &&
+                currentNodeName === currentClusterElementName &&
+                !!currentNode.clusterElementType,
+        }
+    );
+
+    const errors = currentNode?.clusterElementType
+        ? (clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties ?? [])
+        : (workflowNodeMissingRequiredPropertiesData?.workflowNodeMissingRequiredProperties ?? []);
+
+    const errorsLoading =
+        operationChangeInProgress ||
+        (currentNode?.clusterElementType
+            ? clusterElementMissingRequiredPropertiesFetching
+            : workflowNodeMissingRequiredPropertiesFetching);
 
     const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -1061,6 +1119,24 @@ export default function useWorkflowNodeDetailsPanel({
         }
     }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
 
+    // Refetch node-scoped missing required properties once the workflow save is confirmed by the
+    // server (operation switch, property edit, external code edit) so the errors band stays in sync.
+    // Keyed on workflow.version — which only changes on a successful save — instead of
+    // workflow.definition, which updates optimistically before the server persists the change and
+    // would otherwise race the query against the stale server-side definition.
+    useEffect(() => {
+        if (!currentNodeName) {
+            return;
+        }
+
+        if (currentNode?.clusterElementType) {
+            refetchClusterElementMissingRequiredProperties();
+        } else {
+            refetchWorkflowNodeMissingRequiredProperties();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [workflow.version, currentNodeName, currentNode?.clusterElementType]);
+
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
         if (currentOperationDefinition?.properties) {
@@ -1357,6 +1433,9 @@ export default function useWorkflowNodeDetailsPanel({
         currentWorkflowNode,
         currentWorkflowNodeConnections,
         currentWorkflowNodeOperations,
+        errors,
+        errorsAccordionOpen,
+        errorsLoading,
         filteredClusterElementOperations,
         getNodeVersion,
         handleOperationSelectChange,
@@ -1368,6 +1447,7 @@ export default function useWorkflowNodeDetailsPanel({
         outputFunctionDefined,
         rootClusterElementNodeData,
         setActiveTab,
+        setErrorsAccordionOpen,
         tabDataExists,
         workflow,
         workflowNodeDetailsPanelOpen,

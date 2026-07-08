@@ -1,0 +1,13 @@
+query ClusterElementMissingRequiredProperties(
+    $workflowId: String!
+    $workflowNodeName: String!
+    $clusterElementType: String!
+    $clusterElementWorkflowNodeName: String!
+) {
+    clusterElementMissingRequiredProperties(
+        workflowId: $workflowId
+        workflowNodeName: $workflowNodeName
+        clusterElementType: $clusterElementType
+        clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+    )
+}

@@ -1642,6 +1642,24 @@ export type ValidateWorkflowByIdQueryVariables = Exact<{
 
 export type ValidateWorkflowByIdQuery = { validateWorkflowById: { errors: Array<string>, warnings: Array<string> } };
 
+export type WorkflowNodeMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+}>;
+
+
+export type WorkflowNodeMissingRequiredPropertiesQuery = { workflowNodeMissingRequiredProperties: Array<string> };
+
+export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+}>;
+
+
+export type ClusterElementMissingRequiredPropertiesQuery = { clusterElementMissingRequiredProperties: Array<string> };
+
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
   workflowId: string;
   workflowNodeName: string;
@@ -7902,6 +7920,55 @@ export const useValidateWorkflowByIdQuery = <
       {
     queryKey: ['ValidateWorkflowById', variables],
     queryFn: fetcher<ValidateWorkflowByIdQuery, ValidateWorkflowByIdQueryVariables>(ValidateWorkflowByIdDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowNodeMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
+  workflowNodeMissingRequiredProperties(workflowId: $workflowId, workflowNodeName: $workflowNodeName)
+}
+    `);
+
+export const useWorkflowNodeMissingRequiredPropertiesQuery = <
+      TData = WorkflowNodeMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+
+    return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
+    queryFn: fetcher<WorkflowNodeMissingRequiredPropertiesQuery, WorkflowNodeMissingRequiredPropertiesQueryVariables>(WorkflowNodeMissingRequiredPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query ClusterElementMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
+  clusterElementMissingRequiredProperties(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+  )
+}
+    `);
+
+export const useClusterElementMissingRequiredPropertiesQuery = <
+      TData = ClusterElementMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+
+    return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['ClusterElementMissingRequiredProperties', variables],
+    queryFn: fetcher<ClusterElementMissingRequiredPropertiesQuery, ClusterElementMissingRequiredPropertiesQueryVariables>(ClusterElementMissingRequiredPropertiesDocument, variables),
     ...options
   }
     )};
