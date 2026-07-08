@@ -182,10 +182,10 @@ export function AppSidebarFooter() {
                         </AvatarFallback>
                     </Avatar>
 
-                    <div>
+                    <div className="min-w-0">
                         <div className="text-sm text-muted-foreground">Signed in as</div>
 
-                        <div className="text-sm">{account?.email}</div>
+                        <div className="text-sm break-all">{account?.email}</div>
                     </div>
                 </div>
 
