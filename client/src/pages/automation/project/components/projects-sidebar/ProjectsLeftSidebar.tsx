@@ -217,7 +217,7 @@ const ProjectsLeftSidebar = ({
 
                 <ButtonGroup className="w-full">
                     <Button
-                        className="w-full [&_svg]:size-5"
+                        className="flex-1 [&_svg]:size-5"
                         icon={<PlusIcon />}
                         label="Workflow"
                         onClick={() => setShowWorkflowDialog(true)}
