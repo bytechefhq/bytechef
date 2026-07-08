@@ -43,7 +43,7 @@ const ConnectionParameters = ({
         existingAuthorizations && authorizationParameters && !!Object.keys(authorizationParameters).length;
 
     return (
-        <div className="space-y-2 overflow-hidden">
+        <div className="w-full space-y-2 overflow-hidden">
             {baseUri && (
                 <div className="mb-8 flex">
                     <span className="w-1/3 text-sm font-medium text-muted-foreground">Base URI:</span>
