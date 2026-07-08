@@ -5,7 +5,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
-import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ChangeEvent, InputHTMLAttributes, ReactNode, forwardRef, useEffect, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -47,7 +47,9 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
             leadingIcon,
             mentionInput = false,
             name,
+            onBlur,
             onChange,
+            onFocus,
             placeholder,
             required,
             showInputTypeSwitchButton,
@@ -126,7 +128,7 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                             'focus:ring-2 focus:ring-ring focus-visible:outline-hidden',
                             leadingIcon && 'relative rounded-md',
                             type === 'hidden' && 'border-0',
-                            error && 'ring-rose-300',
+                            error && 'ring-stroke-destructive-secondary',
                             trailingAction &&
                                 'flex h-9 items-center rounded-md border border-stroke-neutral-secondary focus-within:ring-2 focus-within:ring-ring'
                         )}
@@ -136,7 +138,8 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 className={twMerge(
                                     'pointer-events-none absolute inset-y-0 left-0 flex items-center rounded-l-md border border-r-0 border-stroke-neutral-secondary bg-surface-neutral-secondary px-3',
                                     trailingAction && 'border-y-0 border-l-0',
-                                    error && 'border-rose-300 text-rose-900 placeholder-rose-300'
+                                    error && 'text-rose-900 placeholder-stroke-destructive-secondary',
+                                    error && !isFocused && 'border-stroke-destructive-secondary'
                                 )}
                             >
                                 {leadingIcon}
@@ -148,22 +151,32 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 className={twMerge(
                                     'shadow-none outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-hidden',
                                     error &&
-                                        'border-rose-300 pr-10 text-rose-900 placeholder-rose-300 ring-rose-300 focus-visible:ring-rose-300',
+                                        'border-stroke-destructive-secondary pr-10 text-rose-900 placeholder-stroke-destructive-secondary ring-stroke-destructive-secondary focus-visible:ring-stroke-destructive-secondary',
                                     disabled && 'bg-gray-100 text-content-neutral-secondary',
                                     leadingIcon && 'pl-property-input-position leading-relaxed',
                                     trailingAction &&
                                         'h-full flex-1 border-0 focus-visible:ring-0 focus-visible:ring-offset-0',
                                     className
                                 )}
+                                {...props}
                                 disabled={disabled}
                                 id={id || name}
                                 name={name}
-                                onBlur={() => setIsFocused(false)}
+                                onBlur={(event) => {
+                                    setIsFocused(false);
+                                    if (onBlur) {
+                                        onBlur(event);
+                                    }
+                                }}
                                 onChange={handleInputChange}
-                                onFocus={() => {
+                                onFocus={(event) => {
                                     setIsFocused(true);
 
                                     setFocusedInput(null);
+
+                                    if (onFocus) {
+                                        onFocus(event);
+                                    }
                                 }}
                                 placeholder={placeholder}
                                 ref={ref}
@@ -171,18 +184,11 @@ const PropertyInput = forwardRef<HTMLInputElement, PropertyInputProps>(
                                 step={type === 'time' ? 60 : 1}
                                 type={type}
                                 value={localValue}
-                                {...props}
                             />
                         )}
 
                         {trailingAction}
                     </div>
-
-                    {error && (
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <TriangleAlertIcon aria-hidden="true" className="size-5 text-rose-500" />
-                        </div>
-                    )}
                 </div>
 
                 {error && (

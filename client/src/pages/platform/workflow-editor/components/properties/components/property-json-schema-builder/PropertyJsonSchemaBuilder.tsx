@@ -6,7 +6,7 @@ import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertyInputTypeSwitch from '@/pages/platform/workflow-editor/components/properties/components/PropertyInputTypeSwitch';
 import PropertyJsonSchemaBuilderSheet from '@/pages/platform/workflow-editor/components/properties/components/property-json-schema-builder/PropertyJsonSchemaBuilderSheet';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
-import {CircleQuestionMarkIcon, FullscreenIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, FullscreenIcon} from 'lucide-react';
 import {ReactNode, forwardRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
@@ -93,12 +93,6 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
 
                                 <span>{`Open ${label || 'Response'} Template`}</span>
                             </Button>
-
-                            {error && (
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
-                                </div>
-                            )}
                         </div>
                     </div>
 

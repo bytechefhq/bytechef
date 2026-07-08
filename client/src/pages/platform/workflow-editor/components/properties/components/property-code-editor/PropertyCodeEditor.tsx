@@ -6,7 +6,7 @@ import PropertyCodeEditorDialog from '@/pages/platform/workflow-editor/component
 import useWorkflowEditorStore from '@/pages/platform/workflow-editor/stores/useWorkflowEditorStore';
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {Workflow} from '@/shared/middleware/platform/configuration';
-import {CircleQuestionMarkIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon} from 'lucide-react';
 import {ReactNode, forwardRef} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/shallow';
@@ -91,12 +91,6 @@ const PropertyCodeEditor = forwardRef<HTMLButtonElement, PropertyCodeEditorProps
                                 ref={ref}
                                 variant="outline"
                             />
-
-                            {error && (
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                                    <TriangleAlertIcon aria-hidden="true" className="size-5 text-red-500" />
-                                </div>
-                            )}
                         </div>
                     </div>
 

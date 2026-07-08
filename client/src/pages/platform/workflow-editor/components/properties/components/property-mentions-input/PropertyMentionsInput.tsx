@@ -28,7 +28,7 @@ import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/s
 import {ERROR_MESSAGES} from '@/shared/errorMessages';
 import {ControlType} from '@/shared/middleware/platform/configuration';
 import {Editor} from '@tiptap/react';
-import {CircleQuestionMarkIcon, SquareFunctionIcon, TriangleAlertIcon} from 'lucide-react';
+import {CircleQuestionMarkIcon, SquareFunctionIcon} from 'lucide-react';
 import {twMerge} from 'tailwind-merge';
 import {useShallow} from 'zustand/react/shallow';
 
@@ -264,7 +264,8 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                 <div
                     className={twMerge(
                         'relative flex items-center rounded-md transition-colors',
-                        error && 'border-rose-300 text-rose-900 ring-rose-300 focus-within:ring-rose-300',
+                        error &&
+                            'border-stroke-destructive-secondary text-rose-900 ring-stroke-destructive-secondary focus-within:ring-stroke-destructive-secondary',
                         isFocused && 'ring-2 ring-ring',
                         label && 'mt-1',
                         leadingIcon && 'rounded-md border border-stroke-neutral-secondary'
@@ -311,12 +312,6 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                             workflow={workflow}
                         />
                     </div>
-
-                    {error && (
-                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                            <TriangleAlertIcon aria-hidden="true" className="size-5 text-rose-500" />
-                        </div>
-                    )}
                 </div>
 
                 {error && (
