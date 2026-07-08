@@ -50,7 +50,9 @@ const PlanCard = ({
 
                                     {' or after '}
 
-                                    <span className="font-semibold text-foreground">{taskLimit.toLocaleString()} tasks</span>
+                                    <span className="font-semibold text-foreground">
+                                        {taskLimit.toLocaleString()} tasks
+                                    </span>
 
                                     {' are used'}
                                 </>
