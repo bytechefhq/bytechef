@@ -29,8 +29,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.atomic.AtomicReference;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +67,43 @@ class AiAgentTestApiControllerIntTest {
 
         JsonUtils.setObjectMapper(objectMapper);
         MapUtils.setObjectMapper(objectMapper);
+    }
+
+    @AfterEach
+    void afterEach() {
+        EnvironmentContext.clear();
+    }
+
+    @Test
+    void testAiAgentBindsRequestEnvironmentDuringStreamingHandler() throws Exception {
+        AtomicReference<Environment> environmentDuringHandle = new AtomicReference<>();
+
+        ActionDefinition.SseEmitterHandler sseEmitterHandler = sseEmitter -> {
+            environmentDuringHandle.set(EnvironmentContext.getCurrentEnvironment());
+
+            sseEmitter.complete();
+        };
+
+        when(aiAgentTestFacade.executeAiAgentAction(anyString(), anyString(), anyLong(), anyString(), anyString(),
+            anyList())).thenReturn(sseEmitterHandler);
+
+        MvcResult mvcResult = mockMvc.perform(
+            post("/internal/ai-agent-tests")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.TEXT_EVENT_STREAM)
+                .content(createRequestJson("wf-1", "node-1", 0L, "conv-1", "Hello")))
+            .andExpect(status().isOk())
+            .andExpect(request().asyncStarted())
+            .andReturn();
+
+        mvcResult.getAsyncResult(10000);
+
+        mockMvc.perform(asyncDispatch(mvcResult))
+            .andExpect(status().isOk());
+
+        // The streaming handler is subscribed after the perform's own binding is restored, so the request
+        // environment (ordinal 0 == DEVELOPMENT) must still be bound here rather than the PRODUCTION fallback.
+        assertThat(environmentDuringHandle.get()).isEqualTo(Environment.DEVELOPMENT);
     }
 
     @Test

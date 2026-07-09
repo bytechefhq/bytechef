@@ -5,6 +5,7 @@ dependencies {
     api(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-api"))
     api(project(":server:libs:platform:platform-workflow:platform-workflow-task-dispatcher:platform-workflow-task-dispatcher-api"))
 
+    implementation("io.micrometer:context-propagation")
     implementation("org.apache.commons:commons-lang3")
     implementation("com.fasterxml.jackson.core:jackson-annotations")
     implementation("org.springframework.data:spring-data-jdbc")

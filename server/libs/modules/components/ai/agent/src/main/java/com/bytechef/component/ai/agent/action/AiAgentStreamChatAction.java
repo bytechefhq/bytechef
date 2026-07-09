@@ -33,6 +33,9 @@ import com.bytechef.platform.component.definition.AbstractActionDefinitionWrappe
 import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsStreamPerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.context.EnvironmentContextThreadLocalAccessor;
+import com.bytechef.platform.configuration.domain.Environment;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -138,9 +141,10 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
         ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
             inputParameters, connectionParameters, extensions, toolExecutionListener, context);
 
-        Flux<Object> contentFlux = chatClientRequestSpec.stream()
-            .chatResponse()
-            .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context)));
+        Flux<Object> contentFlux = withEnvironmentContext(
+            chatClientRequestSpec.stream()
+                .chatResponse()
+                .concatMap(chatResponse -> Flux.fromIterable(toSseEvents(chatResponse, context))));
 
         return createSseHandler(contentFlux, emitterReference, bufferedEvents, context);
     }
@@ -205,6 +209,17 @@ public class AiAgentStreamChatAction extends AbstractAiAgentChatAction {
                     }
                 });
         };
+    }
+
+    private static Flux<Object> withEnvironmentContext(Flux<Object> flux) {
+        Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+        if (environment == null) {
+            return flux;
+        }
+
+        return flux.contextWrite(
+            reactor.util.context.Context.of(EnvironmentContextThreadLocalAccessor.KEY, environment));
     }
 
     private static List<Object> toSseEvents(ChatResponse chatResponse, ActionContext context) {

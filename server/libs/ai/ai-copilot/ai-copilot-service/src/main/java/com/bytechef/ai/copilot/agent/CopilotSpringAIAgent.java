@@ -16,9 +16,15 @@
 
 package com.bytechef.ai.copilot.agent;
 
+import com.agui.core.agent.AgentSubscriber;
 import com.agui.core.agent.RunAgentInput;
 import com.agui.core.exception.AGUIException;
+import com.agui.core.state.State;
 import com.agui.spring.ai.SpringAIAgent;
+import com.bytechef.ai.copilot.constant.CopilotConstants;
+import com.bytechef.commons.util.NumberUtils;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +49,33 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
     }
 
     @Override
+    protected void run(RunAgentInput input, AgentSubscriber subscriber) {
+        runWithEnvironment(input, () -> super.run(input, subscriber));
+    }
+
+    void runWithEnvironment(RunAgentInput input, Runnable action) {
+        Integer environmentId = getEnvironmentId(input);
+
+        Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
+
+        if (environmentId != null) {
+            EnvironmentContext.set(environmentId);
+        }
+
+        try {
+            action.run();
+        } finally {
+            if (environmentId != null) {
+                if (previousEnvironment == null) {
+                    EnvironmentContext.clear();
+                } else {
+                    EnvironmentContext.set(previousEnvironment);
+                }
+            }
+        }
+    }
+
+    @Override
     protected ChatClient resolveChatClient(RunAgentInput input) {
         if (overrideChatClientResolver == null) {
             return super.resolveChatClient(input);
@@ -61,5 +94,21 @@ public abstract class CopilotSpringAIAgent extends SpringAIAgent {
         }
 
         return super.resolveChatClient(input);
+    }
+
+    private static @Nullable Integer getEnvironmentId(RunAgentInput input) {
+        State state = input.state();
+
+        if (state == null) {
+            return null;
+        }
+
+        Long environmentId = NumberUtils.asLong(state.get(CopilotConstants.STATE_ENVIRONMENT_ID));
+
+        if (environmentId == null || environmentId < 0 || environmentId >= Environment.values().length) {
+            return null;
+        }
+
+        return environmentId.intValue();
     }
 }
