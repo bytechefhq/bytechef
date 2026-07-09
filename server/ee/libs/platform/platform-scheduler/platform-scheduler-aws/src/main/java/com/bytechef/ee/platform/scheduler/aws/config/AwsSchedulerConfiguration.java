@@ -76,23 +76,16 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
-    AwsConnectionRefreshScheduler awsConnectionRefreshScheduler(
-        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+    AwsConnectionRefreshScheduler awsConnectionRefreshScheduler(SchedulerClient schedulerClient) {
 
         ApplicationProperties.Cloud.Aws aws = applicationProperties.getCloud()
             .getAws();
-
-        SchedulerClient schedulerClient = SchedulerClient.builder()
-            .credentialsProvider(awsCredentialsProvider)
-            .region(awsRegionProvider.getRegion())
-            .build();
 
         return new AwsConnectionRefreshScheduler(aws, schedulerClient);
     }
 
     @Bean
-    AwsTriggerScheduler awsTriggerScheduler(
-        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
+    AwsTriggerScheduler awsTriggerScheduler(SchedulerClient schedulerClient) {
 
         ApplicationProperties.Cloud.Aws aws = applicationProperties.getCloud()
             .getAws();
@@ -101,10 +94,6 @@ public class AwsSchedulerConfiguration {
             .getTrigger()
             .getPolling();
 
-        SchedulerClient schedulerClient = SchedulerClient.builder()
-            .credentialsProvider(awsCredentialsProvider)
-            .region(awsRegionProvider.getRegion())
-            .build();
 
         return new AwsTriggerScheduler(aws, polling, schedulerClient);
     }
@@ -115,15 +104,20 @@ public class AwsSchedulerConfiguration {
     }
 
     @Bean
-    DynamicWebhookTriggerRefreshListener dynamicWebhookListener(
-        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider,
-        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, TriggerDefinitionFacade triggerDefinitionFacade,
-        TriggerStateService triggerStateService, WorkflowService workflowService) {
+    SchedulerClient schedulerClient(
+        AwsCredentialsProvider awsCredentialsProvider, AwsRegionProvider awsRegionProvider) {
 
-        SchedulerClient schedulerClient = SchedulerClient.builder()
+        return SchedulerClient.builder()
             .credentialsProvider(awsCredentialsProvider)
             .region(awsRegionProvider.getRegion())
             .build();
+    }
+
+    @Bean
+    DynamicWebhookTriggerRefreshListener dynamicWebhookListener(
+        JobPrincipalAccessorRegistry jobPrincipalAccessorRegistry, SchedulerClient schedulerClient,
+        TriggerDefinitionFacade triggerDefinitionFacade,
+        TriggerStateService triggerStateService, WorkflowService workflowService) {
 
         return new DynamicWebhookTriggerRefreshListener(
             jobPrincipalAccessorRegistry, schedulerClient, triggerDefinitionFacade, triggerStateService,
