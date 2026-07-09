@@ -7,6 +7,7 @@ interface PlanTierCardPropsI {
     description: string;
     features: string[];
     highlighted?: boolean;
+    isCurrent?: boolean;
     name: string;
     onSelect: () => void;
     price: string | null;
@@ -17,6 +18,7 @@ const PlanTierCard = ({
     description,
     features,
     highlighted = false,
+    isCurrent = false,
     name,
     onSelect,
     price,
@@ -51,7 +53,8 @@ const PlanTierCard = ({
 
             <Button
                 className="w-full"
-                label={ctaLabel}
+                disabled={isCurrent}
+                label={isCurrent ? 'Current Plan' : ctaLabel}
                 onClick={onSelect}
                 variant={highlighted ? 'default' : 'outline'}
             />
