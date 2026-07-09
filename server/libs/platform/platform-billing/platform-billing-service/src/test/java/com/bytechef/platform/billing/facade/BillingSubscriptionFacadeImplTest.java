@@ -28,6 +28,7 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HexFormat;
@@ -69,8 +70,9 @@ class BillingSubscriptionFacadeImplTest {
     @BeforeEach
     void setUp() {
         BillingProperties billingProperties = new BillingProperties(
-            STRIPE_API_KEY, null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, WEBHOOK_SECRET,
-            null, null);
+            new BillingProperties.Stripe(
+                STRIPE_API_KEY, null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, WEBHOOK_SECRET,
+                null, null));
 
         facade = new BillingSubscriptionFacadeImpl(
             billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
@@ -153,6 +155,7 @@ class BillingSubscriptionFacadeImplTest {
         return subscription;
     }
 
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private String subscriptionUpdatedPayloadWithPeriodRollover(
         String subscriptionId, long periodStartEpoch, long periodEndEpoch) {
 
@@ -196,6 +199,7 @@ class BillingSubscriptionFacadeImplTest {
             """.formatted(subscriptionId, periodStartEpoch, periodEndEpoch);
     }
 
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
     private String subscriptionUpdatedPayload(String subscriptionId, String planName) {
         return """
             {

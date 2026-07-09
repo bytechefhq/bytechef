@@ -39,7 +39,8 @@ public class BillingApiController implements BillingApi {
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public BillingApiController(BillingSubscriptionFacade billingSubscriptionFacade, ConversionService conversionService) {
+    public BillingApiController(BillingSubscriptionFacade billingSubscriptionFacade,
+        ConversionService conversionService) {
         this.billingSubscriptionFacade = billingSubscriptionFacade;
         this.conversionService = conversionService;
     }
