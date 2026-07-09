@@ -7,12 +7,18 @@ import DataTablesFilterTitle from '@/pages/automation/datatables/components/Data
 import DataTablesLeftSidebarNav from '@/pages/automation/datatables/components/DataTablesLeftSidebarNav';
 import useDataTables from '@/pages/automation/datatables/components/hooks/useDataTables';
 import EnvironmentSelect from '@/shared/components/EnvironmentSelect';
+import StorageUsageBanner from '@/shared/components/StorageUsageBanner';
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
+import {useDataTableStorageUsageQuery} from '@/shared/middleware/graphql';
 import {Table2Icon} from 'lucide-react';
 
 const DataTables = () => {
     const {allTags, error, filteredTables, isLoading, tables, tagId, tagsByTableData} = useDataTables();
+
+    const {data: storageUsageData} = useDataTableStorageUsageQuery();
+
+    const storageUsage = storageUsageData?.dataTableStorageUsage;
 
     return (
         <LayoutContainer
@@ -45,6 +51,16 @@ const DataTables = () => {
             leftSidebarWidth="64"
         >
             <PageLoader errors={[error]} loading={isLoading}>
+                {storageUsage && (
+                    <StorageUsageBanner
+                        label="Data table"
+                        limitBytes={storageUsage.limitBytes}
+                        percentage={storageUsage.percentage}
+                        unlimited={storageUsage.unlimited}
+                        usedBytes={storageUsage.usedBytes}
+                    />
+                )}
+
                 {filteredTables.length > 0 ? (
                     <DataTableList allTags={allTags} dataTables={filteredTables} tagsByTableData={tagsByTableData} />
                 ) : (

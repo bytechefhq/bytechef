@@ -1,0 +1,8 @@
+query DataTableStorageUsage {
+    dataTableStorageUsage {
+        limitBytes
+        percentage
+        unlimited
+        usedBytes
+    }
+}
