@@ -11,6 +11,9 @@ springdoc:
     enabled: false
 ---
 
+github-proxy:
+  baseUrl: https://github-proxy.bytechef.io/
+
 info:
   ai:
     copilot:
