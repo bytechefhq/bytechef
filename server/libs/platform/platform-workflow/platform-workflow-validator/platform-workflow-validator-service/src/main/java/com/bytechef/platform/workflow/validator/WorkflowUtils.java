@@ -16,12 +16,14 @@
 
 package com.bytechef.platform.workflow.validator;
 
+import com.bytechef.commons.util.BooleanUtils;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.evaluator.SpelEvaluator;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.Nullable;
 import tools.jackson.core.type.TypeReference;
 import tools.jackson.databind.JsonNode;
 
@@ -76,24 +78,13 @@ class WorkflowUtils {
             com.bytechef.commons.util.JsonUtils.read(actualParameters.toString(), new TypeReference<>() {});
 
         try {
-            Map<String, Object> evaluated = EVALUATOR.evaluate(map, actualParametersMap);
+            Map<String, @Nullable Object> evaluated = EVALUATOR.evaluate(map, actualParametersMap);
 
             Object convertedExpression = evaluated.get("convertedExpression");
 
-            return parseBoolean(convertedExpression.toString());
+            return BooleanUtils.asBoolean(convertedExpression);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
-        }
-    }
-
-    private static boolean parseBoolean(String string) {
-        if ("true".equalsIgnoreCase(string)) {
-            return true;
-        } else if ("false".equalsIgnoreCase(string)) {
-            return false;
-        } else {
-            throw new IllegalArgumentException(
-                "Invalid boolean value: '" + string + "'. Expected 'true' or 'false'");
         }
     }
 }
