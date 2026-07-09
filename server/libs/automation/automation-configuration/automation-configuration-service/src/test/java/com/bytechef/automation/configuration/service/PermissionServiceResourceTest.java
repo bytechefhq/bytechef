@@ -42,7 +42,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
  *
  * @author Ivica Cardic
  */
-class PermissionServiceImplResourceTest {
+class PermissionServiceResourceTest {
 
     private final UserService userService = Mockito.mock(UserService.class);
 
