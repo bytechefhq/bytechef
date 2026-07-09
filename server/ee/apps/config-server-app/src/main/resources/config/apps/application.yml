@@ -110,6 +110,9 @@ spring:
       enabled: false
   jmx:
     enabled: false
+  mvc:
+    async:
+      request-timeout: -1
   output:
     ansi:
       console-available: true
