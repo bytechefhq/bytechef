@@ -73,7 +73,13 @@ const PLANS = [
 
 const getPlanTier = (planName: string | undefined): number => PLAN_TIERS[planName?.toLowerCase() ?? ''] ?? 0;
 
-const SelectPlanDialog = ({currentPlanName, hasActiveSubscription, onClose, onUpgradeSuccess, open}: SelectPlanDialogPropsI) => {
+const SelectPlanDialog = ({
+    currentPlanName,
+    hasActiveSubscription,
+    onClose,
+    onUpgradeSuccess,
+    open,
+}: SelectPlanDialogPropsI) => {
     const [downgradeConfirmOpen, setDowngradeConfirmOpen] = useState(false);
     const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
     const [pendingDowngrade, setPendingDowngrade] = useState<PendingPlanChangeI | null>(null);
@@ -211,7 +217,11 @@ const SelectPlanDialog = ({currentPlanName, hasActiveSubscription, onClose, onUp
                 onClose={closeDowngradeConfirm}
                 onConfirm={() => {
                     if (pendingDowngrade) {
-                        handleSubscriptionChange(pendingDowngrade.name, pendingDowngrade.nameEnum, closeDowngradeConfirm);
+                        handleSubscriptionChange(
+                            pendingDowngrade.name,
+                            pendingDowngrade.nameEnum,
+                            closeDowngradeConfirm
+                        );
                     }
                 }}
                 open={downgradeConfirmOpen}
