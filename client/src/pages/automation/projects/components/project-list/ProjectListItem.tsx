@@ -379,7 +379,7 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
 
                                             <Tooltip>
                                                 <TooltipTrigger asChild>
-                                                    <span>
+                                                    <span className="block">
                                                         <DropdownMenuItem
                                                             aria-label="Import n8n Workflow"
                                                             className="dropdown-menu-item"

@@ -213,7 +213,7 @@ const ProjectWorkflowList = ({
 
                                                 <Tooltip>
                                                     <TooltipTrigger asChild>
-                                                        <span>
+                                                        <span className="block">
                                                             <DropdownMenuItem
                                                                 disabled={importN8nWorkflowDisabled}
                                                                 onClick={(event) => {

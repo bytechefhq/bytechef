@@ -265,7 +265,7 @@ const ProjectsLeftSidebar = ({
 
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <span>
+                                    <span className="block">
                                         <DropdownMenuItem
                                             className="cursor-pointer"
                                             disabled={importN8nWorkflowDisabled}
