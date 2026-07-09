@@ -46,7 +46,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Matija Petanjek
  */
 @ExtendWith(MockitoExtension.class)
-class BillingCheckoutFacadeImplTest {
+class BillingSubscriptionFacadeImplTest {
 
     private static final String WEBHOOK_SECRET = "whsec_test_webhook_secret";
     private static final String STRIPE_API_KEY = "sk_test_abc123";
@@ -64,7 +64,7 @@ class BillingCheckoutFacadeImplTest {
     @Mock
     private BillingWebhookEventService billingWebhookEventService;
 
-    private BillingCheckoutFacadeImpl facade;
+    private BillingSubscriptionFacadeImpl facade;
 
     @BeforeEach
     void setUp() {
@@ -72,7 +72,7 @@ class BillingCheckoutFacadeImplTest {
             STRIPE_API_KEY, null, PRODUCT_STARTER_ID, PRODUCT_GROWTH_ID, PRODUCT_USAGE_ID, null, WEBHOOK_SECRET,
             null, null);
 
-        facade = new BillingCheckoutFacadeImpl(
+        facade = new BillingSubscriptionFacadeImpl(
             billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
             new ObjectMapper(), new StripeClientImpl(billingProperties));
     }

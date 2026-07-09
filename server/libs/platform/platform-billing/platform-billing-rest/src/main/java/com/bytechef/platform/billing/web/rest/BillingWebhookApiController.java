@@ -17,7 +17,7 @@
 package com.bytechef.platform.billing.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.billing.facade.BillingCheckoutFacade;
+import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -30,15 +30,15 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class BillingWebhookApiController implements BillingWebhookApi {
 
-    private final BillingCheckoutFacade billingCheckoutFacade;
+    private final BillingSubscriptionFacade billingSubscriptionFacade;
 
-    public BillingWebhookApiController(BillingCheckoutFacade billingCheckoutFacade) {
-        this.billingCheckoutFacade = billingCheckoutFacade;
+    public BillingWebhookApiController(BillingSubscriptionFacade billingSubscriptionFacade) {
+        this.billingSubscriptionFacade = billingSubscriptionFacade;
     }
 
     @Override
     public ResponseEntity<Void> handleWebhook(String stripeSignature, String body) {
-        billingCheckoutFacade.handleWebhookEvent(body, stripeSignature);
+        billingSubscriptionFacade.handleWebhookEvent(body, stripeSignature);
 
         return ResponseEntity.ok()
             .build();
