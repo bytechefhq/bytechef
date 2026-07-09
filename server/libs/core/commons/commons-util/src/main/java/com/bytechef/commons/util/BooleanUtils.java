@@ -17,8 +17,27 @@
 package com.bytechef.commons.util;
 
 import java.util.Locale;
+import org.jspecify.annotations.Nullable;
 
 public class BooleanUtils {
+
+    /**
+     * Coerces an arbitrary value to a primitive {@code boolean}. Returns the value itself when it is already a
+     * {@link Boolean}; otherwise delegates its string form to {@link #parseBoolean(String)}. Never throws and returns
+     * {@code false} for {@code null} or any value that {@link #parseBoolean(String)} does not recognize as {@code true}
+     * — intended for callers that must fall back to {@code false} when a value cannot be resolved to a genuine boolean.
+     *
+     * @param value the value to coerce; may be {@code null}
+     * @return the boolean interpretation of the value, or {@code false} when it cannot be resolved
+     */
+    public static boolean asBoolean(@Nullable Object value) {
+        if (value instanceof Boolean booleanValue) {
+            return booleanValue;
+        }
+
+        return parseBoolean(String.valueOf(value));
+    }
+
     /**
      * Parses the given string and attempts to convert it into a Boolean value. The method recognizes several string
      * representations for true and false: - For true: "true", "t", "yes", "y", and "1" (case insensitive). - For false:

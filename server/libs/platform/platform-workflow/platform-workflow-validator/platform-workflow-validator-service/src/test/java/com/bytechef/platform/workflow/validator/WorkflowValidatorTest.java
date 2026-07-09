@@ -1813,8 +1813,52 @@ class WorkflowValidatorTest {
 
         TaskValidator.validateTaskParameters("testTask", taskParameters, taskDefinition, errors, warnings);
 
+        // A display condition that references a property absent from the parameters (here 'enableAdvanced', typically
+        // absent because it was left at its default value, which is not persisted) is unresolvable and must be treated
+        // as the property being hidden — matching WorkflowNodeParameterFacadeImpl#evaluate. It is NOT a malformed
+        // condition, so no "Invalid logic for display condition" warning is emitted and the conditional property is
+        // simply excluded from validation.
         assertEquals("", errors.toString());
-        assertEquals("[testTask] Invalid logic for display condition: 'enableAdvanced == true'", warnings.toString());
+        assertEquals("", warnings.toString());
+    }
+
+    /**
+     * Regression for issue #5363: the AI Agent chat action's 'messages' property (display condition
+     * {@code format == 'ADVANCED'}) and 'response.responseSchema' property (display condition
+     * {@code response.responseFormat == 'JSON'}) were flagged with spurious "Invalid logic for display condition"
+     * warnings whenever the referenced field was left at its default value and therefore not persisted in the workflow
+     * JSON. Such properties must be treated as hidden, not malformed.
+     */
+    @Test
+    void validateTaskParametersDisplayConditionReferencingDefaultedFieldExcludesPropertyWithoutWarning() {
+        String taskParameters = """
+            {
+                "format": "SIMPLE",
+                "prompt": "hi",
+                "response": {}
+            }
+            """;
+
+        List<PropertyInfo> taskDefinition = List.of(
+            new PropertyInfo("format", "STRING", null, true, true, null, null),
+            new PropertyInfo("prompt", "STRING", null, true, true, "format == 'SIMPLE'", null),
+            new PropertyInfo("messages", "ARRAY", null, true, true, "format == 'ADVANCED'", null),
+            new PropertyInfo(
+                "response", "OBJECT", null, true, true, null,
+                List.of(
+                    new PropertyInfo("responseFormat", "STRING", null, false, true, null, null),
+                    new PropertyInfo(
+                        "responseSchema", "STRING", null, true, true, "response.responseFormat == 'JSON'", null))));
+
+        StringBuilder errors = new StringBuilder();
+        StringBuilder warnings = new StringBuilder();
+
+        TaskValidator.validateTaskParameters("aiAgent", taskParameters, taskDefinition, errors, warnings);
+
+        // 'messages' (format is SIMPLE, not ADVANCED) and 'response.responseSchema' (responseFormat left at its
+        // non-persisted default) are both hidden and must not surface as errors or "Invalid logic" warnings.
+        assertEquals("", errors.toString());
+        assertEquals("", warnings.toString());
     }
 
     @Test
