@@ -17,72 +17,112 @@
 package com.bytechef.automation.ai.mcp.server.security.web.authentication;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.domain.ApiKey;
+import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.user.domain.User;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 
 /**
  * @author Ivica Cardic
  */
+@SuppressFBWarnings("HARD_CODE_PASSWORD")
 class AutomationMcpServerApiKeyAuthenticationProviderTest {
 
+    private final ApiKeyService apiKeyService = mock(ApiKeyService.class);
+    private final AuthorityService authorityService = mock(AuthorityService.class);
     private final McpServerService mcpServerService = mock(McpServerService.class);
-    private final AutomationMcpServerApiKeyAuthenticationProvider provider =
-        new AutomationMcpServerApiKeyAuthenticationProvider(mcpServerService);
+    private final UserService userService = mock(UserService.class);
+
+    private final AutomationMcpServerApiKeyAuthenticationProvider automationMcpServerApiKeyAuthenticationProvider =
+        new AutomationMcpServerApiKeyAuthenticationProvider(
+            apiKeyService, authorityService, mcpServerService, userService);
 
     @Test
-    void testValidEnabledServerAuthenticatesAsUser() {
+    void testAuthenticateWithValidAutomationApiKeySucceeds() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+        mockMcpServer(Environment.PRODUCTION);
+
+        Authentication authentication = automationMcpServerApiKeyAuthenticationProvider.authenticate(
+            getUnauthenticatedToken());
+
+        assertThat(authentication.isAuthenticated()).isTrue();
+        verify(apiKeyService).updateLastUsedDate(7L);
+    }
+
+    @Test
+    void testAuthenticateWithWrongTypeApiKeyFails() {
+        mockApiKey(PlatformType.EMBEDDED, Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithEnvironmentMismatchFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.STAGING);
+        mockMcpServer(Environment.PRODUCTION);
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    @Test
+    void testAuthenticateWithUnknownMcpServerSecretKeyFails() {
+        mockApiKey(PlatformType.AUTOMATION, Environment.PRODUCTION);
+
+        when(mcpServerService.getMcpServer("server-secret")).thenThrow(new IllegalArgumentException());
+
+        assertThatExceptionOfType(BadCredentialsException.class).isThrownBy(
+            () -> automationMcpServerApiKeyAuthenticationProvider.authenticate(getUnauthenticatedToken()));
+    }
+
+    private ApiKeyAuthenticationToken getUnauthenticatedToken() {
+        return ApiKeyAuthenticationToken.unauthenticated(
+            new McpApiKeyCredentials(Environment.PRODUCTION, "server-secret", "api-secret"));
+    }
+
+    private void mockApiKey(PlatformType type, Environment environment) {
+        ApiKey apiKey = new ApiKey();
+
+        apiKey.setId(7L);
+        apiKey.setName("test");
+        apiKey.setSecretKey("api-secret");
+        apiKey.setType(type);
+        apiKey.setEnvironment(environment);
+        apiKey.setUserId(100L);
+
+        when(apiKeyService.fetchApiKey("api-secret")).thenReturn(Optional.of(apiKey));
+
+        User user = mock(User.class);
+
+        when(user.isActivated()).thenReturn(true);
+        when(user.getLogin()).thenReturn("admin@localhost.com");
+        when(user.getAuthorityIds()).thenReturn(List.of());
+        when(userService.fetchUser(100L)).thenReturn(Optional.of(user));
+    }
+
+    private void mockMcpServer(Environment environment) {
         McpServer mcpServer = mock(McpServer.class);
 
-        when(mcpServer.isEnabled()).thenReturn(true);
-        when(mcpServerService.getMcpServer("secret123")).thenReturn(mcpServer);
-
-        Authentication result = provider.authenticate(
-            new AutomationMcpServerApiKeyAuthenticationToken("secret123", "public"));
-
-        assertThat(result.isAuthenticated()).isTrue();
-        assertThat(result.getAuthorities()
-            .stream()
-            .map(GrantedAuthority::getAuthority)).contains(AuthorityConstants.USER);
-    }
-
-    @Test
-    void testUnknownSecretRejected() {
-        when(mcpServerService.getMcpServer("nope")).thenThrow(new IllegalArgumentException("not found"));
-
-        assertThatThrownBy(() -> provider.authenticate(
-            new AutomationMcpServerApiKeyAuthenticationToken("nope", "public")))
-                .isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    void testDisabledServerRejected() {
-        McpServer mcpServer = mock(McpServer.class);
-
-        when(mcpServer.isEnabled()).thenReturn(false);
-        when(mcpServerService.getMcpServer("secret123")).thenReturn(mcpServer);
-
-        assertThatThrownBy(() -> provider.authenticate(
-            new AutomationMcpServerApiKeyAuthenticationToken("secret123", "public")))
-                .isInstanceOf(BadCredentialsException.class);
-    }
-
-    @Test
-    void testBlankSecretRejectedBeforeLookup() {
-        assertThatThrownBy(() -> provider.authenticate(
-            new AutomationMcpServerApiKeyAuthenticationToken("", "public")))
-                .isInstanceOf(BadCredentialsException.class);
-
-        verify(mcpServerService, never()).getMcpServer("");
+        when(mcpServer.getEnvironment()).thenReturn(environment);
+        when(mcpServerService.getMcpServer("server-secret")).thenReturn(mcpServer);
     }
 }

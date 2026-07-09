@@ -20,26 +20,24 @@ import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
 import com.bytechef.automation.ai.mcp.server.facade.AutomationMcpToolFacade;
-import com.bytechef.automation.ai.mcp.server.security.web.configurer.AutomationMcpServerSecurityConfigurer;
 import com.bytechef.automation.ai.mcp.server.spi.McpServerWorkspaceToolCallbackContributor;
 import com.bytechef.automation.ai.mcp.service.McpProjectService;
 import com.bytechef.automation.ai.mcp.service.McpProjectWorkflowService;
 import com.bytechef.automation.ai.mcp.service.WorkspaceMcpServerService;
 import com.bytechef.automation.configuration.service.ProjectDeploymentWorkflowService;
 import com.bytechef.commons.util.CollectionUtils;
-import com.bytechef.config.ApplicationProperties;
 import com.bytechef.evaluator.Evaluator;
 import com.bytechef.platform.component.facade.ClusterElementDefinitionFacade;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import com.bytechef.platform.mcp.domain.McpComponent;
 import com.bytechef.platform.mcp.domain.McpServer;
-import com.bytechef.platform.mcp.domain.McpTool;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
-import com.bytechef.platform.mcp.server.McpAppWorkflowViewer;
+import com.bytechef.platform.mcp.server.McpToolAuthorizationEvaluator;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
-import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
+import com.bytechef.platform.security.util.SecurityUtils;
 import com.bytechef.platform.workflow.execution.JobCompletionAwaiter;
 import com.bytechef.platform.workflow.execution.facade.PrincipalJobFacade;
 import io.modelcontextprotocol.common.McpTransportContext;
@@ -48,13 +46,12 @@ import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.ai.mcp.McpToolUtils;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -65,6 +62,10 @@ import org.springframework.web.servlet.function.ServerResponse;
 public class AutomationMcpServerConfiguration {
 
     public static final String SECRET_KEY = "secretKey";
+    private static final String AUTHORITIES = "authorities";
+
+    private static final McpToolAuthorizationEvaluator TOOL_AUTHORIZATION_EVALUATOR =
+        new McpToolAuthorizationEvaluator();
 
     @Bean
     WebMvcStreamableServerTransportProvider automationWebMvcStreamableHttpServerTransportProvider() {
@@ -73,7 +74,8 @@ public class AutomationMcpServerConfiguration {
             .contextExtractor(serverRequest -> {
                 String secretKey = serverRequest.pathVariable(SECRET_KEY);
 
-                return McpTransportContext.create(Map.of(SECRET_KEY, secretKey));
+                return McpTransportContext.create(
+                    Map.of(SECRET_KEY, secretKey, AUTHORITIES, SecurityUtils.fetchCurrentUserAuthorities()));
             })
             .build();
     }
@@ -100,9 +102,8 @@ public class AutomationMcpServerConfiguration {
 
     @Bean
     FilterableMcpAsyncServer automationMcpAsyncServer(
-        ApplicationProperties applicationProperties, McpComponentService mcpComponentService,
-        McpProjectService mcpProjectService, McpServerService mcpServerService, McpToolService mcpToolService,
-        AutomationMcpToolFacade mcpToolFacade,
+        McpComponentService mcpComponentService, McpProjectService mcpProjectService,
+        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
         ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
@@ -115,8 +116,6 @@ public class AutomationMcpServerConfiguration {
                     .prompts(true)
                     .logging()
                     .build())
-            .resourceSpecifications(
-                McpAppWorkflowViewer.getResourceSpecifications(applicationProperties.getPublicUrl()))
             .toolFilter((exchange) -> {
                 McpTransportContext mcpTransportContext = exchange.transportContext();
 
@@ -127,15 +126,43 @@ public class AutomationMcpServerConfiguration {
                 }
 
                 return buildToolSpecifications(
-                    secretKeyObject.toString(), mcpComponentService, mcpProjectService, mcpServerService,
-                    mcpToolService, mcpToolFacade, workspaceToolProviders, workspaceMcpServerService);
+                    secretKeyObject.toString(), authorities(mcpTransportContext), mcpComponentService,
+                    mcpProjectService, mcpServerService, mcpToolService, mcpToolFacade, workspaceToolProviders,
+                    workspaceMcpServerService);
             })
             .build();
     }
 
+    @SuppressWarnings("unchecked")
+    private static Set<String> authorities(McpTransportContext mcpTransportContext) {
+        Object authoritiesObject = mcpTransportContext.get(AUTHORITIES);
+
+        return authoritiesObject instanceof Set ? (Set<String>) authoritiesObject : Set.of();
+    }
+
+    /**
+     * The components whose tools the principal may see. When the server does not enforce tool authorization, every
+     * component is returned (legacy behavior); when it does, only components the principal is authorized for are kept
+     * (deny-by-default).
+     */
+    static List<McpComponent> authorizedComponents(
+        McpServer mcpServer, List<McpComponent> mcpComponents, Set<String> principalAuthorities) {
+
+        if (!mcpServer.isEnforceToolAuthorization()) {
+            return mcpComponents;
+        }
+
+        return mcpComponents.stream()
+            .filter(
+                mcpComponent -> TOOL_AUTHORIZATION_EVALUATOR.isComponentAuthorized(
+                    principalAuthorities, mcpComponent.getRequiredAuthorities()))
+            .toList();
+    }
+
     static List<McpServerFeatures.AsyncToolSpecification> buildToolSpecifications(
-        String secretKey, McpComponentService mcpComponentService, McpProjectService mcpProjectService,
-        McpServerService mcpServerService, McpToolService mcpToolService, AutomationMcpToolFacade mcpToolFacade,
+        String secretKey, Set<String> principalAuthorities, McpComponentService mcpComponentService,
+        McpProjectService mcpProjectService, McpServerService mcpServerService, McpToolService mcpToolService,
+        AutomationMcpToolFacade mcpToolFacade,
         ObjectProvider<McpServerWorkspaceToolCallbackContributor> workspaceToolProviders,
         WorkspaceMcpServerService workspaceMcpServerService) {
 
@@ -143,14 +170,14 @@ public class AutomationMcpServerConfiguration {
 
         List<McpServerFeatures.AsyncToolSpecification> tools = new ArrayList<>();
 
-        mcpComponentService.getMcpServerMcpComponents(mcpServer.getId())
-            .stream()
-            .flatMap(
-                mcpComponent -> CollectionUtils.stream(
-                    mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
-            .filter(McpTool::isEnabled)
-            .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
-            .forEach(tools::add);
+        authorizedComponents(
+            mcpServer, mcpComponentService.getMcpServerMcpComponents(mcpServer.getId()), principalAuthorities)
+                .stream()
+                .flatMap(
+                    mcpComponent -> CollectionUtils.stream(
+                        mcpToolService.getMcpComponentMcpTools(mcpComponent.getId())))
+                .map(mcpTool -> McpToolUtils.toAsyncToolSpecification(mcpToolFacade.getFunctionToolCallback(mcpTool)))
+                .forEach(tools::add);
 
         mcpProjectService.getMcpServerMcpProjects(mcpServer.getId())
             .stream()
@@ -165,19 +192,5 @@ public class AutomationMcpServerConfiguration {
                 .forEach(tools::add));
 
         return tools;
-    }
-
-    @Bean
-    SecurityConfigurerContributor automationMcpServerSecurityConfigurerContributor(McpServerService mcpServerService) {
-        return new SecurityConfigurerContributor() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
-                getSecurityConfigurerAdapter() {
-
-                return (T) new AutomationMcpServerSecurityConfigurer(mcpServerService);
-            }
-        };
     }
 }

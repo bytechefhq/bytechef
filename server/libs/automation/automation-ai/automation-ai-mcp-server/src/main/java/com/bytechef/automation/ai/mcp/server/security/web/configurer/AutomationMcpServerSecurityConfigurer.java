@@ -17,47 +17,27 @@
 package com.bytechef.automation.ai.mcp.server.security.web.configurer;
 
 import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerApiKeyAuthenticationProvider;
-import com.bytechef.automation.ai.mcp.server.security.web.authentication.AutomationMcpServerApiKeyAuthenticationToken;
 import com.bytechef.platform.mcp.service.McpServerService;
-import com.bytechef.platform.security.web.configurer.AbstractApiKeyHttpConfigurer;
-import com.bytechef.platform.security.web.filter.AbstractApiKeyAuthenticationConverter;
-import com.bytechef.tenant.domain.TenantKey;
-import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.util.matcher.RegexRequestMatcher;
+import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpApiKeyAuthenticationConverter;
+import com.bytechef.platform.security.web.mcp.McpApiKeyHttpConfigurer;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 
 /**
  * @author Ivica Cardic
  */
-public class AutomationMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfigurer {
+public class AutomationMcpServerSecurityConfigurer extends McpApiKeyHttpConfigurer {
 
     private static final String PATH_PATTERN = "^/api/automation/.+/mcp";
 
-    public AutomationMcpServerSecurityConfigurer(McpServerService mcpServerService) {
+    public AutomationMcpServerSecurityConfigurer(
+        ApiKeyService apiKeyService, AuthorityService authorityService, McpServerService mcpServerService,
+        UserService userService) {
+
         super(
-            PATH_PATTERN, new AutomationMcpServerApiKeyAuthenticationConverter(),
-            new AutomationMcpServerApiKeyAuthenticationProvider(mcpServerService));
-    }
-
-    @Override
-    protected void registerCsrfOverride(CsrfConfigurer<?> csrf) {
-        csrf.ignoringRequestMatchers(RegexRequestMatcher.regexMatcher(PATH_PATTERN));
-    }
-
-    private static class AutomationMcpServerApiKeyAuthenticationConverter
-        extends AbstractApiKeyAuthenticationConverter {
-
-        @Override
-        public Authentication convert(HttpServletRequest request) {
-            String servletPath = request.getServletPath();
-
-            String mcpServerSecretKey = servletPath.replace("/api/automation/", "")
-                .replace("/mcp", "");
-
-            TenantKey tenantKey = TenantKey.parse(mcpServerSecretKey);
-
-            return new AutomationMcpServerApiKeyAuthenticationToken(mcpServerSecretKey, tenantKey.getTenantId());
-        }
+            PATH_PATTERN, new McpApiKeyAuthenticationConverter("/api/automation/"),
+            new AutomationMcpServerApiKeyAuthenticationProvider(
+                apiKeyService, authorityService, mcpServerService, userService));
     }
 }
