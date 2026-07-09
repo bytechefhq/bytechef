@@ -1024,12 +1024,16 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
     }
 
     private boolean evaluate(String displayCondition, Map<String, ?> inputParameters) {
-        Map<String, Object> result = evaluator.evaluate(
-            Map.of("displayCondition", "=" + displayCondition), inputParameters, true);
+        try {
+            Map<String, Object> result = evaluator.evaluate(
+                Map.of("displayCondition", "=" + displayCondition), inputParameters, true);
 
-        Object displayConditionResult = result.get("displayCondition");
+            Object displayConditionResult = result.get("displayCondition");
 
-        return !(displayConditionResult instanceof String) && (boolean) displayConditionResult;
+            return displayConditionResult instanceof Boolean bool && bool;
+        } catch (RuntimeException runtimeException) {
+            return false;
+        }
     }
 
     private static List<Integer> extractIndexes(String expression) {
