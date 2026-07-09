@@ -22,6 +22,7 @@ import com.bytechef.platform.security.audit.ApiKeyAuditPublisher;
 import com.bytechef.platform.security.domain.ApiKey;
 import com.bytechef.platform.security.repository.ApiKeyRepository;
 import com.bytechef.tenant.domain.TenantKey;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +88,12 @@ public class ApiKeyServiceImpl implements ApiKeyService {
 
     @Override
     @Transactional(readOnly = true)
+    public Optional<ApiKey> fetchApiKey(String secretKey) {
+        return apiKeyRepository.findBySecretKey(secretKey);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public ApiKey getApiKey(String secretKey) {
         return apiKeyRepository.findBySecretKey(secretKey)
             .orElseThrow(() -> new IllegalArgumentException("Api key not found."));
@@ -131,5 +138,15 @@ public class ApiKeyServiceImpl implements ApiKeyService {
         curApiKey.setName(Validate.notNull(apiKey.getName(), "name"));
 
         return apiKeyRepository.save(curApiKey);
+    }
+
+    @Override
+    public void updateLastUsedDate(long id) {
+        apiKeyRepository.findById(id)
+            .ifPresent(apiKey -> {
+                apiKey.setLastUsedDate(Instant.now());
+
+                apiKeyRepository.save(apiKey);
+            });
     }
 }

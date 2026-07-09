@@ -26,6 +26,7 @@ import com.bytechef.platform.mcp.facade.McpServerFacade;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpToolService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -91,6 +92,10 @@ public class McpComponentGraphQlController {
         McpComponent mcpComponent = new McpComponent(
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId());
 
+        if (input.requiredAuthorities() != null) {
+            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
+        }
+
         List<McpTool> mcpTools = input.tools()
             .stream()
             .map(toolInput -> new McpTool(toolInput.name(), toolInput.parameters()))
@@ -105,6 +110,10 @@ public class McpComponentGraphQlController {
             input.componentName(), input.componentVersion(), input.mcpServerId(), input.connectionId(),
             input.version());
         mcpComponent.setId(id);
+
+        if (input.requiredAuthorities() != null) {
+            mcpComponent.setRequiredAuthorities(new HashSet<>(input.requiredAuthorities()));
+        }
 
         List<McpTool> mcpTools = input.tools()
             .stream()
@@ -158,7 +167,7 @@ public class McpComponentGraphQlController {
     @SuppressFBWarnings("EI")
     public record McpComponentWithToolsInput(
         String componentName, int componentVersion, Long mcpServerId, Long connectionId,
-        List<McpToolInputForComponent> tools, int version) {
+        List<String> requiredAuthorities, List<McpToolInputForComponent> tools, int version) {
     }
 
     @SuppressFBWarnings("EI")

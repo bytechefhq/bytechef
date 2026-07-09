@@ -21,7 +21,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -85,6 +87,25 @@ public final class SecurityUtils {
         if (currentUserLogin == null || !currentUserLogin.equals(expectedLogin)) {
             throw new AccessDeniedException("Access is denied");
         }
+    }
+
+    /**
+     * Returns the authority names granted to the current user, or an empty set when no user is authenticated. Reads the
+     * security context on the calling thread, so it must be called where that context is established (e.g. within the
+     * request thread).
+     *
+     * @return the current user's authority names.
+     */
+    public static Set<String> fetchCurrentUserAuthorities() {
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+
+        Authentication authentication = securityContext.getAuthentication();
+
+        if (authentication == null) {
+            return Set.of();
+        }
+
+        return getAuthorities(authentication).collect(Collectors.toSet());
     }
 
     /**

@@ -1,0 +1,27 @@
+dependencies {
+    implementation("org.springframework.boot:spring-boot-autoconfigure")
+    implementation("org.springframework:spring-context")
+    implementation("org.springframework.data:spring-data-jdbc")
+    implementation("org.springframework.graphql:spring-graphql")
+    implementation("org.springframework.security:spring-security-config")
+    implementation("org.springframework.security:spring-security-web")
+    implementation(libs.org.springaicommunity.mcp.authorization.server)
+    implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
+    implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-security:platform-security-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.springframework:spring-test")
+    testImplementation("org.springframework:spring-webmvc")
+    testImplementation("org.springframework.boot:spring-boot-starter-webmvc")
+    testImplementation("org.springframework.boot:spring-boot-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.springframework.security:spring-security-test")
+    testImplementation("org.testcontainers:postgresql")
+    testImplementation(project(":server:libs:config:liquibase-config"))
+    testImplementation(project(":server:libs:test:test-int-support"))
+
+    testRuntimeOnly("org.postgresql:postgresql")
+}

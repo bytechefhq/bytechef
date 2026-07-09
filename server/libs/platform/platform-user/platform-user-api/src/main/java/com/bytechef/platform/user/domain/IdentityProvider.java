@@ -18,8 +18,11 @@ package com.bytechef.platform.user.domain;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
@@ -70,8 +73,26 @@ public class IdentityProvider {
     @Column("issuer_uri")
     private String issuerUri;
 
+    @Column("mcp_embedded")
+    private boolean mcpEmbedded;
+
+    @Column("mcp_automation")
+    private boolean mcpAutomation;
+
+    @Column("mcp_management")
+    private boolean mcpManagement;
+
+    @MappedCollection(idColumn = "identity_provider_id")
+    private Set<IdentityProviderAuthorityMapping> authorityMappings = new HashSet<>();
+
+    @Column("authorities_claim")
+    private String authoritiesClaim;
+
     @Column("metadata_uri")
     private String metadataUri;
+
+    @Column("validate_mcp_audience")
+    private boolean validateMcpAudience;
 
     @Column("mfa_method")
     private String mfaMethod;
@@ -140,6 +161,34 @@ public class IdentityProvider {
 
     public boolean isEnforced() {
         return enforced;
+    }
+
+    public boolean isMcpEmbedded() {
+        return mcpEmbedded;
+    }
+
+    public boolean isMcpAutomation() {
+        return mcpAutomation;
+    }
+
+    public boolean isMcpManagement() {
+        return mcpManagement;
+    }
+
+    public Map<String, String> getAuthorityMappings() {
+        return authorityMappings.stream()
+            .collect(
+                Collectors.toMap(
+                    IdentityProviderAuthorityMapping::getExternalGroup,
+                    IdentityProviderAuthorityMapping::getAuthority));
+    }
+
+    public String getAuthoritiesClaim() {
+        return authoritiesClaim;
+    }
+
+    public boolean isValidateMcpAudience() {
+        return validateMcpAudience;
     }
 
     public Long getId() {
@@ -229,6 +278,36 @@ public class IdentityProvider {
 
     public void setIssuerUri(String issuerUri) {
         this.issuerUri = issuerUri;
+    }
+
+    public void setMcpEmbedded(boolean mcpEmbedded) {
+        this.mcpEmbedded = mcpEmbedded;
+    }
+
+    public void setMcpAutomation(boolean mcpAutomation) {
+        this.mcpAutomation = mcpAutomation;
+    }
+
+    public void setMcpManagement(boolean mcpManagement) {
+        this.mcpManagement = mcpManagement;
+    }
+
+    public void setAuthorityMappings(Map<String, String> authorityMappings) {
+        this.authorityMappings = new HashSet<>();
+
+        if (authorityMappings != null) {
+            authorityMappings.forEach(
+                (externalGroup, authority) -> this.authorityMappings.add(
+                    new IdentityProviderAuthorityMapping(externalGroup, authority)));
+        }
+    }
+
+    public void setAuthoritiesClaim(String authoritiesClaim) {
+        this.authoritiesClaim = authoritiesClaim;
+    }
+
+    public void setValidateMcpAudience(boolean validateMcpAudience) {
+        this.validateMcpAudience = validateMcpAudience;
     }
 
     public void setMetadataUri(String metadataUri) {

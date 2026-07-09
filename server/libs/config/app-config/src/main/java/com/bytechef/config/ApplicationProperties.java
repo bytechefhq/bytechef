@@ -19,6 +19,7 @@ package com.bytechef.config;
 import com.bytechef.platform.configuration.domain.Environment;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -4733,6 +4734,11 @@ public class ApplicationProperties {
     public static class Oauth2 {
 
         /**
+         * Embedded OAuth2 authorization server configuration.
+         */
+        private AuthorizationServer authorizationServer = new AuthorizationServer();
+
+        /**
          * Predefined OAuth2 applications mapped by component name
          */
         private Map<String, OAuth2App> predefinedApps = new HashMap<>();
@@ -4742,6 +4748,15 @@ public class ApplicationProperties {
          */
         private String redirectUri;
 
+        /**
+         * OAuth2 resource-server configuration for the MCP endpoints.
+         */
+        private ResourceServer resourceServer = new ResourceServer();
+
+        public AuthorizationServer getAuthorizationServer() {
+            return authorizationServer;
+        }
+
         public Map<String, OAuth2App> getPredefinedApps() {
             return predefinedApps;
         }
@@ -4750,12 +4765,156 @@ public class ApplicationProperties {
             return redirectUri;
         }
 
+        public ResourceServer getResourceServer() {
+            return resourceServer;
+        }
+
+        public void setAuthorizationServer(AuthorizationServer authorizationServer) {
+            this.authorizationServer = authorizationServer;
+        }
+
+        public void setResourceServer(ResourceServer resourceServer) {
+            this.resourceServer = resourceServer;
+        }
+
         public void setPredefinedApps(Map<String, OAuth2App> predefinedApps) {
             this.predefinedApps = predefinedApps;
         }
 
         public void setRedirectUri(String redirectUri) {
             this.redirectUri = redirectUri;
+        }
+
+        /**
+         * Embedded OAuth2 authorization server configuration. When disabled (the default), the authorization server
+         * endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed.
+         */
+        public static class AuthorizationServer {
+
+            /**
+             * Whether the embedded OAuth2 authorization server is enabled.
+             */
+            private boolean enabled;
+
+            public boolean isEnabled() {
+                return enabled;
+            }
+
+            public void setEnabled(boolean enabled) {
+                this.enabled = enabled;
+            }
+        }
+
+        /**
+         * OAuth2 resource-server configuration for the MCP endpoints. The resource server is dormant unless at least
+         * one trusted issuer is configured; when configured it accepts a Bearer JWT (alongside the API key) issued by
+         * any listed issuer - the embedded authorization server and/or an external customer IdP.
+         */
+        public static class ResourceServer {
+
+            /**
+             * Trusted JWT issuers accepted on the MCP endpoints, each with its identity-to-tenant/authorities mapping.
+             */
+            private List<Issuer> issuers = new ArrayList<>();
+
+            public List<Issuer> getIssuers() {
+                return issuers;
+            }
+
+            public void setIssuers(List<Issuer> issuers) {
+                this.issuers = issuers;
+            }
+
+            /**
+             * A trusted JWT issuer and how its tokens map to a ByteChef tenant and authorities.
+             */
+            public static class Issuer {
+
+                /**
+                 * The issuer identifier ({@code iss} claim / issuer URI) whose tokens are trusted.
+                 */
+                private String uri;
+
+                /**
+                 * The claim whose value is the ByteChef tenant id. For the embedded authorization server this is the
+                 * minted {@code tenant_id} claim.
+                 */
+                private String tenantClaim;
+
+                /**
+                 * The claim (e.g. {@code groups} or {@code roles}) whose values are mapped to granted authorities. When
+                 * unset, authorities are resolved from the ByteChef user identified by {@code sub} (embedded issuer).
+                 */
+                private String authoritiesClaim;
+
+                /**
+                 * Authorities granted to every token from this issuer, in addition to any mapped from
+                 * {@link #authoritiesClaim}.
+                 */
+                private List<String> authorities = new ArrayList<>();
+
+                /**
+                 * Whether this issuer is the ByteChef embedded authorization server, whose tokens carry the requested
+                 * MCP endpoint URL as their {@code aud}. When true, audience validation enforces that a token's
+                 * {@code aud} contains the current endpoint URL.
+                 */
+                private boolean self;
+
+                /**
+                 * For an external issuer, the fixed audience value its tokens must carry. When set, audience validation
+                 * requires the token's {@code aud} to contain this value; when unset, audience validation is skipped
+                 * for this issuer.
+                 */
+                private String audience;
+
+                public String getUri() {
+                    return uri;
+                }
+
+                public String getTenantClaim() {
+                    return tenantClaim;
+                }
+
+                public String getAuthoritiesClaim() {
+                    return authoritiesClaim;
+                }
+
+                public List<String> getAuthorities() {
+                    return authorities;
+                }
+
+                public boolean isSelf() {
+                    return self;
+                }
+
+                public String getAudience() {
+                    return audience;
+                }
+
+                public void setUri(String uri) {
+                    this.uri = uri;
+                }
+
+                public void setTenantClaim(String tenantClaim) {
+                    this.tenantClaim = tenantClaim;
+                }
+
+                public void setAuthoritiesClaim(String authoritiesClaim) {
+                    this.authoritiesClaim = authoritiesClaim;
+                }
+
+                public void setAuthorities(List<String> authorities) {
+                    this.authorities = authorities;
+                }
+
+                public void setSelf(boolean self) {
+                    this.self = self;
+                }
+
+                public void setAudience(String audience) {
+                    this.audience = audience;
+                }
+            }
         }
 
         /**

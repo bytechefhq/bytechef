@@ -35,6 +35,7 @@ import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkSer
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
+import com.bytechef.platform.oauth2.authorizationserver.config.Oauth2AuthorizationServerConfiguration;
 import com.bytechef.test.config.testcontainers.PostgreSQLContainerConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -83,6 +84,11 @@ class ServerApplicationIntTest {
         assertThat(applicationContext.getBeansOfType(javax.sql.DataSource.class))
             .doesNotContainKey("clickHouseDataSource");
         assertThat(applicationContext.containsBean("contextStoreRecordClickHouseRepository")).isFalse();
+    }
+
+    @Test
+    void testAuthorizationServerBeansNotPresentWhenDisabled() {
+        assertThat(applicationContext.getBeanNamesForType(Oauth2AuthorizationServerConfiguration.class)).isEmpty();
     }
 
     @Test

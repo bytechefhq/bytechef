@@ -1,0 +1,17 @@
+extend type Query {
+    registeredClients: [RegisteredClient]
+}
+
+extend type Mutation {
+    deleteRegisteredClient(id: ID!): Boolean!
+}
+
+type RegisteredClient {
+    id: ID
+    clientId: String
+    clientName: String
+    clientIdIssuedAt: Long
+    scopes: [String]
+    authorizationGrantTypes: [String]
+    redirectUris: [String]
+}

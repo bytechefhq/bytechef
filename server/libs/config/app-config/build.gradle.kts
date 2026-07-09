@@ -6,4 +6,7 @@ dependencies {
     implementation(project(":server:libs:core:message:message-broker:message-broker-api"))
     implementation(project(":server:libs:config:logback-config"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-api"))
+
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
 }

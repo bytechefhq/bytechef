@@ -61,6 +61,9 @@ public final class McpServer {
     @Column
     private boolean enabled;
 
+    @Column("enforce_tool_authorization")
+    private boolean enforceToolAuthorization;
+
     @Column("secret_key")
     private String secretKey;
 
@@ -165,6 +168,10 @@ public final class McpServer {
         return enabled;
     }
 
+    public boolean isEnforceToolAuthorization() {
+        return enforceToolAuthorization;
+    }
+
     public String getSecretKey() {
         return secretKey;
     }
@@ -200,6 +207,10 @@ public final class McpServer {
 
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
+    }
+
+    public void setEnforceToolAuthorization(boolean enforceToolAuthorization) {
+        this.enforceToolAuthorization = enforceToolAuthorization;
     }
 
     public void setSecretKey(String secretKey) {

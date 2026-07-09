@@ -84,7 +84,15 @@ public class McpServerGraphQlController {
 
     @MutationMapping
     public McpServer updateMcpServer(@Argument long id, @Argument McpServerUpdateInput input) {
-        return mcpServerService.update(id, input.name(), input.enabled());
+        McpServer mcpServer = mcpServerService.update(id, input.name(), input.enabled());
+
+        if (input.enforceToolAuthorization() != null) {
+            mcpServer.setEnforceToolAuthorization(input.enforceToolAuthorization());
+
+            mcpServer = mcpServerService.update(mcpServer);
+        }
+
+        return mcpServer;
     }
 
     @MutationMapping
@@ -151,6 +159,6 @@ public class McpServerGraphQlController {
     public record McpServerInput(String name, PlatformType type, long environmentId, Boolean enabled) {
     }
 
-    public record McpServerUpdateInput(String name, Boolean enabled) {
+    public record McpServerUpdateInput(String name, Boolean enabled, Boolean enforceToolAuthorization) {
     }
 }

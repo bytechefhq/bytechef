@@ -150,6 +150,10 @@ public class ApiKey {
         this.id = id;
     }
 
+    public void setLastUsedDate(Instant lastUsedDate) {
+        this.lastUsedDate = lastUsedDate;
+    }
+
     public void setName(String name) {
         this.name = name;
     }

@@ -41,4 +41,8 @@ public interface IdentityProviderRepository extends ListCrudRepository<IdentityP
     @Query("SELECT ip.* FROM identity_provider ip " +
         "WHERE ip.scim_api_key = :scimApiKey")
     Optional<IdentityProvider> findByScimApiKey(@Param("scimApiKey") String scimApiKey);
+
+    @Query("SELECT ip.* FROM identity_provider ip " +
+        "WHERE ip.enabled = true AND ip.mcp_embedded = true LIMIT 1")
+    Optional<IdentityProvider> findMcpIdentityProvider();
 }

@@ -10,6 +10,8 @@ extend type Mutation {
 }
 
 type IdentityProviderType {
+    authoritiesClaim: String
+    authorityMappings: [AuthorityMappingType!]!
     autoProvision: Boolean!
     clientId: String
     createdBy: String
@@ -22,6 +24,9 @@ type IdentityProviderType {
     issuerUri: String
     lastModifiedBy: String
     lastModifiedDate: Long
+    mcpEmbedded: Boolean!
+    mcpAutomation: Boolean!
+    mcpManagement: Boolean!
     metadataUri: String
     mfaMethod: String
     mfaRequired: Boolean!
@@ -30,9 +35,17 @@ type IdentityProviderType {
     scopes: String
     signingCertificate: String
     type: String!
+    validateMcpAudience: Boolean!
+}
+
+type AuthorityMappingType {
+    authority: String!
+    externalGroup: String!
 }
 
 input IdentityProviderInput {
+    authoritiesClaim: String
+    authorityMappings: [AuthorityMappingInput!]
     autoProvision: Boolean
     clientId: String
     clientSecret: String
@@ -41,6 +54,9 @@ input IdentityProviderInput {
     enabled: Boolean
     enforced: Boolean
     issuerUri: String
+    mcpEmbedded: Boolean
+    mcpAutomation: Boolean
+    mcpManagement: Boolean
     metadataUri: String
     mfaMethod: String
     mfaRequired: Boolean
@@ -49,4 +65,10 @@ input IdentityProviderInput {
     scopes: String
     signingCertificate: String
     type: String
+    validateMcpAudience: Boolean
+}
+
+input AuthorityMappingInput {
+    authority: String!
+    externalGroup: String!
 }
