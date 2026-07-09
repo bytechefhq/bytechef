@@ -156,6 +156,36 @@ class PreAuthorizeAnnotationTest {
             "isTenantAdmin() or isCurrentUser(#id)");
     }
 
+    // NOTE: controller-level delegation is documented in each GraphQL controller's class-level Javadoc. The
+    // controllers live in a sibling module (automation-configuration-graphql) and are not on this test's classpath,
+    // so their existence is enforced at build time by module wiring rather than at runtime reflection. The
+    // delegation contract is exercised end-to-end by PreAuthorizeProxyEnforcementIntTest in this module.
+
+    @Test
+    void testCustomRoleServiceIsTenantAdminOnly() throws NoSuchMethodException {
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod(
+                "createCustomRole", String.class, String.class, java.util.Set.class),
+            "isTenantAdmin()");
+
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod(
+                "updateCustomRole", long.class, String.class, String.class, java.util.Set.class),
+            "isTenantAdmin()");
+
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod("deleteCustomRole", long.class),
+            "isTenantAdmin()");
+
+        // Reads are also tenant-admin only — a custom-role row reveals the org's permission strategy.
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod("getCustomRole", long.class),
+            "isTenantAdmin()");
+
+        assertPreAuthorize(
+            CustomRoleService.class.getMethod("getCustomRoles"),
+            "isTenantAdmin()");
+    }
     private void assertPreAuthorize(Method interfaceMethod, String expectedExpression) {
         // The annotation lives on the implementation, not the interface, so resolve through the impl class. We
         // accept any class in the same package whose name follows the conventional ServiceImpl pattern.
