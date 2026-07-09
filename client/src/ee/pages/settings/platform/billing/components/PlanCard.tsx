@@ -104,9 +104,7 @@ const PlanCard = ({
 
                 <div className="flex gap-2">
                     {cancelAtPeriodEnd ? (
-                        onReactivatePlan && (
-                            <Button label="Reactivate" onClick={onReactivatePlan} variant="default" />
-                        )
+                        onReactivatePlan && <Button label="Reactivate" onClick={onReactivatePlan} variant="default" />
                     ) : (
                         <>
                             <Button label="Change plan" onClick={onChangePlan} variant="default" />
