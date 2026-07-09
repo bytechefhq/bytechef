@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.llm.ChatModel.ResponseFormat.TEXT;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.ASK;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_COMPLETION_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
@@ -96,6 +97,7 @@ public class OpenAiChatAction {
                     .frequencyPenalty(inputParameters.getDouble(FREQUENCY_PENALTY))
                     .logitBias(inputParameters.getMap(LOGIT_BIAS, new TypeReference<>() {}))
                     .maxTokens(inputParameters.getInteger(MAX_TOKENS))
+                    .maxCompletionTokens(inputParameters.getInteger(MAX_COMPLETION_TOKENS))
                     .n(inputParameters.getInteger(N))
                     .presencePenalty(inputParameters.getDouble(PRESENCE_PENALTY))
                     .responseFormat(responseFormat)

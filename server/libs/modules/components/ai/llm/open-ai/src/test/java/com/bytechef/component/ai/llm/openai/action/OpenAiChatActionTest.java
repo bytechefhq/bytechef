@@ -18,6 +18,7 @@ package com.bytechef.component.ai.llm.openai.action;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_COMPLETION_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N;
@@ -143,6 +144,61 @@ class OpenAiChatActionTest {
             assertEquals("low", openAiChatOptions.getReasoningEffort());
             assertEquals("low", openAiChatOptions.getVerbosity());
             assertEquals(Boolean.TRUE, openAiChatOptions.getStore());
+        }
+    }
+
+    @Test
+    void testCreateChatModelMapsMaxCompletionTokens() {
+        // Reasoning models such as gpt-5 and the o-series require `max_completion_tokens` in place of the legacy
+        // `max_tokens`; verify the property is wired through to the request options.
+        Parameters inputParameters = MockParametersFactory.create(
+            Map.of(
+                RESPONSE, Map.of(RESPONSE_FORMAT, ChatModel.ResponseFormat.TEXT.name()),
+                MODEL, "gpt-5",
+                MAX_COMPLETION_TOKENS, 200));
+
+        OpenAiChatOptions openAiChatOptions = createChatOptions(inputParameters);
+
+        assertEquals("gpt-5", openAiChatOptions.getModel());
+        assertEquals(200, openAiChatOptions.getMaxCompletionTokens());
+    }
+
+    private OpenAiChatOptions createChatOptions(Parameters inputParameters) {
+        try (MockedStatic<OpenAIOkHttpClient> openAIOkHttpClientMockedStatic = mockStatic(OpenAIOkHttpClient.class);
+            MockedStatic<OpenAIOkHttpClientAsync> openAIOkHttpClientAsyncMockedStatic =
+                mockStatic(OpenAIOkHttpClientAsync.class)) {
+
+            OpenAIOkHttpClient.Builder mockedOpenAIOkHttpClientBuilder = mock(OpenAIOkHttpClient.Builder.class);
+
+            openAIOkHttpClientMockedStatic.when(OpenAIOkHttpClient::builder)
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+
+            when(mockedOpenAIOkHttpClientBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.timeout(durationArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientBuilder);
+            when(mockedOpenAIOkHttpClientBuilder.build())
+                .thenReturn(mock(OpenAIClient.class));
+
+            OpenAIOkHttpClientAsync.Builder mockedOpenAIOkHttpClientAsyncBuilder =
+                mock(OpenAIOkHttpClientAsync.Builder.class);
+
+            openAIOkHttpClientAsyncMockedStatic.when(OpenAIOkHttpClientAsync::builder)
+                .thenReturn(mockedOpenAIOkHttpClientAsyncBuilder);
+
+            when(mockedOpenAIOkHttpClientAsyncBuilder.apiKey(stringArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientAsyncBuilder);
+            when(mockedOpenAIOkHttpClientAsyncBuilder.timeout(durationArgumentCaptor.capture()))
+                .thenReturn(mockedOpenAIOkHttpClientAsyncBuilder);
+            when(mockedOpenAIOkHttpClientAsyncBuilder.build())
+                .thenReturn(mock(OpenAIClientAsync.class));
+
+            org.springframework.ai.chat.model.ChatModel chatModel = OpenAiChatAction.CHAT_MODEL.createChatModel(
+                inputParameters, mockedConnectionParameters, true);
+
+            assertInstanceOf(OpenAiChatModel.class, chatModel);
+
+            return ((OpenAiChatModel) chatModel).getOptions();
         }
     }
 }

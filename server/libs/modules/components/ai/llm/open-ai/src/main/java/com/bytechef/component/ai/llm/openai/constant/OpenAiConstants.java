@@ -20,6 +20,7 @@ import static com.bytechef.component.ai.llm.constant.LLMConstants.ATTACHMENTS_PR
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FORMAT_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_COMPLETION_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MESSAGES_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MODEL;
@@ -95,6 +96,7 @@ public final class OpenAiConstants {
         MESSAGES_PROPERTY,
         RESPONSE_PROPERTY,
         MAX_TOKENS_PROPERTY,
+        MAX_COMPLETION_TOKENS_PROPERTY,
         N_PROPERTY,
         TEMPERATURE_PROPERTY,
         TOP_P_PROPERTY,

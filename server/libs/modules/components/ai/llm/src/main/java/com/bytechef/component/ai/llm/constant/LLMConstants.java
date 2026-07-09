@@ -60,6 +60,7 @@ public class LLMConstants {
     public static final String INPUT = "input";
     public static final String LANGUAGE = "language";
     public static final String LOGIT_BIAS = "logitBias";
+    public static final String MAX_COMPLETION_TOKENS = "maxCompletionTokens";
     public static final String MAX_TOKENS = "maxTokens";
     public static final String MESSAGES = "messages";
     public static final String IMAGE_MESSAGES = "imageMessages";
@@ -150,6 +151,14 @@ public class LLMConstants {
     public static final ModifiableIntegerProperty MAX_TOKENS_PROPERTY = integer(MAX_TOKENS)
         .label("Max Tokens")
         .description("The maximum number of tokens to generate in the chat completion.")
+        .advancedOption(true);
+
+    public static final ModifiableIntegerProperty MAX_COMPLETION_TOKENS_PROPERTY = integer(MAX_COMPLETION_TOKENS)
+        .label("Max Completion Tokens")
+        .description(
+            "An upper bound for the number of tokens that can be generated for a completion, including visible " +
+                "output tokens and reasoning tokens. Required instead of 'Max Tokens' by reasoning models such as " +
+                "gpt-5 and the o-series.")
         .advancedOption(true);
 
     public static final ModifiableArrayProperty MESSAGES_PROPERTY = array(MESSAGES)
