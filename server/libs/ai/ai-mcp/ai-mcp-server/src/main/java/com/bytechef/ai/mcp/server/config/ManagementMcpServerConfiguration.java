@@ -16,7 +16,6 @@
 
 package com.bytechef.ai.mcp.server.config;
 
-import com.bytechef.ai.mcp.server.security.web.configurer.ManagementMcpServerSecurityConfigurer;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -27,9 +26,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
-import com.bytechef.platform.configuration.service.PropertyService;
 import com.bytechef.platform.mcp.server.McpAppWorkflowEditor;
-import com.bytechef.platform.security.web.config.SecurityConfigurerContributor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
@@ -49,8 +46,6 @@ import org.springframework.ai.tool.ToolCallbackProvider;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
@@ -272,19 +267,5 @@ public class ManagementMcpServerConfiguration {
         }
 
         return ToolCallbackProvider.from(toolCallbacks);
-    }
-
-    @Bean
-    SecurityConfigurerContributor mcpServerSecurityConfigurerContributor(PropertyService propertyService) {
-        return new SecurityConfigurerContributor() {
-
-            @Override
-            @SuppressWarnings("unchecked")
-            public <T extends AbstractHttpConfigurer<T, B>, B extends HttpSecurityBuilder<B>> T
-                getSecurityConfigurerAdapter() {
-
-                return (T) new ManagementMcpServerSecurityConfigurer(propertyService);
-            }
-        };
     }
 }

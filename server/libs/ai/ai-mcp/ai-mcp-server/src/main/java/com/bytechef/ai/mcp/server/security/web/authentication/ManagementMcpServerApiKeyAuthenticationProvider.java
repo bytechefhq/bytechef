@@ -18,55 +18,79 @@ package com.bytechef.ai.mcp.server.security.web.authentication;
 
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.service.PropertyService;
-import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.security.service.ApiKeyService;
+import com.bytechef.platform.security.web.mcp.McpApiKeyCredentials;
+import com.bytechef.platform.security.web.mcp.McpApiKeyEntity;
+import com.bytechef.platform.security.web.mcp.McpApiKeyEntityRepository;
+import com.bytechef.platform.user.service.AuthorityService;
+import com.bytechef.platform.user.service.UserService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.util.List;
+import java.util.Objects;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationProvider;
+import org.springaicommunity.mcp.security.server.apikey.authentication.ApiKeyAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 
 /**
+ * Authenticates management MCP requests: delegates secret validation to mcp-server-security, then enforces that the key
+ * is an admin key (no platform type), that the URL path secret matches the configured MCP server secret, and that the
+ * key's environment matches the requested environment.
+ *
  * @author Ivica Cardic
  */
 public class ManagementMcpServerApiKeyAuthenticationProvider implements AuthenticationProvider {
 
+    private final ApiKeyAuthenticationProvider<McpApiKeyEntity> apiKeyAuthenticationProvider;
+    private final ApiKeyService apiKeyService;
     private final PropertyService propertyService;
 
     @SuppressFBWarnings("EI")
-    public ManagementMcpServerApiKeyAuthenticationProvider(PropertyService propertyService) {
+    public ManagementMcpServerApiKeyAuthenticationProvider(
+        ApiKeyService apiKeyService, AuthorityService authorityService, PropertyService propertyService,
+        UserService userService) {
+
+        this.apiKeyAuthenticationProvider = new ApiKeyAuthenticationProvider<>(
+            new McpApiKeyEntityRepository(apiKeyService, authorityService, userService));
+        this.apiKeyService = apiKeyService;
         this.propertyService = propertyService;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        ManagementMcpServerApiKeyAuthenticationToken token =
-            (ManagementMcpServerApiKeyAuthenticationToken) authentication;
+        Authentication authenticatedAuthentication = apiKeyAuthenticationProvider.authenticate(authentication);
+
+        if (authenticatedAuthentication == null) {
+            return null;
+        }
+
+        ApiKeyAuthenticationToken apiKeyAuthenticationToken = (ApiKeyAuthenticationToken) authentication;
+
+        McpApiKeyCredentials mcpApiKeyCredentials = (McpApiKeyCredentials) apiKeyAuthenticationToken.getCredentials();
+        McpApiKeyEntity mcpApiKeyEntity = (McpApiKeyEntity) authenticatedAuthentication.getPrincipal();
+
+        if (mcpApiKeyEntity.getType() != null) {
+            throw new BadCredentialsException("Invalid API key");
+        }
 
         Property property = propertyService.getProperty("mcp.server", Property.Scope.PLATFORM, null);
 
-        String configuredSecretKey = property == null ? null : (String) property.get("secretKey");
-        String providedSecretKey = token.getMcpServerSecretKey();
-
-        if (configuredSecretKey == null || configuredSecretKey.isBlank() || providedSecretKey == null ||
-            providedSecretKey.isBlank() ||
-            !MessageDigest.isEqual(
-                configuredSecretKey.getBytes(StandardCharsets.UTF_8),
-                providedSecretKey.getBytes(StandardCharsets.UTF_8))) {
-
+        if (!Objects.equals(property.get("secretKey"), mcpApiKeyCredentials.getMcpServerSecretKey())) {
             throw new BadCredentialsException("Invalid MCP server secret key");
         }
 
-        return new ManagementMcpServerApiKeyAuthenticationToken(
-            new User("system", "", List.of(new SimpleGrantedAuthority(AuthorityConstants.ADMIN))));
+        if (mcpApiKeyEntity.getEnvironment() != mcpApiKeyCredentials.getEnvironment()) {
+            throw new BadCredentialsException("Invalid API key");
+        }
+
+        apiKeyService.updateLastUsedDate(mcpApiKeyEntity.getApiKeyId());
+
+        return authenticatedAuthentication;
     }
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return authentication.equals(ManagementMcpServerApiKeyAuthenticationToken.class);
+        return ApiKeyAuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
