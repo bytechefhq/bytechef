@@ -3,12 +3,14 @@ import EmptyList from '@/components/EmptyList';
 import {ButtonGroup} from '@/components/ui/button-group';
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from '@/components/ui/dropdown-menu';
 import {Skeleton} from '@/components/ui/skeleton';
+import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {useConvertN8nToWorkflow} from '@/pages/automation/project/hooks/useConverterN8nToWorkflow';
 import handleImportN8nWorkflow from '@/pages/automation/project/utils/handleImportN8nWorkflow';
 import handleImportWorkflow from '@/pages/automation/project/utils/handleImportWorkflow';
 import ProjectWorkflowListItem from '@/pages/automation/projects/components/project-workflow-list/ProjectWorkflowListItem';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
 import {Project} from '@/shared/middleware/automation/configuration';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
@@ -56,6 +58,9 @@ const ProjectWorkflowList = ({
     const queryClient = useQueryClient();
 
     const {convertN8nWorkflow} = useConvertN8nToWorkflow();
+    const {hasEnabledAiProvider, isPending: isAiProviderCheckPending} = useHasEnabledAiProvider();
+
+    const importN8nWorkflowDisabled = !isAiProviderCheckPending && !hasEnabledAiProvider;
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -206,17 +211,30 @@ const ProjectWorkflowList = ({
                                                     <UploadIcon /> Import Workflow
                                                 </DropdownMenuItem>
 
-                                                <DropdownMenuItem
-                                                    onClick={(event) => {
-                                                        event.stopPropagation();
+                                                <Tooltip>
+                                                    <TooltipTrigger asChild>
+                                                        <span>
+                                                            <DropdownMenuItem
+                                                                disabled={importN8nWorkflowDisabled}
+                                                                onClick={(event) => {
+                                                                    event.stopPropagation();
 
-                                                        if (converterHiddenFileInputRef.current) {
-                                                            converterHiddenFileInputRef.current.click();
-                                                        }
-                                                    }}
-                                                >
-                                                    <UploadIcon /> Import n8n Workflow
-                                                </DropdownMenuItem>
+                                                                    if (converterHiddenFileInputRef.current) {
+                                                                        converterHiddenFileInputRef.current.click();
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <UploadIcon /> Import n8n Workflow
+                                                            </DropdownMenuItem>
+                                                        </span>
+                                                    </TooltipTrigger>
+
+                                                    {importN8nWorkflowDisabled && (
+                                                        <TooltipContent>
+                                                            Enable an AI provider to import n8n workflows.
+                                                        </TooltipContent>
+                                                    )}
+                                                </Tooltip>
                                             </DropdownMenuContent>
                                         </DropdownMenu>
                                     </ButtonGroup>

@@ -18,6 +18,7 @@ import ProjectDialog from '@/pages/automation/projects/components/ProjectDialog'
 import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
 import {useImportProjectMutation} from '@/shared/mutations/automation/projects.mutations';
 import {useCreateProjectWorkflowMutation} from '@/shared/mutations/automation/workflows.mutations';
 import {useGetProjectWorkflowsQuery, useGetWorkflowsQuery} from '@/shared/queries/automation/projectWorkflows.queries';
@@ -93,6 +94,9 @@ const ProjectsLeftSidebar = ({
     const queryClient = useQueryClient();
 
     const {convertN8nWorkflow} = useConvertN8nToWorkflow();
+    const {hasEnabledAiProvider, isPending: isAiProviderCheckPending} = useHasEnabledAiProvider();
+
+    const importN8nWorkflowDisabled = !isAiProviderCheckPending && !hasEnabledAiProvider;
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const importProjectMutation = useImportProjectMutation({
@@ -259,16 +263,27 @@ const ProjectsLeftSidebar = ({
                                 <UploadIcon /> Import Workflow
                             </DropdownMenuItem>
 
-                            <DropdownMenuItem
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    if (converterHiddenFileInputRef.current) {
-                                        converterHiddenFileInputRef.current.click();
-                                    }
-                                }}
-                            >
-                                <UploadIcon /> Import n8n Workflow
-                            </DropdownMenuItem>
+                            <Tooltip>
+                                <TooltipTrigger asChild>
+                                    <span>
+                                        <DropdownMenuItem
+                                            className="cursor-pointer"
+                                            disabled={importN8nWorkflowDisabled}
+                                            onClick={() => {
+                                                if (converterHiddenFileInputRef.current) {
+                                                    converterHiddenFileInputRef.current.click();
+                                                }
+                                            }}
+                                        >
+                                            <UploadIcon /> Import n8n Workflow
+                                        </DropdownMenuItem>
+                                    </span>
+                                </TooltipTrigger>
+
+                                {importN8nWorkflowDisabled && (
+                                    <TooltipContent>Enable an AI provider to import n8n workflows.</TooltipContent>
+                                )}
+                            </Tooltip>
                         </DropdownMenuContent>
                     </DropdownMenu>
                 </ButtonGroup>

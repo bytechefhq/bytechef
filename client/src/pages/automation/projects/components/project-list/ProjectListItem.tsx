@@ -38,6 +38,7 @@ import {useWorkspaceStore} from '@/pages/automation/stores/useWorkspaceStore';
 import WorkflowDialog from '@/shared/components/workflow/WorkflowDialog';
 import EEVersion from '@/shared/edition/EEVersion';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
+import {useHasEnabledAiProvider} from '@/shared/hooks/useHasEnabledAiProvider';
 import {Project, Tag} from '@/shared/middleware/automation/configuration';
 import {useUpdateProjectTagsMutation} from '@/shared/mutations/automation/projectTags.mutations';
 import {useDeleteProjectMutation, useDuplicateProjectMutation} from '@/shared/mutations/automation/projects.mutations';
@@ -116,6 +117,9 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
     const queryClient = useQueryClient();
 
     const {convertN8nWorkflow} = useConvertN8nToWorkflow();
+    const {hasEnabledAiProvider, isPending: isAiProviderCheckPending} = useHasEnabledAiProvider();
+
+    const importN8nWorkflowDisabled = !isAiProviderCheckPending && !hasEnabledAiProvider;
     const [isImportingN8nWorkflow, setIsImportingN8nWorkflow] = useState(false);
 
     const createProjectWorkflowMutation = useCreateProjectWorkflowMutation({
@@ -373,17 +377,30 @@ const ProjectListItem = ({project, projectGitConfiguration, remainingTags}: Proj
                                                 <UploadIcon /> Import Workflow
                                             </DropdownMenuItem>
 
-                                            <DropdownMenuItem
-                                                aria-label="Import n8n Workflow"
-                                                className="dropdown-menu-item"
-                                                onClick={() => {
-                                                    if (converterHiddenFileInputRef.current) {
-                                                        converterHiddenFileInputRef.current.click();
-                                                    }
-                                                }}
-                                            >
-                                                <UploadIcon /> Import n8n Workflow
-                                            </DropdownMenuItem>
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <span>
+                                                        <DropdownMenuItem
+                                                            aria-label="Import n8n Workflow"
+                                                            className="dropdown-menu-item"
+                                                            disabled={importN8nWorkflowDisabled}
+                                                            onClick={() => {
+                                                                if (converterHiddenFileInputRef.current) {
+                                                                    converterHiddenFileInputRef.current.click();
+                                                                }
+                                                            }}
+                                                        >
+                                                            <UploadIcon /> Import n8n Workflow
+                                                        </DropdownMenuItem>
+                                                    </span>
+                                                </TooltipTrigger>
+
+                                                {importN8nWorkflowDisabled && (
+                                                    <TooltipContent>
+                                                        Enable an AI provider to import n8n workflows.
+                                                    </TooltipContent>
+                                                )}
+                                            </Tooltip>
                                         </DropdownMenuContent>
                                     </DropdownMenu>
                                 </ButtonGroup>

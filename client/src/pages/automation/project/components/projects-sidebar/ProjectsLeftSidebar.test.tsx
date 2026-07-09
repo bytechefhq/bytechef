@@ -39,8 +39,8 @@ vi.mock('@/components/ui/dropdown-menu', () => ({
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     DropdownMenuContent: ({children}: any) => <div>{children}</div>,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    DropdownMenuItem: ({children, onClick}: any) => (
-        <div onClick={onClick} role="menuitem">
+    DropdownMenuItem: ({children, disabled, onClick}: any) => (
+        <div aria-disabled={disabled ? 'true' : undefined} onClick={disabled ? undefined : onClick} role="menuitem">
             {children}
         </div>
     ),
@@ -97,6 +97,11 @@ vi.mock('@/shared/queries/automation/projects.queries', async () => ({
     ProjectKeys: {project: (id: number) => ['project', id], projects: ['projects']},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     useGetWorkspaceProjectsQuery: (args: any) => mockGetWorkspaceProjectsQuery(args),
+}));
+
+const hasEnabledAiProviderMock = vi.fn();
+vi.mock('@/shared/hooks/useHasEnabledAiProvider', () => ({
+    useHasEnabledAiProvider: () => hasEnabledAiProviderMock(),
 }));
 
 vi.mock('@/shared/queries/automation/workflows.queries', () => ({
@@ -200,6 +205,8 @@ describe('ProjectsLeftSidebar', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         queryClient = createTestQueryClient();
+
+        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: true, isPending: false});
     });
 
     afterEach(() => {
@@ -415,5 +422,27 @@ describe('ProjectsLeftSidebar', () => {
 
         const items = await screen.findAllByTestId('project-workflows-list');
         expect(items).toHaveLength(projects.length);
+    });
+
+    it('disables the Import n8n Workflow item when no AI provider is enabled', async () => {
+        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: false, isPending: false});
+        setupQueries({selectedProjectId: 5});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
+
+        expect(menuItem).toHaveAttribute('aria-disabled', 'true');
+    });
+
+    it('keeps the Import n8n Workflow item enabled while the AI provider check is pending', async () => {
+        hasEnabledAiProviderMock.mockReturnValue({hasEnabledAiProvider: false, isPending: true});
+        setupQueries({selectedProjectId: 5});
+
+        renderWithProviders(<ProjectsLeftSidebar {...baseProps} projectId={5} />);
+
+        const menuItem = (await screen.findByText('Import n8n Workflow')).closest('[role="menuitem"]');
+
+        expect(menuItem).not.toHaveAttribute('aria-disabled');
     });
 });
