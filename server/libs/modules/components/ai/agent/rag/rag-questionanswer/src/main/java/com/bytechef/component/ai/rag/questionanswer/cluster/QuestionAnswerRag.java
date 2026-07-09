@@ -36,6 +36,7 @@ import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import java.util.Map;
 import org.springframework.ai.chat.client.advisor.vectorstore.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.prompt.PromptTemplate;
 import org.springframework.ai.vectorstore.SearchRequest;
 
 /**
@@ -46,6 +47,24 @@ public class QuestionAnswerRag {
     private static final String FILTER_EXPRESSION = "filterExpression";
     private static final String SIMILARITY_THRESHOLD = "similarityThreshold";
     private static final String TOP_K = "topK";
+
+    // Spring AI's default template forces "answer only from context, not prior knowledge, else refuse", which
+    // suppresses an agent's bound tools and meta questions (e.g. "list tools"). Treat the context as supplementary
+    // instead, keeping the {query} and {question_answer_context} placeholders the advisor requires.
+    private static final PromptTemplate PROMPT_TEMPLATE = new PromptTemplate(
+        """
+            {query}
+
+            Context information is below, surrounded by ---------------------
+
+            ---------------------
+            {question_answer_context}
+            ---------------------
+
+            Use the context above to help answer the user comment when it is relevant. You may also use the tools
+            available to you and your own general knowledge. If the context does not contain the answer, rely on your
+            tools and knowledge instead of refusing to answer.
+            """);
 
     public final ClusterElementDefinition<RagFunction> clusterElementDefinition =
         ComponentDsl.<RagFunction>clusterElement("rag")
@@ -105,6 +124,7 @@ public class QuestionAnswerRag {
                     ParametersFactory.create(clusterElement.getParameters()),
                     ParametersFactory.create(componentConnection),
                     ParametersFactory.create(clusterElement.getExtensions()), componentConnections))
+            .promptTemplate(PROMPT_TEMPLATE)
             .searchRequest(
                 SearchRequest.builder()
                     .filterExpression(inputParameters.getString(FILTER_EXPRESSION))
