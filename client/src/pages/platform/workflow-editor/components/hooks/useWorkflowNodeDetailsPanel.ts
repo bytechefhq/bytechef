@@ -129,6 +129,10 @@ export default function useWorkflowNodeDetailsPanel({
         []
     );
     const [errorsAccordionOpen, setErrorsAccordionOpen] = useState(false);
+    const [errorsRefreshingAfterOperationChange, setErrorsRefreshingAfterOperationChange] = useState(false);
+
+    const errorsLoadingArmedRef = useRef(false);
+    const lastErrorsDataUpdatedAtRef = useRef(0);
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
@@ -395,7 +399,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const {
         data: workflowNodeMissingRequiredPropertiesData,
-        isFetching: workflowNodeMissingRequiredPropertiesFetching,
+        dataUpdatedAt: workflowNodeMissingRequiredPropertiesUpdatedAt,
         refetch: refetchWorkflowNodeMissingRequiredProperties,
     } = useWorkflowNodeMissingRequiredPropertiesQuery(
         {
@@ -415,7 +419,7 @@ export default function useWorkflowNodeDetailsPanel({
 
     const {
         data: clusterElementMissingRequiredPropertiesData,
-        isFetching: clusterElementMissingRequiredPropertiesFetching,
+        dataUpdatedAt: clusterElementMissingRequiredPropertiesUpdatedAt,
         refetch: refetchClusterElementMissingRequiredProperties,
     } = useClusterElementMissingRequiredPropertiesQuery(
         {
@@ -440,11 +444,11 @@ export default function useWorkflowNodeDetailsPanel({
         ? (clusterElementMissingRequiredPropertiesData?.clusterElementMissingRequiredProperties ?? [])
         : (workflowNodeMissingRequiredPropertiesData?.workflowNodeMissingRequiredProperties ?? []);
 
-    const errorsLoading =
-        operationChangeInProgress ||
-        (currentNode?.clusterElementType
-            ? clusterElementMissingRequiredPropertiesFetching
-            : workflowNodeMissingRequiredPropertiesFetching);
+    const errorsDataUpdatedAt = currentNode?.clusterElementType
+        ? clusterElementMissingRequiredPropertiesUpdatedAt
+        : workflowNodeMissingRequiredPropertiesUpdatedAt;
+
+    const errorsLoading = operationChangeInProgress || errorsRefreshingAfterOperationChange;
 
     const currentOperationDefinition = useMemo(() => {
         if (currentNode?.trigger) {
@@ -1148,6 +1152,26 @@ export default function useWorkflowNodeDetailsPanel({
         currentNode?.clusterElementType,
         pendingSaveNodeName,
     ]);
+
+    // Arm the errors loading cue when an operation switch starts.
+    useEffect(() => {
+        if (operationChangeInProgress) {
+            errorsLoadingArmedRef.current = true;
+
+            setErrorsRefreshingAfterOperationChange(true);
+        }
+    }, [operationChangeInProgress]);
+
+    // Clear the error loading cue when the operation switch's refetch finishes
+    useEffect(() => {
+        if (errorsLoadingArmedRef.current && errorsDataUpdatedAt !== lastErrorsDataUpdatedAtRef.current) {
+            errorsLoadingArmedRef.current = false;
+
+            setErrorsRefreshingAfterOperationChange(false);
+        }
+
+        lastErrorsDataUpdatedAtRef.current = errorsDataUpdatedAt;
+    }, [errorsDataUpdatedAt]);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
