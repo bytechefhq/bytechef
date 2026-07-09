@@ -48,4 +48,12 @@ describe('useHasEnabledAiProvider', () => {
 
         expect(result.current).toEqual({hasEnabledAiProvider: false, isPending: true});
     });
+
+    it('fails open when the query errors', () => {
+        useAiDefaultModelQueryMock.mockReturnValue({data: undefined, isError: true, isPending: false});
+
+        const {result} = renderHook(() => useHasEnabledAiProvider());
+
+        expect(result.current).toEqual({hasEnabledAiProvider: false, isPending: true});
+    });
 });
