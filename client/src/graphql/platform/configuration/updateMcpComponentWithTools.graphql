@@ -6,6 +6,7 @@ mutation updateMcpComponentWithTools($id: ID!, $input: McpComponentWithToolsInpu
         title
         mcpServerId
         connectionId
+        requiredAuthorities
         createdBy
         createdDate
         lastModifiedBy

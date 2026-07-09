@@ -12,7 +12,9 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
       "args": [
         "-y",
         "mcp-remote",
-        "${mcpServerUrl}"
+        "${mcpServerUrl}",
+        "--header",
+        "Authorization: Bearer YOUR_API_KEY"
       ]
     }
   }
@@ -21,6 +23,9 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
     const codeSnippet2 = `{
   "mcpServers": {
     "ByteChef": {
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      },
       "url": "${mcpServerUrl}"
     }
   }
@@ -119,6 +124,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                     Paste the configuration below and save, then quit and restart Claude.
                                 </p>
 
+                                <p className="text-sm text-muted-foreground">
+                                    Replace YOUR_API_KEY with an API key created under Settings. Requests without a
+                                    valid API key are rejected.
+                                </p>
+
                                 <McpServerConfigurationCode codeSnippet={codeSnippet1} onRefresh={onRefresh} />
                             </div>
                         </div>
@@ -158,6 +168,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                 </div>
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
+
+                                <p className="text-sm text-muted-foreground">
+                                    Replace YOUR_API_KEY with an API key created under Settings. Requests without a
+                                    valid API key are rejected.
+                                </p>
 
                                 <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
                             </div>
@@ -203,6 +218,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
 
+                                <p className="text-sm text-muted-foreground">
+                                    Replace YOUR_API_KEY with an API key created under Settings. Requests without a
+                                    valid API key are rejected.
+                                </p>
+
                                 <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
                             </div>
                         </div>
@@ -220,6 +240,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                             <div className="flex-1 space-y-4">
                                 <h2 className="font-semibold text-foreground">Server URL</h2>
+
+                                <p className="text-sm text-muted-foreground">
+                                    This URL requires an API key created under Settings, sent with every request as an
+                                    Authorization: Bearer header.
+                                </p>
 
                                 {codeSnippet3 && (
                                     <McpServerConfigurationCode codeSnippet={codeSnippet3} onRefresh={onRefresh} />

@@ -1,0 +1,11 @@
+query registeredClients {
+    registeredClients {
+        id
+        clientId
+        clientName
+        clientIdIssuedAt
+        scopes
+        authorizationGrantTypes
+        redirectUris
+    }
+}

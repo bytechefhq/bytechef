@@ -2,6 +2,7 @@ import {IntegrationApi} from '@/ee/shared/middleware/embedded/configuration';
 import {IntegrationKeys} from '@/ee/shared/queries/embedded/integrations.queries';
 import AccountErrorPage from '@/pages/account/public/AccountErrorPage';
 import Login from '@/pages/account/public/Login';
+import OAuth2Consent from '@/pages/account/public/OAuth2Consent';
 import OAuth2Redirect from '@/pages/account/public/OAuth2Redirect';
 import PasswordResetEmailSent from '@/pages/account/public/PasswordResetEmailSent';
 import PasswordResetFinish from '@/pages/account/public/PasswordResetFinish';
@@ -88,6 +89,7 @@ const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'))
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
 const AuditEvents = lazy(() => import('@/ee/pages/settings/platform/audit-events/AuditEvents'));
 const Billing = lazy(() => import('@/ee/pages/settings/platform/billing/Billing'));
+const RegisteredClients = lazy(() => import('@/ee/pages/settings/platform/registered-clients/RegisteredClients'));
 const IdentityProvidersPage = lazy(
     () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
 );
@@ -431,6 +433,18 @@ const platformSettingsRoutes = {
             ),
             path: 'audit-events',
         },
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <EEVersion>
+                        <LazyLoadWrapper>
+                            <RegisteredClients />
+                        </LazyLoadWrapper>
+                    </EEVersion>
+                </PrivateRoute>
+            ),
+            path: 'registered-clients',
+        },
     ],
     navItems: [
         {
@@ -488,6 +502,10 @@ const platformSettingsRoutes = {
             href: 'audit-events',
             title: 'Audit Events',
         },
+        {
+            href: 'registered-clients',
+            title: 'OAuth2 Clients',
+        },
     ],
 };
 
@@ -511,6 +529,10 @@ export const getRouter = (queryClient: QueryClient) =>
         {
             element: <Register />,
             path: '/register',
+        },
+        {
+            element: <OAuth2Consent />,
+            path: '/oauth2/consent',
         },
         {
             element: <OAuth2Redirect />,

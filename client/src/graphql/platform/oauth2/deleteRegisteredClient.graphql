@@ -1,0 +1,3 @@
+mutation deleteRegisteredClient($id: ID!) {
+    deleteRegisteredClient(id: $id)
+}

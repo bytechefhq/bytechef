@@ -6,6 +6,7 @@ mutation createMcpComponentWithTools($input: McpComponentWithToolsInput!) {
         title
         mcpServerId
         connectionId
+        requiredAuthorities
         createdBy
         createdDate
         lastModifiedBy

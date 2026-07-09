@@ -53,6 +53,10 @@ const IdentityProvidersTable = () => {
                         Enforced
                     </TableHead>
 
+                    <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase">
+                        MCP
+                    </TableHead>
+
                     <TableHead className="sticky top-0 z-10 bg-white p-3 text-left text-xs font-medium tracking-wide text-content-neutral-secondary uppercase" />
                 </TableRow>
             </TableHeader>
@@ -90,6 +94,16 @@ const IdentityProvidersTable = () => {
 
                         <TableCell className="whitespace-nowrap">{identityProvider.enforced ? 'Yes' : 'No'}</TableCell>
 
+                        <TableCell className="whitespace-nowrap">
+                            <div className="flex flex-wrap gap-1">
+                                {identityProvider.mcpEmbedded && <Badge variant="secondary">Embedded</Badge>}
+
+                                {identityProvider.mcpAutomation && <Badge variant="secondary">Automation</Badge>}
+
+                                {identityProvider.mcpManagement && <Badge variant="secondary">Management</Badge>}
+                            </div>
+                        </TableCell>
+
                         <TableCell className="flex justify-end whitespace-nowrap">
                             <Button
                                 icon={<EditIcon className="size-4" />}
@@ -110,7 +124,7 @@ const IdentityProvidersTable = () => {
 
                 {identityProviders.length === 0 && (
                     <TableRow>
-                        <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={7}>
+                        <TableCell className="px-4 py-6 text-center text-muted-foreground" colSpan={8}>
                             No identity providers configured.
                         </TableCell>
                     </TableRow>

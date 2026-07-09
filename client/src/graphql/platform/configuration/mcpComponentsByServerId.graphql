@@ -4,11 +4,11 @@ query mcpComponentsByServerId($mcpServerId: ID!) {
         componentName
         componentVersion
         title
-        connectionId,
+        connectionId
         lastModifiedDate
         mcpServerId
         mcpTools {
-            id,
+            id
             enabled
             mcpComponentId
             name
@@ -16,6 +16,7 @@ query mcpComponentsByServerId($mcpServerId: ID!) {
             title
             version
         }
+        requiredAuthorities
         version
     }
 }

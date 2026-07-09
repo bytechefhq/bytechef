@@ -1,5 +1,10 @@
 query identityProvider($id: ID!) {
     identityProvider(id: $id) {
+        authoritiesClaim
+        authorityMappings {
+            authority
+            externalGroup
+        }
         autoProvision
         clientId
         createdBy
@@ -12,6 +17,9 @@ query identityProvider($id: ID!) {
         issuerUri
         lastModifiedBy
         lastModifiedDate
+        mcpEmbedded
+        mcpAutomation
+        mcpManagement
         metadataUri
         mfaMethod
         mfaRequired
@@ -20,5 +28,6 @@ query identityProvider($id: ID!) {
         scopes
         signingCertificate
         type
+        validateMcpAudience
     }
 }
