@@ -28,13 +28,13 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class StripeUsageReportingJob implements Job {
 
-    private static final Logger logger = LoggerFactory.getLogger(StripeUsageReportingJob.class);
+    private static final Logger log = LoggerFactory.getLogger(StripeUsageReportingJob.class);
 
     private BillingUsageService billingUsageService;
 
     @Override
     public void execute(JobExecutionContext context) {
-        logger.info("Start Stripe usage report");
+        log.info("Start Stripe usage report");
 
         billingUsageService.reportUsage(context.getScheduledFireTime()
             .toInstant());
