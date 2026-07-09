@@ -22,13 +22,17 @@ import com.bytechef.automation.configuration.facade.ProjectWorkflowFacade;
 import com.bytechef.automation.configuration.facade.WorkspaceConnectionFacade;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
+import com.bytechef.ee.automation.configuration.service.WorkspaceUserService;
 import com.bytechef.platform.category.service.CategoryService;
 import com.bytechef.platform.configuration.facade.WorkflowFacade;
 import com.bytechef.platform.tag.service.TagService;
+import com.bytechef.platform.user.service.UserService;
+import com.bytechef.test.config.graphql.GraphQLScalarTypes;
 import org.mockito.Mockito;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.graphql.execution.RuntimeWiringConfigurer;
 
 /**
  * @author Ivica Cardic
@@ -74,6 +78,12 @@ public class AutomationConfigurationGraphQlTestConfiguration {
 
     @Bean
     @Primary
+    public UserService userService() {
+        return Mockito.mock(UserService.class);
+    }
+
+    @Bean
+    @Primary
     public WorkflowService workflowService() {
         return Mockito.mock(WorkflowService.class);
     }
@@ -85,8 +95,19 @@ public class AutomationConfigurationGraphQlTestConfiguration {
     }
 
     @Bean
+    RuntimeWiringConfigurer mapScalarWiringConfigurer() {
+        return wiringBuilder -> wiringBuilder.scalar(GraphQLScalarTypes.mapScalar());
+    }
+
+    @Bean
     @Primary
     public WorkspaceConnectionFacade workspaceConnectionFacade() {
         return Mockito.mock(WorkspaceConnectionFacade.class);
+    }
+
+    @Bean
+    @Primary
+    public WorkspaceUserService workspaceUserService() {
+        return Mockito.mock(WorkspaceUserService.class);
     }
 }

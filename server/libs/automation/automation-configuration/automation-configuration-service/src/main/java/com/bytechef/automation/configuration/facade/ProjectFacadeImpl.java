@@ -66,6 +66,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -98,10 +99,11 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectFacadeImpl(
         ApplicationProperties applicationProperties, CategoryService categoryService,
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
-        ProjectWorkflowService projectWorkflowService, ProjectDeploymentService projectDeploymentService,
-        ProjectService projectService, ProjectDeploymentFacade projectDeploymentFacade,
-        ProjectWorkflowFacade projectWorkflowFacade, SharedTemplateFileStorage sharedTemplateFileStorage,
-        SharedTemplateService sharedTemplateService, TagService tagService, WorkflowService workflowService,
+        ProjectWorkflowService projectWorkflowService,
+        ProjectDeploymentService projectDeploymentService, ProjectService projectService,
+        ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
+        SharedTemplateFileStorage sharedTemplateFileStorage, SharedTemplateService sharedTemplateService,
+        TagService tagService, WorkflowService workflowService,
         WorkflowTestConfigurationService workflowTestConfigurationService,
         WorkflowNodeTestOutputService workflowNodeTestOutputService) {
 
@@ -123,6 +125,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDTO.workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long createProject(ProjectDTO projectDTO) {
         Project project = projectDTO.toProject();
         Category category = projectDTO.category();
@@ -145,6 +148,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void deleteProject(long id) {
         List<ProjectDeployment> projectDeployments = projectDeploymentService.getProjectDeployments(id);
 
@@ -177,6 +181,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public void deleteSharedProject(long id) {
         Project project = projectService.getProject(id);
 
@@ -191,6 +196,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     public ProjectDTO duplicateProject(long id) {
         Project project = projectService.getProject(id);
 
@@ -213,11 +219,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     public byte[] exportProject(long id) {
         return createTemplate(id, null, false);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_SETTINGS')")
     public void exportSharedProject(long id, String description) {
         Project project = projectService.getProject(id);
 
@@ -232,6 +240,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public ProjectDTO getProject(long id) {
         Project project = projectService.getProject(id);
@@ -330,6 +339,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("isTenantAdmin()")
     @Transactional(readOnly = true)
     public List<ProjectDTO> getProjects(Long categoryId, Boolean projectDeployments, Long tagId, Status status) {
         return getProjects(null, categoryId, tagId, projectDeployments, status, true, null);
@@ -365,6 +375,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public List<ProjectDTO> getWorkspaceProjects(
         Boolean apiCollections, Long categoryId, boolean includeAllFields, Boolean projectDeployments, Status status,
@@ -375,6 +386,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'WORKFLOW_VIEW')")
     public List<ProjectWorkflowDTO> getWorkspaceProjectWorkflows(long workspaceId) {
         return projectWorkflowService.getProjectWorkflows(projectService.getWorkspaceProjectIds(workspaceId))
             .stream()
@@ -384,11 +396,13 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long importProject(byte[] projectData, long workspaceId) {
         return importProjectTemplate(projectData, workspaceId);
     }
 
     @Override
+    @PreAuthorize("hasPermission(#workspaceId, 'Workspace', 'PROJECT_CREATE')")
     public long importProjectTemplate(String id, long workspaceId, boolean sharedProject) {
         byte[] data;
 
@@ -408,6 +422,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_EDIT')")
     public int publishProject(long id, String description, boolean syncWithGit) {
         Project project = projectService.getProject(id);
 
@@ -437,6 +452,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     @Override
+    @PreAuthorize("hasPermission(#projectDTO.id, 'Project', 'WORKFLOW_EDIT')")
     public void updateProject(ProjectDTO projectDTO) {
         List<Tag> tags = checkTags(projectDTO.tags());
 
