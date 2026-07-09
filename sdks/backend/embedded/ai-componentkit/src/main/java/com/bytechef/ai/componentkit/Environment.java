@@ -17,7 +17,7 @@
 package com.bytechef.ai.componentkit;
 
 /**
- * Enum representing the environment in which the application is running. It can be either PRODUCTION or TEST.
+ * Enum representing the target embedded environment. It can be DEVELOPMENT, STAGING or PRODUCTION.
  *
  * @author Ivica Cardic
  */
