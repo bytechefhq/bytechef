@@ -9,6 +9,7 @@ query mcpComponentsByServerId($mcpServerId: ID!) {
         mcpServerId
         mcpTools {
             id,
+            enabled
             mcpComponentId
             name
             parameters

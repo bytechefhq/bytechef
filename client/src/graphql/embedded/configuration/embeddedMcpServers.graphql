@@ -14,6 +14,7 @@ query embeddedMcpServers {
             title
             mcpTools {
                 id
+                enabled
                 mcpComponentId
                 name
                 title
