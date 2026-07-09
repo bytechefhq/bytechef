@@ -65,6 +65,8 @@ import com.bytechef.platform.component.domain.Option;
 import com.bytechef.platform.component.domain.OptionsDataSourceAware;
 import com.bytechef.platform.component.domain.Property;
 import com.bytechef.platform.component.exception.ActionDefinitionErrorType;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.constant.PlatformType;
 import com.bytechef.platform.domain.OutputResponse;
 import com.bytechef.platform.util.PropertyUtils;
@@ -210,7 +212,37 @@ public class ActionDefinitionServiceImpl implements ActionDefinitionService {
         @ComponentNameParam String componentName, int componentVersion, String actionName, Long jobPrincipalId,
         Long jobPrincipalWorkflowId, Long jobId, @Nullable Long taskExecutionId, String workflowId,
         Map<String, ?> inputParameters, @ConnectionParam Map<String, ComponentConnection> componentConnections,
-        Map<String, ?> extensions, Long environmentId, boolean editorEnvironment, PlatformType type,
+        Map<String, ?> extensions, @Nullable Long environmentId, boolean editorEnvironment, PlatformType type,
+        @Nullable Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
+        @Nullable Instant suspendExpiresAt) {
+
+        Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
+
+        if (environmentId != null) {
+            EnvironmentContext.set(environmentId.intValue());
+        }
+
+        try {
+            return doExecutePerform(
+                componentName, componentVersion, actionName, jobPrincipalId, jobPrincipalWorkflowId, jobId,
+                taskExecutionId, workflowId, inputParameters, componentConnections, extensions, environmentId,
+                editorEnvironment, type, continueParameters, resumeData, suspendExpiresAt);
+        } finally {
+            if (environmentId != null) {
+                if (previousEnvironment == null) {
+                    EnvironmentContext.clear();
+                } else {
+                    EnvironmentContext.set(previousEnvironment);
+                }
+            }
+        }
+    }
+
+    private Object doExecutePerform(
+        String componentName, int componentVersion, String actionName, Long jobPrincipalId,
+        Long jobPrincipalWorkflowId, Long jobId, @Nullable Long taskExecutionId, String workflowId,
+        Map<String, ?> inputParameters, Map<String, ComponentConnection> componentConnections,
+        Map<String, ?> extensions, @Nullable Long environmentId, boolean editorEnvironment, PlatformType type,
         @Nullable Map<String, ?> continueParameters, @Nullable Map<String, ?> resumeData,
         @Nullable Instant suspendExpiresAt) {
 

@@ -20,6 +20,8 @@ import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.StringUtils;
 import com.bytechef.component.definition.ActionDefinition;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.workflow.test.facade.AiAgentTestFacade;
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
@@ -83,6 +85,15 @@ class AiAgentTestApiController {
         sseEmitter.onError(throwable -> activeTests.invalidate(testId));
 
         CompletableFuture.runAsync(() -> {
+            long environmentId = aiAgentTestRequest.environmentId();
+
+            Environment previousEnvironment = EnvironmentContext.fetchCurrentEnvironment();
+            boolean environmentBound = environmentId >= 0 && environmentId < Environment.values().length;
+
+            if (environmentBound) {
+                EnvironmentContext.set((int) environmentId);
+            }
+
             try {
                 sendEvent(sseEmitter, "start", Map.of("testId", testId));
 
@@ -123,6 +134,14 @@ class AiAgentTestApiController {
                 sendEvent(sseEmitter, "error", getRootCauseMessage(exception));
 
                 completeEmitter(sseEmitter, testId);
+            } finally {
+                if (environmentBound) {
+                    if (previousEnvironment == null) {
+                        EnvironmentContext.clear();
+                    } else {
+                        EnvironmentContext.set(previousEnvironment);
+                    }
+                }
             }
         }, executor);
 
