@@ -27,10 +27,10 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
-import java.time.Instant;
-import java.util.Optional;
-
 import com.bytechef.tenant.service.TenantService;
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -59,6 +59,8 @@ class BillingUsageServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        when(tenantService.getTenantIds()).thenReturn(List.of("default"));
+
         billingUsageService = new BillingUsageServiceImpl(
             billingSubscriptionRepository, billingSubscriptionService, stripeClient, tenantService);
     }

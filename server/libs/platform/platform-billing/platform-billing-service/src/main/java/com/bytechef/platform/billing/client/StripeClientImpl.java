@@ -39,6 +39,7 @@ import com.stripe.param.SubscriptionScheduleUpdateParams;
 import com.stripe.param.SubscriptionUpdateParams;
 import com.stripe.param.billing.MeterEventCreateParams;
 import com.stripe.param.checkout.SessionCreateParams;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
 
@@ -53,10 +54,12 @@ public class StripeClientImpl implements StripeClient {
 
     private final BillingProperties billingProperties;
 
+    @SuppressFBWarnings("ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD")
     public StripeClientImpl(BillingProperties billingProperties) {
         this.billingProperties = billingProperties;
 
-        Stripe.apiKey = billingProperties.stripe().secretKey();
+        Stripe.apiKey = billingProperties.stripe()
+            .secretKey();
     }
 
     @Override
@@ -255,7 +258,9 @@ public class StripeClientImpl implements StripeClient {
     public Price retrievePrice(String priceId) {
         try {
             PriceRetrieveParams priceRetrieveParams =
-                PriceRetrieveParams.builder().addExpand("tiers").build();
+                PriceRetrieveParams.builder()
+                    .addExpand("tiers")
+                    .build();
 
             return Price.retrieve(priceId, priceRetrieveParams, null);
         } catch (StripeException stripeException) {
@@ -275,7 +280,8 @@ public class StripeClientImpl implements StripeClient {
     @Override
     public Event verifyWebhookSignature(String payload, String sigHeader) {
         try {
-            return Webhook.constructEvent(payload, sigHeader, billingProperties.stripe().webhookSecret());
+            return Webhook.constructEvent(payload, sigHeader, billingProperties.stripe()
+                .webhookSecret());
         } catch (SignatureVerificationException signatureVerificationException) {
             throw new RuntimeException("Invalid Stripe signature");
         }
@@ -285,7 +291,8 @@ public class StripeClientImpl implements StripeClient {
     public void reportMeterEvent(String stripeCustomerId, int quantity, String idempotencyKey) {
         try {
             MeterEventCreateParams params = MeterEventCreateParams.builder()
-                .setEventName(billingProperties.stripe().meterEventName())
+                .setEventName(billingProperties.stripe()
+                    .meterEventName())
                 .putExtraParam("payload", Map.of(
                     "stripe_customer_id", stripeCustomerId,
                     "value", String.valueOf(quantity)))

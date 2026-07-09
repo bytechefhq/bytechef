@@ -35,7 +35,8 @@ public class BillingSubscription {
 
         public static Status fromStripe(String stripeStatus) {
             try {
-                return valueOf(stripeStatus.toUpperCase().replace('-', '_'));
+                return valueOf(stripeStatus.toUpperCase()
+                    .replace('-', '_'));
             } catch (IllegalArgumentException e) {
                 return UNKNOWN;
             }

@@ -19,11 +19,11 @@ package com.bytechef.platform.billing.service;
 import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
-import java.time.Instant;
-import java.util.Optional;
-
 import com.bytechef.tenant.TenantContext;
 import com.bytechef.tenant.service.TenantService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.time.Instant;
+import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -34,13 +34,14 @@ import org.springframework.stereotype.Service;
 @Service
 public class BillingUsageServiceImpl implements BillingUsageService {
 
-    private static final Logger logger = LoggerFactory.getLogger(BillingUsageServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(BillingUsageServiceImpl.class);
 
     private final BillingSubscriptionRepository billingSubscriptionRepository;
     private final BillingSubscriptionService billingSubscriptionService;
     private final StripeClient stripeClient;
     private final TenantService tenantService;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BillingUsageServiceImpl(
         BillingSubscriptionRepository billingSubscriptionRepository,
         BillingSubscriptionService billingSubscriptionService,
@@ -54,11 +55,11 @@ public class BillingUsageServiceImpl implements BillingUsageService {
 
     @Override
     public void reportUsage(Instant scheduledFireTime) {
-       for (String tenantId: tenantService.getTenantIds()) {
-           logger.info("Reporting usage for tenant {}", tenantId);
+        for (String tenantId : tenantService.getTenantIds()) {
+            log.info("Reporting usage for tenant {}", tenantId);
 
-           TenantContext.runWithTenantId(tenantId, () -> doReportUsage(scheduledFireTime));
-       }
+            TenantContext.runWithTenantId(tenantId, () -> doReportUsage(scheduledFireTime));
+        }
     }
 
     private void doReportUsage(Instant scheduledFireTime) {

@@ -17,9 +17,11 @@
 package com.bytechef.platform.billing.dto;
 
 import com.bytechef.platform.billing.domain.BillingSubscription;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 /**
  * @author Matija Petanjek
  */
+@SuppressFBWarnings("EI")
 public record BillingSubscriptionDTO(BillingSubscription subscription, int tasksUsed) {
 }

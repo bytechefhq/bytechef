@@ -57,9 +57,9 @@ public class ApplicationProperties {
      */
     private Analytics analytics = new Analytics();
 
-       /**
-        * Billing configuration
-        */
+    /**
+     * Billing configuration
+     */
     private Billing billing = new Billing();
 
     /**
