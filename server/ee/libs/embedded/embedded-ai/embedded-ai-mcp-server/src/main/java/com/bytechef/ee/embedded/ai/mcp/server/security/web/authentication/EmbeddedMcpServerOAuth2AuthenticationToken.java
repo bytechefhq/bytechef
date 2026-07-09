@@ -1,0 +1,52 @@
+/*
+ * Copyright 2025 ByteChef
+ *
+ * Licensed under the ByteChef Enterprise license (the "Enterprise License");
+ * you may not use this file except in compliance with the Enterprise License.
+ */
+
+package com.bytechef.ee.embedded.ai.mcp.server.security.web.authentication;
+
+import com.bytechef.platform.security.web.authentication.AbstractApiKeyAuthenticationToken;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.util.List;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+
+/**
+ * Authentication for an OAuth2 Bearer JWT presented to the embedded MCP endpoint. Unauthenticated form carries the
+ * external user id (token subject), tenant, environment, and the authorities mapped from the token's group claim (used
+ * for per-component tool authorization); the authenticated form carries the resolved connected user.
+ *
+ * @version ee
+ *
+ * @author Ivica Cardic
+ */
+public class EmbeddedMcpServerOAuth2AuthenticationToken extends AbstractApiKeyAuthenticationToken {
+
+    private String externalUserId;
+    private List<GrantedAuthority> mappedAuthorities = List.of();
+
+    public EmbeddedMcpServerOAuth2AuthenticationToken(
+        long environmentId, String externalUserId, String tenantId, List<GrantedAuthority> mappedAuthorities) {
+
+        super(environmentId, tenantId);
+
+        this.externalUserId = externalUserId;
+        this.mappedAuthorities = List.copyOf(mappedAuthorities);
+    }
+
+    @SuppressFBWarnings("EI")
+    public EmbeddedMcpServerOAuth2AuthenticationToken(User user) {
+        super(user);
+    }
+
+    public String getExternalUserId() {
+        return externalUserId;
+    }
+
+    @SuppressFBWarnings("EI")
+    public List<GrantedAuthority> getMappedAuthorities() {
+        return mappedAuthorities;
+    }
+}
