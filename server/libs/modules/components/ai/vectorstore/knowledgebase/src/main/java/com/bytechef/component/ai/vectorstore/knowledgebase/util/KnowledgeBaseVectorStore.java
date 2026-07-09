@@ -232,7 +232,9 @@ public final class KnowledgeBaseVectorStore {
                     Map<String, Object> userMetadata = inputParameters.getMap(
                         ADDITIONAL_METADATA, new TypeReference<>() {});
 
-                    metadata.putAll(userMetadata);
+                    if (userMetadata != null) {
+                        metadata.putAll(userMetadata);
+                    }
 
                     String text = document.getText();
 
