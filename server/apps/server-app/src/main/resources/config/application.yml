@@ -220,6 +220,9 @@ spring:
     protocol: ${bytechef.mail.protocol}
     ssl:
       enabled: ${bytechef.mail.ssl.enabled}
+  mvc:
+    async:
+      request-timeout: -1
   liquibase:
     contexts: mono, #spring.profiles.active#
     enabled: ${bytechef.upgrade.enabled:true}

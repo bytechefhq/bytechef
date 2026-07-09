@@ -82,6 +82,7 @@ import com.bytechef.tenant.TenantContext;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -110,6 +111,7 @@ public class AutomationMcpServerConfiguration {
     WebMvcStreamableServerTransportProvider automationWebMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/automation/{secretKey}/mcp")
+            .keepAliveInterval(Duration.ofSeconds(30))
             .contextExtractor(serverRequest -> {
                 String secretKey = serverRequest.pathVariable(SECRET_KEY);
 

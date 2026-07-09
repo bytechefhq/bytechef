@@ -34,6 +34,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
 import io.modelcontextprotocol.server.McpServer;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.ai.mcp.McpToolUtils;
@@ -92,6 +93,7 @@ public class ManagementMcpServerConfiguration {
     WebMvcStreamableServerTransportProvider webMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/management/{secretKey}/mcp")
+            .keepAliveInterval(Duration.ofSeconds(30))
             .build();
     }
 
