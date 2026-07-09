@@ -3,5 +3,6 @@ mutation updateMcpServer($id: ID!, $input: McpServerUpdateInput!) {
         id
         name
         enabled
+        enforceToolAuthorization
     }
 }
