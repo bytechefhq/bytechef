@@ -24,7 +24,7 @@ import com.stripe.model.checkout.Session;
 /**
  * @author Matija Petanjek
  */
-public interface StripeClientService {
+public interface StripeClient {
 
     void cancelAtPeriodEnd(String stripeSubscriptionId, String tenantId);
 
