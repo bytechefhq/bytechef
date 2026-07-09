@@ -1,0 +1,25 @@
+import {useAiDefaultModelQuery} from '@/shared/middleware/graphql';
+import {useEnvironmentStore} from '@/shared/stores/useEnvironmentStore';
+
+export interface HasEnabledAiProviderStateI {
+    hasEnabledAiProvider: boolean;
+    isPending: boolean;
+}
+
+/**
+ * Reports whether at least one AI provider is enabled for the current environment, using the same
+ * `aiDefaultModel` GraphQL query (and react-query cache entry) the AI Copilot panel uses for its
+ * "No AI providers enabled" empty state: when no provider is enabled, no default model resolves.
+ * While the query is pending, callers should treat AI features as available so users don't see a
+ * disabled-state flash on load.
+ */
+export const useHasEnabledAiProvider = (): HasEnabledAiProviderStateI => {
+    const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
+
+    const {data, isPending} = useAiDefaultModelQuery({environment: String(currentEnvironmentId)});
+
+    return {
+        hasEnabledAiProvider: data?.aiDefaultModel != null,
+        isPending,
+    };
+};
