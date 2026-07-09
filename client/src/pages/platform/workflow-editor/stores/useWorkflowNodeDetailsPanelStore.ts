@@ -31,6 +31,9 @@ interface WorkflowNodeDetailsPanelStoreI {
     operationChangeInProgress: boolean;
     setOperationChangeInProgress: (operationChangeInProgress: boolean) => void;
 
+    pendingSaveNodeName: string | undefined;
+    setPendingSaveNodeName: (pendingSaveNodeName: string | undefined) => void;
+
     reset: () => void;
 
     workflowNodeDetailsPanelOpen: boolean;
@@ -71,6 +74,9 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             setOperationChangeInProgress: (operationChangeInProgress) =>
                 set((state) => ({...state, operationChangeInProgress})),
 
+            pendingSaveNodeName: undefined,
+            setPendingSaveNodeName: (pendingSaveNodeName) => set((state) => ({...state, pendingSaveNodeName})),
+
             reset: () =>
                 set(() => ({
                     aiAgentNodeDetailsPanelOpen: false,
@@ -79,6 +85,7 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
                     currentNode: undefined,
                     focusedInput: null,
                     operationChangeInProgress: false,
+                    pendingSaveNodeName: undefined,
                     workflowNodeDetailsPanelOpen: false,
                 })),
 
