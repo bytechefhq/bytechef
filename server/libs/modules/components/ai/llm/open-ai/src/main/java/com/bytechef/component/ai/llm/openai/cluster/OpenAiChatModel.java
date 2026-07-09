@@ -18,6 +18,7 @@ package com.bytechef.component.ai.llm.openai.cluster;
 
 import static com.bytechef.component.ai.llm.constant.LLMConstants.FREQUENCY_PENALTY_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.LOGIT_BIAS_PROPERTY;
+import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_COMPLETION_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.MAX_TOKENS_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.N_PROPERTY;
 import static com.bytechef.component.ai.llm.constant.LLMConstants.PRESENCE_PENALTY_PROPERTY;
@@ -48,6 +49,7 @@ public class OpenAiChatModel {
             .properties(
                 CHAT_MODEL_PROPERTY,
                 MAX_TOKENS_PROPERTY,
+                MAX_COMPLETION_TOKENS_PROPERTY,
                 N_PROPERTY,
                 TEMPERATURE_PROPERTY,
                 TOP_P_PROPERTY,
