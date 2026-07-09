@@ -16,12 +16,10 @@
 
 package com.bytechef.platform.billing.service;
 
-import com.bytechef.platform.billing.client.StripeClientService;
+import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.domain.BillingSubscription;
-import com.bytechef.platform.billing.job.StripeUsageReportingJob;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
 import java.time.Instant;
-import java.util.List;
 import java.util.Optional;
 
 import com.bytechef.tenant.TenantContext;
@@ -40,17 +38,17 @@ public class BillingUsageServiceImpl implements BillingUsageService {
 
     private final BillingSubscriptionRepository billingSubscriptionRepository;
     private final BillingSubscriptionService billingSubscriptionService;
-    private final StripeClientService stripeClientService;
+    private final StripeClient stripeClient;
     private final TenantService tenantService;
 
     public BillingUsageServiceImpl(
         BillingSubscriptionRepository billingSubscriptionRepository,
         BillingSubscriptionService billingSubscriptionService,
-        StripeClientService stripeClientService, TenantService tenantService) {
+        StripeClient stripeClient, TenantService tenantService) {
 
         this.billingSubscriptionRepository = billingSubscriptionRepository;
         this.billingSubscriptionService = billingSubscriptionService;
-        this.stripeClientService = stripeClientService;
+        this.stripeClient = stripeClient;
         this.tenantService = tenantService;
     }
 
@@ -81,7 +79,7 @@ public class BillingUsageServiceImpl implements BillingUsageService {
         if (count > 0) {
             String idempotencyKey = subscription.getStripeSubscriptionId() + "_" + scheduledFireTime.getEpochSecond();
 
-            stripeClientService.reportMeterEvent(subscription.getStripeCustomerId(), count, idempotencyKey);
+            stripeClient.reportMeterEvent(subscription.getStripeCustomerId(), count, idempotencyKey);
         }
 
         subscription.setLastReportedAt(scheduledFireTime);

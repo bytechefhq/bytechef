@@ -49,11 +49,11 @@ import org.springframework.util.Assert;
  * @author Matija Petanjek
  */
 @Service
-public class StripeClientServiceImpl implements StripeClientService {
+public class StripeClientImpl implements StripeClient {
 
     private final BillingProperties billingProperties;
 
-    public StripeClientServiceImpl(BillingProperties billingProperties) {
+    public StripeClientImpl(BillingProperties billingProperties) {
         this.billingProperties = billingProperties;
 
         Stripe.apiKey = billingProperties.stripe().secretKey();
