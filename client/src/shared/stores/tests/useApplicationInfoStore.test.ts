@@ -11,5 +11,17 @@ describe('applicationInfoStore', () => {
             expect(ai.hub.enabled).toBe(false);
             expect(ai.knowledgeBase.enabled).toBe(false);
         });
+
+        it('defaults custom component Java uploads to enabled before getApplicationInfo resolves', () => {
+            const {component} = applicationInfoStore.getState();
+
+            expect(component.customComponent.javaEnabled).toBe(true);
+        });
+
+        it('defaults code workflow Java uploads to enabled before getApplicationInfo resolves', () => {
+            const {workflow} = applicationInfoStore.getState();
+
+            expect(workflow.codeWorkflow.javaEnabled).toBe(true);
+        });
     });
 });

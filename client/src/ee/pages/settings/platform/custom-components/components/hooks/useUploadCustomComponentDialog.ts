@@ -1,3 +1,4 @@
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {useQueryClient} from '@tanstack/react-query';
 import {ChangeEvent, useCallback, useState} from 'react';
@@ -13,7 +14,11 @@ export default function useUploadCustomComponentDialog() {
     const [selectedFiles, setSelectedFiles] = useState<SelectedFileI[]>([]);
     const [uploading, setUploading] = useState(false);
 
+    const javaEnabled = useApplicationInfoStore((state) => state.component.customComponent.javaEnabled);
+
     const queryClient = useQueryClient();
+
+    const acceptedExtensions = javaEnabled ? '.jar,.js,.py,.rb' : '.js,.py,.rb';
 
     const resetForm = useCallback(() => {
         setSelectedFiles([]);
@@ -89,10 +94,12 @@ export default function useUploadCustomComponentDialog() {
 
     const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            const newFiles = Array.from(event.target.files).map((file) => ({
-                file,
-                status: 'pending' as const,
-            }));
+            const newFiles = Array.from(event.target.files)
+                .filter((file) => javaEnabled || !file.name.toLowerCase().endsWith('.jar'))
+                .map((file) => ({
+                    file,
+                    status: 'pending' as const,
+                }));
 
             setSelectedFiles((prev) => [...prev, ...newFiles]);
         }
@@ -131,6 +138,7 @@ export default function useUploadCustomComponentDialog() {
     };
 
     return {
+        acceptedExtensions,
         canSubmit,
         formatFileSize,
         handleFileChange,
