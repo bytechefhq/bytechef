@@ -211,11 +211,16 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                                         isNestedClusterRoot && 'min-w-0 overflow-hidden'
                                     )}
                                 >
-                                    <span
-                                        className={twMerge('font-semibold', isNestedClusterRoot && 'w-full truncate')}
-                                    >
-                                        {nodeLabel}
-                                    </span>
+                                    {!(isNestedClusterRoot && isRenaming) && (
+                                        <span
+                                            className={twMerge(
+                                                'font-semibold',
+                                                isNestedClusterRoot && 'w-full truncate'
+                                            )}
+                                        >
+                                            {nodeLabel}
+                                        </span>
+                                    )}
 
                                     {data.operationName && (
                                         <pre className={twMerge('text-sm', isNestedClusterRoot && 'w-full truncate')}>
@@ -274,6 +279,28 @@ const WorkflowNodeContent = forwardRef<HTMLDivElement, WorkflowNodeContentProps>
                     </PopoverContent>
                 )}
             </Popover>
+
+            {isNestedClusterRoot && isRenaming && (
+                <div className="absolute top-full left-0 z-10 mt-1 flex max-h-7 items-center rounded-md border-2 bg-surface-neutral-primary p-1">
+                    <input
+                        autoFocus
+                        className="nodrag max-h-5 w-40 cursor-text rounded border border-stroke-neutral-secondary bg-surface-neutral-secondary px-2 py-1 text-sm font-semibold outline-hidden select-text hover:bg-surface-neutral-secondary-hover"
+                        onBlur={(event) => handleRenameSubmit(event.target.value)}
+                        onChange={(event) => setRenameValue(event.target.value)}
+                        onKeyDown={handleRenameKeyDown}
+                        onMouseDown={(event) => event.stopPropagation()}
+                        value={renameValue}
+                    />
+
+                    <Button
+                        className="ml-1 size-5 shrink-0 cursor-pointer [&_svg]:size-4"
+                        icon={<CheckIcon className="text-content-brand-primary" />}
+                        onClick={() => handleRenameSubmit(renameValue)}
+                        size="icon"
+                        variant="ghost"
+                    />
+                </div>
+            )}
 
             {!(isMainRootClusterElement || isNestedClusterRoot) && (
                 <div
