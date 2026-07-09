@@ -22,7 +22,7 @@ import java.util.Optional;
 /**
  * @author Matija Petanjek
  */
-public interface BillingCheckoutFacade {
+public interface BillingSubscriptionFacade {
 
     void cancelSubscription();
 
