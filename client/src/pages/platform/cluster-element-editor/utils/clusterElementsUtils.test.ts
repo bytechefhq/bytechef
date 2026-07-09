@@ -1,10 +1,12 @@
 import {ROOT_CLUSTER_HANDLE_STEP, ROOT_CLUSTER_WIDTH} from '@/shared/constants';
+import {ClusterElementsType} from '@/shared/types';
 import {describe, expect, it} from 'vitest';
 
 import {
     calculateNodeWidth,
     convertNameToCamelCase,
     convertNameToSnakeCase,
+    extractClusterElementIcons,
     getClusterElementsLabel,
     getHandlePosition,
     isPlainObject,
@@ -189,4 +191,44 @@ describe('isPlainObject', () => {
         expect(isPlainObject(42)).toBe(false);
         expect(isPlainObject(true)).toBe(false);
     });
+});
+
+describe('extractClusterElementIcons vs configured-cluster-elements predicate', () => {
+    // The layout offset (hasConfiguredClusterElements in layoutUtils), the connection
+    // handle position (hasValidClusterElements in AiAgentNode) and the fingerprint that
+    // triggers re-layout all use this predicate. AiAgentNode renders the WIDE box (and
+    // the sub-icon row) whenever extractClusterElementIcons returns icons. If the two
+    // ever disagree for a cluster root, the box renders wide while the node is positioned
+    // as unconfigured — pushing the icon ~84px off the incoming connection edge
+    // (the stream/sync off-center bug). Both must be fed the same clusterElements object.
+    const isConfigured = (clusterElements: ClusterElementsType): boolean =>
+        Object.values(clusterElements).some(
+            (value) => value !== null && value !== undefined && !(Array.isArray(value) && value.length === 0)
+        );
+
+    const hasIcons = (clusterElements: ClusterElementsType): boolean =>
+        extractClusterElementIcons(clusterElements).length > 0;
+
+    const dataStreamSyncShapes: Array<{clusterElements: ClusterElementsType; label: string}> = [
+        {
+            clusterElements: {
+                destination: {name: 'dest_1', type: 'dest/v1/write'},
+                source: {name: 'src_1', type: 'src/v1/read'},
+            },
+            label: 'source and destination configured',
+        },
+        {
+            clusterElements: {destination: null, processor: null, source: {name: 'src_1', type: 'src/v1/read'}},
+            label: 'only source configured',
+        },
+        {clusterElements: {destination: null, processor: null, source: null}, label: 'nothing configured'},
+        {clusterElements: {}, label: 'empty clusterElements'},
+    ];
+
+    it.each(dataStreamSyncShapes)(
+        'renders icons exactly when the node is considered configured ($label)',
+        ({clusterElements}) => {
+            expect(hasIcons(clusterElements)).toBe(isConfigured(clusterElements));
+        }
+    );
 });

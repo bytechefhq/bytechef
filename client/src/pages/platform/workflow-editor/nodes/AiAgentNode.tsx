@@ -68,24 +68,11 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
     const {cancelWorkflowQueries, invalidateWorkflowQueries, updateWorkflowMutation} = useWorkflowEditor();
 
     const memoizedIconsList = useMemo(() => {
-        if (!workflow.definition) {
+        if (!data.clusterElements || Array.isArray(data.clusterElements)) {
             return {iconsToShow: [], remainingIcons: []};
         }
 
-        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
-
-        const mainClusterRootTask = data?.workflowNodeName
-            ? getTask({
-                  tasks: workflowDefinitionTasks,
-                  workflowNodeName: data.workflowNodeName,
-              })
-            : undefined;
-
-        if (!mainClusterRootTask?.clusterElements) {
-            return {iconsToShow: [], remainingIcons: []};
-        }
-
-        const iconsList = extractClusterElementIcons(mainClusterRootTask.clusterElements);
+        const iconsList = extractClusterElementIcons(data.clusterElements);
 
         if (!Array.isArray(iconsList)) {
             return {iconsToShow: [], remainingIcons: []};
@@ -105,7 +92,7 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
             iconsToShow: uniqueIconsList.slice(0, 5),
             remainingIcons: uniqueIconsList.slice(5),
         };
-    }, [data?.workflowNodeName, workflow.definition]);
+    }, [data.clusterElements]);
 
     const {data: workflowNodeDescription} = useGetWorkflowNodeDescriptionQuery(
         {
@@ -276,10 +263,6 @@ const AiAgentNode = ({data, id}: {data: NodeDataType; id: string}) => {
 
     const hasIcons = useMemo(() => memoizedIconsList.iconsToShow.length > 0, [memoizedIconsList.iconsToShow]);
 
-    // Must mirror the layout's hasValidClusterElements check exactly (layoutUtils.tsx line 510-514)
-    // to keep handle position in sync with the -85px cross-axis offset applied during layout.
-    // Using data.clusterElements (from node props) instead of workflow.definition (from store)
-    // prevents a timing mismatch when switching between workflows.
     const hasValidClusterElements = useMemo(
         () =>
             !!data.clusterElements &&
