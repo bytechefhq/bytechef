@@ -1486,6 +1486,153 @@ public class WorkflowNodeParameterFacadeTest {
         }
     }
 
+    /**
+     * Regression for issue #5363: a required property whose display condition is not met (because the referenced field
+     * is left at its non-persisted default value) is hidden in the editor and must not be reported as a missing
+     * required property. Mirrors the AI Agent Chat action: 'messages' (display condition {@code format == 'ADVANCED'})
+     * and 'response.responseSchema' (display condition {@code response.responseFormat == 'JSON'}) with Format=Simple
+     * and Response Format=Text.
+     */
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void testGetWorkflowNodeMissingRequiredPropertiesExcludesHiddenProperties() {
+        WorkflowNodeParameterFacadeImpl facade = new WorkflowNodeParameterFacadeImpl(
+            actionDefinitionService, clusterElementDefinitionService, SpelEvaluator.create(),
+            taskDispatcherDefinitionService, triggerDefinitionService, workflowNodeOutputFacade,
+            workflowService, workflowTestConfigurationService);
+        ArrayProperty messages = mock(ArrayProperty.class);
+
+        lenient().when(messages.getName())
+            .thenReturn("messages");
+        lenient().when(messages.getRequired())
+            .thenReturn(true);
+        lenient().when(messages.getDisplayCondition())
+            .thenReturn("format == 'ADVANCED'");
+        lenient().when(messages.getItems())
+            .thenReturn(List.of());
+
+        StringProperty responseFormat = mockRequiredStringProperty("responseFormat", null);
+        StringProperty responseSchema = mockRequiredStringProperty(
+            "responseSchema", "response.responseFormat == 'JSON'");
+        ObjectProperty response = mock(ObjectProperty.class);
+
+        lenient().when(response.getName())
+            .thenReturn("response");
+        lenient().when(response.getRequired())
+            .thenReturn(true);
+        lenient().when(response.getProperties())
+            .thenReturn((List) List.of(responseFormat, responseSchema));
+
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("format", "SIMPLE");
+        parameters.put("response", new HashMap<>(Map.of("responseFormat", "TEXT")));
+
+        List<String> missingRequiredProperties = getWorkflowNodeDisplayConditions(
+            facade, List.of(mockRequiredStringProperty("format", null), messages, response), parameters)
+                .missingRequiredProperties();
+
+        assertFalse(missingRequiredProperties.contains("messages"));
+        assertFalse(missingRequiredProperties.contains("response.responseSchema"));
+        assertTrue(missingRequiredProperties.isEmpty());
+    }
+
+    /**
+     * Regression for issue #5363 (second part): clearing a required field in the editor persists an empty string rather
+     * than removing the parameter key, so a required property whose value is present but blank must still be reported
+     * as missing — otherwise the error never reappears after the user deletes the value.
+     */
+    @Test
+    void testGetWorkflowNodeMissingRequiredPropertiesReportsBlankRequiredValue() {
+        Map<String, Object> parameters = new HashMap<>();
+
+        parameters.put("name", "");
+
+        DisplayConditionResultDTO result = getWorkflowNodeDisplayConditions(
+            workflowNodeParameterFacade, List.of(mockRequiredStringProperty("name", null)), parameters);
+
+        assertTrue(result.missingRequiredProperties()
+            .contains("name"));
+    }
+
+    /**
+     * A workflow node may not correspond to a persisted top-level workflow task (so {@code workflow.getTask()} returns
+     * null). Resolving display conditions/missing required properties for such a node must not throw when there are no
+     * previous outputs to fetch.
+     */
+    @Test
+    void testGetWorkflowNodeDisplayConditionsWithoutMatchingWorkflowTask() {
+        DisplayConditionResultDTO result = getWorkflowNodeDisplayConditions(
+            workflowNodeParameterFacade, List.of(mockRequiredStringProperty("requiredParam", null)), new HashMap<>());
+
+        // No NPE (getTask returns null), the required property is still reported missing, and no previous outputs are
+        // fetched for a node without a matching workflow task.
+        assertTrue(result.missingRequiredProperties()
+            .contains("requiredParam"));
+        verify(workflowNodeOutputFacade, times(0))
+            .getPreviousWorkflowNodeSampleOutputs(anyString(), anyString(), anyLong());
+    }
+
+    private static StringProperty mockRequiredStringProperty(String name, String displayCondition) {
+        StringProperty property = mock(StringProperty.class);
+
+        lenient().when(property.getName())
+            .thenReturn(name);
+        lenient().when(property.getRequired())
+            .thenReturn(true);
+        lenient().when(property.getDisplayCondition())
+            .thenReturn(displayCondition);
+        return property;
+    }
+
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    private DisplayConditionResultDTO getWorkflowNodeDisplayConditions(
+        WorkflowNodeParameterFacadeImpl facade, List<?> properties, Map<String, Object> parameters) {
+
+        String workflowId = "workflow1";
+        String workflowNodeName = "task1";
+        ActionDefinition actionDefinition = mock(ActionDefinition.class);
+
+        when(actionDefinition.getProperties()).thenReturn((List) properties);
+        when(actionDefinitionService.getActionDefinition(anyString(), anyInt(), anyString()))
+            .thenReturn(actionDefinition);
+        lenient().when(workflowTestConfigurationService.getWorkflowTestConfigurationInputs(workflowId, 0))
+            .thenReturn(Map.of());
+
+        Map<String, Object> task = new HashMap<>();
+
+        task.put("name", workflowNodeName);
+        task.put("type", "component/v1/action");
+        task.put("parameters", parameters);
+        task.put("metadata", new HashMap<>());
+
+        try (MockedStatic<JsonUtils> mockedJsonUtils = mockStatic(JsonUtils.class)) {
+            mockedJsonUtils.when(() -> JsonUtils.readMap(anyString()))
+                .thenReturn(new HashMap<>(Map.of("tasks", List.of(task))));
+
+            Workflow workflow = mock(Workflow.class);
+
+            when(workflow.getId()).thenReturn(workflowId);
+            when(workflow.getDefinition()).thenReturn("{}");
+            // No task matches workflowNodeName, so there are no previous outputs to resolve.
+            lenient().when(workflow.getTask(workflowNodeName))
+                .thenReturn(null);
+            when(workflowService.getWorkflow(workflowId)).thenReturn(workflow);
+
+            DisplayConditionResultDTO result = facade.getWorkflowNodeDisplayConditions(
+                workflowId, workflowNodeName, 0);
+
+            assertNotNull(result);
+            assertNotNull(result.missingRequiredProperties());
+
+            return result;
+        }
+    }
+
     @Test
     void testGetWorkflowNodeDisplayConditionsWithComplexProperties() {
         // Given

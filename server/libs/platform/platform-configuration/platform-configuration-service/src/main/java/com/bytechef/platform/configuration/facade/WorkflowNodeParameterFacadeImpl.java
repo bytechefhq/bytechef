@@ -1277,17 +1277,22 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
         Set<String> missingRequiredProperties = new HashSet<>();
 
         if (parameterMap != null && properties != null) {
-            checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties);
+            checkRequiredProperties(properties, parameterMap, "", missingRequiredProperties, parameterMap, List.of());
         }
 
         return new WorkflowNodeStructure(operationType, parameterMap, properties, missingRequiredProperties, name);
     }
 
     private void checkRequiredProperties(
-        List<?> properties, Map<?, ?> parameterMap, String prefix, Set<String> missingRequiredProperties) {
+        List<?> properties, Map<?, ?> parameterMap, String prefix, Set<String> missingRequiredProperties,
+        Map<String, ?> rootParameterMap, List<Integer> indexes) {
 
         for (Object prop : properties) {
             if (!(prop instanceof BaseProperty property)) {
+                continue;
+            }
+
+            if (isHidden(property, rootParameterMap, indexes)) {
                 continue;
             }
 
@@ -1295,7 +1300,7 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
             String propertyPath = prefix.isEmpty() ? propertyName : prefix + "." + propertyName;
 
-            if (property.getRequired() && !parameterMap.containsKey(propertyName)) {
+            if (property.getRequired() && isRequiredValueMissing(parameterMap, propertyName)) {
                 missingRequiredProperties.add(propertyPath);
             } else if (parameterMap.containsKey(propertyName)) {
                 // Check nested properties
@@ -1307,7 +1312,8 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
 
                         if (value instanceof Map) {
                             checkRequiredProperties(
-                                nestedProperties, (Map<?, ?>) value, propertyPath, missingRequiredProperties);
+                                nestedProperties, (Map<?, ?>) value, propertyPath, missingRequiredProperties,
+                                rootParameterMap, indexes);
                         }
                     }
                 } else if (property instanceof ArrayProperty arrayProperty) {
@@ -1320,9 +1326,13 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                                 Object item = list.get(i);
 
                                 if (item instanceof Map) {
+                                    List<Integer> itemIndexes = new ArrayList<>(indexes);
+
+                                    itemIndexes.add(i);
+
                                     checkRequiredProperties(
                                         items, (Map<?, ?>) item, propertyPath + "[" + i + "]",
-                                        missingRequiredProperties);
+                                        missingRequiredProperties, rootParameterMap, itemIndexes);
                                 }
                             }
                         }
@@ -1330,6 +1340,30 @@ public class WorkflowNodeParameterFacadeImpl implements WorkflowNodeParameterFac
                 }
             }
         }
+    }
+
+    private boolean isHidden(BaseProperty property, Map<String, ?> rootParameterMap, List<Integer> indexes) {
+        String displayCondition = property.getDisplayCondition();
+
+        if (displayCondition == null || displayCondition.isEmpty()) {
+            return false;
+        }
+
+        if (displayCondition.contains("[index]")) {
+            displayCondition = replaceIndexes(displayCondition, indexes);
+        }
+
+        return !evaluate(displayCondition, rootParameterMap);
+    }
+
+    private static boolean isRequiredValueMissing(Map<?, ?> parameterMap, String propertyName) {
+        if (!parameterMap.containsKey(propertyName)) {
+            return true;
+        }
+
+        Object value = parameterMap.get(propertyName);
+
+        return value == null || (value instanceof String string && string.isBlank());
     }
 
     @SuppressWarnings("unchecked")
