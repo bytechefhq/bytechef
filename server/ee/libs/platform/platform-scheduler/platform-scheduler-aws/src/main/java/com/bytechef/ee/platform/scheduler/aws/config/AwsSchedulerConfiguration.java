@@ -7,6 +7,7 @@
 
 package com.bytechef.ee.platform.scheduler.aws.config;
 
+import static com.bytechef.ee.platform.scheduler.aws.constant.AwsBillingSchedulingConstants.STRIPE_USAGE_REPORTING_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsConnectionRefreshSchedulerConstants.CONNECTION_REFRESH_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID;
 import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedulerConstants.POLLING_TRIGGER_LISTENER_ID;
@@ -16,12 +17,15 @@ import static com.bytechef.ee.platform.scheduler.aws.constant.AwsTriggerSchedule
 import com.bytechef.atlas.configuration.service.WorkflowService;
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.ee.platform.scheduler.aws.AwsConnectionRefreshScheduler;
+import com.bytechef.ee.platform.scheduler.aws.AwsStripeUsageReportScheduler;
 import com.bytechef.ee.platform.scheduler.aws.AwsTriggerScheduler;
 import com.bytechef.ee.platform.scheduler.aws.listener.ConnectionRefreshListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.DynamicWebhookTriggerRefreshListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.PollingTriggerListener;
 import com.bytechef.ee.platform.scheduler.aws.listener.ScheduleTriggerListener;
+import com.bytechef.ee.platform.scheduler.aws.listener.StripeUsageReportListener;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.component.facade.TriggerDefinitionFacade;
 import com.bytechef.platform.connection.facade.ConnectionFacade;
 import com.bytechef.platform.workflow.execution.accessor.JobPrincipalAccessorRegistry;
@@ -59,7 +63,7 @@ public class AwsSchedulerConfiguration {
 
     private static final List<String> SCHEDULER_SQS_LISTENER_IDS = List.of(
         POLLING_TRIGGER_LISTENER_ID, SCHEDULE_TRIGGER_LISTENER_ID, DYNAMIC_WEBHOOK_TRIGGER_REFRESH_LISTENER_ID,
-        CONNECTION_REFRESH_LISTENER_ID);
+        CONNECTION_REFRESH_LISTENER_ID, STRIPE_USAGE_REPORTING_LISTENER_ID);
 
     private final ApplicationProperties applicationProperties;
     private final MessageListenerContainerRegistry messageListenerContainerRegistry;
@@ -82,6 +86,11 @@ public class AwsSchedulerConfiguration {
             .getAws();
 
         return new AwsConnectionRefreshScheduler(aws, schedulerClient);
+    }
+
+    @Bean
+    AwsStripeUsageReportScheduler awsStripeUsageReportScheduler(SchedulerClient schedulerClient) {
+        return new AwsStripeUsageReportScheduler(applicationProperties, schedulerClient);
     }
 
     @Bean
@@ -132,6 +141,11 @@ public class AwsSchedulerConfiguration {
     @Bean
     ScheduleTriggerListener scheduleListener(ApplicationEventPublisher eventPublisher) {
         return new ScheduleTriggerListener(eventPublisher);
+    }
+
+    @Bean
+    StripeUsageReportListener stripeUsageReportListener(BillingUsageService billingUsageService) {
+        return new StripeUsageReportListener(billingUsageService);
     }
 
     @Bean(name = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY, autowireCandidate = false)
