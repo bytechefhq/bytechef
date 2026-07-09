@@ -84,6 +84,7 @@ import saveTaskDispatcherSubtaskFieldChange from '../../utils/saveTaskDispatcher
 import saveWorkflowDefinition from '../../utils/saveWorkflowDefinition';
 import {getTaskDispatcherTask} from '../../utils/taskDispatcherConfig';
 import isActionDefinitionFresh from './isActionDefinitionFresh';
+import {resolveMissingRequiredPropertiesRefetch} from './resolveMissingRequiredPropertiesRefetch';
 import resolveNodeConnectionFields from './resolveNodeConnectionFields';
 
 const TABS: Array<{label: string; name: TabNameType}> = [
@@ -1119,23 +1120,25 @@ export default function useWorkflowNodeDetailsPanel({
         }
     }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
 
-    // Refetch node-scoped missing required properties once the workflow save is confirmed by the
-    // server (operation switch, property edit, external code edit) so the errors band stays in sync.
-    // Keyed on workflow.version — which only changes on a successful save — instead of
-    // workflow.definition, which updates optimistically before the server persists the change and
-    // would otherwise race the query against the stale server-side definition.
+    // Refetch node-scoped missing required properties once a save is confirmed by the server, so the errors
+    // band stays in sync. Keyed on workflow.version (changes only on a successful save) rather than
+    // workflow.definition, which updates optimistically and would race the query against the stale
+    // server-side definition. resolveMissingRequiredPropertiesRefetch replicates the declarative queries'
+    // `enabled` guards (refetch() bypasses them) — see its doc.
     useEffect(() => {
-        if (!currentNodeName) {
-            return;
-        }
+        const refetchTarget = resolveMissingRequiredPropertiesRefetch(
+            currentNodeName,
+            currentClusterElementName,
+            currentNode?.clusterElementType
+        );
 
-        if (currentNode?.clusterElementType) {
+        if (refetchTarget === 'cluster') {
             refetchClusterElementMissingRequiredProperties();
-        } else {
+        } else if (refetchTarget === 'regular') {
             refetchWorkflowNodeMissingRequiredProperties();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.version, currentNodeName, currentNode?.clusterElementType]);
+    }, [workflow.version, currentNodeName, currentClusterElementName, currentNode?.clusterElementType]);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
