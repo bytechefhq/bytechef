@@ -164,14 +164,16 @@ export function getWorkflowNodeMenuItems({
         });
     }
 
+    const canRename = showRenameAction && !data.isNestedClusterRoot;
+
     const hasFirstGroup = showCutAction || showReplaceAction || showCopyAction || canPaste;
-    const hasSecondGroup = showRenameAction || hasSavedPosition || showInfoAction;
+    const hasSecondGroup = canRename || hasSavedPosition || showInfoAction;
 
     if (hasFirstGroup && hasSecondGroup) {
         menuItems.push({key: 'separator-actions', type: 'separator'});
     }
 
-    if (showRenameAction) {
+    if (canRename) {
         menuItems.push({
             icon: <TextCursorInputIcon className="size-4 shrink-0" />,
             key: 'rename',
