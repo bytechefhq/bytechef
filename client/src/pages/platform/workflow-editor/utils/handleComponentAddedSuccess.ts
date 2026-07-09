@@ -26,9 +26,14 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
         setActiveTab,
         setCurrentComponent,
         setCurrentNode,
+        setPendingSaveNodeName,
         setWorkflowNodeDetailsPanelOpen,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore.getState();
+
+    if (nodeData.name) {
+        setPendingSaveNodeName(nodeData.name);
+    }
 
     if (workflowNodeDetailsPanelOpen) {
         if (currentNode?.trigger && nodeData.trigger) {
@@ -36,8 +41,6 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
             setCurrentComponent({...currentComponent, ...nodeData});
         }
     } else {
-        // Reset to 'description' so the Properties tab's display-conditions query
-        // doesn't fire against the server before the optimistic workflow update lands.
         setActiveTab('description');
         setCurrentNode({...nodeData, description: ''});
         setCurrentComponent({...nodeData, description: ''});
@@ -45,6 +48,16 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 }
 
-export default function handleComponentAddedSuccess({queryClient, workflow}: HandleComponentAddedSuccessProps) {
+export default function handleComponentAddedSuccess({
+    nodeData,
+    queryClient,
+    workflow,
+}: HandleComponentAddedSuccessProps) {
     invalidatePreviousWorkflowNodeOutputsForWorkflow(queryClient, workflow.id!);
+
+    const {pendingSaveNodeName, setPendingSaveNodeName} = useWorkflowNodeDetailsPanelStore.getState();
+
+    if (nodeData.name && pendingSaveNodeName === nodeData.name) {
+        setPendingSaveNodeName(undefined);
+    }
 }

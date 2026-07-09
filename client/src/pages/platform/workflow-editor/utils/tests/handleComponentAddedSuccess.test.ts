@@ -1,8 +1,10 @@
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {Workflow} from '@/shared/middleware/platform/configuration';
 import {NodeDataType} from '@/shared/types';
+import {QueryClient} from '@tanstack/react-query';
 import {beforeEach, describe, expect, it} from 'vitest';
 
-import {openNodeDetailsPanelForNewNode} from '../handleComponentAddedSuccess';
+import handleComponentAddedSuccess, {openNodeDetailsPanelForNewNode} from '../handleComponentAddedSuccess';
 
 const makeNodeData = (overrides: Partial<NodeDataType> = {}): NodeDataType =>
     ({
@@ -23,6 +25,7 @@ describe('openNodeDetailsPanelForNewNode', () => {
             activeTab: 'description',
             currentComponent: undefined,
             currentNode: undefined,
+            pendingSaveNodeName: undefined,
             workflowNodeDetailsPanelOpen: false,
         });
     });
@@ -38,6 +41,12 @@ describe('openNodeDetailsPanelForNewNode', () => {
         expect(state.currentNode?.name).toBe('slack_1');
         expect(state.currentNode?.description).toBe('');
         expect(state.currentComponent?.componentName).toBe('slack');
+    });
+
+    it('should mark the new node as pending its first save so node-scoped queries wait for persistence', () => {
+        openNodeDetailsPanelForNewNode(makeNodeData());
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBe('slack_1');
     });
 
     it('should reset activeTab to description when opening the panel for a new node', () => {
@@ -76,6 +85,30 @@ describe('openNodeDetailsPanelForNewNode', () => {
 
         expect(state.workflowNodeDetailsPanelOpen).toBe(true);
         expect(state.currentNode?.name).toBe('http_1');
+    });
+
+    it('should clear the pending-save marker when the added node is confirmed persisted', () => {
+        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeName: 'slack_1'});
+
+        handleComponentAddedSuccess({
+            nodeData: makeNodeData(),
+            queryClient: new QueryClient(),
+            workflow: {id: 'workflow_1'} as Workflow,
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBeUndefined();
+    });
+
+    it('should not clear the pending-save marker of a different node still awaiting its save', () => {
+        useWorkflowNodeDetailsPanelStore.setState({pendingSaveNodeName: 'accelo_1'});
+
+        handleComponentAddedSuccess({
+            nodeData: makeNodeData({name: 'slack_1'}),
+            queryClient: new QueryClient(),
+            workflow: {id: 'workflow_1'} as Workflow,
+        });
+
+        expect(useWorkflowNodeDetailsPanelStore.getState().pendingSaveNodeName).toBe('accelo_1');
     });
 
     it('should update panel when replacing a trigger while panel is open', () => {

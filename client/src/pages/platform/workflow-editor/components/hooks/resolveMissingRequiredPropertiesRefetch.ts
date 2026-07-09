@@ -1,21 +1,22 @@
 export type MissingRequiredPropertiesRefetchTargetType = 'cluster' | 'none' | 'regular';
 
 /**
- * Decides which missing-required-properties query to imperatively refetch for the focused node, or 'none'.
- *
- * Replicates the `enabled` guards of the two declarative queries in useWorkflowNodeDetailsPanel (a node is a
- * cluster element iff `currentNodeName === currentClusterElementName` AND it has a `clusterElementType`).
- * refetch() bypasses those guards, so without this the plain endpoint can fire with a cluster element's name
- * during the close/switch window where `clusterElementType` has cleared in the store but `currentNodeName`
- * still lags (local state) — the server has no task/trigger by that name and 404s. In that window both names
- * are still equal, so neither branch matches and we return 'none'; the effect re-runs once state reconciles.
+ * Picks which missing-required-properties query to imperatively refetch for the focused node ('cluster' |
+ * 'regular'), or 'none'. refetch() bypasses the declarative queries' `enabled` guards, so this replicates
+ * them: returns 'none' during the cluster-editor-close race (currentNodeName lags clusterElementType) and
+ * for a freshly added node still awaiting its first save — both would 404 against the stale server definition.
  */
 export function resolveMissingRequiredPropertiesRefetch(
     currentNodeName: string | undefined,
     currentClusterElementName: string | undefined,
-    currentNodeClusterElementType: string | undefined
+    currentNodeClusterElementType: string | undefined,
+    pendingSaveNodeName: string | undefined
 ): MissingRequiredPropertiesRefetchTargetType {
     if (!currentNodeName || currentNodeName === 'manual') {
+        return 'none';
+    }
+
+    if (currentNodeName === pendingSaveNodeName) {
         return 'none';
     }
 

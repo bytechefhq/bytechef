@@ -137,6 +137,7 @@ export default function useWorkflowNodeDetailsPanel({
         currentComponent,
         currentNode,
         operationChangeInProgress,
+        pendingSaveNodeName,
         setActiveTab,
         setCurrentComponent,
         setCurrentNode,
@@ -148,6 +149,7 @@ export default function useWorkflowNodeDetailsPanel({
             currentComponent: state.currentComponent,
             currentNode: state.currentNode,
             operationChangeInProgress: state.operationChangeInProgress,
+            pendingSaveNodeName: state.pendingSaveNodeName,
             setActiveTab: state.setActiveTab,
             setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
@@ -406,6 +408,7 @@ export default function useWorkflowNodeDetailsPanel({
                 !!currentNodeName &&
                 currentNodeName !== 'manual' &&
                 currentNodeName !== currentClusterElementName &&
+                currentNodeName !== pendingSaveNodeName &&
                 !currentNode?.clusterElementType,
         }
     );
@@ -428,6 +431,7 @@ export default function useWorkflowNodeDetailsPanel({
                 !!currentNodeName &&
                 currentNodeName !== 'manual' &&
                 currentNodeName === currentClusterElementName &&
+                currentNodeName !== pendingSaveNodeName &&
                 !!currentNode.clusterElementType,
         }
     );
@@ -1120,16 +1124,15 @@ export default function useWorkflowNodeDetailsPanel({
         }
     }, [currentNode?.name, currentOperationDefinition?.properties, isClusterElement]);
 
-    // Refetch node-scoped missing required properties once a save is confirmed by the server, so the errors
-    // band stays in sync. Keyed on workflow.version (changes only on a successful save) rather than
-    // workflow.definition, which updates optimistically and would race the query against the stale
-    // server-side definition. resolveMissingRequiredPropertiesRefetch replicates the declarative queries'
-    // `enabled` guards (refetch() bypasses them) — see its doc.
+    // Refetch missing required properties once a save is confirmed (workflow.version bumps only on success,
+    // not the optimistic update). resolveMissingRequiredPropertiesRefetch replicates the queries' `enabled`
+    // guards since refetch() bypasses them — see its doc.
     useEffect(() => {
         const refetchTarget = resolveMissingRequiredPropertiesRefetch(
             currentNodeName,
             currentClusterElementName,
-            currentNode?.clusterElementType
+            currentNode?.clusterElementType,
+            pendingSaveNodeName
         );
 
         if (refetchTarget === 'cluster') {
@@ -1138,7 +1141,13 @@ export default function useWorkflowNodeDetailsPanel({
             refetchWorkflowNodeMissingRequiredProperties();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workflow.version, currentNodeName, currentClusterElementName, currentNode?.clusterElementType]);
+    }, [
+        workflow.version,
+        currentNodeName,
+        currentClusterElementName,
+        currentNode?.clusterElementType,
+        pendingSaveNodeName,
+    ]);
 
     // Set currentOperationProperties depending if the current node is a trigger or an action
     useEffect(() => {
