@@ -2,7 +2,7 @@ group = "com.bytechef.runtime"
 description = "ByteChef runtime app"
 
 springBoot {
-    mainClass.set("com.bytechef.runtime.RuntimeApplication")
+    mainClass.set("com.bytechef.runtime.job.RuntimeJobApplication")
 }
 
 dependencies {
