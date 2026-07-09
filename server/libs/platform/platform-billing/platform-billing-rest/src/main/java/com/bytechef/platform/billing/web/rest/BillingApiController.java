@@ -17,7 +17,7 @@
 package com.bytechef.platform.billing.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.platform.billing.facade.BillingCheckoutFacade;
+import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
 import com.bytechef.platform.billing.web.rest.model.BillingSubscriptionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionModel;
 import com.bytechef.platform.billing.web.rest.model.CheckoutSessionRequestModel;
@@ -35,18 +35,18 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class BillingApiController implements BillingApi {
 
-    private final BillingCheckoutFacade billingCheckoutFacade;
+    private final BillingSubscriptionFacade billingSubscriptionFacade;
     private final ConversionService conversionService;
 
     @SuppressFBWarnings("EI")
-    public BillingApiController(BillingCheckoutFacade billingCheckoutFacade, ConversionService conversionService) {
-        this.billingCheckoutFacade = billingCheckoutFacade;
+    public BillingApiController(BillingSubscriptionFacade billingSubscriptionFacade, ConversionService conversionService) {
+        this.billingSubscriptionFacade = billingSubscriptionFacade;
         this.conversionService = conversionService;
     }
 
     @Override
     public ResponseEntity<Void> upgradeSubscription(CheckoutSessionRequestModel checkoutSessionRequestModel) {
-        billingCheckoutFacade.upgradeSubscription(
+        billingSubscriptionFacade.upgradeSubscription(
             checkoutSessionRequestModel.getPlanName()
                 .getValue());
 
@@ -56,7 +56,7 @@ public class BillingApiController implements BillingApi {
 
     @Override
     public ResponseEntity<Void> reactivateSubscription() {
-        billingCheckoutFacade.reactivateSubscription();
+        billingSubscriptionFacade.reactivateSubscription();
 
         return ResponseEntity.noContent()
             .build();
@@ -64,7 +64,7 @@ public class BillingApiController implements BillingApi {
 
     @Override
     public ResponseEntity<Void> cancelSubscription() {
-        billingCheckoutFacade.cancelSubscription();
+        billingSubscriptionFacade.cancelSubscription();
 
         return ResponseEntity.noContent()
             .build();
@@ -74,7 +74,7 @@ public class BillingApiController implements BillingApi {
     public ResponseEntity<CheckoutSessionModel> createCheckoutSession(
         CheckoutSessionRequestModel checkoutSessionRequestModel) {
 
-        String checkoutUrl = billingCheckoutFacade.createCheckoutSession(
+        String checkoutUrl = billingSubscriptionFacade.createCheckoutSession(
             checkoutSessionRequestModel.getPlanName()
                 .getValue());
 
@@ -84,7 +84,7 @@ public class BillingApiController implements BillingApi {
     @Override
     public ResponseEntity<BillingSubscriptionModel> getCurrentSubscription() {
         return ResponseEntity.ok(
-            billingCheckoutFacade.fetchCurrentSubscription()
+            billingSubscriptionFacade.fetchCurrentSubscription()
                 .map(dto -> conversionService.convert(dto, BillingSubscriptionModel.class))
                 .orElse(null));
     }

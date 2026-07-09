@@ -43,7 +43,7 @@ import tools.jackson.databind.ObjectMapper;
  * @author Matija Petanjek
  */
 @Service
-public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
+public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade {
 
     private final BillingProperties billingProperties;
     private final BillingSubscriptionService billingSubscriptionService;
@@ -52,7 +52,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
     private final ObjectMapper objectMapper;
     private final StripeClient stripeClient;
 
-    public BillingCheckoutFacadeImpl(
+    public BillingSubscriptionFacadeImpl(
         BillingProperties billingProperties,
         BillingSubscriptionService billingSubscriptionService,
         BillingUsageService billingUsageService,
