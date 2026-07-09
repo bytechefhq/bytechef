@@ -124,6 +124,7 @@ const WorkflowNodeContextMenu = ({
 
                 <ContextMenuContent
                     className={twMerge('w-workflow-node-context-menu-width p-0', !menuReady && 'pointer-events-none')}
+                    onCloseAutoFocus={(event) => event.preventDefault()}
                 >
                     {menuItems.map((menuItem) =>
                         menuItem.type === 'separator' ? (

@@ -114,7 +114,12 @@ const WorkflowNodeDropdownMenu = ({
             <DropdownMenu modal={false} onOpenChange={onOpenChange}>
                 <DropdownMenuTrigger asChild>{trigger}</DropdownMenuTrigger>
 
-                <DropdownMenuContent align="start" className="w-workflow-node-context-menu-width p-0" side="right">
+                <DropdownMenuContent
+                    align="start"
+                    className="w-workflow-node-context-menu-width p-0"
+                    onCloseAutoFocus={(event) => event.preventDefault()}
+                    side="right"
+                >
                     {menuItems.map((menuItem) =>
                         menuItem.type === 'separator' ? (
                             <DropdownMenuSeparator className="m-0" key={menuItem.key} />
