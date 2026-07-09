@@ -1491,6 +1491,17 @@ export type AuditEventType = {
   principal?: Maybe<Scalars['String']['output']>;
 };
 
+export type AuthorityMappingInput = {
+  authority: Scalars['String']['input'];
+  externalGroup: Scalars['String']['input'];
+};
+
+export type AuthorityMappingType = {
+  __typename?: 'AuthorityMappingType';
+  authority: Scalars['String']['output'];
+  externalGroup: Scalars['String']['output'];
+};
+
 export type Authorization = {
   __typename?: 'Authorization';
   description?: Maybe<Scalars['String']['output']>;
@@ -2348,6 +2359,14 @@ export type DataTableSearchResult = SearchResult & {
   type: SearchAssetType;
 };
 
+export type DataTableStorageUsage = {
+  __typename?: 'DataTableStorageUsage';
+  limitBytes: Scalars['Long']['output'];
+  percentage: Scalars['Float']['output'];
+  unlimited: Scalars['Boolean']['output'];
+  usedBytes: Scalars['Long']['output'];
+};
+
 export type DataTableTagsEntry = {
   __typename?: 'DataTableTagsEntry';
   tableId: Scalars['ID']['output'];
@@ -2649,19 +2668,6 @@ export type GeneratePropertyValuePayload = {
   value: Scalars['String']['output'];
 };
 
-export type GenerateSampleOutputInput = {
-  environmentId: Scalars['Int']['input'];
-  prompt: Scalars['String']['input'];
-  workflowId: Scalars['ID']['input'];
-};
-
-export type GenerateSampleOutputPayload = {
-  __typename?: 'GenerateSampleOutputPayload';
-  message?: Maybe<Scalars['String']['output']>;
-  valid: Scalars['Boolean']['output'];
-  value: Scalars['String']['output'];
-};
-
 export type GenerateSpecificationInput = {
   baseUrl?: InputMaybe<Scalars['String']['input']>;
   endpoints: Array<EndpointDefinitionInput>;
@@ -2715,6 +2721,8 @@ export enum HttpMethod {
 }
 
 export type IdentityProviderInput = {
+  authoritiesClaim?: InputMaybe<Scalars['String']['input']>;
+  authorityMappings?: InputMaybe<Array<AuthorityMappingInput>>;
   autoProvision?: InputMaybe<Scalars['Boolean']['input']>;
   clientId?: InputMaybe<Scalars['String']['input']>;
   clientSecret?: InputMaybe<Scalars['String']['input']>;
@@ -2723,6 +2731,9 @@ export type IdentityProviderInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
   enforced?: InputMaybe<Scalars['Boolean']['input']>;
   issuerUri?: InputMaybe<Scalars['String']['input']>;
+  mcpAutomation?: InputMaybe<Scalars['Boolean']['input']>;
+  mcpEmbedded?: InputMaybe<Scalars['Boolean']['input']>;
+  mcpManagement?: InputMaybe<Scalars['Boolean']['input']>;
   metadataUri?: InputMaybe<Scalars['String']['input']>;
   mfaMethod?: InputMaybe<Scalars['String']['input']>;
   mfaRequired?: InputMaybe<Scalars['Boolean']['input']>;
@@ -2731,10 +2742,13 @@ export type IdentityProviderInput = {
   scopes?: InputMaybe<Scalars['String']['input']>;
   signingCertificate?: InputMaybe<Scalars['String']['input']>;
   type?: InputMaybe<Scalars['String']['input']>;
+  validateMcpAudience?: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type IdentityProviderType = {
   __typename?: 'IdentityProviderType';
+  authoritiesClaim?: Maybe<Scalars['String']['output']>;
+  authorityMappings: Array<AuthorityMappingType>;
   autoProvision: Scalars['Boolean']['output'];
   clientId?: Maybe<Scalars['String']['output']>;
   createdBy?: Maybe<Scalars['String']['output']>;
@@ -2747,6 +2761,9 @@ export type IdentityProviderType = {
   issuerUri?: Maybe<Scalars['String']['output']>;
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  mcpAutomation: Scalars['Boolean']['output'];
+  mcpEmbedded: Scalars['Boolean']['output'];
+  mcpManagement: Scalars['Boolean']['output'];
   metadataUri?: Maybe<Scalars['String']['output']>;
   mfaMethod?: Maybe<Scalars['String']['output']>;
   mfaRequired: Scalars['Boolean']['output'];
@@ -2755,6 +2772,7 @@ export type IdentityProviderType = {
   scopes?: Maybe<Scalars['String']['output']>;
   signingCertificate?: Maybe<Scalars['String']['output']>;
   type: Scalars['String']['output'];
+  validateMcpAudience: Scalars['Boolean']['output'];
 };
 
 export type ImportCsvInput = {
@@ -2957,6 +2975,14 @@ export enum KnowledgeBaseSourceStatus {
   Ready = 'READY'
 }
 
+export type KnowledgeBaseStorageUsage = {
+  __typename?: 'KnowledgeBaseStorageUsage';
+  limitBytes: Scalars['Long']['output'];
+  percentage: Scalars['Float']['output'];
+  unlimited: Scalars['Boolean']['output'];
+  usedBytes: Scalars['Long']['output'];
+};
+
 export type KnowledgeBaseTagsEntry = {
   __typename?: 'KnowledgeBaseTagsEntry';
   knowledgeBaseId: Scalars['ID']['output'];
@@ -3030,6 +3056,7 @@ export type McpComponent = {
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
   mcpServerId: Scalars['ID']['output'];
   mcpTools?: Maybe<Array<Maybe<McpTool>>>;
+  requiredAuthorities: Array<Scalars['String']['output']>;
   title?: Maybe<Scalars['String']['output']>;
   version?: Maybe<Scalars['Int']['output']>;
 };
@@ -3046,6 +3073,7 @@ export type McpComponentWithToolsInput = {
   componentVersion: Scalars['Int']['input'];
   connectionId?: InputMaybe<Scalars['ID']['input']>;
   mcpServerId: Scalars['ID']['input'];
+  requiredAuthorities?: InputMaybe<Array<Scalars['String']['input']>>;
   tools: Array<McpToolInputForComponent>;
   version?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -3138,6 +3166,7 @@ export type McpServer = {
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
   enabled: Scalars['Boolean']['output'];
+  enforceToolAuthorization: Scalars['Boolean']['output'];
   environmentId: Scalars['ID']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
@@ -3169,6 +3198,7 @@ export enum McpServerOrderBy {
 
 export type McpServerUpdateInput = {
   enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  enforceToolAuthorization?: InputMaybe<Scalars['Boolean']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -3176,6 +3206,7 @@ export type McpTool = {
   __typename?: 'McpTool';
   createdBy?: Maybe<Scalars['String']['output']>;
   createdDate?: Maybe<Scalars['Long']['output']>;
+  enabled: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
@@ -3425,6 +3456,7 @@ export type Mutation = {
   deleteMcpTool?: Maybe<Scalars['Boolean']['output']>;
   /** Delete an organization connection. Fails if the connection is not ORGANIZATION-scoped. (admin only, EE only) */
   deleteOrganizationConnection: Scalars['Boolean']['output'];
+  deleteRegisteredClient: Scalars['Boolean']['output'];
   deleteSharedProject: Scalars['Boolean']['output'];
   deleteSharedWorkflow: Scalars['Boolean']['output'];
   deleteUser: Scalars['Boolean']['output'];
@@ -3461,7 +3493,6 @@ export type Mutation = {
   generateAiHubTaskTitle: AiHubTask;
   generateFromDocumentation: ApiConnector;
   generatePropertyValue: GeneratePropertyValuePayload;
-  generateSampleOutput: GenerateSampleOutputPayload;
   generateSpecification: GenerateSpecificationResponse;
   generateWorkflowDescription: GenerateWorkflowDescriptionPayload;
   importDataTableCsv: Scalars['Boolean']['output'];
@@ -3652,6 +3683,7 @@ export type Mutation = {
   updateMcpServerTags?: Maybe<Array<Maybe<Tag>>>;
   updateMcpServerUrl: Scalars['String']['output'];
   updateMcpTool?: Maybe<McpTool>;
+  updateMcpToolEnabled?: Maybe<McpTool>;
   /** Update an organization connection's name and tags. (admin only, EE only) */
   updateOrganizationConnection: Scalars['Boolean']['output'];
   updateUser: AdminUser;
@@ -4354,6 +4386,11 @@ export type MutationDeleteOrganizationConnectionArgs = {
 };
 
 
+export type MutationDeleteRegisteredClientArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteSharedProjectArgs = {
   id: Scalars['ID']['input'];
 };
@@ -4490,11 +4527,6 @@ export type MutationGenerateFromDocumentationArgs = {
 
 export type MutationGeneratePropertyValueArgs = {
   input: GeneratePropertyValueInput;
-};
-
-
-export type MutationGenerateSampleOutputArgs = {
-  input: GenerateSampleOutputInput;
 };
 
 
@@ -5226,6 +5258,12 @@ export type MutationUpdateMcpToolArgs = {
 };
 
 
+export type MutationUpdateMcpToolEnabledArgs = {
+  enabled: Scalars['Boolean']['input'];
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateOrganizationConnectionArgs = {
   connectionId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
@@ -5801,6 +5839,7 @@ export type Query = {
   dataStreamCompatibleConnections: Array<DataStreamCompatibleConnection>;
   dataTableRows: Array<DataTableRow>;
   dataTableRowsPage: DataTableRowPage;
+  dataTableStorageUsage: DataTableStorageUsage;
   dataTableTags: Array<Tag>;
   dataTableTagsByTable: Array<DataTableTagsEntry>;
   dataTableWebhooks: Array<DataTableWebhook>;
@@ -5831,6 +5870,7 @@ export type Query = {
   knowledgeBaseEmbeddingActive: Scalars['Boolean']['output'];
   knowledgeBaseSource?: Maybe<KnowledgeBaseSource>;
   knowledgeBaseSources: Array<KnowledgeBaseSource>;
+  knowledgeBaseStorageUsage: KnowledgeBaseStorageUsage;
   knowledgeBaseTags?: Maybe<Array<Tag>>;
   knowledgeBaseTagsByKnowledgeBase?: Maybe<Array<KnowledgeBaseTagsEntry>>;
   knowledgeBases?: Maybe<Array<Maybe<KnowledgeBase>>>;
@@ -5871,6 +5911,7 @@ export type Query = {
   projectDeploymentWorkflow?: Maybe<ProjectDeploymentWorkflow>;
   projectTemplate?: Maybe<ProjectTemplate>;
   projects?: Maybe<Array<Maybe<Project>>>;
+  registeredClients?: Maybe<Array<Maybe<RegisteredClient>>>;
   searchKnowledgeBase?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   sharedProject?: Maybe<SharedProject>;
   sharedWorkflow?: Maybe<SharedWorkflow>;
@@ -7066,6 +7107,17 @@ export type RegisterExistingConnectionInput = {
   environmentId: Scalars['ID']['input'];
   name: Scalars['String']['input'];
   workspaceId: Scalars['ID']['input'];
+};
+
+export type RegisteredClient = {
+  __typename?: 'RegisteredClient';
+  authorizationGrantTypes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  clientId?: Maybe<Scalars['String']['output']>;
+  clientIdIssuedAt?: Maybe<Scalars['Long']['output']>;
+  clientName?: Maybe<Scalars['String']['output']>;
+  id?: Maybe<Scalars['ID']['output']>;
+  redirectUris?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
+  scopes?: Maybe<Array<Maybe<Scalars['String']['output']>>>;
 };
 
 export type RemoveColumnInput = {

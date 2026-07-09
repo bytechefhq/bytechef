@@ -1991,7 +1991,7 @@ export type UpdateMcpServerMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMcpServerMutation = { updateMcpServer: { id: string, name: string, enabled: boolean } | null };
+export type UpdateMcpServerMutation = { updateMcpServer: { id: string, name: string, enabled: boolean, enforceToolAuthorization: boolean } | null };
 
 export type UpdateMcpServerTagsMutationVariables = Exact<{
   id: string | number;
@@ -2071,7 +2071,7 @@ export type WorkspaceMcpServersQueryVariables = Exact<{
 }>;
 
 
-export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+export type WorkspaceMcpServersQuery = { workspaceMcpServers: Array<{ id: string, name: string, type: Types.PlatformType, environmentId: string, enabled: boolean, enforceToolAuthorization: boolean, url: string, lastModifiedDate: any, mcpComponents: Array<{ id: string, mcpServerId: string, componentName: string, componentVersion: number, title: string | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type WorkspaceUsersQueryVariables = Exact<{
   workspaceId: string | number;
@@ -2214,6 +2214,11 @@ export type DataTableRowsPageQueryVariables = Exact<{
 
 
 export type DataTableRowsPageQuery = { dataTableRowsPage: { hasMore: boolean, nextOffset: number | null, items: Array<{ id: string, values: any }> } };
+
+export type DataTableStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type DataTableStorageUsageQuery = { dataTableStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
 
 export type DataTableTagsQueryVariables = Exact<{
   workspaceId: string | number;
@@ -2403,6 +2408,11 @@ export type KnowledgeBaseSourcesQueryVariables = Exact<{
 
 
 export type KnowledgeBaseSourcesQuery = { knowledgeBaseSources: Array<{ id: string, name: string, knowledgeBaseId: string, sourceComponentName: string, sourceComponentVersion: number, sourceClusterElementName: string | null, connectionId: string | null, cadence: string, status: Types.KnowledgeBaseSourceStatus, enabled: boolean, lastSyncRunAt: any, lastSyncJobExecutionId: string | null, workflowId: string | null }> };
+
+export type KnowledgeBaseStorageUsageQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type KnowledgeBaseStorageUsageQuery = { knowledgeBaseStorageUsage: { limitBytes: any, percentage: number, unlimited: boolean, usedBytes: any } };
 
 export type KnowledgeBaseTagsQueryVariables = Exact<{
   workspaceId: string | number;
@@ -2683,7 +2693,7 @@ export type EmbeddedMcpServerTagsQuery = { embeddedMcpServerTags: Array<{ id: st
 export type EmbeddedMcpServersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type EmbeddedMcpServersQuery = { embeddedMcpServers: Array<{ id: string, enabled: boolean, environmentId: string, lastModifiedDate: any, name: string, type: Types.PlatformType, url: string, mcpComponents: Array<{ componentName: string, componentVersion: number, connectionId: string | null, id: string, lastModifiedDate: any, mcpServerId: string, title: string | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, title: string | null, parameters: any } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
+export type EmbeddedMcpServersQuery = { embeddedMcpServers: Array<{ id: string, enabled: boolean, enforceToolAuthorization: boolean, environmentId: string, lastModifiedDate: any, name: string, type: Types.PlatformType, url: string, mcpComponents: Array<{ componentName: string, componentVersion: number, connectionId: string | null, id: string, lastModifiedDate: any, mcpServerId: string, title: string | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, title: string | null, parameters: any } | null> | null } | null> | null, tags: Array<{ id: string, name: string } | null> | null } | null> | null };
 
 export type EnableConnectedUserMcpServerMutationVariables = Exact<{
   connectedUserId: string | number;
@@ -3044,6 +3054,16 @@ export type ClusterElementFieldsQueryVariables = Exact<{
 
 export type ClusterElementFieldsQuery = { clusterElementFields: Array<{ name: string, label: string | null, type: string | null }> };
 
+export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+}>;
+
+
+export type ClusterElementMissingRequiredPropertiesQuery = { clusterElementMissingRequiredProperties: Array<string> };
+
 export type ClusterElementDynamicPropertiesQueryVariables = Exact<{
   componentName: string;
   componentVersion: number;
@@ -3148,7 +3168,7 @@ export type CreateMcpComponentWithToolsMutationVariables = Exact<{
 }>;
 
 
-export type CreateMcpComponentWithToolsMutation = { createMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type CreateMcpComponentWithToolsMutation = { createMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, requiredAuthorities: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type CreateMcpToolMutationVariables = Exact<{
   input: Types.McpToolInput;
@@ -3198,14 +3218,14 @@ export type McpComponentsByServerIdQueryVariables = Exact<{
 }>;
 
 
-export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, version: number | null, mcpTools: Array<{ id: string, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
+export type McpComponentsByServerIdQuery = { mcpComponentsByServerId: Array<{ id: string, componentName: string, componentVersion: number, title: string | null, connectionId: string | null, lastModifiedDate: any, mcpServerId: string, requiredAuthorities: Array<string>, version: number | null, mcpTools: Array<{ id: string, enabled: boolean, mcpComponentId: string, name: string, parameters: any, title: string | null, version: number | null } | null> | null } | null> | null };
 
 export type McpToolsByComponentIdQueryVariables = Exact<{
   mcpComponentId: string | number;
 }>;
 
 
-export type McpToolsByComponentIdQuery = { mcpToolsByComponentId: Array<{ id: string, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
+export type McpToolsByComponentIdQuery = { mcpToolsByComponentId: Array<{ id: string, enabled: boolean, name: string, title: string | null, mcpComponentId: string, parameters: any, version: number | null } | null> | null };
 
 export type SaveClusterElementTestConfigurationConnectionMutationVariables = Exact<{
   workflowId: string;
@@ -3284,7 +3304,7 @@ export type UpdateMcpComponentWithToolsMutationVariables = Exact<{
 }>;
 
 
-export type UpdateMcpComponentWithToolsMutation = { updateMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
+export type UpdateMcpComponentWithToolsMutation = { updateMcpComponentWithTools: { id: string, componentName: string, componentVersion: number, title: string | null, mcpServerId: string, connectionId: string | null, requiredAuthorities: Array<string>, createdBy: string | null, createdDate: any, lastModifiedBy: string | null, lastModifiedDate: any, version: number | null } | null };
 
 export type UpdateMcpServerUrlMutationVariables = Exact<{
   id: string | number;
@@ -3301,6 +3321,14 @@ export type UpdateMcpToolMutationVariables = Exact<{
 
 export type UpdateMcpToolMutation = { updateMcpTool: { id: string, name: string, mcpComponentId: string, parameters: any, version: number | null } | null };
 
+export type UpdateMcpToolEnabledMutationVariables = Exact<{
+  id: string | number;
+  enabled: boolean;
+}>;
+
+
+export type UpdateMcpToolEnabledMutation = { updateMcpToolEnabled: { id: string, enabled: boolean } | null };
+
 export type ValidateWorkflowQueryVariables = Exact<{
   workflowDefinition: string;
 }>;
@@ -3315,24 +3343,6 @@ export type ValidateWorkflowByIdQueryVariables = Exact<{
 
 export type ValidateWorkflowByIdQuery = { validateWorkflowById: { errors: Array<string>, warnings: Array<string> } };
 
-export type WorkflowNodeMissingRequiredPropertiesQueryVariables = Exact<{
-  workflowId: string;
-  workflowNodeName: string;
-}>;
-
-
-export type WorkflowNodeMissingRequiredPropertiesQuery = { workflowNodeMissingRequiredProperties: Array<string> };
-
-export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
-  workflowId: string;
-  workflowNodeName: string;
-  clusterElementType: string;
-  clusterElementWorkflowNodeName: string;
-}>;
-
-
-export type ClusterElementMissingRequiredPropertiesQuery = { clusterElementMissingRequiredProperties: Array<string> };
-
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
   workflowId: string;
   workflowNodeName: string;
@@ -3340,6 +3350,14 @@ export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
 
 
 export type WorkflowNodeComponentConnectionsQuery = { workflowNodeComponentConnections: Array<{ componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
+
+export type WorkflowNodeMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+}>;
+
+
+export type WorkflowNodeMissingRequiredPropertiesQuery = { workflowNodeMissingRequiredProperties: Array<string> };
 
 export type WorkflowNodeScriptInputQueryVariables = Exact<{
   workflowId: string;
@@ -3368,13 +3386,6 @@ export type GeneratePropertyValueMutationVariables = Exact<{
 
 
 export type GeneratePropertyValueMutation = { generatePropertyValue: { value: string, valid: boolean, message: string | null } };
-
-export type GenerateSampleOutputMutationVariables = Exact<{
-  input: Types.GenerateSampleOutputInput;
-}>;
-
-
-export type GenerateSampleOutputMutation = { generateSampleOutput: { value: string, valid: boolean, message: string | null } };
 
 export type GenerateWorkflowDescriptionMutationVariables = Exact<{
   input: Types.GenerateWorkflowDescriptionInput;
@@ -3434,6 +3445,18 @@ export type UploadLicenceMutationVariables = Exact<{
 
 export type UploadLicenceMutation = { uploadLicence: { allowedJobs: any, currentMonthJobUsage: any, expiresAt: string | null, features: Array<string>, holderEmail: string | null, holderName: string | null, id: string | null, issuedAt: string | null, maxUsers: number | null, status: string } };
 
+export type DeleteRegisteredClientMutationVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type DeleteRegisteredClientMutation = { deleteRegisteredClient: boolean };
+
+export type RegisteredClientsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type RegisteredClientsQuery = { registeredClients: Array<{ id: string | null, clientId: string | null, clientName: string | null, clientIdIssuedAt: any, scopes: Array<string | null> | null, authorizationGrantTypes: Array<string | null> | null, redirectUris: Array<string | null> | null } | null> | null };
+
 export type AuthoritiesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -3444,7 +3467,7 @@ export type CreateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type CreateIdentityProviderMutation = { createIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type CreateIdentityProviderMutation = { createIdentityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } };
 
 export type DeleteIdentityProviderMutationVariables = Exact<{
   id: string | number;
@@ -3465,12 +3488,12 @@ export type IdentityProviderQueryVariables = Exact<{
 }>;
 
 
-export type IdentityProviderQuery = { identityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null };
+export type IdentityProviderQuery = { identityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } | null };
 
 export type IdentityProvidersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type IdentityProvidersQuery = { identityProviders: Array<{ autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } | null> };
+export type IdentityProvidersQuery = { identityProviders: Array<{ authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } | null> };
 
 export type InviteUserMutationVariables = Exact<{
   email: string;
@@ -3487,7 +3510,7 @@ export type UpdateIdentityProviderMutationVariables = Exact<{
 }>;
 
 
-export type UpdateIdentityProviderMutation = { updateIdentityProvider: { autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string } };
+export type UpdateIdentityProviderMutation = { updateIdentityProvider: { authoritiesClaim: string | null, autoProvision: boolean, clientId: string | null, createdBy: string | null, createdDate: any, defaultAuthority: string, domains: Array<string>, enabled: boolean, enforced: boolean, id: string, issuerUri: string | null, lastModifiedBy: string | null, lastModifiedDate: any, mcpEmbedded: boolean, mcpAutomation: boolean, mcpManagement: boolean, metadataUri: string | null, mfaMethod: string | null, mfaRequired: boolean, name: string, nameIdFormat: string | null, scopes: string | null, signingCertificate: string | null, type: string, validateMcpAudience: boolean, authorityMappings: Array<{ authority: string, externalGroup: string }> } };
 
 export type UpdateUserMutationVariables = Exact<{
   login: string;
@@ -10932,6 +10955,7 @@ export const UpdateMcpServerDocument = new TypedDocumentString(`
     id
     name
     enabled
+    enforceToolAuthorization
   }
 }
     `);
@@ -11197,6 +11221,7 @@ export const WorkspaceMcpServersDocument = new TypedDocumentString(`
     type
     environmentId
     enabled
+    enforceToolAuthorization
     url
     mcpComponents {
       id
@@ -11714,6 +11739,33 @@ export const useDataTableRowsPageQuery = <
   }
     )};
 
+export const DataTableStorageUsageDocument = new TypedDocumentString(`
+    query DataTableStorageUsage {
+  dataTableStorageUsage {
+    limitBytes
+    percentage
+    unlimited
+    usedBytes
+  }
+}
+    `);
+
+export const useDataTableStorageUsageQuery = <
+      TData = DataTableStorageUsageQuery,
+      TError = unknown
+    >(
+      variables?: DataTableStorageUsageQueryVariables,
+      options?: Omit<UseQueryOptions<DataTableStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableStorageUsageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<DataTableStorageUsageQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['DataTableStorageUsage'] : ['DataTableStorageUsage', variables],
+    queryFn: fetcher<DataTableStorageUsageQuery, DataTableStorageUsageQueryVariables>(DataTableStorageUsageDocument, variables),
+    ...options
+  }
+    )};
+
 export const DataTableTagsDocument = new TypedDocumentString(`
     query dataTableTags($workspaceId: ID!) {
   dataTableTags(workspaceId: $workspaceId) {
@@ -11730,7 +11782,7 @@ export const useDataTableTagsQuery = <
       variables: DataTableTagsQueryVariables,
       options?: Omit<UseQueryOptions<DataTableTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<DataTableTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<DataTableTagsQuery, TError, TData>(
       {
     queryKey: ['dataTableTags', variables],
@@ -12367,6 +12419,33 @@ export const useKnowledgeBaseSourcesQuery = <
   }
     )};
 
+export const KnowledgeBaseStorageUsageDocument = new TypedDocumentString(`
+    query KnowledgeBaseStorageUsage {
+  knowledgeBaseStorageUsage {
+    limitBytes
+    percentage
+    unlimited
+    usedBytes
+  }
+}
+    `);
+
+export const useKnowledgeBaseStorageUsageQuery = <
+      TData = KnowledgeBaseStorageUsageQuery,
+      TError = unknown
+    >(
+      variables?: KnowledgeBaseStorageUsageQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseStorageUsageQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseStorageUsageQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['KnowledgeBaseStorageUsage'] : ['KnowledgeBaseStorageUsage', variables],
+    queryFn: fetcher<KnowledgeBaseStorageUsageQuery, KnowledgeBaseStorageUsageQueryVariables>(KnowledgeBaseStorageUsageDocument, variables),
+    ...options
+  }
+    )};
+
 export const KnowledgeBaseTagsDocument = new TypedDocumentString(`
     query knowledgeBaseTags($workspaceId: ID!) {
   knowledgeBaseTags(workspaceId: $workspaceId) {
@@ -12383,7 +12462,7 @@ export const useKnowledgeBaseTagsQuery = <
       variables: KnowledgeBaseTagsQueryVariables,
       options?: Omit<UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseTagsQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<KnowledgeBaseTagsQuery, TError, TData>(
       {
     queryKey: ['knowledgeBaseTags', variables],
@@ -13283,6 +13362,7 @@ export const EmbeddedMcpServersDocument = new TypedDocumentString(`
   embeddedMcpServers {
     id
     enabled
+    enforceToolAuthorization
     environmentId
     lastModifiedDate
     mcpComponents {
@@ -13295,6 +13375,7 @@ export const EmbeddedMcpServersDocument = new TypedDocumentString(`
       title
       mcpTools {
         id
+        enabled
         mcpComponentId
         name
         title
@@ -14894,6 +14975,33 @@ export const useClusterElementFieldsQuery = <
   }
     )};
 
+export const ClusterElementMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query ClusterElementMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
+  clusterElementMissingRequiredProperties(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+  )
+}
+    `);
+
+export const useClusterElementMissingRequiredPropertiesQuery = <
+      TData = ClusterElementMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['ClusterElementMissingRequiredProperties', variables],
+    queryFn: fetcher<ClusterElementMissingRequiredPropertiesQuery, ClusterElementMissingRequiredPropertiesQueryVariables>(ClusterElementMissingRequiredPropertiesDocument, variables),
+    ...options
+  }
+    )};
+
 export const ClusterElementDynamicPropertiesDocument = new TypedDocumentString(`
     query clusterElementDynamicProperties($componentName: String!, $componentVersion: Int!, $clusterElementName: String!, $propertyName: String!, $connectionId: Long, $inputParameters: Map, $lookupDependsOnPaths: [String!]) {
   clusterElementDynamicProperties(
@@ -15363,6 +15471,7 @@ export const CreateMcpComponentWithToolsDocument = new TypedDocumentString(`
     title
     mcpServerId
     connectionId
+    requiredAuthorities
     createdBy
     createdDate
     lastModifiedBy
@@ -15560,12 +15669,14 @@ export const McpComponentsByServerIdDocument = new TypedDocumentString(`
     mcpServerId
     mcpTools {
       id
+      enabled
       mcpComponentId
       name
       parameters
       title
       version
     }
+    requiredAuthorities
     version
   }
 }
@@ -15591,6 +15702,7 @@ export const McpToolsByComponentIdDocument = new TypedDocumentString(`
     query mcpToolsByComponentId($mcpComponentId: ID!) {
   mcpToolsByComponentId(mcpComponentId: $mcpComponentId) {
     id
+    enabled
     name
     title
     mcpComponentId
@@ -15807,6 +15919,7 @@ export const UpdateMcpComponentWithToolsDocument = new TypedDocumentString(`
     title
     mcpServerId
     connectionId
+    requiredAuthorities
     createdBy
     createdDate
     lastModifiedBy
@@ -15873,6 +15986,28 @@ export const useUpdateMcpToolMutation = <
   }
     )};
 
+export const UpdateMcpToolEnabledDocument = new TypedDocumentString(`
+    mutation updateMcpToolEnabled($id: ID!, $enabled: Boolean!) {
+  updateMcpToolEnabled(id: $id, enabled: $enabled) {
+    id
+    enabled
+  }
+}
+    `);
+
+export const useUpdateMcpToolEnabledMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>) => {
+    
+    return useMutation<UpdateMcpToolEnabledMutation, TError, UpdateMcpToolEnabledMutationVariables, TContext>(
+      {
+    mutationKey: ['updateMcpToolEnabled'],
+    mutationFn: (variables?: UpdateMcpToolEnabledMutationVariables) => fetcher<UpdateMcpToolEnabledMutation, UpdateMcpToolEnabledMutationVariables>(UpdateMcpToolEnabledDocument, variables)(),
+    ...options
+  }
+    )};
+
 export const ValidateWorkflowDocument = new TypedDocumentString(`
     query ValidateWorkflow($workflowDefinition: String!) {
   validateWorkflow(workflow: $workflowDefinition) {
@@ -15923,55 +16058,6 @@ export const useValidateWorkflowByIdQuery = <
   }
     )};
 
-export const WorkflowNodeMissingRequiredPropertiesDocument = new TypedDocumentString(`
-    query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
-  workflowNodeMissingRequiredProperties(workflowId: $workflowId, workflowNodeName: $workflowNodeName)
-}
-    `);
-
-export const useWorkflowNodeMissingRequiredPropertiesQuery = <
-      TData = WorkflowNodeMissingRequiredPropertiesQuery,
-      TError = unknown
-    >(
-      variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
-    ) => {
-
-    return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
-      {
-    queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
-    queryFn: fetcher<WorkflowNodeMissingRequiredPropertiesQuery, WorkflowNodeMissingRequiredPropertiesQueryVariables>(WorkflowNodeMissingRequiredPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
-export const ClusterElementMissingRequiredPropertiesDocument = new TypedDocumentString(`
-    query ClusterElementMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
-  clusterElementMissingRequiredProperties(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-  )
-}
-    `);
-
-export const useClusterElementMissingRequiredPropertiesQuery = <
-      TData = ClusterElementMissingRequiredPropertiesQuery,
-      TError = unknown
-    >(
-      variables: ClusterElementMissingRequiredPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
-    ) => {
-
-    return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
-      {
-    queryKey: ['ClusterElementMissingRequiredProperties', variables],
-    queryFn: fetcher<ClusterElementMissingRequiredPropertiesQuery, ClusterElementMissingRequiredPropertiesQueryVariables>(ClusterElementMissingRequiredPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
 export const WorkflowNodeComponentConnectionsDocument = new TypedDocumentString(`
     query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
   workflowNodeComponentConnections(
@@ -15999,6 +16085,31 @@ export const useWorkflowNodeComponentConnectionsQuery = <
       {
     queryKey: ['workflowNodeComponentConnections', variables],
     queryFn: fetcher<WorkflowNodeComponentConnectionsQuery, WorkflowNodeComponentConnectionsQueryVariables>(WorkflowNodeComponentConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowNodeMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
+  workflowNodeMissingRequiredProperties(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+  )
+}
+    `);
+
+export const useWorkflowNodeMissingRequiredPropertiesQuery = <
+      TData = WorkflowNodeMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
+    queryFn: fetcher<WorkflowNodeMissingRequiredPropertiesQuery, WorkflowNodeMissingRequiredPropertiesQueryVariables>(WorkflowNodeMissingRequiredPropertiesDocument, variables),
     ...options
   }
     )};
@@ -16092,29 +16203,6 @@ export const useGeneratePropertyValueMutation = <
       {
     mutationKey: ['generatePropertyValue'],
     mutationFn: (variables?: GeneratePropertyValueMutationVariables) => fetcher<GeneratePropertyValueMutation, GeneratePropertyValueMutationVariables>(GeneratePropertyValueDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const GenerateSampleOutputDocument = new TypedDocumentString(`
-    mutation generateSampleOutput($input: GenerateSampleOutputInput!) {
-  generateSampleOutput(input: $input) {
-    value
-    valid
-    message
-  }
-}
-    `);
-
-export const useGenerateSampleOutputMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<GenerateSampleOutputMutation, TError, GenerateSampleOutputMutationVariables, TContext>) => {
-    
-    return useMutation<GenerateSampleOutputMutation, TError, GenerateSampleOutputMutationVariables, TContext>(
-      {
-    mutationKey: ['generateSampleOutput'],
-    mutationFn: (variables?: GenerateSampleOutputMutationVariables) => fetcher<GenerateSampleOutputMutation, GenerateSampleOutputMutationVariables>(GenerateSampleOutputDocument, variables)(),
     ...options
   }
     )};
@@ -16365,6 +16453,55 @@ export const useUploadLicenceMutation = <
   }
     )};
 
+export const DeleteRegisteredClientDocument = new TypedDocumentString(`
+    mutation deleteRegisteredClient($id: ID!) {
+  deleteRegisteredClient(id: $id)
+}
+    `);
+
+export const useDeleteRegisteredClientMutation = <
+      TError = unknown,
+      TContext = unknown
+    >(options?: UseMutationOptions<DeleteRegisteredClientMutation, TError, DeleteRegisteredClientMutationVariables, TContext>) => {
+    
+    return useMutation<DeleteRegisteredClientMutation, TError, DeleteRegisteredClientMutationVariables, TContext>(
+      {
+    mutationKey: ['deleteRegisteredClient'],
+    mutationFn: (variables?: DeleteRegisteredClientMutationVariables) => fetcher<DeleteRegisteredClientMutation, DeleteRegisteredClientMutationVariables>(DeleteRegisteredClientDocument, variables)(),
+    ...options
+  }
+    )};
+
+export const RegisteredClientsDocument = new TypedDocumentString(`
+    query registeredClients {
+  registeredClients {
+    id
+    clientId
+    clientName
+    clientIdIssuedAt
+    scopes
+    authorizationGrantTypes
+    redirectUris
+  }
+}
+    `);
+
+export const useRegisteredClientsQuery = <
+      TData = RegisteredClientsQuery,
+      TError = unknown
+    >(
+      variables?: RegisteredClientsQueryVariables,
+      options?: Omit<UseQueryOptions<RegisteredClientsQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<RegisteredClientsQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<RegisteredClientsQuery, TError, TData>(
+      {
+    queryKey: variables === undefined ? ['registeredClients'] : ['registeredClients', variables],
+    queryFn: fetcher<RegisteredClientsQuery, RegisteredClientsQueryVariables>(RegisteredClientsDocument, variables),
+    ...options
+  }
+    )};
+
 export const AuthoritiesDocument = new TypedDocumentString(`
     query authorities {
   authorities
@@ -16390,6 +16527,11 @@ export const useAuthoritiesQuery = <
 export const CreateIdentityProviderDocument = new TypedDocumentString(`
     mutation createIdentityProvider($input: IdentityProviderInput!) {
   createIdentityProvider(input: $input) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -16402,6 +16544,9 @@ export const CreateIdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -16410,6 +16555,7 @@ export const CreateIdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -16468,6 +16614,11 @@ export const useDeleteUserMutation = <
 export const IdentityProviderDocument = new TypedDocumentString(`
     query identityProvider($id: ID!) {
   identityProvider(id: $id) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -16480,6 +16631,9 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -16488,6 +16642,7 @@ export const IdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -16511,6 +16666,11 @@ export const useIdentityProviderQuery = <
 export const IdentityProvidersDocument = new TypedDocumentString(`
     query identityProviders {
   identityProviders {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -16523,6 +16683,9 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -16531,6 +16694,7 @@ export const IdentityProvidersDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
@@ -16573,6 +16737,11 @@ export const useInviteUserMutation = <
 export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     mutation updateIdentityProvider($id: ID!, $input: IdentityProviderInput!) {
   updateIdentityProvider(id: $id, input: $input) {
+    authoritiesClaim
+    authorityMappings {
+      authority
+      externalGroup
+    }
     autoProvision
     clientId
     createdBy
@@ -16585,6 +16754,9 @@ export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     issuerUri
     lastModifiedBy
     lastModifiedDate
+    mcpEmbedded
+    mcpAutomation
+    mcpManagement
     metadataUri
     mfaMethod
     mfaRequired
@@ -16593,6 +16765,7 @@ export const UpdateIdentityProviderDocument = new TypedDocumentString(`
     scopes
     signingCertificate
     type
+    validateMcpAudience
   }
 }
     `);
