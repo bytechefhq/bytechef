@@ -22,7 +22,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.billing.client.StripeClientServiceImpl;
+import com.bytechef.platform.billing.client.StripeClientImpl;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
@@ -74,7 +74,7 @@ class BillingCheckoutFacadeImplTest {
 
         facade = new BillingCheckoutFacadeImpl(
             billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
-            new ObjectMapper(), new StripeClientServiceImpl(billingProperties));
+            new ObjectMapper(), new StripeClientImpl(billingProperties));
     }
 
     @Test

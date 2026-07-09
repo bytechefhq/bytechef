@@ -16,7 +16,7 @@
 
 package com.bytechef.platform.billing.facade;
 
-import com.bytechef.platform.billing.client.StripeClientService;
+import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
@@ -50,7 +50,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
     private final BillingUsageService billingUsageService;
     private final BillingWebhookEventService billingWebhookEventService;
     private final ObjectMapper objectMapper;
-    private final StripeClientService stripeClientService;
+    private final StripeClient stripeClient;
 
     public BillingCheckoutFacadeImpl(
         BillingProperties billingProperties,
@@ -58,14 +58,14 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
         BillingUsageService billingUsageService,
         BillingWebhookEventService billingWebhookEventService,
         ObjectMapper objectMapper,
-        StripeClientService stripeClientService) {
+        StripeClient stripeClient) {
 
         this.billingProperties = billingProperties;
         this.billingSubscriptionService = billingSubscriptionService;
         this.billingUsageService = billingUsageService;
         this.billingWebhookEventService = billingWebhookEventService;
         this.objectMapper = objectMapper;
-        this.stripeClientService = stripeClientService;
+        this.stripeClient = stripeClient;
     }
 
     @Override
@@ -73,15 +73,15 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
-        stripeClientService.cancelAtPeriodEnd(
+        stripeClient.cancelAtPeriodEnd(
             subscription.getStripeSubscriptionId(), TenantContext.getCurrentTenantId());
     }
 
     @Override
     public String createCheckoutSession(String planName) {
         String flatProductId = resolveFlatProductId(planName);
-        String flatPriceId = stripeClientService.fetchProductDefaultPriceId(flatProductId);
-        String usagePriceId = stripeClientService.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
+        String flatPriceId = stripeClient.fetchProductDefaultPriceId(flatProductId);
+        String usagePriceId = stripeClient.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
 
         String customerId = billingSubscriptionService.fetchExistingStripeCustomerId()
             .orElseGet(() -> {
@@ -90,10 +90,10 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
                     .getAuthentication()
                     .getName();
 
-                return stripeClientService.createCustomer(userEmail, tenantId);
+                return stripeClient.createCustomer(userEmail, tenantId);
             });
 
-        Session session = stripeClientService.createCheckoutSession(
+        Session session = stripeClient.createCheckoutSession(
             customerId, flatPriceId, usagePriceId, planName, billingProperties.stripe().successUrl(),
             billingProperties.stripe().cancelUrl(), TenantContext.getCurrentTenantId());
 
@@ -102,7 +102,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
 
     @Override
     public void handleWebhookEvent(String payload, String stripeSignatureHeader) {
-        Event event = stripeClientService.verifyWebhookSignature(payload, stripeSignatureHeader);
+        Event event = stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
 
         TenantContext.runWithTenantId(extractTenantId(payload, event.getType()), () -> {
             if (billingWebhookEventService.isEventProcessed(event.getId())) {
@@ -137,7 +137,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
         BillingSubscription subscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
-        stripeClientService.reactivateSubscription(
+        stripeClient.reactivateSubscription(
             subscription.getStripeSubscriptionId(), TenantContext.getCurrentTenantId());
     }
 
@@ -148,23 +148,23 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
 
         String subscriptionId = currentSubscription.getStripeSubscriptionId();
 
-        Subscription stripeSubscription = stripeClientService.retrieveSubscription(subscriptionId);
+        Subscription stripeSubscription = stripeClient.retrieveSubscription(subscriptionId);
 
-        stripeClientService.releaseSubscriptionScheduleIfPresent(stripeSubscription);
+        stripeClient.releaseSubscriptionScheduleIfPresent(stripeSubscription);
 
-        String newFlatPriceId = stripeClientService.fetchProductDefaultPriceId(resolveFlatProductId(planName));
+        String newFlatPriceId = stripeClient.fetchProductDefaultPriceId(resolveFlatProductId(planName));
         String tenantId = TenantContext.getCurrentTenantId();
 
         if (isUpgrade(currentSubscription.getPlanName(), planName)) {
-            stripeClientService.upgradeSubscriptionNow(
+            stripeClient.upgradeSubscriptionNow(
                 subscriptionId, currentSubscription.getStripeProductId(), newFlatPriceId, planName, tenantId);
 
             currentSubscription.setScheduledPlanName(null);
         } else {
             String newMeteredPriceId =
-                stripeClientService.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
+                stripeClient.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
 
-            stripeClientService.scheduleDowngrade(
+            stripeClient.scheduleDowngrade(
                 subscriptionId, currentSubscription.getStripeProductId(),
                 currentSubscription.getStripeUsageProductId(), newFlatPriceId, newMeteredPriceId, planName,
                 tenantId, currentSubscription.getCurrentPeriodEnd()
@@ -331,7 +331,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize checkout session"));
 
-        Subscription stripeSubscription = stripeClientService.retrieveSubscription(session.getSubscription());
+        Subscription stripeSubscription = stripeClient.retrieveSubscription(session.getSubscription());
 
         List<SubscriptionItem> subscriptionItems = stripeSubscription.getItems()
             .getData();
@@ -368,7 +368,7 @@ public class BillingCheckoutFacadeImpl implements BillingCheckoutFacade {
     }
 
     private int getTaskLimit(SubscriptionItem usageItem) {
-        Price usagePrice = stripeClientService.retrievePrice(usageItem.getPrice().getId());
+        Price usagePrice = stripeClient.retrievePrice(usageItem.getPrice().getId());
 
         return usagePrice.getTiers().getFirst().getUpTo().intValue();
     }

@@ -24,7 +24,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.billing.client.StripeClientService;
+import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
 import java.time.Instant;
@@ -50,7 +50,7 @@ class BillingUsageServiceImplTest {
     private BillingSubscriptionService billingSubscriptionService;
 
     @Mock
-    private StripeClientService stripeClientService;
+    private StripeClient stripeClient;
 
     @Mock
     private TenantService tenantService;
@@ -60,7 +60,7 @@ class BillingUsageServiceImplTest {
     @BeforeEach
     void setUp() {
         billingUsageService = new BillingUsageServiceImpl(
-            billingSubscriptionRepository, billingSubscriptionService, stripeClientService, tenantService);
+            billingSubscriptionRepository, billingSubscriptionService, stripeClient, tenantService);
     }
 
     @Test
@@ -69,7 +69,7 @@ class BillingUsageServiceImplTest {
 
         billingUsageService.reportUsage(Instant.now());
 
-        verify(stripeClientService, never()).reportMeterEvent(anyString(), anyInt(), anyString());
+        verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
         verify(billingSubscriptionService, never()).save(any());
     }
 
@@ -84,7 +84,7 @@ class BillingUsageServiceImplTest {
 
         billingUsageService.reportUsage(scheduledFireTime);
 
-        verify(stripeClientService, never()).reportMeterEvent(anyString(), anyInt(), anyString());
+        verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
         verify(billingSubscriptionService).save(subscription);
     }
 
@@ -102,7 +102,7 @@ class BillingUsageServiceImplTest {
 
         billingUsageService.reportUsage(scheduledFireTime);
 
-        verify(stripeClientService).reportMeterEvent(
+        verify(stripeClient).reportMeterEvent(
             eq("cus_123"), eq(42), eq("sub_abc_" + scheduledFireTime.getEpochSecond()));
         verify(billingSubscriptionService).save(subscription);
     }
