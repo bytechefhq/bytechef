@@ -1,5 +1,6 @@
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
+import {environmentStore} from '@/shared/stores/useEnvironmentStore';
 import {getCookie} from '@/shared/util/cookie-utils';
 import {getRandomId} from '@/shared/util/random-utils';
 import {AgentSubscriber, HttpAgent} from '@ag-ui/client';
@@ -32,6 +33,7 @@ export const useConvertN8nToWorkflow = () => {
 
             agent.setState({
                 currentSelectedNode: currentComponent?.name,
+                environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
                 workflowId: workflow.id,
             });
 
