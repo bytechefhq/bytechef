@@ -30,6 +30,7 @@ import com.stripe.model.Price;
 import com.stripe.model.Subscription;
 import com.stripe.model.SubscriptionItem;
 import com.stripe.model.checkout.Session;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +53,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     private final ObjectMapper objectMapper;
     private final StripeClient stripeClient;
 
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
     public BillingSubscriptionFacadeImpl(
         BillingProperties billingProperties,
         BillingSubscriptionService billingSubscriptionService,
@@ -81,7 +83,8 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     public String createCheckoutSession(String planName) {
         String flatProductId = resolveFlatProductId(planName);
         String flatPriceId = stripeClient.fetchProductDefaultPriceId(flatProductId);
-        String usagePriceId = stripeClient.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
+        String usagePriceId = stripeClient.fetchProductDefaultPriceId(billingProperties.stripe()
+            .productUsageId());
 
         String customerId = billingSubscriptionService.fetchExistingStripeCustomerId()
             .orElseGet(() -> {
@@ -94,8 +97,11 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             });
 
         Session session = stripeClient.createCheckoutSession(
-            customerId, flatPriceId, usagePriceId, planName, billingProperties.stripe().successUrl(),
-            billingProperties.stripe().cancelUrl(), TenantContext.getCurrentTenantId());
+            customerId, flatPriceId, usagePriceId, planName, billingProperties.stripe()
+                .successUrl(),
+            billingProperties.stripe()
+                .cancelUrl(),
+            TenantContext.getCurrentTenantId());
 
         return session.getUrl();
     }
@@ -162,7 +168,8 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             currentSubscription.setScheduledPlanName(null);
         } else {
             String newMeteredPriceId =
-                stripeClient.fetchProductDefaultPriceId(billingProperties.stripe().productUsageId());
+                stripeClient.fetchProductDefaultPriceId(billingProperties.stripe()
+                    .productUsageId());
 
             stripeClient.scheduleDowngrade(
                 subscriptionId, currentSubscription.getStripeProductId(),
@@ -250,10 +257,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                             .getProduct();
                         String newPlanName = null;
 
-                        if (billingProperties.stripe().productStarterId()
+                        if (billingProperties.stripe()
+                            .productStarterId()
                             .equals(productId)) {
                             newPlanName = "STARTER";
-                        } else if (billingProperties.stripe().productGrowthId()
+                        } else if (billingProperties.stripe()
+                            .productGrowthId()
                             .equals(productId)) {
                             newPlanName = "GROWTH";
                         }
@@ -318,9 +327,11 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
     private String resolveFlatProductId(String planName) {
         if ("STARTER".equalsIgnoreCase(planName)) {
-            return billingProperties.stripe().productStarterId();
+            return billingProperties.stripe()
+                .productStarterId();
         } else if ("GROWTH".equalsIgnoreCase(planName)) {
-            return billingProperties.stripe().productGrowthId();
+            return billingProperties.stripe()
+                .productGrowthId();
         }
 
         throw new IllegalArgumentException("Unknown plan: " + planName);
@@ -368,8 +379,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     private int getTaskLimit(SubscriptionItem usageItem) {
-        Price usagePrice = stripeClient.retrievePrice(usageItem.getPrice().getId());
+        Price usagePrice = stripeClient.retrievePrice(usageItem.getPrice()
+            .getId());
 
-        return usagePrice.getTiers().getFirst().getUpTo().intValue();
+        return usagePrice.getTiers()
+            .getFirst()
+            .getUpTo()
+            .intValue();
     }
 }

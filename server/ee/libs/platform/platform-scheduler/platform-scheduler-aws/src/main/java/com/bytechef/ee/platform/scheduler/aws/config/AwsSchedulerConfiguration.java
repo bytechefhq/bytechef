@@ -103,7 +103,6 @@ public class AwsSchedulerConfiguration {
             .getTrigger()
             .getPolling();
 
-
         return new AwsTriggerScheduler(aws, polling, schedulerClient);
     }
 
