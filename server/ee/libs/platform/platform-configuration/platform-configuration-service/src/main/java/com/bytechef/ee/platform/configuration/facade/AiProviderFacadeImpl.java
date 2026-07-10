@@ -21,6 +21,7 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.configuration.domain.Property;
 import com.bytechef.platform.configuration.domain.Property.Scope;
 import com.bytechef.platform.configuration.service.PropertyService;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -28,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,6 +58,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void deleteAiProvider(int id, int environment) {
         Provider provider = getProvider(id);
 
@@ -140,6 +143,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(readOnly = true)
     public AiDefaultModelWithApiKeyDTO getAiDefaultChatModelApiKey(int environmentId) {
         return resolveWithApiKey(getAiDefaultChatModel(environmentId), environmentId);
@@ -187,6 +191,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     @Transactional(readOnly = true)
     public List<AiProviderDTO> getAiProviders(int environment) {
         List<ComponentDefinition> componentDefinitions = componentDefinitionService.getComponentDefinitions();
@@ -244,6 +249,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateAiProvider(int id, boolean enabled, int environment) {
         Provider provider = getProvider(id);
 
@@ -251,6 +257,7 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void updateAiProvider(int id, String apiKey, String url, int environment) {
         Provider provider = getProvider(id);
 

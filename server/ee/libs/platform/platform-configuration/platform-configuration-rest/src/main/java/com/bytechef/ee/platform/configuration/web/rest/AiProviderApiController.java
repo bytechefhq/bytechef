@@ -13,12 +13,10 @@ import com.bytechef.ee.platform.configuration.facade.AiProviderFacade;
 import com.bytechef.ee.platform.configuration.web.rest.model.AiProviderModel;
 import com.bytechef.ee.platform.configuration.web.rest.model.UpdateAiProviderRequestModel;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -43,7 +41,6 @@ public class AiProviderApiController implements AiProviderApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteAiProvider(Integer id, Integer environment) {
         aiProviderFacade.deleteAiProvider(id, environment);
 
@@ -52,7 +49,6 @@ public class AiProviderApiController implements AiProviderApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<List<AiProviderModel>> getAiProviders(Integer environment) {
         return ResponseEntity.ok(
             aiProviderFacade.getAiProviders(environment)
@@ -67,7 +63,6 @@ public class AiProviderApiController implements AiProviderApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> enableAiProvider(Integer id, Boolean enable, Integer environment) {
         aiProviderFacade.updateAiProvider(id, enable, environment);
 
@@ -76,7 +71,6 @@ public class AiProviderApiController implements AiProviderApi {
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> updateAiProvider(
         Integer id, Integer environment, UpdateAiProviderRequestModel updateAiProviderRequestModel) {
 
