@@ -323,8 +323,8 @@ Name: scrape
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | url | URL | STRING | The URL to scrape. | true |
 | formats | Formats | ARRAY <details> <summary> Items </summary> [STRING] </details> | Output formats to include in the response (e.g., markdown, html, json). | false |
-| formatsSchema | JSON Schema | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The schema to use for the JSON output. Must conform to JSON Schema. | false |
-| formatsPrompt | JSON Prompt | OBJECT <details> <summary> Properties </summary> &#123;&#125; </details> | The prompt to use for the JSON output | false |
+| formatsSchema | JSON Schema | STRING | The schema to use for the JSON output. Must conform to JSON Schema. | false |
+| formatsPrompt | JSON Prompt | STRING | The prompt to use for the JSON output | false |
 | onlyMainContent | Only Main Content | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Only return the main content excluding headers, navs, footers, etc. | false |
 | includeTags | Include Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | HTML tags to include in the output. | false |
 | excludeTags | Exclude Tags | ARRAY <details> <summary> Items </summary> [STRING] </details> | HTML tags to exclude from the output. | false |
@@ -350,8 +350,8 @@ Name: scrape
   "parameters" : {
     "url" : "",
     "formats" : [ "" ],
-    "formatsSchema" : { },
-    "formatsPrompt" : { },
+    "formatsSchema" : "",
+    "formatsPrompt" : "",
     "onlyMainContent" : false,
     "includeTags" : [ "" ],
     "excludeTags" : [ "" ],

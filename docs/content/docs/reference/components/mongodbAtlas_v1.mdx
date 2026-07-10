@@ -33,7 +33,6 @@ Version: 1
 | indexName | Vector Index Name | STRING | The name of the Atlas Vector Search index. | false |
 | pathName | Path Name | STRING | The path where the embeddings are stored within the document. | false |
 | numCandidates | Number of Candidates | INTEGER | The number of candidates to consider during approximate nearest neighbor search. | false |
-| metadataFields | Metadata Fields To Filter | STRING | A comma-separated list of metadata fields that can be used to filter search results. | false |
 | initializeSchema | Initialize Schema | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to initialize the collection and the vector search index. | false |
 
 
@@ -70,7 +69,7 @@ Name: delete
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
 
 #### Example JSON Structure
 ```json
@@ -78,7 +77,7 @@ Name: delete
   "label" : "Delete Documents",
   "name" : "delete",
   "parameters" : {
-    "metadata" : [ { } ]
+    "metadataFilter" : [ { } ]
   },
   "type" : "mongodbAtlas/v1/delete"
 }
@@ -102,7 +101,7 @@ Name: load
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
 
 #### Example JSON Structure
 ```json
@@ -110,7 +109,7 @@ Name: load
   "label" : "Load Documents",
   "name" : "load",
   "parameters" : {
-    "metadata" : [ { } ]
+    "metadataFilter" : [ { } ]
   },
   "type" : "mongodbAtlas/v1/load"
 }
@@ -135,7 +134,7 @@ Name: search
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | query | Query | STRING | The query to be executed. | true |
-| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
 | topK | Top K | INTEGER | The top 'k' similar results to return. | false |
 | similarityThreshold | Similarity Threshold | NUMBER | Similarity threshold score to filter the search response by. Only documents with similarity score equal or greater than the threshold will be returned. A threshold value of 0 means any similarity is accepted. A threshold value of 1 means an exact match is required. | false |
 
@@ -146,7 +145,7 @@ Name: search
   "name" : "search",
   "parameters" : {
     "query" : "",
-    "metadata" : [ { } ],
+    "metadataFilter" : [ { } ],
     "topK" : 1,
     "similarityThreshold" : 0.0
   },
@@ -172,7 +171,7 @@ Name: update
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| metadata | Metadata | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. | false |
+| metadataFilter | Metadata Filter | ARRAY <details> <summary> Items </summary> [&#123;&#125;] </details> | List of metadata key-value pairs to filter by. Entries within a group are ANDed; groups are ORed. | false |
 
 #### Example JSON Structure
 ```json
@@ -180,7 +179,7 @@ Name: update
   "label" : "Update Documents",
   "name" : "update",
   "parameters" : {
-    "metadata" : [ { } ]
+    "metadataFilter" : [ { } ]
   },
   "type" : "mongodbAtlas/v1/update"
 }

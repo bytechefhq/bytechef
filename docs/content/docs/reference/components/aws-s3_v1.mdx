@@ -150,7 +150,7 @@ Name: listObjects
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| prefix | Prefix | STRING | The prefix of an AWS S3 objects. | true |
+| prefix | Key Prefix | STRING | The prefix of an AWS S3 object key. | false |
 
 #### Example JSON Structure
 ```json
@@ -178,7 +178,7 @@ Items Type: OBJECT
 |     Name     |     Type     |     Description     |
 |:------------:|:------------:|:-------------------:|
 | key | STRING |  |
-| suffix | STRING |  |
+| name | STRING |  |
 | uri | STRING |  |
 
 
@@ -189,7 +189,7 @@ Items Type: OBJECT
 ```json
 [ {
   "key" : "",
-  "suffix" : "",
+  "name" : "",
   "uri" : ""
 } ]
 ```
