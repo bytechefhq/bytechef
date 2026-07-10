@@ -10,18 +10,18 @@ package com.bytechef.ee.automation.configuration.web.rest;
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.automation.configuration.domain.Workspace;
 import com.bytechef.automation.configuration.web.rest.model.WorkspaceModel;
-import com.bytechef.ee.automation.configuration.service.WorkspaceService;
+import com.bytechef.ee.automation.configuration.facade.AdminWorkspaceFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
+ * Authorization (ROLE_ADMIN) is enforced on {@link AdminWorkspaceFacade}, not here.
+ *
  * @version ee
  *
  * @author Ivica Cardic
@@ -32,55 +32,51 @@ import org.springframework.web.bind.annotation.RestController;
 @ConditionalOnCoordinator
 public class WorkspaceApiController implements WorkspaceApi {
 
+    private final AdminWorkspaceFacade adminWorkspaceFacade;
     private final ConversionService conversionService;
-    private final WorkspaceService workspaceService;
 
     @SuppressFBWarnings("EI")
-    public WorkspaceApiController(ConversionService conversionService, WorkspaceService workspaceService) {
+    public WorkspaceApiController(AdminWorkspaceFacade adminWorkspaceFacade, ConversionService conversionService) {
+        this.adminWorkspaceFacade = adminWorkspaceFacade;
         this.conversionService = conversionService;
-        this.workspaceService = workspaceService;
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<WorkspaceModel> createWorkspace(WorkspaceModel workspaceModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workspaceService.create(conversionService.convert(workspaceModel, Workspace.class)),
+                adminWorkspaceFacade.createWorkspace(conversionService.convert(workspaceModel, Workspace.class)),
                 WorkspaceModel.class));
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<Void> deleteWorkspace(Long id) {
-        workspaceService.delete(id);
+        adminWorkspaceFacade.deleteWorkspace(id);
 
         return ResponseEntity.noContent()
             .build();
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<WorkspaceModel> getWorkspace(Long id) {
-        return ResponseEntity.ok(conversionService.convert(workspaceService.getWorkspace(id), WorkspaceModel.class));
+        return ResponseEntity.ok(
+            conversionService.convert(adminWorkspaceFacade.getWorkspace(id), WorkspaceModel.class));
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<List<WorkspaceModel>> getWorkspaces() {
         return ResponseEntity.ok(
-            workspaceService.getWorkspaces()
+            adminWorkspaceFacade.getWorkspaces()
                 .stream()
                 .map(workspace -> conversionService.convert(workspace, WorkspaceModel.class))
                 .toList());
     }
 
     @Override
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public ResponseEntity<WorkspaceModel> updateWorkspace(Long id, WorkspaceModel workspaceModel) {
         return ResponseEntity.ok(
             conversionService.convert(
-                workspaceService.update(conversionService.convert(workspaceModel.id(id), Workspace.class)),
+                adminWorkspaceFacade.updateWorkspace(conversionService.convert(workspaceModel.id(id), Workspace.class)),
                 WorkspaceModel.class));
     }
 }
