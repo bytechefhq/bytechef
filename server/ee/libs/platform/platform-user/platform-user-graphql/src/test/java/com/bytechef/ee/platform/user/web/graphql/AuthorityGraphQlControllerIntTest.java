@@ -18,10 +18,10 @@ package com.bytechef.ee.platform.user.web.graphql;
 
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.user.facade.AuthorityFacade;
 import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlTestConfiguration;
 import com.bytechef.platform.user.domain.Authority;
-import com.bytechef.platform.user.service.AuthorityService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +50,7 @@ public class AuthorityGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @Autowired
-    private AuthorityService authorityService;
+    private AuthorityFacade authorityFacade;
 
     @Test
     void testGetAuthorities() {
@@ -58,7 +58,7 @@ public class AuthorityGraphQlControllerIntTest {
         Authority adminAuthority = createMockAuthority(1L, "ROLE_ADMIN");
         Authority userAuthority = createMockAuthority(2L, "ROLE_USER");
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(adminAuthority, userAuthority));
+        when(authorityFacade.getAuthorities()).thenReturn(List.of(adminAuthority, userAuthority));
 
         // When & Then
         this.graphQlTester
@@ -77,7 +77,7 @@ public class AuthorityGraphQlControllerIntTest {
     @Test
     void testGetAuthoritiesEmpty() {
         // Given
-        when(authorityService.getAuthorities()).thenReturn(List.of());
+        when(authorityFacade.getAuthorities()).thenReturn(List.of());
 
         // When & Then
         this.graphQlTester

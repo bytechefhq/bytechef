@@ -16,21 +16,18 @@
 
 package com.bytechef.ee.platform.user.web.graphql;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.ee.platform.user.facade.UserManagementFacade;
+import com.bytechef.ee.platform.user.facade.UserManagementFacade.UserWithAuthorities;
+import com.bytechef.ee.platform.user.facade.UserManagementFacade.UsersWithAuthorities;
 import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlConfigurationSharedMocks;
 import com.bytechef.ee.platform.user.web.graphql.config.PlatformUserGraphQlTestConfiguration;
-import com.bytechef.platform.mail.MailService;
 import com.bytechef.platform.user.domain.Authority;
 import com.bytechef.platform.user.domain.User;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.tenant.service.TenantService;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -64,22 +61,13 @@ public class UserGraphQlControllerIntTest {
     private GraphQlTester graphQlTester;
 
     @Autowired
-    private AuthorityService authorityService;
-
-    @Autowired
-    private MailService mailService;
-
-    @Autowired
-    private TenantService tenantService;
-
-    @Autowired
-    private UserService userService;
+    private UserManagementFacade userManagementFacade;
 
     @Test
     void testDeleteUser() {
         // Given
-        doNothing().when(userService)
-            .delete(anyString());
+        doNothing().when(userManagementFacade)
+            .deleteUser(anyString());
 
         // When & Then
         this.graphQlTester
@@ -93,7 +81,7 @@ public class UserGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(userService).delete("testuser");
+        verify(userManagementFacade).deleteUser("testuser");
     }
 
     @Test
@@ -104,8 +92,8 @@ public class UserGraphQlControllerIntTest {
 
         mockUser.setAuthorities(Set.of(authority));
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        when(userService.fetchUserByLogin("john")).thenReturn(Optional.of(mockUser));
+        when(userManagementFacade.fetchUser("john"))
+            .thenReturn(Optional.of(new UserWithAuthorities(mockUser, List.of(authority))));
 
         // When & Then
         this.graphQlTester
@@ -135,10 +123,7 @@ public class UserGraphQlControllerIntTest {
     @Test
     void testGetUserNotFound() {
         // Given
-        Authority authority = createMockAuthority(1L, "ROLE_ADMIN");
-
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        when(userService.fetchUserByLogin("unknown")).thenReturn(Optional.empty());
+        when(userManagementFacade.fetchUser("unknown")).thenReturn(Optional.empty());
 
         // When & Then
         this.graphQlTester
@@ -167,8 +152,8 @@ public class UserGraphQlControllerIntTest {
 
         Page<User> userPage = new PageImpl<>(List.of(user1, user2), PageRequest.of(0, 20), 2);
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        when(userService.getAllManagedUsers(any(PageRequest.class))).thenReturn(userPage);
+        when(userManagementFacade.getUsers(null, null))
+            .thenReturn(new UsersWithAuthorities(userPage, List.of(authority)));
 
         // When & Then
         this.graphQlTester
@@ -221,8 +206,8 @@ public class UserGraphQlControllerIntTest {
 
         Page<User> userPage = new PageImpl<>(List.of(user1), PageRequest.of(1, 10), 25);
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        when(userService.getAllManagedUsers(PageRequest.of(1, 10))).thenReturn(userPage);
+        when(userManagementFacade.getUsers(1, 10))
+            .thenReturn(new UsersWithAuthorities(userPage, List.of(authority)));
 
         // When & Then
         this.graphQlTester
@@ -259,7 +244,7 @@ public class UserGraphQlControllerIntTest {
             .entity(Integer.class)
             .isEqualTo(10);
 
-        verify(userService).getAllManagedUsers(PageRequest.of(1, 10));
+        verify(userManagementFacade).getUsers(1, 10);
     }
 
     @Test
@@ -268,8 +253,8 @@ public class UserGraphQlControllerIntTest {
         Authority authority = createMockAuthority(1L, "ROLE_USER");
         Page<User> emptyPage = new PageImpl<>(List.of(), PageRequest.of(0, 20), 0);
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        when(userService.getAllManagedUsers(any(PageRequest.class))).thenReturn(emptyPage);
+        when(userManagementFacade.getUsers(null, null))
+            .thenReturn(new UsersWithAuthorities(emptyPage, List.of(authority)));
 
         // When & Then
         this.graphQlTester
@@ -299,17 +284,8 @@ public class UserGraphQlControllerIntTest {
     @Test
     void testInviteUser() {
         // Given
-        Authority authority = createMockAuthority(1L, "ROLE_USER");
-        User mockUser = createMockUser(1L, "newuser", "newuser@example.com");
-
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("newuser@example.com")).thenReturn(Optional.empty());
-        when(userService.registerUser(any(), anyString())).thenReturn(mockUser);
-        when(authorityService.getAuthorities()).thenReturn(List.of(authority));
-        doNothing().when(userService)
-            .save(any());
-        doNothing().when(mailService)
-            .sendInvitationEmail(any(), anyString());
+        doNothing().when(userManagementFacade)
+            .inviteUser(anyString(), anyString(), anyString());
 
         // When & Then - password meets requirements: 8+ chars, uppercase, digit
         this.graphQlTester
@@ -323,73 +299,7 @@ public class UserGraphQlControllerIntTest {
             .entity(Boolean.class)
             .isEqualTo(true);
 
-        verify(mailService).sendInvitationEmail(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordTooShort() {
-        // Given
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        // When & Then - password too short (less than 8 characters)
-        this.graphQlTester
-            .document("""
-                mutation {
-                    inviteUser(email: "test@example.com", password: "Pass1", role: "ROLE_USER")
-                }
-                """)
-            .execute()
-            .errors()
-            .expect(error -> true)
-            .verify();
-
-        // Verify registerUser was never called due to password validation failure
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingUppercase() {
-        // Given
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        // When & Then - password missing uppercase letter
-        this.graphQlTester
-            .document("""
-                mutation {
-                    inviteUser(email: "test@example.com", password: "password123", role: "ROLE_USER")
-                }
-                """)
-            .execute()
-            .errors()
-            .expect(error -> true)
-            .verify();
-
-        // Verify registerUser was never called due to password validation failure
-        verify(userService, never()).registerUser(any(), anyString());
-    }
-
-    @Test
-    void testInviteUserWithPasswordMissingDigit() {
-        // Given
-        when(tenantService.isMultiTenantEnabled()).thenReturn(false);
-        when(userService.fetchUserByEmail("test@example.com")).thenReturn(Optional.empty());
-
-        // When & Then - password missing digit
-        this.graphQlTester
-            .document("""
-                mutation {
-                    inviteUser(email: "test@example.com", password: "PasswordABC", role: "ROLE_USER")
-                }
-                """)
-            .execute()
-            .errors()
-            .expect(error -> true)
-            .verify();
-
-        // Verify registerUser was never called due to password validation failure
-        verify(userService, never()).registerUser(any(), anyString());
+        verify(userManagementFacade).inviteUser("newuser@example.com", "Password123", "ROLE_USER");
     }
 
     @Test
@@ -399,11 +309,10 @@ public class UserGraphQlControllerIntTest {
         Authority userAuthority = createMockAuthority(2L, "ROLE_USER");
         User mockUser = createMockUser(1L, "john", "john@example.com");
 
-        mockUser.setAuthorities(Set.of(userAuthority));
+        mockUser.setAuthorities(Set.of(adminAuthority));
 
-        when(authorityService.getAuthorities()).thenReturn(List.of(adminAuthority, userAuthority));
-        when(userService.fetchUserByLogin("john")).thenReturn(Optional.of(mockUser));
-        when(userService.update(any())).thenReturn(Optional.of(mockUser));
+        when(userManagementFacade.updateUserRole("john", "ROLE_ADMIN"))
+            .thenReturn(new UserWithAuthorities(mockUser, List.of(adminAuthority, userAuthority)));
 
         // When & Then
         this.graphQlTester

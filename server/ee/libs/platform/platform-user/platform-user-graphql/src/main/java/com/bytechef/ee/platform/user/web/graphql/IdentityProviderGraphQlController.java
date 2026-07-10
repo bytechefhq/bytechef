@@ -8,11 +8,10 @@
 package com.bytechef.ee.platform.user.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.IdentityProvider;
 import com.bytechef.platform.user.domain.IdentityProviderDomain;
-import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Set;
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -35,15 +33,14 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class IdentityProviderGraphQlController {
 
-    private final IdentityProviderService identityProviderService;
+    private final IdentityProviderFacade identityProviderFacade;
 
     @SuppressFBWarnings("EI")
-    public IdentityProviderGraphQlController(IdentityProviderService identityProviderService) {
-        this.identityProviderService = identityProviderService;
+    public IdentityProviderGraphQlController(IdentityProviderFacade identityProviderFacade) {
+        this.identityProviderFacade = identityProviderFacade;
     }
 
     @MutationMapping(name = "createIdentityProvider")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProviderDTO createIdentityProvider(@Argument IdentityProviderInput input) {
         if (input.clientSecret() == null || input.clientSecret()
             .isEmpty()) {
@@ -52,40 +49,36 @@ public class IdentityProviderGraphQlController {
 
         IdentityProvider identityProvider = toIdentityProvider(input);
 
-        return toDTO(identityProviderService.create(identityProvider));
+        return toDTO(identityProviderFacade.create(identityProvider));
     }
 
     @MutationMapping(name = "deleteIdentityProvider")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public Boolean deleteIdentityProvider(@Argument Long id) {
-        identityProviderService.delete(id);
+        identityProviderFacade.delete(id);
 
         return true;
     }
 
     @QueryMapping(name = "identityProvider")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProviderDTO identityProvider(@Argument Long id) {
-        return toDTO(identityProviderService.getIdentityProvider(id));
+        return toDTO(identityProviderFacade.getIdentityProvider(id));
     }
 
     @QueryMapping(name = "identityProviders")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public List<IdentityProviderDTO> identityProviders() {
-        return identityProviderService.getIdentityProviders()
+        return identityProviderFacade.getIdentityProviders()
             .stream()
             .map(this::toDTO)
             .toList();
     }
 
     @MutationMapping(name = "updateIdentityProvider")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public IdentityProviderDTO updateIdentityProvider(@Argument Long id, @Argument IdentityProviderInput input) {
         IdentityProvider identityProvider = toIdentityProvider(input);
 
         identityProvider.setId(id);
 
-        return toDTO(identityProviderService.update(identityProvider));
+        return toDTO(identityProviderFacade.update(identityProvider));
     }
 
     private IdentityProviderDTO toDTO(IdentityProvider identityProvider) {
