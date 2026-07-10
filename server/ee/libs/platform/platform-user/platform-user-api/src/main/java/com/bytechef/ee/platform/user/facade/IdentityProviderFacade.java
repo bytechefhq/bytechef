@@ -7,7 +7,7 @@
 
 package com.bytechef.ee.platform.user.facade;
 
-import com.bytechef.ee.platform.user.domain.IdentityProvider;
+import com.bytechef.platform.user.domain.IdentityProvider;
 import java.util.List;
 
 /**

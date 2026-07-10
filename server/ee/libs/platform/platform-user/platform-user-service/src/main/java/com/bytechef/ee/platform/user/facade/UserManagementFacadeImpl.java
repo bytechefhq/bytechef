@@ -82,6 +82,14 @@ class UserManagementFacadeImpl implements UserManagementFacade {
 
         PasswordValidator.validate(password);
 
+        // Validate the requested role before creating any user record so an invalid role cannot leave an orphaned
+        // user. Resolving the authority once here also avoids the earlier double getAuthorities()/double save().
+        Authority authority = authorityService.getAuthorities()
+            .stream()
+            .filter(curAuthority -> Objects.equals(curAuthority.getName(), role))
+            .findFirst()
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
+
         // Derive login from email if not provided
         String login = StringUtils.substringBefore(email, "@");
 
@@ -92,21 +100,6 @@ class UserManagementFacadeImpl implements UserManagementFacade {
         userDTO.setLangKey(UserConstants.DEFAULT_LANGUAGE);
 
         User user = userService.registerUser(userDTO, password);
-
-        authorityService.getAuthorities()
-            .stream()
-            .filter(authority -> Objects.equals(authority.getName(), role))
-            .findFirst()
-            .ifPresent(authority -> {
-                user.setAuthorities(Set.of(authority));
-                userService.save(user);
-            });
-
-        Authority authority = authorityService.getAuthorities()
-            .stream()
-            .filter(curAuthority -> Objects.equals(curAuthority.getName(), role))
-            .findFirst()
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
 
         user.setAuthorities(Set.of(authority));
 
@@ -152,7 +145,7 @@ class UserManagementFacadeImpl implements UserManagementFacade {
         Authority authority = allAuthorities.stream()
             .filter(curAuthority -> Objects.equals(curAuthority.getName(), role))
             .findFirst()
-            .orElseThrow();
+            .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
 
         user.setAuthorities(Set.of(authority));
 

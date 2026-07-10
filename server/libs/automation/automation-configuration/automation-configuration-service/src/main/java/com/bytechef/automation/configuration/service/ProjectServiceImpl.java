@@ -16,8 +16,6 @@
 
 package com.bytechef.automation.configuration.service;
 
-import com.bytechef.automation.configuration.audit.ProjectAuditEvent;
-import com.bytechef.automation.configuration.audit.ProjectAuditPublisher;
 import com.bytechef.automation.configuration.domain.Project;
 import com.bytechef.automation.configuration.domain.ProjectVersion;
 import com.bytechef.automation.configuration.domain.ProjectVersion.Status;
@@ -46,16 +44,11 @@ import org.springframework.util.Assert;
 public class ProjectServiceImpl implements ProjectService {
 
     private final ApplicationContext applicationContext;
-    private final ProjectAuditPublisher projectAuditPublisher;
     private final ProjectRepository projectRepository;
 
     @SuppressFBWarnings("EI")
-    public ProjectServiceImpl(
-        ApplicationContext applicationContext, ProjectAuditPublisher projectAuditPublisher,
-        ProjectRepository projectRepository) {
-
+    public ProjectServiceImpl(ApplicationContext applicationContext, ProjectRepository projectRepository) {
         this.applicationContext = applicationContext;
-        this.projectAuditPublisher = projectAuditPublisher;
         this.projectRepository = projectRepository;
     }
 
@@ -70,19 +63,13 @@ public class ProjectServiceImpl implements ProjectService {
         Assert.isTrue(project.getId() == null, "'id' must be null");
         Assert.notNull(project.getName(), "'name' must not be null");
 
-        Project savedProject = projectRepository.save(project);
-
-        projectAuditPublisher.publish(ProjectAuditEvent.PROJECT_CREATED, savedProject.getId());
-
-        return savedProject;
+        return projectRepository.save(project);
     }
 
     @Override
     @PreAuthorize("hasPermission(#id, 'Project', 'PROJECT_DELETE')")
     public void delete(long id) {
         projectRepository.deleteById(id);
-
-        projectAuditPublisher.publish(ProjectAuditEvent.PROJECT_DELETED, id);
     }
 
     @Override
@@ -104,7 +91,6 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    // @PreAuthorize("hasPermission(#id, 'Project', 'WORKFLOW_VIEW')")
     @Transactional(readOnly = true)
     public Project getProject(long id) {
         return OptionalUtils.get(projectRepository.findById(id));
@@ -195,11 +181,7 @@ public class ProjectServiceImpl implements ProjectService {
 
         project.setTagIds(tagIds);
 
-        Project savedProject = projectRepository.save(project);
-
-        projectAuditPublisher.publish(ProjectAuditEvent.PROJECT_UPDATED, savedProject.getId());
-
-        return savedProject;
+        return projectRepository.save(project);
     }
 
     @Override
@@ -217,11 +199,7 @@ public class ProjectServiceImpl implements ProjectService {
         curProject.setTagIds(project.getTagIds());
         curProject.setVersion(project.getVersion());
 
-        Project savedProject = projectRepository.save(curProject);
-
-        projectAuditPublisher.publish(ProjectAuditEvent.PROJECT_UPDATED, savedProject.getId());
-
-        return savedProject;
+        return projectRepository.save(curProject);
     }
 
     @Override

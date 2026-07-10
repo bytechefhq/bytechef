@@ -330,6 +330,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-security-web:platform-security-web-impl"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-graphql"))
     implementation(project(":server:ee:libs:platform:platform-user:platform-user-scim"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-service"))
 
     // EE Components - filtered by includeComponents/excludeComponents properties
     // Use pre-built JARs when useComponentJars=true for faster IntelliJ startup
