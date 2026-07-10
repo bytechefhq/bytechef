@@ -18,6 +18,7 @@ package com.bytechef.platform.billing.web.rest;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
 import com.bytechef.platform.billing.facade.BillingSubscriptionFacade;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("${openapi.openAPIDefinition.base-path.platform:}")
 @ConditionalOnCoordinator
+@ConditionalOnProperty(prefix = "bytechef.billing", name = "enabled", havingValue = "true")
 public class BillingWebhookApiController implements BillingWebhookApi {
 
     private final BillingSubscriptionFacade billingSubscriptionFacade;

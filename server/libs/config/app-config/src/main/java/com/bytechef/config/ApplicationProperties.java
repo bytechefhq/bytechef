@@ -2621,7 +2621,16 @@ public class ApplicationProperties {
      */
     public static class Billing {
 
+        private boolean enabled;
         private Stripe stripe = new Stripe();
+
+        public boolean isEnabled() {
+            return enabled;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
 
         public Stripe getStripe() {
             return stripe;
