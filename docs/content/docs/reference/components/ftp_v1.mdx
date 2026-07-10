@@ -1,0 +1,349 @@
+---
+title: "FTP"
+description: "FTP (File Transfer Protocol) is a standard network protocol for transferring files between a client and a server. It allows uploading, downloading, and managing files on remote servers."
+---
+
+
+Categories: File Storage, Helpers
+
+
+Type: ftp/v1
+
+<hr />
+
+
+
+
+## Connections
+
+Version: 1
+
+
+### custom
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| host | Host | STRING | The hostname or IP address of the FTP server. | true |
+| port | Port | INTEGER | The port number of the server. Defaults to 21 for FTP and 22 for SFTP if not specified. | false |
+| username | Username | STRING | The username for authentication. | true |
+| password | Password | STRING | The password for authentication. | true |
+| passiveMode | Passive Mode | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use passive mode for data connections. Recommended when the server is behind a firewall. Only applicable for FTP connections. | false |
+| sftp | Use SFTP | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Use SFTP (SSH File Transfer Protocol) instead of FTP. SFTP provides encrypted file transfer over SSH. When enabled, the port defaults to 22 instead of 21. | false |
+
+
+
+
+
+
+<hr />
+
+
+## Actions
+
+
+### Upload File
+Name: uploadFile
+
+`Uploads a file to the FTP/SFTP server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File | FILE_ENTRY | The file to upload. | true |
+| path | Remote Path | STRING | The path on the server where the file should be uploaded (including filename). | true |
+| createDirectories | Create Directories | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Create the directory structure on the server if it does not exist. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Upload File",
+  "name" : "uploadFile",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    },
+    "path" : "",
+    "createDirectories" : false
+  },
+  "type" : "ftp/v1/uploadFile"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{remotePath=/uploads/document.pdf, success=true}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| remotePath | STRING | The path where the file was uploaded. |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the upload was successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "remotePath" : "",
+  "success" : false
+}
+```
+
+
+
+
+### Download File
+Name: downloadFile
+
+`Downloads a file from the FTP/SFTP server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Remote Path | STRING | The path of the file on the server to download. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Download File",
+  "name" : "downloadFile",
+  "parameters" : {
+    "path" : ""
+  },
+  "type" : "ftp/v1/downloadFile"
+}
+```
+
+#### Output
+
+
+
+Type: FILE_ENTRY
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| extension | STRING |  |
+| mimeType | STRING |  |
+| name | STRING |  |
+| url | STRING |  |
+
+
+
+
+#### Output Example
+```json
+{
+  "extension" : "",
+  "mimeType" : "",
+  "name" : "",
+  "url" : ""
+}
+```
+
+
+
+
+### List Directory
+Name: list
+
+`Lists the contents of a directory on the FTP/SFTP server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of the directory to list. | true |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | List files recursively in subdirectories. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "List Directory",
+  "name" : "list",
+  "parameters" : {
+    "path" : "",
+    "recursive" : false
+  },
+  "type" : "ftp/v1/list"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: OBJECT
+
+
+#### Properties
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| name | STRING | Name of the file or directory. |
+| path | STRING | Full path to the file or directory. |
+| type | STRING | Type: 'file' or 'directory'. |
+| size | INTEGER | Size in bytes (for files). |
+| modifiedAt | STRING | Last modified timestamp. |
+
+
+
+
+
+#### Output Example
+```json
+[ {
+  "name" : "",
+  "path" : "",
+  "type" : "",
+  "size" : 1,
+  "modifiedAt" : ""
+} ]
+```
+
+
+
+
+### Delete
+Name: delete
+
+`Deletes a file or directory from the FTP/SFTP server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| path | Path | STRING | The path of the file or directory to delete. | true |
+| recursive | Recursive | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | If the path is a directory, delete all contents recursively. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Delete",
+  "name" : "delete",
+  "parameters" : {
+    "path" : "",
+    "recursive" : false
+  },
+  "type" : "ftp/v1/delete"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{success=true, deletedPath=/uploads/old-file.pdf}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| deletedPath | STRING | The path that was deleted. |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the deletion was successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "deletedPath" : "",
+  "success" : false
+}
+```
+
+
+
+
+### Rename/Move
+Name: rename
+
+`Renames or moves a file or directory on the FTP/SFTP server.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| oldPath | Source Path | STRING | The current path of the file or directory. | true |
+| newPath | Destination Path | STRING | The new path for the file or directory. | true |
+| createDirectories | Create Directories | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Create the destination directory structure if it does not exist. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Rename/Move",
+  "name" : "rename",
+  "parameters" : {
+    "oldPath" : "",
+    "newPath" : "",
+    "createDirectories" : false
+  },
+  "type" : "ftp/v1/rename"
+}
+```
+
+#### Output
+
+
+___Sample Output:___
+
+```{newPath=/archive/new-name.pdf, oldPath=/uploads/old-name.pdf, success=true}```
+
+
+
+Type: OBJECT
+
+
+#### Properties
+
+|     Name     |     Type     |     Description     |
+|:------------:|:------------:|:-------------------:|
+| oldPath | STRING | The original path. |
+| newPath | STRING | The new path. |
+| success | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether the operation was successful. |
+
+
+
+
+#### Output Example
+```json
+{
+  "oldPath" : "",
+  "newPath" : "",
+  "success" : false
+}
+```
+
+
+
+
+
+

@@ -18,22 +18,13 @@ Type: claudeCode/v1
 ### Initialize Claude Code
 Name: initializeClaude
 
-`Run this first to install Claude Code to ByteChef terminal`
-
-#### Properties
-
-|      Name       |      Label     |     Type     |     Description     | Required |
-|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| password | Password | STRING | The password to your bash, so you can give permission to sudo | false |
+`Performs a no-op probe against the Claude agent so connectivity issues surface early.`
 
 #### Example JSON Structure
 ```json
 {
   "label" : "Initialize Claude Code",
   "name" : "initializeClaude",
-  "parameters" : {
-    "password" : ""
-  },
   "type" : "claudeCode/v1/initializeClaude"
 }
 ```
@@ -61,7 +52,7 @@ Type: STRING
 ### Add MCP Server
 Name: addMCP
 
-`Adds an MCP server and all its tools to Claude Code via http protocol`
+`Builds an HTTP-transport MCP server descriptor that can be passed to the Chat action.`
 
 #### Properties
 
@@ -121,6 +112,7 @@ Name: chat
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | script | Message | STRING | Command to send to Claude | true |
+| mcpServers | MCP Servers | ARRAY <details> <summary> Items </summary> [STRING] </details> | MCP servers (HTTP transport) configured via the 'Add MCP Server' action. | false |
 
 #### Example JSON Structure
 ```json
@@ -128,7 +120,8 @@ Name: chat
   "label" : "Chat",
   "name" : "chat",
   "parameters" : {
-    "script" : ""
+    "script" : "",
+    "mcpServers" : [ "" ]
   },
   "type" : "claudeCode/v1/chat"
 }

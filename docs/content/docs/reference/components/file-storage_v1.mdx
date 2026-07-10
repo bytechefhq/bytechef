@@ -65,6 +65,56 @@ Type: STRING
 
 
 
+### Read from File as Byte Array
+Name: readBytes
+
+`Reads data from the file as byte array.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| fileEntry | File Entry | FILE_ENTRY | The file object which contains content of the file to read from. | true |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Read from File as Byte Array",
+  "name" : "readBytes",
+  "parameters" : {
+    "fileEntry" : {
+      "extension" : "",
+      "mimeType" : "",
+      "name" : "",
+      "url" : ""
+    }
+  },
+  "type" : "fileStorage/v1/readBytes"
+}
+```
+
+#### Output
+
+
+
+Type: ARRAY
+
+
+Items Type: INTEGER
+
+
+
+
+
+
+#### Output Example
+```json
+[ 1 ]
+```
+
+
+
+
 ### Write to File
 Name: write
 

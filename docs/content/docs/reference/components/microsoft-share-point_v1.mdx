@@ -507,6 +507,7 @@ Name: getFolderContents
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
 | siteId | Site ID | STRING | The ID of the SharePoint site. | true |
 | parentFolder | Parent Folder ID | STRING <details> <summary> Depends On </summary> siteId </details> | ID of the folder whose contents you want to list. If no folder is selected, root folder will be listed. | false |
+| recursive | Include Subfolders | BOOLEAN <details> <summary> Options </summary> <span>true</span>, <span>false</span> </details> | Whether to include subfolders in the results. | false |
 
 #### Example JSON Structure
 ```json
@@ -515,7 +516,8 @@ Name: getFolderContents
   "name" : "getFolderContents",
   "parameters" : {
     "siteId" : "",
-    "parentFolder" : ""
+    "parentFolder" : "",
+    "recursive" : false
   },
   "type" : "microsoftSharePoint/v1/getFolderContents"
 }

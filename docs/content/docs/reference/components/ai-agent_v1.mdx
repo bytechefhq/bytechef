@@ -135,5 +135,45 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+### Realtime Chat
+Name: realtimeChat
+
+`Streaming LLM turn handler. Consumes finalized user turns from the inbound WebSocket and emits assistant tokens to the outbound channel, supporting tool calls and conversation memory. Designed for voice pipelines where this action sits between an STT and a TTS task.`
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| model | Model | STRING | Model name override for the cluster element. If omitted, the model cluster element's default is used. | false |
+| systemPrompt | System Prompt | STRING | The system prompt that defines the agent's behavior and personality. | false |
+| threadId | Thread ID | STRING | Chat memory thread id. Defaults to the call's $&#123;callSid&#125; when omitted (referenced via the embedded sub-workflow's inputs). | false |
+| maxTokens | Max Tokens | INTEGER | Maximum tokens per assistant response. | false |
+| temperature | Temperature | NUMBER | Sampling temperature for the assistant response. | false |
+
+#### Example JSON Structure
+```json
+{
+  "label" : "Realtime Chat",
+  "name" : "realtimeChat",
+  "parameters" : {
+    "model" : "",
+    "systemPrompt" : "",
+    "threadId" : "",
+    "maxTokens" : 1,
+    "temperature" : 0.0
+  },
+  "type" : "aiAgent/v1/realtimeChat"
+}
+```
+
+#### Output
+
+This action does not produce any output.
+
+
+
+
+
+
 
 
