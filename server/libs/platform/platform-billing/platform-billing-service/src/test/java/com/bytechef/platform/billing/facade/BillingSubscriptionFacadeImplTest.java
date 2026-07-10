@@ -280,6 +280,7 @@ class BillingSubscriptionFacadeImplTest {
         BillingSubscription subscription = starterSubscription();
 
         subscription.setStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID);
+        subscription.setScheduledPlanName("GROWTH");
 
         when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
         when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
@@ -295,6 +296,8 @@ class BillingSubscriptionFacadeImplTest {
         verify(billingSubscriptionService).save(captor.capture());
         assertThat(captor.getValue()
             .isCancelAtPeriodEnd()).isTrue();
+        assertThat(captor.getValue()
+            .getScheduledPlanName()).isNull();
     }
 
     private BillingSubscription starterSubscription() {

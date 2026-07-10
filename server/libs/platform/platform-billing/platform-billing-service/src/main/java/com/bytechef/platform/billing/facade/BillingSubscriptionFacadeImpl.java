@@ -242,7 +242,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             .map(subscription -> {
                 subscription.setStatus(
                     BillingSubscription.Status.fromStripe(stripeSubscription.getStatus()));
+
                 subscription.setCancelAtPeriodEnd(Boolean.TRUE.equals(stripeSubscription.getCancelAtPeriodEnd()));
+
+                if (subscription.isCancelAtPeriodEnd()) {
+                    subscription.setScheduledPlanName(null);
+                }
 
                 List<SubscriptionItem> items = stripeSubscription.getItems()
                     .getData();
