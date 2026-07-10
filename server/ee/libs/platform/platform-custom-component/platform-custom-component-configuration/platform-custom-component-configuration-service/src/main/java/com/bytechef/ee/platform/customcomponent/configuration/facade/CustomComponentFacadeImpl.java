@@ -19,6 +19,7 @@ import com.bytechef.ee.platform.customcomponent.file.storage.CustomComponentFile
 import com.bytechef.ee.platform.customcomponent.loader.ComponentHandlerLoader;
 import com.bytechef.file.storage.domain.FileEntry;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
+import com.bytechef.platform.security.constant.AuthorityConstants;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
 import java.net.URI;
@@ -29,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -100,6 +102,7 @@ public class CustomComponentFacadeImpl implements CustomComponentFacade {
     }
 
     @Override
+    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public void save(byte[] bytes, Language language) {
         try {
             ComponentDefinition componentDefinition = loadComponentDefinition(language, bytes);
