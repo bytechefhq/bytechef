@@ -7,11 +7,10 @@
 
 package com.bytechef.ee.platform.user.facade;
 
-import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
-import com.bytechef.ee.platform.user.domain.IdentityProvider;
-import com.bytechef.ee.platform.user.service.IdentityProviderService;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
 import com.bytechef.platform.security.constant.AuthorityConstants;
+import com.bytechef.platform.user.domain.IdentityProvider;
+import com.bytechef.platform.user.service.IdentityProviderService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @ConditionalOnEEVersion
-@ConditionalOnCoordinator
 class IdentityProviderFacadeImpl implements IdentityProviderFacade {
 
     private final IdentityProviderService identityProviderService;

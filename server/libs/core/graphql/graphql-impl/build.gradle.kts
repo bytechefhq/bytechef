@@ -3,4 +3,5 @@ dependencies {
     implementation("org.springframework.graphql:spring-graphql")
     implementation("org.springframework.security:spring-security-core")
     implementation(project(":server:libs:core:exception:exception-api"))
+    implementation(project(":server:libs:core:graphql:graphql-api"))
 }

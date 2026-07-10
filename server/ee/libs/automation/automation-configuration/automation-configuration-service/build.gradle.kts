@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":server:ee:libs:platform:platform-configuration:platform-configuration-api"))
 
     testImplementation("org.springframework.data:spring-data-jdbc")
+    testImplementation("org.springframework.security:spring-security-config")
     testImplementation(project(":server:libs:config:liquibase-config"))
     testImplementation(project(":server:libs:test:test-int-support"))
 }

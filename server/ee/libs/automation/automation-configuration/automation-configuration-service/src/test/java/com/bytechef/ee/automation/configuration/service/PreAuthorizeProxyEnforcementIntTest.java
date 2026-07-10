@@ -16,6 +16,9 @@ import static org.mockito.Mockito.when;
 
 import com.bytechef.automation.configuration.security.AutomationMethodSecurityConfiguration;
 import com.bytechef.automation.configuration.service.PermissionService;
+import com.bytechef.ee.automation.configuration.audit.WorkspaceUserAuditPublisher;
+import com.bytechef.ee.automation.configuration.repository.WorkspaceUserRepository;
+import com.bytechef.ee.automation.configuration.security.constant.WorkspaceRole;
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,7 +42,7 @@ import org.springframework.stereotype.Service;
  *
  * @author Ivica Cardic
  */
-@SpringBootTest(classes = PreAuthorizeProxyEnforcementIntTest.Config.class)
+@SpringBootTest(classes = PreAuthorizeProxyEnforcementIntTest.Config.class, properties = "bytechef.edition=ee")
 class PreAuthorizeProxyEnforcementIntTest {
 
     @Autowired
@@ -54,6 +57,9 @@ class PreAuthorizeProxyEnforcementIntTest {
     @Autowired
     private GuardedResourceOwnerReads guardedResourceOwnerReads;
 
+    @Autowired
+    private WorkspaceUserService workspaceUserService;
+
     @BeforeEach
     void authenticateAsNonAdmin() {
         SecurityContextHolder.getContext()
@@ -61,12 +67,14 @@ class PreAuthorizeProxyEnforcementIntTest {
                 new UsernamePasswordAuthenticationToken(
                     "viewer", "n/a", List.of(new SimpleGrantedAuthority("ROLE_USER"))));
 
+        // Re-established each test so the positive control's specific true-stub does not leak across methods (the
+        // PermissionService mock is shared via the cached Spring context). Every gate defaults to denied here.
         when(permissionService.isTenantAdmin()).thenReturn(false);
         when(permissionService.isCurrentUser(anyLong())).thenReturn(false);
         when(permissionService.isResourceOwner(anyString(), anyLong())).thenReturn(false);
-        // Re-established each test so the positive control's specific true-stub does not leak across methods (the
-        // PermissionService mock is shared via the cached Spring context). Every resource-typed gate now routes here.
         when(permissionService.hasResourceScope(any(), anyString(), anyString())).thenReturn(false);
+        when(permissionService.hasWorkspaceScope(anyLong(), anyString())).thenReturn(false);
+        when(permissionService.hasWorkspaceScopeForProject(anyLong(), anyString())).thenReturn(false);
     }
 
     @AfterEach
@@ -111,22 +119,58 @@ class PreAuthorizeProxyEnforcementIntTest {
         guardedProjectMutations.getProject(1L);
     }
 
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesAddWorkspaceUser() {
+        assertThatThrownBy(() -> workspaceUserService.addWorkspaceUser(2L, 1L, WorkspaceRole.VIEWER))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesRemoveWorkspaceUser() {
+        assertThatThrownBy(() -> workspaceUserService.removeWorkspaceUser(2L, 1L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesUpdateWorkspaceUserRole() {
+        assertThatThrownBy(
+            () -> workspaceUserService.updateWorkspaceUserRole(2L, 1L, WorkspaceRole.VIEWER))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void testRealWorkspaceUserServiceImplEnforcesGetWorkspaceWorkspaceUsers() {
+        assertThatThrownBy(() -> workspaceUserService.getWorkspaceWorkspaceUsers(1L))
+            .isInstanceOf(AccessDeniedException.class);
+    }
+
     // @SpringBootConfiguration (not @TestConfiguration) because @SpringBootTest(classes = Config.class) requires a
     // primary Spring Boot configuration class; @TestConfiguration is a supplemental config and Spring Boot explicitly
-    // rejects it as the primary ("Classes annotated with @TestConfiguration are not considered"). The practical
-    // difference is zero for this test — the class is only loaded when referenced via classes=... — but using the
-    // correct annotation keeps Spring Boot's context bootstrapping happy.
+    // rejects it as the primary ("Classes annotated with @TestConfiguration are not considered"). The synthetic
+    // Guarded* stand-ins and the real WorkspaceUserServiceImpl share one context; the mocked PermissionService backs
+    // both.
     @SpringBootConfiguration
     @EnableMethodSecurity
     @ImportAutoConfiguration(AutomationMethodSecurityConfiguration.class)
     @Import({
-        GuardedProjectMutations.class, GuardedProjectFacadeReads.class, GuardedResourceOwnerReads.class
+        GuardedProjectMutations.class, GuardedProjectFacadeReads.class, GuardedResourceOwnerReads.class,
+        WorkspaceUserServiceImpl.class
     })
     static class Config {
 
         @Bean("permissionService")
         PermissionService permissionService() {
             return mock(PermissionService.class);
+        }
+
+        @Bean
+        WorkspaceUserRepository workspaceUserRepository() {
+            return mock(WorkspaceUserRepository.class);
+        }
+
+        @Bean
+        WorkspaceUserAuditPublisher workspaceUserAuditPublisher() {
+            return mock(WorkspaceUserAuditPublisher.class);
         }
     }
 

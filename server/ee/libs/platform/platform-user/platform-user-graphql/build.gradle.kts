@@ -49,6 +49,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-mail"))
     implementation(project(":server:libs:platform:platform-user:platform-user-api"))
+    implementation(project(":server:ee:libs:platform:platform-user:platform-user-api"))
 
     testImplementation("com.zaxxer:HikariCP")
     testImplementation("org.springframework:spring-webflux")
