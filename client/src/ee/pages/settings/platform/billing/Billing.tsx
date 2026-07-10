@@ -12,6 +12,7 @@ import {toast} from 'sonner';
 
 import CancelPlanDialog from './components/CancelPlanDialog';
 import PlanCard from './components/PlanCard';
+import ReactivatePlanDialog from './components/ReactivatePlanDialog';
 import SelectPlanDialog from './components/SelectPlanDialog';
 
 const TRIAL_TASK_LIMIT = 5000;
@@ -22,11 +23,13 @@ const Billing = () => {
     const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
     const [pendingUpgradePlanName, setPendingUpgradePlanName] = useState<string | null>(null);
     const [pollAttempts, setPollAttempts] = useState(0);
+    const [reactivateDialogOpen, setReactivateDialogOpen] = useState(false);
     const [searchParams, setSearchParams] = useSearchParams();
     const [selectPlanOpen, setSelectPlanOpen] = useState(false);
 
     const {isPending: isCancelPending, mutate: cancelSubscription} = useCancelSubscriptionMutation();
-    const {mutate: reactivateSubscription} = useReactivateSubscriptionMutation();
+    const {isPending: isReactivateMutationPending, mutate: reactivateSubscription} =
+        useReactivateSubscriptionMutation();
 
     const isCheckoutSuccess = searchParams.get('checkout') === 'success';
     const isCancelPolling = searchParams.get('cancel') === 'pending';
@@ -220,15 +223,7 @@ const Billing = () => {
                             }
                             onChangePlan={() => setSelectPlanOpen(true)}
                             onReactivatePlan={
-                                subscription?.cancelAtPeriodEnd
-                                    ? () =>
-                                          reactivateSubscription(undefined, {
-                                              onSuccess: () => {
-                                                  setPollAttempts(0);
-                                                  setSearchParams({reactivate: 'pending'}, {replace: true});
-                                              },
-                                          })
-                                    : undefined
+                                subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
                             }
                         />
                     </TabsContent>
@@ -251,6 +246,21 @@ const Billing = () => {
                         })
                     }
                     open={cancelDialogOpen}
+                />
+
+                <ReactivatePlanDialog
+                    isPending={isReactivateMutationPending}
+                    onClose={() => setReactivateDialogOpen(false)}
+                    onConfirm={() =>
+                        reactivateSubscription(undefined, {
+                            onSuccess: () => {
+                                setReactivateDialogOpen(false);
+                                setPollAttempts(0);
+                                setSearchParams({reactivate: 'pending'}, {replace: true});
+                            },
+                        })
+                    }
+                    open={reactivateDialogOpen}
                 />
 
                 <SelectPlanDialog
