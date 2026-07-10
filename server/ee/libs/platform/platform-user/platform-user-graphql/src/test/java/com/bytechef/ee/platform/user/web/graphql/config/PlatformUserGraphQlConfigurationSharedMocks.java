@@ -16,10 +16,9 @@
 
 package com.bytechef.ee.platform.user.web.graphql.config;
 
-import com.bytechef.platform.mail.MailService;
-import com.bytechef.platform.user.service.AuthorityService;
-import com.bytechef.platform.user.service.UserService;
-import com.bytechef.tenant.service.TenantService;
+import com.bytechef.ee.platform.user.facade.AuthorityFacade;
+import com.bytechef.ee.platform.user.facade.IdentityProviderFacade;
+import com.bytechef.ee.platform.user.facade.UserManagementFacade;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -32,7 +31,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @MockitoBean(types = {
-    AuthorityService.class, MailService.class, TenantService.class, UserService.class
+    AuthorityFacade.class, IdentityProviderFacade.class, UserManagementFacade.class
 })
 public @interface PlatformUserGraphQlConfigurationSharedMocks {
 }

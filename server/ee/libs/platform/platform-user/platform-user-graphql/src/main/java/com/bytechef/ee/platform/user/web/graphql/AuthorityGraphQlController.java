@@ -8,15 +8,13 @@
 package com.bytechef.ee.platform.user.web.graphql;
 
 import com.bytechef.atlas.coordinator.annotation.ConditionalOnCoordinator;
+import com.bytechef.ee.platform.user.facade.AuthorityFacade;
 import com.bytechef.platform.annotation.ConditionalOnEEVersion;
-import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.user.domain.Authority;
-import com.bytechef.platform.user.service.AuthorityService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 /**
@@ -31,17 +29,16 @@ import org.springframework.stereotype.Controller;
 @ConditionalOnCoordinator
 public class AuthorityGraphQlController {
 
-    private final AuthorityService authorityService;
+    private final AuthorityFacade authorityFacade;
 
     @SuppressFBWarnings("EI")
-    public AuthorityGraphQlController(AuthorityService authorityService) {
-        this.authorityService = authorityService;
+    public AuthorityGraphQlController(AuthorityFacade authorityFacade) {
+        this.authorityFacade = authorityFacade;
     }
 
     @QueryMapping(name = "authorities")
-    @PreAuthorize("hasAuthority(\"" + AuthorityConstants.ADMIN + "\")")
     public List<String> authorities() {
-        return authorityService.getAuthorities()
+        return authorityFacade.getAuthorities()
             .stream()
             .map(Authority::getName)
             .collect(Collectors.toList());
