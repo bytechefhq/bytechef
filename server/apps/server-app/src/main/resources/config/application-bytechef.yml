@@ -56,6 +56,7 @@ bytechef:
   analytics:
     enabled: false
   billing:
+    enabled: false
     stripe:
       customer-portal-url: https://billing.stripe.com/p/login/test_8x214mfs66RX9fP6BV3Je00
       secret-key:
