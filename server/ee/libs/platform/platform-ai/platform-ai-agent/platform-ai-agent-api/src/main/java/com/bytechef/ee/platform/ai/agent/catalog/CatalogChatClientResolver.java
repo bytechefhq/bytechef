@@ -9,6 +9,7 @@ package com.bytechef.ee.platform.ai.agent.catalog;
 
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 
 /**
  * Resolves an override {@link ChatClient} from the platform AI provider catalog: given a catalog provider key (e.g.
@@ -55,4 +56,17 @@ public interface CatalogChatClientResolver {
      */
     @Nullable
     ChatClient resolvePreferred(String providerKey, int environment);
+
+    /**
+     * Resolves the environment-default {@link ChatModel} (same provider/model selection as
+     * {@link #resolveDefault(int)}, optionally preferring a specific provider first) without wrapping it in a
+     * {@link ChatClient}, so callers can attach their own system prompt and tools.
+     *
+     * @param preferredProviderKey the catalog provider key to prefer, or {@code null}/blank to use the environment
+     *                             default
+     * @param environment          the environment ordinal
+     * @return the resolved {@link ChatModel}, or {@code null} when nothing is resolvable
+     */
+    @Nullable
+    ChatModel resolveDefaultChatModel(@Nullable String preferredProviderKey, int environment);
 }

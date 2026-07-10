@@ -807,8 +807,12 @@ public class ApplicationProperties {
             private Docs docs = new Docs();
 
             /**
-             * Explicit CE chat-model provider key (e.g. openAi) to use for Copilot, overriding auto-detection from the
-             * configured provider API keys/endpoints. Ignored when the EE AI Providers catalog is active.
+             * Explicit chat-model provider to prefer for Copilot — accepts the short provider name (e.g. openAi) or the
+             * full catalog key (e.g. ai.provider.openAi), case-insensitively; unrecognized values fall back to
+             * auto-detection. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE
+             * it is used as the environment default provider when set, provided that provider is enabled and has a
+             * configured chat model; otherwise resolution falls back to the first enabled chat provider. A per-turn
+             * model picked in the Copilot toolbar always overrides this.
              */
             private String provider;
 
@@ -1173,6 +1177,11 @@ public class ApplicationProperties {
             private Groq groq = new Groq();
 
             /**
+             * Image model configuration grouped by provider
+             */
+            private Image image = new Image();
+
+            /**
              * Mistral AI configuration
              */
             private Mistral mistral = new Mistral();
@@ -1255,6 +1264,10 @@ public class ApplicationProperties {
                 return groq;
             }
 
+            public Image getImage() {
+                return image;
+            }
+
             public Nvidia getNvidia() {
                 return nvidia;
             }
@@ -1329,6 +1342,10 @@ public class ApplicationProperties {
 
             public void setGroq(Groq groq) {
                 this.groq = groq;
+            }
+
+            public void setImage(Image image) {
+                this.image = image;
             }
 
             public void setNvidia(Nvidia nvidia) {
@@ -2407,6 +2424,63 @@ public class ApplicationProperties {
 
                         /**
                          * Embedding model name (e.g., text-embedding-ada-002)
+                         */
+                        private String model;
+
+                        public String getModel() {
+                            return model;
+                        }
+
+                        public void setModel(String model) {
+                            this.model = model;
+                        }
+                    }
+                }
+            }
+
+            /**
+             * Image model configuration grouped by provider.
+             */
+            public static class Image {
+
+                /**
+                 * OpenAI image model configuration
+                 */
+                private OpenAi openAi = new OpenAi();
+
+                public OpenAi getOpenAi() {
+                    return openAi;
+                }
+
+                public void setOpenAi(OpenAi openAi) {
+                    this.openAi = openAi;
+                }
+
+                /**
+                 * OpenAI image model configuration.
+                 */
+                public static class OpenAi {
+
+                    /**
+                     * Image model options
+                     */
+                    private Options options = new Options();
+
+                    public Options getOptions() {
+                        return options;
+                    }
+
+                    public void setOptions(Options options) {
+                        this.options = options;
+                    }
+
+                    /**
+                     * OpenAI image model options.
+                     */
+                    public static class Options {
+
+                        /**
+                         * Image model name (e.g., dall-e-3)
                          */
                         private String model;
 

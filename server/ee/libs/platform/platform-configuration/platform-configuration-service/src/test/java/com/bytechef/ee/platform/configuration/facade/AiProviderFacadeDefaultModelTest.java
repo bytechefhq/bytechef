@@ -59,6 +59,28 @@ class AiProviderFacadeDefaultModelTest {
     }
 
     @Test
+    void testResolvesPreferredProviderByShortName() {
+        stubProviderComponentsWithNoStoredProperties();
+
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getAnthropic()
+            .getApiKey()).thenReturn("sk-anthropic");
+        when(applicationProperties.getAi()
+            .getProvider()
+            .getChat()
+            .getAnthropic()
+            .getOptions()
+            .getModel()).thenReturn("claude-sonnet-4-6");
+
+        AiDefaultModelDTO result = facade.getAiDefaultChatModel("anthropic", ENVIRONMENT);
+
+        assertThat(result).isNotNull();
+        assertThat(result.provider()).isEqualTo("ai.provider.anthropic");
+        assertThat(result.model()).isEqualTo("claude-sonnet-4-6");
+    }
+
+    @Test
     void testReturnsAnthropicWhenAnthropicApiKeyConfigured() {
         stubProviderComponentsWithNoStoredProperties();
 

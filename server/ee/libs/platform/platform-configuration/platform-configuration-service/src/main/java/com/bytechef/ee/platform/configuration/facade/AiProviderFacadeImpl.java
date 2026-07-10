@@ -117,12 +117,14 @@ public class AiProviderFacadeImpl implements AiProviderFacade {
     @Override
     @Transactional(readOnly = true)
     public AiDefaultModelDTO getAiDefaultChatModel(String providerKey, int environmentId) {
+        Provider preferredProvider = Provider.fetchByNameOrKey(providerKey);
+
         return getAiProviders(environmentId)
             .stream()
             .filter(AiProviderDTO::enabled)
             .map(aiProviderDTO -> getProvider(aiProviderDTO.id()))
             .filter(Provider.CHAT_PROVIDERS::contains)
-            .filter(provider -> providerKey == null || Objects.equals(provider.getKey(), providerKey))
+            .filter(provider -> providerKey == null || provider == preferredProvider)
             .map(provider -> {
                 String model = resolveDefaultChatModel(provider);
 

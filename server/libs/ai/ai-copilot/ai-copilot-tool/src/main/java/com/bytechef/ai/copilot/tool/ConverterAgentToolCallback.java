@@ -23,6 +23,7 @@ import com.bytechef.ai.agent.tool.ToolErrors;
 import com.bytechef.commons.util.JsonUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,11 +63,16 @@ public class ConverterAgentToolCallback implements ToolCallback {
                 "required": ["request"]
             }""";
 
-    private final ChatClient converterChatClient;
+    private final Supplier<ChatClient> converterChatClientSupplier;
 
     @SuppressFBWarnings("EI_EXPOSE_REP2")
     public ConverterAgentToolCallback(ChatClient converterChatClient) {
-        this.converterChatClient = converterChatClient;
+        this(() -> converterChatClient);
+    }
+
+    @SuppressFBWarnings("EI_EXPOSE_REP2")
+    public ConverterAgentToolCallback(Supplier<ChatClient> converterChatClientSupplier) {
+        this.converterChatClientSupplier = converterChatClientSupplier;
     }
 
     @Override
@@ -98,6 +104,8 @@ public class ConverterAgentToolCallback implements ToolCallback {
             AgentType parentAgent = parent != null ? parent.agentName() : null;
 
             Map<String, Object> forwardedContext = toolContext == null ? Map.of() : toolContext.getContext();
+
+            ChatClient converterChatClient = converterChatClientSupplier.get();
 
             String result = CurrentAgentContext.callWith(
                 CopilotAgentType.CONVERTER_AGENT, parentAgent,

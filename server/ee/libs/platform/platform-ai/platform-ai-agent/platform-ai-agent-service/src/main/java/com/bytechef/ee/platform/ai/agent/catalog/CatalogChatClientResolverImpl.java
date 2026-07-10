@@ -47,6 +47,43 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
             return null;
         }
 
+        ChatModel chatModel = resolveChatModel(providerKey, model, environment);
+
+        if (chatModel == null) {
+            return null;
+        }
+
+        return ChatClient.builder(chatModel)
+            .defaultOptions(
+                ChatOptions.builder()
+                    .model(model))
+            .build();
+    }
+
+    @Override
+    public @Nullable ChatModel resolveDefaultChatModel(@Nullable String preferredProviderKey, int environment) {
+        if (environment < 0 || environment >= Environment.values().length) {
+            return null;
+        }
+
+        AiDefaultModelDTO defaultModel = null;
+
+        if (preferredProviderKey != null && !preferredProviderKey.isBlank()) {
+            defaultModel = aiProviderFacade.getAiDefaultChatModel(preferredProviderKey, environment);
+        }
+
+        if (defaultModel == null) {
+            defaultModel = aiProviderFacade.getAiDefaultChatModel(environment);
+        }
+
+        if (defaultModel == null) {
+            return null;
+        }
+
+        return resolveChatModel(defaultModel.provider(), defaultModel.model(), environment);
+    }
+
+    private @Nullable ChatModel resolveChatModel(String providerKey, String model, int environment) {
         Provider provider = Arrays.stream(Provider.values())
             .filter(curProvider -> Objects.equals(curProvider.getKey(), providerKey))
             .findFirst()
@@ -64,17 +101,7 @@ public class CatalogChatClientResolverImpl implements CatalogChatClientResolver 
 
         String url = aiProviderFacade.getUrl(provider.getKey(), environment);
 
-        ChatModel chatModel = catalogChatModelFactory.createChatModel(provider, model, apiKey, url);
-
-        if (chatModel == null) {
-            return null;
-        }
-
-        return ChatClient.builder(chatModel)
-            .defaultOptions(
-                ChatOptions.builder()
-                    .model(model))
-            .build();
+        return catalogChatModelFactory.createChatModel(provider, model, apiKey, url);
     }
 
     @Override

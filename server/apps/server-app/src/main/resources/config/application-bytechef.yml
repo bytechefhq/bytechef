@@ -16,19 +16,41 @@ bytechef:
           options:
             model: claude-sonnet-4-6
             temperature: 0.5
+        deep-seek:
+          options:
+            model: deepseek-chat
+        groq:
+          options:
+            model: llama-3.3-70b-versatile
+        mistral:
+          options:
+            model: mistral-large-latest
+        nvidia:
+          options:
+            model: meta/llama-3.1-70b-instruct
         openai:
           options:
             model: gpt-5.1
             temperature: 1
             reasoning-effect: medium
             verbosity: low
-      embedding:
-        ollama:
+        perplexity:
           options:
-            model: qwen3-embedding:8b
+            model: sonar
+        vertex-gemini:
+          options:
+            model: gemini-2.5-pro
+      embedding:
+        mistral:
+          options:
+            model: mistral-embed
         openai:
           options:
             model: text-embedding-3-small
+      image:
+        openai:
+          options:
+            model: dall-e-3
     vectorstore:
       provider: pgvector
   analytics:
