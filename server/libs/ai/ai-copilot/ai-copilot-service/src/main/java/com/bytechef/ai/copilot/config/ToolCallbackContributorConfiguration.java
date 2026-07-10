@@ -25,6 +25,7 @@ import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.SkillsTools;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
@@ -46,7 +47,8 @@ class ToolCallbackContributorConfiguration {
         @Qualifier("codeEditorBuildSubAgentChatClient") ObjectProvider<ChatClient> codeEditorProvider,
         @Qualifier("clusterElementBuildSubAgentChatClient") ObjectProvider<ChatClient> clusterElementProvider,
         @Qualifier("skillsBuildSubAgentChatClient") ObjectProvider<ChatClient> skillsProvider,
-        @Qualifier("converterBuildSubAgentChatClient") ObjectProvider<ChatClient> converterProvider) {
+        @Qualifier("converterBuildSubAgentChatClientSupplier") //
+        ObjectProvider<Supplier<ChatClient>> converterSupplierProvider) {
 
         return () -> {
             List<ToolCallback> toolCallbacks = new ArrayList<>();
@@ -62,8 +64,9 @@ class ToolCallbackContributorConfiguration {
                 chatClient -> toolCallbacks.add(new ClusterElementAgentToolCallback(chatClient)));
             skillsProvider.ifAvailable(
                 chatClient -> toolCallbacks.add(new SkillsAgentToolCallback(chatClient)));
-            converterProvider.ifAvailable(
-                chatClient -> toolCallbacks.add(new ConverterAgentToolCallback(chatClient)));
+            converterSupplierProvider.ifAvailable(
+                converterChatClientSupplier -> toolCallbacks.add(
+                    new ConverterAgentToolCallback(converterChatClientSupplier)));
 
             return toolCallbacks;
         };

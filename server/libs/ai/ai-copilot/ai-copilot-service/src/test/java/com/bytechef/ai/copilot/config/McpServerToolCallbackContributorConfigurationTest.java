@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.ObjectProvider;
@@ -37,9 +38,14 @@ class McpServerToolCallbackContributorConfigurationTest {
 
     @Test
     void contributesAgentCallbacksWhenChatClientsPresent() {
+        ChatClient converterChatClient = mock(ChatClient.class);
+
+        Supplier<ChatClient> converterChatClientSupplier = () -> converterChatClient;
+
         McpServerToolCallbackContributor contributor = configuration.copilotAgentToolCallbackContributor(
             emptyProvider(), present(mock(ChatClient.class)), present(mock(ChatClient.class)),
-            present(mock(ChatClient.class)), present(mock(ChatClient.class)), present(mock(ChatClient.class)));
+            present(mock(ChatClient.class)), present(mock(ChatClient.class)),
+            present(converterChatClientSupplier));
 
         assertThat(contributor.getToolCallbacks()).hasSize(5);
     }

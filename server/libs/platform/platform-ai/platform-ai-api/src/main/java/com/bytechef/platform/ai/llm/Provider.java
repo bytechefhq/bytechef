@@ -87,6 +87,41 @@ public enum Provider {
         this.name = name;
     }
 
+    /**
+     * Resolves a provider from either its short name (e.g. {@code anthropic}) or its full catalog key (e.g.
+     * {@code ai.provider.anthropic}), case-insensitively. Returns {@code null} when the value matches no provider, so
+     * callers can fall back instead of failing.
+     */
+    public static Provider fetchByNameOrKey(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+
+        for (Provider provider : values()) {
+            if (provider.key.equalsIgnoreCase(value) || provider.name.equalsIgnoreCase(value)) {
+                return provider;
+            }
+        }
+
+        return null;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public String getName() {
+        return name;
+    }
+
     public boolean isEmbeddingSupported() {
         return EMBEDDING_PROVIDERS.contains(this);
     }
@@ -105,22 +140,6 @@ public enum Provider {
 
     public boolean requiresEndpoint() {
         return ENDPOINT_PROVIDERS.contains(this);
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public String getLabel() {
-        return label;
-    }
-
-    public String getKey() {
-        return key;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public static Provider valueOfKey(String key) {

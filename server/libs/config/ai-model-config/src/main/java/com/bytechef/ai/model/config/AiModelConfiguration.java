@@ -45,6 +45,8 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.HashMap;
 import java.util.Map;
 import org.jspecify.annotations.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -63,6 +65,8 @@ import org.springframework.core.type.AnnotatedTypeMetadata;
 @Configuration
 @ConditionalOnCEVersion
 class AiModelConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(AiModelConfiguration.class);
 
     private final ApplicationProperties applicationProperties;
     private final String openAiApiKey;
@@ -115,7 +119,15 @@ class AiModelConfiguration {
             .getProvider();
 
         if (explicitProviderKey != null && !explicitProviderKey.isBlank()) {
-            return Provider.valueOfKey(explicitProviderKey);
+            Provider explicitProvider = Provider.fetchByNameOrKey(explicitProviderKey);
+
+            if (explicitProvider != null) {
+                return explicitProvider;
+            }
+
+            log.warn(
+                "bytechef.ai.copilot.provider value '{}' matches no AI provider; falling back to auto-detection",
+                explicitProviderKey);
         }
 
         for (Provider provider : Provider.CHAT_PROVIDERS) {

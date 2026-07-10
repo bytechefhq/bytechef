@@ -19,6 +19,7 @@ package com.bytechef.ai.copilot.agent;
 import com.agui.core.state.State;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.model.ChatModel;
 
 /**
  * Per-request resolver of an override {@link ChatClient} for Copilot agents. Used to swap the LLM at runtime when the
@@ -27,9 +28,17 @@ import org.springframework.ai.chat.client.ChatClient;
  *
  * @author Ivica Cardic
  */
-@FunctionalInterface
 public interface OverrideChatClientResolver {
 
     @Nullable
     ChatClient resolve(State state);
+
+    /**
+     * Resolves the environment-default {@link ChatModel} from the runtime provider catalog, honoring per-provider model
+     * overrides. Returns {@code null} when no catalog is active (CE) or nothing is resolvable — callers fall back to
+     * their startup-configured model.
+     */
+    default @Nullable ChatModel resolveDefaultChatModel(int environmentId) {
+        return null;
+    }
 }

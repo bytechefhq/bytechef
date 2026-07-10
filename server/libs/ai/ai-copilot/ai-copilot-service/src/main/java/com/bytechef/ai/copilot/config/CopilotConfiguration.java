@@ -65,6 +65,8 @@ import com.bytechef.platform.component.service.ComponentDefinitionService;
 import com.bytechef.platform.component.service.ConnectionDefinitionService;
 import com.bytechef.platform.component.service.TriggerDefinitionService;
 import com.bytechef.platform.configuration.ai.EmbeddingProviderStatusProvider;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
 import com.bytechef.platform.configuration.facade.WorkflowNodeOutputFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.IOException;
@@ -73,6 +75,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
@@ -81,6 +84,7 @@ import org.springframework.ai.support.ToolCallbacks;
 import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -543,6 +547,47 @@ public class CopilotConfiguration {
                 projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)
             .build();
+    }
+
+    /**
+     * Per-request converter subagent {@link ChatClient} supplier: when an EE {@link OverrideChatClientResolver} can
+     * resolve the environment-default {@link ChatModel} from the AI provider catalog (honoring per-provider model
+     * overrides), the client is rebuilt around it with the converter system prompt and tools; otherwise the
+     * startup-configured bean is returned.
+     */
+    @Bean
+    Supplier<ChatClient> converterBuildSubAgentChatClientSupplier(
+        @Qualifier("converterBuildSubAgentChatClient") ChatClient converterChatClient, ProjectTools projectTools,
+        ProjectWorkflowTools projectWorkflowTools, TaskTools taskTools, ScriptTools scriptTools,
+        ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) {
+
+        return () -> {
+            OverrideChatClientResolver overrideChatClientResolver =
+                overrideChatClientResolverProvider.getIfAvailable();
+
+            if (overrideChatClientResolver == null) {
+                return converterChatClient;
+            }
+
+            Environment environment = EnvironmentContext.fetchCurrentEnvironment();
+
+            if (environment == null) {
+                return converterChatClient;
+            }
+
+            ChatModel resolvedChatModel = overrideChatClientResolver.resolveDefaultChatModel(environment.ordinal());
+
+            if (resolvedChatModel == null) {
+                return converterChatClient;
+            }
+
+            return ChatClient.builder(resolvedChatModel)
+                .defaultSystem(getSystemPrompt(promptConverterBuildResource))
+                .defaultTools(
+                    projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
+                    workflowInstructionTools)
+                .build();
+        };
     }
 
     @Bean

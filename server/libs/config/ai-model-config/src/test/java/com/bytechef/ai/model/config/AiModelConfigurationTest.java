@@ -74,6 +74,40 @@ class AiModelConfigurationTest {
     }
 
     @Test
+    void acceptsShortProviderNameForCopilotOverride() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .setApiKey("test-api-key");
+        applicationProperties.getAi()
+            .getCopilot()
+            .setProvider("anthropic");
+
+        AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
+
+        assertThat(aiModelConfiguration.resolveProvider()).isEqualTo(Provider.ANTHROPIC);
+    }
+
+    @Test
+    void fallsBackToAutoDetectionForUnknownCopilotOverride() {
+        ApplicationProperties applicationProperties = new ApplicationProperties();
+
+        applicationProperties.getAi()
+            .getProvider()
+            .getOpenAi()
+            .setApiKey("test-api-key");
+        applicationProperties.getAi()
+            .getCopilot()
+            .setProvider("does-not-exist");
+
+        AiModelConfiguration aiModelConfiguration = new AiModelConfiguration(applicationProperties);
+
+        assertThat(aiModelConfiguration.resolveProvider()).isEqualTo(Provider.OPEN_AI);
+    }
+
+    @Test
     void doesNotAutoSelectKeylessOllamaWithoutExplicitConfiguration() {
         ApplicationProperties applicationProperties = new ApplicationProperties();
 

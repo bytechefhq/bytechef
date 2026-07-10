@@ -27,6 +27,7 @@ import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -174,6 +175,33 @@ class ConverterAgentToolCallbackTest {
         callback.call("{\"request\":\"any\"}", null);
 
         verify(requestSpec).toolContext(Map.of());
+    }
+
+    @Test
+    void testCallResolvesChatClientFromSupplierPerCall() {
+        ChatClient chatClient = mock(ChatClient.class);
+        ChatClientRequestSpec requestSpec = mock(ChatClientRequestSpec.class);
+        CallResponseSpec responseSpec = mock(CallResponseSpec.class);
+
+        when(chatClient.prompt(anyString())).thenReturn(requestSpec);
+        stubToolContext(requestSpec);
+        when(requestSpec.call()).thenReturn(responseSpec);
+        when(responseSpec.content()).thenReturn("converted");
+
+        AtomicInteger supplierCalls = new AtomicInteger();
+
+        ConverterAgentToolCallback callback = new ConverterAgentToolCallback(() -> {
+            supplierCalls.incrementAndGet();
+
+            return chatClient;
+        });
+
+        String firstResult = callback.call("{\"request\":\"convert this n8n workflow\"}");
+        String secondResult = callback.call("{\"request\":\"convert that make workflow\"}");
+
+        assertThat(firstResult).isEqualTo("converted");
+        assertThat(secondResult).isEqualTo("converted");
+        assertThat(supplierCalls.get()).isEqualTo(2);
     }
 
     @Test
