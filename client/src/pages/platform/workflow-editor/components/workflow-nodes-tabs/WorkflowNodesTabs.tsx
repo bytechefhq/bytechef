@@ -3,7 +3,6 @@ import {Tabs, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import {getClusterElementsLabel} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
 import {ComponentDefinitionBasic, TaskDispatcherDefinition} from '@/shared/middleware/platform/configuration';
-import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {ClickedDefinitionType, UpdateWorkflowMutationType} from '@/shared/types';
 import {ClipboardPasteIcon, ClipboardXIcon} from 'lucide-react';
 import {MouseEvent, useCallback, useEffect, useMemo, useRef, useState} from 'react';
@@ -86,8 +85,6 @@ const WorkflowNodesTabs = ({
             workflow: state.workflow,
         }))
     );
-
-    const ff_1057 = useFeatureFlagsStore()('ff-1057');
 
     const visibleActionComponentDefinitions = useMemo(
         () =>
@@ -186,16 +183,7 @@ const WorkflowNodesTabs = ({
     }, [triggerFiltering.filteredComponents]);
 
     const availableTaskDispatchers = useMemo(() => {
-        const baseDefinitions = ff_1057
-            ? taskDispatcherDefinitions
-            : taskDispatcherDefinitions.filter(
-                  (taskDispatcherDefinition) =>
-                      taskDispatcherDefinition.name === 'branch' ||
-                      taskDispatcherDefinition.name === 'condition' ||
-                      taskDispatcherDefinition.name === 'loop'
-              );
-
-        const filteredDefinitions = baseDefinitions.filter(
+        const filteredDefinitions = taskDispatcherDefinitions.filter(
             (taskDispatcherDefinition) => !HIDDEN_TASK_DISPATCHER_NAMES.has(taskDispatcherDefinition.name)
         );
 
@@ -206,7 +194,7 @@ const WorkflowNodesTabs = ({
                     taskDispatcher: true,
                 }) as DefinitionType
         );
-    }, [ff_1057, taskDispatcherDefinitions]);
+    }, [taskDispatcherDefinitions]);
 
     const availableClusterElements = useMemo(
         () =>
