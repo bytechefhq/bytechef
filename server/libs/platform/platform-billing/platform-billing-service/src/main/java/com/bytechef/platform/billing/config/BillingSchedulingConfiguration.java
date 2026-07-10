@@ -22,7 +22,7 @@ import org.quartz.CronTrigger;
 import org.quartz.JobBuilder;
 import org.quartz.JobDetail;
 import org.quartz.TriggerBuilder;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,9 +30,8 @@ import org.springframework.context.annotation.Configuration;
  * @author Matija Petanjek
  */
 @Configuration
-@ConditionalOnProperty(
-    prefix = "bytechef", name = "coordinator.trigger.scheduler.provider",
-    havingValue = "quartz", matchIfMissing = true)
+@ConditionalOnExpression("${bytechef.billing.enabled:false} " +
+    "and '${bytechef.coordinator.trigger.scheduler.provider:quartz}'.equals('quartz')")
 public class BillingSchedulingConfiguration {
 
     @Bean
@@ -48,7 +47,7 @@ public class BillingSchedulingConfiguration {
         return TriggerBuilder.newTrigger()
             .forJob(stripeUsageReportingJobDetail)
             .withIdentity("stripeUsageReportingTrigger")
-            .withSchedule(CronScheduleBuilder.cronSchedule("0 0/1 * * * ?"))
+            .withSchedule(CronScheduleBuilder.cronSchedule("0 0 * * * ?"))
             .build();
     }
 }
