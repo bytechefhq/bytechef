@@ -166,7 +166,7 @@ const SelectPlanDialog = ({
     return (
         <>
             <Dialog onOpenChange={(isOpen) => !isOpen && onClose()} open={open}>
-                <DialogContent className="max-w-[960px] gap-6">
+                <DialogContent className="gap-6 sm:max-w-[960px]">
                     <DialogHeader className="flex-row items-start justify-between space-y-0">
                         <div className="flex flex-col gap-1">
                             <DialogTitle>Select a plan</DialogTitle>
