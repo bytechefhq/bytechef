@@ -82,15 +82,13 @@ class UserManagementFacadeImpl implements UserManagementFacade {
 
         PasswordValidator.validate(password);
 
-        // Validate the requested role before creating any user record so an invalid role cannot leave an orphaned
-        // user. Resolving the authority once here also avoids the earlier double getAuthorities()/double save().
+        // Resolve the requested role before creating any user record so an invalid role cannot leave an orphaned user
         Authority authority = authorityService.getAuthorities()
             .stream()
             .filter(curAuthority -> Objects.equals(curAuthority.getName(), role))
             .findFirst()
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid role: " + role));
 
-        // Derive login from email if not provided
         String login = StringUtils.substringBefore(email, "@");
 
         AdminUserDTO userDTO = new AdminUserDTO();
