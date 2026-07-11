@@ -32,15 +32,20 @@ import static com.bytechef.component.definition.ComponentDsl.integer;
 import static com.bytechef.component.definition.ComponentDsl.number;
 import static com.bytechef.component.definition.ComponentDsl.string;
 
+import com.anthropic.models.messages.Model;
 import com.bytechef.component.ai.llm.util.ModelUtils;
 import com.bytechef.component.definition.ComponentDsl.ModifiableIntegerProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableNumberProperty;
 import com.bytechef.component.definition.ComponentDsl.ModifiableStringProperty;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Property;
-import java.util.LinkedHashMap;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * @author Ivica Cardic
@@ -71,21 +76,7 @@ public class AnthropicConstants {
         .maxValue(1)
         .advancedOption(true);
 
-    private static final Map<String, String> MODEL_MAP = new LinkedHashMap<>();
-
-    static {
-        MODEL_MAP.put("claude-opus-4-6", "claude-opus-4-6");
-        MODEL_MAP.put("claude-sonnet-4-6", "claude-sonnet-4-6");
-        MODEL_MAP.put("claude-haiku-4-5", "claude-haiku-4-5");
-        MODEL_MAP.put("claude-opus-4-5", "claude-opus-4-5");
-        MODEL_MAP.put("claude-sonnet-4-5", "claude-sonnet-4-5");
-        MODEL_MAP.put("claude-opus-4-1", "claude-opus-4-1");
-        MODEL_MAP.put("claude-opus-4-0", "claude-opus-4-0");
-        MODEL_MAP.put("claude-sonnet-4-0", "claude-sonnet-4-0");
-        MODEL_MAP.put("claude-3-haiku-20240307", "claude-3-haiku-20240307");
-    }
-
-    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(MODEL_MAP);
+    public static final List<Option<String>> MODELS = ModelUtils.getEnumOptions(toChatModelMap());
 
     public static final ModifiableStringProperty CHAT_MODEL_PROPERTY = string(MODEL)
         .label("Model")
@@ -106,4 +97,23 @@ public class AnthropicConstants {
         TOP_P_PROPERTY,
         TOP_K_PROPERTY,
         STOP_PROPERTY);
+
+    /**
+     * Model ids are read straight off the Anthropic SDK's {@link Model} constants via {@link Model#asString()}, so the
+     * options list refreshes automatically on SDK upgrades.
+     */
+    private static Map<String, String> toChatModelMap() {
+        return Arrays.stream(Model.class.getFields())
+            .filter(field -> Modifier.isStatic(field.getModifiers()) && field.getType() == Model.class)
+            .map(AnthropicConstants::resolveChatModelValue)
+            .collect(Collectors.toMap(Function.identity(), Function.identity(), (a, b) -> a));
+    }
+
+    private static String resolveChatModelValue(Field field) {
+        try {
+            return ((Model) field.get(null)).asString();
+        } catch (IllegalAccessException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
 }
