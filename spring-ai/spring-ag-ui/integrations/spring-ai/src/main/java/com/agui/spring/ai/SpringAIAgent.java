@@ -171,6 +171,12 @@ public class SpringAIAgent extends LocalAgent {
             getChatRequest(input, content, messageId, deferredEvents, this.createSystemMessage(state, input.context()), subscriber)
                 .stream()
                 .chatResponse()
+                // Capture ThreadLocals registered in the ContextRegistry (environment, tenant, tracing) into the
+                // Reactor Context at this subscription point. A plain lambda subscribe() never captures ThreadLocals
+                // (automatic context propagation only captures at blocking entry points), so without this the
+                // per-request context a host binds around run() is silently dropped once the advisor chain hops to
+                // Schedulers.boundedElastic(). No-op when the context-propagation library is absent.
+                .contextCapture()
                 .subscribe(
                     evt -> onEvent(subscriber, evt, assistantMessage, messageId, deferredEvents),
                     err -> {
