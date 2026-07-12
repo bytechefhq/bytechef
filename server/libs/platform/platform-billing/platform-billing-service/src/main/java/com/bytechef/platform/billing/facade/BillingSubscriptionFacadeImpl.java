@@ -226,7 +226,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             String clientReferenceId = dataObject.path("client_reference_id")
                 .textValue();
 
-            return clientReferenceId != null ? clientReferenceId : TenantContext.DEFAULT_TENANT_ID;
+            if (clientReferenceId == null) {
+                throw new IllegalStateException(
+                    "Missing client_reference_id in checkout.session.completed webhook event");
+            }
+
+            return clientReferenceId;
         }
 
         if ("customer.subscription.updated".equals(eventType) ||
@@ -236,10 +241,15 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                 .path("tenantId")
                 .textValue();
 
-            return tenantId != null ? tenantId : TenantContext.DEFAULT_TENANT_ID;
+            if (tenantId == null) {
+                throw new IllegalStateException(
+                    "Missing tenantId metadata in " + eventType + " webhook event");
+            }
+
+            return tenantId;
         }
 
-        return TenantContext.DEFAULT_TENANT_ID;
+        throw new IllegalArgumentException("Unhandled webhook event type: " + eventType);
     }
 
     private BillingSubscription handleSubscriptionUpdated(Event event) {
