@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.facade;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -26,7 +27,6 @@ import static org.mockito.Mockito.when;
 import com.bytechef.platform.billing.client.StripeClientImpl;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
-import com.bytechef.platform.billing.domain.BillingSubscriptionWebhookEvent;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
@@ -184,22 +184,12 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
-    void testHandleUnknownEventTypeSavesWebhookEventWithoutSubscriptionLink() throws Exception {
-        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
-
+    void testHandleUnknownEventTypeThrowsIllegalArgumentException() throws Exception {
         String payload = unknownEventPayload();
 
-        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
-
-        verify(billingSubscriptionService, never()).fetchSubscriptionByStripeSubscriptionId(any());
-        verify(billingSubscriptionService, never()).save(any());
-
-        ArgumentCaptor<BillingSubscriptionWebhookEvent> captor =
-            ArgumentCaptor.forClass(BillingSubscriptionWebhookEvent.class);
-
-        verify(billingWebhookEventService).save(captor.capture());
-        assertThat(captor.getValue()
-            .getSubscriptionId()).isNull();
+        assertThatThrownBy(() -> facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET)))
+            .isInstanceOf(IllegalArgumentException.class)
+            .hasMessage("Unhandled webhook event type: invoice.payment_succeeded");
     }
 
     @Test
