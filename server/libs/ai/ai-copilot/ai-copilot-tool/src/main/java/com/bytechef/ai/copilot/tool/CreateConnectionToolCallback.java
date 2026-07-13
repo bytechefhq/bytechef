@@ -122,8 +122,10 @@ public class CreateConnectionToolCallback implements ToolCallback {
                 componentDefinition = componentDefinitionService.fetchComponentDefinition(componentName, null);
 
                 if (componentDefinition.isEmpty()) {
-                    return toolError(
-                        ComponentSlugUtils.unknownComponentMessage(componentName, componentDefinitionService));
+                    // The slug came straight from the catalog scan, so a missing definition here means a concurrent
+                    // catalog change between the two lookups — fail loud rather than emit a marker for a vanished slug.
+                    return toolError(ComponentSlugUtils.unknownComponentMessage(componentName,
+                        componentDefinitionService));
                 }
             }
 
