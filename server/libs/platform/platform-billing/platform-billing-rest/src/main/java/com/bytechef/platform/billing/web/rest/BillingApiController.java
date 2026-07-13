@@ -49,7 +49,7 @@ public class BillingApiController implements BillingApi {
 
     @Override
     public ResponseEntity<Void> upgradeSubscription(CheckoutSessionRequestModel checkoutSessionRequestModel) {
-        billingSubscriptionFacade.upgradeSubscription(
+        billingSubscriptionFacade.updateSubscription(
             checkoutSessionRequestModel.getPlanName()
                 .getValue());
 
