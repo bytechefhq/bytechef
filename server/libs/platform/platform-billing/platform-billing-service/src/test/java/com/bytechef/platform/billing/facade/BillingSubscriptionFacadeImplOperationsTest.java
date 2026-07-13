@@ -82,7 +82,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
     }
 
     @Test
-    void testUpgradeSubscriptionCallsUpgradeNowForUpgradePath() {
+    void testUpgradeSubscriptionCallsUpgradeNowForUpdatePath() {
         BillingSubscription currentSubscription = starterSubscription();
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
@@ -90,7 +90,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        facade.upgradeSubscription("GROWTH");
+        facade.updateSubscription("GROWTH");
 
         verify(stripeClient).upgradeSubscriptionNow(
             eq("sub_starter"), eq("si_flat_starter"), eq("price_growth"), eq("GROWTH"), any());
@@ -98,7 +98,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
     }
 
     @Test
-    void testUpgradeSubscriptionSchedulesDowngradeAndSetsPlanName() {
+    void testUpdateSubscriptionSchedulesDowngradeAndSetsPlanName() {
         BillingSubscription currentSubscription = growthSubscription();
 
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(currentSubscription));
@@ -107,7 +107,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_USAGE_ID)).thenReturn("price_usage");
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        facade.upgradeSubscription("STARTER");
+        facade.updateSubscription("STARTER");
 
         verify(stripeClient).scheduleDowngrade(
             eq("sub_growth"), eq("si_flat_growth"), eq("si_usage_growth"),
@@ -122,7 +122,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
     }
 
     @Test
-    void testUpgradeSubscriptionClearsScheduledPlanNameOnUpgrade() {
+    void testUpgradeSubscriptionClearsScheduledPlanNameOnUpdate() {
         BillingSubscription currentSubscription = starterSubscription();
 
         currentSubscription.setScheduledPlanName("GROWTH");
@@ -132,7 +132,7 @@ class BillingSubscriptionFacadeImplOperationsTest {
         when(stripeClient.fetchProductDefaultPriceId(PRODUCT_GROWTH_ID)).thenReturn("price_growth");
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
 
-        facade.upgradeSubscription("GROWTH");
+        facade.updateSubscription("GROWTH");
 
         ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
 
@@ -160,11 +160,11 @@ class BillingSubscriptionFacadeImplOperationsTest {
     }
 
     @Test
-    void testUpgradeSubscriptionThrowsForUnknownPlanName() {
+    void testUpdateSubscriptionThrowsForUnknownPlanName() {
         when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(starterSubscription()));
         when(stripeClient.retrieveSubscription(any())).thenReturn(mockStripeSubscription);
 
-        assertThatThrownBy(() -> facade.upgradeSubscription("ENTERPRISE"))
+        assertThatThrownBy(() -> facade.updateSubscription("ENTERPRISE"))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unknown plan: ENTERPRISE");
     }

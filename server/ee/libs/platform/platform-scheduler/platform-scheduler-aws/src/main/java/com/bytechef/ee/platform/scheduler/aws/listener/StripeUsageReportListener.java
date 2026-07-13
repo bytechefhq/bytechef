@@ -15,6 +15,8 @@ import com.bytechef.platform.billing.service.BillingUsageService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.awspring.cloud.sqs.annotation.SqsListener;
 import java.time.Instant;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @version ee
@@ -22,6 +24,7 @@ import java.time.Instant;
  * @author Matija Petanjek
  */
 public class StripeUsageReportListener {
+    private static final Logger log = LoggerFactory.getLogger(StripeUsageReportListener.class);
 
     private final BillingUsageService billingUsageService;
 
@@ -35,6 +38,8 @@ public class StripeUsageReportListener {
         id = STRIPE_USAGE_REPORTING_LISTENER_ID,
         factory = SCHEDULER_SQS_LISTENER_CONTAINER_FACTORY)
     public void onSchedule(String message) {
+        log.info("Stripe usage reporting triggered");
+
         billingUsageService.reportUsage(Instant.now());
     }
 }

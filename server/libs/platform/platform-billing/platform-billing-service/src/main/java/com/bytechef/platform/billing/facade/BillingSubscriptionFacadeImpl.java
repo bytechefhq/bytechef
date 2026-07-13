@@ -35,6 +35,9 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import tools.jackson.databind.JsonNode;
@@ -45,6 +48,8 @@ import tools.jackson.databind.ObjectMapper;
  */
 @Service
 public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade {
+
+    private static final Logger log = LoggerFactory.getLogger(BillingSubscriptionFacadeImpl.class);
 
     private final BillingProperties billingProperties;
     private final BillingSubscriptionService billingSubscriptionService;
@@ -112,8 +117,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
         TenantContext.runWithTenantId(extractTenantId(payload, event.getType()), () -> {
             if (billingWebhookEventService.isEventProcessed(event.getId())) {
+                log.info("Ignoring already processed webhook event: {}", event.getId());
+
                 return;
             }
+
+            log.info("Processing webhook event: {}", event);
 
             BillingSubscription savedSubscription = null;
 
@@ -148,7 +157,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
-    public void upgradeSubscription(String planName) {
+    public void updateSubscription(String newPlanName) {
         BillingSubscription currentSubscription = billingSubscriptionService.fetchCurrentSubscription()
             .orElseThrow(() -> new IllegalStateException("No active subscription found"));
 
@@ -158,12 +167,12 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
         stripeClient.releaseSubscriptionScheduleIfPresent(stripeSubscription);
 
-        String newFlatPriceId = stripeClient.fetchProductDefaultPriceId(resolveFlatProductId(planName));
+        String newFlatPriceId = stripeClient.fetchProductDefaultPriceId(resolveFlatProductId(newPlanName));
         String tenantId = TenantContext.getCurrentTenantId();
 
-        if (isUpgrade(currentSubscription.getPlanName(), planName)) {
+        if (isUpgrade(currentSubscription.getPlanName(), newPlanName)) {
             stripeClient.upgradeSubscriptionNow(
-                subscriptionId, currentSubscription.getStripeProductId(), newFlatPriceId, planName, tenantId);
+                subscriptionId, currentSubscription.getStripeProductId(), newFlatPriceId, newPlanName, tenantId);
 
             currentSubscription.setScheduledPlanName(null);
         } else {
@@ -173,11 +182,11 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
 
             stripeClient.scheduleDowngrade(
                 subscriptionId, currentSubscription.getStripeProductId(),
-                currentSubscription.getStripeUsageProductId(), newFlatPriceId, newMeteredPriceId, planName,
+                currentSubscription.getStripeUsageProductId(), newFlatPriceId, newMeteredPriceId, newPlanName,
                 tenantId, currentSubscription.getCurrentPeriodEnd()
                     .getEpochSecond());
 
-            currentSubscription.setScheduledPlanName(planName);
+            currentSubscription.setScheduledPlanName(newPlanName);
         }
 
         billingSubscriptionService.save(currentSubscription);
