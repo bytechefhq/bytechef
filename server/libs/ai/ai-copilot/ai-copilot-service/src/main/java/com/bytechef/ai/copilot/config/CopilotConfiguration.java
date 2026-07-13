@@ -216,22 +216,25 @@ public class CopilotConfiguration {
     @Bean
     ClusterElementSpringAIAgent clusterElementAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools, SecurityContextRehydrator securityContextRehydrator,
+        ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools,
+        SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider) throws AGUIException {
 
         String name = Source.CLUSTER_ELEMENT.name() + "_" + Mode.ASK.name();
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
 
         return ClusterElementSpringAIAgent.builder()
             .agentId(name.toLowerCase())
             .chatMemory(chatMemory)
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptClusterElementAskResource))
-            .toolCallbacks(
-                wrapTools(
-                    securityContextRehydrator,
-                    List.of(
-                        readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools,
-                        workflowInstructionTools)))
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .state(state)
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
@@ -419,11 +422,18 @@ public class CopilotConfiguration {
     SkillsSpringAIAgent skillsAskSpringAIAgent(
         ChatMemory chatMemory, ChatModel chatModel, ReadProjectTools readProjectTools,
         ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
-        SecurityContextRehydrator securityContextRehydrator,
+        Optional<FirecrawlTools> firecrawlTools, SecurityContextRehydrator securityContextRehydrator,
         ObjectProvider<OverrideChatClientResolver> overrideChatClientResolverProvider)
         throws AGUIException {
 
         String name = Source.SKILLS.name() + "_" + Mode.ASK.name();
+
+        List<Object> tools = new ArrayList<>(
+            List.of(
+                readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                workflowInstructionTools));
+
+        firecrawlTools.ifPresent(tools::add);
 
         return SkillsSpringAIAgent.builder()
             .agentId(name.toLowerCase())
@@ -431,12 +441,7 @@ public class CopilotConfiguration {
             .chatModel(chatModel)
             .systemMessage(getSystemPrompt(promptSkillsAskResource))
             .state(state)
-            .toolCallbacks(
-                wrapTools(
-                    securityContextRehydrator,
-                    List.of(
-                        readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                        workflowInstructionTools)))
+            .toolCallbacks(wrapTools(securityContextRehydrator, tools))
             .overrideChatClientResolver(overrideChatClientResolverProvider.getIfAvailable())
             .build();
     }
@@ -593,13 +598,21 @@ public class CopilotConfiguration {
     @Bean
     ChatClient clusterElementAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectWorkflowTools readProjectWorkflowTools,
-        ComponentTools componentTools, TaskTools taskTools) {
+        ComponentTools componentTools, TaskTools taskTools, Optional<FirecrawlTools> firecrawlTools) {
 
-        return ChatClient.builder(chatModel)
-            .defaultSystem(getSystemPrompt(promptClusterElementAskResource))
-            .defaultTools(
-                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools)
-            .build();
+        ChatClient.Builder builder = ChatClient.builder(chatModel)
+            .defaultSystem(getSystemPrompt(promptClusterElementAskResource));
+
+        if (firecrawlTools.isPresent()) {
+            builder.defaultTools(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools,
+                firecrawlTools.get());
+        } else {
+            builder.defaultTools(
+                readProjectWorkflowTools, componentTools, taskTools, workflowValidatorTools, workflowInstructionTools);
+        }
+
+        return builder.build();
     }
 
     @Bean
@@ -618,14 +631,23 @@ public class CopilotConfiguration {
     @Bean
     ChatClient skillsAskSubAgentChatClient(
         ChatModel chatModel, ReadProjectTools readProjectTools,
-        ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools) {
+        ReadProjectWorkflowTools readProjectWorkflowTools, ReadSkillsTools readSkillsTools,
+        Optional<FirecrawlTools> firecrawlTools) {
 
-        return ChatClient.builder(chatModel)
-            .defaultSystem(getSystemPrompt(promptSkillsAskResource))
-            .defaultTools(
+        ChatClient.Builder builder = ChatClient.builder(chatModel)
+            .defaultSystem(getSystemPrompt(promptSkillsAskResource));
+
+        if (firecrawlTools.isPresent()) {
+            builder.defaultTools(
                 readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
-                workflowInstructionTools)
-            .build();
+                workflowInstructionTools, firecrawlTools.get());
+        } else {
+            builder.defaultTools(
+                readSkillsTools, readProjectTools, readProjectWorkflowTools, workflowValidatorTools,
+                workflowInstructionTools);
+        }
+
+        return builder.build();
     }
 
     @Bean
