@@ -30,7 +30,7 @@ public interface BillingSubscriptionFacade {
 
     void reactivateSubscription();
 
-    void upgradeSubscription(String planName);
+    void updateSubscription(String planName);
 
     void handleWebhookEvent(String payload, String stripeSignatureHeader);
 
