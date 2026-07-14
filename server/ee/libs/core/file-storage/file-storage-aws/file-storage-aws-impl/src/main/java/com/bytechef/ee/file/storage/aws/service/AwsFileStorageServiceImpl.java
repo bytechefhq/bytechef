@@ -24,6 +24,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
@@ -49,9 +50,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public void deleteFile(String directory, FileEntry fileEntry) {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
-
-        s3Template.deleteObject(bucketName, Objects.requireNonNull(s3Resource.getFilename()));
+        findObject(directory, fileEntry.getName())
+            .ifPresent(
+                s3Resource -> s3Template.deleteObject(bucketName, Objects.requireNonNull(s3Resource.getFilename())));
     }
 
     @Override
@@ -201,12 +202,16 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     private S3Resource getObject(String directoryPath, String filename) {
+        return findObject(directoryPath, filename)
+            .orElseThrow(() -> new FileStorageException("File %s doesn't exist".formatted(filename)));
+    }
+
+    private Optional<S3Resource> findObject(String directoryPath, String filename) {
         List<S3Resource> s3Resources = s3Template.listObjects(bucketName, "");
 
         return s3Resources.stream()
             .filter((file) -> StringUtils.contains(file.getFilename(), directoryPath + "/" + filename))
-            .findFirst()
-            .orElseThrow(() -> new FileStorageException("File %s doesn't exist".formatted(filename)));
+            .findFirst();
     }
 
     private static String combinePaths(String directory, String filename) {
