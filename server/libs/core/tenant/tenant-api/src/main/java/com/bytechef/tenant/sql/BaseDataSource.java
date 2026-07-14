@@ -122,7 +122,9 @@ public abstract class BaseDataSource implements DataSource {
      * qualification, even when the tenant schema is searched first.
      * </p>
      */
-    @SuppressFBWarnings("SQL_INJECTION_JDBC")
+    @SuppressFBWarnings({
+        "SQL_INJECTION_JDBC", "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING"
+    })
     protected void setSearchPath(Connection connection) throws SQLException {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(getVectorSchemaSuffix());
 
