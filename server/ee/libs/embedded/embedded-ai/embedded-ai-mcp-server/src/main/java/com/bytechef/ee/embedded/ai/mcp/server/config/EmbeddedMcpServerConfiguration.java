@@ -85,7 +85,6 @@ import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.servlet.http.HttpServletRequest;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -120,7 +119,6 @@ public class EmbeddedMcpServerConfiguration {
     WebMvcStreamableServerTransportProvider embeddedWebMvcStreamableHttpServerTransportProvider() {
         return WebMvcStreamableServerTransportProvider.builder()
             .mcpEndpoint("/api/embedded/{secretKey}/mcp")
-            .keepAliveInterval(Duration.ofSeconds(30))
             .contextExtractor(serverRequest -> {
                 String externalUserId = SecurityUtils.getCurrentUserLogin();
                 String secretKey = serverRequest.pathVariable(SECRET_KEY);
