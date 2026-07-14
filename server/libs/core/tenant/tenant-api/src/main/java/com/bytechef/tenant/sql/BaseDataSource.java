@@ -121,10 +121,21 @@ public abstract class BaseDataSource implements DataSource {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(getVectorSchemaSuffix());
 
         try (PreparedStatement statement =
-            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + currentDatabaseSchema)) {
+            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + getSearchPath(currentDatabaseSchema))) {
 
             statement.execute();
         }
+    }
+
+    /**
+     * Builds the value used in the {@code SET search_path TO} statement for the given tenant schema. Subclasses may
+     * append additional schemas (such as {@code public}) that hold shared objects like PostgreSQL extensions.
+     *
+     * @param currentDatabaseSchema the validated tenant schema
+     * @return the search path value
+     */
+    protected String getSearchPath(String currentDatabaseSchema) {
+        return currentDatabaseSchema;
     }
 
     /**

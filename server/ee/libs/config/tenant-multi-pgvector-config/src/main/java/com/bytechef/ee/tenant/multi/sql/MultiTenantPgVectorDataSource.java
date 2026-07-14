@@ -33,4 +33,14 @@ public class MultiTenantPgVectorDataSource extends BaseDataSource {
     protected String getVectorSchemaSuffix() {
         return VECTOR_STORE_SCHEMA_SUFFIX;
     }
+
+    /**
+     * Appends the {@code public} schema so that pgvector's {@code vector} type and its operators (e.g. {@code <=>}),
+     * installed via {@code CREATE EXTENSION vector SCHEMA public}, remain resolvable while the search_path is otherwise
+     * narrowed to the tenant vector schema.
+     */
+    @Override
+    protected String getSearchPath(String currentDatabaseSchema) {
+        return currentDatabaseSchema + ", public";
+    }
 }
