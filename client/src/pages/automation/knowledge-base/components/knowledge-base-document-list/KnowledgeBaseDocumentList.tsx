@@ -1,9 +1,7 @@
 import DeleteAlertDialog from '@/components/DeleteAlertDialog';
-import {Collapsible, CollapsibleContent} from '@/components/ui/collapsible';
 import {KnowledgeBaseDocument} from '@/shared/middleware/graphql';
 
-import KnowledgeBaseDocumentChunkList from './KnowledgeBaseDocumentChunkList';
-import KnowledgeBaseDocumentListItem from './KnowledgeBaseDocumentListItem';
+import KnowledgeBaseDocumentListRow from './KnowledgeBaseDocumentListRow';
 import useKnowledgeBaseDocumentList from './hooks/useKnowledgeBaseDocumentList';
 import useKnowledgeBaseDocumentListItemDeleteDialog from './hooks/useKnowledgeBaseDocumentListItemDeleteDialog';
 
@@ -13,9 +11,7 @@ interface KnowledgeBaseDocumentListProps {
 }
 
 const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDocumentListProps) => {
-    const {getRemainingTagsForDocument, getSortedChunksForDocument, getTagsForDocument} = useKnowledgeBaseDocumentList({
-        documents,
-    });
+    const {getRemainingTagsForDocument, getTagsForDocument} = useKnowledgeBaseDocumentList();
 
     const {
         handleClose: handleDeleteDialogClose,
@@ -31,29 +27,15 @@ const KnowledgeBaseDocumentList = ({documents, knowledgeBaseId}: KnowledgeBaseDo
                 </p>
             ) : (
                 <>
-                    {documents.map((document) => {
-                        const tags = getTagsForDocument(document.id);
-                        const remainingTags = getRemainingTagsForDocument(document.id);
-                        const sortedChunks = getSortedChunksForDocument(document.id);
-
-                        return (
-                            <Collapsible className="group" key={document.id}>
-                                <KnowledgeBaseDocumentListItem
-                                    document={document}
-                                    remainingTags={remainingTags}
-                                    tags={tags}
-                                />
-
-                                <CollapsibleContent>
-                                    <KnowledgeBaseDocumentChunkList
-                                        chunks={sortedChunks}
-                                        documentName={document.name}
-                                        knowledgeBaseId={knowledgeBaseId}
-                                    />
-                                </CollapsibleContent>
-                            </Collapsible>
-                        );
-                    })}
+                    {documents.map((document) => (
+                        <KnowledgeBaseDocumentListRow
+                            document={document}
+                            key={document.id}
+                            knowledgeBaseId={knowledgeBaseId}
+                            remainingTags={getRemainingTagsForDocument(document.id)}
+                            tags={getTagsForDocument(document.id)}
+                        />
+                    ))}
 
                     <DeleteAlertDialog
                         onCancel={handleDeleteDialogClose}

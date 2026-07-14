@@ -20,25 +20,18 @@ vi.mock('../hooks/useKnowledgeBaseDocumentListItemDeleteDialog', () => ({
     default: hoisted.mockUseKnowledgeBaseDocumentListItemDeleteDialog,
 }));
 
-vi.mock('../KnowledgeBaseDocumentListItem', () => ({
+vi.mock('../KnowledgeBaseDocumentListRow', () => ({
     default: ({document}: {document: {id: string; name: string}}) => (
-        <div data-testid={`document-item-${document.id}`}>{document.name}</div>
-    ),
-}));
+        <div data-testid={`document-item-${document.id}`}>
+            {document.name}
 
-vi.mock('../KnowledgeBaseDocumentChunkList', () => ({
-    default: ({documentName}: {documentName: string}) => (
-        <div data-testid={`chunk-list-${documentName}`}>Chunks for {documentName}</div>
+            <div data-testid={`chunk-list-${document.name}`}>Chunks for {document.name}</div>
+        </div>
     ),
 }));
 
 vi.mock('@/components/DeleteAlertDialog', () => ({
     default: ({open}: {open: boolean}) => (open ? <div data-testid="delete-dialog">Delete Dialog</div> : null),
-}));
-
-vi.mock('@/components/ui/collapsible', () => ({
-    Collapsible: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
-    CollapsibleContent: ({children}: {children: React.ReactNode}) => <div>{children}</div>,
 }));
 
 const mockDocuments = [
@@ -62,7 +55,6 @@ const mockDocuments = [
 
 const defaultListMockReturn = {
     getRemainingTagsForDocument: vi.fn(() => []),
-    getSortedChunksForDocument: vi.fn(() => []),
     getTagsForDocument: vi.fn(() => []),
 };
 
@@ -158,20 +150,6 @@ describe('KnowledgeBaseDocumentList', () => {
 
         expect(getRemainingTagsForDocument).toHaveBeenCalledWith('doc-1');
         expect(getRemainingTagsForDocument).toHaveBeenCalledWith('doc-2');
-    });
-
-    it('calls getSortedChunksForDocument for each document', () => {
-        const getSortedChunksForDocument = vi.fn(() => []);
-
-        hoisted.mockUseKnowledgeBaseDocumentList.mockReturnValue({
-            ...defaultListMockReturn,
-            getSortedChunksForDocument,
-        });
-
-        renderComponent();
-
-        expect(getSortedChunksForDocument).toHaveBeenCalledWith('doc-1');
-        expect(getSortedChunksForDocument).toHaveBeenCalledWith('doc-2');
     });
 });
 

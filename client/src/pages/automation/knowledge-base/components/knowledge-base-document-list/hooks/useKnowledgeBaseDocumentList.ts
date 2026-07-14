@@ -1,16 +1,10 @@
 import {
-    KnowledgeBaseDocument,
-    KnowledgeBaseDocumentChunk,
     useKnowledgeBaseDocumentTagsByDocumentQuery,
     useKnowledgeBaseDocumentTagsQuery,
 } from '@/shared/middleware/graphql';
 import {useMemo} from 'react';
 
-interface UseKnowledgeBaseDocumentListProps {
-    documents: KnowledgeBaseDocument[];
-}
-
-export default function useKnowledgeBaseDocumentList({documents}: UseKnowledgeBaseDocumentListProps) {
+export default function useKnowledgeBaseDocumentList() {
     const {data: tagsByDocumentData} = useKnowledgeBaseDocumentTagsByDocumentQuery();
     const {data: allTagsData} = useKnowledgeBaseDocumentTagsQuery();
 
@@ -23,24 +17,6 @@ export default function useKnowledgeBaseDocumentList({documents}: UseKnowledgeBa
         () => allTagsData?.knowledgeBaseDocumentTags ?? [],
         [allTagsData?.knowledgeBaseDocumentTags]
     );
-
-    const sortedChunksByDocument = useMemo(() => {
-        const chunkMap = new Map<string, KnowledgeBaseDocumentChunk[]>();
-
-        for (const document of documents) {
-            const sortedChunks = (document.chunks || [])
-                .filter((chunk): chunk is NonNullable<typeof chunk> => chunk !== null)
-                .sort((chunkA, chunkB) => chunkA.id.localeCompare(chunkB.id));
-
-            chunkMap.set(document.id, sortedChunks);
-        }
-
-        return chunkMap;
-    }, [documents]);
-
-    const getSortedChunksForDocument = (documentId: string): KnowledgeBaseDocumentChunk[] => {
-        return sortedChunksByDocument.get(documentId) || [];
-    };
 
     const getTagsForDocument = (documentId: string): string[] => {
         const entry = tagsByDocument.find((tagEntry) => tagEntry.knowledgeBaseDocumentId === documentId);
@@ -56,7 +32,6 @@ export default function useKnowledgeBaseDocumentList({documents}: UseKnowledgeBa
 
     return {
         getRemainingTagsForDocument,
-        getSortedChunksForDocument,
         getTagsForDocument,
     };
 }

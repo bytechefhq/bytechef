@@ -21,8 +21,6 @@ query knowledgeBase($id: ID!) {
             chunks {
                 id
                 knowledgeBaseDocumentId
-                content
-                metadata
             }
         }
         createdDate
