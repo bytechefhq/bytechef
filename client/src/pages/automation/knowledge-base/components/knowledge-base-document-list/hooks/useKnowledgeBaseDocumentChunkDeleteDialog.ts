@@ -34,6 +34,7 @@ export default function useKnowledgeBaseDocumentChunkDeleteDialog({
     const deleteMutation = useDeleteKnowledgeBaseDocumentChunkMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
+            queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentChunks']});
             clearSelection();
         },
     });

@@ -1,0 +1,8 @@
+query knowledgeBaseDocumentChunks($id: ID!) {
+    knowledgeBaseDocumentChunks(id: $id) {
+        id
+        knowledgeBaseDocumentId
+        content
+        metadata
+    }
+}

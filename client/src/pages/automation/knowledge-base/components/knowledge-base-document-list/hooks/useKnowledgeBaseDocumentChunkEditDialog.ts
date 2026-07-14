@@ -25,6 +25,7 @@ export default function useKnowledgeBaseDocumentChunkEditDialog({
     const updateMutation = useUpdateKnowledgeBaseDocumentChunkMutation({
         onSuccess: () => {
             queryClient.invalidateQueries({queryKey: ['knowledgeBase', {id: knowledgeBaseId}]});
+            queryClient.invalidateQueries({queryKey: ['knowledgeBaseDocumentChunks']});
 
             toast('Chunk updated successfully.');
 
