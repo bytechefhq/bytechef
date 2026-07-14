@@ -53,6 +53,7 @@ import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
+import com.bytechef.platform.mcp.server.McpSseProviderRegistry;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -85,12 +86,15 @@ import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import jakarta.servlet.http.HttpServletRequest;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.ai.mcp.McpToolUtils;
+import org.springframework.ai.mcp.server.webmvc.transport.WebMvcSseServerTransportProvider;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -138,6 +142,43 @@ public class EmbeddedMcpServerConfiguration {
     @Bean
     RouterFunction<ServerResponse> embeddedMcpRouterFunction() {
         return embeddedWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        prefix = "bytechef.ai.mcp.server.sse", name = "enabled", havingValue = "true", matchIfMissing = true)
+    McpSseProviderRegistry embeddedMcpSseProviderRegistry(FilterableMcpAsyncServer embeddedMcpAsyncServer) {
+        return new McpSseProviderRegistry(secretKey -> {
+            WebMvcSseServerTransportProvider transportProvider = WebMvcSseServerTransportProvider.builder()
+                .sseEndpoint("/api/embedded/" + secretKey + "/sse")
+                .messageEndpoint("/api/embedded/" + secretKey + "/message")
+                .keepAliveInterval(Duration.ofSeconds(30))
+                .contextExtractor(serverRequest -> {
+                    String externalUserId = SecurityUtils.getCurrentUserLogin();
+                    HttpServletRequest httpServletRequest = serverRequest.servletRequest();
+
+                    String environment = httpServletRequest.getHeader("X-Environment");
+
+                    return McpTransportContext.create(
+                        Map.of(
+                            ENVIRONMENT, environment,
+                            EXTERNAL_USER_ID, externalUserId,
+                            SECRET_KEY, secretKey));
+                })
+                .build();
+
+            embeddedMcpAsyncServer.attachSse(transportProvider);
+
+            return transportProvider;
+        });
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        prefix = "bytechef.ai.mcp.server.sse", name = "enabled", havingValue = "true", matchIfMissing = true)
+    RouterFunction<ServerResponse> embeddedMcpSseRouterFunction(McpSseProviderRegistry embeddedMcpSseProviderRegistry) {
+        return embeddedMcpSseProviderRegistry.toRouterFunction(
+            "/api/embedded/{secretKey}/sse", "/api/embedded/{secretKey}/message");
     }
 
     @Bean
