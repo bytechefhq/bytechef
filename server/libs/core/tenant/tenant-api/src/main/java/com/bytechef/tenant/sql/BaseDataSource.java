@@ -24,6 +24,7 @@ import java.sql.ConnectionBuilder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
+import java.util.Objects;
 import javax.sql.DataSource;
 
 /**
@@ -115,13 +116,21 @@ public abstract class BaseDataSource implements DataSource {
      * parameterized values. The tenant ID is validated to contain only alphanumeric characters, underscores, and
      * hyphens to prevent SQL injection. This is a PostgreSQL limitation, not a security vulnerability.
      * </p>
+     * <p>
+     * The {@code public} schema is always appended as a fallback so that objects installed there (e.g. the pgvector
+     * extension's {@code vector} type and its operators such as {@code <=>}) remain resolvable without explicit schema
+     * qualification, even when the tenant schema is searched first.
+     * </p>
      */
     @SuppressFBWarnings("SQL_INJECTION_JDBC")
     protected void setSearchPath(Connection connection) throws SQLException {
         String currentDatabaseSchema = TenantContext.getCurrentDatabaseSchema(getVectorSchemaSuffix());
 
+        String searchPath = Objects.equals(currentDatabaseSchema, TenantContext.DEFAULT_TENANT_ID)
+            ? currentDatabaseSchema : currentDatabaseSchema + ", " + TenantContext.DEFAULT_TENANT_ID;
+
         try (PreparedStatement statement =
-            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + currentDatabaseSchema)) {
+            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + searchPath)) {
 
             statement.execute();
         }
