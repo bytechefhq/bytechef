@@ -20,6 +20,10 @@ info:
       enabled: ${bytechef.ai.copilot.enabled}
     knowledgeBase:
       enabled: ${bytechef.ai.knowledge-base.enabled:false}
+    mcp:
+      server:
+        sse:
+          enabled: ${bytechef.ai.mcp.server.sse.enabled:true}
   analytics:
     enabled: ${bytechef.analytics.enabled}
     postHog:
