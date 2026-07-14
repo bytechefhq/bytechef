@@ -47,6 +47,8 @@ public class FilterableMcpServerBuilder {
 
     private Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter;
 
+    private List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications = List.of();
+
     @SuppressFBWarnings("EI")
     public FilterableMcpServerBuilder(McpStreamableServerTransportProvider transportProvider) {
         this.transportProvider = transportProvider;
@@ -90,9 +92,25 @@ public class FilterableMcpServerBuilder {
         return this;
     }
 
+    /**
+     * Static resources served to every session (session-independent, e.g. MCP App UI resources).
+     */
+    public FilterableMcpServerBuilder resourceSpecifications(
+        List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications) {
+
+        this.resourceSpecifications = List.copyOf(resourceSpecifications);
+
+        return this;
+    }
+
     public FilterableMcpAsyncServer build() {
-        return new FilterableMcpAsyncServer(
-            transportProvider, McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions,
-            requestTimeout, McpJsonDefaults.getSchemaValidator(), validateToolInputs, toolFilter);
+        FilterableMcpAsyncServer filterableMcpAsyncServer = new FilterableMcpAsyncServer(
+            McpJsonDefaults.getMapper(), serverInfo, serverCapabilities, instructions, requestTimeout,
+            McpJsonDefaults.getSchemaValidator(), validateToolInputs, toolFilter, resourceSpecifications,
+            transportProvider.protocolVersions());
+
+        filterableMcpAsyncServer.attachStreamable(transportProvider);
+
+        return filterableMcpAsyncServer;
     }
 }

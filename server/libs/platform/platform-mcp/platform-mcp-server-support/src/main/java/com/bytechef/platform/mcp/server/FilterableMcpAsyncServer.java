@@ -16,7 +16,6 @@
 
 package com.bytechef.platform.mcp.server;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.json.McpJsonMapper;
 import io.modelcontextprotocol.json.TypeRef;
 import io.modelcontextprotocol.json.schema.JsonSchemaValidator;
@@ -30,13 +29,17 @@ import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpSchema.CallToolResult;
 import io.modelcontextprotocol.spec.McpSchema.ErrorCodes;
 import io.modelcontextprotocol.spec.McpSchema.Tool;
+import io.modelcontextprotocol.spec.McpServerSession;
+import io.modelcontextprotocol.spec.McpServerTransportProvider;
 import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
 import io.modelcontextprotocol.util.ToolInputValidator;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,8 +59,9 @@ import reactor.core.publisher.Mono;
  * Rather than forking {@code McpAsyncServer}, this class composes the MCP SDK's public primitives
  * ({@link DefaultMcpStreamableServerSessionFactory}, {@link McpRequestHandler}, {@link ToolInputValidator}), which are
  * stable as of SDK 2.0.0. It implements only the request methods ByteChef serves: {@code ping}, {@code tools/list},
- * {@code tools/call}, plus empty {@code resources/list}, {@code resources/templates/list} and {@code prompts/list}
- * handlers (for parity with the advertised capabilities) and a no-op {@code logging/setLevel} acknowledgement.
+ * {@code tools/call}, {@code resources/list} and {@code resources/read} over a static, session-independent resource
+ * list (e.g. MCP App UI resources), plus empty {@code resources/templates/list} and {@code prompts/list} handlers (for
+ * parity with the advertised capabilities) and a no-op {@code logging/setLevel} acknowledgement.
  *
  * @author Ivica Cardic
  */
@@ -81,25 +85,34 @@ public class FilterableMcpAsyncServer {
 
     private final Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter;
 
+    private final List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications;
+
+    private final Duration requestTimeout;
+
+    private final Map<String, McpRequestHandler<?>> requestHandlers;
+
+    private final Map<String, McpNotificationHandler> notificationHandlers;
+
     /**
      * Create a new FilterableMcpAsyncServer and install its session factory on the given transport provider.
      *
-     * @param transportProvider   The streamable transport layer implementation for MCP communication.
-     * @param jsonMapper          The JsonMapper to use for JSON serialization/deserialization.
-     * @param serverInfo          The server implementation information.
-     * @param serverCapabilities  The server capabilities configuration.
-     * @param instructions        Optional instructions for the server.
-     * @param requestTimeout      The request timeout duration.
-     * @param jsonSchemaValidator The JSON schema validator.
-     * @param validateToolInputs  Whether to validate tool call arguments against the tool input schema.
-     * @param toolFilter          The tool filter function, or null to serve no tools.
+     * @param transportProvider      The streamable transport layer implementation for MCP communication.
+     * @param jsonMapper             The JsonMapper to use for JSON serialization/deserialization.
+     * @param serverInfo             The server implementation information.
+     * @param serverCapabilities     The server capabilities configuration.
+     * @param instructions           Optional instructions for the server.
+     * @param requestTimeout         The request timeout duration.
+     * @param jsonSchemaValidator    The JSON schema validator.
+     * @param validateToolInputs     Whether to validate tool call arguments against the tool input schema.
+     * @param toolFilter             The tool filter function, or null to serve no tools.
+     * @param resourceSpecifications Static resources served to every session, or null to serve none.
      */
-    @SuppressFBWarnings("EI")
     FilterableMcpAsyncServer(
-        McpStreamableServerTransportProvider transportProvider, McpJsonMapper jsonMapper,
-        McpSchema.Implementation serverInfo, McpSchema.ServerCapabilities serverCapabilities, String instructions,
-        Duration requestTimeout, JsonSchemaValidator jsonSchemaValidator, boolean validateToolInputs,
-        Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter) {
+        McpJsonMapper jsonMapper, McpSchema.Implementation serverInfo,
+        McpSchema.ServerCapabilities serverCapabilities, String instructions, Duration requestTimeout,
+        JsonSchemaValidator jsonSchemaValidator, boolean validateToolInputs,
+        Function<McpAsyncServerExchange, List<McpServerFeatures.AsyncToolSpecification>> toolFilter,
+        List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications, List<String> protocolVersions) {
 
         this.jsonMapper = jsonMapper;
         this.serverInfo = serverInfo;
@@ -109,17 +122,37 @@ public class FilterableMcpAsyncServer {
                 .build()
             : null;
         this.instructions = instructions;
+        this.requestTimeout = requestTimeout;
         this.jsonSchemaValidator = jsonSchemaValidator;
         this.validateToolInputs = validateToolInputs;
         this.toolFilter = toolFilter != null ? toolFilter : exchange -> List.of();
-        this.protocolVersions = transportProvider.protocolVersions();
+        this.resourceSpecifications = resourceSpecifications != null ? List.copyOf(resourceSpecifications) : List.of();
+        this.protocolVersions = protocolVersions;
 
-        Map<String, McpRequestHandler<?>> requestHandlers = prepareRequestHandlers();
-        Map<String, McpNotificationHandler> notificationHandlers = prepareNotificationHandlers();
+        this.requestHandlers = prepareRequestHandlers();
+        this.notificationHandlers = prepareNotificationHandlers();
+    }
 
+    /**
+     * Installs the filtering core's session factory on a Streamable HTTP transport provider.
+     */
+    public void attachStreamable(McpStreamableServerTransportProvider transportProvider) {
         transportProvider.setSessionFactory(new DefaultMcpStreamableServerSessionFactory(requestTimeout,
             this::asyncInitializeRequestHandler, requestHandlers, notificationHandlers, sessionId -> Mono.empty(),
-            this.jsonSchemaValidator));
+            jsonSchemaValidator));
+    }
+
+    /**
+     * Installs the filtering core's session factory on an HTTP+SSE transport provider. The same core may be attached to
+     * many SSE providers (e.g. one per secret key); the request/notification handlers are stateless and resolve the
+     * caller's tools per request from the {@link McpAsyncServerExchange} transport context.
+     */
+    public void attachSse(McpServerTransportProvider transportProvider) {
+        transportProvider.setSessionFactory(sessionTransport -> new McpServerSession(
+            UUID.randomUUID()
+                .toString(),
+            requestTimeout, sessionTransport, this::asyncInitializeRequestHandler, requestHandlers,
+            notificationHandlers, Mono::empty, jsonSchemaValidator));
     }
 
     private Map<String, McpRequestHandler<?>> prepareRequestHandlers() {
@@ -137,12 +170,17 @@ public class FilterableMcpAsyncServer {
             requestHandlers.put(McpSchema.METHOD_TOOLS_CALL, toolsCallRequestHandler());
         }
 
-        // ByteChef registers no static resources or prompts; the empty handlers below exist only so clients that
-        // honor the advertised resources/prompts capabilities receive an empty list rather than a method-not-found.
+        // Resources are static and session-independent (e.g. MCP App UI resources); resource templates stay empty so
+        // clients that honor the advertised capability receive an empty list rather than a method-not-found.
         if (serverCapabilities.resources() != null) {
             requestHandlers.put(McpSchema.METHOD_RESOURCES_LIST,
-                (exchange, params) -> Mono.just(McpSchema.ListResourcesResult.builder(List.of())
-                    .build()));
+                (exchange, params) -> Mono.just(
+                    McpSchema.ListResourcesResult.builder(
+                        resourceSpecifications.stream()
+                            .map(McpServerFeatures.AsyncResourceSpecification::resource)
+                            .toList())
+                        .build()));
+            requestHandlers.put(McpSchema.METHOD_RESOURCES_READ, resourcesReadRequestHandler());
             requestHandlers.put(McpSchema.METHOD_RESOURCES_TEMPLATES_LIST,
                 (exchange, params) -> Mono.just(McpSchema.ListResourceTemplatesResult.builder(List.of())
                     .build()));
@@ -206,6 +244,32 @@ public class FilterableMcpAsyncServer {
 
             return Mono.just(McpSchema.ListToolsResult.builder(toolList)
                 .build());
+        };
+    }
+
+    private McpRequestHandler<McpSchema.ReadResourceResult> resourcesReadRequestHandler() {
+        return (exchange, params) -> {
+            McpSchema.ReadResourceRequest readResourceRequest = jsonMapper.convertValue(params,
+                new TypeRef<McpSchema.ReadResourceRequest>() {});
+
+            Optional<McpServerFeatures.AsyncResourceSpecification> resourceSpecification =
+                resourceSpecifications.stream()
+                    .filter(specification -> Objects.equals(
+                        readResourceRequest.uri(),
+                        specification.resource()
+                            .uri()))
+                    .findFirst();
+
+            if (resourceSpecification.isEmpty()) {
+                return Mono.error(McpError.builder(ErrorCodes.RESOURCE_NOT_FOUND)
+                    .message("Unknown resource: " + readResourceRequest.uri())
+                    .data("Resource not found: " + readResourceRequest.uri())
+                    .build());
+            }
+
+            return resourceSpecification.get()
+                .readHandler()
+                .apply(exchange, readResourceRequest);
         };
     }
 
