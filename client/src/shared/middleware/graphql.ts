@@ -4,24 +4,12 @@ type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import type * as Types from './graphql-types';
 
+import { DocumentTypeDecoration } from '@graphql-typed-document-node/core';
 import { useQuery, useMutation, UseQueryOptions, UseMutationOptions } from '@tanstack/react-query';
 import { fetcher } from './graphqlFetcher';
 export * from './graphql-types';
 import type {KnowledgeBaseDocument as KnowledgeBaseDocumentSchemaType} from './graphql-types';
 export type KnowledgeBaseDocument = KnowledgeBaseDocumentSchemaType;
-export class TypedDocumentString<TResult, TVariables> extends String {
-  __apiType?: { result: TResult; variables: TVariables };
-  __meta__?: Record<string, unknown>;
-
-  constructor(private value: string, __meta__?: Record<string, unknown>) {
-    super(value);
-    this.__meta__ = __meta__;
-  }
-
-  override toString(): string {
-    return this.value;
-  }
-}
 export type AiAgentEvalResultQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -771,7 +759,14 @@ export type KnowledgeBaseQueryVariables = Exact<{
 }>;
 
 
-export type KnowledgeBaseQuery = { knowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any, documents: Array<{ id: string, name: string, status: number, tags: Array<string> | null, createdDate: any, document: { name: string, extension: string | null, mimeType: string | null, url: string } | null, chunks: Array<{ id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any } | null> | null } | null> | null } | null };
+export type KnowledgeBaseQuery = { knowledgeBase: { id: string, name: string, description: string | null, maxChunkSize: number | null, minChunkSizeChars: number | null, overlap: number | null, createdDate: any, lastModifiedDate: any, documents: Array<{ id: string, name: string, status: number, tags: Array<string> | null, createdDate: any, document: { name: string, extension: string | null, mimeType: string | null, url: string } | null, chunks: Array<{ id: string, knowledgeBaseDocumentId: string } | null> | null } | null> | null } | null };
+
+export type KnowledgeBaseDocumentChunksQueryVariables = Exact<{
+  id: string | number;
+}>;
+
+
+export type KnowledgeBaseDocumentChunksQuery = { knowledgeBaseDocumentChunks: Array<{ id: string, knowledgeBaseDocumentId: string, content: string | null, metadata: any } | null> | null };
 
 export type KnowledgeBaseDocumentStatusQueryVariables = Exact<{
   id: string | number;
@@ -1052,13 +1047,6 @@ export type EnableConnectedUserProjectWorkflowMutationVariables = Exact<{
 
 
 export type EnableConnectedUserProjectWorkflowMutation = { enableConnectedUserProjectWorkflow: boolean | null };
-
-export type IntegrationByIdQueryVariables = Exact<{
-  id: string | number;
-}>;
-
-
-export type IntegrationByIdQuery = { integration: { id: string, name: string } | null };
 
 export type IntegrationWorkflowsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -1362,6 +1350,16 @@ export type ClusterElementDefinitionQuery = { clusterElementDefinition: { compon
       | { controlType: Types.ControlType, label: string | null, placeholder: string | null, advancedOption: boolean | null, description: string | null, displayCondition: string | null, expressionEnabled: boolean | null, hidden: boolean | null, name: string | null, required: boolean | null, type: Types.PropertyType, timeDefaultValue: string | null }
     > } };
 
+export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+  clusterElementType: string;
+  clusterElementWorkflowNodeName: string;
+}>;
+
+
+export type ClusterElementMissingRequiredPropertiesQuery = { clusterElementMissingRequiredProperties: Array<string> };
+
 export type ClusterElementDynamicPropertiesQueryVariables = Exact<{
   componentName: string;
   componentVersion: number;
@@ -1642,24 +1640,6 @@ export type ValidateWorkflowByIdQueryVariables = Exact<{
 
 export type ValidateWorkflowByIdQuery = { validateWorkflowById: { errors: Array<string>, warnings: Array<string> } };
 
-export type WorkflowNodeMissingRequiredPropertiesQueryVariables = Exact<{
-  workflowId: string;
-  workflowNodeName: string;
-}>;
-
-
-export type WorkflowNodeMissingRequiredPropertiesQuery = { workflowNodeMissingRequiredProperties: Array<string> };
-
-export type ClusterElementMissingRequiredPropertiesQueryVariables = Exact<{
-  workflowId: string;
-  workflowNodeName: string;
-  clusterElementType: string;
-  clusterElementWorkflowNodeName: string;
-}>;
-
-
-export type ClusterElementMissingRequiredPropertiesQuery = { clusterElementMissingRequiredProperties: Array<string> };
-
 export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
   workflowId: string;
   workflowNodeName: string;
@@ -1667,6 +1647,14 @@ export type WorkflowNodeComponentConnectionsQueryVariables = Exact<{
 
 
 export type WorkflowNodeComponentConnectionsQuery = { workflowNodeComponentConnections: Array<{ componentName: string, componentVersion: number, key: string, required: boolean, workflowNodeName: string }> };
+
+export type WorkflowNodeMissingRequiredPropertiesQueryVariables = Exact<{
+  workflowId: string;
+  workflowNodeName: string;
+}>;
+
+
+export type WorkflowNodeMissingRequiredPropertiesQuery = { workflowNodeMissingRequiredProperties: Array<string> };
 
 export type WorkflowNodeScriptInputQueryVariables = Exact<{
   workflowId: string;
@@ -1783,6 +1771,24 @@ export type UsersQueryVariables = Exact<{
 export type UsersQuery = { users: { number: number, size: number, totalElements: number, totalPages: number, content: Array<{ id: string | null, login: string | null, email: string | null, firstName: string | null, lastName: string | null, activated: boolean | null, authorities: Array<string | null> | null } | null> } | null };
 
 
+export class TypedDocumentString<TResult, TVariables>
+  extends String
+  implements DocumentTypeDecoration<TResult, TVariables>
+{
+  __apiType?: NonNullable<DocumentTypeDecoration<TResult, TVariables>['__apiType']>;
+  private value: string;
+  public __meta__?: Record<string, any> | undefined;
+
+  constructor(value: string, __meta__?: Record<string, any> | undefined) {
+    super(value);
+    this.value = value;
+    this.__meta__ = __meta__;
+  }
+
+  override toString(): string & DocumentTypeDecoration<TResult, TVariables> {
+    return this.value;
+  }
+}
 
 export const AiAgentEvalResultDocument = new TypedDocumentString(`
     query aiAgentEvalResult($id: ID!) {
@@ -4444,8 +4450,6 @@ export const KnowledgeBaseDocument = new TypedDocumentString(`
       chunks {
         id
         knowledgeBaseDocumentId
-        content
-        metadata
       }
     }
     createdDate
@@ -4466,6 +4470,33 @@ export const useKnowledgeBaseQuery = <
       {
     queryKey: ['knowledgeBase', variables],
     queryFn: fetcher<KnowledgeBaseQuery, KnowledgeBaseQueryVariables>(KnowledgeBaseDocument, variables),
+    ...options
+  }
+    )};
+
+export const KnowledgeBaseDocumentChunksDocument = new TypedDocumentString(`
+    query knowledgeBaseDocumentChunks($id: ID!) {
+  knowledgeBaseDocumentChunks(id: $id) {
+    id
+    knowledgeBaseDocumentId
+    content
+    metadata
+  }
+}
+    `);
+
+export const useKnowledgeBaseDocumentChunksQuery = <
+      TData = KnowledgeBaseDocumentChunksQuery,
+      TError = unknown
+    >(
+      variables: KnowledgeBaseDocumentChunksQueryVariables,
+      options?: Omit<UseQueryOptions<KnowledgeBaseDocumentChunksQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<KnowledgeBaseDocumentChunksQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<KnowledgeBaseDocumentChunksQuery, TError, TData>(
+      {
+    queryKey: ['knowledgeBaseDocumentChunks', variables],
+    queryFn: fetcher<KnowledgeBaseDocumentChunksQuery, KnowledgeBaseDocumentChunksQueryVariables>(KnowledgeBaseDocumentChunksDocument, variables),
     ...options
   }
     )};
@@ -5446,31 +5477,6 @@ export const useEnableConnectedUserProjectWorkflowMutation = <
   }
     )};
 
-export const IntegrationByIdDocument = new TypedDocumentString(`
-    query integrationById($id: ID!) {
-  integration(id: $id) {
-    id
-    name
-  }
-}
-    `);
-
-export const useIntegrationByIdQuery = <
-      TData = IntegrationByIdQuery,
-      TError = unknown
-    >(
-      variables: IntegrationByIdQueryVariables,
-      options?: Omit<UseQueryOptions<IntegrationByIdQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<IntegrationByIdQuery, TError, TData>['queryKey'] }
-    ) => {
-    
-    return useQuery<IntegrationByIdQuery, TError, TData>(
-      {
-    queryKey: ['integrationById', variables],
-    queryFn: fetcher<IntegrationByIdQuery, IntegrationByIdQueryVariables>(IntegrationByIdDocument, variables),
-    ...options
-  }
-    )};
-
 export const IntegrationWorkflowsDocument = new TypedDocumentString(`
     query integrationWorkflows {
   integrationWorkflows {
@@ -5868,7 +5874,7 @@ export const useAiDefaultModelQuery = <
       variables: AiDefaultModelQueryVariables,
       options?: Omit<UseQueryOptions<AiDefaultModelQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiDefaultModelQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiDefaultModelQuery, TError, TData>(
       {
     queryKey: ['aiDefaultModel', variables],
@@ -5900,7 +5906,7 @@ export const useAiProviderCatalogQuery = <
       variables: AiProviderCatalogQueryVariables,
       options?: Omit<UseQueryOptions<AiProviderCatalogQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<AiProviderCatalogQuery, TError, TData>['queryKey'] }
     ) => {
-
+    
     return useQuery<AiProviderCatalogQuery, TError, TData>(
       {
     queryKey: ['aiProviderCatalog', variables],
@@ -6860,6 +6866,33 @@ export const useClusterElementDefinitionQuery = <
       {
     queryKey: ['clusterElementDefinition', variables],
     queryFn: fetcher<ClusterElementDefinitionQuery, ClusterElementDefinitionQueryVariables>(ClusterElementDefinitionDocument, variables),
+    ...options
+  }
+    )};
+
+export const ClusterElementMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query ClusterElementMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
+  clusterElementMissingRequiredProperties(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+    clusterElementType: $clusterElementType
+    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
+  )
+}
+    `);
+
+export const useClusterElementMissingRequiredPropertiesQuery = <
+      TData = ClusterElementMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: ClusterElementMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['ClusterElementMissingRequiredProperties', variables],
+    queryFn: fetcher<ClusterElementMissingRequiredPropertiesQuery, ClusterElementMissingRequiredPropertiesQueryVariables>(ClusterElementMissingRequiredPropertiesDocument, variables),
     ...options
   }
     )};
@@ -7924,55 +7957,6 @@ export const useValidateWorkflowByIdQuery = <
   }
     )};
 
-export const WorkflowNodeMissingRequiredPropertiesDocument = new TypedDocumentString(`
-    query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
-  workflowNodeMissingRequiredProperties(workflowId: $workflowId, workflowNodeName: $workflowNodeName)
-}
-    `);
-
-export const useWorkflowNodeMissingRequiredPropertiesQuery = <
-      TData = WorkflowNodeMissingRequiredPropertiesQuery,
-      TError = unknown
-    >(
-      variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
-    ) => {
-
-    return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
-      {
-    queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
-    queryFn: fetcher<WorkflowNodeMissingRequiredPropertiesQuery, WorkflowNodeMissingRequiredPropertiesQueryVariables>(WorkflowNodeMissingRequiredPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
-export const ClusterElementMissingRequiredPropertiesDocument = new TypedDocumentString(`
-    query ClusterElementMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!, $clusterElementType: String!, $clusterElementWorkflowNodeName: String!) {
-  clusterElementMissingRequiredProperties(
-    workflowId: $workflowId
-    workflowNodeName: $workflowNodeName
-    clusterElementType: $clusterElementType
-    clusterElementWorkflowNodeName: $clusterElementWorkflowNodeName
-  )
-}
-    `);
-
-export const useClusterElementMissingRequiredPropertiesQuery = <
-      TData = ClusterElementMissingRequiredPropertiesQuery,
-      TError = unknown
-    >(
-      variables: ClusterElementMissingRequiredPropertiesQueryVariables,
-      options?: Omit<UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<ClusterElementMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
-    ) => {
-
-    return useQuery<ClusterElementMissingRequiredPropertiesQuery, TError, TData>(
-      {
-    queryKey: ['ClusterElementMissingRequiredProperties', variables],
-    queryFn: fetcher<ClusterElementMissingRequiredPropertiesQuery, ClusterElementMissingRequiredPropertiesQueryVariables>(ClusterElementMissingRequiredPropertiesDocument, variables),
-    ...options
-  }
-    )};
-
 export const WorkflowNodeComponentConnectionsDocument = new TypedDocumentString(`
     query workflowNodeComponentConnections($workflowId: String!, $workflowNodeName: String!) {
   workflowNodeComponentConnections(
@@ -8000,6 +7984,31 @@ export const useWorkflowNodeComponentConnectionsQuery = <
       {
     queryKey: ['workflowNodeComponentConnections', variables],
     queryFn: fetcher<WorkflowNodeComponentConnectionsQuery, WorkflowNodeComponentConnectionsQueryVariables>(WorkflowNodeComponentConnectionsDocument, variables),
+    ...options
+  }
+    )};
+
+export const WorkflowNodeMissingRequiredPropertiesDocument = new TypedDocumentString(`
+    query WorkflowNodeMissingRequiredProperties($workflowId: String!, $workflowNodeName: String!) {
+  workflowNodeMissingRequiredProperties(
+    workflowId: $workflowId
+    workflowNodeName: $workflowNodeName
+  )
+}
+    `);
+
+export const useWorkflowNodeMissingRequiredPropertiesQuery = <
+      TData = WorkflowNodeMissingRequiredPropertiesQuery,
+      TError = unknown
+    >(
+      variables: WorkflowNodeMissingRequiredPropertiesQueryVariables,
+      options?: Omit<UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>, 'queryKey'> & { queryKey?: UseQueryOptions<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>['queryKey'] }
+    ) => {
+    
+    return useQuery<WorkflowNodeMissingRequiredPropertiesQuery, TError, TData>(
+      {
+    queryKey: ['WorkflowNodeMissingRequiredProperties', variables],
+    queryFn: fetcher<WorkflowNodeMissingRequiredPropertiesQuery, WorkflowNodeMissingRequiredPropertiesQueryVariables>(WorkflowNodeMissingRequiredPropertiesDocument, variables),
     ...options
   }
     )};
