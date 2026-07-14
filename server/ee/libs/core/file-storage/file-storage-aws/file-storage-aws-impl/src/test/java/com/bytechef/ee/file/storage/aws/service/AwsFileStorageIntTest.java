@@ -8,6 +8,7 @@
 package com.bytechef.ee.file.storage.aws.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.awaitility.Awaitility.await;
 import static org.testcontainers.containers.localstack.LocalStackContainer.Service.S3;
 
@@ -220,6 +221,16 @@ class AwsFileStorageIntTest {
 
                 assertThat(exists).isFalse();
             });
+    }
+
+    @Test
+    void deleteFileIsIdempotentWhenObjectMissing() {
+        FileEntry fileEntry = new FileEntry(
+            "missing-key", "s3://" + BUCKET_NAME + "/" + TENANT_ID + "/" + DIR_PATH + "/missing-key");
+
+        // Deleting an object that is not present must be a no-op, not a FileStorageException. Regression for a
+        // knowledge base document whose chunk content file was already gone from the bucket (issue #5392).
+        assertThatCode(() -> storageService.deleteFile(DIR_PATH, fileEntry)).doesNotThrowAnyException();
     }
 
     @Configuration
