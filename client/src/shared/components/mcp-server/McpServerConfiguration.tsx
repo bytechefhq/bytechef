@@ -4,29 +4,47 @@ import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
 import {InfoCircledIcon} from '@radix-ui/react-icons';
 
-const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string; onRefresh: () => void}) => {
-    const codeSnippet1 = `{
+const buildMcpRemoteSnippet = (url: string) => `{
   "mcpServers": {
     "ByteChef": {
       "command": "npx",
       "args": [
         "-y",
         "mcp-remote",
-        "${mcpServerUrl}"
+        "${url}"
       ]
     }
   }
 }`;
 
-    const codeSnippet2 = `{
+const buildUrlSnippet = (url: string) => `{
   "mcpServers": {
     "ByteChef": {
-      "url": "${mcpServerUrl}"
+      "url": "${url}"
     }
   }
 }`;
 
-    const codeSnippet3 = mcpServerUrl;
+const toSseUrl = (mcpServerUrl: string) => mcpServerUrl.replace(/\/mcp$/, '/sse');
+
+const TransportSnippets = ({
+    httpSnippet,
+    onRefresh,
+    sseSnippet,
+}: {
+    httpSnippet: string;
+    onRefresh: () => void;
+    sseSnippet: string;
+}) => (
+    <div className="space-y-3">
+        <McpServerConfigurationCode codeSnippet={httpSnippet} label="Streamable HTTP" onRefresh={onRefresh} />
+
+        <McpServerConfigurationCode codeSnippet={sseSnippet} label="SSE" onRefresh={onRefresh} />
+    </div>
+);
+
+const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string; onRefresh: () => void}) => {
+    const sseServerUrl = toSseUrl(mcpServerUrl);
 
     return (
         <Tabs defaultValue="claude">
@@ -79,8 +97,12 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                     </AlertTitle>
                                 </Alert>
 
-                                {codeSnippet3 && (
-                                    <McpServerConfigurationCode codeSnippet={codeSnippet3} onRefresh={onRefresh} />
+                                {mcpServerUrl && (
+                                    <TransportSnippets
+                                        httpSnippet={mcpServerUrl}
+                                        onRefresh={onRefresh}
+                                        sseSnippet={sseServerUrl}
+                                    />
                                 )}
                             </div>
                         </div>
@@ -119,7 +141,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                                     Paste the configuration below and save, then quit and restart Claude.
                                 </p>
 
-                                <McpServerConfigurationCode codeSnippet={codeSnippet1} onRefresh={onRefresh} />
+                                <TransportSnippets
+                                    httpSnippet={buildMcpRemoteSnippet(mcpServerUrl)}
+                                    onRefresh={onRefresh}
+                                    sseSnippet={buildMcpRemoteSnippet(sseServerUrl)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -159,7 +185,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
 
-                                <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
+                                <TransportSnippets
+                                    httpSnippet={buildUrlSnippet(mcpServerUrl)}
+                                    onRefresh={onRefresh}
+                                    sseSnippet={buildUrlSnippet(sseServerUrl)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -203,7 +233,11 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
 
                                 <p className="text-sm text-muted-foreground">Paste the configuration below and save.</p>
 
-                                <McpServerConfigurationCode codeSnippet={codeSnippet2} onRefresh={onRefresh} />
+                                <TransportSnippets
+                                    httpSnippet={buildUrlSnippet(mcpServerUrl)}
+                                    onRefresh={onRefresh}
+                                    sseSnippet={buildUrlSnippet(sseServerUrl)}
+                                />
                             </div>
                         </div>
                     </div>
@@ -221,8 +255,12 @@ const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string
                             <div className="flex-1 space-y-4">
                                 <h2 className="font-semibold text-foreground">Server URL</h2>
 
-                                {codeSnippet3 && (
-                                    <McpServerConfigurationCode codeSnippet={codeSnippet3} onRefresh={onRefresh} />
+                                {mcpServerUrl && (
+                                    <TransportSnippets
+                                        httpSnippet={mcpServerUrl}
+                                        onRefresh={onRefresh}
+                                        sseSnippet={sseServerUrl}
+                                    />
                                 )}
                             </div>
                         </div>

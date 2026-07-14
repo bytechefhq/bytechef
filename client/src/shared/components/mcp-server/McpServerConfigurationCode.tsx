@@ -5,7 +5,15 @@ import {AlertTriangleIcon, CheckIcon, CopyIcon, RefreshCwIcon} from 'lucide-reac
 import {useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 
-const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: string; onRefresh: () => void}) => {
+const McpServerConfigurationCode = ({
+    codeSnippet,
+    label,
+    onRefresh,
+}: {
+    codeSnippet: string;
+    label?: string;
+    onRefresh: () => void;
+}) => {
     const [copied, setCopied] = useState(false);
     const [refreshed, setRefreshed] = useState(false);
 
@@ -29,6 +37,8 @@ const McpServerConfigurationCode = ({codeSnippet, onRefresh}: {codeSnippet: stri
         <Card className="relative overflow-hidden border-border bg-card py-0">
             <div className="flex items-center justify-between border-b border-border bg-muted/30 px-4 py-2">
                 <div className="flex items-center gap-2">
+                    {label && <span className="text-xs font-semibold text-muted-foreground">{label}</span>}
+
                     <Tooltip>
                         <TooltipTrigger>
                             <Badge
