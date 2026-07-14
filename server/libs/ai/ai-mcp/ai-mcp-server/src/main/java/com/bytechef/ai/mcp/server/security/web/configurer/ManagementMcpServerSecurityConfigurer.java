@@ -59,8 +59,12 @@ public class ManagementMcpServerSecurityConfigurer extends AbstractApiKeyHttpCon
             String authToken = fetchAuthToken(request);
             String servletPath = request.getServletPath();
 
+            // Strip the base prefix and the transport endpoint suffix. Streamable HTTP uses /mcp; HTTP+SSE uses /sse
+            // (the stream) and /message (client-to-server POSTs).
             String mcpServerSecretKey = servletPath.replace("/api/management/", "")
-                .replace("/mcp", "");
+                .replace("/mcp", "")
+                .replace("/sse", "")
+                .replace("/message", "");
 
             TenantKey tenantKey = TenantKey.parse(mcpServerSecretKey);
 
