@@ -1113,12 +1113,41 @@ public class ApplicationProperties {
                  */
                 private boolean enabled;
 
+                private Sse sse = new Sse();
+
                 public boolean isEnabled() {
                     return enabled;
                 }
 
                 public void setEnabled(boolean enabled) {
                     this.enabled = enabled;
+                }
+
+                public Sse getSse() {
+                    return sse;
+                }
+
+                public void setSse(Sse sse) {
+                    this.sse = sse;
+                }
+
+                /**
+                 * HTTP+SSE transport settings. The Streamable HTTP transport is always enabled; SSE is opt-out.
+                 */
+                public static class Sse {
+
+                    /**
+                     * Whether the MCP servers additionally expose the HTTP+SSE transport.
+                     */
+                    private boolean enabled = true;
+
+                    public boolean isEnabled() {
+                        return enabled;
+                    }
+
+                    public void setEnabled(boolean enabled) {
+                        this.enabled = enabled;
+                    }
                 }
             }
         }
