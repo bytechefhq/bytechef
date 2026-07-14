@@ -24,7 +24,6 @@ import com.github.victools.jsonschema.generator.SchemaGenerator;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfig;
 import com.github.victools.jsonschema.generator.SchemaGeneratorConfigBuilder;
 import com.github.victools.jsonschema.generator.SchemaVersion;
-import com.github.victools.jsonschema.module.jackson.JacksonModule;
 import com.github.victools.jsonschema.module.jackson.JacksonOption;
 import java.lang.reflect.Type;
 import java.time.LocalDate;
@@ -34,8 +33,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import com.github.victools.jsonschema.module.jackson.JacksonSchemaModule;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.ai.util.json.JsonParser;
+import org.springframework.ai.util.JacksonUtils;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ObjectNode;
@@ -50,7 +51,7 @@ public class JsonSchemaGeneratorUtils {
     private static final SchemaGenerator TYPE_SCHEMA_GENERATOR;
 
     static {
-        Module jacksonModule = new JacksonModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED);
+        Module jacksonModule = new JacksonSchemaModule(JacksonOption.RESPECT_JSONPROPERTY_REQUIRED);
 
         SchemaGeneratorConfigBuilder schemaGeneratorConfigBuilder =
             new SchemaGeneratorConfigBuilder(SchemaVersion.DRAFT_2020_12, OptionPreset.PLAIN_JSON)
@@ -64,7 +65,7 @@ public class JsonSchemaGeneratorUtils {
     }
 
     public static String generateInputSchema(List<? extends Property> properties) {
-        JsonMapper jsonMapper = JsonParser.getJsonMapper();
+        JsonMapper jsonMapper = JacksonUtils.getDefaultJsonMapper();
 
         ObjectNode schemaObjectNode = jsonMapper.createObjectNode();
 

@@ -18,7 +18,7 @@ package com.bytechef.platform.ai.tool.util;
 
 import com.bytechef.platform.ai.tool.FromAiResult;
 import java.util.List;
-import org.springframework.ai.util.json.JsonParser;
+import org.springframework.ai.util.JacksonUtils;
 import tools.jackson.databind.json.JsonMapper;
 import tools.jackson.databind.node.ArrayNode;
 import tools.jackson.databind.node.ObjectNode;
@@ -33,7 +33,7 @@ public class FromAiInputSchemaUtils {
     private static final String SCHEMA_DRAFT_2020_12 = "https://json-schema.org/draft/2020-12/schema";
 
     public static String generateInputSchema(List<FromAiResult> fromAiResults) {
-        JsonMapper jsonMapper = JsonParser.getJsonMapper();
+        JsonMapper jsonMapper = JacksonUtils.getDefaultJsonMapper();
 
         ObjectNode schemaObjectNode = jsonMapper.createObjectNode();
 
