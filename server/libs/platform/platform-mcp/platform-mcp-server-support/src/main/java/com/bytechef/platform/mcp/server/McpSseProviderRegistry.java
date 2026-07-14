@@ -20,12 +20,12 @@ import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Duration;
+import java.util.Optional;
 import java.util.function.Function;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcSseServerTransportProvider;
-import org.springframework.web.servlet.function.HandlerFunction;
-import org.springframework.web.servlet.function.ServerRequest;
+import org.springframework.web.servlet.function.RequestPredicate;
+import org.springframework.web.servlet.function.RequestPredicates;
+import org.springframework.web.servlet.function.RouterFunction;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
@@ -41,7 +41,7 @@ import org.springframework.web.servlet.function.ServerResponse;
  */
 public class McpSseProviderRegistry {
 
-    private static final Logger log = LoggerFactory.getLogger(McpSseProviderRegistry.class);
+    private static final String SECRET_KEY = "secretKey";
 
     private static final int MAX_PROVIDERS = 1000;
     private static final Duration IDLE_TTL = Duration.ofMinutes(30);
@@ -65,27 +65,31 @@ public class McpSseProviderRegistry {
     }
 
     /**
-     * Routes an SSE or message request to the provider that owns {@code secretKey}, creating it on first use. Returns
-     * 404 when the resolved provider does not match the request (should not happen, since the dispatcher matches the
-     * same concrete paths the provider registers).
+     * Builds a {@link RouterFunction} that resolves the per-secret provider for a matching request and returns
+     * <em>its</em> handler function to Spring.
+     *
+     * <p>
+     * The handler is handed back to Spring rather than invoked here, so Spring MVC owns the async dispatch — this is
+     * what keeps the provider's streaming {@code ServerResponse.sse(...)} response flowing to the client. The endpoint
+     * patterns must carry a {@code {secretKey}} path variable.
+     *
+     * @param ssePathPattern     the SSE stream endpoint pattern, e.g. {@code /api/automation/{secretKey}/sse}
+     * @param messagePathPattern the message endpoint pattern, e.g. {@code /api/automation/{secretKey}/message}
      */
-    public ServerResponse route(ServerRequest request, String secretKey) {
-        WebMvcSseServerTransportProvider provider = providerCache.get(secretKey, providerFactory);
+    public RouterFunction<ServerResponse> toRouterFunction(String ssePathPattern, String messagePathPattern) {
+        RequestPredicate requestPredicate = RequestPredicates.GET(ssePathPattern)
+            .or(RequestPredicates.POST(messagePathPattern));
 
-        return provider.getRouterFunction()
-            .route(request)
-            .map(handlerFunction -> handle(handlerFunction, request))
-            .orElseGet(() -> ServerResponse.notFound()
-                .build());
-    }
+        return request -> {
+            if (!requestPredicate.test(request)) {
+                return Optional.empty();
+            }
 
-    private static ServerResponse handle(HandlerFunction<ServerResponse> handlerFunction, ServerRequest request) {
-        try {
-            return handlerFunction.handle(request);
-        } catch (Exception exception) {
-            log.error("Failed to handle MCP SSE request", exception);
+            WebMvcSseServerTransportProvider transportProvider = providerCache.get(
+                request.pathVariable(SECRET_KEY), providerFactory);
 
-            throw new IllegalStateException(exception);
-        }
+            return transportProvider.getRouterFunction()
+                .route(request);
+        };
     }
 }
