@@ -53,6 +53,7 @@ import com.bytechef.platform.job.sync.file.storage.InMemoryTaskFileStorage;
 import com.bytechef.platform.mcp.domain.McpServer;
 import com.bytechef.platform.mcp.server.FilterableMcpAsyncServer;
 import com.bytechef.platform.mcp.server.FilterableMcpServerBuilder;
+import com.bytechef.platform.mcp.server.McpSseProviderRegistry;
 import com.bytechef.platform.mcp.service.McpComponentService;
 import com.bytechef.platform.mcp.service.McpServerService;
 import com.bytechef.platform.mcp.service.McpToolService;
@@ -82,12 +83,15 @@ import com.bytechef.tenant.TenantContext;
 import io.modelcontextprotocol.common.McpTransportContext;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.ai.mcp.McpToolUtils;
+import org.springframework.ai.mcp.server.webmvc.transport.WebMvcSseServerTransportProvider;
 import org.springframework.ai.mcp.server.webmvc.transport.WebMvcStreamableServerTransportProvider;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -96,6 +100,7 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.web.servlet.function.RouterFunction;
+import org.springframework.web.servlet.function.RouterFunctions;
 import org.springframework.web.servlet.function.ServerResponse;
 
 /**
@@ -121,6 +126,44 @@ public class AutomationMcpServerConfiguration {
     @Bean
     RouterFunction<ServerResponse> automationMcpRouterFunction() {
         return automationWebMvcStreamableHttpServerTransportProvider().getRouterFunction();
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        prefix = "bytechef.ai.mcp.server.sse", name = "enabled", havingValue = "true",
+        matchIfMissing = true)
+    McpSseProviderRegistry automationMcpSseProviderRegistry(FilterableMcpAsyncServer automationMcpAsyncServer) {
+        return new McpSseProviderRegistry(secretKey -> {
+            WebMvcSseServerTransportProvider transportProvider = WebMvcSseServerTransportProvider.builder()
+                .sseEndpoint("/api/automation/" + secretKey + "/sse")
+                .messageEndpoint("/api/automation/" + secretKey + "/message")
+                .keepAliveInterval(Duration.ofSeconds(30))
+                .contextExtractor(serverRequest -> McpTransportContext.create(Map.of(SECRET_KEY, secretKey)))
+                .build();
+
+            automationMcpAsyncServer.attachSse(transportProvider);
+
+            return transportProvider;
+        });
+    }
+
+    @Bean
+    @ConditionalOnProperty(
+        prefix = "bytechef.ai.mcp.server.sse", name = "enabled", havingValue = "true",
+        matchIfMissing = true)
+    RouterFunction<ServerResponse> automationMcpSseRouterFunction(
+        McpSseProviderRegistry automationMcpSseProviderRegistry) {
+
+        return RouterFunctions.route()
+            .GET(
+                "/api/automation/{secretKey}/sse",
+                serverRequest -> automationMcpSseProviderRegistry.route(
+                    serverRequest, serverRequest.pathVariable(SECRET_KEY)))
+            .POST(
+                "/api/automation/{secretKey}/message",
+                serverRequest -> automationMcpSseProviderRegistry.route(
+                    serverRequest, serverRequest.pathVariable(SECRET_KEY)))
+            .build();
     }
 
     @Bean
