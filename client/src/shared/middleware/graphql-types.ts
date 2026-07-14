@@ -195,6 +195,28 @@ export enum AiAgentScenarioType {
   SingleTurn = 'SINGLE_TURN'
 }
 
+export type AiDefaultModel = {
+  __typename?: 'AiDefaultModel';
+  model: Scalars['String']['output'];
+  provider: Scalars['String']['output'];
+};
+
+export type AiProviderCatalogItem = {
+  __typename?: 'AiProviderCatalogItem';
+  enabled: Scalars['Boolean']['output'];
+  icon?: Maybe<Scalars['String']['output']>;
+  key: Scalars['String']['output'];
+  models: Array<AiProviderModel>;
+  name: Scalars['String']['output'];
+  supportsModelById: Scalars['Boolean']['output'];
+};
+
+export type AiProviderModel = {
+  __typename?: 'AiProviderModel';
+  label: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type AiSkill = {
   __typename?: 'AiSkill';
   /** Epoch milliseconds (UTC) */
@@ -362,6 +384,7 @@ export type AutomationWorkflowProject = {
   id: Scalars['ID']['output'];
   lastPublishedVersion?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
+  permissionExpression?: Maybe<Scalars['String']['output']>;
   published: Scalars['Boolean']['output'];
   tagIds: Array<Scalars['ID']['output']>;
   version: Scalars['Int']['output'];
@@ -400,6 +423,7 @@ export type AutomationWorkflowProjectWorkflowTemplate = {
   description?: Maybe<Scalars['String']['output']>;
   label?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['String']['output']>;
+  permissionExpression?: Maybe<Scalars['String']['output']>;
   triggers: Array<AutomationWorkflowProjectComponent>;
   workflowUuid: Scalars['ID']['output'];
 };
@@ -1114,6 +1138,7 @@ export type Integration = {
   componentName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  permissionExpression?: Maybe<Scalars['String']['output']>;
 };
 
 export type IntegrationInstanceConfigurationWorkflow = {
@@ -1144,6 +1169,7 @@ export type IntegrationWorkflow = {
   label: Scalars['String']['output'];
   lastModifiedBy?: Maybe<Scalars['String']['output']>;
   lastModifiedDate?: Maybe<Scalars['Long']['output']>;
+  permissionExpression?: Maybe<Scalars['String']['output']>;
   workflowTaskComponentNames: Array<Scalars['String']['output']>;
   workflowTriggerComponentNames: Array<Scalars['String']['output']>;
   workflowUuid?: Maybe<Scalars['String']['output']>;
@@ -1553,9 +1579,12 @@ export type Mutation = {
   updateApiKey: Scalars['Boolean']['output'];
   updateApprovalTask?: Maybe<ApprovalTask>;
   updateAutomationWorkflowProject: Scalars['Boolean']['output'];
+  updateAutomationWorkflowProjectWorkflow: Scalars['Boolean']['output'];
+  updateAutomationWorkflowProjectWorkflowPermissionExpression: Scalars['Boolean']['output'];
   updateDataTableRow: DataTableRow;
   updateDataTableTags: Scalars['Boolean']['output'];
   updateIdentityProvider: IdentityProviderType;
+  updateIntegrationWorkflowPermissionExpression?: Maybe<IntegrationWorkflow>;
   updateKnowledgeBase?: Maybe<KnowledgeBase>;
   updateKnowledgeBaseDocumentChunk?: Maybe<KnowledgeBaseDocumentChunk>;
   updateKnowledgeBaseDocumentTags: Scalars['Boolean']['output'];
@@ -1672,12 +1701,14 @@ export type MutationCreateAutomationWorkflowProjectArgs = {
   category?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   name: Scalars['String']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 
 export type MutationCreateAutomationWorkflowProjectWorkflowArgs = {
   definition?: InputMaybe<Scalars['String']['input']>;
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
   projectId: Scalars['ID']['input'];
 };
 
@@ -2204,7 +2235,21 @@ export type MutationUpdateAutomationWorkflowProjectArgs = {
   description?: InputMaybe<Scalars['String']['input']>;
   id: Scalars['ID']['input'];
   name: Scalars['String']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+
+export type MutationUpdateAutomationWorkflowProjectWorkflowArgs = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  label: Scalars['String']['input'];
+  workflowUuid: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateAutomationWorkflowProjectWorkflowPermissionExpressionArgs = {
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
+  workflowUuid: Scalars['ID']['input'];
 };
 
 
@@ -2221,6 +2266,12 @@ export type MutationUpdateDataTableTagsArgs = {
 export type MutationUpdateIdentityProviderArgs = {
   id: Scalars['ID']['input'];
   input: IdentityProviderInput;
+};
+
+
+export type MutationUpdateIntegrationWorkflowPermissionExpressionArgs = {
+  integrationWorkflowId: Scalars['ID']['input'];
+  permissionExpression?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -2568,6 +2619,8 @@ export type Query = {
   aiAgentEvalTest?: Maybe<AiAgentEvalTest>;
   aiAgentEvalTests: Array<AiAgentEvalTest>;
   aiAgentJudges: Array<AiAgentJudge>;
+  aiDefaultModel?: Maybe<AiDefaultModel>;
+  aiProviderCatalog: Array<AiProviderCatalogItem>;
   aiSkill: AiSkill;
   aiSkillFileContent: Scalars['String']['output'];
   aiSkillFilePaths: Array<Scalars['String']['output']>;
@@ -2624,13 +2677,13 @@ export type Query = {
   generationJobStatus?: Maybe<GenerationJobStatus>;
   identityProvider?: Maybe<IdentityProviderType>;
   identityProviders: Array<Maybe<IdentityProviderType>>;
-  integration?: Maybe<Integration>;
   integrationWorkflows: Array<IntegrationWorkflow>;
   integrationWorkflowsByIntegrationId: Array<IntegrationWorkflow>;
   jobFileLogs: LogPage;
   jobFileLogsExist: Scalars['Boolean']['output'];
   knowledgeBase?: Maybe<KnowledgeBase>;
   knowledgeBaseDocument?: Maybe<KnowledgeBaseDocument>;
+  knowledgeBaseDocumentChunks?: Maybe<Array<Maybe<KnowledgeBaseDocumentChunk>>>;
   knowledgeBaseDocumentStatus?: Maybe<DocumentStatusUpdate>;
   knowledgeBaseDocumentTags?: Maybe<Array<Scalars['String']['output']>>;
   knowledgeBaseDocumentTagsByDocument?: Maybe<Array<KnowledgeBaseDocumentTagsEntry>>;
@@ -2752,6 +2805,16 @@ export type QueryAiAgentEvalTestsArgs = {
 export type QueryAiAgentJudgesArgs = {
   workflowId: Scalars['String']['input'];
   workflowNodeName: Scalars['String']['input'];
+};
+
+
+export type QueryAiDefaultModelArgs = {
+  environment: Scalars['ID']['input'];
+};
+
+
+export type QueryAiProviderCatalogArgs = {
+  environment: Scalars['ID']['input'];
 };
 
 
@@ -3030,11 +3093,6 @@ export type QueryIdentityProviderArgs = {
 };
 
 
-export type QueryIntegrationArgs = {
-  id?: InputMaybe<Scalars['ID']['input']>;
-};
-
-
 export type QueryIntegrationWorkflowsByIntegrationIdArgs = {
   integrationId: Scalars['ID']['input'];
 };
@@ -3059,6 +3117,11 @@ export type QueryKnowledgeBaseArgs = {
 
 
 export type QueryKnowledgeBaseDocumentArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryKnowledgeBaseDocumentChunksArgs = {
   id: Scalars['ID']['input'];
 };
 
