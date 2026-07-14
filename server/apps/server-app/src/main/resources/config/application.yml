@@ -225,7 +225,9 @@ spring:
       enabled: ${bytechef.mail.ssl.enabled}
   mvc:
     async:
-      request-timeout: -1
+      # Bound long-lived MCP Streamable HTTP SSE streams: far above the 30s servlet default so idle
+      # streams are not torn down, but finite so idle/leaked async requests are eventually reclaimed.
+      request-timeout: 10m
   liquibase:
     contexts: mono, #spring.profiles.active#
     enabled: ${bytechef.upgrade.enabled:true}
