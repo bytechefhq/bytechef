@@ -132,18 +132,24 @@ public class GoogleMailSearchEmailAction {
 
         Gmail service = GoogleServices.getMail(connectionParameters);
 
-        StringBuilder query = createQuery(inputParameters);
+        String query = createQuery(inputParameters)
+            .toString()
+            .trim();
 
         try {
-            return service.users()
+            Gmail.Users.Messages.List list = service.users()
                 .messages()
                 .list(ME)
                 .setMaxResults(inputParameters.getLong(MAX_RESULTS))
                 .setPageToken(inputParameters.getString(PAGE_TOKEN))
-                .setQ(query.toString())
                 .setLabelIds(inputParameters.getList(LABEL_IDS, String.class, List.of()))
-                .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH))
-                .execute();
+                .setIncludeSpamTrash(inputParameters.getBoolean(INCLUDE_SPAM_TRASH));
+
+            if (!query.isEmpty()) {
+                list.setQ(query);
+            }
+
+            return list.execute();
         } catch (IOException e) {
             throw translateGoogleIOException(e);
         }
