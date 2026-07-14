@@ -32,7 +32,9 @@ import org.springframework.security.web.util.matcher.RegexRequestMatcher;
  */
 public class AutomationMcpServerSecurityConfigurer extends AbstractApiKeyHttpConfigurer {
 
-    private static final String PATH_PATTERN = "^/api/automation/.+/(mcp|sse|message)";
+    // RegexRequestMatcher matches servletPath + "?" + queryString with Matcher#matches(), so the trailing (\?.*)?
+    // is required for the SSE message endpoint, which the client calls as /message?sessionId=...
+    private static final String PATH_PATTERN = "^/api/automation/.+/(mcp|sse|message)(\\?.*)?";
 
     public AutomationMcpServerSecurityConfigurer(McpServerService mcpServerService) {
         super(
