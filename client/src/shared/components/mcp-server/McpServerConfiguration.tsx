@@ -2,6 +2,7 @@ import Badge from '@/components/Badge/Badge';
 import {Alert, AlertTitle} from '@/components/ui/alert';
 import {Tabs, TabsContent, TabsList, TabsTrigger} from '@/components/ui/tabs';
 import McpServerConfigurationCode from '@/shared/components/mcp-server/McpServerConfigurationCode';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {InfoCircledIcon} from '@radix-ui/react-icons';
 
 const buildMcpRemoteSnippet = (url: string) => `{
@@ -35,13 +36,21 @@ const TransportSnippets = ({
     httpSnippet: string;
     onRefresh: () => void;
     sseSnippet: string;
-}) => (
-    <div className="space-y-3">
-        <McpServerConfigurationCode codeSnippet={httpSnippet} label="Streamable HTTP" onRefresh={onRefresh} />
+}) => {
+    const sseEnabled = useApplicationInfoStore((state) => state.ai.mcp.server.sse.enabled);
 
-        <McpServerConfigurationCode codeSnippet={sseSnippet} label="SSE" onRefresh={onRefresh} />
-    </div>
-);
+    return (
+        <div className="space-y-3">
+            <McpServerConfigurationCode
+                codeSnippet={httpSnippet}
+                label={sseEnabled ? 'Streamable HTTP' : undefined}
+                onRefresh={onRefresh}
+            />
+
+            {sseEnabled && <McpServerConfigurationCode codeSnippet={sseSnippet} label="SSE" onRefresh={onRefresh} />}
+        </div>
+    );
+};
 
 const McpServerConfiguration = ({mcpServerUrl, onRefresh}: {mcpServerUrl: string; onRefresh: () => void}) => {
     const sseServerUrl = toSseUrl(mcpServerUrl);
