@@ -94,9 +94,9 @@ public class FilterableMcpAsyncServer {
     private final Map<String, McpNotificationHandler> notificationHandlers;
 
     /**
-     * Create a new FilterableMcpAsyncServer and install its session factory on the given transport provider.
+     * Build the transport-agnostic filtering core. Attach it to a transport with {@link #attachStreamable} and/or
+     * {@link #attachSse}.
      *
-     * @param transportProvider      The streamable transport layer implementation for MCP communication.
      * @param jsonMapper             The JsonMapper to use for JSON serialization/deserialization.
      * @param serverInfo             The server implementation information.
      * @param serverCapabilities     The server capabilities configuration.
@@ -106,6 +106,7 @@ public class FilterableMcpAsyncServer {
      * @param validateToolInputs     Whether to validate tool call arguments against the tool input schema.
      * @param toolFilter             The tool filter function, or null to serve no tools.
      * @param resourceSpecifications Static resources served to every session, or null to serve none.
+     * @param protocolVersions       The protocol versions the server supports.
      */
     FilterableMcpAsyncServer(
         McpJsonMapper jsonMapper, McpSchema.Implementation serverInfo,
