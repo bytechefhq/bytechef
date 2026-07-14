@@ -54,6 +54,6 @@ public class FileEntryDeserializer extends ValueDeserializer<FileEntry> {
             return null;
         }
 
-        return fieldJsonNode.asText();
+        return fieldJsonNode.asString();
     }
 }
