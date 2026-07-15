@@ -14,6 +14,7 @@ import static org.testcontainers.containers.localstack.LocalStackContainer.Servi
 
 import com.bytechef.config.ApplicationProperties;
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.tenant.TenantContext;
 import io.awspring.cloud.s3.S3Template;
 import java.io.IOException;
 import java.io.InputStream;
@@ -231,6 +232,29 @@ class AwsFileStorageIntTest {
         // Deleting an object that is not present must be a no-op, not a FileStorageException. Regression for a
         // knowledge base document whose chunk content file was already gone from the bucket (issue #5392).
         assertThatCode(() -> storageService.deleteFile(DIR_PATH, fileEntry)).doesNotThrowAnyException();
+    }
+
+    @Test
+    void fileLookupIsTenantScoped() {
+        FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
+
+        await()
+            .pollInterval(Duration.ofSeconds(2))
+            .atMost(Duration.ofSeconds(10))
+            .ignoreExceptions()
+            .untilAsserted(() -> assertThat(storageService.fileExists(DIR_PATH, KEY)).isTrue());
+
+        try {
+            TenantContext.setCurrentTenantId("other");
+
+            assertThat(storageService.fileExists(DIR_PATH, KEY)).isFalse();
+
+            assertThatCode(() -> storageService.deleteFile(DIR_PATH, fileEntry)).doesNotThrowAnyException();
+        } finally {
+            TenantContext.resetCurrentTenantId();
+        }
+
+        assertThat(storageService.fileExists(DIR_PATH, KEY)).isTrue();
     }
 
     @Configuration

@@ -62,12 +62,12 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public boolean fileExists(String directory, String filename) throws FileStorageException {
-        List<S3Resource> s3Resources = listAllObjects();
+        String key = combinePaths(directory, filename);
 
-        return s3Resources.stream()
+        return s3Template.listObjects(bucketName, key)
+            .stream()
             .map(S3Resource::getFilename)
-            .filter(Objects::nonNull)
-            .anyMatch((curFilename) -> curFilename.endsWith(directory + "/" + filename));
+            .anyMatch(key::equals);
     }
 
     @Override
@@ -207,10 +207,11 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     private Optional<S3Resource> findObject(String directoryPath, String filename) {
-        List<S3Resource> s3Resources = s3Template.listObjects(bucketName, "");
+        String key = combinePaths(directoryPath, filename);
 
-        return s3Resources.stream()
-            .filter((file) -> StringUtils.contains(file.getFilename(), directoryPath + "/" + filename))
+        return s3Template.listObjects(bucketName, key)
+            .stream()
+            .filter(s3Resource -> key.equals(s3Resource.getFilename()))
             .findFirst();
     }
 
