@@ -49,9 +49,11 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public void deleteFile(String directory, FileEntry fileEntry) {
-        findObject(directory, fileEntry.getName())
-            .ifPresent(
-                s3Resource -> s3Template.deleteObject(bucketName, Objects.requireNonNull(s3Resource.getFilename())));
+        if (fileEntry != null) {
+            findObject(directory, fileEntry.getName())
+                .ifPresent(s3Resource -> s3Template.deleteObject(
+                    bucketName, Objects.requireNonNull(s3Resource.getFilename())));
+        }
     }
 
     @Override
