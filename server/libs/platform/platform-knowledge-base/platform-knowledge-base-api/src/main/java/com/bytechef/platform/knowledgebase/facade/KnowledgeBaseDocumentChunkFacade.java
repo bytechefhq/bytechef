@@ -35,6 +35,17 @@ public interface KnowledgeBaseDocumentChunkFacade {
     List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentId(long knowledgeBaseDocumentId);
 
     /**
+     * Gets all chunks for a document without loading their text content from file storage. Used by the {@code chunks}
+     * field resolver so listing a document's chunks does not incur one file-storage read per chunk; chunk content is
+     * fetched lazily via {@link #getKnowledgeBaseDocumentChunksByDocumentId(long)} when a document is expanded.
+     *
+     * @param knowledgeBaseDocumentId the knowledge base document ID
+     * @return list of chunks without content
+     */
+    List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(
+        long knowledgeBaseDocumentId);
+
+    /**
      * Updates a knowledge base document chunk, recomputing embeddings if content changed.
      *
      * @param id      the ID of the chunk to update

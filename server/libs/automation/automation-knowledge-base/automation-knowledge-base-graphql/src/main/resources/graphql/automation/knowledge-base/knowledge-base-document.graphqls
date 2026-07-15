@@ -1,5 +1,6 @@
 extend type Query {
     knowledgeBaseDocument(id: ID!): KnowledgeBaseDocument
+    knowledgeBaseDocumentChunks(id: ID!): [KnowledgeBaseDocumentChunk]
     knowledgeBaseDocumentStatus(id: ID!): DocumentStatusUpdate
     knowledgeBaseDocumentTags: [String!]
     knowledgeBaseDocumentTagsByDocument: [KnowledgeBaseDocumentTagsEntry!]
