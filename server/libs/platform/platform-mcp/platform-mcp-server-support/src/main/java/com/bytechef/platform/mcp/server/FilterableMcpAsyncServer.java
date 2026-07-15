@@ -201,6 +201,10 @@ public class FilterableMcpAsyncServer {
         return requestHandlers;
     }
 
+    McpRequestHandler<?> requestHandler(String method) {
+        return requestHandlers.get(method);
+    }
+
     private Map<String, McpNotificationHandler> prepareNotificationHandlers() {
         Map<String, McpNotificationHandler> notificationHandlers = new HashMap<>();
 

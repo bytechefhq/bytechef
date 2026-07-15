@@ -16,10 +16,14 @@
 
 package com.bytechef.platform.mcp.server;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 
 import io.modelcontextprotocol.json.McpJsonDefaults;
+import io.modelcontextprotocol.server.McpServerFeatures;
+import io.modelcontextprotocol.spec.McpError;
 import io.modelcontextprotocol.spec.McpSchema;
 import io.modelcontextprotocol.spec.McpServerSession;
 import io.modelcontextprotocol.spec.McpServerTransportProvider;
@@ -27,10 +31,12 @@ import io.modelcontextprotocol.spec.McpStreamableServerSession;
 import io.modelcontextprotocol.spec.McpStreamableServerTransportProvider;
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import reactor.core.publisher.Mono;
 
 /**
  * Verifies that the filtering core builds transport-agnostic handlers and can be attached to both the streamable and
@@ -40,6 +46,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
  */
 @ExtendWith(MockitoExtension.class)
 class FilterableMcpAsyncServerTest {
+
+    private static final String RESOURCE_URI = "ui://test/resource";
 
     @Mock
     private McpStreamableServerTransportProvider streamableTransportProvider;
@@ -65,6 +73,49 @@ class FilterableMcpAsyncServerTest {
         verify(sseTransportProvider).setSessionFactory(any(McpServerSession.Factory.class));
     }
 
+    @Test
+    void testResourcesListReturnsConfiguredResources() {
+        FilterableMcpAsyncServer server = newServerWithResource();
+
+        McpSchema.ListResourcesResult result = (McpSchema.ListResourcesResult) server
+            .requestHandler(McpSchema.METHOD_RESOURCES_LIST)
+            .handle(null, Map.of())
+            .block();
+
+        assertEquals(1, result.resources()
+            .size());
+        assertEquals(RESOURCE_URI, result.resources()
+            .get(0)
+            .uri());
+    }
+
+    @Test
+    void testResourcesReadReturnsResourceContents() {
+        FilterableMcpAsyncServer server = newServerWithResource();
+
+        McpSchema.ReadResourceResult result = (McpSchema.ReadResourceResult) server
+            .requestHandler(McpSchema.METHOD_RESOURCES_READ)
+            .handle(null, Map.of("uri", RESOURCE_URI))
+            .block();
+
+        assertEquals(1, result.contents()
+            .size());
+    }
+
+    @Test
+    void testResourcesReadUnknownUriReturnsResourceNotFound() {
+        FilterableMcpAsyncServer server = newServerWithResource();
+
+        Mono<?> result = server.requestHandler(McpSchema.METHOD_RESOURCES_READ)
+            .handle(null, Map.of("uri", "ui://test/missing"));
+
+        McpError mcpError = assertThrows(McpError.class, result::block);
+
+        assertEquals(McpSchema.ErrorCodes.RESOURCE_NOT_FOUND, mcpError.getJsonRpcError()
+            .code()
+            .intValue());
+    }
+
     private static FilterableMcpAsyncServer newServer() {
         return new FilterableMcpAsyncServer(
             McpJsonDefaults.getMapper(), new McpSchema.Implementation("test", "1.0.0"),
@@ -73,5 +124,28 @@ class FilterableMcpAsyncServerTest {
                 .build(),
             null, Duration.ofSeconds(10), McpJsonDefaults.getSchemaValidator(), false, exchange -> List.of(),
             List.of(), List.of("2024-11-05"));
+    }
+
+    private static FilterableMcpAsyncServer newServerWithResource() {
+        return new FilterableMcpAsyncServer(
+            McpJsonDefaults.getMapper(), new McpSchema.Implementation("test", "1.0.0"),
+            McpSchema.ServerCapabilities.builder()
+                .resources(false, false)
+                .build(),
+            null, Duration.ofSeconds(10), McpJsonDefaults.getSchemaValidator(), false, exchange -> List.of(),
+            List.of(resourceSpecification(RESOURCE_URI)), List.of("2024-11-05"));
+    }
+
+    private static McpServerFeatures.AsyncResourceSpecification resourceSpecification(String uri) {
+        McpSchema.Resource resource = McpSchema.Resource.builder()
+            .uri(uri)
+            .name("Test Resource")
+            .mimeType("text/plain")
+            .build();
+
+        return new McpServerFeatures.AsyncResourceSpecification(
+            resource,
+            (exchange, request) -> Mono.just(new McpSchema.ReadResourceResult(
+                List.of(new McpSchema.TextResourceContents(request.uri(), "text/plain", "hello")))));
     }
 }

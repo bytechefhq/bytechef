@@ -98,7 +98,7 @@ public class FilterableMcpServerBuilder {
     public FilterableMcpServerBuilder resourceSpecifications(
         List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications) {
 
-        this.resourceSpecifications = List.copyOf(resourceSpecifications);
+        this.resourceSpecifications = resourceSpecifications != null ? List.copyOf(resourceSpecifications) : List.of();
 
         return this;
     }
