@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -86,9 +85,10 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public Set<FileEntry> getFileEntries(String directory) throws FileStorageException {
-        List<S3Resource> s3Resources = listAllObjects();
+        String prefix = combinePaths(directory, null);
 
-        return s3Resources.stream()
+        return s3Template.listObjects(bucketName, prefix)
+            .stream()
             .map(S3Resource::getFilename)
             .filter(Objects::nonNull)
             .map(filename -> new FileEntry(
@@ -195,10 +195,6 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         throws FileStorageException {
 
         return storeFileContent(directory, filename, inputStream);
-    }
-
-    private List<S3Resource> listAllObjects() {
-        return s3Template.listObjects(bucketName, "");
     }
 
     private S3Resource getObject(String directoryPath, String filename) {

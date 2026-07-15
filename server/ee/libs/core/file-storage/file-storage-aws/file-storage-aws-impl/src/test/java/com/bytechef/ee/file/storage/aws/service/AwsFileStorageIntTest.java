@@ -195,7 +195,7 @@ class AwsFileStorageIntTest {
     void canGetFileEntries() {
         FileEntry fileEntry1 = storageService.storeFileContent(DIR_PATH, KEY, DATA);
         FileEntry fileEntry2 = storageService.storeFileContent(DIR_PATH, "key2", DATA);
-        Set<FileEntry> fileEntries = storageService.getFileEntries(TENANT_ID + "/" + DIR_PATH);
+        Set<FileEntry> fileEntries = storageService.getFileEntries(DIR_PATH);
 
         await()
             .pollInterval(Duration.ofSeconds(2))
@@ -248,6 +248,7 @@ class AwsFileStorageIntTest {
             TenantContext.setCurrentTenantId("other");
 
             assertThat(storageService.fileExists(DIR_PATH, KEY)).isFalse();
+            assertThat(storageService.getFileEntries(DIR_PATH)).isEmpty();
 
             assertThatCode(() -> storageService.deleteFile(DIR_PATH, fileEntry)).doesNotThrowAnyException();
         } finally {
