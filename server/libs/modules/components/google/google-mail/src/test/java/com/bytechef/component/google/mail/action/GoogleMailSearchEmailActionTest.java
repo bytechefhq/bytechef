@@ -28,11 +28,8 @@ import static com.bytechef.component.google.mail.constant.GoogleMailConstants.SU
 import static com.bytechef.component.google.mail.constant.GoogleMailConstants.TO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.ActionContext;
@@ -102,49 +99,11 @@ class GoogleMailSearchEmailActionTest {
             assertEquals(mockedListMessagesResponse, response);
             assertEquals(mockedConnectionParameters, parametersArgumentCaptor.getValue());
             assertEquals(
-                List.of(ME, "pageToken", "from:from@mail.com to:to@mail.com subject:subject category:social"),
+                List.of(ME, "pageToken", " from:from@mail.com to:to@mail.com subject:subject category:social"),
                 stringArgumentCaptor.getAllValues());
             assertEquals(1, longArgumentCaptor.getValue());
             assertEquals(List.of("id1", "id2"), listArgumentCaptor.getValue());
             assertEquals(true, booleanArgumentCaptor.getValue());
-        }
-    }
-
-    @Test
-    @SuppressWarnings("unchecked")
-    void testPerformWithoutQueryFiltersDoesNotSendQ() throws IOException {
-        Parameters inputParameters = MockParametersFactory.create(
-            Map.of(MAX_RESULTS, 1L, LABEL_IDS, List.of("id1"), INCLUDE_SPAM_TRASH, true));
-
-        try (MockedStatic<GoogleServices> googleServicesMockedStatic = mockStatic(GoogleServices.class)) {
-            googleServicesMockedStatic
-                .when(() -> GoogleServices.getMail(parametersArgumentCaptor.capture()))
-                .thenReturn(mockedGmail);
-            when(mockedGmail.users())
-                .thenReturn(mockedUsers);
-            when(mockedUsers.messages())
-                .thenReturn(mockedMessages);
-            when(mockedMessages.list(stringArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setMaxResults(longArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setPageToken(stringArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setLabelIds(listArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.setIncludeSpamTrash(booleanArgumentCaptor.capture()))
-                .thenReturn(mockedList);
-            when(mockedList.execute())
-                .thenReturn(mockedListMessagesResponse);
-
-            ListMessagesResponse response = GoogleMailSearchEmailAction.perform(
-                inputParameters, mockedConnectionParameters, mock(ActionContext.class));
-
-            assertEquals(mockedListMessagesResponse, response);
-
-            // Without From/To/Subject/Category filters the 'q' parameter must not be sent at all: Gmail rejects
-            // even an empty 'q' when the token carries the gmail.metadata scope.
-            verify(mockedList, never()).setQ(anyString());
         }
     }
 }

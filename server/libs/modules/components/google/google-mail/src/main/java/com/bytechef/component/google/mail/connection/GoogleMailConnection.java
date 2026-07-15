@@ -44,6 +44,7 @@ public class GoogleMailConnection {
             map.put("https://www.googleapis.com/auth/gmail.compose", false);
             map.put("https://www.googleapis.com/auth/gmail.insert", false);
             map.put("https://www.googleapis.com/auth/gmail.labels", false);
+            map.put("https://www.googleapis.com/auth/gmail.metadata", false);
             map.put("https://www.googleapis.com/auth/gmail.modify", false);
             map.put("https://www.googleapis.com/auth/gmail.readonly", false);
             map.put("https://www.googleapis.com/auth/gmail.send", false);
