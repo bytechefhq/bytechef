@@ -17,6 +17,9 @@
 package com.bytechef.platform.knowledgebase.facade;
 
 import com.bytechef.file.storage.domain.FileEntry;
+import com.bytechef.platform.configuration.context.EnvironmentContext;
+import com.bytechef.platform.configuration.domain.Environment;
+import com.bytechef.platform.knowledgebase.domain.KnowledgeBase;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocument;
 import com.bytechef.platform.knowledgebase.domain.KnowledgeBaseDocumentChunk;
 import com.bytechef.platform.knowledgebase.event.KnowledgeBaseDocumentEvent;
@@ -24,6 +27,7 @@ import com.bytechef.platform.knowledgebase.file.storage.KnowledgeBaseFileStorage
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentChunkService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseDocumentTagService;
+import com.bytechef.platform.knowledgebase.service.KnowledgeBaseService;
 import com.bytechef.platform.knowledgebase.service.KnowledgeBaseVectorStoreMetadataService;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.InputStream;
@@ -48,6 +52,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
     private final KnowledgeBaseDocumentService knowledgeBaseDocumentService;
     private final KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService;
     private final KnowledgeBaseFileStorage knowledgeBaseFileStorage;
+    private final KnowledgeBaseService knowledgeBaseService;
     private final KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService;
     private final VectorStore vectorStore;
 
@@ -56,7 +61,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         ApplicationEventPublisher eventPublisher, KnowledgeBaseDocumentChunkService knowledgeBaseDocumentChunkService,
         KnowledgeBaseDocumentService knowledgeBaseDocumentService,
         KnowledgeBaseDocumentTagService knowledgeBaseDocumentTagService,
-        KnowledgeBaseFileStorage knowledgeBaseFileStorage,
+        KnowledgeBaseFileStorage knowledgeBaseFileStorage, KnowledgeBaseService knowledgeBaseService,
         KnowledgeBaseVectorStoreMetadataService knowledgeBaseVectorStoreMetadataService,
         @Qualifier("knowledgeBasePgVectorStore") VectorStore vectorStore) {
 
@@ -65,6 +70,7 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
         this.knowledgeBaseDocumentService = knowledgeBaseDocumentService;
         this.knowledgeBaseDocumentTagService = knowledgeBaseDocumentTagService;
         this.knowledgeBaseFileStorage = knowledgeBaseFileStorage;
+        this.knowledgeBaseService = knowledgeBaseService;
         this.knowledgeBaseVectorStoreMetadataService = knowledgeBaseVectorStoreMetadataService;
         this.vectorStore = vectorStore;
     }
@@ -102,7 +108,17 @@ class KnowledgeBaseDocumentFacadeImpl implements KnowledgeBaseDocumentFacade {
             .toList();
 
         if (!vectorStoreIds.isEmpty()) {
-            vectorStore.delete(vectorStoreIds);
+            KnowledgeBase knowledgeBase =
+                knowledgeBaseService.getKnowledgeBase(knowledgeBaseDocument.getKnowledgeBaseId());
+            Environment environment = knowledgeBase.getEnvironment();
+
+            EnvironmentContext.set(environment);
+
+            try {
+                vectorStore.delete(vectorStoreIds);
+            } finally {
+                EnvironmentContext.clear();
+            }
         }
 
         for (KnowledgeBaseDocumentChunk chunk : knowledgeBaseDocumentChunks) {
