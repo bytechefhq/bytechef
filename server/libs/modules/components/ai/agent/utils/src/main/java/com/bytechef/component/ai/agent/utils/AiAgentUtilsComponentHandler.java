@@ -23,6 +23,7 @@ import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsAppendFilesToAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsCreateAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsDeleteAiSkillAction;
+import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsRemoveFileFromAiSkillAction;
 import com.bytechef.component.ai.agent.utils.action.AiAgentUtilsUpdateAiSkillAction;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsBraveWebSearchTool;
 import com.bytechef.component.ai.agent.utils.cluster.AiAgentUtilsFileSystemTools;
@@ -64,6 +65,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
             tool(AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade)),
+            tool(AiAgentUtilsRemoveFileFromAiSkillAction.of(aiSkillFacade)),
             tool(AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))));
 
         for (AiAgentUtilsClusterElementContributor clusterElementContributor : clusterElementContributors) {
@@ -79,6 +81,7 @@ public class AiAgentUtilsComponentHandler implements ComponentHandler {
                 AiAgentUtilsAppendFilesToAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsCreateAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsDeleteAiSkillAction.of(aiSkillFacade),
+                AiAgentUtilsRemoveFileFromAiSkillAction.of(aiSkillFacade),
                 AiAgentUtilsUpdateAiSkillAction.of(aiSkillFacade))
             .clusterElements(clusterElements);
     }

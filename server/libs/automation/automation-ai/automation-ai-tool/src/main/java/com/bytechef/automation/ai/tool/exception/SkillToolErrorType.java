@@ -31,6 +31,7 @@ public class SkillToolErrorType extends AbstractErrorType {
     public static final SkillToolErrorType LIST_SKILLS = new SkillToolErrorType(105);
     public static final SkillToolErrorType UPDATE_SKILL = new SkillToolErrorType(106);
     public static final SkillToolErrorType UPDATE_SKILL_CONTENT = new SkillToolErrorType(107);
+    public static final SkillToolErrorType REMOVE_SKILL_FILE = new SkillToolErrorType(108);
 
     private SkillToolErrorType(int errorKey) {
         super(SkillToolErrorType.class, errorKey);

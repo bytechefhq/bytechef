@@ -208,6 +208,29 @@ public class SkillsTools {
     }
 
     @Tool(
+        description = "Remove a single file from an existing AI skill archive. SKILL.md cannot be removed. " +
+            "Returns the updated skill.")
+    public AiSkill removeFileInSkill(
+        @ToolParam(description = "The ID of the skill to remove the file from") long id,
+        @ToolParam(description = "The path of the file to remove within the skill archive") String path) {
+
+        try {
+            AiSkill aiSkill = aiSkillFacade.removeFileInSkill(id, path);
+
+            if (log.isDebugEnabled()) {
+                log.debug("removeFileInSkill({}, {}): Removed file", id, path);
+            }
+
+            return aiSkill;
+        } catch (Exception e) {
+            log.error("removeFileInSkill({}, {}): Failed to remove file from skill", id, path, e);
+
+            throw new ExecutionException(
+                "Failed to remove file from skill: " + e.getMessage(), e, SkillToolErrorType.REMOVE_SKILL_FILE);
+        }
+    }
+
+    @Tool(
         description = "Update the instructions (e.g. `SKILL.md` content) of an existing AI skill. Returns the updated skill.")
     public AiSkill updateAiSkillContent(
         @ToolParam(description = "The ID of the skill to update") long id,

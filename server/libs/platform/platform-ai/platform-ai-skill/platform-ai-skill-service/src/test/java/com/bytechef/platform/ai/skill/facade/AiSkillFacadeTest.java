@@ -470,6 +470,99 @@ class AiSkillFacadeTest {
     }
 
     @Test
+    void testRemoveFileInSkill() {
+        long skillId = 1L;
+
+        byte[] existingZipBytes = createZipBytesWithEntries(
+            new String[] {
+                "SKILL.md", "scripts/run.py"
+            });
+
+        FileEntry oldFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
+        FileEntry newFileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill-new.skill");
+
+        AiSkill aiSkill = new AiSkill();
+
+        aiSkill.setId(skillId);
+        aiSkill.setName("my-skill");
+        aiSkill.setSkillFile(oldFileEntry);
+
+        AiSkill updatedAiSkill = new AiSkill();
+
+        updatedAiSkill.setId(skillId);
+        updatedAiSkill.setName("my-skill");
+        updatedAiSkill.setSkillFile(newFileEntry);
+
+        when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
+        when(aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry)).thenReturn(existingZipBytes);
+        when(aiSkillFileStorage.storeAiSkillFile(eq("my-skill.skill"), any(byte[].class))).thenReturn(newFileEntry);
+        when(aiSkillService.updateAiSkillFile(skillId, newFileEntry)).thenReturn(updatedAiSkill);
+
+        AiSkill result = aiSkillFacade.removeFileInSkill(skillId, "scripts/run.py");
+
+        assertEquals(updatedAiSkill, result);
+
+        verify(aiSkillFileStorage).storeAiSkillFile(eq("my-skill.skill"), argThat(zipBytes -> {
+            Map<String, String> entries = readZipEntries(zipBytes);
+
+            return entries.containsKey("SKILL.md") && !entries.containsKey("scripts/run.py");
+        }));
+    }
+
+    @Test
+    void testRemoveFileInSkillRejectsPathTraversal() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.removeFileInSkill(1L, "../etc/passwd"));
+    }
+
+    @Test
+    void testRemoveFileInSkillRejectsAbsolutePath() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.removeFileInSkill(1L, "/etc/passwd"));
+    }
+
+    @Test
+    void testRemoveFileInSkillRejectsBlankPath() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.removeFileInSkill(1L, " "));
+    }
+
+    @Test
+    void testRemoveFileInSkillRejectsSkillMd() {
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.removeFileInSkill(1L, "SKILL.md"));
+    }
+
+    @Test
+    void testRemoveFileInSkillFileNotFoundThrows() {
+        long skillId = 1L;
+
+        byte[] existingZipBytes = createZipBytes("SKILL.md", "content");
+
+        FileEntry fileEntry = new FileEntry("my-skill.skill", "file:///storage/my-skill.skill");
+
+        AiSkill aiSkill = new AiSkill();
+
+        aiSkill.setId(skillId);
+        aiSkill.setName("my-skill");
+        aiSkill.setSkillFile(fileEntry);
+
+        when(aiSkillService.getAiSkill(skillId)).thenReturn(aiSkill);
+        when(aiSkillFileStorage.readAiSkillFileBytes(fileEntry)).thenReturn(existingZipBytes);
+
+        IllegalArgumentException exception = assertThrows(
+            IllegalArgumentException.class,
+            () -> aiSkillFacade.removeFileInSkill(skillId, "nonexistent.txt"));
+
+        assertTrue(exception.getMessage()
+            .contains("File not found"));
+    }
+
+    @Test
     void testUpdateAiSkill() {
         long skillId = 1L;
 

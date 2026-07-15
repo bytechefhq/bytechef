@@ -72,6 +72,14 @@ public interface AiSkillFacade {
      */
     List<String> getAiSkillFilePaths(long id);
 
+    /**
+     * Removes a single file from the skill zip archive. The path must not contain traversal sequences (..) or be
+     * absolute, and must not refer to SKILL.md.
+     *
+     * @throws IllegalArgumentException if path is invalid, refers to SKILL.md, or the file is not found
+     */
+    AiSkill removeFileInSkill(long id, String path);
+
     @SuppressFBWarnings("EI")
     record AiSkillDownload(AiSkill aiSkill, byte[] bytes) {
     }
