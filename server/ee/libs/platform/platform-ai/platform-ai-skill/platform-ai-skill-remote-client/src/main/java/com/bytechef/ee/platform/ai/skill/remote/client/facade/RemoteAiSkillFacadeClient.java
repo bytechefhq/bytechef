@@ -78,6 +78,11 @@ public class RemoteAiSkillFacadeClient implements AiSkillFacade {
     }
 
     @Override
+    public AiSkill removeFileInSkill(long id, String path) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public AiSkill updateAiSkill(long id, String name, String description) {
         throw new UnsupportedOperationException();
     }

@@ -433,6 +433,59 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     @Override
+    public AiSkill removeFileInSkill(long id, String path) {
+        Assert.hasText(path, "File path must not be blank");
+
+        if (path.contains("..") || path.startsWith("/")) {
+            throw new IllegalArgumentException(
+                "Path must not contain path traversal sequences or be absolute: " + path);
+        }
+
+        if (SKILL_MD_FILENAME.equalsIgnoreCase(path)) {
+            throw new IllegalArgumentException("SKILL.md cannot be removed from a skill archive");
+        }
+
+        AiSkill aiSkill = aiSkillService.getAiSkill(id);
+
+        FileEntry oldFileEntry = aiSkill.getSkillFile();
+
+        byte[] existingZipBytes = aiSkillFileStorage.readAiSkillFileBytes(oldFileEntry);
+        byte[] zipBytes = removeZipEntry(existingZipBytes, path);
+
+        FileEntry newFileEntry = aiSkillFileStorage.storeAiSkillFile(
+            toSkillFilename(aiSkill.getName()), zipBytes);
+
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+
+            @Override
+            public void afterCommit() {
+                try {
+                    aiSkillFileStorage.deleteAiSkillFile(oldFileEntry);
+                } catch (RuntimeException exception) {
+                    log.error(
+                        "Failed to delete old skill file after removing file, fileEntry={}", oldFileEntry,
+                        exception);
+                }
+            }
+
+            @Override
+            public void afterCompletion(int status) {
+                if (status == STATUS_ROLLED_BACK) {
+                    try {
+                        aiSkillFileStorage.deleteAiSkillFile(newFileEntry);
+                    } catch (RuntimeException exception) {
+                        log.error(
+                            "Failed to clean up new skill file after rollback, fileEntry={}", newFileEntry,
+                            exception);
+                    }
+                }
+            }
+        });
+
+        return aiSkillService.updateAiSkillFile(id, newFileEntry);
+    }
+
+    @Override
     public AiSkill updateAiSkill(long id, String name, @Nullable String description) {
         Assert.hasText(name, "Skill name must not be blank");
 
@@ -504,6 +557,24 @@ class AiSkillFacadeImpl implements AiSkillFacade {
     }
 
     private byte[] replaceZipEntry(byte[] existingZipBytes, String targetPath, byte[] newContentBytes) {
+        Map<String, byte[]> entries = readZipEntries(existingZipBytes);
+
+        entries.put(targetPath, newContentBytes);
+
+        return writeZipEntries(entries);
+    }
+
+    private byte[] removeZipEntry(byte[] existingZipBytes, String targetPath) {
+        Map<String, byte[]> entries = readZipEntries(existingZipBytes);
+
+        if (entries.remove(targetPath) == null) {
+            throw new IllegalArgumentException("File not found in skill archive: " + targetPath);
+        }
+
+        return writeZipEntries(entries);
+    }
+
+    private Map<String, byte[]> readZipEntries(byte[] existingZipBytes) {
         Map<String, byte[]> entries = new LinkedHashMap<>();
 
         try (ZipInputStream zipInputStream = new ZipInputStream(new ByteArrayInputStream(existingZipBytes))) {
@@ -524,8 +595,10 @@ class AiSkillFacadeImpl implements AiSkillFacade {
             throw new UncheckedIOException("Failed to read existing skill archive", ioException);
         }
 
-        entries.put(targetPath, newContentBytes);
+        return entries;
+    }
 
+    private byte[] writeZipEntries(Map<String, byte[]> entries) {
         try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             ZipOutputStream zipOutputStream = new ZipOutputStream(byteArrayOutputStream)) {
 
