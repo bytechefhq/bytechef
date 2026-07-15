@@ -123,7 +123,7 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 mcp: {
                                     server: {
                                         sse: {
-                                            enabled: json.ai.mcp?.server?.sse?.enabled !== 'false',
+                                            enabled: String(json.ai.mcp?.server?.sse?.enabled ?? 'true') === 'true',
                                         },
                                     },
                                 },
