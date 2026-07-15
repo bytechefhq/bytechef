@@ -58,7 +58,10 @@ const config: CodegenConfig = {
         },
     },
     hooks: {
-        afterAllFileWrite: ['prettier --write'],
+        afterAllFileWrite: [
+            "perl -pi -e 's/^import \\{ DocumentTypeDecoration \\}/import type { DocumentTypeDecoration }/'",
+            'prettier --write',
+        ],
     },
     schema: [
         '../server/libs/platform/platform-workflow/platform-workflow-validator/platform-workflow-validator-graphql/src/main/resources/graphql/*.graphqls',
