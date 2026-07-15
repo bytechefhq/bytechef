@@ -235,6 +235,13 @@ class AwsFileStorageIntTest {
     }
 
     @Test
+    void deleteFileIsNoOpWhenFileEntryIsNull() {
+        // A knowledge base document with no attached file (only chunk content) has a null FileEntry. Regression for
+        // a NullPointerException on fileEntry.getName() (issue #5392).
+        assertThatCode(() -> storageService.deleteFile(DIR_PATH, null)).doesNotThrowAnyException();
+    }
+
+    @Test
     void fileLookupIsTenantScoped() {
         FileEntry fileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA);
 
