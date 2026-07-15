@@ -53,8 +53,13 @@ class KnowledgeBaseDocumentGraphQlController {
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "chunks")
     List<KnowledgeBaseDocumentChunk> documentChunks(KnowledgeBaseDocument knowledgeBaseDocument) {
-        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(
+        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(
             knowledgeBaseDocument.getId());
+    }
+
+    @QueryMapping
+    List<KnowledgeBaseDocumentChunk> knowledgeBaseDocumentChunks(@Argument Long id) {
+        return knowledgeBaseDocumentChunkFacade.getKnowledgeBaseDocumentChunksByDocumentId(id);
     }
 
     @SchemaMapping(typeName = "KnowledgeBaseDocument", field = "tags")

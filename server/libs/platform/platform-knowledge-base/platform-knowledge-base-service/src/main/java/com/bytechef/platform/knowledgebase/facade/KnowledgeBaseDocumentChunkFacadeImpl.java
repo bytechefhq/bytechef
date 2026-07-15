@@ -75,6 +75,14 @@ class KnowledgeBaseDocumentChunkFacadeImpl implements KnowledgeBaseDocumentChunk
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public List<KnowledgeBaseDocumentChunk> getKnowledgeBaseDocumentChunksByDocumentIdWithoutContent(
+        long knowledgeBaseDocumentId) {
+
+        return knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunksByDocumentId(knowledgeBaseDocumentId);
+    }
+
+    @Override
     public KnowledgeBaseDocumentChunk updateKnowledgeBaseDocumentChunk(long id, String content) {
         KnowledgeBaseDocumentChunk existingChunk = knowledgeBaseDocumentChunkService.getKnowledgeBaseDocumentChunk(id);
 
