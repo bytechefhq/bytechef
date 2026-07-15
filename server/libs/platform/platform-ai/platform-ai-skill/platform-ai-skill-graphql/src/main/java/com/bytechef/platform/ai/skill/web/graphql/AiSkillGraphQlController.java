@@ -99,6 +99,11 @@ class AiSkillGraphQlController {
     }
 
     @MutationMapping
+    AiSkill removeFileInSkill(@Argument long id, @Argument String path) {
+        return aiSkillFacade.removeFileInSkill(id, path);
+    }
+
+    @MutationMapping
     boolean deleteAiSkill(@Argument long id) {
         aiSkillFacade.deleteAiSkill(id);
 
