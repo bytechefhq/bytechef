@@ -27,6 +27,8 @@ import java.util.Map;
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 
@@ -35,6 +37,7 @@ import org.springframework.context.ApplicationEventPublisher;
  */
 public class ScheduleTriggerJob implements Job {
 
+    private static final Logger logger = LoggerFactory.getLogger(ScheduleTriggerJob.class);
     private ApplicationEventPublisher eventPublisher;
 
     @Override
@@ -45,7 +48,7 @@ public class ScheduleTriggerJob implements Job {
         Map<String, Object> output = JsonUtils.readMap(jobDataMap.getString("output"), Object.class);
 
         LocalDateTime localDateTime = fireTime.toInstant()
-            .atZone(ZoneId.of((String) output.get("timezone")))
+            .atZone(getZoneId(output))
             .toLocalDateTime();
 
         eventPublisher.publishEvent(
@@ -60,4 +63,25 @@ public class ScheduleTriggerJob implements Job {
     public void setApplicationEventPublisher(ApplicationEventPublisher eventPublisher) {
         this.eventPublisher = eventPublisher;
     }
+
+    /**
+     * This method returns the default ZoneId if the key or value miss. Method mitigates NullPointerException in the
+     * cases when we upgrade action with the new zoneId required parameter which old definitions present in production
+     * don't have. This method can be removed once you confirm there are no workflow definitions that miss this value.
+     *
+     * @param map
+     * @return configured value or default given by defaultValue argument
+     */
+    private static ZoneId getZoneId(Map<String, ?> map) {
+        if (map.containsKey("timezone")) {
+            Object value = map.get("timezone");
+
+            if (value instanceof String stringValue) {
+                return ZoneId.of(stringValue);
+            }
+        }
+
+        return ZoneId.systemDefault();
+    }
+
 }
