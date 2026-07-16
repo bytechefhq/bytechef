@@ -81,9 +81,18 @@ export type {FileTreeNodeI};
 
 export default function useAiSkillDetail() {
     const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+    const [selectedFilePathSkillId, setSelectedFilePathSkillId] = useState<string | null>(null);
     const [isSaving, setIsSaving] = useState(false);
 
     const {closeSkillDetail, selectedSkillId} = useAiSkillsStore();
+
+    if (selectedSkillId !== selectedFilePathSkillId) {
+        setSelectedFilePathSkillId(selectedSkillId);
+
+        if (selectedFilePath !== null) {
+            setSelectedFilePath(null);
+        }
+    }
 
     const navigate = useNavigate();
     const queryClient = useQueryClient();
@@ -142,10 +151,6 @@ export default function useAiSkillDetail() {
     }, [skill?.name]);
 
     useEffect(() => {
-        setSelectedFilePath(null);
-    }, [selectedSkillId]);
-
-    useEffect(() => {
         if (selectedFilePath !== null || filePaths.length === 0) {
             return;
         }
@@ -186,12 +191,16 @@ export default function useAiSkillDetail() {
                 return;
             }
 
+            const skillId = selectedSkillId;
+
             try {
-                await createAdditionalFilesInSkill({additionalFiles: {[path]: ''}, id: selectedSkillId});
+                await createAdditionalFilesInSkill({additionalFiles: {[path]: ''}, id: skillId});
 
-                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
+                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: skillId}]});
 
-                setSelectedFilePath(path);
+                if (useAiSkillsStore.getState().selectedSkillId === skillId) {
+                    setSelectedFilePath(path);
+                }
 
                 toast.success('File added');
             } catch (error) {
@@ -241,19 +250,31 @@ export default function useAiSkillDetail() {
                 return;
             }
 
+            const skillId = selectedSkillId;
+            const wasSelected = selectedFilePath === path;
+
+            // Deselect before touching the query cache below — otherwise the aiSkillFileContent query for this
+            // path is still active/enabled, and removeQueries immediately refetches it against the file we just
+            // deleted server-side, logging a spurious "File not found" error.
+            if (wasSelected) {
+                setSelectedFilePath(null);
+            }
+
             try {
-                await removeFileInSkill({id: selectedSkillId, path});
+                await removeFileInSkill({id: skillId, path});
 
-                queryClient.removeQueries({queryKey: ['aiSkillFileContent', {id: selectedSkillId, path}]});
+                queryClient.removeQueries({queryKey: ['aiSkillFileContent', {id: skillId, path}]});
 
-                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
-
-                if (selectedFilePath === path) {
-                    setSelectedFilePath(null);
-                }
+                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: skillId}]});
 
                 toast.success('File removed');
             } catch (error) {
+                // Only restore the selection if the user is still looking at the skill this file belongs to —
+                // otherwise this force-selects a path that doesn't exist in whatever skill is now active.
+                if (wasSelected && useAiSkillsStore.getState().selectedSkillId === skillId) {
+                    setSelectedFilePath(path);
+                }
+
                 toast.error('Failed to remove file', {
                     description: error instanceof Error ? error.message : 'An unexpected error occurred',
                 });
