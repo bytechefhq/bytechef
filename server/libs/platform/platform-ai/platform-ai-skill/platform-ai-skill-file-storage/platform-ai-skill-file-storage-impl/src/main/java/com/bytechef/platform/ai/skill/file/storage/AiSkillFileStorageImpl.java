@@ -46,6 +46,6 @@ public class AiSkillFileStorageImpl implements AiSkillFileStorage {
 
     @Override
     public FileEntry storeAiSkillFile(String filename, byte[] bytes) {
-        return fileStorageService.storeFileContent(AI_AGENT_SKILLS_FILES_DIR, filename, bytes);
+        return fileStorageService.storeFileContent(AI_AGENT_SKILLS_FILES_DIR, filename, bytes, true);
     }
 }

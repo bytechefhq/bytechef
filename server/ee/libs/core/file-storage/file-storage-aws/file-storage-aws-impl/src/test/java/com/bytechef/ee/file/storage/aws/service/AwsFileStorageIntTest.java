@@ -265,6 +265,22 @@ class AwsFileStorageIntTest {
         assertThat(storageService.fileExists(DIR_PATH, KEY)).isTrue();
     }
 
+    @Test
+    void deletingPreviousVersionDoesNotDeleteReplacementWithGeneratedFilename() {
+        FileEntry oldFileEntry = storageService.storeFileContent(DIR_PATH, KEY, DATA, true);
+        FileEntry newFileEntry = storageService.storeFileContent(DIR_PATH, KEY, "Updated content", true);
+
+        storageService.deleteFile(DIR_PATH, oldFileEntry);
+
+        await()
+            .pollInterval(Duration.ofSeconds(2))
+            .atMost(Duration.ofSeconds(10))
+            .ignoreExceptions()
+            .untilAsserted(() -> {
+                assertThat(storageService.readFileToString(DIR_PATH, newFileEntry)).isEqualTo("Updated content");
+            });
+    }
+
     @Configuration
     @EnableConfigurationProperties(ApplicationProperties.class)
     @ImportAutoConfiguration({
