@@ -1,6 +1,7 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
+import AiSkillFileAddDialog from '@/pages/automation/ai/skills/components/AiSkillFileAddDialog';
 import AiSkillFileDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillFileDeleteAlertDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
@@ -9,7 +10,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
-import {FileIcon, FileTextIcon, FolderIcon, TrashIcon} from 'lucide-react';
+import {FileIcon, FileTextIcon, FolderIcon, PlusIcon, TrashIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
@@ -159,6 +160,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
 };
 
 const AiSkillDetail = () => {
+    const [showAddFileDialog, setShowAddFileDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [fileToRemove, setFileToRemove] = useState<string | null>(null);
     const [isContentDirty, setIsContentDirty] = useState(false);
@@ -179,7 +181,9 @@ const AiSkillDetail = () => {
     const {
         editorLanguage,
         fileContent,
+        filePaths,
         fileTree,
+        handleAddFile,
         handleDelete,
         handleDownload,
         handleFileSelect,
@@ -248,6 +252,21 @@ const AiSkillDetail = () => {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="flex min-h-0 flex-1 overflow-hidden">
                 <div className="w-60 shrink-0 border-r border-r-border/50 py-2 pr-2">
+                    <div className="mb-1 flex items-center justify-between px-2">
+                        <span className="text-xs font-medium text-gray-400 uppercase">Files</span>
+
+                        <Button
+                            aria-label="Add file"
+                            className="h-auto rounded p-1 text-gray-400 hover:text-gray-700"
+                            onClick={() => setShowAddFileDialog(true)}
+                            size="xs"
+                            type="button"
+                            variant="ghost"
+                        >
+                            <PlusIcon className="size-3.5" />
+                        </Button>
+                    </div>
+
                     {fileTree.map((node) => (
                         <FileTreeNode
                             key={node.path}
@@ -334,6 +353,18 @@ const AiSkillDetail = () => {
 
                         await handleRemoveFile(path);
                     }}
+                />
+            )}
+
+            {showAddFileDialog && (
+                <AiSkillFileAddDialog
+                    existingPaths={filePaths}
+                    onAdd={async (path) => {
+                        setShowAddFileDialog(false);
+
+                        await handleAddFile(path);
+                    }}
+                    onClose={() => setShowAddFileDialog(false)}
                 />
             )}
         </div>
