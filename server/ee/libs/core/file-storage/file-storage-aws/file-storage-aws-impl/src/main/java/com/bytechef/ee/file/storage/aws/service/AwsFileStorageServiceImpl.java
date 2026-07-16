@@ -25,6 +25,7 @@ import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
@@ -48,6 +49,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public void deleteFile(String directory, FileEntry fileEntry) {
         if (fileEntry != null) {
             findObject(directory, fileEntry.getName())
@@ -57,8 +59,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public boolean fileExists(String directory, FileEntry fileEntry) throws FileStorageException {
-        return fileExists(directory, fileEntry.getName());
+        return s3Template.objectExists(bucketName, resolveKey(fileEntry));
     }
 
     @Override
@@ -72,8 +75,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public long getContentLength(String directory, FileEntry fileEntry) throws FileStorageException {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+        S3Resource s3Resource = resolveResource(fileEntry);
 
         return s3Resource.contentLength();
     }
@@ -99,8 +103,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public URL getFileEntryURL(String directory, FileEntry fileEntry) {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+        S3Resource s3Resource = resolveResource(fileEntry);
 
         try {
             return s3Resource.getURL();
@@ -115,8 +120,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+        S3Resource s3Resource = resolveResource(fileEntry);
 
         try {
             return s3Resource.getOutputStream();
@@ -126,8 +132,9 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
+    @SuppressWarnings("PMD.UnusedFormalParameter")
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
-        S3Resource s3Resource = getObject(directory, fileEntry.getName());
+        S3Resource s3Resource = resolveResource(fileEntry);
 
         byte[] bytes;
 
@@ -154,18 +161,14 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
 
     @Override
     public FileEntry storeFileContent(String directory, String filename, byte[] data) throws FileStorageException {
-        directory = combinePaths(directory, filename);
-
-        s3Template.store(bucketName, directory, data);
-
-        return new FileEntry(filename, URL_PREFIX + bucketName + "/" + directory);
+        return doStoreFileContent(directory, filename, data, false);
     }
 
     @Override
     public FileEntry storeFileContent(String directory, String filename, byte[] data, boolean generateFilename)
         throws FileStorageException {
 
-        return storeFileContent(directory, filename, data);
+        return doStoreFileContent(directory, filename, data, generateFilename);
     }
 
     @Override
@@ -177,7 +180,7 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     public FileEntry storeFileContent(String directory, String filename, String data, boolean generateFilename)
         throws FileStorageException {
 
-        return storeFileContent(directory, filename, data);
+        return storeFileContent(directory, filename, data.getBytes(StandardCharsets.UTF_8), generateFilename);
     }
 
     @Override
@@ -196,12 +199,54 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         String directory, String filename, InputStream inputStream, boolean generateFilename)
         throws FileStorageException {
 
-        return storeFileContent(directory, filename, inputStream);
+        try {
+            return storeFileContent(directory, filename, inputStream.readAllBytes(), generateFilename);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private FileEntry doStoreFileContent(String directory, String filename, byte[] data, boolean generateFilename) {
+        String storageFilename = generateFilename ? generateUniqueFilename(filename) : filename;
+
+        String path = combinePaths(directory, storageFilename);
+
+        s3Template.store(bucketName, path, data);
+
+        return new FileEntry(filename, URL_PREFIX + bucketName + "/" + path);
     }
 
     private S3Resource getObject(String directoryPath, String filename) {
         return findObject(directoryPath, filename)
             .orElseThrow(() -> new FileStorageException("File %s doesn't exist".formatted(filename)));
+    }
+
+    private S3Resource resolveResource(FileEntry fileEntry) {
+        String key = resolveKey(fileEntry);
+
+        if (!s3Template.objectExists(bucketName, key)) {
+            throw new FileStorageException("File %s doesn't exist".formatted(fileEntry.getName()));
+        }
+
+        return s3Template.download(bucketName, key);
+    }
+
+    private String resolveKey(FileEntry fileEntry) {
+        String prefix = URL_PREFIX + bucketName + "/";
+        String url = fileEntry.getUrl();
+
+        if (!url.startsWith(prefix)) {
+            throw new FileStorageException("Invalid file URL: " + url);
+        }
+
+        return url.substring(prefix.length());
+    }
+
+    private static String generateUniqueFilename(String filename) {
+        int dotIndex = filename.lastIndexOf('.');
+        UUID uuid = UUID.randomUUID();
+
+        return dotIndex > 0 ? uuid + filename.substring(dotIndex) : uuid.toString();
     }
 
     private Optional<S3Resource> findObject(String directoryPath, String filename) {
