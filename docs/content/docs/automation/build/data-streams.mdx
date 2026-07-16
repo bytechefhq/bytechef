@@ -1,0 +1,34 @@
+---
+title: "Data Streams"
+description: Transfer large volumes of records from one system to another with a source, an optional field-mapping processor, and a destination.
+---
+
+> **Coming soon.** Data Streams are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
+A **Data Stream** is a workflow step built for bulk record transfer — syncing contacts between CRMs, exporting rows to a warehouse, migrating data between systems. Instead of looping over items one action at a time, the Data Stream node reads records from a **source**, optionally transforms each record through a **processor**, and writes them to a **destination** as a managed batch job.
+
+Like the AI Agent, the Data Stream node is a *cluster root*: its source, processor, and destination are cluster elements hosted inside the node rather than separate workflow steps.
+
+## The slots
+
+| Slot | Role |
+|---|---|
+| **Source** | Where records are read from — a component operation that streams items (e.g. read rows, list records). |
+| **Processor** (optional) | Transforms each record in flight. The standard processor is the **Field Mapper**, which maps source fields onto the destination's shape. |
+| **Destination** | Where records are written — a component operation that accepts items in bulk. |
+
+## Simple vs Advanced editor
+
+Clicking the Data Stream node opens its editor, which has two modes with a toggle in the header:
+
+- **Simple editor** (default) — a step-by-step wizard: pick the **Source**, define the **Mapping** (the Field Mapper's source-to-destination field assignments), pick the **Destination**, and **Test** the stream — all without touching the underlying element graph.
+
+  {/* TODO screenshot: Data Stream simple editor on the Mapping step — step nav (Source / Mapping / Destination / Test) at the top, field-mapping rows in the body */}
+
+- **Advanced editor** — the raw cluster-elements canvas, where source, processor, and destination appear as wired nodes. Use it to configure element parameters directly or to swap the processor for something other than the Field Mapper.
+
+  {/* TODO screenshot: Data Stream advanced editor — cluster-elements canvas with Source, Field Mapper processor, and Destination nodes wired to the Data Stream root */}
+
+The simple wizard is available only while the processor slot holds the standard **Field Mapper**. If you replace it with a different processor in the advanced editor, the node opens in advanced mode from then on — the wizard has no way to represent a custom processor.
+
+Both modes edit the same configuration, and your last mode choice is remembered per node.

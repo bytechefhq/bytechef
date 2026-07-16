@@ -1,0 +1,41 @@
+---
+title: "Extensibility Overview"
+description: "Ship proprietary logic, write workflows as code, generate connectors from OpenAPI specs, and embed scripting inside any step."
+---
+
+ByteChef Enterprise is built so the platform never becomes the bottleneck. When the visual editor isn't the right tool, drop into code. When a built-in component doesn't fit, write your own. When you need to integrate a REST API nobody else has, point at the spec and generate a connector.
+
+## What you get
+
+| Capability | Purpose |
+|---|---|
+| [Custom components](/enterprise/extensibility/custom-components) | Upload Java or JavaScript components, dynamically loaded via a sandboxed classloader. Hosts the auto-generated API connector *(coming soon)* section. |
+| [Polyglot scripting](/enterprise/extensibility/polyglot-scripting) | JavaScript, Python, Ruby inside any workflow step via GraalVM. |
+| [200+ built-in components](/enterprise/extensibility/built-in-components) | CRM, project management, communication, AI/ML, databases — all open source. |
+| [MCP integration](/enterprise/extensibility/mcp-integration) | Expose your workflows as Model Context Protocol tools *(coming soon)*. |
+
+[Code workflows *(coming soon)*](/enterprise/collaboration-devops/git-backed-change-tracking#code-workflows-coming-soon) — Python and JavaScript workflows that live in Git — are covered under Git-backed change tracking in the Collaboration & DevOps pillar, since the developer loop (edit → PR → merge → publish) is what makes them distinct.
+
+## The extension layers
+
+```
+┌──────────────────────────────────────────┐
+│  MCP — expose workflows as agent tools   │
+├──────────────────────────────────────────┤
+│  Code workflows — full programs as       │
+│                   workflows (coming soon)│
+├──────────────────────────────────────────┤
+│  Custom components — your own actions    │
+│                      and triggers        │
+├──────────────────────────────────────────┤
+│  API connector — generate from OpenAPI   │
+│                  (coming soon)           │
+├──────────────────────────────────────────┤
+│  Polyglot scripting — JS/Python/Ruby     │
+│                       inside a workflow  │
+├──────────────────────────────────────────┤
+│  Built-in components — 200+ connectors   │
+└──────────────────────────────────────────┘
+```
+
+Each layer answers a different "I need to do something the platform doesn't support out of the box" question. The right layer is usually the highest one you can get away with.

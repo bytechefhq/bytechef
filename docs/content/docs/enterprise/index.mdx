@@ -1,0 +1,114 @@
+---
+title: "ByteChef Enterprise"
+description: "The open-source platform that unifies AI agents and workflow automation — hardened for production rollouts, secured for compliance, and embeddable inside your own SaaS."
+---
+
+ByteChef Enterprise is the production-hardened distribution of ByteChef: **one platform for AI agents and the workflow automation that grounds them.** Reliable agents are a durable-execution problem, not a prompting problem — and ByteChef's workflow engine (suspend/resume, typed task state, deterministic replay, observability) was built years before the agent hype landed. Enterprise wraps that engine with the governance, scale, and white-label surfaces an enterprise rollout demands.
+
+## What "unifies AI agents and workflow automation" means in practice
+
+- **Agents are first-class workflow citizens.** Cluster elements plug LLMs, tools, RAG, and memory into the same suspend/resume engine that runs the rest of your workflows. No separate agent runtime, no separate observability stack.
+- **Workflows are first-class agent tools.** Any workflow you've published becomes a callable tool over [MCP](/enterprise/extensibility/mcp-integration) — exposing your real business operations to Claude, Cursor, Copilot, or your own LLM scaffolding.
+- **200+ components, one connection model.** The same Salesforce/Slack/Postgres/Stripe integrations your workflows use, your agents use. No re-implementing tool calls.
+- **A real [knowledge base](/enterprise/data-knowledge/knowledge-base) on infrastructure you already run.** RAG on Postgres + pgvector, with [bring-your-own-embedding-model](/enterprise/data-knowledge/embedding-models). No separate vector DB to operate.
+
+## Who Enterprise is for
+
+- **AI platform teams** building production agents that have to act against real systems — and need durability, audit trails, and per-tenant guardrails their LangChain prototype didn't ship with.
+- **Platform teams** standardizing automation across many tenants, environments, and business units.
+- **Product teams** embedding AI-powered workflows and integration surfaces inside their own SaaS — a true white-label runtime for B2B2B.
+- **Security and compliance teams** that need audit trails, RBAC, encrypted credentials, and a vault-backed secret story.
+- **SREs and infra teams** running distributed deployments with their own brokers, schedulers, observability stacks, and storage backends.
+
+## The seven pillars
+
+Enterprise organizes its capabilities into seven pillars. Each pillar has its own section in this guide; the summaries below link to the deep-dive pages.
+
+### Data & Knowledge — the agent grounding layer
+
+The substrate that lets agents reason over your data without leaking, hallucinating from stale snapshots, or shipping a separate vector store.
+
+- [Postgres-based knowledge base](/enterprise/data-knowledge/knowledge-base) — RAG on the database you already run; no Pinecone, no Weaviate.
+- [Bring your own embedding model](/enterprise/data-knowledge/embedding-models) — provider-portable embedding pipeline, side-by-side migrations.
+- [Embedded data tables](/enterprise/data-knowledge/data-tables) — CRUD UI + API for structured workflow data.
+
+### Extensibility — where agents pick up tools
+
+The integration and code surfaces that let agents and workflows reach the rest of your stack.
+
+- [MCP integration](/enterprise/extensibility/mcp-integration) — expose any workflow as an agent-callable tool *(coming soon)*.
+- [200+ built-in components](/enterprise/extensibility/built-in-components) — the breadth of integrations both workflows and agents can use today.
+- [Custom components](/enterprise/extensibility/custom-components) — typed Java components for what isn't built in yet. Hosts auto-generated [API connectors](/enterprise/extensibility/custom-components#auto-generated-api-connectors-coming-soon) *(coming soon)*.
+- [Polyglot scripting](/enterprise/extensibility/polyglot-scripting) — GraalVM-powered JavaScript, Python, Ruby inside a step.
+- [Code workflows](/enterprise/collaboration-devops/git-backed-change-tracking#code-workflows-coming-soon) — Python / JS workflows in Git *(coming soon)*, hosted under Collaboration & DevOps.
+
+### Embedded iPaaS — your agent or integration runtime, white-labelled
+
+The surface for embedding ByteChef inside your own SaaS so your customers get integrations and AI workflows without leaving your product.
+
+- [White-label execution](/embedded/white-label-execution)
+- [Embedded MCP](/embedded/embedded-mcp) — agent-callable tools, scoped per tenant *(coming soon)*.
+- [Embedded configuration API](/embedded/configuration-api)
+- [Tenant-isolated security](/embedded/tenant-isolated-security)
+
+### Governance & Security
+
+Control who can do what, where credentials live, and how every privileged action is recorded.
+
+- [Flexible deployment](/enterprise/governance-security/flexible-deployment) — self-host on Kubernetes, AWS/GCP/Azure, or hybrid via Helm charts. Includes the [microservices topology](/enterprise/governance-security/flexible-deployment#microservices-topology-coming-soon) *(coming soon)*.
+- [Role-based access control](/enterprise/governance-security/rbac) — workspace-scoped permissions *(coming soon)*.
+- [Component policies](/enterprise/governance-security/component-policies) — curate which components builders can see and run, toggled tenant-wide *(coming soon)*.
+- [Enterprise SSO](/enterprise/governance-security/sso) — federated identity via SAML 2.0 / OIDC, with IdP group-to-role mapping *(coming soon)*.
+- [Audit log](/enterprise/governance-security/audit-log) — every privileged action captured with actor, timestamp, and correlation IDs *(coming soon)*.
+- [Data retention](/enterprise/governance-security/data-retention) — organization-wide retention and deletion policy for execution logs, soft-deleted resources, and audit records *(Soon)*.
+- [Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) — workspace-scoped encryption keys, with [external secret managers](/enterprise/governance-security/encrypted-credentials#external-secret-managers-coming-soon) *(coming soon)*.
+- [Connection visibility](/enterprise/governance-security/connection-visibility) — PRIVATE / WORKSPACE / ORGANIZATION scopes that make credential sharing explicit and audited *(coming soon)*.
+- [Observability](/enterprise/governance-security/observability) — OpenTelemetry, structured logs, Micrometer metrics.
+- [License-gated EE distribution](/enterprise/governance-security/license-gated-distribution) — clean separation of Community and Enterprise binaries.
+
+### Scale & Reliability
+
+Run the same workflows and the same agents from a single node to a multi-region distributed deployment.
+
+- [Distributed scheduler](/enterprise/scale-reliability/distributed-scheduler)
+- [Pluggable message brokers](/enterprise/scale-reliability/message-brokers)
+- [Cloud-native storage](/enterprise/scale-reliability/cloud-native-storage)
+- [Multi-tenant data isolation](/enterprise/scale-reliability/multi-tenant-isolation)
+- [Horizontal scaling](/enterprise/scale-reliability/horizontal-scaling)
+- [Runtime Job: ephemeral workflow execution](/enterprise/scale-reliability/runtime-job) — single-shot, no-database execution binary for Kubernetes Jobs, CronJobs, and CI pipelines.
+- The [microservices topology](/enterprise/governance-security/flexible-deployment#microservices-topology-coming-soon) *(coming soon)* lives under Flexible deployment.
+
+### Collaboration & DevOps
+
+Ship workflows the same way you ship code — with environments, versioning, and Git.
+
+- [Workspaces and projects](/enterprise/collaboration-devops/workspaces-projects)
+- [Environments](/enterprise/collaboration-devops/environments) — DEVELOPMENT / STAGING / PRODUCTION
+- [Workflow versioning](/enterprise/collaboration-devops/workflow-versioning)
+- [Build once, deploy many times](/enterprise/collaboration-devops/build-once-deploy-many)
+- [Workflow executions](/enterprise/collaboration-devops/workflow-executions)
+- [Git-backed change tracking](/enterprise/collaboration-devops/git-backed-change-tracking) — hosts [code workflows](/enterprise/collaboration-devops/git-backed-change-tracking#code-workflows-coming-soon) *(coming soon)*.
+
+### Runtime Job Runner
+
+Execute a workflow from the command line or a Docker container and exit — no always-on platform required. The right tool for CI/CD pipelines, scheduled batch jobs, and integration points where another system already owns the schedule.
+
+- [Runtime Job Runner](/enterprise/runtime-job-runner) — standalone CLI / Docker workflow executor.
+
+### Support & Trust
+
+- [Enterprise support SLAs](/enterprise/support-trust/support-slas)
+- [Production migrations](/enterprise/support-trust/production-migrations)
+- [Source-available code](/enterprise/support-trust/source-available-code)
+
+## Community vs. Enterprise
+
+ByteChef Community is the open-source core: the workflow engine, the agent primitives, the 200+ components, the UI shell, and the visible source code. Enterprise adds the governance, scale, and embedded-iPaaS capabilities above as a separately distributed binary, wired in at compile time via conditional configuration. Anything you build on Community runs unchanged on Enterprise.
+
+See [License-gated EE distribution](/enterprise/governance-security/license-gated-distribution) for how the two binaries differ on disk and at runtime.
+
+## Ready to scale?
+
+- **Talk to sales** — for licensing, migration help, and SLA terms.
+- **[Book a demo](https://bytechef.io)** — walk through Enterprise with our team.
+- **[Read the docs](/)** — start with [Self-Hosting](/self-hosting) and [Embedded](/embedded).

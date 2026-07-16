@@ -1,0 +1,63 @@
+---
+title: Use the Chats Page
+description: Pick a chat-enabled workflow, send messages and files, and follow the workflow's reply as it streams back.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Workflow chats and the Chats page (part of the AI Hub, an Enterprise Edition feature) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+Open **Automation → Chats**. The left sidebar lists every chat-enabled workflow in the
+workspace, grouped by project. Click one to open its conversation in the main panel.
+
+## Sending a message
+
+Type into the composer and send. ByteChef calls the workflow's
+[New Chat Request trigger](/automation/workflow-chats/enable-chat) with your message and the
+current conversation id, the workflow runs, and the reply appears in the thread.
+
+While a turn is running, the workflow is busy: the composer waits for the reply and the
+other workflows in the sidebar are temporarily disabled so a run isn't interrupted by
+switching away. When the reply finishes, you can send the next message.
+
+## Streamed replies
+
+Replies arrive as a stream rather than all at once. A workflow can emit:
+
+- **Incremental text** that is appended to the reply as it's produced, so long answers show
+  up token by token instead of after a pause.
+- **A final result** when the run completes.
+
+This is what makes an AI-backed chat feel responsive even when the underlying model takes a
+few seconds to finish.
+
+## Attachments
+
+You can attach files to a message. They are delivered to the workflow in the request's
+`attachments` array, where a step can read, parse, or store them — for example to pass a PDF
+into a [knowledge base](/automation/knowledge-base) search or to extract data from an
+uploaded spreadsheet.
+
+## Conversations
+
+Each workflow keeps its own conversation. Switching to another workflow in the sidebar saves
+the current thread and restores that workflow's history, so you can move between chats
+without losing context. Use **Clear messages** to reset the active conversation and start a
+fresh thread; it's disabled while a turn is still running.
+
+## Environments
+
+Like the rest of Automation, the Chats page is environment-aware. The sidebar shows the
+chat workflows deployed in the selected environment, and conversations run against that
+environment's connections and workflow version — so a chat tested in `DEVELOPMENT` is
+isolated from `PRODUCTION`.
+
+<Callout title="Don't see your workflow?">
+  A workflow only appears here when it has a **New Chat Request** trigger set to **Hosted
+  Chat** and is deployed to the selected environment. Check the
+  [trigger configuration](/automation/workflow-chats/enable-chat) if a workflow is missing.
+</Callout>

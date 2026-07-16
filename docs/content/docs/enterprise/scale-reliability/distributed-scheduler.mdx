@@ -1,0 +1,70 @@
+---
+title: "Distributed Scheduler"
+description: "Quartz clustering or native AWS EventBridge — pick the substrate that fits your ops. No single point of failure on cron."
+---
+
+If your workflows are time-triggered — cron-style schedules, polling triggers, delayed retries — the scheduler is on the critical path. ByteChef Enterprise ships two production-grade scheduler backends so you can run schedules with the same HA story as the rest of your stack.
+
+## The two backends
+
+| Backend | Best fit | Operational model |
+|---|---|---|
+| **Quartz clustering** | Most deployments. Self-contained, no extra infra. | Multiple scheduler nodes share state via Postgres; leader election guarantees a single fire per schedule. |
+| **AWS EventBridge** | AWS-native deployments. | Native AWS managed service; rules and schedules in EventBridge invoke ByteChef. |
+
+Both are first-class — you pick the one that aligns with your existing ops.
+
+## Quartz clustering
+
+[Quartz](https://www.quartz-scheduler.org/) is the JVM-standard job scheduler. Clustering mode lets multiple scheduler nodes coordinate via shared state in Postgres:
+
+- All scheduler nodes read the same job store.
+- A row-level lock guarantees only one node fires a given trigger.
+- If the leader dies mid-fire, another node picks up the next trigger window.
+- Schedules survive restarts because they live in the database, not in node memory.
+
+**Why this matters:** the worst kind of scheduling bug is a missed fire that goes unnoticed because the only node that knew about the schedule was the one that crashed. Clustering eliminates the single point of failure.
+
+### Setup snapshot
+
+- Set `BYTECHEF_SCHEDULER_PROVIDER=QUARTZ`.
+- Quartz tables are created automatically via Liquibase.
+- Run 2+ scheduler pods; clustering activates automatically when they see each other in the database.
+
+## AWS EventBridge
+
+For AWS-native deployments, EventBridge is often the better choice — it's already part of your AWS posture, integrates with CloudWatch for observability, and offloads scheduler HA to AWS.
+
+- ByteChef registers EventBridge rules for time-based triggers.
+- EventBridge invokes ByteChef via a webhook or SQS message at fire time.
+- Schedules persist in EventBridge, not in your ByteChef database.
+- Scaling the trigger surface is AWS's problem, not yours.
+
+### Setup snapshot
+
+- Set `BYTECHEF_SCHEDULER_PROVIDER=EVENTBRIDGE`.
+- Configure AWS credentials with permission to create EventBridge rules.
+- ByteChef provisions the rules on first save of a schedule.
+
+## What gets scheduled
+
+The scheduler handles every time-based event in the platform:
+
+- **Cron triggers** in user workflows.
+- **Polling triggers** that periodically check an external system.
+- **Suspend/resume wake-ups** for workflows that paused for a delay.
+- **Retry backoff** for failed steps.
+- **Knowledge base re-indexing** and other background jobs.
+- **License-validation reminders** and other internal housekeeping.
+
+## Multi-tenant scheduling
+
+In a [multi-tenant deployment](/enterprise/scale-reliability/multi-tenant-isolation), the scheduler is tenant-aware — each tenant's schedules are isolated, and a noisy tenant's burst of triggers can't starve another tenant's fires.
+
+## Drift and accuracy
+
+Both backends are accurate to the second under normal load. Under sustained scheduler-pool saturation, Quartz queues fires (none are dropped), and EventBridge respects its own delivery guarantees.
+
+## Switching backends
+
+You can switch from Quartz to EventBridge (or vice versa) by changing the provider env var and replaying schedules. The workflow definitions don't change — only the substrate they're scheduled on.

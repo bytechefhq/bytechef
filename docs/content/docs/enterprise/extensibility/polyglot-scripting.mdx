@@ -1,0 +1,67 @@
+---
+title: "Polyglot Scripting"
+description: "GraalVM-powered JavaScript, Python, and Ruby inside any workflow step."
+---
+
+Sometimes a workflow just needs a few lines of code — a tricky transformation, a custom validation, a one-off API call too small for its own component. The Script component lets you drop those few lines into any workflow without a separate language toolchain or deploy step.
+
+## Three languages, one runtime
+
+| Language | Use cases |
+|---|---|
+| **JavaScript** | Default for most scripting; rich JSON ergonomics, familiar syntax. |
+| **Python** | Data manipulation, ML-adjacent transformations, anything where the Python idiom is cleaner. |
+| **Ruby** | Teams that prefer Ruby's expressiveness; common for text processing. |
+
+All three run on **GraalVM** — Oracle's polyglot virtual machine — which lets multiple languages share memory and call each other inside a single execution. Additional languages (Java, others) can be enabled at the runtime level, but JavaScript / Python / Ruby are the supported set today.
+
+## What you can do in a script step
+
+- Read inputs from upstream steps via the workflow context.
+- Make HTTP calls.
+- Transform JSON, CSV, dates.
+- Throw an error with a useful message to fail the workflow gracefully.
+- Suspend the workflow waiting for an external signal.
+- Return a typed output that downstream steps can data-pill into.
+
+## Why GraalVM
+
+The choice of GraalVM matters for two reasons:
+
+1. **Per-language isolation without separate processes.** Each script runs in a context that limits memory, CPU, and time budgets — a runaway Python loop cannot OOM the worker.
+2. **Real interop.** A Python script can pass a structured object to a Java helper without serializing through JSON, which keeps performance acceptable even when the script is doing heavy work.
+
+## Limits and safety
+
+Script steps run with **bounded budgets**:
+
+- A time limit (configurable; defaults to seconds, not minutes).
+- A memory limit.
+- No filesystem access by default.
+- No subprocess execution.
+
+For unbounded or long-running computation, write a [custom component](/enterprise/extensibility/custom-components) instead — it gets the full JVM, full access, and proper lifecycle management.
+
+## When to reach for a script vs. a custom component
+
+| Reach for a script when... | Reach for a custom component when... |
+|---|---|
+| The logic is small and used in one place. | The logic is reused across workflows. |
+| The logic is genuinely one-off. | The logic deserves its own typed schema. |
+| Speed of iteration matters more than reusability. | Speed of execution and operational hygiene matter. |
+| You're prototyping. | You're shipping production behavior. |
+
+A common pattern: prototype in a script, promote to a custom component once it stabilizes.
+
+## Editor experience
+
+The script editor inside the workflow builder has:
+
+- Syntax highlighting per language.
+- Inline access to the data-pill panel (drop a reference into the script via click).
+- A "Test" button that runs the script against the upstream step's last output.
+- Error markers when the script throws on test.
+
+## Performance
+
+Scripts pay a small startup cost per execution. For high-volume workflows (thousands of runs per second per step), a [custom component](/enterprise/extensibility/custom-components) is usually faster because it amortizes initialization. For everything else, the difference is invisible.

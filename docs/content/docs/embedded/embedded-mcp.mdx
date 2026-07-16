@@ -1,0 +1,103 @@
+---
+title: "Embedded MCP"
+description: "Surface tenant workflows as MCP tools — your customers' agents call your customers' integrations."
+---
+
+> **Coming soon.** Embedded MCP is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+The combination of [Embedded iPaaS](/embedded) and [MCP integration](/enterprise/extensibility/mcp-integration) is what makes ByteChef genuinely interesting for AI-native products: every workflow a customer builds becomes a tool *their* agent can invoke.
+
+## What this enables
+
+Your customer:
+
+1. Builds workflows in your white-labeled builder.
+2. Configures connections to *their* systems (their CRM, their Slack, their database).
+3. Their AI agent — Claude, Cursor, a custom agent in their product — discovers and invokes those workflows as MCP tools.
+4. The agent acts on the customer's behalf, in the customer's tenant, with the customer's credentials.
+
+You provide the orchestration surface; the customer's agent does the reasoning; the platform handles auth, execution, and audit.
+
+## Tenant scoping is the foundation
+
+The thing that makes Embedded MCP safe is that MCP sessions are **tenant-scoped end-to-end**. An MCP client connects with a tenant-scoped credential. The session only exposes:
+
+- Workflows the tenant owns.
+- Connections the tenant has authorized.
+- Execution history within the tenant.
+
+The platform never exposes workflows from one tenant to another tenant's agent. The [tenant-isolated security](/embedded/tenant-isolated-security) model applies at every step.
+
+## Accepted credentials
+
+The embedded MCP endpoint (`/api/embedded/<secret-key>/mcp`) accepts two Bearer credential types, both presented as an `Authorization: Bearer` header:
+
+- **ByteChef-signed JWT** — a JWT you mint with your tenant [signing key](/embedded/settings) (the `kid` header identifies your tenant, the `sub` claim carries the end user's external id). This is the same JWT flow used across the embedded APIs, and it identifies the ConnectedUser the agent acts as.
+- **Your own IdP's tokens (OAuth2 federation)** — the endpoint can trust JWTs issued by the tenant's configured external identity provider directly, and advertises standard OAuth2 protected-resource discovery metadata so OAuth2-capable MCP clients (Claude Desktop, Cursor, custom agents) can authenticate through your IdP without any ByteChef-specific token minting. The authenticated end user is resolved (or auto-created) as a ConnectedUser in your tenant.
+
+The environment is selected with the `X-Environment` request header.
+
+### Optional authentication
+
+Each embedded MCP server has a **Require authentication** toggle. With it **on** (the default for newly created servers), a request must present one of the credentials above, and the authenticated end user is resolved as a ConnectedUser. With it **off**, the endpoint serves requests using the URL secret alone — an OAuth2-capable client can connect with no credential and the standard discovery challenge is skipped. Because no credential is presented there is **no ConnectedUser**, so tools that need a connection return their setup URL instead of executing. Servers created before this setting existed default to **off**, so they keep working unchanged; the URL secret remains the server's protection in both modes.
+
+## The shape of an Embedded MCP session
+
+```
+Customer's agent                      Embedded MCP endpoint
+       │                                       │
+       │── connect (tenant-scoped token) ─────▶│
+       │                                       │── identify tenant from token
+       │                                       │── load tenant's workflows
+       │◄── list tools (tenant's workflows) ──│
+       │                                       │
+       │── call tool "import-leads" ──────────▶│── execute workflow under tenant
+       │                                       │   - tenant connections
+       │                                       │   - tenant credentials
+       │                                       │   - tenant audit log
+       │◄── tool result ───────────────────────│
+```
+
+## Per-tenant tool exposure controls
+
+Not every workflow should be an MCP tool. Each workflow has a setting for whether it's MCP-callable:
+
+- **Off** (default) — invisible to MCP clients.
+- **On** — exposed as a tool with the workflow's input/output schema.
+- **Approval-gated** — exposed, but tool invocations pause for human approval before executing.
+
+The tenant's admin owns these toggles; you can ship sane defaults but the tenant decides.
+
+{/* TODO screenshot: per-workflow MCP exposure setting — a radio/segmented control with the three options (Off / On / Approval-gated), the workflow's inferred input/output schema preview, and a tenant-scope notice */}
+![Per-workflow MCP exposure setting with Off / On / Approval-gated options](/enterprise/embedded-mcp/per-workflow-mcp-setting.png)
+
+## Per-tool permissions
+
+Within a tenant, MCP access can be further scoped:
+
+- Tools the agent can list vs. tools it can call.
+- Tools that require a specific role on the agent's principal.
+- Tools that are environment-pinned (e.g., agent can hit DEVELOPMENT workflows but not PRODUCTION).
+
+This composes with [RBAC](/enterprise/governance-security/rbac) — the agent gets a principal that has roles, and tool access flows from those roles.
+
+## Customer-facing experience
+
+In your product UI, customers can:
+
+- See which workflows are exposed via MCP.
+- Generate MCP credentials they (or their tools) can paste into Claude Desktop, Cursor, Windsurf, etc.
+- Audit which tool calls have been made by their agents over time.
+
+The audit log makes the "agent did X on my behalf" timeline available — important for trust as agents take on more meaningful actions.
+
+{/* TODO screenshot: customer-facing MCP credentials screen — list of exposed workflows, a "Generate credential" button, an already-generated credential row with copy-to-clipboard, and an "Open in Claude Desktop" / "Open in Cursor" launcher block */}
+![Customer-facing MCP credentials and exposed workflows](/enterprise/embedded-mcp/customer-mcp-credentials.png)
+
+## Why this is the right architecture for agentic products
+
+Agents are getting good at *reasoning* over tools. They're not getting good at *building, securing, and operating* tools — those are still platform problems. Embedded MCP is the layer in your product where you put platform-class tools in front of agents without your product having to be the platform.
+
+## See also
+
+- [MCP integration](/enterprise/extensibility/mcp-integration) — non-embedded MCP for first-party agents.

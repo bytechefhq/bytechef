@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Embedded Webhook",
+  "description": "Public REST API for ByteChef Embedded (webhook): fire App Events and trigger workflows synchronously via Request triggers.",
+  "pages": [
+    "..."
+  ]
+}

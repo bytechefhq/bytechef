@@ -1,0 +1,55 @@
+---
+title: Sources
+description: Keep a knowledge base in sync with an external system on a schedule instead of uploading files by hand.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<Callout type="warn" title="Coming soon">
+    Knowledge base sources are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+A **source** connects a knowledge base to an external system and keeps it up to date
+automatically. Instead of re-uploading files whenever your content changes, you point a
+source at the system of record and ByteChef re-ingests on a schedule.
+
+Sources are managed from the **Sources** tab of a knowledge base.
+
+<Callout title="Admin action">
+  Adding a source is an administrator action. Each source is backed by an automatically
+  generated sync workflow, so creating one provisions a small amount of workflow
+  infrastructure on your behalf.
+</Callout>
+
+## What a source captures
+
+Each source row shows:
+
+| Column | Meaning |
+| --- | --- |
+| **Name** | A label for the source. |
+| **Source** | The component the records come from (for example a database or an API). |
+| **Cadence** | How often the sync runs, expressed as a schedule. |
+| **Status** | Whether the source is enabled and the outcome of the last run. |
+| **Last sync** | When the source last pulled records. |
+
+## How syncing works
+
+Under the hood a source is a generated data-stream workflow: it reads records from the
+configured component, transforms each record into a document, and writes it into the
+knowledge base — where it is chunked and embedded exactly like an uploaded file. A
+connection supplies any credentials the source component needs.
+
+### Sync modes
+
+- **Full replace** — Records not seen in the latest run are removed from the knowledge
+  base. Use this when the source is the complete, authoritative set and deletions should
+  propagate.
+- **Partial** — Unseen records are left in place. Use this for incremental or append-only
+  feeds where each run only brings new or changed records.
+
+## Managing a source
+
+From a source's row menu you can refresh it on demand, enable or disable the schedule, or
+delete it. Disabling a source stops future syncs but leaves the documents it has already
+contributed in the knowledge base; deleting a source removes its sync workflow.

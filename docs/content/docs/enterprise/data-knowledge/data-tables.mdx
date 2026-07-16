@@ -1,0 +1,62 @@
+---
+title: "Embedded Data Tables"
+description: "First-class relational data inside ByteChef. CRUD UI plus API — store lookup tables, queues, configuration data, or feature flags without standing up an external database."
+---
+
+Data tables are ByteChef's built-in answer to "I need a small relational store for this workflow." Instead of provisioning a separate database, picking an ORM, building a CRUD UI, and wiring up auth, you create a data table in a few clicks and use it from any workflow.
+
+## What you can do
+
+- **Create tables** with typed columns (text, number, boolean, date, JSON).
+- **Insert / update / delete rows** via UI or API.
+- **Query** by primary key, by indexed column, or via filter expressions.
+- **Use in workflows** — data table actions are first-class components.
+
+## Common use cases
+
+| Use case | How it's modeled |
+|---|---|
+| **Lookup tables** — map a code to a label, an SKU to a price, a country to a region. | One row per mapping, indexed by the lookup key. |
+| **Configuration data** — environment-specific knobs, regional overrides, A/B targets. | One row per configuration key. |
+| **Feature flags** — workflow-level on/off without redeploying. | Boolean column keyed by flag name. |
+| **Work queues** — pending items to process, deduplicated against a key. | Insert on enqueue; query and delete on consume. |
+| **Idempotency keys** — record processed external IDs to dedupe redeliveries. | Single-column unique-index table. |
+| **Reference data** — small datasets too dynamic for static config, too small for a warehouse. | A few hundred to a few thousand rows. |
+
+## What data tables are not
+
+- **Not a transactional system of record.** If you need ACID across many writers, point your workflow at a real database via the relevant component.
+- **Not a data warehouse.** Built for tens of thousands of rows, not tens of millions.
+- **Not a search index.** Use the [knowledge base](/enterprise/data-knowledge/knowledge-base) for semantic search.
+
+## The UI
+
+The data tables UI is a spreadsheet-style view:
+
+- Create columns inline with their types.
+- Edit cells directly; changes commit on blur.
+- Filter, sort, and search the table.
+- Export to CSV; import from CSV.
+- Use each table from a workflow via the Data Table component actions.
+
+{/* TODO screenshot: data table spreadsheet view — header row with typed columns (text/number/boolean/date/json badges); a few sample rows; one cell in edit mode; toolbar with filter/sort/search + import/export CSV */}
+![Data table spreadsheet UI with typed columns and an inline cell edit](/enterprise/data-tables/spreadsheet-view.png)
+
+## Using data tables from workflows
+
+Data tables are designed to be read and written from workflows, not from a separate REST surface you have to authenticate against. The built-in **Data Table** component exposes the row operations — list with filters, insert, update, delete — as first-class workflow actions. A step like "look up region by country code" is one node: no HTTP component, no auth setup, no URL templating.
+
+You create and manage the tables themselves — columns, types, rows — in the ByteChef UI, which is backed by the platform's GraphQL API.
+
+## Scoping
+
+Data tables are **workspace-scoped**: a table belongs to a workspace and is available to that workspace's projects and their workflows. They are not isolated per project, so a shared lookup table (country → region, SKU → price) is defined once and reused across the workspace without copying.
+
+## When to reach for a data table vs. a real database
+
+| Reach for a data table when... | Reach for an external DB when... |
+|---|---|
+| The data is small (~thousands of rows). | The data is large (millions of rows). |
+| Writers are workflows, not external systems. | Many external services write to the same data. |
+| You want zero ops. | You already operate a database and want to keep one source of truth. |
+| Workflow editors will manage the data. | DBAs / engineers manage the data. |

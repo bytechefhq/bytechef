@@ -1,0 +1,45 @@
+---
+title: "Data Retention"
+description: "One organization-wide policy for how long ByteChef keeps execution logs, soft-deleted resources, audit records, and AI conversation history before permanent deletion."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<Callout type="info">
+  **Soon.** A consolidated Data Retention settings surface is on the near-term roadmap.
+  Today, retention is configured per data type on the pages noted below; the unified
+  policy described here reflects the planned implementation and may change before general availability.
+</Callout>
+
+Compliance regimes rarely ask "can you keep this data?" — they ask "can you prove it's *gone*?" Data Retention gives organization admins one place to set how long each class of ByteChef data lives before a scheduled cleanup job deletes it for good.
+
+## One policy, organization-wide
+
+Retention is configured at the **organization** level and applies uniformly to every workspace beneath it. There are no per-workspace overrides — a single, auditable policy is easier to defend in a compliance review than a patchwork of workspace-by-workspace settings.
+
+Each category accepts a retention window from **1 day** to **5 years**, or **Forever** to disable automatic deletion.
+
+## What you can set retention for
+
+| Category | Covers | Configured today on |
+|---|---|---|
+| **Execution log retention** | Workflow execution records, step inputs/outputs, and the [cloud-native storage](/enterprise/scale-reliability/cloud-native-storage) artifacts they reference. | [Workflow executions](/enterprise/collaboration-devops/workflow-executions#retention) |
+| **Soft-delete cleanup** | The recovery window for deleted projects, workflows, connections, data tables, and knowledge base documents before they are permanently purged. | — |
+| **Audit log retention** | Privileged-action records in the [audit log](/enterprise/governance-security/audit-log#retention-and-export). | [Audit log](/enterprise/governance-security/audit-log#retention-and-export) |
+| **AI conversation retention** | Copilot and AI Hub chat history, run history, and checkpoints. | — |
+
+## How deletion runs
+
+Deletion is **not instantaneous**. A scheduled cleanup job runs on a fixed cadence and removes records whose retention window has expired:
+
+- Expired **execution logs** are deleted along with their storage artifacts, so storage cost tracks the retention policy rather than growing without bound.
+- Once the **soft-delete** window closes, the resource is permanently removed and can no longer be recovered.
+- **Audit records** past their window are deleted last — and only after they have been emitted to your [observability pipeline](/enterprise/governance-security/observability), so a SIEM that needs longer retention than ByteChef keeps its own copy.
+
+## Defaults
+
+Until you set a policy, every category defaults to **Forever** — ByteChef never deletes your data without an explicit retention decision. Set each category deliberately as part of your compliance onboarding.
+
+## What gets logged
+
+Every change to a retention window is itself captured in the [audit log](/enterprise/governance-security/audit-log) — the acting admin, the category, the previous window, and the new window — so "when did we shorten execution-log retention, and who approved it?" is always answerable.

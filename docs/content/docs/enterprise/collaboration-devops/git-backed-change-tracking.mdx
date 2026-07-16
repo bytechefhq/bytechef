@@ -1,0 +1,141 @@
+---
+title: "Git-Backed Change Tracking"
+description: "Connect a workspace to a Git repository and projects push on publish and pull on demand — workflow versions and Git commits cross-reference each other. Diff in pull requests, roll back with git revert."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+ByteChef workflows have a canonical file representation — JSON for visual workflows, source files for [code workflows](#code-workflows-coming-soon). That means everything you already do for software — branches, pull requests, code review, blame, revert — applies directly to your automation.
+
+Enterprise ships this as a **built-in integration**, not a convention: connect a workspace to a Git repository once, point each project at a branch, and the platform pushes workflows to Git on every publish and pulls them back on demand. No export buttons, no CI glue required to get started.
+
+## Workflows as files
+
+A visual workflow exports as a single JSON document. The JSON captures:
+
+- Tasks, their ordering, and their parameters.
+- Trigger configuration.
+- Connection references (by name, not by secret).
+- Input and output schemas.
+
+This file is the source of truth — the visual editor renders from it, and exporting from the editor produces it byte-for-byte. Two engineers building the same workflow in two different visual sessions produce identical JSON.
+
+In the repository, each workflow is one file named after its label — `Invoice Import.json` — on the project's configured branch. A push writes the complete workflow set of the project's latest version, so the branch always mirrors the project: workflows removed from the project disappear from the branch on the next push.
+
+## Setting up the integration
+
+Two configuration steps, at two scopes:
+
+1. **Workspace → repository.** Under **Settings → Git Configuration**, an administrator enters the repository URL and credentials (username plus password or access token). Any HTTPS Git remote works — GitHub, GitLab, Bitbucket, or self-hosted. The configuration is workspace-scoped, so every project in the workspace shares one repository.
+2. **Project → branch.** On the Projects list, each project's menu has a **Git Configuration** entry: pick the branch the project syncs with (the dropdown lists the repository's actual remote branches) and flip **Enabled** on. One project ↔ one branch.
+
+| Action | Required permission |
+|---|---|
+| Configure the workspace repository | Workspace management |
+| Push (publish with sync enabled) | `DEPLOYMENT_PUSH` on the project |
+| Pull Project from Git | `DEPLOYMENT_PULL` on the project |
+
+## Push on publish
+
+With sync enabled, **publishing a project version pushes it to Git automatically**. The commit message is the version description you type at publish time (defaulting to "Update workflows"), and after the push the version description is annotated with the repository, branch, and commit hash.
+
+That last part is the point: the ByteChef version history and the Git history **cross-reference each other**. Given a version, you can find the exact commit it produced; given a commit, `git log` shows which publish produced it.
+
+## Pull from Git
+
+The Projects list menu has a **Pull Project from Git** action. A pull:
+
+1. Reads the workflow files from the project's configured branch.
+2. Matches them to existing workflows by label — new files become new workflows, matching files update the existing ones.
+3. Publishes a new project version whose description records the Git commit message, repository, branch, and commit hash.
+
+Because a pull ends in a publish, whatever landed on the branch — a merged PR, a `git revert`, a cross-repo refactor — becomes an immutable, promotable [version](/enterprise/collaboration-devops/workflow-versioning), same as one published from the editor.
+
+## What Git gives you
+
+| Git operation | What it lets your team do |
+|---|---|
+| **Branch** | Work on a workflow change in isolation. |
+| **Pull request** | Review the workflow JSON diff in your normal PR tool. |
+| **Code review** | Engineers and PMs read the change side-by-side; comments, approvals, the works. |
+| **CI checks** | Lint the JSON, run validation tests, smoke-test the workflow in an ephemeral env. |
+| **Merge** | One source of truth lands on the project's branch. |
+| **`git revert`** | Roll the file back, pull, and promote the resulting version to undo a deployment. |
+| **`git blame`** | See who introduced a specific task or expression and when. |
+| **`git log`** | Full history of the workflow's evolution, cross-linked to ByteChef versions. |
+
+## The promotion bridge
+
+Git holds the reviewed source of truth; the ByteChef versioning model is the deployment mechanism:
+
+```
+Engineer edits in branch
+        │
+        ▼
+PR opened (diff reviewed)
+        │
+        ▼
+PR merged to the project's branch
+        │
+        ▼
+Pull Project from Git → new version published
+        │
+        ▼
+Promote to STAGING, then PRODUCTION
+```
+
+Promotion across [environments](/enterprise/collaboration-devops/environments) works exactly as it does for editor-published versions — see [Build once, deploy many](/enterprise/collaboration-devops/build-once-deploy-many). Teams that want the pull step automated can call the same operation from CI, or use the [configuration API](/embedded/configuration-api) to import and publish programmatically.
+
+## Two-way sync
+
+You can drive workflow evolution from either side:
+
+- **UI → Git.** Edit visually, publish — the push happens for you. Best for prototyping and for teams whose primary builders are not developers.
+- **Git → UI.** Edit the JSON in your IDE, merge the PR, pull. Best for advanced changes, refactors, and when your CI policy requires a PR.
+
+In practice, most teams do both — prototypes in the UI, hardening in Git. The label-based matching keeps the two sides converging on the same workflow set.
+
+## Code workflows (coming soon)
+
+<Callout type="info">
+  **Status: Coming soon.** Code workflows are on the near-term roadmap. The shape described here is the planned implementation.
+</Callout>
+
+The visual editor is the right tool for most workflows — explicit, reviewable, accessible to non-engineers. But there are cases where code is just *better*: the workflow is mostly data manipulation (the visual nodes would be a chain of `Map → Filter → Map → Filter`); a library you want already exists in Python or JavaScript and the visual nodes can't import it; the team owning the workflow lives in code and reviews everything via PRs anyway; the workflow is generated programmatically (templates, codegen).
+
+Code workflows are Python or JavaScript files that live in Git natively. There's no JSON intermediate — the file *is* the workflow.
+
+```
+my-project/
+├── workflows/
+│   ├── invoice-import.py        # Python workflow
+│   └── slack-digest.js          # JS workflow
+├── connections.yaml             # Declarative connection references
+└── README.md
+```
+
+Both languages run via [GraalVM polyglot](/enterprise/extensibility/polyglot-scripting), so they have access to the same connection types, helpers, and runtime context as visual workflows.
+
+**Lifecycle parity.** Code workflows participate in the same lifecycle as visual workflows: they publish into immutable [versions](/enterprise/collaboration-devops/workflow-versioning), promote across [environments](/enterprise/collaboration-devops/environments), generate [execution records](/enterprise/collaboration-devops/workflow-executions), appear in the [audit log](/enterprise/governance-security/audit-log), and can be exposed as [MCP tools](/enterprise/extensibility/mcp-integration). The difference is purely "where the source lives" — JSON in a database vs. files in a repo.
+
+**The Git-native loop.** Because the workflow *is* a file:
+
+```
+edit locally → commit → PR → review → merge → CI publishes new version → promote
+```
+
+There's no export/import step. The repository is the source of truth.
+
+**Mixing with visual workflows.** Code workflows and visual workflows coexist in the same project. A code workflow can call a visual workflow as a subflow and vice versa. Teams typically pick the medium per workflow, not per project.
+
+**When *not* to use code workflows.** The workflow needs frequent edits by non-engineers; the team values the visual explainability of the workflow for a less technical audience; the work is genuinely simple visual orchestration (don't reach for code if four visual nodes do the job).
+
+## Beyond rollback
+
+Once your workflows are in Git, you get a lot for free:
+
+- **`git bisect`** to find the change that introduced a regression.
+- **CODEOWNERS** to require a specific team's review for sensitive workflows.
+- **Required reviewers** for PRODUCTION-facing workflow changes.
+- **Cross-repo refactors** when a connection rename should propagate everywhere.
+- **Synced documentation** — keep workflow READMEs next to the JSON.

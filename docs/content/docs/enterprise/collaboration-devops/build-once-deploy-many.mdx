@@ -1,0 +1,58 @@
+---
+title: "Build Once, Deploy Many Times"
+description: "Building a workflow and deploying it are separate operations. Edit freely in DEVELOPMENT without affecting STAGING or PRODUCTION; promote a known-good build forward when you're ready."
+---
+
+The core DevOps invariant in ByteChef is: **build and deploy are two operations, not one.**
+
+- **Build** = publishing a workflow draft as an immutable [version](/enterprise/collaboration-devops/workflow-versioning).
+- **Deploy** = promoting that version into a specific [environment](/enterprise/collaboration-devops/environments).
+
+That split is what lets you edit a workflow at 2 PM and not have it land in PRODUCTION until you say so at 5 PM — and what lets you ship the same artifact to STAGING and PRODUCTION without rebuilding it.
+
+## What it buys you
+
+### Edit freely in DEVELOPMENT
+
+While you're editing, you're working on a draft. Drafts only run in DEVELOPMENT. Nothing you do to a draft changes what's running in STAGING or PRODUCTION. No "save as draft" toggle, no risk of accidentally hitting "save" and pushing a half-written workflow to PRODUCTION.
+
+### One artifact, many environments
+
+The version you cut is a **build artifact**. Like a Docker image, you build it once and promote the exact same bits through STAGING and PRODUCTION. STAGING isn't running a "STAGING build" and PRODUCTION isn't running a "PRODUCTION build" — they're running the same v17 with different connections.
+
+This eliminates a whole class of bugs ("works in staging, fails in prod") that come from environment-specific build paths.
+
+### Trivial rollback
+
+Because the previous version is on disk and immutable, rolling PRODUCTION back to v15 is just a promotion in the other direction. No revert commit, no rebuild, no "git, please find me a commit that compiled."
+
+### Parallel work
+
+Two engineers can publish different versions of the same workflow. v17 by Alice gets promoted to STAGING and then PRODUCTION. v18 by Bob sits as the latest draft until Alice's v17 lands; then Bob picks up, rebases his changes, and publishes v19. No merge conflicts on the workflow JSON; the version model is the conflict resolution.
+
+## The promotion gate
+
+In practice, teams add policy on top of the build/deploy split:
+
+- A version must run successfully in STAGING for N minutes before it can promote to PRODUCTION.
+- Promotion to PRODUCTION requires a second approver.
+- Promotion is automated by your CI/CD when a Git PR merges.
+
+These policies are orthogonal to the model — they sit on the promote operation, not inside the workflow.
+
+## What "deploy" actually does
+
+A promotion is a small, atomic operation:
+
+1. Move the environment's pin from version X to version Y.
+2. Record an audit log entry.
+3. Drain any in-flight runs of version X (they finish on X), and start new runs on Y.
+
+That's it — no recompilation, no service restart, no DB migration. This is why promotions are safe to run mid-day.
+
+{/* TODO screenshot: promote dialog — source environment (STAGING / v17), target environment (PRODUCTION / currently v15), publish description, optional approver field, and a "Promote" button with the pin-move shown visually */}
+![Promote dialog moving v17 from STAGING to PRODUCTION](/enterprise/build-once-deploy-many/promote-dialog.png)
+
+## Anti-pattern: editing in PRODUCTION
+
+Some teams instinctively reach for "edit straight in PRODUCTION" for a hotfix. The platform doesn't make this convenient on purpose. The faster path is: edit the draft in DEVELOPMENT, publish v18, promote v18 straight to PRODUCTION (skipping STAGING if your policy allows). Same time-to-fix, full audit trail, no in-place mutation.

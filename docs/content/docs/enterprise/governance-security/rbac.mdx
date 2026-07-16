@@ -1,0 +1,59 @@
+---
+title: "Role-Based Access Control"
+description: "Workspace roles control who can view, edit, deploy, and execute workflows. Centralized administration with clear ownership at every level."
+---
+
+> **Coming soon.** Role-based access control is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+ByteChef's RBAC model is intentionally simple: permissions are scoped to **workspaces**, and roles bundle the actions you can perform within a workspace. There are no per-resource ACLs to babysit and no implicit superuser tier that bypasses the model.
+
+## The scope hierarchy
+
+```
+Organization
+  └── Workspace
+       ├── Data tables / Knowledge bases   (workspace-scoped)
+       └── Project
+            ├── Workflows
+            └── Connections
+```
+
+- An **organization** is the tenant boundary.
+- A **workspace** groups projects that share settings, environments, connections, data tables, and knowledge bases.
+- A **project** scopes workflows and connections to a single team or initiative.
+
+Roles are granted **at the workspace level** and apply to every project inside that workspace. A user can be an admin in one workspace, an editor in another, and have no access at all to a third.
+
+## Built-in roles
+
+| Scope | Role | Can do |
+|---|---|---|
+| Workspace | Admin | All workspace actions: manage members, create/delete projects, promote credentials, view audit log. |
+| Workspace | Editor | Create and edit projects and workflows within the workspace. |
+| Workspace | Viewer | Read-only access across the workspace. |
+
+## What each role gates
+
+The permission model gates four classes of action:
+
+1. **View** — see the workflow, its definition, and its execution history.
+2. **Edit** — modify the workflow definition or its connections.
+3. **Deploy** — publish a draft as a version, promote a build between environments.
+4. **Execute** — trigger a workflow run.
+
+Roles are tuned so that the common separation-of-duties patterns work out of the box: a contractor can be granted **Edit** without **Deploy**; an on-call engineer can be granted **Execute** without **Edit**.
+
+## Centralized administration
+
+Workspace admins manage members and their roles from a single screen. When a user is removed at the workspace level, their access to every project in that workspace is revoked atomically — no orphan grants left behind.
+
+{/* TODO screenshot: workspace members admin screen — table of members with columns Name / Email / Workspace role; "Add member" button visible; one row in an "edit role" state to show the assignment UI */}
+![Workspace members and roles admin screen](/enterprise/rbac/members-and-roles.png)
+
+## Enterprise SSO
+
+Centralized identity — SAML 2.0 / OIDC federation — has its own page: [Enterprise SSO](/enterprise/governance-security/sso). SSO group claims map onto the workspace roles described above, so membership in an IdP group drives ByteChef permissions automatically.
+
+## What gets logged
+
+Every role change is captured in the [audit log](/enterprise/governance-security/audit-log) with the acting admin, the affected user, the previous role, the new role, and the timestamp. Forensic reconstruction of "who had what access on date X" is always available.

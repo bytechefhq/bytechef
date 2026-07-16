@@ -1,0 +1,44 @@
+---
+title: "Scale & Reliability Overview"
+description: "Run the same workflows from a single node to a multi-region distributed deployment. Pick the substrate that fits your ops."
+---
+
+ByteChef Enterprise is built so the deployment substrate is a choice, not a constraint. The same workflow that runs on a single-node monolith for evaluation runs on a multi-service cluster with Kafka, Quartz, S3, and per-tenant database routing — without rewriting the workflow.
+
+## What you get
+
+| Capability | Purpose |
+|---|---|
+| [Distributed scheduler](/enterprise/scale-reliability/distributed-scheduler) | Quartz clustering or native AWS EventBridge. No SPOF on cron. |
+| [Pluggable message brokers](/enterprise/scale-reliability/message-brokers) | Memory, Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS. |
+| [Cloud-native storage](/enterprise/scale-reliability/cloud-native-storage) | S3 file storage and database-backed storage, auto-wired. |
+| [Multi-tenant data isolation](/enterprise/scale-reliability/multi-tenant-isolation) | Database-per-tenant routing, multi-tenant Quartz, per-tenant config. |
+| [Horizontal scaling](/enterprise/scale-reliability/horizontal-scaling) | Stateless coordinators and workers behind your broker. |
+| [Runtime Job: ephemeral execution](/enterprise/scale-reliability/runtime-job) | Single-shot, no-database execution binary for Kubernetes Jobs and CI pipelines. |
+
+The microservices topology *(coming soon)* — the polished production deployment story — lives under [Flexible deployment](/enterprise/governance-security/flexible-deployment#microservices-topology-coming-soon) in the Governance & Security pillar, since deployment shape and operational perimeter are typically owned by the same team.
+
+## The substrate spectrum
+
+```
+Evaluation                       Production                     Multi-region
+    │                                  │                              │
+    ▼                                  ▼                              ▼
+Single JVM                  Coordinator + N workers          Per-region clusters
+Memory broker               Kafka / SQS                      with cross-region
+SQLite Quartz               Quartz clustering / EventBridge  replication
+Local file storage          S3                               and routing
+```
+
+Every step on this spectrum changes infrastructure — nothing about the workflow definition, the component model, or the user-facing UI changes. A workflow built on the left runs unchanged on the right.
+
+## Pick your defaults
+
+| You're starting with... | Pick |
+|---|---|
+| **Docker compose on one machine** | Memory broker, file storage, single JVM, default Quartz. |
+| **Kubernetes, single region, ~100K runs/day** | Redis or RabbitMQ, Postgres, S3, Quartz clustering. |
+| **Kubernetes, multi-region, millions of runs/day** | Kafka, S3, EventBridge or Quartz clustering, multi-tenant routing. |
+| **AWS-native, embracing managed services** | SQS for the broker, EventBridge for scheduling, S3 for storage. |
+
+Each choice is independently swappable — you can start with a memory broker and switch to Kafka later without rewriting components.

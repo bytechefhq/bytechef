@@ -1,0 +1,79 @@
+---
+title: "Multi-Tenant Data Isolation"
+description: "Database-per-tenant routing for true SaaS isolation; multi-tenant Quartz for isolated schedules; per-tenant configuration overlays."
+---
+
+If you're running ByteChef as part of your own SaaS — either as the [embedded iPaaS surface](/embedded/white-label-execution) or as a shared automation backbone across many customers — tenant isolation is a foundational requirement. ByteChef Enterprise's multi-tenant story is built on three **data-layer** mechanisms, described below. For the request-flow view of isolation (identity, routing, crypto, observability), see [Tenant-isolated security](/embedded/tenant-isolated-security).
+
+## Layer 1: Database-per-tenant routing
+
+Each tenant's data lives in its own database (or its own schema, depending on policy). At every request, the platform identifies the tenant from the request context (header, JWT claim, URL prefix) and routes the connection pool to that tenant's database.
+
+The practical guarantees:
+
+- **No shared rows.** A query for "workflows" in tenant A can never accidentally return a workflow from tenant B because they aren't in the same table.
+- **Restore granularity.** You can restore tenant A's database without touching tenant B.
+- **Per-tenant capacity planning.** A noisy tenant doesn't share table space with quiet tenants.
+- **Per-tenant compliance.** Some tenants can live in EU-region databases, others in US-region.
+
+```
+                ┌─────────────────────┐
+Request ───────▶│  Tenant Identifier  │
+(with tenant ID)└──────────┬──────────┘
+                           │
+                           ▼
+                ┌─────────────────────┐
+                │   Routing Connection│
+                │       Pool          │
+                └──────────┬──────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        ▼                  ▼                  ▼
+┌────────────┐    ┌────────────┐      ┌────────────┐
+│ Tenant A   │    │ Tenant B   │      │ Tenant C   │
+│ DB         │    │ DB         │      │ DB         │
+└────────────┘    └────────────┘      └────────────┘
+```
+
+## Layer 2: Multi-tenant Quartz
+
+[Quartz](https://www.quartz-scheduler.org/) — the scheduler — is also tenant-aware. Each tenant has its own job store, so:
+
+- Tenant A's cron triggers can't see Tenant B's.
+- A misconfigured schedule in one tenant can't disrupt another tenant's fires.
+- You can pause all schedules for one tenant (e.g., during a customer-side incident) without touching others.
+
+This matters because the scheduler is shared infrastructure even when the data is sharded — and shared scheduler state has historically been a leakage vector in multi-tenant SaaS.
+
+## Layer 3: Per-tenant configuration overlays
+
+Some settings need to vary per tenant:
+
+- Feature flags ("Tenant A is on the new AI gateway; Tenant B is on the old one").
+- Resource limits ("Tenant A can run 1000 concurrent workflows; Tenant B is capped at 100").
+- Provider routing ("Tenant A's OpenAI calls go through their own API key").
+- Branding ("Tenant A's emails come from their domain").
+
+Per-tenant configuration overlays let you set these at the tenant level, layered over workspace and global defaults. The resolution order is **tenant → workspace → global**, so tenant-specific values override broader ones predictably.
+
+## Encryption and isolation
+
+Combine multi-tenant routing with [encrypted credential storage](/enterprise/governance-security/encrypted-credentials):
+
+- Each workspace has its own encryption key.
+- Workspaces in different tenants have independent keys.
+- A leaked database backup for tenant A is useless against tenant B even if you compromise both.
+
+## Performance considerations
+
+- **Connection pool sizing.** With per-tenant pools, total connection count = tenants × pool size. Use a routing pool that lazily creates per-tenant pools, not a static N-per-tenant allocation.
+- **Migration replay.** Liquibase migrations run per tenant database; budget the migration window accordingly.
+- **Cross-tenant queries.** Don't. The model assumes you never join across tenants. Analytics live in a separate warehouse fed by per-tenant exports.
+
+## When to use it
+
+- ✅ You sell automation as part of your SaaS and your customers each need isolated data.
+- ✅ Compliance requires data residency at the customer level.
+- ✅ You have a small number of large tenants (each their own database is fine).
+- ⚠ You have millions of tiny tenants (consider schema-per-tenant or row-level partitioning instead).
+- ❌ You're a single-team internal deployment (you don't need this; just use one workspace).

@@ -1,0 +1,43 @@
+---
+title: "API Platform"
+description: Publish workflows as your own REST API — collections of endpoints with API-client credentials.
+---
+
+<EEBadge />
+
+The **API Platform** turns workflows into a REST API you can hand to consumers:
+
+- **API Collections** — group workflows from a deployed project into a collection of HTTP endpoints. Each endpoint maps a method and path to a workflow; the collection is served under your instance's API host.
+- **API Clients** — issue credential keys to the applications that will call your collections, so access can be granted and revoked per consumer.
+
+Both live in the Automation workspace sidebar under **API Platform**.
+
+{/* TODO screenshot: API Collections page — a collection expanded to show its endpoints (method, path, workflow) */}
+
+## How an endpoint responds
+
+Each endpoint maps an HTTP method and path to a workflow, but *how* the caller gets a response is decided by the trigger the workflow starts with. The built-in **Request** component provides two, and the choice is the difference between a synchronous API and a fire-and-forget one:
+
+| Trigger | Behavior | Use when |
+|---|---|---|
+| **Await Workflow and Respond** (`request/v1/awaitWorkflowAndRespond`) | The endpoint **waits** for the workflow to finish and returns its output as the HTTP response body. | The caller needs the result (a lookup, a computation, a created record). |
+| **Auto Respond with HTTP 200 Status** (`request/v1/autoRespondWithHTTP200`) | The endpoint replies **immediately with 200** and runs the workflow in the background. No validation of the request. | The caller just needs the request accepted (ingestion, fire-and-forget events). |
+
+This is the same **trigger in, response out** model as [subflows](/automation/build/subflows) — an HTTP caller here plays the role a parent workflow plays there. The difference: the API Platform has a real external caller, and the *sync* trigger itself shapes the response (there's no separate "return response" action — the workflow's output *is* the response).
+
+### Synchronous responses
+
+For **Await Workflow and Respond**, the request is held open until the workflow completes and then answered with its output. A `timeout` parameter (milliseconds) bounds the wait; the maximum is **5 minutes**. If the workflow doesn't respond in time, the caller gets a timeout rather than a hung connection. Under the hood these synchronous calls run through the same in-process job-completion path used by synchronous webhooks, so the response is returned on the request thread without polling.
+
+<Callout type="info">
+Design a synchronous endpoint's workflow to finish quickly and keep its final step's output shaped like the response you want the caller to see. Long-running work is a better fit for the auto-respond trigger plus a callback or a status endpoint.
+</Callout>
+
+## Access control
+
+Callers authenticate with an **API Client** credential issued for the collection. Issue a separate client per consuming application so access can be granted or revoked independently, without disturbing other consumers.
+
+## Reference
+
+- [Request component](/reference/components/request_v1) — the two triggers and their properties (including the `timeout` on Await Workflow and Respond).
+- [Subflows](/automation/build/subflows) — the same trigger-in/response-out model, for workflow-to-workflow calls instead of HTTP.

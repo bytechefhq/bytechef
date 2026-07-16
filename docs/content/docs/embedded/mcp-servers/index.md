@@ -7,6 +7,8 @@ description: Expose integration components as MCP-compatible tool servers.
 
 ---
 
+> **Coming soon.** Embedded MCP Servers are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
 ## Key Features
 
 | Feature | Description |
@@ -40,6 +42,8 @@ Each server in the list displays:
 4. Assign tags if desired.
 5. Click **Save** to create the server.
 
+For each exposed component action, you choose which parameters you fix yourself and which the connected agent fills at call time, using the `fromAi(...)` expression — the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
+
 ### Managing MCP Servers
 
 - **Enable/Disable** -- toggle a server on or off to control availability.
@@ -56,4 +60,4 @@ Use the left sidebar to filter the server list:
 
 ### Environment Selection
 
-Use the environment selector in the header to switch between environments. MCP server configurations are scoped per environment.
+Use the environment selector at the top of the page (or the global one in the left sidebar) to switch between environments. MCP server configurations are scoped per environment.

@@ -1,0 +1,15 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "flexible-deployment",
+    "rbac",
+    "component-policies",
+    "sso",
+    "audit-log",
+    "data-retention",
+    "encrypted-credentials",
+    "connection-visibility",
+    "observability",
+    "license-gated-distribution"
+  ]
+}

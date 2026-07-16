@@ -1,0 +1,133 @@
+---
+title: "Custom Components"
+description: "Upload Java or JavaScript components and load them dynamically via a sandboxed classloader. Ship proprietary business logic without forking the platform."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+A component is ByteChef's unit of integration — a bundle of actions, triggers, and connection logic that wraps a single external system or capability. The platform ships [200+ of them](/enterprise/extensibility/built-in-components). When you need something they don't cover, you write a custom component.
+
+## Why a custom component over a script
+
+Anyone can call an HTTP API from a script step. Custom components are the right reach when:
+
+- **The integration is reused across many workflows.** Define it once; benefit everywhere.
+- **The integration has a meaningful schema.** Components expose typed input/output properties; the visual editor shows them in the data-pill picker, with validation and helpful error messages.
+- **The integration has authentication.** Components define connection types, which plug into [encrypted credential storage](/enterprise/governance-security/encrypted-credentials), [connection scopes](/enterprise/governance-security/connection-visibility), and the standard OAuth flow.
+- **You want to surface the integration as an MCP tool.** Components are what get [exposed via MCP](/enterprise/extensibility/mcp-integration).
+
+## Two implementation paths
+
+### Java components
+
+The canonical path. A Java component:
+
+- Implements `ComponentHandler` and is annotated `@AutoService(ComponentHandler.class)` for ServiceLoader discovery, or `@Component` for Spring DI when it needs framework beans.
+- Defines a static `ComponentDefinition` describing actions, triggers, and the connection.
+- Lives in its own Gradle module under `server/libs/modules/components/`.
+- Ships an OpenAPI spec when wrapping a REST API.
+
+A small example skeleton:
+
+```java
+@AutoService(ComponentHandler.class)
+public class MyComponentHandler implements ComponentHandler {
+    private static final ComponentDefinition COMPONENT_DEFINITION = component("my-system")
+        .title("My System")
+        .connection(CONNECTION_DEFINITION)
+        .actions(MyAction.ACTION_DEFINITION)
+        .triggers(MyTrigger.TRIGGER_DEFINITION);
+}
+```
+
+### JavaScript components
+
+For teams that don't want a Java toolchain, components can be authored in JavaScript and loaded by the GraalVM runtime. The component definition surface is the same; only the implementation language changes.
+
+## Dynamic loading via a sandboxed classloader
+
+Custom components are loaded at runtime via a **sandboxed classloader**:
+
+- Each component lives in an isolated classloader, so version conflicts between components can't poison each other.
+- A buggy component cannot reach into platform internals.
+- Hot-loading new component versions doesn't require a process restart.
+
+### Hardening options for Java uploads
+
+> **Coming soon.** These hardening properties are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
+Two deployment properties let administrators tighten how Java custom components are handled:
+
+- **Disable Java uploads** — `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED=false` rejects new Java (jar) custom component uploads while JavaScript components and previously uploaded Java components keep working. Use this when you want scripting-language extensibility without accepting arbitrary JVM bytecode.
+- **Run Java in a guest JVM sandbox** — `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER=ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of the in-process isolating classloader, adding a stronger isolation boundary between component code and the host process. The default is `CLASS_LOADER`.
+
+The same pair exists for Java code workflows: `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` and `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER`. See [Environment Variables](/self-hosting/configuration/environment-variables#component-configuration) for details.
+
+## Distribution
+
+| Distribution method | When to use |
+|---|---|
+| **Upload via UI** | One-off custom components for a single tenant. |
+| **Bundle into the JAR** | First-party, vendored components shipped with your build. |
+| **Marketplace / shared registry** | Coming-soon community pattern for sharing components across workspaces. |
+
+## Lifecycle
+
+Components evolve through versions (`v1`, `v2`, ...). Old workflows continue to reference older versions; new workflows use the latest. Removing a component version requires migrating any workflows that still reference it.
+
+## CLI scaffolding
+
+The CLI tool can scaffold a new component from scratch or from an OpenAPI spec:
+
+```bash
+cd cli
+./gradlew :cli-app:bootRun --args="component init openapi --name=my-component --openapi-path=/path/to/openapi.yaml"
+```
+
+That generates a full module skeleton — handler class, action and trigger stubs, tests, and a README template — that you fill in.
+
+Working starter projects live in the samples repository:
+
+- [Java custom component sample](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-sample-custom-component-java)
+- [JavaScript custom component sample](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-sample-custom-component-javascript)
+
+## Auto-generated API connectors (coming soon)
+
+<Callout type="info">
+  **Status: Coming soon.** Auto-generated API connectors from OpenAPI specs are on the near-term roadmap. The CLI scaffolding above is the manual path that's available today; the connector generator is its higher-level successor.
+</Callout>
+
+Most modern REST APIs publish an OpenAPI spec. That spec already contains everything a component needs: the endpoints, the parameters, the schemas, the auth model. The API connector turns that spec into a working ByteChef component — actions for each endpoint, connection for each auth scheme, typed inputs and outputs — without you writing the boilerplate.
+
+**What it generates.** Given an OpenAPI 3.x spec: a component definition with the API's title, description, and version; one action per endpoint with parameters extracted from the spec; typed input properties for path, query, header, and body parameters; typed output schemas based on the response schemas; a connection definition matching the spec's `securitySchemes` (Bearer, API key, OAuth 2.0, Basic auth); a test scaffold; and README documentation with the action list and connection setup.
+
+**How it works.**
+
+```
+openapi.yaml          ─────►   Component generator
+                                     │
+                                     ▼
+                              ┌────────────────┐
+                              │ Java module    │
+                              │ src/main/java  │
+                              │ src/test/java  │
+                              │ README.md      │
+                              └────────────────┘
+                                     │
+                                     ▼
+                              Build & deploy
+                              like any custom component
+```
+
+The generated code is **your code** — it lives in the repo, you can edit it, and it ships through the same pipeline as a hand-written component. The generator is an accelerator, not a runtime: there's no live "evaluate the spec at request time" path that could break in production.
+
+**When to use it.** The third-party API has an OpenAPI spec; the API is REST-ish and follows reasonable conventions; you'd rather invest 10 minutes editing generated code than 2 weeks hand-writing it.
+
+**When to hand-write instead.** The API is GraphQL (use the GraphQL Client component); the API has complex pre/post-processing that doesn't fit OpenAPI semantics; you're integrating a non-HTTP system (file, queue, database).
+
+**Customizing generated components.** Add custom output post-processing for endpoints that return non-obvious shapes; add trigger definitions (the generator focuses on actions); adjust action naming for editor ergonomics; layer rate-limiting or caching on top. Once edited, the component is yours — you can regenerate against a new spec version by diffing or by regenerating the "base" and rebasing your edits.
+
+## See also
+
+- [Developer guide](/developer-guide) — full component author guide.
+- [Polyglot scripting](/enterprise/extensibility/polyglot-scripting) — when a script inside one step is the right tool instead of a whole component.

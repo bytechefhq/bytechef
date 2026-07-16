@@ -1,0 +1,33 @@
+{
+  "$schema": "../../../.source/json-schema/docs.meta.json",
+  "title": "Enterprise",
+  "description": "ByteChef Enterprise features for production-scale automation",
+  "icon": "Building2",
+  "root": true,
+  "pages": [
+    "index",
+    "---Governance & Security---",
+    "governance-security/index",
+    "...governance-security",
+    "---Collaboration & DevOps---",
+    "collaboration-devops/index",
+    "...collaboration-devops",
+    "---Runtime Job Runner---",
+    "runtime-job-runner/index",
+    "---Scale & Reliability---",
+    "scale-reliability/index",
+    "...scale-reliability",
+    "---Data & Knowledge---",
+    "data-knowledge/index",
+    "...data-knowledge",
+    "---Extensibility---",
+    "extensibility/index",
+    "...extensibility",
+    "---Embedded iPaaS---",
+    "embedded-ipaas/index",
+    "...embedded-ipaas",
+    "---Support & Trust---",
+    "support-trust/index",
+    "...support-trust"
+  ]
+}

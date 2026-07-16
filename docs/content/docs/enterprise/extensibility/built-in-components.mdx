@@ -1,0 +1,74 @@
+---
+title: "200+ Built-In Components"
+description: "CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases — all open source, all extensible."
+---
+
+ByteChef ships with a large catalog of pre-built components — actions and triggers for the systems your workflows most often need to talk to. Every component is **open source** (Apache 2.0 in the Community distribution), which means you can audit the integration, fix it, or fork it.
+
+## What's in the catalog
+
+A rough map of the categories. Browse the full list under [Component Reference](/reference).
+
+| Category | Representative components |
+|---|---|
+| **CRM & sales** | Salesforce, HubSpot, Pipedrive, Close, Apollo, ZoomInfo, Active Campaign, Freshsales |
+| **Project management** | Jira, Asana, Linear, Notion, ClickUp, Monday, Trello |
+| **Communication** | Slack, Microsoft Teams, Discord, Telegram, Twilio, Zoom |
+| **Email** | Gmail, Microsoft Outlook 365, Brevo (Sendinblue), Mailchimp |
+| **E-commerce** | Shopify, Stripe, WooCommerce, Square |
+| **Cloud storage** | Google Drive, Dropbox, Box, Microsoft OneDrive, AWS S3 |
+| **Productivity** | Google Docs, Google Sheets, Notion, Confluence, Airtable |
+| **Developer tools** | GitHub, GitLab, Bitbucket, PagerDuty, OpsGenie |
+| **AI / ML** | OpenAI, Anthropic, Mistral, Ollama, Stability AI, Pinecone |
+| **Databases** | MySQL, PostgreSQL, MongoDB, Supabase, BigQuery |
+| **Helpers** | HTTP Client, GraphQL Client, JSON Helper, Date Helper, Math Helper, JWT Helper, Logger |
+| **Flow controls** | Condition, Branch, Loop, Parallel, Each, Map, Subflow, On-Error, Wait for Approval, Terminate |
+| **Files** | CSV, JSON, XML, PDF, ZIP, file converters |
+| **Web** | Firecrawl, ZenRows, Browser Use, web scraping primitives |
+
+## Anatomy of a built-in component
+
+Each component is a self-contained module under `server/libs/modules/components/`:
+
+```
+my-component/
+├── build.gradle.kts
+├── src/main/java/             # Component handler, actions, triggers
+├── src/main/resources/
+│   ├── README.md              # Component documentation
+│   └── openapi.yaml           # When wrapping a REST API
+└── src/test/java/             # Unit and integration tests
+```
+
+The same scaffold applies to [custom components](/enterprise/extensibility/custom-components) — built-in vs. custom is a distribution distinction, not an architectural one.
+
+## Versioning
+
+Components are versioned (`v1`, `v2`, ...). When a third-party API breaks compatibility, a new component version is cut so existing workflows can stay on the old one until they migrate. The component reference docs always show available versions.
+
+## Auto-generated docs
+
+Every component ships a `README.md` describing its actions, triggers, and connection. These are aggregated into the [Component Reference](/reference) section of the docs and regenerated with each build:
+
+```
+./gradlew generateDocumentation
+```
+
+## When the catalog doesn't cover your need
+
+In rough order of effort:
+
+1. **Polyglot script step** — paste a few lines of JS/Python and call the API directly. ([Polyglot scripting](/enterprise/extensibility/polyglot-scripting))
+2. **HTTP Client component** — typed HTTP request without any new component code.
+3. **API connector** — point at an OpenAPI spec, get a generated component. ([API connector](/enterprise/extensibility/custom-components#auto-generated-api-connectors-coming-soon) *(coming soon)*)
+4. **Custom component** — fully hand-written when none of the above fit. ([Custom components](/enterprise/extensibility/custom-components))
+
+## Source-available, modifiable
+
+Because every built-in component is in the open-source repo, when one of them doesn't quite do what you need, you can:
+
+- Fork the component module into your own repo.
+- Modify it to your taste.
+- Contribute the change back via PR.
+
+You're never blocked waiting for a vendor to ship a feature.

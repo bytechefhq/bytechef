@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Embedded Configuration",
+  "description": "Public REST API for ByteChef Embedded (configuration): manage integrations, instances, and end-user workflows.",
+  "pages": [
+    "..."
+  ]
+}

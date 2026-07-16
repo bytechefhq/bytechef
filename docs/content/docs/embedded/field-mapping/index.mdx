@@ -1,0 +1,196 @@
+---
+title: Field Mapping
+description: Let end users map their application's fields to a connected integration's fields inside the Connect dialog.
+---
+
+---
+
+Field Mapping lets your end user, inside the **Connect dialog**, pick a remote **object type** (e.g. Contacts, Leads) and map your application's fields to the connected integration's fields. The result is saved as a workflow-input value and becomes referenceable as **data pills** in the embedded workflow builder.
+
+Two halves make up the feature, joined by a single shared **object name**:
+
+- **Design time** (you, the workflow author) — add a `Field Mapping` workflow input and give it a static sample so the editor knows the object name and which application fields to expose as data pills.
+- **Runtime** (your end user) — the React SDK renders the mapping UI, fetching object types and integration fields **live** against the user's connection through callbacks you supply on `useConnectDialog`.
+
+## Key Features
+
+| Feature | Description |
+|---|---|
+| Object-type selector | The user picks a remote object type; the integration-field dropdown then loads for that type. |
+| Live option lists | Object types and integration fields are fetched at runtime against the user's connection — no hardcoded lists. |
+| Configurable rows | `defaultFields` seeds which application-field rows show initially; `userCanRemoveMappings` lets users remove and re-add them. |
+| User-creatable fields | When your application object supports freeform fields or a flexible schema, `userCanCreateFields` lets users create their own fields beyond your configured set. |
+| Data pills | Mapped application fields appear as child data pills in the embedded workflow builder. |
+
+<Callout title="Scope">
+    This is a deliberately reduced subset of full field mapping. **Included:** dynamic application fields, the object-type selector, flat (non-paginated) option lists, configurable/creatable mappings, and data-pill preview. **Not included:** paginated / search-as-you-type dropdowns, and any built-in runtime transform — the stored mapping is the input *value*; your workflow reads it and applies it however you like.
+</Callout>
+
+---
+
+## How it fits together
+
+```
+Design time (workflow builder)
+  Workflow input  type = Field Mapping
+    test value = static mapObjectFields-shaped JSON
+      └─ top-level key            → objectName (matches the SDK config key)
+      └─ applicationFields.fields[] → one data pill each
+
+Runtime (end user, Connect dialog)
+  useConnectDialog({ mapObjectFields: { <objectName>: { objectTypes, integrationFields, applicationFields: { fields, ... } } } })
+    object-type <select>     ← objectTypes.get({ executeAction, search })
+    row: app field → integration field <select> ← integrationFields.get({ executeAction, objectType, search })
+    executeAction(...)       → runs a component action against the user's live credentials
+    mapping value            → saved via the debounced inputs PUT
+```
+
+The same **object name** keys both sides: the top-level key of the design-time JSON must equal the key in the runtime `mapObjectFields` config.
+
+---
+
+## Design time — add a Field Mapping input
+
+1. Open a workflow in the integration editor and open its **Inputs** editor.
+2. Add an input and set its **Type** to **Field Mapping**.
+3. In the **Test Value** field (rendered as a JSON editor for this type), provide a static, `mapObjectFields`-shaped sample. The top-level key is the **object name**; `applicationFields` becomes the data pills:
+
+   ```json
+   {
+     "Contacts": {
+       "objectTypes":       [{"label": "Contacts", "value": "contacts"}, {"label": "Leads", "value": "leads"}],
+       "integrationFields": [{"label": "First Name", "value": "first_name"}, {"label": "Last Name", "value": "last_name"}],
+       "applicationFields": {
+         "fields": [{"label": "Title", "value": "title"}, {"label": "Email", "value": "email"}]
+       }
+     }
+   }
+   ```
+
+   A `mapObjectFields` envelope is optional for a single input — `{ "Contacts": { ... } }` and `{ "mapObjectFields": { "Contacts": { ... } } }` both work. On save, ByteChef derives the input's `objectName` (the top-level key) automatically.
+
+4. Save and publish. The `objectTypes` / `integrationFields` arrays here are **only** a design-time preview; at runtime they're replaced by your live callbacks (next section).
+
+### Data pills
+
+Each entry in `applicationFields` becomes a child data pill under the input (for example `contactMapping.title`, `contactMapping.email`), using the field's `label` and `value`. Because the embedded workflow builder reuses the shared data-pill panel, these pills appear automatically — no extra wiring.
+
+---
+
+## Runtime — configure the SDK
+
+Pass `mapObjectFields` to `useConnectDialog`, keyed by the **same object name** you used in the test value. Each entry supplies two `get` callbacks plus the application fields and optional toggles:
+
+```tsx
+'use client';
+import {
+    useConnectDialog,
+    type MapObjectFieldsType,
+    type OptionType,
+} from '@bytechef/embedded';
+
+const mapObjectFields: MapObjectFieldsType = {
+    Contacts: {
+        // Remote object types — fetched live against the user's connection.
+        objectTypes: {
+            get: async ({executeAction}) => {
+                const objects = await executeAction('hubspot', 1, 'listObjects', {});
+
+                return objects.map((object: any): OptionType => ({label: object.name, value: object.id}));
+            },
+        },
+        // Integration fields for the chosen object type.
+        integrationFields: {
+            get: async ({executeAction, objectType}) => {
+                const fields = await executeAction('hubspot', 1, 'listObjectFields', {objectType});
+
+                return fields.map((field: any): OptionType => ({label: field.label, value: field.id}));
+            },
+        },
+        // Your application's fields the user maps from (the left column).
+        applicationFields: {
+            fields: [
+                {label: 'Title', value: 'title'},
+                {label: 'Email', value: 'email'},
+            ],
+            defaultFields: [],            // [] = none shown initially; omit = all shown
+            userCanRemoveMappings: true,  // optional — per-row remove / re-add
+            userCanCreateFields: true,    // optional — let users invent a field
+        },
+    },
+};
+
+export function ConnectButton({jwtToken, integrationId}: {jwtToken: string; integrationId: string}) {
+    const {openDialog} = useConnectDialog({
+        baseUrl: 'https://your-bytechef-host.example.com',
+        environment: 'DEVELOPMENT',
+        integrationId,
+        jwtToken,
+        mapObjectFields,
+    });
+
+    return <button onClick={openDialog}>Connect</button>;
+}
+```
+
+### The `executeAction` helper
+
+Both callbacks receive an `executeAction` function **provided by the SDK** — you never construct it:
+
+```ts
+executeAction(componentName: string, componentVersion: number, actionName: string, input: Record<string, unknown>): Promise<unknown[]>
+```
+
+It runs the named component action against the connected user's stored credentials and returns the action's `result` array. It is bound to the current dialog's integration instance (sent as the `X-Instance-Id` header) and the user's JWT, so:
+
+- You never thread an instance id through your callbacks.
+- A callback **cannot** target another user's instance — the server verifies the connected user (from the JWT `sub`) owns the instance and rejects the call otherwise.
+
+### Callback arguments
+
+| Callback | Argument | Notes |
+|---|---|---|
+| `objectTypes.get` | `{executeAction, search?}` | `search` is accepted but unused (no server-side search). |
+| `integrationFields.get` | `{executeAction, objectType, search?}` | The integration-field `<select>` stays disabled until an object type is chosen. |
+
+### Config reference
+
+| Field | Type | Required | Description |
+|---|---|---|---|
+| `objectTypes.get` | `(args) => Promise<OptionType[]>` | yes | Returns the remote object types for the selector. |
+| `integrationFields.get` | `(args) => Promise<OptionType[]>` | yes | Returns the integration fields for the chosen object type. |
+| `applicationFields` | `object` | yes | Nested object containing your application's field options and toggles (see sub-fields below). |
+| `applicationFields.fields` | `OptionType[]` | yes | Your application's fields (the mappable left column). |
+| `applicationFields.defaultFields` | `string[]` | no | `value`s of the rows visible initially. `[]` shows none; omitting shows all. |
+| `applicationFields.userCanRemoveMappings` | `boolean` | no | Allow per-row remove and re-add. |
+| `applicationFields.userCanCreateFields` | `boolean` | no | For application objects with a freeform or flexible schema, let users create their own application fields beyond the configured `fields`. |
+
+`OptionType` is `{label: string; value: string}`.
+
+---
+
+## The stored value
+
+The user's mapping is saved as the workflow input's value (through the same debounced inputs `PUT` the Connect dialog already uses). The shape is self-describing so user-created fields survive:
+
+```json
+{
+  "objectType": "contacts",
+  "mappings": [
+    {"applicationField": {"label": "Title", "value": "title", "custom": false}, "integrationField": "first_name"},
+    {"applicationField": {"label": "Priority", "value": "priority", "custom": true}, "integrationField": "hs_priority"}
+  ]
+}
+```
+
+This is exported as `FieldMappingValueType` from `@bytechef/embedded`.
+
+<Callout title="You apply the mapping yourself">
+    ByteChef stores the mapping but does **not** transform any payload with it. In your workflow, read this input value and apply it however you need — for example in a Code step, or by feeding `integrationField` names into a downstream action's parameters.
+</Callout>
+
+---
+
+## Example use case
+
+You sync your app's contacts to whatever CRM each customer connects. You expose a single `Field Mapping` input named after the `Contacts` object. At runtime, `objectTypes.get` lists the CRM's object types and `integrationFields.get` lists the fields of the chosen one — both via `executeAction` against that user's live credentials. The user maps your `Title`/`Email` fields to the CRM's fields, optionally adds a custom field, and your sync workflow reads the stored mapping to build each upsert.

@@ -1,0 +1,73 @@
+---
+title: "Cloud-Native Storage"
+description: "AWS S3 file storage and database-backed storage out of the box. Auto-wired via environment post-processors — no YAML gymnastics."
+---
+
+Workflows handle files: uploads from triggers, attachments going to external systems, intermediate artifacts passed between steps. ByteChef abstracts the storage substrate behind a `FileStorageService` interface so the workflow doesn't care where bytes actually live. Two backends are first-class.
+
+## The two backends
+
+| Backend | Best fit | Notes |
+|---|---|---|
+| **S3** | Production deployments of any size. | Native AWS S3 or any S3-compatible store (MinIO, Cloudflare R2, Wasabi). |
+| **Database (JDBC)** | Single-node deployments and smaller scale. | Bytes stored as Postgres rows. Simpler to operate; doesn't scale for large files. |
+
+The choice is per deployment, not per workflow — workflows reference files by ID, and the storage layer resolves to the configured backend.
+
+## S3 storage
+
+When you configure S3:
+
+- Files written by workflows land in your bucket.
+- Files referenced by workflows are streamed from S3 on demand.
+- Lifecycle policies (e.g., expire execution attachments after N days) live in your S3 config, not in ByteChef.
+- Cross-region replication is a bucket-level concern.
+
+### S3-compatible providers
+
+The S3 backend speaks the standard AWS SDK protocol, so any S3-compatible store works:
+
+- **AWS S3** — the default.
+- **MinIO** — self-hosted, often used for on-prem deployments that want S3 semantics without AWS.
+- **Cloudflare R2** — egress-free S3-compatible storage.
+- **Wasabi**, **Backblaze B2**, **DigitalOcean Spaces** — other compatible providers.
+
+## Database storage
+
+For small deployments without an object store, files can live as rows in your Postgres database. Pros: zero extra infra, no IAM to configure. Cons: large files bloat the database, backup/restore times grow, and there's no native lifecycle management.
+
+Default for: single-node Docker Compose deployments, tests, evaluations.
+
+## Auto-wiring
+
+ByteChef uses Spring environment post-processors to auto-wire the file storage backend based on configuration. The practical effect:
+
+- Set `BYTECHEF_FILE_STORAGE_PROVIDER=S3` and a few S3-specific properties — the platform picks up the S3 backend at boot.
+- No XML, no programmatic bean overrides, no copy-pasted YAML.
+- The same workflow JSON runs against either backend.
+
+## What "file" actually means
+
+Anything the platform persists as opaque bytes:
+
+- Trigger payloads (when a webhook delivers a large body).
+- Intermediate values that exceed the inline size limit and spill to storage.
+- Component-uploaded files (e.g., a CSV uploaded for processing).
+- Component-downloaded files (e.g., an attachment fetched from an email).
+- Knowledge base documents and chunks.
+
+Smaller values stay inline in the execution record; larger values are spilled to storage and referenced.
+
+## What doesn't go through file storage
+
+- **Workflow definitions** — they live in the database as structured JSON, not opaque bytes.
+- **Connection credentials** — [encrypted credential storage](/enterprise/governance-security/encrypted-credentials).
+- **Audit log entries** — the operational database.
+- **Metrics** — exported to your monitoring stack, not stored locally.
+
+## Operational checklist
+
+- [ ] Set `BYTECHEF_FILE_STORAGE_PROVIDER` explicitly in production. Don't rely on the default.
+- [ ] For S3: give the platform an IAM role with `s3:GetObject`, `s3:PutObject`, `s3:DeleteObject` on the bucket — nothing wider.
+- [ ] Set a lifecycle policy on the bucket to expire old execution artifacts.
+- [ ] Pair with [encrypted credential storage](/enterprise/governance-security/encrypted-credentials) for sensitive uploads — S3 server-side encryption is a good complement, not a replacement.

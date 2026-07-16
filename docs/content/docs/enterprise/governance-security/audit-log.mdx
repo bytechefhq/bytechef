@@ -1,0 +1,63 @@
+---
+title: "Audit Log"
+description: "Every privileged action — workflow publish, role change, credential update — captured automatically with actor, timestamp, before/after, and correlation IDs for bulk operations."
+---
+
+> **Coming soon.** The audit log is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+The audit log — surfaced in the UI as **Settings → Audit Events** — answers two questions auditors and incident responders need: **who did what, and when?** Every privileged action in ByteChef Enterprise is captured automatically — there is no opt-in flag to enable per resource and no way for a user to bypass it.
+
+{/* TODO screenshot: audit log table with columns Actor / Action / Target / Timestamp / Source; mixed rows showing WORKFLOW_PUBLISHED, ROLE_GRANTED, CONNECTION_UPDATED, ENVIRONMENT_PROMOTION; filter bar showing actor + date-range filters applied */}
+![Audit log table with mixed event types and active filters](/enterprise/audit-log/audit-log-table.png)
+
+## What gets captured
+
+The categories below summarize the surface; the authoritative list of event types is the filter dropdown on the **Settings → Audit Events** page, which is populated from the events your instance has actually recorded.
+
+| Category | Events |
+|---|---|
+| **Workflow lifecycle** | Create, edit, delete, publish (version cut), unpublish. |
+| **Project lifecycle** | Create, edit, delete, environment promotion. |
+| **Connection lifecycle** | Create, update, delete, credential rotation, [scope change](/enterprise/governance-security/connection-visibility) (promote/demote/share/revoke). |
+| **Access control** | Role grant/revoke, workspace membership change, SSO mapping change. |
+| **Execution** | Manual trigger, scheduled job activation/deactivation, webhook registration. |
+| **Configuration** | Workspace settings change, environment variable override (non-secret), policy change. |
+
+## Per-entry fields
+
+Each entry includes at minimum:
+
+- **Actor** — the user (or service account) that performed the action.
+- **Action** — the verb (e.g., `WORKFLOW_PUBLISHED`, `ROLE_GRANTED`).
+- **Target** — the resource the action was performed on (workflow ID, project ID, user ID, etc.).
+- **Timestamp** — UTC, millisecond precision.
+- **Before / after** — the state diff for mutations, so you can see what changed without reconstructing from earlier entries.
+- **Correlation ID** — a single ID shared across all entries that originated from one logical operation (e.g., a bulk role change that touches 50 users gets one correlation ID, so you can filter the timeline to that operation).
+- **Source** — the surface the action came from (web UI, API call, MCP tool invocation).
+- **IP and user agent** — when the action was a web request.
+
+## Correlation IDs for bulk operations
+
+Most audit systems lose the "this was all one operation" signal when a single admin click fans out into dozens of writes. ByteChef stamps every action that originates from a single logical operation — bulk role updates, project-wide credential rotations, environment promotions — with the same correlation ID, so the timeline reads as a single event rather than 50 disconnected ones.
+
+{/* TODO screenshot: audit log filtered by a single correlation ID — showing ~10 grouped ROLE_GRANTED rows from one bulk admin action, all with the same correlation ID and timestamp window */}
+![Audit log entries grouped by a single correlation ID from a bulk operation](/enterprise/audit-log/correlation-id-grouping.png)
+
+## What is not logged
+
+- **Secret values.** The audit log records that a credential was updated, by whom, and when — never the secret material itself. Secrets live in [encrypted credential storage](/enterprise/governance-security/encrypted-credentials) or your [external secret manager](/enterprise/governance-security/encrypted-credentials#external-secret-managers-coming-soon) *(coming soon)*.
+- **Workflow execution data.** Execution inputs and outputs are stored separately in [execution history](/enterprise/collaboration-devops/workflow-executions) so the audit log stays focused on privileged administrative actions, not data flow.
+
+## Retention and export
+
+- Audit entries persist in your operational database alongside the rest of ByteChef's state.
+- Export to your SIEM (Splunk, Datadog, Elastic, Sumo) via the [observability pipeline](/enterprise/governance-security/observability) — every entry is also emitted as a structured log so your existing log analytics stack inherits the audit trail.
+- Retention policy is configurable per workspace.
+
+## Forensic patterns
+
+Common queries the audit log makes trivial:
+
+- *"Who promoted the broken build to PRODUCTION last night?"* — filter by `ENVIRONMENT_PROMOTION` between two timestamps.
+- *"Did anyone change the Stripe API key in the last 90 days?"* — filter by target = the Stripe connection, action = `CONNECTION_UPDATED`.
+- *"What did this departed contractor touch in their last week?"* — filter by actor, group by correlation ID.

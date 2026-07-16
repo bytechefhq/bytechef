@@ -1,0 +1,67 @@
+---
+title: Add Documents
+description: Upload files and follow them through the chunk-and-embed processing pipeline.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+Open a knowledge base and use the **Documents** tab to upload files. You can drag and drop
+or browse, and you can select multiple files at once. Each file is uploaded, then processed
+in the background.
+
+## Supported file types
+
+Text is extracted from common document and data formats:
+
+- **Documents** — PDF, DOC, DOCX, TXT, MD, HTML
+- **Presentations** — PPT, PPTX
+- **Spreadsheets / data** — CSV, XLS, XLSX
+
+Scanned PDFs and image-only pages are run through OCR before text extraction, so a PDF that
+is really a photo of a page still becomes searchable.
+
+## Storage limits
+
+> **Coming soon.** Storage limits are on the upcoming release track and are not yet enforced in the latest released version of ByteChef.
+
+The total size of all knowledge base documents in a tenant is capped — by default at **1 GB**.
+Uploads that would exceed the cap are rejected with a limit-exceeded error until documents are
+deleted. Self-hosted administrators can change or remove the cap with the
+[`BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES`](/self-hosting/configuration/environment-variables#ai-knowledge-base-configuration)
+environment variable (`0` = unlimited).
+
+## The processing lifecycle
+
+Every document moves through a small set of states, shown as a status on each row in the
+Documents tab:
+
+| Status | Meaning |
+| --- | --- |
+| **Uploaded** | The file has been received and is queued for processing. |
+| **Processing** | Text is being extracted, chunked, and embedded. |
+| **Ready** | The document is fully indexed and searchable. |
+| **Error** | Processing failed — hover the row to see the reason. |
+
+A document only contributes to [search](/automation/knowledge-base/search) results once it
+reaches **Ready**. Large files and OCR-heavy PDFs take longer; the status updates as
+processing completes.
+
+<Callout title="Re-processing">
+  Deleting and re-uploading a document re-runs the full pipeline with the knowledge base's
+  current chunk settings. This is how you re-chunk older documents after changing those
+  settings.
+</Callout>
+
+## Tagging documents
+
+Documents can be tagged individually. Tags are the unit of retrieval filtering: a workflow
+or agent can be pointed at only the documents carrying a given tag. Tag consistently if you
+plan to keep distinct content (for example `policy`, `product`, `legal`) in one knowledge
+base but retrieve from each independently.
+
+## Keeping documents in sync automatically
+
+Uploading files by hand is fine for static reference material. For content that lives in
+another system and changes over time — a database table, a CMS, a help center — configure a
+[source](/automation/knowledge-base/sources) instead, and ByteChef will keep the knowledge
+base up to date on a schedule.

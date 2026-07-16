@@ -1,0 +1,80 @@
+---
+title: "MCP Integration"
+description: "Expose your workflows as Model Context Protocol tools to Claude, Cursor, Windsurf, or any MCP-aware client."
+---
+
+> **Coming soon.** MCP integration is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+The **Model Context Protocol (MCP)** is the emerging standard for letting LLM agents call external tools. ByteChef Enterprise exposes its workflows as MCP tools, which turns every workflow you've built into an action your agent can take.
+
+## What this unlocks
+
+Without MCP, agents reach external systems via raw HTTP — auth juggling, error handling, retry logic, schema discovery, all on the agent side. With MCP, agents discover and invoke tools through a typed, standardized protocol.
+
+ByteChef's MCP server takes this further: it doesn't just expose tools, it exposes **your already-built, audited, version-controlled, environment-aware workflows** as tools.
+
+```
+┌──────────────┐         MCP        ┌──────────────────────┐
+│ Claude /     │  ◄───────────────▶ │ ByteChef MCP server  │
+│ Cursor /     │                    └──────┬───────────────┘
+│ Windsurf /   │                           │
+│ any MCP      │                           │ exposes
+│ client       │                           ▼
+└──────────────┘                  ┌────────────────────────┐
+                                  │ Your workflows         │
+                                  │ Your connections       │
+                                  │ Your governance        │
+                                  └────────────────────────┘
+```
+
+## What gets exposed
+
+Each workflow that you mark as MCP-callable becomes an MCP tool with:
+
+- **A name and description** generated from the workflow metadata.
+- **An input schema** matching the workflow's input definition.
+- **An output schema** matching the workflow's output definition.
+- **Execution semantics** — the agent's tool call kicks off a real workflow execution, which can include long-running steps, suspensions, retries.
+
+When the agent invokes the tool:
+
+- ByteChef runs the workflow as it would for any other trigger.
+- All the [audit log](/enterprise/governance-security/audit-log), [observability](/enterprise/governance-security/observability), and [execution history](/enterprise/collaboration-devops/workflow-executions) machinery applies.
+- The credentials the workflow uses live in [encrypted credential storage](/enterprise/governance-security/encrypted-credentials) — the agent never sees them.
+
+## Why this is the right surface for agents
+
+Agents calling raw APIs is what people did before MCP. The problem: every agent reinvents auth, retry, idempotency, error parsing, and observability. Exposing workflows instead means:
+
+- **Auth lives once**, in connections, governed by your team.
+- **Retries and error handling** are built into the workflow, not the agent.
+- **Observability** is uniform — every agent tool call is a workflow execution you can debug.
+- **Permissions** flow through [RBAC](/enterprise/governance-security/rbac) — an agent only sees the tools its principal is allowed to call.
+- **Updates** ship via the [build/deploy lifecycle](/enterprise/collaboration-devops/build-once-deploy-many) — change the tool's behavior by promoting a new workflow version.
+
+## Compatible clients
+
+Any MCP-aware client works:
+
+- **Claude Desktop** and **Claude Code**.
+- **Cursor**.
+- **Windsurf**.
+- **Custom agents** built with the Anthropic SDK, OpenAI Agents SDK, LangChain MCP adapters, or the [Claude Agent SDK](https://docs.anthropic.com/en/api/agent-sdk).
+
+## Embedded MCP
+
+For SaaS products using the [embedded iPaaS](/embedded/white-label-execution), MCP can be exposed per-tenant — see [Embedded MCP](/embedded/embedded-mcp). Your customers' agents call your customers' integrations, never crossing tenant boundaries.
+
+## Configuration
+
+Enable the MCP server:
+
+```
+BYTECHEF_AI_MCP_SERVER_ENABLED=true
+```
+
+Mark workflows as MCP-callable from the workflow settings panel. Clients connect to the MCP server endpoint with the appropriate auth.
+
+## Related
+
+- [Platform → MCP server](/platform/mcp-server) — the broader MCP story across the platform.

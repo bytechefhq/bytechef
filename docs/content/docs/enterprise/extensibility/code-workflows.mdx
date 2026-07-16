@@ -1,0 +1,37 @@
+---
+title: "Code Workflows"
+description: Define whole workflows in Java, JavaScript, Python, or Ruby instead of the visual editor.
+---
+
+> **Coming soon.** Code workflows are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
+A **code workflow** is a workflow defined entirely in code — you upload an artifact (a Java jar, or a JavaScript / Python / Ruby script) and ByteChef runs it as a workflow, with the same execution engine, connections, and monitoring as visually built workflows.
+
+## When to use one
+
+- The logic is easier to express (and review) as code than as a node graph — heavy branching, data structures, algorithms.
+- Your team wants workflows to live in Git with pull-request review — see [Git-backed change tracking](/enterprise/collaboration-devops/git-backed-change-tracking).
+- You're generating workflows programmatically.
+
+## Languages
+
+| Language | Artifact | Notes |
+|---|---|---|
+| Java | jar | Compiled against the ByteChef workflow SDK. |
+| JavaScript / Python / Ruby | script file | Run on the GraalVM polyglot runtime, like [Polyglot scripting](/enterprise/extensibility/polyglot-scripting) steps. |
+
+## Shipping a code workflow
+
+Code workflows are deployed programmatically — the natural home is your CI pipeline: build the artifact, then push it through the [Automation API](/openapi/automation), which manages code-based projects end to end (create the project, upload the workflow artifact, publish, enable).
+
+Working starter projects live in the samples repository:
+
+- [Java code workflow sample](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-automation-sample-code-workflow-java)
+- [JavaScript code workflow sample](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-automation-sample-code-workflow-javascript)
+
+## Hardening controls
+
+Administrators can restrict how Java code workflows are handled — the same pair of controls as [custom components](/enterprise/extensibility/custom-components#hardening-options-for-java-uploads):
+
+- `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED=false` rejects new Java code-workflow uploads while script languages and previously uploaded artifacts keep working.
+- `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER=ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader.

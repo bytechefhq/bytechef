@@ -1,0 +1,74 @@
+---
+title: "Connection Visibility"
+description: "Control who can see a connection exists — PRIVATE, WORKSPACE, or ORGANIZATION — so credential sharing is an explicit, audited action instead of an out-of-band Slack DM."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+[Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) protects the secret material. **Visibility** controls something different: who can even see that a connection exists and reuse it. Without an explicit sharing model, credentials leak out-of-band — Slack DMs, shared docs, test workflows that "temporarily" become production. Connection visibility makes every widening of access an explicit, governed, audited action.
+
+<Callout type="warn" title="Coming soon">
+  Connection visibility is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+</Callout>
+
+<Callout type="info">
+  Connection visibility is an **Enterprise, automation-edition** feature. In the Community edition every connection is `PRIVATE`. In an [embedded](/embedded/white-label-execution) deployment connections are always `PRIVATE` (server-enforced), because each connected end-user owns their own credentials.
+</Callout>
+
+## The three scopes
+
+A connection has exactly one scope at a time. You widen access by **promoting** and narrow it by **demoting**. The hierarchy is `PRIVATE < WORKSPACE < ORGANIZATION`.
+
+| Scope | Who can see it | Typical use |
+|---|---|---|
+| **PRIVATE** | Just the creator | A personal sandbox connection — your own dev token. |
+| **WORKSPACE** | All members of the workspace | A shared infra credential used across projects — the workspace's central Postgres. |
+| **ORGANIZATION** | Every workspace in the organization | A corp-wide identity provider key or shared observability token. |
+
+## Who can change scope
+
+- Anyone can create a `PRIVATE` connection.
+- **Promotion is an admin action.** Promoting a connection to `WORKSPACE` requires the workspace admin role (`ROLE_ADMIN`). The connection-create dialog only offers `WORKSPACE` to admins; non-admins can create only `PRIVATE` connections.
+- **The creator can always demote their own connection back to `PRIVATE`.** This is an orphan-recovery path: if every admin loses their role, the person who created a promoted connection can still pull it back in. Demotion is therefore allowed for an admin **or** the connection's creator.
+- **`ORGANIZATION` is managed through the organization-scoped surface** and is terminal — organization connections are deleted rather than demoted.
+
+Every promotion and demotion is recorded in the [audit log](/enterprise/governance-security/audit-log) with the before/after scope.
+
+## Managing visibility
+
+In the automation UI, visibility is surfaced in three places:
+
+- A **scope badge** on each connection showing its current visibility.
+- A **visibility selector** in the connection-create dialog (admins see the full set; non-admins see `PRIVATE` only).
+- A **promote / demote** menu on the connection list, available to admins (plus the creator's own demote).
+
+The underlying operations are exposed as GraphQL mutations:
+
+| Mutation | Effect |
+|---|---|
+| `promoteConnectionToWorkspace` | `PRIVATE` → `WORKSPACE`. |
+| `demoteConnectionToPrivate` | Any scope → `PRIVATE`. Admin **or** creator. |
+| `promoteAllPrivateConnectionsToWorkspace` | Migration helper (Community → Enterprise); bulk-promotes a workspace's private connections. |
+
+### Bulk operations report partial results
+
+`promoteAllPrivateConnectionsToWorkspace` returns a structured result — `{ promoted, skipped, failed, failures }` — so a partial failure surfaces to the caller instead of bailing on the first error. `skipped` counts benign races where a connection was already at the target visibility, so the UI can report "N promoted, M skipped" rather than treating those as failures.
+
+## How it composes with the rest of the model
+
+- **With [RBAC](/enterprise/governance-security/rbac).** Visibility controls *who can see the connection*; RBAC controls *what they can do with it*. A user needs access to the workspace (or org) **and** the right credential-level permission — the two checks are independent and both apply.
+- **With encryption.** Visibility governs who can *use* a connection; it says nothing about where the secret lives. The secret is still encrypted at rest with the [workspace-scoped key](/enterprise/governance-security/encrypted-credentials), regardless of scope.
+
+## What gets audited
+
+Each scope change is captured with the actor, timestamp, and before/after visibility:
+
+| Event | When |
+|---|---|
+| `CONNECTION_PROMOTED` | A connection moved to a wider scope. |
+| `CONNECTION_DEMOTED` | A connection moved to a narrower scope. |
+| `CONNECTION_REASSIGNED` | A connection's owner was changed. |
+
+## Metrics
+
+`bytechef_connection_create` (counter) increments on every successful workspace connection creation, tagged `visibility=PRIVATE|WORKSPACE`, so you can watch how much credential sharing actually happens versus how much stays private.

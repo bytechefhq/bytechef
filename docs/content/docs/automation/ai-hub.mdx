@@ -1,0 +1,53 @@
+---
+title: AI Hub
+description: The workspace's AI surface — conversations with the assistant, personal agents, and workflow chats in one place.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+import {Card, Cards} from "fumadocs-ui/components/card";
+import {Bot, MessageSquare, Sparkles} from "lucide-react";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    The AI Hub is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+</Callout>
+
+{/* TODO screenshot: AI Hub home — conversations sidebar on the left (grouped by kind), an open assistant conversation in the main panel, composer at the bottom */}
+
+The **AI Hub** is the conversational home of your automation workspace. It gathers every way you talk to AI in ByteChef — the general-purpose assistant, your saved personal agents, and chat-enabled workflows — into one sidebar of conversations, with shared attachments, memory, and model selection.
+
+## What lives in the AI Hub
+
+<Cards>
+  <Card icon={<Sparkles className="text-purple-300" />} title="Assistant conversations">
+    Chat with the workspace assistant: ask questions, research, generate images and slides, read data tables and knowledge bases, run workflows — each conversation keeps its own history.
+  </Card>
+  <Card icon={<Bot className="text-blue-300" />} title="Personal Agents" href="/automation/personal-agents">
+    Saved instruction sets you chat with as focused assistants, with optional schedules that run them unattended.
+  </Card>
+  <Card icon={<MessageSquare className="text-green-300" />} title="Workflow Chats" href="/automation/workflow-chats">
+    Conversations bound to a chat-enabled workflow — a message triggers the workflow and the reply streams back.
+  </Card>
+</Cards>
+
+## Working in a conversation
+
+{/* TODO screenshot: conversation composer close-up — model picker dropdown open showing catalog models, microphone and attachment buttons visible */}
+
+- **Model picker** — choose which activated [AI provider](/platform/ai-providers) and model answers each conversation; different conversations can run on different models.
+- **Attachments and files** — upload files into a conversation, and open anything the assistant produces (files, charts, data tables, knowledge bases, workflow executions, workflows) in a viewer panel beside the chat.
+- **Voice** — the microphone button in the composer starts a spoken interaction instead of typing.
+- **Memories** — durable facts the assistant learns are saved automatically and listed on the **Memories** page, where you can review and delete them. The same auto-memory capability is available inside workflow [AI Agents](/platform/ai/agent) via the Agent Utils **Auto Memory** tool, scoped to the deployment instead of the user.
+- **Skills** — type `/` at the start of the composer to open a picker over your [skills](/platform/ai/agent/skills) (the same set as the **AI → Skills** page); selecting one inserts `/skill-name` and the assistant consults that skill's content to steer the run.
+- **Tasks sidebar** — every conversation is listed in the collapsible sidebar, grouped by kind, so you can return to or archive past threads.
+
+## Enabling the AI Hub
+
+The AI Hub is an Enterprise Edition surface, disabled by default:
+
+```
+BYTECHEF_AI_HUB_ENABLED=true
+```
+
+It uses the models you activate in [AI Providers](/platform/ai-providers), so at least one chat provider must be configured for the environment.

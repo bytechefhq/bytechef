@@ -1,0 +1,51 @@
+---
+title: Create a Knowledge Base
+description: Name a knowledge base and tune how its documents are split into chunks.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+Open **Automation → Knowledge Base** and click **New Knowledge Base**. The create dialog
+asks for a name, an optional description, and the chunking settings that control how every
+document added to this knowledge base is split before it is embedded.
+
+## Fields
+
+| Field | What it controls |
+| --- | --- |
+| **Name** | The display name shown in the list and selected from workflow steps. |
+| **Description** | Optional free text to help your team understand what's inside. |
+| **Min chunk size (characters)** | The smallest a chunk may be before it's merged with a neighbor. Defaults to `100`. |
+| **Max chunk size (tokens)** | The upper bound on a single chunk. Defaults to `1024`. |
+| **Overlap (tokens)** | How many tokens each chunk repeats from the previous one so context isn't lost at the boundary. Defaults to `200`. |
+
+You can upload documents directly in the create dialog, or create the knowledge base empty
+and [add documents](/automation/knowledge-base/add-documents) later.
+
+## Choosing chunk settings
+
+Chunking is a trade-off between precision and context:
+
+- **Smaller chunks** return more precise matches but may cut an idea in half.
+- **Larger chunks** preserve more surrounding context but dilute relevance scores and cost
+  more tokens when passed to a model.
+- **Overlap** softens the boundaries so a sentence split across two chunks still appears in
+  full in at least one of them.
+
+The defaults (min `100` chars, max `1024` tokens, overlap `200` tokens) work well for prose
+documents such as PDFs, Markdown, and help-center articles. Raise the max chunk size for
+long-form reference material where whole sections should stay together; lower it for dense,
+fact-dense content such as FAQs.
+
+<Callout type="warn" title="Chunk settings apply at ingestion">
+  Chunk settings are applied when a document is processed. Changing them affects documents
+  added afterward — re-upload existing documents if you want them re-chunked with the new
+  values.
+</Callout>
+
+## Tags
+
+Knowledge bases and their documents can be tagged. Tags let you filter the list and, more
+importantly, narrow retrieval at query time — an agent can be restricted to documents
+tagged `policy` while ignoring everything else in the same knowledge base. See
+[Use it in workflows & agents](/automation/knowledge-base/use-in-workflows#filtering-by-tag).

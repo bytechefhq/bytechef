@@ -3,6 +3,8 @@ title: Evals
 description: Test and evaluate your AI agents with scenario-based evaluations and automated judges
 ---
 
+> **Coming soon.** AI agent Evals are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
 The Evals section is your command center for testing and evaluating AI agent performance. Located in the **Evals** tab within the AI Agent node editor, Evals enables you to create tests, define evaluation criteria (judges), run automated evaluations, and review detailed results — all without manual testing.
 
 ![Evals panel overview](evals/evals-overview.png)

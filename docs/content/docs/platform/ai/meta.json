@@ -4,6 +4,8 @@
   "description": "Build, evaluate, and protect AI agents in ByteChef",
   "icon": "Sparkles",
   "pages": [
-    "agent"
+    "agent",
+    "agentic-ai",
+    "agentic-patterns"
   ]
 }

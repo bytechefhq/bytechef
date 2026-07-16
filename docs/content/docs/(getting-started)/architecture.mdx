@@ -9,7 +9,7 @@ ByteChef is built on a scalable, modular architecture designed to handle enterpr
 
 The ByteChef platform is composed of several interconnected layers that work together to deliver workflow automation capabilities.
 
-**API & Integration Layer** : This layer handles communication with external services and applications. It provides comprehensive REST and GraphQL APIs that allow seamless integration with over 500+ pre-built connectors and custom integrations through our component system.
+**API & Integration Layer** : This layer handles communication with external services and applications. It provides comprehensive REST and GraphQL APIs that allow seamless integration with over 200+ pre-built connectors and custom integrations through our component system.
 
 **Workflow Engine** : The core execution engine processes workflow definitions, manages task execution, handles data transformations, and orchestrates component interactions. It supports parallel execution, conditional branching, looping, and error handling.
 
@@ -60,7 +60,7 @@ ByteChef connects applications through a standardized component model.
 
 **Connection Management** : Securely stores API credentials, OAuth tokens, and authentication details. Supports multiple authentication methods (API keys, OAuth 2.0, Basic Auth, custom).
 
-**Component Interface** : Standardized interface that all components implement, ensuring consistency across 500+ integrations. Each component defines its actions, triggers, and required properties.
+**Component Interface** : Standardized interface that all components implement, ensuring consistency across 200+ integrations. Each component defines its actions, triggers, and required properties.
 
 **Data Mapping** : Powerful expression engine allows transforming and mapping data between components. Supports JavaScript expressions, field references, and utility functions for data manipulation.
 
@@ -82,9 +82,9 @@ ByteChef is designed to handle enterprise-scale automation demands.
 
 Security is built into every layer of the platform.
 
-**Authentication** : Supports multiple authentication methods including OAuth 2.0, API keys, and single sign-on (SSO) integration.
+**Authentication** : Supports multiple authentication methods including OAuth 2.0, API keys, social login, and single sign-on (SSO) integration (Enterprise Edition).
 
-**Authorization** : Fine-grained RBAC (Role-Based Access Control) allows controlling what users can access and modify at the project and workflow levels.
+**Authorization** : RBAC (Role-Based Access Control) with workspace-scoped roles controls what users can access and modify.
 
 **Data Protection** : Credentials are encrypted at rest and in transit. Sensitive data in logs is masked. Audit logs track all actions for compliance.
 
@@ -152,4 +152,4 @@ The modular, layered architecture provides several advantages.
 
 ---
 
-For information on deploying ByteChef in your specific environment, see the [Deployment](/deployment/environment_variables) section. For details on building custom integrations, visit the [Developer Guide](/developer-guide).
+For information on deploying ByteChef in your specific environment, see the [Self-Hosting](/self-hosting/configuration/environment-variables) section. For details on building custom integrations, visit the [Developer Guide](/developer-guide).

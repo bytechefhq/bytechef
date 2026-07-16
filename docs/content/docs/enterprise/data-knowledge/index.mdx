@@ -1,0 +1,50 @@
+---
+title: "Data & Knowledge Overview"
+description: "The data substrate that makes AI agents trustworthy — structured workflow state plus RAG, both on the Postgres you already operate."
+---
+
+This is the layer that lets your agents reason over **your** data instead of the public internet's. It covers the two stores most production workflows want but most teams don't want to stand up separately: a structured store for workflow state (lookups, queues, feature flags) and a vector store for RAG. Both live in Postgres, so there's no new service to provision, monitor, patch, or pay a per-seat fee for.
+
+## Mental model
+
+```
+                                  Workflow / Agent
+                                        │
+                  ┌─────────────────────┼───────────────────────┐
+                  ▼                     ▼                       ▼
+          ┌──────────────┐    ┌──────────────────┐    ┌──────────────────┐
+          │ Data tables  │    │  Knowledge base  │    │ Connections      │
+          │ (CRUD state) │    │  (RAG / pgvector)│    │ (external APIs)  │
+          └──────┬───────┘    └─────────┬────────┘    └────────┬─────────┘
+                 │                      │                      │
+                 └──────────┬───────────┘                      │
+                            ▼                                  ▼
+                       Postgres                          Live source-of-truth
+                  (structured + vector)                   (Salesforce, etc.)
+```
+
+The split is intentional: **data tables** for state your workflows own and mutate; **knowledge base** for semi-static content your agents read over; **connections** for live source-of-truth systems you don't own. An agent that needs "current state of order #4521" goes through a connection; an agent that needs "the contract clause on early termination" goes through the knowledge base; an agent that needs "the per-account routing rule we configured for Acme" goes through a data table.
+
+## What's in this pillar
+
+| Capability | Purpose | What it replaces |
+|---|---|---|
+| [Postgres-based knowledge base](/enterprise/data-knowledge/knowledge-base) | RAG on Postgres + pgvector. OCR, chunking, hybrid search, per-workspace isolation. | Pinecone, Weaviate, Chroma |
+| [Bring your own embedding model](/enterprise/data-knowledge/embedding-models) | Open embedding pipeline; swap providers with side-by-side migration, no re-ingest outage. | Hard-coded model choice; full re-indexing on swap |
+| [Embedded data tables](/enterprise/data-knowledge/data-tables) | CRUD UI + API for structured workflow data. Lookup tables, queues, feature flags. | A second Postgres + custom CRUD UI; Airtable for state |
+
+## Why Postgres for both layers
+
+The default reaction to "we need vectors" is to add Pinecone or Weaviate. That works, but it adds a service to operate, a sync to maintain, and another credential surface. For most use cases, **pgvector on the Postgres you already run** is the lower-operational-cost choice — full-text search, structured filtering, and vector similarity all live in one place, queryable in one SQL statement.
+
+The trade-off: pgvector is slower than dedicated vector DBs at extreme scale (tens of millions of chunks per index). For that regime, you'd plug in an external store; for the regime most enterprise knowledge bases live in (hundreds of thousands to a few million chunks), pgvector is fast enough and one fewer thing to break.
+
+## Where agents pick this up
+
+The knowledge base is exposed to agents through the same [cluster element](/enterprise/extensibility/mcp-integration) plumbing as everything else. A retrieval step in a workflow and a tool call from an LLM agent hit the same code path, the same tenancy boundary, and the same observability stack.
+
+## See also
+
+- [Tenant-isolated security](/embedded/tenant-isolated-security) — how knowledge base reads stay scoped per tenant in embedded deployments.
+- [Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) — how the API keys for your embedding provider are stored.
+- [Observability](/enterprise/governance-security/observability) — how embedding latency, token spend, and cache-hit rate get traced.

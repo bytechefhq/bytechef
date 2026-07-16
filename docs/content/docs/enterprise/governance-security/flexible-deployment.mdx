@@ -1,0 +1,112 @@
+---
+title: "Flexible Deployment"
+description: "Self-host ByteChef on your own Kubernetes, run on AWS/GCP/Azure, or deploy hybrid — same binary, your perimeter, your secrets."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+ByteChef Enterprise is distributed as a self-contained binary you deploy on infrastructure you control. The same artifact runs as a single-node monolith for small teams and as a multi-service, horizontally scaled cluster for large-scale tenants. You choose where the data lives, which cloud provider hosts the workloads, and which networks the platform can reach.
+
+## Deployment models
+
+### Monolithic single-node
+
+Run the full platform as a single Spring Boot process. This is the fastest path to a working environment — Postgres, Redis (optional), and the ByteChef JAR are all you need. Use it for evaluation, development environments, and small production tenants.
+
+### Distributed (microservices)
+
+Split the platform into purpose-built services — API gateway, coordinator, scheduler, webhook handler, workers, AI gateway, configuration server, and so on. Each service scales independently behind your chosen message broker.
+
+#### Microservices topology (coming soon)
+
+<Callout type="info">
+  **Status: Coming soon.** The microservices topology is on the near-term roadmap. The service map below reflects the planned architecture.
+</Callout>
+
+The monolithic ByteChef binary is right for evaluation and small production tenants. At scale, the workload profile diverges: schedulers need leader election, webhook handlers need a CDN-grade ingress, AI traffic needs a separate budget envelope, and worker pools need to scale on a different signal than the API surface.
+
+```
+                        ┌──────────────────┐
+                        │   API Gateway    │ ──── routes ──┐
+                        └──────────────────┘                │
+                                                            │
+       ┌────────────────────┬─────────────┬────────────────┤
+       ▼                    ▼             ▼                ▼
+┌────────────┐    ┌────────────────┐  ┌────────────┐  ┌──────────┐
+│ Webhook    │    │ Configuration  │  │ Connection │  │ Execution│
+│ App        │    │ App            │  │ App        │  │ App      │
+└─────┬──────┘    └────────────────┘  └────────────┘  └─────┬────┘
+      │                                                      │
+      └──────► message broker ◄───────────────────────────────┘
+                       │
+            ┌──────────┴─────────┬──────────────────┬─────────────┐
+            ▼                    ▼                  ▼             ▼
+      ┌──────────┐         ┌────────────┐    ┌─────────┐  ┌──────────┐
+      │ Coord-   │         │ Scheduler  │    │ Worker  │  │ Worker   │
+      │ inator   │         │ App        │    │ App     │  │ Pool N   │
+      └──────────┘         └────────────┘    └─────────┘  └──────────┘
+                                                                │
+                                                                ▼
+                                                          ┌──────────┐
+                                                          │ AI       │
+                                                          │ Gateway  │
+                                                          └──────────┘
+```
+
+| Service | Responsibility |
+|---|---|
+| **API Gateway** | Public entry point; auth, rate limit, routing to internal services. |
+| **Configuration App** | CRUD for workspaces, projects, workflows, environments. |
+| **Connection App** | Connection lifecycle, credential storage, scope enforcement. |
+| **Webhook App** | Public webhook ingress; high QPS, stateless. |
+| **Scheduler App** | Cron and time-based triggers; leader-elected. |
+| **Coordinator App** | Decomposes workflow runs into tasks; dispatches to workers. |
+| **Execution App** | Persists execution history, surfaces it via API. |
+| **Worker App** | Executes individual tasks (one per component invocation). |
+| **AI Gateway App** _(planned)_ | Routes AI model calls; centralizes API keys, quotas, observability. Not yet shipped — AI traffic currently flows through the per-service AI configuration. |
+| **AI Copilot App** | Workflow-assistance LLM endpoints. |
+| **Config Server App** | Spring Cloud Config; centralizes service configuration. |
+| **Runtime Job App** | On-demand, single-shot workflow execution — boots, runs one workflow, exits. No database; configured via arguments and environment variables. See [Runtime Job](/enterprise/scale-reliability/runtime-job). |
+
+The split lines are drawn around **scaling signals** and **failure domains**, not arbitrary feature grouping: workers scale on CPU and concurrency (typically the largest pool); the Webhook App scales on incoming QPS; the Scheduler App needs leader election (single-leader semantics in a small pool); the AI Gateway App has expensive, slow upstream calls and is bulkheaded so a provider outage can't take down the rest of the platform; the API Gateway is the perimeter — separate auth/ACL surface from internal services.
+
+What stays unified across monolith and microservices: the database schema, the component model, the workflow definition, and the [observability pipeline](/enterprise/governance-security/observability). A component definition and a workflow JSON run identically regardless of topology.
+
+### Hybrid
+
+Mix and match: run the control plane (API, coordinator, scheduler) in one environment and worker fleets closer to your data — for example, on-prem workers that execute workflows against internal systems while the control plane runs in your cloud account.
+
+## Supported substrates
+
+| Substrate | Recommended for | Notes |
+|---|---|---|
+| **Kubernetes** | Production deployments of any size | A Helm chart for the monolith topology is provided; per-service microservice charts are coming soon. |
+| **Docker / Docker Compose** | Dev, demo, and small production | Reference `docker-compose.yml` and `docker-compose.dev.server.yml` files are shipped with the platform. |
+| **AWS** | Cloud-native deployments on AWS | EC2 + Helm on EKS; native integration with SQS, S3, Secrets Manager (coming soon), and EventBridge. |
+| **GCP** | Cloud-native deployments on GCP | Helm on GKE; Postgres on Cloud SQL. |
+| **Azure** | Cloud-native deployments on Azure | Helm on AKS; Postgres on Azure Database for PostgreSQL. |
+| **Hybrid / on-prem** | Regulated environments | Run workers behind your perimeter while consuming SaaS-hosted control plane (or vice versa). |
+| **DigitalOcean** | Small to mid-size deployments | Reference deployment available. |
+
+## What "your perimeter, your secrets" actually means
+
+- **No outbound dependency on a vendor control plane.** Enterprise does not phone home for licensing checks at runtime. License validation is local.
+- **Credentials never leave your network.** Connection credentials are stored in your database, encrypted with keys you provide.
+- **Telemetry is opt-in and points at your stack.** OpenTelemetry, logs, and metrics stream to the endpoints you configure ([Observability](/enterprise/governance-security/observability)).
+- **AI traffic is routable.** When you wire in an AI gateway, you control which models receive prompts and where the keys are stored.
+
+## Helm charts
+
+The Helm chart for the monolith deployment lives under `kubernetes/helm/bytechef-monolith/`. Per-service charts for the microservices topology are on the near-term roadmap; until they ship, deploy the individual service images with your own manifests. The monolith chart covers:
+
+- Pod sizing and HPA defaults per service
+- ConfigMaps and Secrets for environment variables
+- Liquibase migration jobs that run before the first pod starts
+- Service accounts and RBAC rules
+- Optional sidecars for log shippers and OpenTelemetry collectors
+
+## Quick references
+
+- [Self-Hosting guide](/self-hosting) — concrete install steps for each substrate.
+- [Environment variables](/self-hosting/configuration/environment-variables) — every knob the platform exposes.
+- [Architecture](/architecture) — the layered architecture you're deploying.

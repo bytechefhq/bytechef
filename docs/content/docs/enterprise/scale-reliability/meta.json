@@ -1,0 +1,11 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "distributed-scheduler",
+    "message-brokers",
+    "cloud-native-storage",
+    "multi-tenant-isolation",
+    "horizontal-scaling",
+    "runtime-job"
+  ]
+}

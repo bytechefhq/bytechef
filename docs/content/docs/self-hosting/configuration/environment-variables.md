@@ -7,32 +7,57 @@ ByteChef can be configured using environment variables. This page documents all 
 
 ## AI Copilot Configuration
 
+> **Coming soon.** The AI Copilot is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_COPILOT_ENABLED` | Enable or disable the AI copilot feature | `false` |
 | `BYTECHEF_AI_COPILOT_PROVIDER` | Chat-model provider to prefer for Copilot — accepts the short provider name (e.g. `anthropic`, `openAi`) or the full catalog key (e.g. `ai.provider.anthropic`), case-insensitively; unrecognized values fall back to auto-detection. In CE it overrides auto-detection from the configured provider API keys/endpoints. In EE it is used as the environment default provider when set, provided that provider is enabled and has a configured chat model (`BYTECHEF_AI_PROVIDER_CHAT_<PROVIDER>_OPTIONS_MODEL`); otherwise Copilot falls back to the first enabled chat provider. A per-turn model picked in the Copilot toolbar always overrides this. | - |
-| `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_PROVIDER` | Embedding provider for the Copilot documentation index (OLLAMA, OPENAI) | - |
-| `BYTECHEF_AI_COPILOT_DOCS_EMBEDDING_APIKEY` | API key for the Copilot documentation embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
+| `BYTECHEF_AI_COPILOT_EMBEDDING_PROVIDER` | Embedding provider for the Copilot vector index (OLLAMA, OPENAI) | - |
+| `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` | API key for the Copilot embedding provider — OpenAI only; Ollama runs locally and needs none (sensitive) | - |
 
 ## AI Firecrawl Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_FIRECRAWL_APIKEY` | Firecrawl API key (sensitive) | - |
-| `BYTECHEF_AI_FIRECRAWL_BASEURL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
+| `BYTECHEF_AI_FIRECRAWL_API_KEY` | Firecrawl API key (sensitive) | - |
+| `BYTECHEF_AI_FIRECRAWL_BASE_URL` | Firecrawl API base URL | `https://api.firecrawl.dev/v2` |
 | `BYTECHEF_AI_FIRECRAWL_ENABLED` | Enable or disable Firecrawl | `false` |
+
+## AI Gateway Configuration
+
+> **Coming soon.** The AI Gateway is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_GATEWAY_ENABLED` | Enable or disable the AI Gateway | `false` |
+| `BYTECHEF_AI_GATEWAY_OTLP_MAX_SPANS_PER_REQUEST` | Maximum spans accepted in a single OTLP request body. Requests exceeding this return HTTP 413. | `1000` |
+| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_ENABLED` | Enable or disable AI Gateway rate limiting | `false` |
+| `BYTECHEF_AI_GATEWAY_RATE_LIMITING_PROVIDER` | Rate limiting provider | - |
+| `BYTECHEF_AI_GATEWAY_EXTERNAL_SCORES_MAX_BATCH_SIZE` | Maximum scores accepted in a single batch POST. Requests exceeding this return HTTP 413. | `1000` |
+
+## AI Hub Configuration
+
+> **Coming soon.** The AI Hub is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_AI_HUB_ENABLED` | Enable or disable the AI Hub surface (REST/GraphQL controllers, JDBC repositories, service beans) | `false` |
 
 ## AI Knowledge Base Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_AI_KNOWLEDGEBASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
-| `BYTECHEF_AI_KNOWLEDGEBASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
-| `BYTECHEF_AI_KNOWLEDGEBASE_OCR_MISTRAL_APIKEY` | Mistral OCR API key (sensitive) | - |
-| `BYTECHEF_AI_KNOWLEDGEBASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
-| `BYTECHEF_AI_KNOWLEDGEBASE_SUBSCRIPTIONS_DOCUMENT_CHUNK_UPDATE_EVENTS` | Number of subscribers for document chunk update events | `1` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Enable or disable knowledge base AI features | `false` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_MAX_SIZE_BYTES` | Maximum total size in bytes of all knowledge base documents in a tenant. `0` means unlimited. *Coming soon — upcoming release* | `1073741824` (1 GB) |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | OCR provider for knowledge base documents (NONE, AZURE, MISTRAL) | `NONE` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_MISTRAL_API_KEY` | Mistral OCR API key (sensitive) | - |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_PROCESS_EVENTS` | Number of subscribers for document process events | `1` |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_SUBSCRIPTIONS_DOCUMENT_CHUNK_UPDATE_EVENTS` | Number of subscribers for document chunk update events | `1` |
 
 ## AI MCP Server Configuration
+
+> **Coming soon.** The MCP server is on the upcoming release track and is not yet available in the latest released version of ByteChef.
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
@@ -43,29 +68,22 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_AI_MEMORY_PROVIDER` | Memory storage provider for chat-style interactions (AWS, IN_MEMORY, JDBC, REDIS) | `JDBC` |
-| `BYTECHEF_AI_MEMORY_AWS_BUCKETPREFIX` | Prefix used to derive the per-tenant S3 bucket name (provider `AWS`) | `bytechef-chat-memory` |
-| `BYTECHEF_AI_MEMORY_AWS_REGION` | AWS region for S3-backed chat memory (provider `AWS`) | - |
-| `BYTECHEF_AI_MEMORY_AWS_ACCESSKEYID` | AWS access key ID for S3-backed chat memory (sensitive) | - |
-| `BYTECHEF_AI_MEMORY_AWS_SECRETACCESSKEY` | AWS secret access key for S3-backed chat memory (sensitive) | - |
-| `BYTECHEF_AI_MEMORY_AWS_KEYPREFIX` | Key prefix prepended to every stored object key (provider `AWS`) | - |
 
 ## AI Provider API Keys
 
 | Environment Variable                        | Description | Default Value |
 |---------------------------------------------|---|---|
-| `BYTECHEF_AI_PROVIDER_ANTHROPIC_APIKEY`     | Anthropic API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_APIKEY`  | Azure OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`     | Anthropic API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_API_KEY`  | Azure OpenAI API key (sensitive) | - |
 | `BYTECHEF_AI_PROVIDER_AZURE_OPENAI_ENDPOINT` | Azure OpenAI resource endpoint, e.g. `https://my-resource.openai.azure.com` | - |
-| `BYTECHEF_AI_PROVIDER_DEEP_SEEK_APIKEY`     | DeepSeek API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_GROQ_APIKEY`          | Groq API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_MISTRAL_APIKEY`       | Mistral API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_NVIDIA_APIKEY`        | NVIDIA API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_OLLAMA_APIKEY`        | Ollama API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_OLLAMA_URL`           | Ollama server base URL; fallback for chat and embedding models (defaults to `http://localhost:11434` when blank) | - |
-| `BYTECHEF_AI_PROVIDER_OPENAI_APIKEY`        | OpenAI API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_PERPLEXITY_APIKEY`    | Perplexity API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_STABILITY_APIKEY`     | Stability API key (sensitive) | - |
-| `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_APIKEY` | Vertex Gemini API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_DEEP_SEEK_API_KEY`     | DeepSeek API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_GROQ_API_KEY`          | Groq API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_MISTRAL_API_KEY`       | Mistral API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_NVIDIA_API_KEY`        | NVIDIA API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY`        | OpenAI API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_PERPLEXITY_API_KEY`    | Perplexity API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_STABILITY_API_KEY`     | Stability API key (sensitive) | - |
+| `BYTECHEF_AI_PROVIDER_VERTEX_GEMINI_API_KEY` | Vertex Gemini API key (sensitive) | - |
 
 ## AI Chat Model Configuration
 
@@ -81,7 +99,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` | Ollama chat model name (e.g., `deepseek-r1:8b`) — no default; the model must be pulled on your Ollama instance | - |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_MODEL` | OpenAI chat model name | `gpt-5.1` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_TEMPERATURE` | OpenAI chat temperature (0.0-2.0) | `1` |
-| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONINGEFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
+| `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effect (NONE, LOW, MEDIUM, HIGH) | `MEDIUM` |
 | `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_VERBOSITY` | OpenAI response verbosity (NONE, LOW, MEDIUM, HIGH) | `LOW` |
 | `BYTECHEF_AI_PROVIDER_CHAT_PERPLEXITY_OPTIONS_MODEL` | Perplexity chat model name | `sonar` |
 | `BYTECHEF_AI_PROVIDER_CHAT_VERTEX_GEMINI_OPTIONS_MODEL` | Vertex Gemini chat model name | `gemini-2.5-pro` |
@@ -115,6 +133,18 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_ANALYTICS_ENABLED` | Enable or disable analytics | `false` |
 
+## Context Store Configuration
+
+> **Coming soon.** The Context Store is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+The Context Store sync engine writes records to Postgres by default (the same database used for the rest of ByteChef). Setting a `CLICKHOUSE_URL` opts the deployment into an alternative ClickHouse backend for record storage; each Context Store source then picks `POSTGRES` or `CLICKHOUSE` at create time. Postgres-backed sources are unaffected by these variables — they continue to use the primary application database.
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_URL` | JDBC URL for the optional ClickHouse server (e.g. `jdbc:clickhouse://host:8123/database`). When unset, the ClickHouse backend is unreachable and the UI hides the backend selector. | - |
+| `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_USERNAME` | ClickHouse username (sensitive) | - |
+| `BYTECHEF_CONTEXT_STORE_CLICKHOUSE_PASSWORD` | ClickHouse password (sensitive) | - |
+
 ## Cache Configuration
 
 | Environment Variable | Description | Default Value |
@@ -135,6 +165,8 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_ENABLED` | Enable uploading of Java (jar) custom components. When disabled, Java custom component uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java custom components continue to work. *Coming soon — upcoming release* | `true` |
+| `BYTECHEF_COMPONENT_CUSTOM_COMPONENT_JAVA_LOADER` | Loader used to run Java custom components (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java custom components inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon — upcoming release* | `CLASS_LOADER` |
 | `BYTECHEF_COMPONENT_REGISTRY_EXCLUDE` | List of components to exclude from registry | - |
 
 ## Coordinator Configuration
@@ -158,7 +190,7 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECKPERIOD` | Trigger polling interval in minutes | `5` |
+| `BYTECHEF_COORDINATOR_TRIGGER_POLLING_CHECK_PERIOD` | Trigger polling interval in minutes | `5` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_APPLICATION_EVENTS` | Number of application event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_COMPLETE_EVENTS` | Number of trigger execution complete event subscribers | `1` |
 | `BYTECHEF_COORDINATOR_TRIGGER_SUBSCRIPTIONS_TRIGGER_EXECUTION_ERROR_EVENTS` | Number of trigger execution error event subscribers | `1` |
@@ -178,7 +210,13 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_DATASTORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_DATA_STORAGE_PROVIDER` | Data storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+
+## Data Table Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES` | Maximum total size in bytes of all data tables in a tenant. `0` means unlimited. *Coming soon — upcoming release* | `52428800` (50 MB) |
 
 ## Discovery Service Configuration
 
@@ -209,21 +247,27 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_FEATUREFLAGS` | List of enabled feature flags | - |
+| `BYTECHEF_FEATURE_FLAGS` | List of enabled feature flags | - |
 
 ## File Storage Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_FILESTORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
-| `BYTECHEF_FILESTORAGE_FILESYSTEM_BASEDIR` | Base directory for filesystem storage | `${user.home}/bytechef/data/file-storage` |
-| `BYTECHEF_FILESTORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
+| `BYTECHEF_FILE_STORAGE_PROVIDER` | File storage provider (AWS, FILESYSTEM, JDBC) | `FILESYSTEM` |
+| `BYTECHEF_FILE_STORAGE_FILESYSTEM_BASE_DIR` | Base directory for filesystem storage | `${user.home}/bytechef/data/file-storage` |
+| `BYTECHEF_FILE_STORAGE_AWS_BUCKET` | AWS S3 bucket name | - |
+
+## GitHub Proxy Configuration
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `GITHUB_PROXY_BASE_URL` | Base URL of the ByteChef GitHub proxy used to fetch pre-built workflow templates. Point it at a private mirror when the instance cannot reach the public proxy. Note: this property is top-level (`github-proxy.baseUrl`), not under the `bytechef.*` prefix. *Coming soon — upcoming release* | `https://github-proxy.bytechef.io/` |
 
 ## Help Hub Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_HELPHUB_ENABLED` | Enable or disable the help hub | `false` |
+| `BYTECHEF_HELP_HUB_ENABLED` | Enable or disable the help hub | `false` |
 
 ## Kafka Configuration
 
@@ -237,7 +281,7 @@ ByteChef can be configured using environment variables. This page documents all 
 | Environment Variable | Description | Default Value |
 |---|---|---|
 | `BYTECHEF_MAIL_AUTH` | Enable mail authentication | `false` |
-| `BYTECHEF_MAIL_BASEURL` | Base URL for mail links | `BYTECHEF_PUBLICURL` |
+| `BYTECHEF_MAIL_BASE_URL` | Base URL for mail links | `BYTECHEF_PUBLIC_URL` |
 | `BYTECHEF_MAIL_DEBUG` | Enable mail debug | `false` |
 | `BYTECHEF_MAIL_FROM` | From email address | `noreply@app.bytechef.io` |
 | `BYTECHEF_MAIL_HOST` | Mail server host | `localhost` |
@@ -253,21 +297,30 @@ ByteChef can be configured using environment variables. This page documents all 
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_MESSAGEBROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
+| `BYTECHEF_MESSAGE_BROKER_PROVIDER` | Message broker provider (AMQP, AWS, JMS, KAFKA, MEMORY, REDIS) | `MEMORY` |
 
 ## OAuth2 Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLICURL/callback` |
+| `BYTECHEF_OAUTH2_REDIRECT_URI` | OAuth2 redirect URI | `BYTECHEF_PUBLIC_URL/callback` |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_ID` | Client ID for predefined OAuth2 app (sensitive) | - |
 | `BYTECHEF_OAUTH2_PREDEFINED_APPS_<APP_NAME>_CLIENT_SECRET` | Client secret for predefined OAuth2 app (sensitive) | - |
+| `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED` | Enable the embedded OAuth2 authorization server. When disabled, the authorization server endpoints and the OAuth2 resource-server support on the MCP endpoints are not exposed | `false` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_URI` | Issuer identifier (`iss` claim / issuer URI) whose JWTs are trusted on the MCP endpoints. Repeat with `_1_`, `_2_`, … for additional issuers | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_TENANT_CLAIM` | JWT claim whose value is the ByteChef tenant id (for the embedded authorization server this is the minted `tenant_id` claim) | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_CLAIM` | JWT claim (e.g. `groups`, `roles`) whose values are mapped to granted authorities. When unset, authorities are resolved from the ByteChef user identified by `sub` | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUTHORITIES_0` | Authority granted to every token from this issuer, in addition to any mapped from the authorities claim | - |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_SELF` | Whether this issuer is the ByteChef embedded authorization server; when `true`, audience validation enforces that a token's `aud` contains the requested MCP endpoint URL | `false` |
+| `BYTECHEF_OAUTH2_RESOURCE_SERVER_ISSUERS_0_AUDIENCE` | For an external issuer, the fixed audience value its tokens must carry. When unset, audience validation is skipped for this issuer | - |
+
+> **Coming soon.** The `BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_*` and `BYTECHEF_OAUTH2_RESOURCE_SERVER_*` variables are on the upcoming release track and are not yet available in the latest released version of ByteChef.
 
 ## Public URL Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_PUBLICURL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
+| `BYTECHEF_PUBLIC_URL` | Public URL of the ByteChef instance | `http://127.0.0.1:8080` |
 
 ## RabbitMQ Configuration
 
@@ -300,13 +353,13 @@ ByteChef can be configured using environment variables. This page documents all 
 |---|---|---|
 | `BYTECHEF_SECURITY_CONTENT_SECURITY_POLICY` | Content Security Policy | `"default-src 'self'; frame-src 'self' https://*.command.ai data:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.command.ai https://*.commandbar.com https://*.i.posthog.com https://cdn.jsdelivr.net https://storage.googleapis.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://*.commandbar.com https://cdn.jsdelivr.net https://*.command.ai https://unpkg.com; img-src 'self' https://*.command.ai data:; font-src 'self' data:; media-src 'self' https://*.command.ai; connect-src 'self' https://*.command.ai https://*.i.posthog.com https://*.commandbar.com; worker-src blob: 'self';"` |
 | `BYTECHEF_SECURITY_REMEMBER_ME_KEY` | Remember Me key (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIALLOGIN_ENABLED` | Enable social login | `false` |
-| `BYTECHEF_SECURITY_SOCIALLOGIN_GOOGLE_CLIENTID` | Google OAuth2 client ID (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIALLOGIN_GOOGLE_CLIENTSECRET` | Google OAuth2 client secret (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIALLOGIN_GITHUB_CLIENTID` | GitHub OAuth2 client ID (sensitive) | - |
-| `BYTECHEF_SECURITY_SOCIALLOGIN_GITHUB_CLIENTSECRET` | GitHub OAuth2 client secret (sensitive) | - |
-| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On | `false` |
-| `BYTECHEF_SECURITY_TWOFACTORAUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_ENABLED` | Enable social login | `false` |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_ID` | Google OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GOOGLE_CLIENT_SECRET` | Google OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_ID` | GitHub OAuth2 client ID (sensitive) | - |
+| `BYTECHEF_SECURITY_SOCIAL_LOGIN_GITHUB_CLIENT_SECRET` | GitHub OAuth2 client secret (sensitive) | - |
+| `BYTECHEF_SECURITY_SSO_ENABLED` | Enable Single Sign-On via an external identity provider (SAML 2.0 / OIDC). Enterprise Edition only; Community Edition supports local login and social login | `false` |
+| `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED` | Enable two-factor authentication | `false` |
 | `BYTECHEF_SECURITY_SYSTEM_USERNAME` | System administrator username | `system_admin` |
 | `BYTECHEF_SECURITY_SYSTEM_PASSWORD` | System administrator password (sensitive) | - |
 
@@ -322,7 +375,7 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_SIGNUP_ACTIVATIONREQUIRED` | Require account activation | `false` |
+| `BYTECHEF_SIGNUP_ACTIVATION_REQUIRED` | Require account activation | `false` |
 | `BYTECHEF_SIGNUP_ENABLED` | Enable sign up | `true` |
 
 ## Tenant Configuration
@@ -341,14 +394,14 @@ System administrator is used for accessing protected data reachable through /act
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_USERGUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials) | `false` |
-| `BYTECHEF_USERGUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | - |
+| `BYTECHEF_USER_GUIDING_ENABLED` | Enable or disable user guiding (in-application tutorials) | `false` |
+| `BYTECHEF_USER_GUIDING_CONTAINER_ID` | Container ID for the UserGuiding SDK | - |
 
 ## Webhook URL Configuration
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WEBHOOKURL` | Webhook URL | `BYTECHEF_PUBLICURL/webhooks/{id}` |
+| `BYTECHEF_WEBHOOK_URL` | Webhook URL | `BYTECHEF_PUBLIC_URL/webhooks/{id}` |
 
 ## Observability Configuration
 
@@ -372,11 +425,18 @@ System administrator is used for accessing protected data reachable through /act
 
 ## Workflow Configuration
 
+### Code Workflow
+
+| Environment Variable | Description | Default Value |
+|---|---|---|
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_ENABLED` | Enable uploading of Java (jar) code workflows. When disabled, Java code workflow uploads are rejected while other languages (JavaScript, Python, Ruby) and previously uploaded Java code workflows continue to work. *Coming soon — upcoming release* | `true` |
+| `BYTECHEF_WORKFLOW_CODE_WORKFLOW_JAVA_LOADER` | Loader used to run Java code workflows (`CLASS_LOADER`, `ESPRESSO`). `ESPRESSO` executes Java code workflows inside a sandboxed GraalVM Espresso guest JVM instead of an in-process classloader. *Coming soon — upcoming release* | `CLASS_LOADER` |
+
 ### Output Storage
 
 | Environment Variable | Description | Default Value |
 |---|---|---|
-| `BYTECHEF_WORKFLOW_OUTPUTSTORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
+| `BYTECHEF_WORKFLOW_OUTPUT_STORAGE_PROVIDER` | Output storage provider (AWS, FILESYSTEM, JDBC) | `JDBC` |
 
 ### Repository Configuration
 

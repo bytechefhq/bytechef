@@ -1,0 +1,67 @@
+---
+title: Adding an Integration
+description: Choose a component, register a developer app with the provider, and publish the integration your users will connect.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+An **Integration** is what your end users see in the [Connect dialog](/embedded/getting-started/displaying-the-connect-dialog): a component (Gmail, Slack, Salesforce, …) plus the workflows you ship with it. This page walks through creating one and wiring up the third-party credentials it needs.
+
+## Choose a component
+
+1. In the ByteChef UI, go to **Embedded** → **Integrations** and click **New Integration**.
+2. Pick the component you want to offer (e.g. **Gmail**) and give the integration a name.
+3. ByteChef opens the workflow editor with a default workflow — add the triggers and actions that make up the integration's behavior.
+
+{/* TODO screenshot: New Integration dialog with the component picker open and a component (e.g. Gmail) selected */}
+
+See [Integrations](/embedded/integrations) for versioning, categories, and the rest of the authoring surface.
+
+## Create a developer app
+
+For OAuth2-based components, the third-party provider requires a registered **developer app** — that's what your end users will see on the OAuth consent screen ("*YourProduct* wants to access your Gmail"). Register one in the provider's developer console (Google Cloud Console, Slack API dashboard, …). You'll get back a **Client ID** and **Client Secret**.
+
+When the provider asks for an **authorized redirect URL**, use your ByteChef instance's OAuth callback:
+
+```
+https://<your-bytechef-host>/callback
+```
+
+(Configurable via `BYTECHEF_OAUTH2_REDIRECT_URI`; it defaults to `<public-url>/callback`.)
+
+<Callout title="Provider-specific setup">
+    Some components ship an application-setup guide with exact console steps — see for example the [Google application setup](/reference/components/google-application-setup_v1) and [Microsoft Graph application setup](/reference/components/microsoft-graph-application-setup_v1) references.
+</Callout>
+
+## Connect your developer app to ByteChef
+
+Give ByteChef the developer app's credentials as a **predefined OAuth2 app**, keyed by component name, so the Connect dialog never asks your end users for a client id or secret:
+
+```
+BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_ID=<client id>
+BYTECHEF_OAUTH2_PREDEFINED_APPS_<COMPONENT_NAME>_CLIENT_SECRET=<client secret>
+```
+
+Whenever a connection is created without its own client credentials, ByteChef falls back to the predefined app registered for that component. Components using API keys or other non-OAuth authorization need no developer app — the Connect dialog collects the credential from the end user directly.
+
+## Configure scopes
+
+The OAuth scopes a connection requests come from the component's connection definition. Make sure the scopes enabled on your developer app (in the provider's console) cover what the component requests — a mismatch surfaces as a provider-side consent error when your user connects.
+
+## Publish and deploy
+
+An integration becomes connectable once it's published and deployed to an environment:
+
+1. From the integration's three-dot menu, click **Publish** — this freezes a version (`V1 PUBLISHED`).
+
+   ![Publish integration from the three-dot menu](../quickstart-publish-integration.png)
+
+2. Go to **Embedded** → **Integration Configurations**, create a **New Instance Configuration** for the published version in your target environment, and toggle it **on**.
+
+   ![New Instance Configuration dialog](../quickstart-instance-configuration.png)
+
+See [Integration Configurations](/embedded/configurations) for per-environment settings and internal-only workflow inputs.
+
+## Next step
+
+[Display the Connect dialog](/embedded/getting-started/displaying-the-connect-dialog) so your users can connect their accounts.

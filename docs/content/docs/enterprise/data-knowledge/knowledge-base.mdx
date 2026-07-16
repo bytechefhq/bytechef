@@ -1,0 +1,95 @@
+---
+title: "Postgres-Based Knowledge Base"
+description: "RAG on the database you already operate. Document ingestion, chunking, embedding, and semantic search all backed by Postgres + pgvector — no separate vector store to provision, monitor, or patch."
+---
+
+The knowledge base is ByteChef's built-in RAG layer. You upload documents, the platform chunks and embeds them, and your workflows can semantically search the result — all without a dedicated vector store.
+
+## The pipeline
+
+```
+Upload          Chunk             Embed             Index               Query
+─────►          ─────►            ─────►            ─────►              ─────►
+PDF/MD/      Configurable     Configurable      pgvector in        Workflow action:
+HTML/        chunker          embedding model   Postgres           "semantic search
+TXT/...                                                            over knowledge base K"
+```
+
+Every step is observable and swappable.
+
+## Document ingestion
+
+Supported input formats:
+
+- **PDF** (with optional OCR via [Mistral OCR](/enterprise/data-knowledge/knowledge-base#ocr)).
+- **Markdown** and **plain text**.
+- **HTML**.
+- **Common Office formats** (Word, PowerPoint).
+- **Source code** files.
+
+Documents can be uploaded via the UI, the API, or — more usefully — fed in from workflows. A common pattern: a workflow watches a Drive folder, ingests new files, and the knowledge base stays in sync without manual touch.
+
+### Status lifecycle
+
+Each document moves through a status lifecycle (`PENDING` → `PROCESSING` → `READY`, with `FAILED` for errors). The processing happens asynchronously so large batches don't block the UI.
+
+{/* TODO screenshot: knowledge base documents view — table of uploaded docs with columns Filename / Type / Status (mix of READY / PROCESSING / FAILED) / Chunk count / Uploaded at; "Upload" button visible; one row expanded to show chunks */}
+![Knowledge base document list with status badges and chunk counts](/enterprise/knowledge-base/documents-list.png)
+
+## Chunking
+
+Chunking strategy is configurable per knowledge base:
+
+- **Fixed-size** — N characters per chunk with overlap.
+- **Sentence-aware** — preserves sentence boundaries.
+- **Structure-aware** — splits on headings, sections, code fences.
+
+Chunk sizes typically tune around 500–1500 tokens depending on the embedding model and downstream prompt budget.
+
+## Embeddings
+
+Each chunk gets an embedding vector via the configured [embedding model](/enterprise/data-knowledge/embedding-models). The vector is stored as a `vector` column in Postgres via the `pgvector` extension.
+
+## Indexing — pgvector in your Postgres
+
+`pgvector` adds vector similarity search to vanilla Postgres. The platform creates an HNSW or IVFFlat index on the embedding column for fast nearest-neighbor search. Practically this means:
+
+- Queries return in milliseconds at the scales most teams operate (millions of chunks).
+- The same SQL query can filter by metadata (`document_type`, `language`, `source`) and rank by vector similarity in one round-trip.
+- There's no separate vector store to back up — your Postgres backups already contain the knowledge base.
+
+## Query — from a workflow
+
+A workflow node "Semantic Search" takes a knowledge base ID, a query string, and a top-K, and returns the matched chunks with their metadata and similarity scores. Plug the output into an LLM prompt, into a downstream search step, or into a classification rule.
+
+## OCR
+
+For scanned PDFs and image-based documents, OCR is pluggable:
+
+- `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER=NONE` (default) — text-only PDFs.
+- `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER=MISTRAL` — Mistral OCR with your API key (`bytechef.ai.knowledge-base.ocr.mistral.api-key`).
+
+OCR happens during ingestion; the extracted text follows the same chunk/embed/index pipeline. Additional OCR providers are on the roadmap; today Mistral is the wired-in option.
+
+## Multi-tenancy
+
+Knowledge bases respect [multi-tenant isolation](/enterprise/scale-reliability/multi-tenant-isolation) — each tenant's documents and embeddings live in their own database (or schema), with no cross-tenant queries possible.
+
+## What you don't have to do
+
+- **Provision a vector DB.** pgvector lives in your existing Postgres.
+- **Operate a separate cluster.** Same backup, monitoring, patching as your other Postgres.
+- **Build a CRUD UI for documents.** It's in the box.
+- **Wire embedding model auth.** Configured once at the workspace level.
+- **Manage chunk metadata schema.** It's part of the knowledge base.
+
+## Configuration knobs
+
+| Variable | Purpose |
+|---|---|
+| `BYTECHEF_AI_KNOWLEDGE_BASE_ENABLED` | Master switch for the knowledge base. |
+| `BYTECHEF_AI_KNOWLEDGE_BASE_OCR_PROVIDER` | `NONE` (default) or `MISTRAL`. |
+| `BYTECHEF_AI_VECTORSTORE_PROVIDER` | Vector store backend (default `PGVECTOR`). |
+| `BYTECHEF_AI_VECTORSTORE_PGVECTOR_URL` | JDBC URL for the pgvector database (can be separate from main DB). |
+
+See [environment variables](/self-hosting/configuration/environment-variables) for the full list.

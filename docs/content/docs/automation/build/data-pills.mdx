@@ -1,0 +1,184 @@
+---
+title: "Data Pills & Input Modes"
+description: "Reference outputs from earlier steps with data pills, and switch fields between static, dynamic, and formula input modes."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+When you configure a component, every property field can hold more than a typed-in constant. It can
+pull in the output of the trigger or an earlier component (a **data pill**), or compute a value with
+an **expression**. This page explains data pills and the three ways a field can accept input:
+**static**, **dynamic**, and **formula** mode.
+
+## Data Pills
+
+A **data pill** is a reference to a piece of data produced earlier in the workflow — the trigger's
+payload or the output of a component that runs before the current step. Instead of hard-coding a
+value, you drop in a pill and ByteChef resolves it to the real value at run time.
+
+Under the hood a pill is stored as a `${...}` reference, for example:
+
+- `${mathHelper_1}` — the whole output of the step named `mathHelper_1`.
+- `${webhook_1.body.email}` — a nested field inside an earlier step's output.
+
+You never have to type this syntax by hand — the editor inserts it for you and renders it as a
+colored pill — but it is what gets saved in the workflow's JSON.
+
+### Use the Data Pill Panel
+
+1. Click into a property field that supports dynamic input. The **Data Pill Panel** opens on the
+   left, listing the trigger and every component that runs before the current one.
+2. Expand a component to see the fields available in its output.
+3. Click a field to insert it as a pill at the cursor position.
+
+You can also type `$` directly in the field to open an inline data-pill picker without using the panel.
+
+<Callout type="info">
+Only steps that run **before** the current component appear in the Data Pill Panel. A component can
+never reference the output of a step that runs after it.
+</Callout>
+
+### Make sure the output schema is available
+
+Data pills are built from each step's **output schema**. If a component hasn't been tested and has no
+predefined schema, its fields won't show up as pills yet. Open the component's **Output** tab and use
+one of:
+
+- **Test Action** — runs the action and reads the real output structure.
+- **Upload Sample Output Data** — provide your own representative output.
+- **Reset** — show the structure with placeholder sample values.
+
+See the [Output section](./workflows#output) on the Workflows page for the full walkthrough.
+
+## Input Modes
+
+Most property fields can be filled in one of three modes. The mode determines whether the value is a
+fixed constant, a value assembled from data pills, or a computed expression.
+
+### Static (constant) value
+
+This is the default. You type a literal value — a number, a piece of text, a selection from a
+dropdown — and that exact value is used every time the workflow runs.
+
+Use static input when the value never changes, for example a fixed subject line or a constant limit.
+
+### Dynamic value
+
+Toggle the **Dynamic** switch on a field to turn it into a dynamic input. The field becomes a rich
+editor where you can mix typed text with data pills, so the value is assembled from earlier steps at
+run time.
+
+1. Turn on the **Dynamic** switch (or simply start typing `$` in a supported field).
+2. Insert one or more data pills from the panel or the inline `$` picker.
+3. Combine pills with literal text as needed, e.g. `Hello ${webhook_1.body.firstName}, your order shipped.`
+
+The placeholder text in these fields reminds you of the shortcuts: use `$` for data pills and `=` for
+an expression.
+
+### Formula (expression) mode
+
+When a field needs a computed value — concatenating strings, formatting a date, doing arithmetic —
+start the field with an equals sign (`=`) to enter **formula mode**. The leading icon changes to an
+`f(x)` marker to show the field is now an expression.
+
+In formula mode you can:
+
+- Reference data pills inside the expression, e.g. `=concat(${webhook_1.body.firstName}, ' ', ${webhook_1.body.lastName})`.
+- Call built-in functions. As you type a function name, an autocomplete list and a signature tooltip
+  appear to guide you.
+
+The autocomplete offers the full set of functions as you type. The complete catalog is grouped below
+by category.
+
+#### String
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `concat` | Concatenate strings (or lists) into one value | `=concat('Order #', ${webhook_1.body.id})` |
+| `equalsIgnoreCase` | Compare two strings ignoring case | `=equalsIgnoreCase(${webhook_1.body.status}, 'active')` |
+| `format` | Format a date/time (or apply `String.format`) with a pattern | `=format(${webhook_1.body.createdDate}, 'yyyy-MM-dd')` |
+| `indexOf` | First position of a substring | `=indexOf(${webhook_1.body.email}, '@')` |
+| `lastIndexOf` | Last position of a substring | `=lastIndexOf(${webhook_1.body.path}, '/')` |
+| `length` | Length of a string | `=length(${webhook_1.body.title})` |
+| `split` | Split a string into a list by a delimiter | `=split(${webhook_1.body.tags}, ',')` |
+| `substring` | Extract part of a string | `=substring(${step_1.code}, 0, 4)` |
+
+#### Date & time
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `now` | Current instant | `=now()` |
+| `timestamp` | Current Unix timestamp | `=timestamp()` |
+| `atZone` | Convert an instant to a zoned date/time | `=atZone(${webhook_1.body.createdDate}, 'America/New_York')` |
+| `parseDate` | Parse a string into a date | `=parseDate(${webhook_1.body.date})` |
+| `parseDateTime` | Parse a string into a date/time | `=parseDateTime(${webhook_1.body.timestamp})` |
+| `plusDays` … `plusYears` | Add time to a temporal value (`plusHours`, `plusMinutes`, `plusSeconds`, `plusMillis`, `plusMicros`, `plusWeeks`, `plusMonths`, `plusYears`) | `=plusDays(${webhook_1.body.startDate}, 7)` |
+| `minusDays` … `minusYears` | Subtract time from a temporal value (`minusHours`, `minusMinutes`, `minusSeconds`, `minusMillis`, `minusMicros`, `minusWeeks`, `minusMonths`, `minusYears`) | `=minusMonths(${webhook_1.body.dueDate}, 1)` |
+
+#### List
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `add` | Add an element to a list | `=add(${webhook_1.body.tags}, 'urgent')` |
+| `addAll` | Append all elements of one list to another | `=addAll(${step_1.items}, ${step_2.items})` |
+| `contains` | Whether a list contains an element (or a string a substring) | `=contains(${webhook_1.body.tags}, 'vip')` |
+| `flatten` | Flatten a list of lists into a single list | `=flatten(${step_1.groups})` |
+| `join` | Join a list into a string with a separator | `=join(', ', ${webhook_1.body.tags})` |
+| `range` | Build a list of integers between two bounds | `=range(1, 10)` |
+| `remove` | Remove an element from a list | `=remove(${webhook_1.body.tags}, 'draft')` |
+| `set` | Replace the element at an index | `=set(${webhook_1.body.items}, 0, 'first')` |
+| `size` | Number of elements in a list | `=size(${webhook_1.body.items})` |
+| `sort` | Sort a list in natural order | `=sort(${webhook_1.body.scores})` |
+| `toMap` | Build a map from a list of key/value pairs | `=toMap(${step_1.entries})` |
+
+#### Map
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `put` | Add or replace a key in a map | `=put(${step_1.record}, 'status', 'done')` |
+| `putAll` | Merge all entries of one map into another | `=putAll(${step_1.record}, ${step_2.extra})` |
+| `remove` | Remove a key from a map | `=remove(${step_1.record}, 'tempKey')` |
+
+#### Type conversion
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `boolean` | Convert a value to a boolean | `=boolean(${webhook_1.body.enabled})` |
+| `byte` | Convert a value to a byte | `=byte(${webhook_1.body.code})` |
+| `char` | Convert a value to a character | `=char(${webhook_1.body.code})` |
+| `short` | Convert a value to a short | `=short(${webhook_1.body.count})` |
+| `int` | Convert a value to an integer | `=int(${webhook_1.body.quantity})` |
+| `long` | Convert a value to a long | `=long(${webhook_1.body.id})` |
+| `float` | Convert a value to a float | `=float(${webhook_1.body.price})` |
+| `double` | Convert a value to a double | `=double(${webhook_1.body.amount})` |
+
+#### Utility
+
+| Function | Purpose | Example |
+| --- | --- | --- |
+| `config` | Read a configuration property value by name | `=config('some.property')` |
+| `uuid` | Generate a random UUID (version 4) | `=uuid()` |
+
+#### Operators
+
+Beyond the functions above, expressions support the standard operators for arithmetic,
+comparison, and conditional logic — combine them freely with data pills and functions.
+
+| Operator | Purpose | Example |
+| --- | --- | --- |
+| `+` `-` `*` `/` `%` | Arithmetic (`+` also concatenates strings) | `=${webhook_1.body.price} * 1.2` |
+| `==` `!=` `>` `>=` `<` `<=` | Comparison | `=${webhook_1.body.total} >= 100` |
+| `&&` `\|\|` `!` | Logical and / or / not | `=${webhook_1.body.active} && ${webhook_1.body.total} > 0` |
+| `? :` | Ternary — pick one of two values on a condition | `=${webhook_1.body.count} > 0 ? 'has items' : 'empty'` |
+| `?:` | Elvis — fall back to a default when the left side is null | `=${webhook_1.body.name} ?: 'Anonymous'` |
+
+<Callout type="info">
+To leave formula mode, clear the field and remove the leading `=`. To go back to a plain constant,
+turn the **Dynamic** switch off.
+</Callout>
+
+## Which mode should I use?
+
+- **Static** — the value is the same on every run.
+- **Dynamic** — the value comes from the trigger or an earlier step, optionally mixed with fixed text.
+- **Formula** — the value must be computed or transformed before it is used.

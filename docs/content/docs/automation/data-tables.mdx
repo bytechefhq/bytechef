@@ -1,0 +1,110 @@
+---
+title: Data Tables
+description: Create typed relational tables inside ByteChef and read or write them from workflows — no external database required.
+---
+
+# Data Tables
+
+Data Tables give you first-class relational storage inside ByteChef. Create a table with typed columns, manage rows in a spreadsheet-like grid (or by importing a CSV), and read or write that data from your workflows — without standing up an external database.
+
+Use them for lookup tables, configuration, queues, feature flags, deduplication keys, or any small structured dataset your automations need to share.
+
+Data Tables are **workspace-scoped** and **per-environment**: each table belongs to a workspace, and the rows you see depend on the selected environment (Development, Staging, Production).
+
+---
+
+## Create a table
+
+1. In the Automation workspace, open **Data Tables** from the sidebar.
+2. Click **New Table**.
+3. Enter a **name** and an optional **description**.
+4. Define at least one **column** — give it a name and a type (see below).
+5. Click **Create**.
+
+Every table automatically has an `id` column that uniquely identifies each row, so `id` is reserved and can't be used as a column name.
+
+### Column types
+
+| Type | Stores |
+|---|---|
+| **String** | Text |
+| **Number** | Decimal numbers |
+| **Integer** | Whole numbers |
+| **Boolean** | `true` / `false` |
+| **Date** | A calendar date |
+| **Date Time** | A date and time |
+
+Values are coerced to the column's type, so a row written from a workflow or imported from CSV is stored in the correct shape.
+
+---
+
+## Manage columns
+
+Open a table and use its column menu to:
+
+- **Add a column** — pick a name and type.
+- **Rename a column.**
+- **Delete a column** — removes that column's values from every row.
+
+---
+
+## Manage rows
+
+The table opens in a grid where you can:
+
+- **Add a row** — fill in the new empty row at the bottom.
+- **Edit a cell** — click it and type; changes save when you move off the cell.
+- **Delete rows** — select one or more and delete them.
+- **Import a CSV** — bulk-load rows from a file whose header matches your column names.
+- **Export a CSV** — download the current rows.
+
+Larger tables are paginated in the grid. Use **tags** to organize tables once you have several.
+
+---
+
+## Use a table in workflows
+
+Add the **Data Table** component to a workflow to read and write your tables as part of an automation. Select the target table, and the action's inputs adapt to that table's columns.
+
+### Actions
+
+| Action | What it does |
+|---|---|
+| **Create Records** | Insert one or more new rows |
+| **Get Record** | Fetch a single row by its `id` |
+| **Find Records** | Query and filter rows |
+| **Update Record** | Update an existing row by its `id` |
+| **Delete Records** | Delete rows |
+| **Clear Table** | Remove every row from the table |
+
+### Triggers
+
+A workflow can also start in response to a row change:
+
+- **Record Created** — a new row was added
+- **Record Updated** — a row was changed
+- **Record Deleted** — a row was removed
+
+This makes Data Tables a lightweight event source — for example, "when a row is added to the *Customers* table, send a welcome email."
+
+---
+
+## Scope and access
+
+- **Workspace-scoped** — a table is available to every project and workflow in its workspace.
+- **Per-environment** — the rows are tied to the selected environment, so Development data stays separate from Production.
+- **Role-based access** — viewing rows requires at least viewer access; creating tables, editing columns, and writing rows require editor access.
+
+---
+
+## Storage limits
+
+> **Coming soon.** Storage limits are on the upcoming release track and are not yet enforced in the latest released version of ByteChef.
+
+The total size of all data tables in a tenant is capped — by default at **50 MB**. As usage approaches the cap, a warning alert appears in the Data Tables UI; once the cap is reached, writes that would grow the data (inserting rows, importing CSV, updating rows) are rejected with a limit-exceeded error until space is freed.
+
+{/* TODO screenshot: Data Tables page with the storage-usage warning alert visible (usage approaching the cap) */}
+
+Self-hosted administrators can change or remove the cap with the [`BYTECHEF_DATA_TABLE_MAX_SIZE_BYTES`](/self-hosting/configuration/environment-variables#data-table-configuration) environment variable (`0` = unlimited).
+
+For where Data Tables fit relative to an external database, see [Embedded Data Tables](/enterprise/data-knowledge/data-tables).

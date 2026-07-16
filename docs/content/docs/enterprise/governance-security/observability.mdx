@@ -1,0 +1,79 @@
+---
+title: "Observability"
+description: "OpenTelemetry tracing (OTLP), structured logs, and Micrometer metrics across every microservice. Stream to Datadog, Grafana, Honeycomb, or your existing stack."
+---
+
+ByteChef is built on the standard JVM observability triad — **traces, logs, and metrics** — using open protocols so you can wire it into the monitoring stack you already operate. Nothing in the pipeline is ByteChef-specific; if your tooling speaks OTLP, JSON logs, and Prometheus, you're already integrated.
+
+## Traces (OpenTelemetry / OTLP)
+
+Every API call, workflow execution, task dispatch, and component invocation produces an OpenTelemetry span. Spans are correlated with a single trace ID per logical operation, so:
+
+- A webhook trigger that fans out into 20 parallel tasks appears as one trace with the full task tree.
+- A retry that takes three attempts to succeed shows all three attempts under the parent span.
+- An execution that hops between coordinator → broker → worker keeps a continuous trace across services.
+
+**Configuration** is via a handful of `bytechef.observability.*` properties that enable each signal and set its OTLP endpoint — no proprietary protocol. Point at any OTLP-compatible collector: Datadog, Honeycomb, Tempo, Jaeger, or a vendor-neutral OpenTelemetry Collector that fans out to multiple backends. See [Observability configuration](/self-hosting/observability) for the exact properties, defaults, and sampling knobs.
+
+## Structured logs
+
+All log lines are emitted as structured JSON with consistent fields:
+
+| Field | Meaning |
+|---|---|
+| `timestamp` | ISO 8601 with millisecond precision. |
+| `level` | INFO / WARN / ERROR / DEBUG / TRACE. |
+| `logger` | Source logger (typically a Java package + class). |
+| `message` | Human-readable message. |
+| `traceId` / `spanId` | Cross-references the OpenTelemetry trace. |
+| `workspaceId` / `projectId` | Scoping for multi-tenant filtering. |
+| `executionId` | The workflow execution this line belongs to, when applicable. |
+
+The trace correlation means you can pivot from a log line to its containing trace and back in one click in tools like Grafana or Datadog.
+
+Sensitive properties are scrubbed before serialization — see [encrypted credentials](/enterprise/governance-security/encrypted-credentials).
+
+## Metrics (Micrometer)
+
+ByteChef ships Micrometer instruments for:
+
+- **Workflow throughput** — executions per second, queue depth, latency histograms.
+- **Component health** — call counts, error rates, latency per component and action.
+- **Connection pool stats** — DB pool usage, HTTP client pool usage.
+- **JVM internals** — heap, GC, thread counts, class loading.
+- **Message broker depths** — queue length and consumer lag (whichever broker you're on).
+
+Micrometer exports to Prometheus, Datadog, New Relic, CloudWatch, and others via standard registries.
+
+## Where it all goes
+
+Common deployment patterns:
+
+| Stack | Setup |
+|---|---|
+| **Datadog** | OTLP traces to the Datadog agent, JSON logs to Datadog log ingest, Micrometer Datadog registry for metrics. |
+| **Grafana stack** | OTLP traces to Tempo, JSON logs to Loki, metrics to Mimir/Prometheus, dashboards in Grafana. |
+| **Honeycomb** | OTLP traces and metrics to Honeycomb, logs to your preferred backend with trace ID correlation. |
+| **AWS** | OTLP via ADOT collector to CloudWatch, logs to CloudWatch Logs, metrics to CloudWatch Metrics. |
+
+You don't need to commit to one — point the OpenTelemetry Collector at multiple backends and fan out.
+
+## Built-in — not retrofitted
+
+Observability is woven through every microservice, not tacked on as a sidecar:
+
+- Coordinators, workers, schedulers, and gateway services all emit consistent traces and metrics out of the box.
+- Service-to-service hops propagate trace context, so a trace started at the API gateway extends to the worker that runs the task.
+- Logging configuration is consistent across services — one place to set log levels, one format to parse.
+
+## SLO-friendly defaults
+
+The shipped instrumentation is designed to support common SLO definitions without custom code:
+
+- **Latency SLOs** — request and execution histograms are exposed with the buckets needed for 50/95/99 percentiles.
+- **Availability SLOs** — error counters distinguish 4xx (user error) from 5xx (server error).
+- **Saturation SLOs** — pool utilization and queue depth metrics show backpressure before it becomes user-visible.
+
+## See also
+
+- [Observability configuration](/self-hosting/observability) — the exact properties, default OTLP endpoints, sampling, and collector wiring to turn this on.

@@ -86,6 +86,9 @@ dataSources
 ######################
 .gradle/
 **/build/
+# Documentation guide pages live under docs/content/docs/**/build/ (the "Build Workflows"
+# section) — exempt them from the Gradle build-output rule above so new pages aren't silently ignored.
+!docs/content/docs/**/build/
 **/generated/generated
 
 ######################

@@ -1,0 +1,69 @@
+---
+title: "Bring Your Own Embedding Model"
+description: "The embedding pipeline is open and configurable. Swap providers without rebuilding the index from scratch."
+---
+
+Embedding models are a moving target — every few months a new model promises lower cost, higher recall, or longer context. Locking your RAG pipeline to one provider means rebuilding everything when the next better option ships.
+
+ByteChef Enterprise's embedding pipeline is designed to be **open**: the provider is a configuration choice, the model is a string, and the indexes are namespaced so you can run two embedding models side-by-side during a migration.
+
+## Supported providers
+
+Today the embedding pipeline ships with **OpenAI** wired in:
+
+| Provider | Models |
+|---|---|
+| **OpenAI** | `text-embedding-3-small`, `text-embedding-3-large`, legacy `text-embedding-ada-002`. |
+
+Additional embedding providers — Azure OpenAI (the same model family routed through your Azure resource), Vertex AI (Google's Gecko-family embeddings), and OpenAI-API-compatible local/self-hosted servers (LM Studio, vLLM with embedding heads) — are on the roadmap. The pipeline is built around a provider abstraction so these slot in without changing how knowledge bases are authored.
+
+(Anthropic does not ship embedding models — pair Anthropic LLMs for generation with OpenAI for embeddings.)
+
+## Configuration
+
+The embedding model is configured at the workspace level. The most common knob:
+
+```
+BYTECHEF_AI_PROVIDER_EMBEDDING_OPENAI_OPTIONS_MODEL=text-embedding-3-small
+```
+
+You can change models per knowledge base if you have a reason to (e.g., one knowledge base of code and one of natural language, each with their best-fit model).
+
+## Why "swap without re-indexing from scratch" matters
+
+Re-embedding a corpus from scratch is expensive — both in API spend and in re-index time. ByteChef's pipeline supports a **dual-write migration**:
+
+1. Add the new embedding model as a secondary on the knowledge base.
+2. New documents get embedded with both models.
+3. Existing documents are re-embedded in the background.
+4. Once coverage hits 100%, flip the read path to the new model.
+5. Drop the old vectors.
+
+This is hours of background work rather than a re-ingestion outage.
+
+## Dimensionality and pgvector
+
+Different models produce vectors of different dimensions (`text-embedding-3-small` is 1536, `large` is 3072, others vary). pgvector indexes are dimension-scoped, so:
+
+- Each model gets its own vector column.
+- Switching models = creating a new column and a new index, not mutating in place.
+- Side-by-side migration doesn't bloat the existing index.
+
+## Cost considerations
+
+- **OpenAI `text-embedding-3-small`** — typically the best $/quality tradeoff for English knowledge bases, and the default to reach for.
+- **OpenAI `text-embedding-3-large`** — higher cost; only worth it if you've measured a quality gap on your corpus.
+- **Local and cloud alternatives** (self-hosted servers for zero per-token cost, Vertex AI for a single GCP billing surface) become options as those providers land on the [roadmap](#supported-providers).
+
+## Observability
+
+Embedding calls are traced through the same [OpenTelemetry pipeline](/enterprise/governance-security/observability) as everything else. You can:
+
+- Measure embedding latency per model.
+- Track token spend (input tokens × provider rate).
+- Alert on provider error rates.
+- Compare model performance side-by-side during a migration.
+
+## API keys
+
+Each provider's API key is stored in [encrypted credential storage](/enterprise/governance-security/encrypted-credentials), with the workspace-scoped encryption key. When you wire in an [external secret manager](/enterprise/governance-security/encrypted-credentials#external-secret-managers-coming-soon) *(coming soon)*, the API keys can be injected at runtime rather than persisted.

@@ -1,0 +1,50 @@
+---
+title: "Workflow Builder Tools"
+description: "Let an AI agent create, update, and delete a connected user's workflows from chat — the user identity is injected from the request context, never supplied by the model."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+The **embedded workflow builder tools** let an AI agent build and refine workflows for a connected user from natural language — "create a workflow that posts new Salesforce leads to Slack," then "also email me a daily summary." They are exposed by the built-in **`embeddedWorkflowBuilder`** component, whose actions run against the connected user resolved from the request, so neither your agent nor the user it serves has to touch workflow JSON.
+
+<Callout type="warn" title="Coming soon">
+  The embedded workflow builder tools are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+This is distinct from the one-shot [AI workflow generation](/embedded/quickstart) REST endpoint: these are *tools* an agent calls inside a conversation, so it can create a workflow and then keep iterating on it across turns.
+
+## The tools
+
+| Tool | Input | What it does |
+|---|---|---|
+| `createConnectedUserWorkflowFromPrompt` | `prompt` | Generates a new workflow for the connected user from a natural-language description. Returns the new workflow uuid. |
+| `updateConnectedUserWorkflowFromPrompt` | `workflowUuid`, `prompt` | Refines an existing workflow from a natural-language description. Returns the workflow uuid. |
+| `updateConnectedUserWorkflow` | `workflowUuid`, `definition` | Replaces a workflow's JSON definition directly. Returns a confirmation message. |
+| `deleteConnectedUserWorkflow` | `workflowUuid` | Deletes a workflow. Returns a confirmation message. |
+
+## Identity comes from the request context
+
+<Callout title="The model never supplies the user identity">
+The connected user's `externalUserId` and `environment` are **not** tool inputs. They are injected server-side from the authenticated request context, so an agent can only ever create or modify workflows for the user the request is scoped to. Each tool's input schema exposes only `prompt` / `workflowUuid` / `definition` — there is no field through which the model could target another user.
+</Callout>
+
+Every operation runs as the connected user identified by the request (its signed JWT, plus the `X-Instance-Id` header where applicable). The resulting workflows are owned by that connected user — they show up in their [Automations](/embedded/automations) and are editable in the [white-labeled workflow builder](/embedded/white-label-execution).
+
+## Exposing the tools
+
+The tools reach an agent through the standard embedded tool surfaces:
+
+- **MCP server.** Add the `embeddedWorkflowBuilder` component (and the operations you want) to an [MCP server](/embedded/mcp-servers); the connected user's agent then sees them as MCP tools.
+- **REST `/tools` endpoint.** Call `POST /api/embedded/v1/{externalUserId}/tools` with a body of `{ "name": "<tool>", "parameters": { ... } }`, authenticated with the connected user's JWT.
+
+The component is **connection-less** — it operates on the user's ByteChef workflows, not an external system — so there is no connect dialog or shared connection to set up. The operation runs directly against the connected user.
+
+## Try it: Create From Chat
+
+The [sample app](/embedded/sample-app) includes a **Create From Chat** page: a chat whose agent has `createWorkflow` / `updateWorkflow` tools wired to these operations. Describe a workflow, watch it get created for the connected user, refine it conversationally, then return to the automations list when you're satisfied. It's a minimal, copy-pasteable reference for wiring the tools into your own product's AI surface.
+
+## See also
+
+- [Automations](/embedded/automations) — where the created workflows appear, per connected user.
+- [MCP Servers](/embedded/mcp-servers) — exposing components (including this one) as agent tools.
+- [Embedded MCP](/embedded/embedded-mcp) — surfacing a tenant's existing workflows as MCP tools.

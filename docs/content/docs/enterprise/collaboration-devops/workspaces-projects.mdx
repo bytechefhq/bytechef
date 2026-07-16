@@ -1,0 +1,64 @@
+---
+title: "Workspaces and Projects"
+description: "Unlimited workspaces with per-workspace settings, and projects that scope workflows, connections, and data tables to the right team."
+---
+
+Workspaces and projects are the two-level org structure that lets you run ByteChef for many teams without them stepping on each other.
+
+## The hierarchy
+
+```
+Organization
+  └── Workspace             (a team, a tenant, a business unit)
+       ├── Settings         (environments, SSO mapping, observability tags)
+       ├── Data tables      (workspace-scoped, shared across projects)
+       ├── Knowledge bases  (workspace-scoped, shared across projects)
+       └── Project          (an initiative or a product area)
+            ├── Workflows
+            └── Connections
+```
+
+## Workspaces
+
+A workspace is the **boundary for settings and shared state**. Common settings owned at the workspace level:
+
+- DEVELOPMENT, STAGING, and PRODUCTION environments live inside each workspace.
+- SSO configuration and IdP group mappings.
+- Workspace-scoped connections shared across projects.
+- Workspace-scoped encryption key for [encrypted credential storage](/enterprise/governance-security/encrypted-credentials).
+- Workspace-level audit log filtering and retention.
+- Observability tags (so traces and metrics carry `workspace=...`).
+
+You can have an unlimited number of workspaces in a deployment. There's no licensing penalty for splitting work across more workspaces; the cost is operational (more places to manage).
+
+## Projects
+
+A project is the **unit of ownership and access**. A project is what a team works in day-to-day. Each project contains:
+
+- One or more workflows.
+- Project-scoped connections.
+- A set of users with [project roles](/enterprise/governance-security/rbac) (admin, editor, operator, viewer).
+
+Data tables and knowledge bases are **workspace-scoped**, not project-scoped — they're shared across the workspace's projects rather than owned by one. Workflows in a project share state — they can call each other as subflows, share workspace data tables, and reference each other's connections. Projects do **not** share state with each other; that's the boundary's whole point.
+
+## When to create a new workspace vs. a new project
+
+| Situation | Reach for |
+|---|---|
+| Two teams that should not see each other's work at all | Separate workspaces |
+| One team running multiple initiatives | Multiple projects in one workspace |
+| Multi-tenant SaaS — each customer is isolated | One workspace per tenant ([Multi-tenant isolation](/enterprise/scale-reliability/multi-tenant-isolation)) |
+| Separate environments (DEVELOPMENT / STAGING / PRODUCTION) | One workspace, [environments](/enterprise/collaboration-devops/environments) inside it |
+| Acquired company being onboarded | New workspace; map their IdP groups, then merge over time |
+
+A common mistake is using separate workspaces for environments. **Don't** — environments are a first-class concept *inside* a workspace, and using workspaces for that loses you build-once-deploy-many semantics.
+
+## Project lifecycle
+
+Projects move through a publish lifecycle:
+
+- **Draft** — work in progress in DEVELOPMENT; edits are live to anyone with edit access.
+- **Published version** — a snapshot you can promote to higher environments.
+- **Archived** — soft-deleted; recoverable.
+
+See [Workflow versioning](/enterprise/collaboration-devops/workflow-versioning) for how the version model works in detail.

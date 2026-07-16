@@ -1,0 +1,77 @@
+---
+title: "Enterprise Support SLAs"
+description: "Priority response, named contacts, and migration assistance."
+---
+
+ByteChef Enterprise comes with service-level commitments that match production-grade infrastructure. The exact terms are part of your contract; the shape below is the standard offering.
+
+## What's covered
+
+| Element | Standard Enterprise |
+|---|---|
+| **Priority response** | Tiered response times by severity (P1/P2/P3/P4), measured from first contact. |
+| **Named contacts** | A specific Customer Engineer and a Technical Account Manager assigned to your account, not a rotating queue. |
+| **Engineering escalation** | A defined path from named contact to the engineering team that owns the affected subsystem. |
+| **Migration assistance** | Hands-on help when you upgrade across major versions or change deployment topology. |
+| **Architectural review** | Periodic reviews of your deployment with recommendations on scaling, security, and operational posture. |
+| **24/7 P1 coverage** | Around-the-clock pager rotation for P1 incidents. |
+
+## Severity definitions (typical)
+
+| Severity | What it means | Typical response target |
+|---|---|---|
+| **P1** | Production down, no workaround. | Within 1 hour, 24/7. |
+| **P2** | Production degraded or major feature broken; partial workaround exists. | Within 4 hours, business hours. |
+| **P3** | Non-blocking bug or significant question. | 1 business day. |
+| **P4** | Question, feature request, or minor issue. | 2 business days. |
+
+Exact numbers are part of your contract — these are illustrative.
+
+## What "priority response" actually means
+
+The valuable part of "priority" is not just speed — it's that someone with context picks up. With a named contact:
+
+- They know your deployment topology.
+- They know the workflows that matter most to you.
+- They know your runbooks.
+- They can skip the discovery phase and go straight to root cause.
+
+That cuts the resolution time for serious incidents by hours, not minutes.
+
+## Channels
+
+Standard support channels:
+
+- **Email** — for P3/P4 and async.
+- **Slack Connect / Teams** — for collaboration with your named contact.
+- **Pager** — for P1 incidents.
+- **Quarterly reviews** — scheduled with your TAM.
+
+## What's not covered
+
+Support covers the platform; it doesn't cover:
+
+- **Your custom components.** ByteChef can review them; we don't own them.
+- **Third-party API outages.** A Salesforce outage isn't a ByteChef incident, but we can help you build resilient retry/fallback logic in your workflows.
+- **Workflow design.** Architectural review can help, but writing your team's workflows is your team's job. We provide patterns and best-practice templates.
+
+## Migration assistance (specifically)
+
+When you're moving from Community to Enterprise, upgrading across a major version, or changing topology (monolith → microservices, or single-region → multi-region), the named contact runs the migration with you:
+
+- Reviews your current deployment.
+- Writes the migration plan.
+- Sits on the call during the cutover.
+- Validates post-migration health.
+
+See [Production migrations](/enterprise/support-trust/production-migrations) for the technical side.
+
+## Engagement model
+
+Standard cadence with your TAM:
+
+- **Weekly or biweekly** sync during active deployment and migration phases.
+- **Monthly** sync during steady-state operation.
+- **Quarterly** architectural review.
+
+Increase or decrease the cadence as your needs change.

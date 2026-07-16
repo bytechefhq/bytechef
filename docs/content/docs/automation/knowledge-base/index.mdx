@@ -1,0 +1,63 @@
+---
+title: "Overview"
+description: "Upload documents, let ByteChef chunk and embed them, and give your workflows and AI agents semantic search over your own content."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+import {Card, Cards} from "fumadocs-ui/components/card";
+import {Database, FileText, Search, Workflow} from "lucide-react";
+
+A **knowledge base** is a collection of documents that ByteChef ingests, splits into
+chunks, and embeds into vectors so they can be searched by meaning rather than by exact
+keywords. It is the retrieval layer behind Retrieval-Augmented Generation (RAG): a
+workflow or AI agent asks a question, the knowledge base returns the most relevant chunks,
+and the model answers grounded in your own content.
+
+Knowledge bases live under **Automation → Knowledge Base**. Each one is scoped to a
+workspace and an environment, so the documents an agent retrieves in `DEVELOPMENT` are
+isolated from `PRODUCTION`.
+
+<Callout title="Availability">
+  The Knowledge Base is enabled through configuration
+  (`bytechef.ai.knowledge-base.enabled`). If you don't see **Knowledge Base** in the
+  Automation navigation, ask your administrator to enable it. The vector store is backed by
+  Postgres with the `pgvector` extension — there is no separate vector database to operate.
+</Callout>
+
+## What you can do
+
+<Cards>
+  <Card icon={<Database className="text-purple-300" />} title="Create a knowledge base" href="/automation/knowledge-base/create-a-knowledge-base">
+    Name a knowledge base and tune how documents are chunked.
+  </Card>
+
+  <Card icon={<FileText className="text-blue-300" />} title="Add documents" href="/automation/knowledge-base/add-documents">
+    Upload files and watch them move through the processing pipeline.
+  </Card>
+
+  <Card icon={<Search className="text-green-300" />} title="Search" href="/automation/knowledge-base/search">
+    Run semantic queries and inspect the matching chunks and scores.
+  </Card>
+
+  <Card icon={<Workflow />} title="Use it in workflows & agents" href="/automation/knowledge-base/use-in-workflows">
+    Retrieve chunks from a workflow step or wire it into an AI agent as RAG.
+  </Card>
+</Cards>
+
+## How it works
+
+1. **Ingest** — You upload a file (or a [source](/automation/knowledge-base/sources) syncs
+   records in). ByteChef extracts text, running OCR first for scanned PDFs and images.
+2. **Chunk** — The text is split into overlapping chunks sized by the knowledge base's
+   chunking settings.
+3. **Embed** — Each chunk is turned into a vector by the configured embedding model and
+   stored alongside the chunk text and metadata.
+4. **Retrieve** — A query is embedded the same way, and the nearest chunks are returned
+   with a similarity score, optionally filtered by metadata or tags.
+
+## Related
+
+- [Postgres-Based Knowledge Base](/enterprise/data-knowledge/knowledge-base) — the
+  operational and architectural view (pgvector, multi-tenancy, scale).
+- [Bring Your Own Embedding Model](/enterprise/data-knowledge/embedding-models) — which
+  embedding providers are supported and how to migrate between them.

@@ -1,0 +1,53 @@
+---
+title: "Overview"
+description: "Let users talk to a workflow. A chat message triggers the workflow, it runs, and the reply streams back into the conversation."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+import {Card, Cards} from "fumadocs-ui/components/card";
+import {MessageSquare, Play, Settings} from "lucide-react";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Workflow chats and the Chats page (part of the AI Hub, an Enterprise Edition feature) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+A **workflow chat** turns a workflow into a conversational interface. A user types a message,
+that message triggers the workflow, the workflow runs, and the reply streams back into the
+chat thread in real time. It's the simplest way to put a friendly front end on an
+automation without building any UI.
+
+Workflow chats live under **Automation → Chats**. The left sidebar lists every
+chat-enabled workflow in the workspace, grouped by project; selecting one opens its
+conversation.
+
+## When to use a workflow chat
+
+A workflow chat fits any workflow that takes free-form text and returns a reply:
+
+- Customer-support assistants that look up an order and draft a response.
+- Internal "ask the docs" bots that retrieve from a [knowledge base](/automation/knowledge-base) and answer.
+- Triage or intake flows where a person answers a few questions conversationally.
+
+## In this section
+
+<Cards>
+  <Card icon={<Settings className="text-purple-300" />} title="Enable chat on a workflow" href="/automation/workflow-chats/enable-chat">
+    Add the New Chat Request trigger so a workflow shows up in Chats.
+  </Card>
+
+  <Card icon={<MessageSquare className="text-blue-300" />} title="Use the Chats page" href="/automation/workflow-chats/using-chats">
+    Send messages, attach files, and follow streamed replies.
+  </Card>
+
+  <Card icon={<Play className="text-green-300" />} title="Advanced behavior" href="/automation/workflow-chats/advanced">
+    Human-in-the-loop questions, embedded chat, and current limits.
+  </Card>
+</Cards>
+
+<Callout title="Hosted vs. embedded">
+  A chat workflow can run in ByteChef's hosted **Chats** page or be driven from your own UI
+  ("embedded"). Both use the same trigger; the difference is one trigger setting. See
+  [Enable chat on a workflow](/automation/workflow-chats/enable-chat#hosted-vs-embedded).
+</Callout>

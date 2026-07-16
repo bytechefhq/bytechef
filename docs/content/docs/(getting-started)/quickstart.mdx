@@ -18,13 +18,13 @@ You have two ways to use ByteChef:
 
 - **Your own infrastructure (Self-Hosted)**: Deploy and run ByteChef yourself. Supported on:
 
-  - [Docker](/self-hosting/docker)
-  - [Kubernetes](/self-hosting/kubernetes)
-  - [AWS EC2](/self-hosting/aws-ec2)
-  - [AWS ECS](/self-hosting/aws-ecs)
-  - [Azure Container Instance](/self-hosting/azure-container-instance)
-  - [Google Cloud Run](/self-hosting/google-cloud-run)
-  - [DigitalOcean](/self-hosting/digitalocean)
+  - [Docker](/self-hosting/deployment/local-docker)
+  - [Kubernetes](/self-hosting/deployment/kubernetes)
+  - [AWS EC2](/self-hosting/deployment/aws-ec2)
+  - [AWS ECS](/self-hosting/deployment/aws-ecs)
+  - [Azure](/self-hosting/deployment/azure)
+  - [Google Cloud](/self-hosting/deployment/google-cloud)
+  - [DigitalOcean](/self-hosting/deployment/digitalocean)
 
 If you're ready to selfhost, you can pick any of the platforms above for detailed setup instructions.
 
@@ -123,13 +123,13 @@ The demo in this quickstart demonstrates the core concept of automation:
 
 - **Trigger**: Something starts the workflow
 - **Components**: Do the actual work (create, fetch, send)
-- **Expressions**: Pull data between components using `{{ $json.fieldName }}`
+- **Data pills**: Pull data between components using `${stepName.fieldName}` — see [Data Pills & Input Modes](/automation/build/data-pills)
 
 ## Next Steps
 
 Here are a few things you can explore next:
 
-- [Build Workflows](/automation/build-workflows)
+- [Build Workflows](/automation/build)
 - [Browse 200+ Components](/reference/components)
 - [Deploy your workflow](/automation/deploy)
 - [Monitor Executions](/automation/monitor)

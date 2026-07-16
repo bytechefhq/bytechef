@@ -1,0 +1,24 @@
+---
+title: "Templates"
+description: Start from pre-built project and workflow templates, or share your own via import links.
+---
+
+Templates let you start from a working automation instead of a blank canvas.
+
+## Browse the gallery
+
+- **Project templates** — open **Projects** → **Templates** to browse the gallery of pre-built projects. Selecting one imports it into your workspace as a regular project you can edit, publish, and deploy.
+- **Workflow templates** — inside a project, browse workflow templates and import one as a new workflow.
+
+Templates are fetched from ByteChef's template catalog through the GitHub proxy — self-hosted instances behind a firewall can point at a mirror via [`GITHUB_PROXY_BASE_URL`](/self-hosting/configuration/environment-variables#github-proxy-configuration).
+
+{/* TODO screenshot: project templates gallery — card grid with template titles, descriptions, and component icons */}
+
+## Share and import
+
+A project or workflow can be shared as an **import link**. Anyone with the link (and access to a ByteChef instance) opens it and gets a guided import:
+
+- `/import/shared/...` — import something another user shared from their workspace.
+- `/import/template/...` — import a catalog template directly.
+
+The import creates a copy in the target workspace — connections and credentials are never carried across; the importer connects their own accounts.

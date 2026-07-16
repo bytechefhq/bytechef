@@ -1,3 +1,14 @@
 {
-  "pages": ["projects", "workflows", "universal-ai"]
+  "pages": [
+    "projects",
+    "workflows",
+    "build-approaches",
+    "flow-controls",
+    "subflows",
+    "data-pills",
+    "data-streams",
+    "human-in-the-loop",
+    "forms",
+    "universal-ai"
+  ]
 }

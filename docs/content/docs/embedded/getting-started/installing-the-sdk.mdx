@@ -1,0 +1,84 @@
+---
+title: Installing the SDK
+description: Install the @bytechef/embedded React SDK and authenticate your end users with signed JWTs.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+The `@bytechef/embedded` SDK renders ByteChef's embedded surfaces — the [Connect dialog](/embedded/getting-started/displaying-the-connect-dialog) and the embedded workflow builder — inside your own product. This page covers installing the package and wiring up end-user authentication.
+
+## Installing from npm
+
+```bash
+npm install @bytechef/embedded
+```
+
+The package exports two surfaces:
+
+- **`useConnectDialog`** — a React hook that opens the hosted Connect dialog so an end user can authorize an integration.
+- **`EmbeddedWorkflowBuilder`** — a React component that embeds the full workflow editor so end users can build their own automations.
+
+Both are configured with the same three values: your ByteChef instance's `baseUrl`, an `environment` (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`), and a `jwtToken` identifying the current end user.
+
+## Setup
+
+ByteChef needs to know **which of your users** is interacting with the embedded surface. You prove this with a short-lived JWT that your backend signs with a private key only you hold — ByteChef verifies it with the matching public key and resolves (or creates) the **Connected User** identified by the token's `sub` claim.
+
+### 1. Create a Signing Key
+
+1. In the ByteChef UI, go to **Embedded** → **Settings** → **Signing Keys**.
+2. Click **New Signing Key** and give it a name (e.g. `web-app-dev`).
+3. Copy the **private key** shown in the dialog — it is displayed only once. Store it as a secret in your backend (e.g. a `BYTECHEF_SIGNING_PRIVATE_KEY` environment variable).
+4. Note the **Key Id** (`kid`) shown in the table — you set it as the JWT's `kid` header so ByteChef knows which public key to verify with.
+
+![Create Signing Key dialog](../quickstart-signing-key.png)
+
+<Callout title="Keep the private key server-side">
+    The private key must never reach the browser. Your backend signs tokens; your frontend only ever sees the resulting short-lived JWT.
+</Callout>
+
+### 2. Generate a user token in your backend
+
+Sign an RS256 JWT whose `sub` claim is your user's unique id. ByteChef stores this value as the Connected User's **external user id** — every connection and workflow the user activates hangs off it.
+
+```ts
+// Node.js example using jsonwebtoken
+import jwt from 'jsonwebtoken';
+
+const token = jwt.sign(
+    {
+        sub: externalUserId, // your user's unique id
+        iat: Math.floor(Date.now() / 1000),
+    },
+    process.env.BYTECHEF_SIGNING_PRIVATE_KEY!,
+    {
+        algorithm: 'RS256',
+        expiresIn: '10m',
+        keyid: process.env.BYTECHEF_SIGNING_KEY_ID!,
+    }
+);
+```
+
+Keep the TTL short (10 minutes is a good default) and mint a fresh token per session. A common pattern is a small authenticated endpoint (e.g. `POST /api/token`) that returns a token for the logged-in user — the [Sample App](/embedded/sample-app) implements exactly this with Fastify.
+
+### 3. Pass the token to the SDK
+
+There is no global `authenticate()` call — each SDK surface takes the JWT directly:
+
+```tsx
+'use client';
+import {useConnectDialog} from '@bytechef/embedded';
+
+const {openDialog} = useConnectDialog({
+    baseUrl: 'https://your-bytechef-host.example.com',
+    environment: 'DEVELOPMENT',
+    integrationId,
+    jwtToken,
+});
+```
+
+The same `jwtToken` also authenticates direct calls to the embedded REST API (`Authorization: Bearer <token>` plus an `X-Environment` header) — for example `GET /api/embedded/v1/integrations` to list the integrations available to that user.
+
+## Next step
+
+With the SDK installed and tokens flowing, [add an integration](/embedded/getting-started/adding-an-integration) for your users to connect.

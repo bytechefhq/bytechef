@@ -1,0 +1,76 @@
+---
+title: AI Providers
+description: Activate LLM and AI providers once, per environment, and reuse them across Universal AI components, the Copilot, the Knowledge Base, and the AI Hub.
+---
+
+# AI Providers
+
+<EEBadge />
+
+**AI Providers** is the central catalog where an admin activates the AI providers (OpenAI, Anthropic, Mistral, and others) that power ByteChef's AI features. You enter a provider's API key once, and every AI feature that needs a model resolves its credentials from this catalog — so keys live in one place instead of being re-entered per workflow.
+
+> AI Providers is an Enterprise Edition feature, and activating providers is restricted to **admins**.
+
+<Callout title="Community Edition">
+    The AI Providers page is not available in CE. Providers and models are configured exclusively through configuration properties / environment variables — for example `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` and `BYTECHEF_AI_PROVIDER_CHAT_OPENAI_OPTIONS_MODEL`. See the [environment variables reference](/self-hosting/configuration/environment-variables#ai-provider-api-keys). AI features use those keys directly.
+</Callout>
+
+Keys are stored **per environment**, so Development, Staging, and Production can each use their own provider and credentials.
+
+---
+
+## Activate a provider
+
+1. Go to **Settings → AI Providers** in the Automation workspace.
+2. Select the **environment** you're configuring (Development, Staging, or Production).
+3. Find the provider in the list and open it.
+4. Paste the provider's **API key** and save.
+5. Toggle the provider **on**.
+
+The API key is encrypted at rest, and the list only ever shows it back in obfuscated form. To rotate a key, edit the provider and save the new value; to stop using a provider, toggle it off or delete it.
+
+Repeat per environment — activating OpenAI in Development does not activate it in Production.
+
+### Available providers
+
+The catalog includes OpenAI, Anthropic, Azure OpenAI, Mistral, Groq, NVIDIA, Vertex Gemini, Perplexity, DeepSeek, and Hugging Face. Most are chat (text-generation) providers; **OpenAI** additionally provides the **embedding** model used for semantic search, and is marked with an *Embeddings* badge.
+
+---
+
+## What uses activated providers
+
+Once a provider is activated for an environment, it is available to:
+
+- **Universal AI components** — workflow steps where you pick a provider from the catalog and then a model, instead of managing a separate connection.
+- **The Copilot model picker** *(coming soon)* — choose which activated provider and model answers a Copilot conversation.
+- **The AI Hub** *(coming soon)* — the same catalog backs the AI Hub's model selection.
+- **The Knowledge Base** — document embedding uses the activated OpenAI provider for the environment.
+
+Each feature resolves the key for the **current environment**, so the same workflow or conversation automatically uses the right credentials as it moves from Development to Production.
+
+---
+
+## Default models
+
+Every provider ships with a default model per kind — chat, embedding, and (for OpenAI) image generation — defined in configuration: `bytechef.ai.provider.{chat,embedding,image}.<provider>.options.model`, overridable through the matching environment variables. See the [chat](/self-hosting/configuration/environment-variables#ai-chat-model-configuration), [embedding](/self-hosting/configuration/environment-variables#ai-embedding-model-configuration), and [image](/self-hosting/configuration/environment-variables#ai-image-model-configuration) model references. Model names are configuration-only — the AI Providers page stores credentials and enablement, not models.
+
+The page still decides **which** default applies: features where ByteChef picks the model for you — the Copilot default, the workflow converter, the property Copilot, Knowledge Base embedding, and AI Hub image generation — resolve to the first **enabled** provider in the current environment (or the provider preferred via `BYTECHEF_AI_COPILOT_PROVIDER`, when set and enabled) and use that provider's configured model. Enabling or disabling a provider per environment redirects these features at the next request, without a restart. Universal AI workflow steps are unaffected — their authors pick the model per step.
+
+Two providers have **no** default model on purpose, and are skipped by the default resolution until you set theirs explicitly:
+
+- **Azure OpenAI** — the "model" is your deployment name; set `BYTECHEF_AI_PROVIDER_CHAT_AZURE_OPENAI_OPTIONS_MODEL` to it.
+- **Ollama** — the usable models are whatever your Ollama instance has pulled; set `BYTECHEF_AI_PROVIDER_CHAT_OLLAMA_OPTIONS_MODEL` (e.g. `deepseek-r1:8b`) and, for Knowledge Base embedding, `BYTECHEF_AI_PROVIDER_EMBEDDING_OLLAMA_OPTIONS_MODEL` (e.g. `qwen3-embedding:8b`).
+
+<Callout title="Choosing an embedding model">
+    Pick the embedding model deliberately: documents already stored in Knowledge Bases are embedded with the model that was active at upload time, and switching to a different embedding model degrades semantic search over existing documents until they are re-embedded.
+</Callout>
+
+---
+
+## Self-hosting: static keys
+
+Instead of (or in addition to) activating providers through the UI, a self-hosted deployment can supply provider keys as configuration — for example `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` or `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`. See the [environment variables reference](/self-hosting/configuration/environment-variables#ai-provider-api-keys).
+
+**Precedence:** a provider activated through the UI for an environment always wins. The static configuration key is used only as a fallback when no provider is activated for that environment. This lets an operator ship a default key while still letting each environment override it through the UI. On the Community Edition there is no catalog to override with, so the static keys are the sole source.
+
+> The Copilot documentation corpus is a special case: it is instance-global and embeds with its own dedicated key rather than the per-environment catalog. See [AI Copilot → Documentation embeddings](/platform/copilot#documentation-embeddings).

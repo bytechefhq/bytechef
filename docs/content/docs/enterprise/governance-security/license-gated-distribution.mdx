@@ -1,0 +1,64 @@
+---
+title: "License-Gated EE Distribution"
+description: "Clean separation of Community and Enterprise binaries via compile-time conditional wiring. No surprises in your supply chain."
+---
+
+ByteChef Enterprise is distributed as a **separate binary** from Community, not as a runtime toggle in the open-source build. This matters because it gives you a clear, auditable supply-chain story: the bits you deploy are the bits you intend to deploy, and your security review only needs to cover one of the two distributions.
+
+## Compile-time conditional wiring
+
+The Enterprise modules live alongside Community modules in the repository (under `server/ee/` and parallel `server/ee/libs/` trees), but they're wired in at **compile time** via Spring's conditional configuration:
+
+- The `bytechef.edition` property selects between `ce` (Community) and `ee` (Enterprise) at build time.
+- `@ConditionalOnEEVersion` annotations on EE beans ensure the Enterprise wiring only activates in the EE build.
+- The CE build excludes the EE modules entirely — they don't end up in the resulting JAR.
+
+The practical effect:
+
+- A Community deployment **cannot** be flipped into an Enterprise mode at runtime by editing a config file. The EE classes aren't on the classpath.
+- An Enterprise deployment includes only the EE features your license entitles you to.
+- Supply-chain scanners (Snyk, Trivy, CodeQL) get the same view your team gets — the bits in the JAR match the source you reviewed.
+
+## What's in each distribution
+
+| Module class | Community | Enterprise |
+|---|---|---|
+| Workflow engine, Atlas | ✓ | ✓ |
+| Visual workflow editor | ✓ | ✓ |
+| 200+ components | ✓ | ✓ |
+| Single-tenant monolith deployment | ✓ | ✓ |
+| Multi-tenant isolation | — | ✓ |
+| Microservice topology | — | ✓ (coming soon) |
+| Workspaces and environments | — | ✓ |
+| Audit log | — | ✓ |
+| RBAC | basic | full |
+| External secret managers | — | ✓ (coming soon) |
+| Embedded iPaaS surface | — | ✓ |
+| Production SLAs and support | — | ✓ |
+
+The Community feature set is intentionally *complete* for single-tenant, single-team use — Enterprise is not a feature-gated cripple-ware build, it's the same engine with the extra fabric needed for multi-team and multi-tenant operation.
+
+## License validation
+
+> **Coming soon.** License-file validation is on the upcoming release track. In the latest released version of ByteChef, EE activation is controlled by the `bytechef.edition` configuration alone.
+
+License validation is local and offline — no callbacks to a vendor licensing server during normal operation. The license file is read at boot, validated, and used to determine which EE modules to activate. If your license expires, the platform continues to operate but stops activating the EE-gated features.
+
+## Migrating Community → Enterprise
+
+Because the engine, the workflow JSON, the component model, and the database schema are shared between the two distributions, migrating from Community to Enterprise is a binary swap plus configuration:
+
+1. Stop the Community process.
+2. Deploy the Enterprise JAR pointing at the same database.
+3. Apply the EE-specific Liquibase migrations (run automatically at startup).
+4. Configure the EE features you intend to use.
+
+Your existing workflows, connections, and execution history come along unchanged.
+
+## Supply-chain transparency
+
+For organizations that need to audit what their automation platform actually does:
+
+- Community source is open and forkable on GitHub.
+- Enterprise source is **source-available** ([Source-Available Code](/enterprise/support-trust/source-available-code)) — you can inspect, audit, and modify the EE modules under the Enterprise license.
+- SBOM and dependency manifests are published with each release.

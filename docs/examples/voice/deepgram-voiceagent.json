@@ -1,0 +1,56 @@
+{
+    "_comment": [
+        "Example browser-voice workflow using Deepgram's all-in-one voiceAgent component.",
+        "",
+        "Two layers:",
+        "  1. The OUTER workflow has a browser/v1/voiceSession trigger. When a browser opens a voice",
+        "     session against this workflow's webhook URL, the platform parses the trigger's websocketTasks",
+        "     extension and spawns the INNER sub-workflow against the live audio stream.",
+        "  2. The INNER sub-workflow (embedded as a JSON string under websocketTasks) has one task:",
+        "     deepgram/v1/voiceAgent. That action terminates the audio loop end-to-end — STT + LLM + TTS",
+        "     all happen at Deepgram, with the platform just bridging audio bytes in/out.",
+        "",
+        "To use:",
+        "  1. Create a Deepgram API key (https://console.deepgram.com). Free tier works.",
+        "  2. Create a Deepgram connection in ByteChef with the key.",
+        "  3. Import this JSON as a new workflow.",
+        "  4. Replace 'YOUR_DEEPGRAM_CONNECTION_ID' below with your actual connection id.",
+        "  5. Publish the workflow to get its webhook URL.",
+        "  6. Drop the webhook URL into one of:",
+        "       - AutomationChatModal config: voiceWebhookUrl",
+        "       - AI Hub workspace settings: Voice webhook URL",
+        "       - Workflow editor test panel: just open the workflow and click the mic",
+        "",
+        "Customize:",
+        "  * llmProvider / llmModel: change to anthropic/claude-3-5-sonnet, google/gemini-1.5-pro, etc.",
+        "  * ttsModel: aura-asteria-en, aura-luna-en, aura-stella-en for different voices",
+        "  * prompt: define the agent's behavior and persona",
+        "  * greeting: the assistant's opening line when the call starts",
+        "",
+        "Audio format notes:",
+        "  * sampleRate=16000 on the trigger matches the browser's PCM16 capture rate (see",
+        "    client/public/mic-worklet.js).",
+        "  * audioInputEncoding=linear16 + audioInputSampleRate=16000 match the trigger.",
+        "  * audioOutputSampleRate=24000 is Deepgram's TTS native rate; the browser playback resamples",
+        "    automatically via the AudioBuffer constructor."
+    ],
+    "label": "Voice Assistant (Deepgram all-in-one)",
+    "description": "Browser voice trigger feeding Deepgram voiceAgent — handles STT, LLM, and TTS over one provider WebSocket.",
+    "inputs": [],
+    "outputs": [],
+    "triggers": [
+        {
+            "name": "trigger_1",
+            "type": "browser/v1/voiceSession/v1",
+            "label": "Browser voice session",
+            "parameters": {
+                "subWorkflow": "voice-subflow-1",
+                "sampleRate": "16000",
+                "echoCancellation": true,
+                "noiseSuppression": true,
+                "websocketTasks": "{\"tasks\":[{\"name\":\"agent\",\"type\":\"deepgram/v1/voiceAgent/v1\",\"label\":\"Voice agent\",\"parameters\":{\"language\":\"en\",\"prompt\":\"You are a helpful voice assistant for ByteChef. Keep responses concise and natural for spoken delivery — avoid markdown, bullet lists, or long paragraphs. When the user asks you to do something you can't do, say so directly rather than improvising.\",\"greeting\":\"Hi there! How can I help?\",\"llmProvider\":\"open_ai\",\"llmModel\":\"gpt-4o-mini\",\"ttsProvider\":\"deepgram\",\"ttsModel\":\"aura-asteria-en\",\"audioInputEncoding\":\"linear16\",\"audioInputSampleRate\":\"16000\",\"audioOutputEncoding\":\"linear16\",\"audioOutputSampleRate\":\"24000\"},\"connections\":{\"deepgram_1\":{\"componentName\":\"deepgram\",\"componentVersion\":1,\"connectionId\":\"YOUR_DEEPGRAM_CONNECTION_ID\"}}}]}"
+            }
+        }
+    ],
+    "tasks": []
+}

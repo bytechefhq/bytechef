@@ -65,4 +65,4 @@ Click on any execution row to open a detail sheet that shows:
 
 ### Environment Selection
 
-Executions are scoped to the current environment. Use the environment selector in the header to switch between Development, Staging, and Production.
+Executions are scoped to the current environment. Use the environment selector in the left sidebar (next to the user menu) to switch between Development, Staging, and Production.

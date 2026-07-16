@@ -1,0 +1,50 @@
+---
+title: "Component Policies"
+description: "Curate which of the 200+ components builders can see and run — a tenant-wide on/off switch per component, enforced at listing time and again at execution time."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+A catalog of [200+ components](/enterprise/extensibility/built-in-components) is a feature — until your security team asks why any builder can wire company data into any SaaS tool that ships with the platform. **Component policies** let an administrator curate the catalog: each component can be switched off tenant-wide, disappearing from builders' component lists and refusing to execute even if referenced directly.
+
+<Callout type="warn" title="Coming soon">
+  Component policies are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+<Callout type="info">
+  Component policies are an **Enterprise** feature (license feature `component-policies`). In the Community edition every component is always available.
+</Callout>
+
+## How it works
+
+Administrators manage policies under **Settings → Component Policies → Component Visibility**: a searchable list of every registered component with an on/off toggle per component.
+
+- **Default is enabled.** A component with no policy row is available. You only create policy state by switching something off, so a fresh installation behaves exactly like Community.
+- **Scope is tenant-wide.** A disabled component is disabled for every workspace, project, and environment in the tenant. There is no per-workspace override.
+- **Changes propagate within seconds.** Enforcement reads a short-lived per-tenant cache (10-second TTL), so a toggle takes effect across the platform within roughly ten seconds — without a database probe on every component listing.
+
+## What disabling a component does
+
+Enforcement happens in two independent layers:
+
+| Layer | Effect |
+|---|---|
+| **Listing** | The component disappears from component lists — builders no longer see it in the workflow editor palette. |
+| **Execution** | Any attempt to run the component — actions, triggers, or agent cluster elements — is rejected with `Component '<name>' is disabled by an administrator and cannot be executed.` |
+
+The execution layer is what makes the policy a real control rather than a UI filter: a workflow that already references a component keeps its definition, but the referencing steps **fail at run time** while the policy is in place. Re-enabling the component restores them without any workflow change. If you disable a component that production workflows depend on, expect those executions to start failing within the cache window — check [workflow executions](/enterprise/collaboration-devops/workflow-executions) for the resulting errors.
+
+## API
+
+The settings UI is backed by two admin-only GraphQL operations:
+
+| Operation | Effect |
+|---|---|
+| `componentPolicies` (query) | Lists every registry component with its tenant-wide `enabled` flag. |
+| `updateComponentPolicy(name, enabled)` (mutation) | Enables or disables one component tenant-wide. |
+
+## How it composes with the rest of the model
+
+- **With [RBAC](/enterprise/governance-security/rbac).** RBAC controls *who* can do *what* with resources they can reach; component policies control *which integration surface exists at all*. A user with every role still cannot run a disabled component.
+- **With [connection visibility](/enterprise/governance-security/connection-visibility).** Visibility governs who can reuse a credential for a component; a component policy removes the component underneath — existing connections for a disabled component simply have nothing to run against until it is re-enabled.
+- **With [custom components](/enterprise/extensibility/custom-components).** Policies apply to the component registry as a whole, so uploaded custom components can be toggled the same way as built-in ones.

@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "data-tables",
+    "knowledge-base",
+    "embedding-models"
+  ]
+}

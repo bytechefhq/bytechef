@@ -5,8 +5,12 @@
   "root": true,
   "pages": [
     "overview",
+    "settings",
+    "ai-providers",
     "copilot",
+    "context-store",
     "mcp-server",
+    "ai-gateway",
     "ai"
   ]
 }

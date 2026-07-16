@@ -1,0 +1,103 @@
+---
+title: "Production Migrations"
+description: "Helm charts for monolith and microservices deployments; runbook-driven upgrade paths."
+---
+
+Most platforms get the "first install" experience right and the "upgrade in production" experience wrong. ByteChef Enterprise's migration story is engineered for the second case — because the install is a one-time cost but the upgrade is forever.
+
+## What we ship for migrations
+
+| Artifact | What it does |
+|---|---|
+| **Helm charts** | One chart for monolith deployments, another for microservices. Tuned defaults for each topology. |
+| **Liquibase migrations** | All schema changes are versioned and run automatically on startup. No manual SQL. |
+| **Runbooks** | Step-by-step procedures for common migrations — version upgrades, broker swaps, topology changes. |
+| **Hands-on assistance** | A named [support contact](/enterprise/support-trust/support-slas) runs the migration with you. |
+
+## The migration types
+
+### Minor version upgrade (e.g., 1.4.0 → 1.4.3)
+
+- Backwards compatible by definition.
+- Liquibase migrations are additive.
+- Rolling restart of your deployment pulls in the new image.
+- Typical window: minutes, no downtime.
+
+### Major version upgrade (e.g., 1.x → 2.x)
+
+- May include breaking schema changes.
+- Liquibase handles them, but the upgrade is one-way (always back up first).
+- Helm values may need updates for new configuration knobs.
+- Typical window: hours, with a maintenance announcement to users.
+- Runbook covers pre-checks, the cutover, and post-checks.
+
+### Community → Enterprise
+
+- Stop the Community process; deploy the Enterprise JAR pointing at the same database.
+- EE Liquibase migrations run automatically.
+- Configure new EE features incrementally — you don't have to enable everything on day one.
+- Existing workflows, executions, and connections come along unchanged.
+
+### Monolith → microservices
+
+- Larger lift; requires planning around the broker, the scheduler, and service-to-service auth.
+- Typically done in stages: extract the webhook service first, then the scheduler, then split workers into pools, finally introduce the API gateway.
+- Each stage is a deployment with its own runbook.
+
+### Broker swap (e.g., Redis → Kafka)
+
+- Drain in-flight tasks on the old broker.
+- Reconfigure environment variables and Helm values.
+- Restart coordinator and worker pods against the new broker.
+- Runs resume against the new substrate; suspended executions wake up unchanged.
+
+### Region migration (e.g., us-east-1 → eu-west-1)
+
+- Bring up the new region cluster.
+- Replicate the database (logical or physical depending on size).
+- Cut over DNS once the new cluster is warm.
+- For [multi-tenant deployments](/enterprise/scale-reliability/multi-tenant-isolation), this can be done tenant-by-tenant for zero overall downtime.
+
+## The Helm charts
+
+The Helm charts are designed to be **safe to apply repeatedly** — every value has a sane default, and re-applying doesn't reset anything you customized. The chart structure mirrors the deployment:
+
+```
+bytechef-monolith/
+├── Chart.yaml
+├── values.yaml          # All your knobs
+├── templates/
+│   ├── deployment.yaml
+│   ├── service.yaml
+│   ├── ingress.yaml
+│   ├── configmap.yaml
+│   ├── secret.yaml
+│   ├── pvc.yaml
+│   └── liquibase-job.yaml  # Pre-deploy hook
+└── README.md            # Migration runbook
+```
+
+Microservice charts (coming soon) follow the same pattern, one sub-chart per service.
+
+## Runbook-driven upgrades
+
+Every migration ships with a runbook that covers:
+
+- **Pre-checks** — what to verify before starting (backup taken, observability ready, change window open).
+- **Steps** — the actual sequence with expected output at each step.
+- **Validation** — how to confirm health post-migration.
+- **Rollback** — exactly how to back out if something goes wrong.
+
+The runbooks live with the release; you're never reading docs that don't match the version you're upgrading to.
+
+## Backup is a prerequisite, always
+
+Before every migration:
+
+- [ ] Database backup (and tested restore procedure).
+- [ ] [Master encryption key](/enterprise/governance-security/encrypted-credentials) backed up.
+- [ ] Helm values committed to your config repo.
+- [ ] Audit log exported to your SIEM (so the migration window has continuous coverage).
+- [ ] On-call coverage in place during the cutover.
+
+These steps are in every runbook for a reason — they're cheap insurance against the migration that turns out harder than expected.

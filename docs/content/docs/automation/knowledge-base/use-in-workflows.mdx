@@ -1,0 +1,65 @@
+---
+title: Use it in Workflows & Agents
+description: Retrieve chunks from a workflow step or wire a knowledge base into an AI agent as its RAG layer.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+A knowledge base is only useful once something queries it. ByteChef exposes it through the
+**Knowledge Base** component, which can be used directly as a workflow action or attached to
+an [AI agent](/platform/ai/agent) as its retrieval layer.
+
+## Search from a workflow step
+
+Add the Knowledge Base **Search** action to a workflow to fetch the most relevant chunks for
+a query. The action takes:
+
+- **Knowledge base** — which knowledge base to query.
+- **Query** — the natural-language text to match against.
+- **Top K** — how many chunks to return.
+- **Similarity threshold** — a floor on the relevance score; lower-scoring chunks are
+  dropped.
+- **Metadata filter** — an optional JSON filter applied before ranking.
+
+It returns an array of matching chunks, each with its content, relevance score, and
+metadata — ready to feed into a prompt, a condition, or any downstream step.
+
+## Ground an AI agent (RAG)
+
+Attach a knowledge base to an [AI agent](/platform/ai/agent) so the agent can retrieve
+context on its own:
+
+- **As the agent's vector store** — the agent searches the knowledge base automatically
+  when answering, grounding its responses in your documents.
+- **As a tool** — the agent decides when to call the knowledge base, issuing a search only
+  when it needs supporting facts.
+
+Either way the pattern is the same:
+
+```
+User question → embed → nearest chunks from the knowledge base → chunks added to the prompt → model answers
+```
+
+This is what keeps an agent's answers grounded in your content instead of the model's
+training data alone.
+
+## Filtering by tag
+
+When a single knowledge base holds distinct kinds of content, pass a **tag filter** so a
+given workflow or agent only retrieves from the documents you intend. Tag matching is
+inclusive — any document carrying one of the requested tags is eligible — so an agent
+scoped to `policy` never surfaces a chunk from an untagged product spec in the same
+knowledge base.
+
+<Callout title="Keep ingestion and retrieval aligned">
+  Retrieval quality starts at ingestion. If an agent gives vague answers, check the
+  [chunk settings](/automation/knowledge-base/create-a-knowledge-base#choosing-chunk-settings)
+  and confirm the documents you expect are **Ready** before blaming the prompt.
+</Callout>
+
+## Feeding a knowledge base from a workflow
+
+The Knowledge Base component also has a **write** side used by
+[sources](/automation/knowledge-base/sources): a workflow can upsert records into a
+knowledge base as documents, which are then chunked and embedded like any uploaded file.
+This is how external systems keep a knowledge base current without manual uploads.

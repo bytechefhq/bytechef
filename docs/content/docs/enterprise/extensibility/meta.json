@@ -1,0 +1,10 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "custom-components",
+    "code-workflows",
+    "polyglot-scripting",
+    "built-in-components",
+    "mcp-integration"
+  ]
+}

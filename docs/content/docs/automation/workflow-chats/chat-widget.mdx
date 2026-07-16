@@ -1,0 +1,71 @@
+---
+title: Embed the Chat Widget
+description: Drop the @bytechef/chat React widget into your own app and point it at a chat-enabled workflow — text and voice.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Workflow chats and the Chats page (part of the AI Hub, an Enterprise Edition feature) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+When a chat-enabled workflow runs in [Embedded Chat mode](/automation/workflow-chats/enable-chat), you bring your own UI. The **`@bytechef/chat`** React package is that UI — a ready-made chat widget that speaks the New Chat Request webhook contract, including streamed replies and voice.
+
+## Install
+
+```bash
+npm install @bytechef/chat
+```
+
+## Drop in the widget
+
+Point the widget at your workflow's chat webhook URL:
+
+```tsx
+import {AutomationChat} from '@bytechef/chat';
+
+export function SupportChat() {
+    return (
+        <AutomationChat
+            config={{
+                description: 'Ask anything about your account.',
+                suggestions: ['Where is my order?', 'Cancel my subscription'],
+                title: 'Support Assistant',
+                webhookUrl: 'https://<your-host>/webhooks/<webhook-id>',
+            }}
+        />
+    );
+}
+```
+
+Three components are exported:
+
+| Export | What it renders |
+|---|---|
+| `AutomationChat` | The full chat surface, inline in your page. |
+| `AutomationChatModal` | A floating launcher button that opens the chat in a modal (`position` defaults to `bottom-right`). |
+| `AutomationChatProvider` | The context provider underneath both — exported for fully custom layouts, together with building blocks like `Thread` and the `useSSE` hook. |
+
+The widget sends `{ message, conversationId, attachments }` to the webhook and renders the reply; when the webhook URL ends in `/sse`, replies stream token by token.
+
+## Voice
+
+The widget can hold a spoken conversation with a workflow whose trigger is **Browser → Voice Session** (`browser/v1/voiceSession`):
+
+```tsx
+<AutomationChat
+    config={{
+        chatMode: true,
+        title: 'Voice Assistant',
+        voiceMode: true,
+        voiceWebhookUrl: 'https://<your-host>/webhooks/<voice-webhook-id>',
+        webhookUrl: 'https://<your-host>/webhooks/<webhook-id>',
+    }}
+/>
+```
+
+- `voiceMode: true` with `chatMode: false` takes over the surface with a full-screen voice layout; with `chatMode: true` the regular thread gains a voice-mode button and a push-to-talk microphone in the composer.
+- Under the hood the widget mints a session token (`POST <webhook>/voice-session-token`), then streams microphone audio over a WebSocket (`/webhooks/<id>/wss`) and plays the assistant's audio back — emitting transcript and status events you can observe via the exported `BrowserVoiceSession` types.
+- Voice requires a **secure (https) context** and microphone permission; `checkVoiceSupport()` is exported to feature-detect before showing voice controls.

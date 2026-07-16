@@ -1,0 +1,31 @@
+---
+title: "Collaboration & DevOps Overview"
+description: "Ship workflows the way you ship code — with environments, versions, separation of build and deploy, and Git as the source of truth."
+---
+
+The Collaboration & DevOps pillar makes workflows feel like first-class software artifacts: they live in projects, version on every change, promote across environments, and back to Git when you want them to.
+
+## What you get
+
+| Capability | Purpose |
+|---|---|
+| [Workspaces and projects](/enterprise/collaboration-devops/workspaces-projects) | Multi-team org structure with per-workspace settings. |
+| [Environments — DEVELOPMENT / STAGING / PRODUCTION](/enterprise/collaboration-devops/environments) | First-class environment selection across UI and APIs. |
+| [Workflow versioning](/enterprise/collaboration-devops/workflow-versioning) | Every change is a version; pin specific versions per environment. |
+| [Build once, deploy many](/enterprise/collaboration-devops/build-once-deploy-many) | Separate the act of building from the act of deploying. |
+| [Workflow executions](/enterprise/collaboration-devops/workflow-executions) | Per-execution history with full step-by-step traces. |
+| [Git-backed change tracking](/enterprise/collaboration-devops/git-backed-change-tracking) | Workflows-as-files, diffable in PRs, revertable with `git revert`. Hosts [code workflows](/enterprise/collaboration-devops/git-backed-change-tracking#code-workflows-coming-soon) *(coming soon)*. |
+
+For executing workflows from a CI step or batch job without standing up the platform, see the standalone [Runtime Job Runner](/enterprise/runtime-job-runner) section.
+
+## The mental model
+
+If you're coming from "no-code" tools where workflows are mutable globals that can change under a running production trigger, the model here will feel familiar from engineering:
+
+```
+Edit (DEVELOPMENT)  →  Publish (version cut)  →  Promote (deploy version to STAGING/PRODUCTION)
+```
+
+Editing a workflow doesn't change what's running anywhere. Publishing a version creates an immutable artifact. Promoting picks an artifact and tells an environment to use it. The same artifact can be promoted to multiple environments at different times.
+
+This is why a hotfix in PRODUCTION can't accidentally land in DEVELOPMENT, why two engineers can edit the same workflow without stepping on each other, and why "roll back" is always a single click — promote the previous version.

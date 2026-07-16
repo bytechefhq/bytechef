@@ -1,0 +1,160 @@
+---
+title: Personal Agents
+description: User-defined LLM agents with custom instructions that apply on every turn.
+---
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Personal Agents and the AI Hub (Enterprise Edition) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+A **personal agent** is a saved set of instructions you can chat with as a focused
+assistant — a code reviewer, a research helper, a copywriter — without re-typing the
+prompt on every conversation. The AI Hub applies your agent's instructions on
+top of the workspace's default copilot prompt, so the agent can specialise without
+losing the workspace tools.
+
+## When to use a personal agent
+
+- You repeat the same setup ("review this code for bugs and security issues, prefer
+  short bullet points, cite line numbers") at the start of every chat.
+- You want a focused assistant for one task and a separate one for another, each with
+  its own personality and rules.
+- You want the same instructions to apply across multiple chats with the same agent
+  rather than copy-pasting into each new conversation.
+
+Personal agents are scoped per **user + workspace + environment**. Your DEV agents
+don't surface in PROD; the agents in workspace A don't appear in workspace B; another
+user in the same workspace can't see your agents.
+
+## Creating an agent
+
+The **Personal Agents** section sits at the top of the AI Hub sidebar. If you
+have no agents yet, the empty-state CTA opens the create dialog:
+
+- **Display title** — what shows in the sidebar (e.g. "Research Assistant").
+- **Slug** — auto-generated from the title; matches `^[a-z0-9_-]{1,64}$`. Immutable
+  after creation because chat URLs and tool references key off it.
+- **Description** — short blurb shown as a tooltip in the sidebar.
+- **Instructions** — appended to the copilot's system prompt every turn. This is where
+  you describe how the agent should behave, what tone to use, and what to focus on.
+
+Click **Create agent** and the new agent appears in the sidebar. Click the row to
+start a conversation with it.
+
+### Creating from chat
+
+You can also create an agent through a chat with the regular copilot:
+
+> "Set up a personal agent called 'PR reviewer' that focuses on pull-request reviews —
+> it should always cite specific line numbers and prefer short, actionable comments."
+
+The copilot uses the `createPersonalAgent` tool to mint the agent and `openPersonalAgentTab`
+to open the new conversation. You'll see the new agent appear in the sidebar.
+
+## Editing an agent
+
+Hover over an agent row in the sidebar to reveal pencil + delete icons. The pencil
+opens an edit dialog with title, description, and instructions all editable. Slug is
+immutable post-create — if you need to rename the agent's identifier, delete and
+recreate.
+
+## Chatting with an agent
+
+Click an agent row in the sidebar. The conversation:
+
+- Lives in the same conversations table as copilot and workflow chats — message
+  history, archive, attached tools, file uploads all work the same way.
+- Renders with a bot icon in the sidebar to distinguish it from copilot rows.
+- Applies the agent's instructions on every turn. The agent's title shows up in the
+  system prompt as `You are operating as the user's personal agent: "Research Assistant"`,
+  so the model can refer to itself by name in replies.
+- Each click on the agent row starts a **fresh conversation**. Past conversations with
+  the same agent stay reachable through the conversations list — they're just no longer
+  the default landing target. This change (May 2026) lets you have multiple parallel
+  threads with the same agent without having to manually archive between sessions.
+
+The conversation has access to the same tools as the regular copilot: file/data-table/
+knowledge-base reads, workflow runs, research, image/slide generation. The instructions
+overlay narrows the agent's behaviour without removing capabilities.
+
+A few more things you can do in a conversation:
+
+- **Pick the model per conversation** — the composer's model picker lists the chat models
+  from your activated [AI Providers](/platform/ai-providers), so one conversation can run
+  on a fast model and another on a stronger one.
+- **Talk instead of type** — the microphone button in the composer starts a voice
+  interaction with the agent.
+- **Memories** — the assistant remembers durable facts it learns across conversations.
+  Saved memories are listed on the **Memories** page (under the AI section), where you
+  can review and delete them.
+
+## Scheduling an agent
+
+An agent can run on a schedule without you opening a chat. The agent's edit page has a
+**Schedule** tab:
+
+- **Task description** — the prompt the agent receives on each scheduled run
+  (e.g. "Summarize yesterday's failed workflow executions and flag anything unusual").
+- **Run frequency** — presets such as Daily or Weekly, or a custom cron expression, with
+  an explicit timezone.
+- **Lifecycle** — run indefinitely or stop after a set number of runs.
+- **Enabled** toggle — pause and resume the schedule without deleting it.
+
+{/* TODO screenshot: personal agent edit page on the Schedule tab — task description, run frequency selector with timezone, lifecycle options, and the Enabled toggle */}
+
+Each scheduled run produces a normal conversation, so results land in the conversations
+list where you can read and continue them.
+
+## Deleting an agent
+
+The trash icon (hover-revealed on the sidebar row) opens a confirmation dialog.
+Deleting:
+
+- Removes the agent definition.
+- Does **not** delete past conversations bound to the agent — message history stays
+  visible. New turns on those conversations run against the default copilot
+  (no instructions overlay) since the agent definition is gone.
+
+If you want to permanently delete the chat history too, archive or delete the
+conversation row separately from the conversation menu.
+
+## Limitations and known constraints
+
+- **Instructions are advisory**: the LLM treats the agent's instructions as part of
+  the system prompt, not an enforced ACL. Workspace-level guardrails (the copilot's
+  baseline prompt, tool ACL, content moderation) still apply on top.
+- **One agent per conversation**: a conversation is bound to a specific agent at
+  creation time. To run a different agent against the same chat history, create a
+  fresh conversation with the new agent.
+- **No per-agent model override (yet)**: an agent definition cannot pin its own model.
+  You can, however, pick the model **per conversation** from the composer's model picker;
+  a future release will let an agent specify a default model.
+- **No per-agent tool ACL (yet)**: every agent has access to the same tool set as the
+  baseline copilot. Use the per-conversation tool attachment surface
+  (`AttachConversationTool`) for tool scoping today.
+- **Per-user scope**: agents aren't shareable across users. A future release will add
+  workspace-shared agents alongside personal ones.
+
+## Architecture overview (for developers)
+
+For developers extending the personal-agent surface:
+
+- The agent entity lives at `PersonalAgent` (`server/ee/libs/ai/ai-copilot/ai-copilot-api`)
+  with a Spring Data JDBC repository in the matching `ai-copilot-service` module.
+- The router (`AiHubRoutingAgent`) detects `kind = PERSONAL_AGENT` conversations
+  and injects the agent's instructions into the per-turn AG-UI `State` under
+  `personalAgentInstructions` and `personalAgentTitle`.
+- `AiHubSpringAIAgent.appendPersonalAgentContext` reads those state keys and
+  adds them as a `Personal Agent` Context block to the system message.
+- Conversations are persisted as `kind = PERSONAL_AGENT` rows with a `personal_agent_id`
+  foreign-shape pointer. Every call to `createPersonalAgentChat` inserts a new row with a
+  UUID-suffixed `pa-chat:<uuid>` threadId — the previous partial unique index that scoped
+  one row per `(workspace, user, environment, personal_agent_id)` was dropped to support
+  always-new conversations.
+- LLM tool callbacks: `ListPersonalAgentsToolCallback`, `CreatePersonalAgentToolCallback`,
+  `OpenPersonalAgentTabToolCallback`, `UpdatePersonalAgentToolCallback`,
+  `DeletePersonalAgentToolCallback`.
+- GraphQL surface: `PersonalAgentGraphQlController` with workspace + user gating via
+  `WorkspaceAccessGuard`.

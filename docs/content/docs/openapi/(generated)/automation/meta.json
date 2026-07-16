@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../../.source/json-schema/docs.meta.json",
+  "title": "Automation",
+  "description": "Public REST API for ByteChef Automation (code-based projects).",
+  "pages": [
+    "..."
+  ]
+}

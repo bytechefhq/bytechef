@@ -1,0 +1,56 @@
+---
+title: Advanced Behavior
+description: Human-in-the-loop questions inside a chat, embedded chat interfaces, and the current limits of workflow chats.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Workflow chats and the Chats page (part of the AI Hub, an Enterprise Edition feature) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+## Human-in-the-loop inside a chat
+
+A workflow turn doesn't have to be a single request and response. A workflow can pause
+mid-run to ask the user a question and resume once they answer — all inside the same
+conversation.
+
+When the workflow suspends with a question, the Chats page renders the prompt and waits.
+The user's answer is sent back to the running execution, which resumes from where it
+paused. This is the same suspend/resume mechanism described in
+[Human in the Loop](/automation/build/human-in-the-loop), surfaced conversationally: instead
+of an approval inbox or a Slack button, the question appears in the chat thread.
+
+Use it for flows that need a clarification before continuing — confirming an action,
+collecting a missing field, or choosing between options — without leaving the chat.
+
+## Embedded chat
+
+Setting the trigger's **Mode** to **Embedded Chat** keeps the workflow out of the hosted
+Chats page and lets you drive it from your own UI. Your interface calls the
+[New Chat Request webhook](/automation/workflow-chats/enable-chat#the-request-shape) with the
+same `{ message, conversationId, attachments }` body and renders the streamed reply however
+you like. The workflow contract is identical; only the front end changes.
+
+This is the path to embedding a branded assistant in your own product while still building
+the logic as an ordinary ByteChef workflow.
+
+## Limitations
+
+Keep these in mind when designing a chat workflow:
+
+- **The chat trigger runs synchronously.** A turn occupies the conversation until it
+  returns; design workflows so a turn completes in a reasonable time, and lean on streamed
+  output for long answers.
+- **Access follows the workflow.** A user who can see a workflow's chat can run it; scope
+  chat workflows the same way you scope any other workflow.
+- **Conversations are environment-isolated.** A conversation is bound to the environment and
+  workflow version it started against.
+
+<Callout title="Keep turns responsive">
+  If a chat feels slow, stream partial output early in the workflow and defer heavy work, so
+  the user sees progress instead of a spinner. See
+  [Streamed replies](/automation/workflow-chats/using-chats#streamed-replies).
+</Callout>

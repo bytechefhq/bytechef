@@ -1,0 +1,8 @@
+{
+  "$schema": "../../../../.source/json-schema/docs.meta.json",
+  "pages": [
+    "support-slas",
+    "production-migrations",
+    "source-available-code"
+  ]
+}

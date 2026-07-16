@@ -1,20 +1,24 @@
 ---
 title: App Events
-description: Trigger integration workflows based on events from your application.
+description: Define events your product fires to trigger embedded workflows.
 ---
 
 ![App Events overview](app-events-overview.png)
 
 ---
 
+App Events are named events that originate in **your application** (e.g. `user.signed_up`, `order.placed`, `record.updated`). You declare them here with a JSON schema for their payload, and workflows subscribe to them via an **App Event trigger**.
+
+The flow is intentionally one-way: an App Event is the contract, and any number of workflows can listen for it.
+
 ## Key Features
 
 | Feature | Description |
 |---|---|
-| Event-driven triggers | Define events that originate from your application and connect them to workflows. |
-| Workflow filtering | Filter app events by the workflows they trigger using the left sidebar. |
-| Multiple workflow support | A single app event can trigger multiple workflows simultaneously. |
-| Environment awareness | App events respect the current environment setting. |
+| Named contract | Each event has a name and a JSON schema describing its payload. |
+| Many-to-many | Any number of workflows (across any integrations) can subscribe to the same App Event. |
+| Workflow filtering | Filter the App Events list by the workflows that subscribe to them. |
+| Environment awareness | Events fire against the environment specified in the request header. |
 
 ---
 
@@ -22,26 +26,50 @@ description: Trigger integration workflows based on events from your application
 
 ### Creating an App Event
 
-1. Click the **New App Event** button in the top-right corner.
-2. Provide a name and schema for the event.
-3. Map the event to one or more workflows that should execute when the event fires.
-4. Click **Save** to create the app event.
+1. Click **New App Event** in the top-right corner.
+2. Enter a **Name** (this is the event identifier you'll use when firing the event).
+3. Enter the event's **Schema** as JSON — the structure of the payload your application will send. It documents the event's contract (see the note under [Firing an App Event](#firing-an-app-event-from-your-application) about payload delivery).
+4. Click **Save**.
 
-### Firing App Events
+Note that you do **not** select workflows here. Workflows opt in to receive an event by adding an App Event trigger and picking this event's name (see below).
 
-App events are triggered programmatically from your application using the ByteChef API. When your application calls the app event endpoint with the event name and payload, ByteChef executes all workflows mapped to that event.
+### Subscribing a workflow to an App Event
 
-Example use cases:
+1. Open a workflow in the integration editor.
+2. Add the **App Event** trigger (component: "App Event", trigger: "New Event").
+3. In the trigger's properties, select the App Event Id you want to subscribe to from the dropdown — it lists every App Event defined on this page.
+4. Save and publish the integration.
 
-- **User signup** -- trigger a workflow that syncs the new user to your CRM and sends a welcome email via Mailchimp.
-- **Order placed** -- trigger a workflow that creates an invoice in your accounting system and notifies your team on Slack.
-- **Record updated** -- trigger a workflow that syncs changes to a third-party database or spreadsheet.
+Multiple workflows can subscribe to the same App Event; ByteChef will trigger all of them when the event fires.
+
+### Firing an App Event from your application
+
+`POST` to the embedded API with the end user's JWT:
+
+```http
+POST /api/embedded/v1/app-events HTTP/1.1
+Host: your-bytechef-host.example.com
+Authorization: Bearer <end-user JWT>
+X-Environment: DEVELOPMENT
+```
+
+The connected user is identified by the JWT `sub` claim. ByteChef looks up that user's enabled integration instances and starts an execution for every workflow whose trigger is the **App Event** trigger, in the environment named by `X-Environment`.
+
+> **Payload delivery is coming soon.** Today the endpoint takes **no request body**: a `POST /api/embedded/v1/app-events` starts every one of the connected user's App Event–triggered workflows in the given environment. Carrying the event payload in the request body — so the schema's properties populate as variables your workflows can read — is coming soon. Until then, the schema documents the event's intended shape.
 
 ### Filtering App Events
 
-Use the left sidebar to filter app events by workflow. Select "All Workflows" to view every app event, or click a specific workflow to see only the events that trigger it.
+Use the left sidebar to filter by workflow. Select "All Workflows" to view every App Event, or click a specific workflow to see only the events it subscribes to.
 
 ### Managing App Events
 
-- **Edit** -- update the event name, schema, or workflow mappings.
-- **Delete** -- remove the app event and its workflow associations.
+- **Edit** — update the event name or schema. Changing the name will break workflows that subscribe to the old name.
+- **Delete** — remove the App Event. Subscribed workflows will no longer fire.
+
+---
+
+## Example use cases
+
+- **User signup** — your app fires `user.signed_up`; workflows sync the new user to the customer's CRM and Mailchimp.
+- **Order placed** — your app fires `order.placed`; workflows create an invoice in the customer's accounting tool and post to Slack.
+- **Record updated** — your app fires `record.updated`; workflows sync the change to whatever third-party store the customer has connected.

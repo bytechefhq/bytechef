@@ -1,0 +1,84 @@
+---
+title: "Workflow Executions"
+description: "Per-execution history with status, duration, inputs, outputs, and step-by-step traces. Debug a real run instead of guessing."
+---
+
+Every workflow run produces an **execution record** — a full, queryable snapshot of what happened, why, and how long it took. Debugging in ByteChef means opening a real execution and reading the trace, not staring at logs hoping you find the relevant lines.
+
+{/* TODO screenshot: execution list view with rows for recent runs — columns showing execution ID, workflow, version, environment, status (mix of succeeded/failed/suspended), duration, trigger; filters bar at top */}
+![Workflow execution list with status, version, and trigger columns](/enterprise/workflow-executions/execution-list.png)
+
+## What's in an execution record
+
+| Field | Meaning |
+|---|---|
+| **Execution ID** | A globally unique identifier. Cross-references logs and [OpenTelemetry](/enterprise/governance-security/observability) traces. |
+| **Workflow + version** | Which workflow ran and which immutable version. |
+| **Environment** | DEVELOPMENT, STAGING, or PRODUCTION. |
+| **Trigger** | What kicked it off — webhook, schedule, manual, API. |
+| **Status** | Running, succeeded, failed, cancelled, suspended (waiting for a signal). |
+| **Started / ended** | Timestamps and total duration. |
+| **Inputs** | The trigger payload that started the run. |
+| **Outputs** | The final result of the workflow. |
+| **Step traces** | One entry per task: status, duration, input parameters, output value, error (if any). |
+| **Retry attempts** | If a step retried, each attempt is captured. |
+| **Audit linkage** | Correlation IDs that join the execution to related audit entries. |
+
+## Per-step traces
+
+Clicking a task in the execution view opens its full record:
+
+- The resolved input parameters (after expressions evaluated).
+- The output payload.
+- The component version that ran.
+- Errors with the original stack trace.
+- Network call details when applicable (for HTTP-based components).
+
+{/* TODO screenshot: single-execution detail view with the step list on the left (one entry per task with status icons) and the right pane showing input parameters, output payload, and a stack trace for a failed step */}
+![Per-step trace view with input, output, and stack trace for a failed task](/enterprise/workflow-executions/step-trace-detail.png)
+
+Sensitive properties are masked everywhere — see [encrypted credentials](/enterprise/governance-security/encrypted-credentials).
+
+## Debug a real run, not a synthesized one
+
+The execution view is built so you can:
+
+- **Re-run** a failed execution with the same inputs to reproduce.
+- **Re-run with edits** — adjust the input payload, see if the fix would have worked.
+- **Pin** an execution as a test case for the workflow.
+- **Compare** two executions to see what diverged.
+
+## Status filters and views
+
+The execution list view supports:
+
+- **Filter by status** (failed only, suspended only, etc.).
+- **Filter by date range**.
+- **Filter by trigger type**.
+- **Filter by execution duration** — surface the slowest 1% of runs.
+- **Filter by workflow version** — useful right after a promotion to compare v17 vs v18 behavior.
+
+## Suspended executions
+
+A workflow can suspend itself waiting for an external signal — a webhook callback, an approval, a scheduled wake-up, an async job completion. Suspended executions:
+
+- Persist their state ([the engine round-trips values with type fidelity](/enterprise/scale-reliability/horizontal-scaling)).
+- Appear in the execution view as `SUSPENDED` with the reason.
+- Resume automatically when their signal arrives, picking up exactly where they paused.
+
+## Retention
+
+Execution records retain on a configurable per-workspace schedule. The defaults balance debuggability with storage cost:
+
+- Successful executions: shorter retention (you usually don't need them).
+- Failed and suspended executions: longer retention (you usually do).
+- Audit log entries are retained independently — see [audit log](/enterprise/governance-security/audit-log).
+
+## API access
+
+The same execution data is available via REST API for:
+
+- Custom dashboards.
+- CI/CD checks ("has this version succeeded in STAGING N times?").
+- Incident response runbooks.
+- ETL into your data warehouse for analytics.

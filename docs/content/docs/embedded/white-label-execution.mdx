@@ -1,0 +1,111 @@
+---
+title: "White-Label Execution"
+description: "Expose ByteChef's workflow engine inside your SaaS. Your customers build integrations; you don't build an integration team."
+---
+
+White-label execution is the core promise of the [Embedded iPaaS](/embedded): your customers get a fully featured workflow engine and an integration builder inside your product, with your branding, your URL, your user experience.
+
+## The mental model
+
+```
+       Your SaaS product
+       ┌────────────────────────────────┐
+       │  Your UI / Your branding       │
+       │  ┌──────────────────────────┐  │
+       │  │  ByteChef-rendered       │  │
+       │  │  workflow builder        │  │  ◄── embedded via iframe / SDK
+       │  │  (white-labeled)         │  │
+       │  └──────────────────────────┘  │
+       │  ┌──────────────────────────┐  │
+       │  │  Your business logic     │  │
+       │  └──────────────────────────┘  │
+       └────────────────────────────────┘
+                      │
+                      ▼
+       ┌────────────────────────────────┐
+       │  ByteChef Enterprise           │
+       │  ┌──────────────┐  ┌────────┐  │
+       │  │ Tenant A     │  │ Tenant │  │
+       │  │ workspace    │  │   B    │  │  ◄── per-customer isolation
+       │  └──────────────┘  └────────┘  │
+       └────────────────────────────────┘
+```
+
+Your customer never sees "ByteChef." They see your product offering integrations.
+
+## What "white-label" actually covers
+
+| Surface | White-labeled? |
+|---|---|
+| **UI shell** | Your product chrome wraps the workflow builder. |
+| **Workflow builder** | Renders inside your product (iframe or SDK component) with your CSS theme tokens. |
+| **Component catalog** | The 200+ built-in components are visible to your customers; the "ByteChef" branding is removed. |
+| **Customer-facing emails** | Sent from your domain, with your templates. |
+| **Webhook URLs** | Live under your domain. |
+| **Documentation links** | Point at your help center, not ByteChef's. |
+| **Error messages** | Translated to your voice and locale. |
+
+## How customers interact with it
+
+A typical embedded flow:
+
+1. **Customer signs in** to your product as they always do.
+2. **Customer navigates to "Integrations"** (or whatever you call it).
+3. **They see a list of integration templates** you've defined for your product — pre-built workflows that solve common scenarios.
+4. **They configure a connection** to their external system (Salesforce, etc.) by completing the standard auth flow. The credentials live in [encrypted credential storage](/enterprise/governance-security/encrypted-credentials), scoped to their tenant.
+5. **The workflow runs** every time the trigger fires. Execution history is visible to them; nothing leaves your product.
+
+## Two integration models
+
+### Pre-built templates
+
+You define a library of integrations as templates. Customers don't build from scratch — they pick a template, configure their connections and parameters, and turn it on. Best for product teams that want curated, supported integrations.
+
+### Builder access
+
+You give customers the visual workflow builder and let them build whatever they want. Best for technical customers and developer-tool products.
+
+You can mix — offer templates as the on-ramp, expose the builder for power users.
+
+## What "execution" means here
+
+When a customer's workflow runs:
+
+- It runs on **your** ByteChef cluster, isolated to their tenant.
+- It uses **their** connections (their Salesforce key, their Slack token).
+- It executes against **their** business logic (your custom components plus the built-in ones).
+- It generates execution history they can see in your product UI.
+
+Crucially, your other customers never share runtime — see [tenant-isolated security](/embedded/tenant-isolated-security).
+
+## Custom components for your product's logic
+
+The integration catalog you give customers can include [custom components](/enterprise/extensibility/custom-components) you write — for example, a "Your Product" component with actions like "create a record" or "look up a customer." That lets you bundle your own product as a first-class integration point in the workflows your customers build.
+
+## What you don't have to do
+
+- **Build a visual workflow builder.**
+- **Build connectors.**
+- **Build an execution engine.**
+- **Build credential storage.**
+- **Build a webhook ingress.**
+- **Build a scheduler.**
+- **Build observability and execution history.**
+
+All of those come with the platform. You build **the product wrapper** — branding, billing, customer onboarding, your business logic.
+
+## The promise to your customers
+
+Embedded gives your customers:
+
+- **Hundreds of integrations** without you having to build them.
+- **A visual workflow builder** they can use without writing code.
+- **Their own connections** — they bring their own credentials; you don't see them.
+- **Their data, isolated** — your other customers can't see their workflows or data.
+
+## The promise to you
+
+- **No integration team.** ByteChef ships and maintains the [200+ built-in components](/enterprise/extensibility/built-in-components).
+- **No new infrastructure to operate** — Embedded is the same binary you've already deployed.
+- **One billing surface.** You charge your customers; ByteChef bills you.
+- **Source-available engine.** No vendor lock-in on the part of your product that powers a critical workflow surface.

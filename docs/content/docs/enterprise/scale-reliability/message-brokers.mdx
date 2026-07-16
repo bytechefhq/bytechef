@@ -1,0 +1,65 @@
+---
+title: "Pluggable Message Brokers"
+description: "Memory, Redis, RabbitMQ, Kafka, JMS, AMQP, or AWS SQS — same workflow code, different infrastructure."
+---
+
+The message broker is how ByteChef's coordinator dispatches tasks to workers. It's also one of the most opinionated choices a platform makes. ByteChef Enterprise instead treats the broker as a **runtime choice** — the same workflow runs on top of any supported broker, and you can change brokers without rewriting a single component.
+
+## Supported brokers
+
+| Broker | Best fit | Notes |
+|---|---|---|
+| **In-memory** | Dev, evaluation, single-JVM. | Zero ops; not suitable for production multi-node. |
+| **Redis** | Small to mid production deployments. | You probably already run it; great latency. |
+| **RabbitMQ** | Production deployments wanting a dedicated broker. | Mature, well-understood, AMQP. |
+| **Kafka** | High-throughput, multi-region, multi-tenant. | Best when you also use Kafka for other event streams. |
+| **AWS SQS** | AWS-native deployments. | Managed; fits the AWS posture; integrates with EventBridge. |
+| **JMS / AMQP** | Enterprises with existing JMS/AMQP infrastructure. | Reuses your existing broker investment. |
+
+## What the broker carries
+
+- **Task dispatches.** "Run this task on a worker."
+- **Task completions.** "Worker is done; here's the result."
+- **Suspend/resume signals.** "This workflow is waiting; wake it up."
+- **Coordinator events.** "Workflow finished" / "Workflow failed."
+
+The broker does *not* carry user-data heavy payloads — large blobs go through [cloud-native storage](/enterprise/scale-reliability/cloud-native-storage) instead, and the broker only carries the reference.
+
+## How the abstraction works
+
+A small `MessageBroker` interface defines `publish`, `subscribe`, and `acknowledge`. Each backend is a thin adapter — the coordinator and worker code is broker-agnostic. This means:
+
+- Adding a new broker is a self-contained implementation.
+- Bugs in one backend can't leak into another.
+- You can run with broker A in production and broker B in your local dev — and trust that components behave the same.
+
+## Picking a broker
+
+Some heuristics:
+
+- **Already using Kafka?** Use Kafka. Reusing existing infrastructure beats introducing a new piece.
+- **AWS-only deployment?** SQS. It's already there, it's managed, the IAM story is straightforward.
+- **Single-region, mid-scale, no existing broker?** Redis. Lowest latency, easiest to run.
+- **Need transactional semantics?** RabbitMQ or JMS.
+- **Multi-region, high throughput?** Kafka.
+
+## Operational considerations
+
+| Concern | Where it lives |
+|---|---|
+| **Backpressure** | The broker. Workers consume at their own pace; the broker buffers. |
+| **Ordering** | Per-task ordering is preserved by default; cross-task ordering is a workflow concern. |
+| **At-least-once delivery** | Yes, on all backends. Components are expected to be idempotent or to handle redelivery. |
+| **Dead-letter** | All backends support dead-letter routing for tasks that fail repeatedly. |
+| **Observability** | Broker queue depth and consumer lag are exposed as [Micrometer metrics](/enterprise/governance-security/observability). |
+
+## Migration between brokers
+
+To switch brokers in a running deployment:
+
+1. Drain in-flight tasks on the old broker.
+2. Update `BYTECHEF_MESSAGE_BROKER_PROVIDER` and the broker-specific connection settings.
+3. Restart coordinator and worker pods.
+4. Run resumes against the new broker; suspended executions wake up against the new substrate.
+
+The workflow definitions, the execution history, and the component code are unchanged.

@@ -1,0 +1,68 @@
+---
+title: "Environments"
+description: "First-class DEVELOPMENT / STAGING / PRODUCTION selection across the UI and APIs. Connections, workflows, and credentials all carry environment context end-to-end."
+---
+
+Environments are a **first-class concept** inside every workspace, not a convention enforced by naming or a separate workspace per stage. The platform threads the environment context through every connection, every workflow version selection, and every API call — so DEVELOPMENT traffic stays in DEVELOPMENT and PRODUCTION traffic stays in PRODUCTION without you having to remember which is which.
+
+## The environment set
+
+Every workspace ships with the same three environments:
+
+| Environment | Purpose |
+|---|---|
+| **DEVELOPMENT** | Where you edit workflows. Connections point at sandbox/dev versions of external systems. |
+| **STAGING** | Pre-production. Mirrors PRODUCTION configuration; used for smoke testing a build before promoting. |
+| **PRODUCTION** | Live traffic. Only published, promoted versions run here. |
+
+The set is fixed — these three names are platform-defined, not user-configurable. The intent is operational consistency: every workspace looks the same to anyone reading an audit log, an API call, or a connection picker.
+
+## What carries environment context
+
+- **Connections** — each connection has an environment. A "Stripe" connection in DEVELOPMENT holds your sandbox keys; in PRODUCTION it holds your live keys. Workflows reference the *logical* connection; the platform resolves to the environment-specific record at runtime.
+- **Workflow versions** — each environment pins a specific version of each workflow. DEVELOPMENT may run draft v17; PRODUCTION may still run v14 until you promote.
+- **Credentials** — the values behind connections are environment-specific. Rotating the PRODUCTION secret never touches DEVELOPMENT.
+- **Webhooks** — webhook URLs include the environment, so a misconfigured webhook can't accidentally hit PRODUCTION.
+- **Schedules** — a cron trigger in DEVELOPMENT doesn't fire in PRODUCTION; promotion is explicit.
+- **Audit log entries** — every entry is tagged with the environment, so filtering "what happened in PRODUCTION" is one click.
+
+## The UI experience
+
+The environment selector lives in the workspace header. Switching from DEVELOPMENT to PRODUCTION switches:
+
+- Which workflow version each project is showing.
+- Which connections appear in the picker.
+- Which executions show up in the history view.
+- Which schedules show as active.
+
+{/* TODO screenshot: workspace header showing the environment selector dropdown open with DEVELOPMENT / STAGING / PRODUCTION entries, and the currently-selected environment highlighted */}
+![Environment selector in the workspace header](/enterprise/environments/environment-selector.png)
+
+You can't accidentally edit PRODUCTION while looking at DEVELOPMENT — edits are gated to the environment that owns the draft (DEVELOPMENT by default).
+
+{/* TODO screenshot: workflow builder canvas in PRODUCTION view with the edit/save controls visibly disabled and a banner explaining edits happen in DEVELOPMENT */}
+![Read-only workflow view when looking at PRODUCTION](/enterprise/environments/edit-gated-by-environment.png)
+
+## The API experience
+
+Every relevant API call accepts an `environment` parameter. CI/CD pipelines that promote builds, manage connections, or trigger workflows do so explicitly against an environment — never against an ambient default.
+
+## Promotion vs. editing
+
+A core invariant: **editing happens in DEVELOPMENT, promotion moves builds forward.**
+
+```
+Draft (DEVELOPMENT)  ──publish──▶  Version v18  ──promote──▶  STAGING  ──promote──▶  PRODUCTION
+```
+
+This separation is what makes [Build once, deploy many](/enterprise/collaboration-devops/build-once-deploy-many) work. A hotfix to PRODUCTION that requires an edit goes through DEVELOPMENT first — same workflow, just a faster path.
+
+## If three environments aren't enough
+
+The fixed environment set is a deliberate constraint. When teams reach for more, the underlying need is usually one of:
+
+- **A separate slice of traffic** (e.g., canary, partner sandbox) — model this as a [tenant](/enterprise/scale-reliability/multi-tenant-isolation), not an environment.
+- **A separate team or business unit** — use a separate [workspace](/enterprise/collaboration-devops/workspaces-projects).
+- **Load testing without touching real traffic** — point a dedicated workspace's PRODUCTION at a perf-test backend.
+
+The three-environment shape stays uniform across customers, deployments, and audit views — which is what makes the rest of the platform's environment context (promotion, RBAC scoping, observability filters) tractable.

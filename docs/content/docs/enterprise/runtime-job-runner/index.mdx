@@ -1,0 +1,135 @@
+---
+title: "Runtime Job Runner"
+description: "Execute ByteChef workflows from the command line or a Docker container — for CI/CD pipelines, scheduled batch jobs, and external integrations that don't need the always-on platform."
+---
+
+The Runtime Job Runner is a standalone Spring Boot application that executes a single ByteChef workflow and exits. It's the right tool when you don't need the full always-on platform — for CI/CD pipelines, cron-driven batch jobs, ETL tasks, and integration points where another system already owns the schedule.
+
+## What it is
+
+The Runtime Job Application (`runtime-job-app`) is a self-contained binary that:
+
+- Reads a workflow JSON file from disk.
+- Accepts optional input parameters and connection configurations as JSON strings.
+- Executes the workflow end-to-end.
+- Exits — no long-running server, no Postgres, no broker required.
+
+It's a separate distribution from the main platform server: same workflow engine, same component model, no platform footprint.
+
+## Command-line interface
+
+| Argument | Required | Purpose |
+|---|---|---|
+| `--workflow=<path>` | Yes | Path to the workflow JSON file. |
+| `--parameters=<json>` | No | JSON object of input parameters passed to the workflow trigger. |
+| `--connections=<json>` | No | JSON object of connection configurations, keyed by connection name. |
+
+## Usage
+
+### Plain JAR
+
+```bash
+# Build
+./gradlew :server:ee:apps:runtime-job-app:build
+
+# Run
+java -jar server/ee/apps/runtime-job-app/build/libs/runtime-job-app-*.jar \
+  --workflow=workflow.json \
+  --parameters='{"message": "Processing batch job"}' \
+  --connections='{"openAi": {"token": "sk-your-openai-token"}}'
+```
+
+### Gradle (development)
+
+```bash
+./gradlew :server:ee:apps:runtime-job-app:bootRun \
+  --args='--workflow=workflow.json --connections={"openAi":{"token":"test-token"}}'
+```
+
+### Docker
+
+```bash
+# Build the image once
+./gradlew :server:ee:apps:runtime-job-app:build
+docker build -t bytechef-runtime-job server/ee/apps/runtime-job-app/
+
+# Run any workflow against it, mounting the workflows directory
+docker run --rm \
+  -v /path/to/workflows:/workflows \
+  bytechef-runtime-job \
+  --workflow=/workflows/my-workflow.json \
+  --parameters='{"inputValue": "Hello World", "count": 5}' \
+  --connections='{"openAi": {"token": "sk-your-openai-token"}}'
+```
+
+The `-v` flag mounts your workflow directory into the container — the workflow file doesn't need to be baked into the image.
+
+## Connection mapping
+
+Connections are keyed by name. When a task asks for a connection, the runner resolves it in this order:
+
+1. **By task name.** If the connections JSON has a key matching the workflow task's `name` (e.g., `openAi_1`), that wins.
+2. **By component name.** Otherwise the runner looks for a key matching the component name (e.g., `openAi`).
+3. **No connection.** If neither matches, the task runs without connection parameters — appropriate only for components that don't require them.
+
+This lets you either share one connection across every task of a given type, or scope a distinct connection to each task — without changing the workflow definition.
+
+```json
+// Option A: shared across all openAi tasks
+{
+  "openAi": { "token": "sk-shared-token" }
+}
+
+// Option B: per-task overrides
+{
+  "openAi_1": { "token": "sk-token-for-task1" },
+  "openAi_2": { "token": "sk-token-for-task2" }
+}
+```
+
+## When to reach for the runtime job runner
+
+| Reach for it when... | Use the platform server when... |
+|---|---|
+| The execution is one-shot — CI step, cron, ETL pipeline. | The execution is event-driven and you need always-on webhook/trigger handling. |
+| The schedule lives in your existing scheduler (Airflow, GitHub Actions, Kubernetes Job). | You want ByteChef's [distributed scheduler](/enterprise/scale-reliability/distributed-scheduler) to own scheduling. |
+| You need a tiny footprint — no Postgres, no broker. | You need [execution history](/enterprise/collaboration-devops/workflow-executions), [audit log](/enterprise/governance-security/audit-log), and the UI. |
+| You want to ship the runner as a step inside another product. | You want centralized governance, RBAC, and observability. |
+
+## What's missing vs. the full platform
+
+The runtime job runner is intentionally narrow:
+
+- **No execution-history persistence.** Output goes to stdout/stderr; capture it in your job runner's logs.
+- **No audit log.** External governance (your CI's own audit trail) covers this.
+- **No environment promotion.** The runner takes a single workflow file; promotion happens upstream (your CI promotes the artifact).
+- **No trigger handling beyond the manual trigger.** Webhooks, schedules, and message triggers belong on the always-on platform.
+
+If you need any of these, run the workflow on the [full platform](/enterprise/governance-security/flexible-deployment) instead — the workflow definition is the same.
+
+## Error handling
+
+The runner exits non-zero when:
+
+- The `--workflow` argument is missing.
+- The workflow file can't be found or parsed.
+- A required connection is missing for a task.
+- Workflow execution fails.
+
+Pair that with your CI's failure handling: a non-zero exit fails the step.
+
+## Debug logging
+
+```bash
+java -jar runtime-job-app.jar \
+  --workflow=workflow.json \
+  --logging.level.com.bytechef=DEBUG
+```
+
+Default levels: `ROOT=INFO`, `com.bytechef=DEBUG` in development profiles.
+
+## See also
+
+- [Build once, deploy many](/enterprise/collaboration-devops/build-once-deploy-many) — how the workflow file you hand the runner is produced.
+- [Git-backed change tracking](/enterprise/collaboration-devops/git-backed-change-tracking) — keeping the workflow JSON in Git is the natural pairing with running it from CI.
+- [Flexible deployment](/enterprise/governance-security/flexible-deployment) — the always-on platform alternative.

@@ -1,0 +1,46 @@
+---
+title: "AI ComponentKit"
+description: A Java SDK that turns a connected user's component actions into AI tools your own LLM application can call.
+---
+
+**AI ComponentKit** is a backend Java SDK for AI-native products: it fetches the component actions a [connected user](/embedded/connected-users) has access to and exposes them as **tools** your own LLM application can call — so your agent acts through the user's ByteChef connections without you writing per-integration glue.
+
+It's the server-side sibling of the [Workflow Builder Tools](/embedded/workflow-builder-tools): those give an agent control over a user's *workflows*; ComponentKit gives it the user's *component actions* as callable functions.
+
+## `ToolClient`
+
+The core client wraps the embedded execution API:
+
+```java
+ToolClient toolClient = new ToolClient(apiKey, "https://your-bytechef-host.example.com", Environment.DEVELOPMENT);
+
+// The connected user's available actions, as tool definitions (name, description, JSON-schema parameters)
+List<ToolModel> tools = toolClient.getTools(externalUserId);
+```
+
+- Authentication is an embedded **API key** (`Authorization: Bearer`), created under **Embedded → Settings → API Keys**.
+- `Environment` selects the target environment (`DEVELOPMENT`, `STAGING`, `PRODUCTION`), sent as the `X-Environment` header.
+- Tools are fetched from `GET /api/embedded/v1/{externalUserId}/tools` and executed through the matching `POST …/tools` endpoint — each call runs the component action with the connected user's own credentials.
+
+## Spring AI integration
+
+The `ai-componentkit-spring` module adapts the client to Spring AI, so the user's actions plug straight into a `ChatClient` as tools:
+
+```java
+ToolCallbackProvider toolCallbackProvider = toolCallbackProviderFactory.create(externalUserId, Environment.PRODUCTION);
+
+chatClient.prompt(userMessage)
+    .toolCallbacks(toolCallbackProvider)
+    .call();
+```
+
+The LLM now sees every action the user has connected — send a Slack message, create a CRM contact — and invocations execute server-side in ByteChef under that user's connections.
+
+<Callout title="ComponentKit in the Sample App">
+    The [Sample App](/embedded/sample-app) includes a "ComponentKit Playground" and a tool-based AI chat page that demonstrate this exact flow end to end.
+</Callout>
+
+## Sample projects
+
+- [ComponentKit + Spring AI (Java)](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-embedded-ai-componentkit-spring-ai) — a Java LLM app calling a connected user's actions as Spring AI tools.
+- [ComponentKit + Vercel AI SDK (TypeScript)](https://github.com/bytechefhq/bytechef-samples/tree/main/bytechef-embedded-ai-componentkit-vercel-ai-sdk) — the same tools consumed from a TypeScript app via the `/tools` REST endpoints and the Vercel AI SDK.

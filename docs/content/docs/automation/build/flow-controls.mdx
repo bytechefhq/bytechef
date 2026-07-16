@@ -1,0 +1,23 @@
+---
+title: "Flow Controls"
+description: Branch, loop, parallelize, and error-handle your workflows with the built-in task dispatchers.
+---
+
+Flow controls are the structural building blocks of a workflow — they decide *which* steps run, *how many times*, and *what happens when something fails*. In the editor they appear alongside components in the step picker; under the hood each one is a task dispatcher that orchestrates its child tasks.
+
+| Flow control | What it does |
+|---|---|
+| **Condition** | Run one of two branches depending on a boolean expression. |
+| **Branch** | Route to one of several cases by matching a value (switch-style). |
+| **Loop** | Repeat its child steps over a list or a fixed number of iterations, with access to the current item and index. |
+| **Each** | Execute child steps once per item of a list. |
+| **Map** | Transform a list by running child steps for every item and collecting the results. |
+| **Parallel** | Run several child steps at the same time and continue when all finish. |
+| **Fork/Join** | Split into multiple named branches that run concurrently, then join their results. |
+| **Subflow** | Invoke another workflow as a step and use its output — see [Subflows](/automation/build/subflows). |
+| **Approval** | Pause the workflow until a human approves or rejects — see [Human-in-the-Loop](/automation/build/human-in-the-loop). |
+| **Suspend** | Pause the workflow until an external resume call arrives (the primitive underneath Approval and chat questions). |
+| **On Error** | Catch a failing step and run a recovery branch instead of failing the run. |
+| **Terminate** | End the workflow immediately from inside a branch. |
+
+Every flow control's inputs and outputs are documented in the [flow-controls reference](/reference/flow-controls). Flow controls nest freely — a Loop inside a Condition inside a Fork branch is a normal workflow.

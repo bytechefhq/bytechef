@@ -139,6 +139,8 @@ If you upload a single file from the **detail view**, ByteChef navigates straigh
 
 ### Create With AI
 
+> **Coming soon.** Create With AI depends on the AI Copilot, which is on the upcoming release track and not yet available in the latest released version of ByteChef.
+
 Let the AI Copilot generate a skill for you through a conversational interface. Selecting this option opens a full-page chat where you describe the domain knowledge you want to capture and the Copilot iterates with you, validates the SKILL.md format, and creates the skill via the `createAiSkill` tool when you're satisfied.
 
 The Copilot runs in **BUILD mode** here — it has write access to skills. The list refreshes automatically after each assistant turn so newly-created skills appear without a manual reload. When the create page detects a new skill in the workspace, it navigates either to the skill list (if you launched from there) or to the newly-created skill (if you launched from another skill's detail page).
@@ -148,6 +150,8 @@ The Copilot runs in **BUILD mode** here — it has write access to skills. The l
 ---
 
 ## The Skills Copilot
+
+> **Coming soon.** The Skills Copilot depends on the AI Copilot, which is on the upcoming release track and not yet available in the latest released version of ByteChef.
 
 The same AI Copilot you use in the workflow editor is available on the Skills page, with a Skills-specific toolset and a split between **Ask** and **Build** agents.
 
@@ -170,7 +174,9 @@ Both agents are **context-aware**: when you have a skill open in the detail view
 
 ### Skills as Tools for Other Agents
 
-Beyond the Copilot, any AI Agent in any workflow can attach the **Skills tool** ([agentUtils/v1](/reference/components/agent-utils_v1)) as a child of its **Tools** slot. That tool surfaces the chosen skills to the agent at runtime, so the model can read skill content on demand instead of carrying it in every prompt. See the [AI Agent overview — Tools slot](.) for wiring.
+Beyond the Copilot, any AI Agent in any workflow can attach the **Skills tool** ([aiAgentUtils/v1](/reference/components/ai_agent-utils_v1)) as a child of its **Tools** slot. That tool surfaces the chosen skills to the agent at runtime, so the model can read skill content on demand instead of carrying it in every prompt. See the [AI Agent overview — Tools slot](.) for wiring.
+
+Your skills are also available in the [AI Hub](/automation/ai-hub) *(coming soon)*: type `/` at the start of the composer to pick a skill by name (e.g. `/email-triage-rules summarize this thread`), and the assistant loads that skill's archive to steer the run.
 
 ---
 
@@ -277,7 +283,7 @@ Review and update skills when processes change, new edge cases are discovered, o
 
 ### Test with Evals
 
-Use [Evals](evals) to verify that your skills are working as intended. Create test scenarios that exercise the knowledge in your skills and confirm the agent responds correctly.
+Use [Evals](evals) *(coming soon)* to verify that your skills are working as intended. Create test scenarios that exercise the knowledge in your skills and confirm the agent responds correctly.
 
 ### Version Control Your Skills
 
@@ -293,7 +299,7 @@ There is no hard limit. Keep in mind that attaching many large skills to a singl
 
 #### Can I share skills between agents?
 
-Yes. Skills are shared across your workspace. Any skill you create is available to attach to any AI agent in any workflow, and to the Skills tool in [agentUtils/v1](/reference/components/agent-utils_v1).
+Yes. Skills are shared across your workspace. Any skill you create is available to attach to any AI agent in any workflow, and to the Skills tool in [aiAgentUtils/v1](/reference/components/ai_agent-utils_v1).
 
 #### What file types are supported in skill archives?
 

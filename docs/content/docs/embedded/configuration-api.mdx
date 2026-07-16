@@ -1,0 +1,61 @@
+---
+title: "Embedded Configuration API"
+description: "Programmatic project, workflow, and connection management — designed for product surfaces, not just internal ops."
+---
+
+The Embedded Configuration API is the programmatic surface for managing the same things the visual UI manages — projects, workflows, connections, environments — but from your product's backend, on behalf of your customers.
+
+## Why a configuration API
+
+Embedded customers shouldn't need to leave your product to manage their integrations. Every action the UI exposes — create a project, import a workflow, configure a connection, promote a version — needs to be callable from your code so you can wrap it in your own UX.
+
+## The shape
+
+A REST API with predictable resources:
+
+| Resource | Endpoints |
+|---|---|
+| `/projects` | Create, list, update, delete projects. |
+| `/projects/{id}/workflows` | CRUD over workflows in a project. |
+| `/projects/{id}/workflows/{id}/versions` | List versions, publish a draft, promote a version. |
+| `/integrations` | Create, list, update, delete integrations and their workflows. |
+| `/integration-instances` | Manage a connected user's enabled integration instances. |
+| `/components/{name}/connections` | Create and manage a connected user's connections. |
+| `/automation/workflows/generate` | Generate a new workflow from a natural-language prompt (AI Copilot); `POST /automation/workflows/{workflowUuid}/generate` updates an existing one from a prompt. |
+| `/{externalUserId}/tools` | `GET` lists a connected user's component actions as AI tool definitions; `POST` executes one — the surface behind [AI ComponentKit](/embedded/componentkit) and [Workflow Builder Tools](/embedded/workflow-builder-tools). |
+
+Resources are also addressable per connected user via an `/{externalUserId}/...` prefix. Each endpoint is scoped to a tenant via the request's auth context — see [tenant-isolated security](/embedded/tenant-isolated-security).
+
+## Designed for product surfaces
+
+A few choices that make the API friendlier than a typical internal admin API:
+
+- **Idempotent creates.** Re-issuing a create with the same idempotency key is safe — your product can retry on network errors.
+- **Schema-validated requests.** Bad input fails with structured errors you can show to your customer, not stack traces.
+- **Webhook callbacks.** Long-running operations (workflow imports, knowledge base ingestion) can call back to your URL when done instead of forcing your code to poll.
+- **Pagination on every list endpoint.** With stable cursor pagination so concurrent writes don't shift the page.
+- **Sparse fieldsets.** Ask for only the fields you need; reduce payload size for product surfaces.
+
+## Common use cases
+
+| Your product flow | Configuration API call |
+|---|---|
+| Customer signs up | Provision the tenant's connected user (their `externalUserId`). |
+| Customer adds a connection | `POST /components/{name}/connections` with the auth flow result. |
+| Customer enables an integration template | `POST /automation/workflows` importing the template JSON. |
+| Customer turns an integration on | `POST /automation/workflows/{workflowUuid}/enable`. |
+| Customer hits "view history" | Query the executions API (see the [embedded developer guide](/embedded)). |
+| Customer manages an integration instance | `PATCH /integration-instances/{id}`. |
+
+## Auth
+
+The API authenticates calls with one of:
+
+- **Tenant-scoped service tokens** issued by ByteChef to your backend, with the tenant ID baked in.
+- **Customer-scoped JWTs** signed by you and validated by ByteChef against a shared key.
+
+In both cases, the auth context selects the tenant, and the [tenant-isolated security](/embedded/tenant-isolated-security) model takes over from there.
+
+## Audit linkage
+
+Every API call lands in the [audit log](/enterprise/governance-security/audit-log) with the source ("API call") and the calling principal. Your product's actions are first-class in the audit timeline, indistinguishable from UI clicks (and just as traceable).

@@ -1,0 +1,96 @@
+---
+title: "Permission Expressions"
+description: "Gate which integrations, automation workflow projects, and workflows each connected end-user sees with a per-resource expression evaluated against the user's identity and metadata. Fails closed."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+In an [embedded](/embedded) deployment, not every customer should see every integration or automation workflow. A free-tier user shouldn't see the Salesforce integration you sell as a premium add-on; an EU customer shouldn't see an integration that isn't GDPR-cleared; a beta feature should reach only the accounts you've flagged. **Permission expressions** let you encode those rules directly on an integration, an automation workflow project, or one of their workflows, evaluated per connected user at request time.
+
+<Callout type="info">
+  Permission expressions are an **Enterprise, embedded-edition** feature. They gate visibility for **connected users** — the end-users of your product who authenticate through your backend — not the admins who build integrations in the ByteChef UI.
+</Callout>
+
+## How it works
+
+Each integration, each automation workflow project, and each of their workflows carries an optional **permission expression**: a [SpEL](https://docs.spring.io/spring-framework/reference/core/expressions.html) expression that must evaluate to `true` for the requesting connected user to see that resource.
+
+When your product lists the integrations or automation workflow projects available to a connected user, the platform evaluates each expression against that user's identity and metadata and filters out anything that doesn't pass.
+
+```
+Connected user requests their integrations / automation workflow projects
+        │
+        ▼
+For each integration / project / workflow:
+  permission expression blank? ──► visible
+  expression evaluates to true? ──► visible
+  anything else (false or error) ──► hidden
+```
+
+## Fail-closed semantics
+
+The evaluator **fails closed**, which is the safe default for an access decision:
+
+- A **blank or absent** expression means *no restriction* — the integration is visible to everyone. (Most integrations have no expression.)
+- An expression that evaluates to **`true`** makes the integration visible.
+- **Anything else hides it** — `false`, a malformed expression, a null dereference, any evaluation error. A typo in an expression hides the integration rather than exposing it.
+
+## What the expression can reference
+
+The expression is evaluated against a context built from the requesting connected user:
+
+| Variable | Type | Meaning |
+|---|---|---|
+| `metadata` | map | The arbitrary key/value metadata your backend attached to the connected user (plan tier, region, feature flags, account ID, …). |
+| `externalId` | string | The user's ID in *your* system — the external user ID you provisioned them with. |
+| `email` | string | The connected user's email. |
+| `name` | string | The connected user's display name. |
+| `environment` | string | The environment name (`DEVELOPMENT`, `STAGING`, `PRODUCTION`) the request is scoped to. |
+
+`metadata` is the workhorse. Because your backend controls what it writes there when it provisions a connected user, you can drive integration visibility off your own entitlement model without ByteChef needing to know what a "plan" or a "region" is.
+
+## Examples
+
+Show an integration only to paid plans:
+
+```
+metadata['plan'] == 'pro' || metadata['plan'] == 'enterprise'
+```
+
+Restrict a workflow to a specific region:
+
+```
+metadata['region'] == 'eu'
+```
+
+Gate a beta integration to explicitly flagged accounts:
+
+```
+metadata['betaIntegrations'] == true
+```
+
+Limit a sensitive integration to internal users by email domain:
+
+```
+email != null && email.endsWith('@yourcompany.com')
+```
+
+## Setting an expression
+
+Expressions are managed through the admin API, scoped to the resource they gate.
+
+**Integrations:**
+
+- The integration-level expression is set as part of the integration update (a `permissionExpression` field on the integration), so it is saved together with the rest of the integration in a single write.
+- `updateIntegrationWorkflowPermissionExpression` — sets the expression on a single workflow within an integration.
+
+**Automation workflow projects:**
+
+- The project-level expression is folded into `createAutomationWorkflowProject` / `updateAutomationWorkflowProject` as a `permissionExpression` argument, so it is saved with the rest of the project in a single write. A `null` argument leaves any stored expression unchanged; an empty string clears it.
+- A workflow's expression can be passed on `createAutomationWorkflowProjectWorkflow`, and changed later with `updateAutomationWorkflowProjectWorkflowPermissionExpression`.
+
+A workflow-level expression lets you ship an integration or automation workflow project broadly while still gating individual workflows inside it — e.g., the project is visible to everyone, but its "bulk export" workflow only to enterprise accounts. The project-level expression behaves like the integration-level one: when it evaluates `false`, the whole project (and all its workflows) drops out of that connected user's catalog.
+
+## Where it fits
+
+Permission expressions are an **advisory visibility filter**, not a hard security boundary on execution. They decide what a connected user is *offered*; [tenant-isolated security](/embedded/tenant-isolated-security) is what guarantees one tenant can't reach another's data or credentials. Use expressions to shape each customer's catalog; rely on tenant isolation for the actual blast-radius guarantee.

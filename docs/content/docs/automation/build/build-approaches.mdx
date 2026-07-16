@@ -1,0 +1,41 @@
+---
+title: Build Approaches
+description: Choose how you build automations in ByteChef — no-code on the visual canvas, low-code with a Script step, or full-code as a Code Workflow — all running on the same engine.
+---
+
+ByteChef does not force a single way of building. The same workflow engine runs automations authored three different ways, and you pick the one that fits the task, the team, and even the individual step. Think of it as a slider from no-code to full-code, not three separate products — you can move along it without switching tools or migrating anything.
+
+---
+
+## The Three Approaches
+
+### No-code — the visual canvas
+
+Build entirely in the [workflow editor](/automation/build/workflows): drag components onto the canvas, connect a trigger to a sequence of actions, map data between steps with [data pills](/automation/build/data-pills), and express branching and looping with visual [flow controls](/automation/build/flow-controls). With hundreds of built-in components, most integrations are a matter of picking an action and filling in fields — no syntax, no build step.
+
+This is the right approach for the majority of automations and builders. Visual is not the beginner tier; for most workflows it is simply the clearest one.
+
+### Low-code — the canvas plus a Script step
+
+When one step needs logic no component captures — reshaping a payload, computing a value, parsing an odd format — drop in the **[Script component](/reference/components/script_v1)** and write a bit of JavaScript, Python, or Ruby right inside the workflow. See [Polyglot scripting](/enterprise/extensibility/polyglot-scripting) for details. The Script step takes the previous steps' data as input and returns a value the next steps consume, exactly like any other component.
+
+The workflow stays visual; one node just happens to be code. Low-code done right is *visual with an escape hatch* — the escape hatch is a single step, not the whole workflow.
+
+### Full-code — a Code Workflow
+
+For teams that want their automations in version control, reviewed in pull requests, and shipped through CI, define the entire workflow in code as a **[Code Workflow](/enterprise/extensibility/code-workflows)** — in Java, JavaScript, Python, or Ruby — and deploy the artifact through the API. It runs on the same engine as a canvas-built workflow, with the same components and triggers; only the authoring and lifecycle differ.
+
+If you want your own *authoring UI* rather than ByteChef's editor (for embedded scenarios), see also [Custom Components](/enterprise/extensibility/custom-components) and the embedded [workflow builder tools](/embedded/workflow-builder-tools).
+
+---
+
+## Choosing an Approach
+
+| If… | Build it… |
+|---|---|
+| It's integrations and standard logic | **No-code** — on the canvas |
+| One step needs a transform or bit of glue | **Low-code** — canvas + a [Script](/reference/components/script_v1) step |
+| It belongs in Git, reviewed and CI-shipped | **Full-code** — a [Code Workflow](/enterprise/extensibility/code-workflows) |
+| You're not sure yet | **Start no-code** — add a script step or graduate to code later |
+
+Because all three compile to the same workflow on the same engine, they coexist: a no-code workflow can gain a single Script step the day its logic outgrows the components, and a Script step's logic can graduate into a Code Workflow when it deserves tests and version control — without rebuilding the workflow around it.

@@ -1,0 +1,67 @@
+---
+title: "Source-Available Code"
+description: "Inspect, audit, and fork — no black-box vendor risk."
+---
+
+ByteChef's open-source Community distribution is, well, open source — Apache 2.0, on GitHub, forkable, contributable. The Enterprise distribution adds the multi-tenant, embedded, and operational features described in the rest of this guide, and those modules are **source-available** under the Enterprise license: you can read them, audit them, and modify them.
+
+## Two licenses, one repository
+
+| Distribution | License | Where the code lives |
+|---|---|---|
+| **Community** | Apache 2.0 | Open repository on GitHub. |
+| **Enterprise** | ByteChef Enterprise License | Source provided with your Enterprise distribution. |
+
+The Enterprise license is **source-available**, not open-source. It permits inspection, modification, and use under your Enterprise contract; it restricts redistribution and competitive offerings. The intent is straightforward: you have the access you need to operate the platform safely, without giving anyone the right to repackage and resell it as their own.
+
+## What "source-available" gets you in practice
+
+### 1. Audit before deployment
+
+Your security team can read every line that runs in your environment. There is no compiled-only blob, no "trust us" module. SBOM and dependency manifests are published, but the actual implementation is also available — go read the encryption routines, the SAML handler, the tenant-routing logic.
+
+### 2. Debug without us
+
+When something doesn't behave the way you expect, you can read the source instead of opening a ticket. Most "wait, why does this happen?" questions resolve faster by grep than by a support thread.
+
+### 3. Patch in-place for urgent issues
+
+If you hit a critical bug at 11 PM, you can patch the source, build, and deploy — same loop your application team uses. Then we work with you to land the fix upstream so you stop carrying the patch.
+
+### 4. Fork as escape hatch
+
+If ByteChef went away tomorrow, your team would still have:
+
+- The Community source (Apache 2.0, perpetual).
+- The Enterprise source (under your contract, perpetual to the contract terms).
+- A platform you can keep running.
+
+This isn't a marketing line — it's a structural property of the licensing model. The "vendor disappears" risk is materially smaller than with closed-source competitors.
+
+## What we keep proprietary
+
+- **The compiled binaries we distribute.** You can build your own from source if you prefer.
+- **Our cloud control plane** (where we operate hosted ByteChef on customers' behalf — not part of self-hosted Enterprise).
+- **Customer data.** Of course.
+
+## How to access Enterprise source
+
+Source access is provisioned as part of your Enterprise contract:
+
+- A private repository or source tarball, refreshed with each release.
+- License terms governing what you can do with it.
+- Same release notes and changelogs as the binary distribution.
+
+## Compared to typical SaaS
+
+| Concern | Closed-source SaaS | ByteChef Enterprise |
+|---|---|---|
+| Can your team read the code? | No. | Yes. |
+| Can your security audit be thorough? | Limited to vendor attestations. | Read the actual code. |
+| Can you patch a critical bug yourselves? | No, file a ticket and wait. | Yes, patch and run upstream in parallel. |
+| Can you keep running if the vendor disappears? | No. | Yes. |
+| Can you sue your engineers for `git pull`? | N/A. | License clearly permits use and modification. |
+
+## The trust posture
+
+The source-available model is, ultimately, a trust posture. It says: **you don't have to take our word for anything.** Read the code, run the code, modify the code if you need to. That's the only honest way to ship platform software that people are going to bet their business on.

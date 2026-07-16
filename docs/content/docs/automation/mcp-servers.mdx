@@ -1,0 +1,207 @@
+---
+title: MCP Servers
+description: Publish your components and workflows as Model Context Protocol tools for AI assistants like Claude, Cursor, and Windsurf.
+---
+
+# MCP Servers
+
+<Callout type="warn" title="Coming soon">
+    MCP Servers are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+An **MCP Server** turns the things you build in ByteChef into tools that AI assistants can call. You choose which component actions and which workflows to expose, ByteChef gives you a single [Model Context Protocol (MCP)](https://modelcontextprotocol.io) URL, and any MCP-aware client — Claude, Cursor, Windsurf, or your own agent — can discover and invoke them.
+
+A server can expose two kinds of tools:
+
+- **Component actions** — individual actions from a connected component (for example, "send a Slack message" or "create a HubSpot contact"), optionally backed by one of your connections so the assistant can act as you.
+- **Workflows** — whole workflows from a published project deployment, exposed as a single tool the assistant runs with the inputs you define.
+
+> **MCP Servers vs. the Management MCP Server.** This page is about *publishing your own tools* to external assistants. If you instead want an assistant to *manage* ByteChef itself — create and edit projects, workflows, and components — see the [Management MCP Server](/platform/mcp-server).
+
+---
+
+## Create an MCP server
+
+1. In the Automation workspace, open **MCP Servers** from the sidebar.
+2. Click **New MCP Server**.
+3. Give it a **name** and toggle **Enabled** on.
+
+Each server belongs to your workspace and a single environment (Development, Staging, or Production), so you can publish a different set of tools — with different credentials — per environment. Use **tags** to organize servers as the list grows.
+
+A server exposes nothing until you add components or workflows to it.
+
+---
+
+## Expose component actions
+
+1. Open the server and click **Add Component**.
+2. **Select a component** from the available components.
+3. **Select the actions** (tools) from that component you want to expose. Only the actions you pick become callable; everything else stays hidden.
+4. If the actions need authentication, attach one of your **connections** to the component. The assistant then runs those actions using that connection's credentials.
+
+You can add multiple components to one server, and enable or disable individual tools at any time: each tool row has its own **Enabled** toggle, and a disabled tool disappears from the server's tool list — connected assistants no longer see or can call it, as if it did not exist. Existing and newly added tools default to enabled. This complements the server-level toggle, which turns the whole server on or off at once.
+
+For each exposed action you decide which parameters you fix yourself (a constant the assistant can't change) and which the assistant fills at call time, using the `fromAi(...)` expression — the same mechanism as attaching tools to an AI Agent. See [Supplying tool parameters with fromAi](/platform/ai/agent#supplying-tool-parameters-with-fromai) for the syntax.
+
+---
+
+## Expose workflows
+
+1. Open the server and click **Add Workflows**.
+2. **Select a project** and a **published version**.
+3. **Select the workflows** from that deployment you want to expose.
+4. Optionally configure each workflow's **input parameters** so the assistant knows what to provide when it runs the workflow.
+
+Each exposed workflow becomes one tool. When the assistant calls it, ByteChef runs the workflow with the inputs the assistant supplies and returns the result.
+
+---
+
+## Get the server URL
+
+Open the server's **Connect** tab to copy its URL. It has the form:
+
+```
+https://<your-host>/api/automation/<secret-key>/mcp
+```
+
+> **Keep this URL private.** The secret key identifies this server and selects which tools are exposed. **Regenerate the secret key** from the same tab to invalidate the old URL.
+
+The URL alone is not enough to connect — every request must also carry a valid credential (see [Authentication](#authentication) below).
+
+---
+
+## Authentication
+
+The URL secret identifies the server. When the server has **Require authentication** enabled, a separate credential also authenticates the caller, and requests without a valid one are rejected with `401`. Whether a credential is required is a per-server setting — see [Require authentication](#require-authentication) below.
+
+### Require authentication
+
+Each MCP server has a **Require authentication** toggle (edit the server to change it):
+
+- **On** — every request must carry a valid API key or OAuth2 token; token-less requests get `401`. This is the default for **newly created** servers.
+- **Off** — the URL secret alone is enough; requests are served without a credential, and any credential that *is* sent is ignored. Servers created before this setting existed default to **off**, so they keep working unchanged.
+
+Keep the URL secret private in both modes — it is the server's only protection when authentication is off. Turning authentication off also disables per-component tool-authorization enforcement (an anonymous caller has no identity to authorize), so the two settings can't both be enabled.
+
+### API key (default)
+
+Create an API key under **Settings** → **API Keys** in the Automation workspace and send it with every request as a Bearer header:
+
+```
+Authorization: Bearer <your-api-key>
+```
+
+The connection snippets below include this header. API keys are bound to an environment — the key's environment must match the MCP server's environment. Because the key is bound to your user account, you can revoke a single client by deleting its key without regenerating the server URL or touching other clients.
+
+### OAuth2 (optional)
+
+For MCP clients that support OAuth2 — including those that cannot send custom headers, such as claude.ai web integrations — ByteChef can run its own OAuth2 authorization server:
+
+```
+BYTECHEF_OAUTH2_AUTHORIZATION_SERVER_ENABLED=true
+```
+
+Once enabled, OAuth2-capable clients need no manual credential setup: the client discovers the authorization server, registers itself automatically, and you complete a standard authorization-code + PKCE flow using your existing ByteChef login, followed by a consent screen. API keys keep working alongside OAuth2.
+
+On Enterprise Edition, you can additionally trust JWTs from your own identity provider — see [Environment Variables](/self-hosting/configuration/environment-variables#oauth2-configuration) for the trusted-issuer properties.
+
+---
+
+## Connect an AI assistant
+
+### Claude
+
+#### Claude.ai (web)
+
+> Requires a Claude Pro subscription. claude.ai integrations cannot send custom headers, so [enable OAuth2](#oauth2-optional) on your instance first.
+
+1. Go to [claude.ai/settings/integrations](https://claude.ai/settings/integrations)
+2. Click **Add More**
+3. Paste your MCP server URL and save
+
+#### Claude Desktop
+
+1. Open Claude Desktop
+2. Go to **Settings** → **Developer** → **Edit Config** → **Open `claude_desktop_config.json`**
+3. Add the following, replacing the URL with yours and `YOUR_API_KEY` with your API key:
+
+   ```json
+   {
+     "mcpServers": {
+       "ByteChef": {
+         "command": "npx",
+         "args": [
+           "-y",
+           "mcp-remote",
+           "https://<your-host>/api/automation/<secret-key>/mcp",
+           "--header",
+           "Authorization: Bearer YOUR_API_KEY"
+         ]
+       }
+     }
+   }
+   ```
+
+4. Save the file, then quit and restart Claude Desktop
+
+---
+
+### Cursor
+
+1. Open Cursor → **Settings** → **Cursor Settings** → **MCP** → **Add new global MCP server**
+2. Paste the following, replacing the URL with yours and `YOUR_API_KEY` with your API key:
+
+   ```json
+   {
+     "mcpServers": {
+       "ByteChef": {
+         "headers": {
+           "Authorization": "Bearer YOUR_API_KEY"
+         },
+         "url": "https://<your-host>/api/automation/<secret-key>/mcp"
+       }
+     }
+   }
+   ```
+
+3. Save
+
+---
+
+### Windsurf
+
+1. Open Windsurf → **Settings** → **Advanced** → **Cascade** → **Add Server** → **Add custom server**
+2. Paste the following, replacing the URL with yours and `YOUR_API_KEY` with your API key:
+
+   ```json
+   {
+     "mcpServers": {
+       "ByteChef": {
+         "headers": {
+           "Authorization": "Bearer YOUR_API_KEY"
+         },
+         "url": "https://<your-host>/api/automation/<secret-key>/mcp"
+       }
+     }
+   }
+   ```
+
+3. Save
+
+---
+
+### Other clients
+
+Any MCP-compatible client that supports Streamable HTTP transport can connect using the raw server URL:
+
+```
+https://<your-host>/api/automation/<secret-key>/mcp
+```
+
+Send an API key with every request as an `Authorization: Bearer` header, or [enable OAuth2](#oauth2-optional) for clients that authenticate via the standard MCP OAuth2 discovery flow.
+
+---
+
+## How requests are handled
+
+When a client connects, ByteChef authenticates the caller's credential, identifies the server from the secret key in the URL, and returns **only** the tools that server exposes — the enabled actions and workflows you selected, in that server's environment. Disabling the server, disabling a tool, removing a tool, or regenerating the secret key takes effect immediately for new requests.

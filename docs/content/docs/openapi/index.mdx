@@ -1,6 +1,62 @@
 ---
-title: Overview
+title: API Reference
+description: Public REST APIs you can call from your application — generated from ByteChef's OpenAPI specifications.
 ---
 
-This is currently in development. For more information please contact [support@bytechef.io](mailto:support@bytechef.io).
+ByteChef exposes four public REST APIs for use from your own applications:
 
+- **[Embedded API](/openapi/embedded)** — invoke component actions and list a user's available tools (the execution surface behind ad-hoc action invocation and tool-based AI integrations).
+- **[Embedded Configuration API](/openapi/embedded-configuration)** — manage your customers' integrations, instance configurations, connections, and end-user workflows from your application.
+- **[Embedded Webhook API](/openapi/embedded-webhook)** — fire App Events to trigger every subscribed workflow for a connected user, or invoke a specific workflow synchronously via its Request trigger.
+- **[Automation API](/openapi/automation)** — deploy and manage code-based projects in Automation mode (CI/CD-style integration).
+
+An **AI Gateway API** (`/api/ai-gateway/v1` — chat completions, embeddings, models, routing, tags, and scores) is *coming soon* alongside the [AI Gateway](/platform/ai-gateway).
+
+All four APIs are documented here directly from their OpenAPI specs. Each operation page includes the full request and response schema, parameter descriptions, and an interactive "Try it" panel that calls the API through a CORS-friendly proxy.
+
+---
+
+## Base URLs
+
+| API | Base path |
+|---|---|
+| Embedded | `/api/embedded/v1` |
+| Embedded Configuration | `/api/embedded/v1` |
+| Embedded Webhook | `/api/embedded/v1` |
+| Automation | `/api/automation/v1` |
+
+Prefix the operation path you see on each reference page with the corresponding base path, then with your ByteChef host (e.g. `https://your-bytechef-host.example.com`).
+
+---
+
+## Authentication
+
+| API | Auth | Header |
+|---|---|---|
+| Embedded | Per-end-user JWT signed by your backend with a **Signing Key** | `Authorization: Bearer <jwt>` |
+| Embedded Configuration | Per-end-user JWT signed by your backend with a **Signing Key** | `Authorization: Bearer <jwt>` |
+| Embedded Webhook | Per-end-user JWT signed by your backend with a **Signing Key** | `Authorization: Bearer <jwt>` |
+| Automation | A workspace **API Key** | `Authorization: Bearer <api-key-secret>` |
+
+Pass an optional `X-Environment` header (`DEVELOPMENT`, `STAGING`, or `PRODUCTION`) to scope the request to a specific environment. If omitted, ByteChef falls back to the workspace's default environment.
+
+See [Embedded → Settings](/embedded/settings) for how to create Signing Keys and API Keys.
+
+---
+
+## Updating these pages
+
+The reference sections are generated from the OpenAPI specs in the ByteChef monorepo:
+
+- Embedded: `server/ee/libs/embedded/embedded-execution/embedded-execution-public-rest/openapi.yaml`
+- Embedded Configuration: `server/ee/libs/embedded/embedded-configuration/embedded-configuration-public-rest/openapi.yaml`
+- Embedded Webhook: `server/ee/libs/embedded/embedded-webhook/embedded-webhook-public-rest/openapi.yaml`
+- Automation: `server/ee/libs/automation/automation-configuration/automation-configuration-public-rest/openapi.yaml`
+
+After editing any spec, regenerate the pages from the `docs/` directory:
+
+```bash
+npm run generate:openapi
+```
+
+The script runs on [Bun](https://bun.sh/) (bundled as a `docs/` devDependency, so `npm install` is enough). It wipes `openapi/(generated)/` and re-emits operation pages plus a `meta.json` per group, so do not edit those files by hand.

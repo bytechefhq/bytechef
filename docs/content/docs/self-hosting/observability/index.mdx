@@ -1,0 +1,164 @@
+---
+title: "Observability"
+description: "Turn on OpenTelemetry traces, logs, and metrics — the exact properties, default OTLP endpoints, sampling, and collector wiring, grounded in the shipped configuration."
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+This is the hands-on companion to [Observability](/enterprise/governance-security/observability). That page explains *what* you get; this page is *how to turn it on* — the exact properties, their defaults, and where they map in Spring Boot.
+
+<Callout type="info">
+  Observability ships **disabled by default**. Every signal stays off until you point it at a collector and flip the enable flag — so a fresh install never tries to export to `localhost:4318` and fill your logs with connection errors.
+</Callout>
+
+## The pipeline, in one sentence
+
+ByteChef's observability is standard Spring Boot Actuator + Micrometer + Micrometer Tracing exporting over **OTLP/HTTP**. There is no ByteChef-specific agent or protocol — if your stack speaks OTLP, you point ByteChef at it and you're done. The Enterprise `observability-config` module adds the glue described in [What the EE module installs](#what-the-ee-module-installs) below.
+
+## Default OTLP endpoints
+
+All three signals export over OTLP/HTTP. The shipped defaults assume an [OpenTelemetry Collector](https://opentelemetry.io/docs/collector/) reachable on `localhost:4318`:
+
+| Signal | Default endpoint |
+|---|---|
+| Traces | `http://localhost:4318/v1/traces` |
+| Logs | `http://localhost:4318/v1/logs` |
+| Metrics | `http://localhost:4318/v1/metrics` |
+
+Override each endpoint independently — you can send traces to one backend and metrics to another, or point all three at a single collector that fans out.
+
+## Single-node deployment
+
+The single-node `server-app` exposes **per-signal toggles** so you can enable, say, traces without paying for metric export. The shipped defaults:
+
+```yaml
+bytechef:
+  observability:
+    logging:
+      enabled: false
+      endpoint: http://localhost:4318/v1/logs
+    metrics:
+      enabled: false
+      endpoint: http://localhost:4318/v1/metrics
+    tracing:
+      enabled: false
+      endpoint: http://localhost:4318/v1/traces
+```
+
+As environment variables (Spring relaxed binding — uppercase, dots become underscores):
+
+```bash
+BYTECHEF_OBSERVABILITY_TRACING_ENABLED=true
+BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT=http://otel-collector:4318/v1/traces
+
+BYTECHEF_OBSERVABILITY_LOGGING_ENABLED=true
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://otel-collector:4318/v1/logs
+
+BYTECHEF_OBSERVABILITY_METRICS_ENABLED=true
+BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT=http://otel-collector:4318/v1/metrics
+```
+
+## Microservices deployment
+
+The distributed apps (coordinator, worker, scheduler, webhook, connection, configuration, execution, the API and AI gateways, and the runtime job runner) read a **single master switch** plus per-signal endpoints. This keeps the enable/disable decision uniform across every service while still letting each signal target a different backend:
+
+```yaml
+bytechef:
+  observability:
+    enabled: true
+    tracing:
+      endpoint: http://otel-collector:4318/v1/traces
+    logging:
+      endpoint: http://otel-collector:4318/v1/logs
+    metrics:
+      endpoint: http://otel-collector:4318/v1/metrics
+```
+
+As environment variables:
+
+```bash
+BYTECHEF_OBSERVABILITY_ENABLED=true
+BYTECHEF_OBSERVABILITY_TRACING_ENDPOINT=http://otel-collector:4318/v1/traces
+BYTECHEF_OBSERVABILITY_LOGGING_ENDPOINT=http://otel-collector:4318/v1/logs
+BYTECHEF_OBSERVABILITY_METRICS_ENDPOINT=http://otel-collector:4318/v1/metrics
+```
+
+<Callout type="info">
+  **Why two models?** The single-node binary is often used for local evaluation, where you might want only one signal. The microservices model favours operational consistency — one flag, every service exports or none does. Set the master switch via your config server or per-pod environment.
+</Callout>
+
+## How the properties map to Spring Boot
+
+The `bytechef.observability.*` properties are thin aliases over the standard Spring Boot Actuator / Micrometer keys. You never need to set these directly, but knowing the mapping makes the behaviour predictable and lets you tune what ByteChef doesn't surface:
+
+| Spring Boot property | Driven by | Effect |
+|---|---|---|
+| `management.tracing.export.enabled` | observability enable flag | Turns OTLP span export on/off. |
+| `management.tracing.sampling.probability` | fixed at `1.0` | 100% of traces are sampled. |
+| `management.opentelemetry.tracing.export.otlp.endpoint` | tracing endpoint | Where spans go. |
+| `management.logging.export.enabled` | observability enable flag | Turns OTLP log export on/off. |
+| `management.opentelemetry.logging.export.otlp.endpoint` | logging endpoint | Where log records go. |
+| `management.otlp.metrics.export.enabled` | observability enable flag | Turns OTLP metric export on/off. |
+| `management.otlp.metrics.export.step` | fixed at `10s` | Metric push interval. |
+| `management.otlp.metrics.export.url` | metrics endpoint | Where metrics go. |
+
+### Sampling
+
+The shipped default is `management.tracing.sampling.probability: 1.0` — **every** request is traced. That's the right default for correctness and for low-to-moderate traffic. For high-throughput production, lower it (e.g. `0.1` for 10%) by overriding the property, or — preferably — do **tail-based sampling at the collector** so you keep all error and slow traces while dropping the boring ones.
+
+### Metrics detail
+
+Micrometer is configured to publish HTTP, JVM, Logback, process, and system meters, each tagged with the originating service via `application=${spring.application.name}`. Latency distributions are exported as histograms with the `0.5 / 0.75 / 0.95 / 0.99` percentiles precomputed, so you can build percentile-based latency SLOs without client-side estimation.
+
+## What the EE module installs
+
+Enabling the flags above activates the standard exporters. The Enterprise `observability-config` module (wired into the single-node binary and every microservice) adds the connective tissue that makes traces actually correlate end-to-end:
+
+| Component | What it does |
+|---|---|
+| **OpenTelemetry Logback appender** | Installed at startup so every log line is emitted as an OTLP log record carrying the active `traceId` / `spanId`. This is what lets you pivot log ↔ trace in Grafana or Datadog. |
+| **`AddTraceIdFilter`** | Adds an `X-Trace-Id` response header to every HTTP response, so a client (or a support engineer reading a browser network tab) can grab the trace ID for any request. |
+| **`ContextPropagatingTaskDecorator`** | Propagates the trace context across async boundaries (thread pools, `@Async`, task executors), so a trace started on the request thread continues into background work. |
+| **OTel JVM meter conventions** | Registers CPU, memory, thread, and class-loader meters using OpenTelemetry semantic conventions, so JVM metrics line up with the OTel ecosystem rather than legacy Micrometer names. |
+
+Service-to-service hops propagate W3C trace context automatically, so a trace started at the API gateway extends through the coordinator, the broker, and the worker that runs the task — one continuous trace across the whole topology.
+
+## Actuator endpoints
+
+Observability also exposes the Spring Boot Actuator surface. Health probes are split into Kubernetes-friendly `liveness` and `readiness` groups, and detailed health is gated behind `ROLE_ADMIN`:
+
+- `GET /actuator/health/liveness` — liveness probe (no auth needed for the probe state).
+- `GET /actuator/health/readiness` — readiness probe.
+- `GET /actuator/health` — full details, visible only to authenticated admins.
+- `GET /actuator/metrics`, `/actuator/info`, etc. — the standard Actuator endpoints.
+
+<Callout type="warn">
+  The default config exposes **all** Actuator endpoints (`management.endpoints.web.exposure.include: '*'`). In production, put the management surface behind your ingress/network policy so only your platform team and probes can reach it.
+</Callout>
+
+## Quick start: local collector
+
+To see traces, logs, and metrics end-to-end on a laptop:
+
+1. Run an OpenTelemetry Collector exposing OTLP/HTTP on `4318` (the [contrib image](https://github.com/open-telemetry/opentelemetry-collector-releases) works), with exporters to Jaeger/Tempo (traces), Loki (logs), and Prometheus (metrics).
+2. Start ByteChef with the enable flags on and the endpoints pointed at the collector.
+3. Trigger a workflow. The trace shows the webhook → coordinator → worker → component span tree; the log lines for that execution carry the same `traceId`; the metrics appear within one `10s` step.
+
+## Where it all goes
+
+ByteChef doesn't care which backend you run — point the collector wherever you already operate:
+
+| Stack | Wiring |
+|---|---|
+| **Datadog** | OTLP to the Datadog agent (traces + metrics + logs), or OTLP straight to Datadog's intake. |
+| **Grafana stack** | Traces → Tempo, logs → Loki, metrics → Mimir/Prometheus, dashboards in Grafana. |
+| **Honeycomb** | OTLP traces and metrics to Honeycomb; logs to your log backend with trace-ID correlation. |
+| **AWS** | OTLP via the ADOT collector to CloudWatch / X-Ray. |
+
+You don't have to commit to one — the collector fans out to multiple backends.
+
+## See also
+
+- [Observability](/enterprise/governance-security/observability) — the conceptual overview of traces, logs, and metrics.
+- [Encrypted credentials](/enterprise/governance-security/encrypted-credentials) — sensitive properties are scrubbed before log serialization.
+- [Pluggable message brokers](/enterprise/scale-reliability/message-brokers) — broker queue depth and consumer lag are exposed as Micrometer metrics.

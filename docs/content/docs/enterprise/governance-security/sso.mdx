@@ -1,0 +1,60 @@
+---
+title: "Enterprise SSO"
+description: "Federate authentication through your identity provider — SAML 2.0 and OIDC — so identity, group membership, and de-provisioning all happen in one place."
+---
+
+Centralized identity is non-negotiable for a multi-team enterprise rollout. Enterprise SSO replaces ByteChef's local user store with your existing identity provider, so identity, group membership, and de-provisioning all happen in one place — never in a second directory your IT team has to keep in sync by hand.
+
+> **Coming soon.** Enterprise SSO is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+> **Edition availability.** External identity provider federation — SAML 2.0 and OIDC — is an **Enterprise Edition** feature (`BYTECHEF_SECURITY_SSO_ENABLED`). Community Edition ships local email/password login, plus optional social login with Google and GitHub *(coming soon)*. See [Social login](#social-login) and [Two-factor authentication](#two-factor-authentication) below.
+
+## Protocols
+
+Both protocols are first-class — neither is a degraded variant of the other.
+
+- **SAML 2.0** — assertion-based SSO, typical of legacy and large-enterprise IdPs such as ADFS and Shibboleth.
+- **OIDC / OAuth 2.0** — for OIDC-native IdPs like Okta, Auth0, Google Workspace, and modern Azure AD / Entra ID.
+
+If your IdP advertises a SAML metadata URL or an OIDC discovery document, it will plug in.
+
+## Dynamic provider registration
+
+Administrators register identity providers at runtime — metadata URLs, client IDs, secrets, and attribute mappings are all admin-editable without a redeploy. This matters most for:
+
+- **Multi-tenant deployments**, where each tenant brings their own IdP.
+- **Acquisitions**, where you onboard a new identity domain without an outage window.
+
+## Tested identity providers
+
+Okta, Auth0, Azure AD / Entra ID, Google Workspace, Keycloak, plus generic SAML 2.0 and OIDC providers.
+
+## What gets federated
+
+- **Authentication** — your IdP performs the login; ByteChef trusts the assertion or ID token.
+- **Identity attributes** — email, display name, and (configurably) group membership.
+- **Group-to-role mapping** — IdP group claims map to ByteChef workspace [roles](/enterprise/governance-security/rbac), so adding a new hire to your IdP's `platform-engineering` group automatically grants the right ByteChef permissions. The mapping is owned by workspace admins.
+
+## What does not get federated
+
+Service-account credentials — the API keys, OAuth tokens, and basic-auth secrets that workflows use — stay in [encrypted credential storage](/enterprise/governance-security/encrypted-credentials). SSO governs **human** identities, not machine credentials.
+
+## Migration from local accounts
+
+When you switch a workspace to SSO, existing local accounts are matched by email. Local password authentication can be disabled per workspace once SSO is live, so users cannot fall back to it.
+
+## What gets logged
+
+Every SSO sign-in and every provider configuration change is captured in the [audit log](/enterprise/governance-security/audit-log) with the actor, the timestamp, and — for configuration changes — the previous and new values.
+
+## Social login
+
+> **Coming soon.** Social login is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+In addition to local email/password, users can sign in with **Google** or **GitHub**. Enable it with `BYTECHEF_SECURITY_SOCIAL_LOGIN_*`. This is separate from Enterprise SSO federation above — social login is aimed at Community Edition and small teams, where a full IdP is overkill.
+
+## Two-factor authentication
+
+> **Coming soon.** Two-factor authentication is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+
+For local accounts, ByteChef can require a time-based one-time password (TOTP) as a second factor at sign-in, enabled with `BYTECHEF_SECURITY_TWO_FACTOR_AUTHENTICATION_ENABLED`. Users register an authenticator app (e.g. Google Authenticator, 1Password) and enter the rotating code after their password.

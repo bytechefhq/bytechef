@@ -1,0 +1,89 @@
+---
+title: "Tenant-Isolated Security"
+description: "Multi-tenant security context and per-tenant data isolation — defaults that fail safe in white-label scenarios."
+---
+
+In an embedded iPaaS, the worst possible failure mode is **cross-tenant leakage** — Tenant A's workflow seeing Tenant B's data, Tenant A's credentials being used by Tenant B's run, Tenant A's audit log showing Tenant B's actions. ByteChef's tenant isolation is built so the **default** is safe; you'd have to actively misconfigure something to leak.
+
+This page describes isolation from the **request-flow** perspective — what happens to a single call as it lands. For the underlying data-layer mechanisms (DB routing, multi-tenant Quartz, per-tenant configuration overlays) see [Multi-tenant data isolation](/enterprise/scale-reliability/multi-tenant-isolation); Layer 2 below is exactly those three primitives in action.
+
+## The four request-flow isolation layers
+
+```
+┌──────────────────────────────────────────┐
+│  1. Identity — tenant from auth context  │
+├──────────────────────────────────────────┤
+│  2. Routing — tenant DB, tenant Quartz   │
+├──────────────────────────────────────────┤
+│  3. Crypto — tenant-scoped keys          │
+├──────────────────────────────────────────┤
+│  4. Observability — tenant-tagged data   │
+└──────────────────────────────────────────┘
+```
+
+Every request passes through all four layers in order.
+
+## Layer 1: Identity from the auth context
+
+Every API call, webhook, MCP call, and scheduled fire carries a **tenant ID** derived from the authenticated principal:
+
+- For API calls: the tenant token contains the tenant ID as a signed claim.
+- For webhook ingress: the webhook URL itself contains a tenant-scoped path segment.
+- For MCP: the MCP session is established per-tenant.
+- For scheduled fires: the schedule is registered with the tenant ID and the scheduler attaches it on dispatch.
+
+There is no "ambient" tenant ID anywhere. Code that needs the tenant must read it from the request context — the platform refuses to operate with no tenant set.
+
+## Layer 2: Routing
+
+Once the tenant ID is set, [multi-tenant data isolation](/enterprise/scale-reliability/multi-tenant-isolation) takes over:
+
+- The database connection pool routes to the tenant's database (or schema).
+- The Quartz scheduler reads from the tenant's job store.
+- The file storage backend prefixes with the tenant ID.
+- The message broker queues are tenant-scoped (or carry tenant ID in headers, depending on backend).
+
+A query that would otherwise span tenants simply can't reach them — the connection pool is pinned to one tenant at a time.
+
+## Layer 3: Crypto
+
+[Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) uses **workspace-scoped keys**, and workspaces don't span tenants. The practical effect:
+
+- Tenant A's credentials are encrypted with Tenant A's workspace key.
+- Tenant B cannot decrypt Tenant A's credentials even with access to the database, because Tenant B doesn't have the workspace key.
+- A leaked database backup is useless without the master key, and re-deriving the workspace keys still requires the master.
+
+When you wire in an [external secret manager](/enterprise/governance-security/encrypted-credentials#external-secret-managers-coming-soon) *(coming soon)*, tenants can use entirely separate vaults — one tenant's secrets never even exist in another tenant's vault namespace.
+
+## Layer 4: Observability
+
+Logs, traces, and metrics are tagged with `tenant_id` automatically:
+
+- A trace can never "jump" tenants — context propagation carries the tenant tag end-to-end.
+- Logs filtered for one tenant return only that tenant's lines.
+- Metrics aggregated per tenant let you bill, throttle, and monitor at the tenant level.
+
+The default observability dashboard for an embedded deployment is tenant-segmented.
+
+## The "fail safe" defaults
+
+Specific design choices that prevent the easy mistakes:
+
+- **No global queries.** APIs don't expose "list all workflows" — they expose "list workflows in this tenant." Cross-tenant analytics happen via separate exports.
+- **No accidental wildcards.** [Connection visibility](/enterprise/governance-security/connection-visibility) prevents a credential from being shared beyond the workspace, let alone the tenant.
+- **No shared schedulers.** Even though there's a single scheduler service, [multi-tenant Quartz](/enterprise/scale-reliability/multi-tenant-isolation) partitions schedules per tenant.
+- **No shared embeddings.** The [knowledge base](/enterprise/data-knowledge/knowledge-base) is tenant-scoped; one tenant's pgvector index doesn't see another tenant's chunks.
+
+## Operational guardrails for you
+
+A few things you should set as the operator of an embedded deployment:
+
+- [ ] Issue distinct service tokens per tenant; never use a "master" token for runtime traffic.
+- [ ] Use separate databases per tenant (or at minimum separate schemas) so a Postgres-level mistake doesn't span tenants.
+- [ ] Set tenant-aware rate limits at the gateway so a noisy tenant can't degrade others' experience.
+- [ ] Configure the master encryption key in your KMS, not in a static config file.
+
+## See also
+
+- [Multi-tenant data isolation](/enterprise/scale-reliability/multi-tenant-isolation) — the infrastructure-level isolation primitives.
+- [Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) — the cryptographic story.

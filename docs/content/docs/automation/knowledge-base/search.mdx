@@ -1,0 +1,45 @@
+---
+title: Search
+description: Run semantic queries against a knowledge base and inspect the matching chunks and relevance scores.
+---
+
+The **Search** tab is a built-in playground for querying a knowledge base the same way a
+workflow or agent would. Use it to sanity-check that your documents were ingested well and
+that a given question retrieves the chunks you expect — before you wire the knowledge base
+into anything.
+
+## Running a query
+
+1. Open a knowledge base and switch to the **Search** tab.
+2. Type a natural-language query. Search is **semantic**: it matches on meaning, so
+   "how do I cancel" will find a chunk titled "Terminating a subscription" even though no
+   words overlap.
+3. (Optional) Add a **metadata filter** as JSON to restrict which chunks can match.
+4. Submit. Results come back ranked by relevance.
+
+## Reading the results
+
+Each result card shows:
+
+- The **source document** the chunk came from.
+- The **chunk index** — which slice of the document matched.
+- A **relevance score** from 0–100%, where higher means a closer semantic match.
+- The chunk's **metadata**, including the file name and anything attached during ingestion.
+
+If a query you expect to work returns nothing useful, check that the relevant document is
+**Ready** (see [Add documents](/automation/knowledge-base/add-documents)), and consider
+whether the [chunk settings](/automation/knowledge-base/create-a-knowledge-base#choosing-chunk-settings)
+are splitting the content too finely or too coarsely.
+
+## Metadata filters
+
+The metadata filter narrows the candidate set before ranking. It accepts a JSON object
+whose keys are matched against each chunk's stored metadata, for example:
+
+```json
+{"file_name": "refund-policy.pdf"}
+```
+
+Only chunks whose metadata satisfies the filter are eligible to be returned. This is the
+playground equivalent of the metadata and [tag filters](/automation/knowledge-base/use-in-workflows#filtering-by-tag)
+you'll use from workflows and agents.

@@ -93,6 +93,11 @@ To summarize:
   <iframe src="https://www.guidejar.com/embed/4a9369e5-aff8-47f8-956d-9e88bfec0cad?type=1&controls=on" width="100%" height="100%" style={{ height: '100%', position: 'absolute', inset: 0 }} allowFullScreen frameBorder="0"></iframe>
 </div>
 
+#### Multiple triggers
+
+> **Coming soon.** Multiple triggers per workflow are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
+A workflow can have **more than one trigger** — for example, run on a schedule *and* on an incoming webhook. Use the add-trigger button next to the existing trigger to attach another one; on deployment every trigger is enabled, and any of them can start a run of the same workflow.
 
 ### Edit Component
 
@@ -102,6 +107,25 @@ To summarize:
 <div style={{ position: 'relative', height: 0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(53.02672956% + 32px)' }}>
 <iframe src="https://www.guidejar.com/embed/owUEJCVUqSi3T7YlqDHx?type=1&controls=on" width="100%" height="100%" style={{ height: '100%', position: 'absolute', inset: 0 }} allowFullScreen frameBorder="0"></iframe>
 </div>
+
+### Stream data in bulk
+
+For moving large volumes of records between systems (bulk sync, export, migration), use a **[Data Stream](/automation/build/data-streams)** node *(coming soon)* instead of looping over single-record actions.
+
+### Add Sticky Notes
+
+> **Coming soon.** Sticky notes are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+
+Sticky notes let you annotate the workflow canvas — describe what a section does, leave review comments, or link a walkthrough video. They are documentation only and are never executed.
+
+1. Click the **sticky note icon** (Add note) in the editor toolbar. A note appears on the canvas.
+2. **Double-click** the note to edit its text — Markdown is supported, and pasted YouTube links render as embedded videos.
+3. Drag the note anywhere on the canvas and resize it from its edges.
+4. Use the note's color swatches to pick a preset color, or choose a custom one; recently used custom colors are remembered.
+
+{/* TODO screenshot: workflow canvas with a sticky note next to a few nodes — note in edit mode showing Markdown text and the color swatch row */}
+
+Sticky notes are saved with the workflow, so everyone who opens it sees the same annotations.
 
 ## Edit Workflow
 

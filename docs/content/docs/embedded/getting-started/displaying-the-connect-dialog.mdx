@@ -1,0 +1,85 @@
+---
+title: Displaying the Connect Dialog
+description: Open the hosted Connect dialog from your app so end users can authorize integrations and enable workflows.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+The **Connect dialog** is the embedded surface your end users interact with: it walks them through authorizing the third-party account (OAuth consent, API key entry), enabling the integration's workflows, and filling in any workflow inputs — and it stores the resulting credentials as a **Connection** under their **Connected User** record. You never handle or refresh their tokens yourself.
+
+## Activate the integration
+
+The dialog only offers integrations that are live in the target environment:
+
+- The integration is **published** (has a `PUBLISHED` version).
+- An **instance configuration** for that version exists in the environment and is toggled **on**.
+
+Both steps are covered in [Adding an Integration](/embedded/getting-started/adding-an-integration#publish-and-deploy).
+
+## Display the Connect dialog in your app
+
+First, make sure your backend can mint an end-user JWT — see [Installing the SDK](/embedded/getting-started/installing-the-sdk). Then hand the token and the integration's id to `useConnectDialog`:
+
+```tsx
+'use client';
+import {useConnectDialog} from '@bytechef/embedded';
+
+export function ConnectGmailButton({jwtToken, integrationId}: {
+    jwtToken: string;
+    integrationId: string;
+}) {
+    const {openDialog} = useConnectDialog({
+        baseUrl: 'https://your-bytechef-host.example.com',
+        environment: 'DEVELOPMENT',
+        integrationId,
+        jwtToken,
+    });
+
+    return <button onClick={openDialog}>Connect Gmail</button>;
+}
+```
+
+![Connect dialog rendered in your application](../quickstart-connect-dialog.png)
+
+To build an integrations catalog page (and get each `integrationId`), list the integrations available to the current user from the embedded API:
+
+```ts
+const response = await fetch(`${baseUrl}/api/embedded/v1/integrations`, {
+    headers: {
+        'Authorization': `Bearer ${jwtToken}`,
+        'X-Environment': 'DEVELOPMENT',
+    },
+});
+
+const integrations = await response.json();
+```
+
+Each returned integration includes its id, title, description, and icon — plus the user's existing instances, so you can render "Connect" vs "Connected" states. The [Sample App](/embedded/sample-app) implements this exact page.
+
+For an **already-connected** integration, pass the instance's id as `integrationInstanceId` alongside `integrationId` — the dialog then opens directly in the workflows view for that instance (the manage/edit path: toggle workflows, adjust inputs) instead of the first-time connect flow.
+
+<Callout title="The dialog can collect more than credentials">
+    Beyond the account authorization step, the dialog renders any end-user-facing **workflow inputs** (including live dropdowns fetched against the user's new connection) and, when configured, a **[Field Mapping](/embedded/field-mapping)** step where the user maps your application's fields to the integration's fields.
+</Callout>
+
+## Authenticating an account
+
+When the user clicks your button, the dialog opens and the flow depends on the component's authorization type:
+
+- **OAuth 2.0** — the user is sent to the provider's consent screen (branded as your [developer app](/embedded/getting-started/adding-an-integration#create-a-developer-app)) and returns with an authorized connection.
+- **API key / other credentials** — the dialog renders the component's credential form and validates the entry.
+
+Either way, the credential is stored server-side as a Connection scoped to the Connected User identified by the JWT's `sub` claim, in the environment the dialog was opened with.
+
+## Verify the connection
+
+After a user connects, confirm everything landed:
+
+- **Embedded → Connected Users** — the user appears with the integrations they connected.
+- **Embedded → Connections** — the authorized credential, with its status.
+- **Embedded → Workflow Executions** — runs of the integration's workflows as they start firing.
+
+## Next steps
+
+- Trigger the user's workflows from your product with [App Events](/embedded/app-events).
+- Let users author their own automations with the embedded workflow builder — see the [Quick Start](/embedded/quickstart#let-your-users-build-their-own-workflows-optional).

@@ -4,7 +4,9 @@
   "description": "Build, evaluate, and protect AI agents in ByteChef",
   "icon": "Bot",
   "pages": [
+    "index",
     "skills",
+    "agent-utils",
     "evals",
     "guardrails"
   ]

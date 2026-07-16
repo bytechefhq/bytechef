@@ -121,17 +121,14 @@ The default of `0.7` is a reasonable middle ground for general-purpose agents. F
 
 ## Telemetry
 
-On a blocked response, the advisor attaches one metadata key so downstream observability picks up guardrail activity without grepping logs:
+The advisors attach metadata keys to the `ChatResponse` so downstream observability picks up guardrail activity without grepping logs:
 
 | Key | When emitted | Carries |
 |---|---|---|
-| `guardrail.violations` | Blocked response | List of violations with public-view fields (guardrail name, match count, classifier score, execution-failure kind). Raw matched substrings are scrubbed |
-| `guardrail.uncheckedStructuredOutput` | Output pass forwarded a generation whose assistant text was empty but which carried tool calls / media / other structured fields the string checks cannot inspect | `true` |
-| `guardrail.unsanitizedStructuredOutput` | `Sanitize Text` forwarded one or more generations without sanitization because they carried no assistant text (tool calls, media payloads) | `true` |
-| `guardrail.skippedLlmOutputChecks` | Streaming output: LLM-stage output checks are skipped per chunk because running an LLM classifier per token would exhaust rate limits and produce nonsense verdicts | Skipped check count (int) |
-| `guardrail.partialLeak` | Streaming output: a violation fired (or upstream errored) mid-stream after chunks had already shipped; the remainder is withheld but prior chunks reached the caller | Chunk count delivered before the cutover (int) |
+| `guardrail.violations` | `Check For Violations` blocks a request — any inbound or outbound check fired | List of violations with public-view fields (guardrail name, match count, classifier score, execution-failure kind). Raw matched substrings are scrubbed |
+| `guardrail.sanitizeWithheld` | `Sanitize Text` itself failed — a sanitizer threw or errored — so the response was withheld and replaced with a placeholder | `true` |
 
-Execution failures appear as entries in `guardrail.violations` with `executionFailed=true` and a `failureKind` tag, so a single subscription covers both rule-fired violations and broken-guardrail incidents. Operators should additionally alert on the structured-output and partial-leak keys — they indicate cases where the advisor's "fail closed" contract degraded to "best effort".
+Execution failures appear as entries in `guardrail.violations` with `executionFailed=true` and a `failureKind` tag, so a single subscription covers both rule-fired violations and broken-guardrail incidents. The `guardrail.sanitizeWithheld` key flags the case where the outbound sanitizer's "fail closed" contract triggered — operators should alert on it.
 
 ---
 

@@ -1,0 +1,78 @@
+---
+title: "Horizontal Scaling That's Actually Horizontal"
+description: "Coordinator and workers communicate via your chosen broker. Add workers, get throughput."
+---
+
+Some platforms claim "horizontal scaling" but quietly funnel everything through a shared singleton component, so adding workers gains you 10% past a point. ByteChef's coordinator-worker model is genuinely shared-nothing — workers don't talk to each other, the coordinator doesn't hold per-execution state, and the broker is the only fan-out point.
+
+## The shared-nothing architecture
+
+```
+            ┌─────────────────────┐
+            │   Coordinator(s)    │
+            │  (stateless, HA)    │
+            └──────────┬──────────┘
+                       │
+                       ▼
+            ┌─────────────────────┐
+            │   Message Broker    │
+            │  (Kafka/SQS/etc.)   │
+            └──────────┬──────────┘
+                       │
+       ┌───────────────┼───────────────┐
+       ▼               ▼               ▼
+┌──────────┐    ┌──────────┐    ┌──────────┐
+│ Worker 1 │    │ Worker 2 │    │ Worker N │
+└──────────┘    └──────────┘    └──────────┘
+```
+
+- The **coordinator** receives workflow runs, decomposes them into tasks, and publishes task dispatches to the broker. It holds no per-execution state in memory — restart it and runs continue.
+- The **broker** buffers and distributes task dispatches to whichever worker pulls next. See [pluggable message brokers](/enterprise/scale-reliability/message-brokers).
+- The **workers** pull tasks, execute them, publish results back to the broker. They hold no per-execution state beyond the current task.
+- The **database** is the only durable shared state; everything coordinators and workers need to know is queryable.
+
+## What "horizontal" means in practice
+
+| Action | Effect |
+|---|---|
+| Add 5 more worker pods | ~5x increase in concurrent task throughput. |
+| Add 5 more coordinator pods | More API throughput; more runs dispatched per second. |
+| Remove a worker mid-run | Its in-flight tasks are redelivered to another worker (broker at-least-once). |
+| Kill the coordinator mid-run | A surviving coordinator picks up; in-flight tasks are unaffected. |
+
+There's no leader-election bottleneck on the run dispatch path. The only place leader election lives is in the [scheduler](/enterprise/scale-reliability/distributed-scheduler) — and only there to prevent duplicate fires of a single cron.
+
+## State persistence with type fidelity
+
+Suspended executions (workflows waiting for an external signal) persist their state to the database with **type fidelity**. When a worker reads the persisted state on resume, it gets back the original Java types — not a generic `Map<String, Object>` representation. The serialization layer uses a `TaskStateValue(Object value, String classname)` pattern with custom Spring Data JDBC converters, so resumption is a fast deserialize, not an interpretive reconstruction.
+
+The practical consequence: long-running workflows that suspend for hours or days can resume on a different worker, possibly a different version of the worker code, with their data intact.
+
+## Idempotency expectations
+
+At-least-once delivery means tasks may be delivered more than once under failure. Components should be idempotent — and the built-in component framework gives you the hooks to make idempotency easy:
+
+- Component invocations carry a stable execution + task ID; component implementations can use it as the idempotency key for downstream APIs.
+- Tasks that observably failed are retried; tasks that succeeded but lost their ack are retried but typically resolve via the downstream system's idempotency.
+
+## Autoscaling signals
+
+Common scaling signals:
+
+| Signal | Scale |
+|---|---|
+| Broker queue depth growing | Add workers. |
+| Worker CPU saturation | Add workers. |
+| API gateway latency growing | Add coordinators / API gateway pods. |
+| Scheduler missed-fire rate | Add scheduler pods (only useful up to a point — schedulers are leader-elected). |
+
+Kubernetes HPA with metrics from [Micrometer](/enterprise/governance-security/observability) covers the common cases.
+
+## What does *not* scale horizontally
+
+- **The database.** You scale the database vertically (or shard via [multi-tenant routing](/enterprise/scale-reliability/multi-tenant-isolation)). The platform is designed to push the lion's share of work to workers, but Postgres is still the durable backbone.
+- **Per-tenant scheduler fires.** A single tenant's cron fires are serialized; you scale by adding tenants, not by parallelizing one tenant's fires.
+
+## When you've outgrown horizontal scaling
+
+When a single tenant's workload exceeds a single database, the next step is [multi-tenant isolation](/enterprise/scale-reliability/multi-tenant-isolation) — split tenants across multiple databases, route requests at the edge. Each tenant database then independently scales horizontally on the same model above.

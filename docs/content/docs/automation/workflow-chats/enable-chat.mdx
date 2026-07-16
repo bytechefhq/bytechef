@@ -1,0 +1,74 @@
+---
+title: Enable Chat on a Workflow
+description: Add the New Chat Request trigger so a workflow appears in the Chats page and responds to messages.
+---
+
+import {Callout} from "fumadocs-ui/components/callout";
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    Workflow chats and the Chats page (part of the AI Hub, an Enterprise Edition feature) are on the upcoming release track and are not yet available in the latest released version of ByteChef.
+</Callout>
+
+A workflow becomes chat-enabled when its trigger is **New Chat Request**. This is the
+canonical chat trigger: it's a webhook that runs the workflow synchronously and hands it a
+message, a conversation id, and any attachments.
+
+## Add the trigger
+
+1. Open the workflow in the **Workflow Editor**.
+2. Add or replace the trigger — choose **New Chat Request** from the trigger palette.
+3. Configure the **Mode** (see below).
+4. Save and deploy.
+
+Once deployed, the workflow appears in **Automation → Chats**, grouped under its project.
+
+## The request shape
+
+The New Chat Request trigger receives a JSON body shaped like:
+
+```json
+{
+  "conversationId": "a stable id for the conversation",
+  "message": "the user's text",
+  "attachments": [
+    {"file_entry": {}}
+  ]
+}
+```
+
+- **`conversationId`** ties successive turns together so the workflow (and any chat memory)
+  can keep context across messages.
+- **`message`** is the user's text for this turn.
+- **`attachments`** carries any files the user uploaded (see
+  [Use the Chats page](/automation/workflow-chats/using-chats#attachments)).
+
+Because the trigger runs synchronously, whatever the workflow returns becomes the reply
+shown in the chat.
+
+## Hosted vs. embedded
+
+The trigger's **Mode** decides where the chat is consumed:
+
+| Mode | Behavior |
+| --- | --- |
+| **Hosted Chat** (default) | The workflow appears in ByteChef's **Chats** page. Nothing else to build. |
+| **Embedded Chat** | The workflow is hidden from the Chats page; you invoke its webhook from your own interface. |
+
+Pick **Hosted Chat** when you want ByteChef to provide the chat UI, and **Embedded Chat**
+when you're building the front end yourself and just want the trigger contract.
+
+## Workflows with multiple triggers
+
+A workflow can have more than one trigger — for example a New Chat Request trigger and a
+Slack trigger on a specific channel. When a user opens the workflow from the **Chats** page,
+the conversation is bound to the **chat trigger** specifically. Other triggers on the same
+workflow keep firing independently from their own sources.
+
+<Callout title="Other webhook triggers">
+  The Chats page is calibrated for the New Chat Request trigger and its
+  `{ message, conversationId, attachments }` body. A workflow built on a different webhook
+  trigger can still be invoked, but the trigger must accept that same body shape (or read
+  the equivalent keys from its parameters) for the message to reach the workflow.
+</Callout>

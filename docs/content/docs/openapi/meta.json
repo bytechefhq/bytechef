@@ -3,5 +3,5 @@
   "description": "The API reference docs",
   "icon": "Play",
   "root": true,
-  "pages": ["index"]
+  "pages": ["index", "embedded", "embedded-configuration", "embedded-webhook", "automation"]
 }

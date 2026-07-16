@@ -1,0 +1,24 @@
+---
+title: "Governance & Security Overview"
+description: "Identity, access, secrets, and audit controls that make ByteChef safe to run in production."
+---
+
+Governance & Security in ByteChef Enterprise covers everything you need to make automation safe to operate at scale — from how the binary is distributed, to how identities are federated, to how a single credential rotation propagates through your environments.
+
+## What you get
+
+| Capability | Purpose |
+|---|---|
+| [Flexible deployment](/enterprise/governance-security/flexible-deployment) | Run on your perimeter — Kubernetes, AWS/GCP/Azure, or hybrid. Microservices topology covered here too *(coming soon)*. |
+| [Role-based access control](/enterprise/governance-security/rbac) | Workspace-scoped permissions with clear ownership *(coming soon)*. |
+| [Enterprise SSO](/enterprise/governance-security/sso) | Federated identity via SAML 2.0 / OIDC, with IdP group-to-role mapping *(coming soon)*. |
+| [Audit log](/enterprise/governance-security/audit-log) | Every privileged action captured with actor, timestamp, and correlation ID *(coming soon)*. |
+| [Data retention](/enterprise/governance-security/data-retention) | Organization-wide retention and deletion policy for execution logs, soft-deleted resources, and audit records *(Soon)*. |
+| [Encrypted credential storage](/enterprise/governance-security/encrypted-credentials) | Workspace-scoped encryption keys. Hosts the external secret managers *(coming soon)* section. |
+| [Connection visibility](/enterprise/governance-security/connection-visibility) | PRIVATE / WORKSPACE / ORGANIZATION scopes that make credential sharing explicit and audited *(coming soon)*. |
+| [Observability](/enterprise/governance-security/observability) | OpenTelemetry tracing, structured logs, Micrometer metrics. |
+| [License-gated EE distribution](/enterprise/governance-security/license-gated-distribution) | Clean separation of Community and Enterprise binaries. |
+
+## The security model in one paragraph
+
+ByteChef separates **identity** (who you are — federated via your IdP), **authorization** (what you can do — workspace roles), **secret material** (credentials encrypted at rest, optionally externalized to your vault), and **action history** (the audit log). Every privileged operation passes through all four layers, so a compromised connection cannot escape its workspace, a credential rotation propagates to every running execution, and a forensic question can be answered from a single timeline.

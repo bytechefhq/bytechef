@@ -1,0 +1,81 @@
+---
+title: "Workflow Versioning"
+description: "Every workflow change is a version. Inspect, compare, and pin specific versions per environment — no silent overwrites of production logic."
+---
+
+ByteChef workflows are versioned end-to-end. A version is an **immutable snapshot** of the workflow definition — the tasks, the connections it references, the trigger configuration, the inputs and outputs. Once a version is cut, the bits behind that version number never change.
+
+## Why immutability matters
+
+Mutable workflows are how production incidents get written. Someone edits "the workflow," a webhook fires, and the wrong version runs. With immutable versions:
+
+- A workflow running in PRODUCTION cannot change while it's running.
+- An edit in DEVELOPMENT cannot leak into a STAGING or PRODUCTION environment without an explicit promotion.
+- "What did this run a month ago?" is always answerable — the version it ran is still on disk.
+
+## The version timeline
+
+```
+draft (DEVELOPMENT)
+   │   ─── edit, edit, edit  (no version cut yet)
+   ▼
+publish
+   │   ─── version v1 cut, immutable
+   │   ─── can be promoted to STAGING or PRODUCTION
+   ▼
+edit again (back to draft)
+   ▼
+publish
+   │   ─── version v2 cut
+   │   ─── independent from v1; can co-exist (v1 in PRODUCTION, v2 in DEVELOPMENT)
+```
+
+## Pinning versions per environment
+
+Each environment pins exactly one version of each workflow:
+
+| Environment | Pinned version |
+|---|---|
+| DEVELOPMENT | draft (live edits) |
+| STAGING | v17 |
+| PRODUCTION | v15 |
+
+So DEVELOPMENT can be experimenting with v17-in-progress, STAGING can be smoke-testing v17, and PRODUCTION can be running the last-known-good v15 — all simultaneously, all isolated.
+
+When you promote v17 to PRODUCTION, the pin moves; v15 doesn't disappear — it stays available for rollback.
+
+## Inspecting and comparing
+
+For any workflow, you can:
+
+- **List** every published version with its publish timestamp, author, and the description supplied at publish time.
+- **Diff** two versions to see exactly which tasks, parameters, or connections changed.
+- **View** any version's definition as JSON.
+- **Compare** what a specific environment is running against the latest published version.
+
+{/* TODO screenshot: workflow versions panel — list of versions (v15, v16, v17) with author, publish description, timestamp; environment pin badges (DEVELOPMENT/STAGING/PRODUCTION) next to the relevant rows; a "Diff" action visible */}
+![Workflow versions list with environment-pin badges and a diff action](/enterprise/workflow-versioning/versions-panel.png)
+
+## What's in a version
+
+A version snapshot includes everything needed to reproduce execution behavior:
+
+- The workflow definition (tasks, ordering, parameters, expressions).
+- References to component versions (e.g., `slack/v1/sendMessage`).
+- Trigger configuration.
+- Input/output schemas.
+- The publish description.
+- Author and timestamp.
+
+What it does **not** include:
+
+- Connection secrets. Connections are referenced by ID; the version persists across credential rotations.
+- Environment-specific configuration. The same version runs in DEVELOPMENT and PRODUCTION using each environment's resolved connections.
+
+## Rollback
+
+To roll back PRODUCTION, promote the previous version. There is no rebuild, no edit, no re-publish — the version is on disk, ready to run. This is what [Build once, deploy many](/enterprise/collaboration-devops/build-once-deploy-many) buys you.
+
+## Audit trail
+
+Every publish and promotion is recorded in the [audit log](/enterprise/governance-security/audit-log) with the actor, the version, the environment, and the timestamp. "Who promoted v17 to PRODUCTION last Friday?" is one filter away.

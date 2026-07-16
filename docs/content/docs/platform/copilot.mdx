@@ -1,79 +1,134 @@
 ---
 title: AI Copilot
-description: Use the AI Copilot to ask questions and build workflows in ByteChef
+description: Use the AI Copilot to ask questions, generate values, and build workflows in ByteChef
 ---
 
 # AI Copilot
+
+<EEBadge />
+
+<Callout type="warn" title="Coming soon">
+    The AI Copilot is on the upcoming release track and is not yet available in the latest released version of ByteChef.
+</Callout>
 
 <div style={{ position: 'relative', height:0, width: '100%', overflow: 'hidden', zindex: 49, boxSizing: 'border-box', paddingBottom: 'calc(50.05219207% + 32px)'}}>
   <iframe src="https://www.guidejar.com/embed/4e73ae48-89a8-47bd-84fb-d47008814078?type=1&controls=on&skipIntro=false" width="100%" height="100%" style={{height:'100%', position:'absolute', inset:0}} allowfullscreen frameborder="0"></iframe>
 </div>
 
-The AI Copilot is an AI assistant embedded in the ByteChef workflow editor. It helps you understand, design, and build automation workflows without leaving the editor.
+The AI Copilot is an AI assistant embedded throughout the ByteChef editor. It helps you understand, design, build, and debug automation workflows — and fill in individual fields — without leaving the editor.
 
-Copilot is available in two modes: **Ask** and **Build**.
+> The AI Copilot is an Enterprise Edition feature and is disabled by default. See [Enabling Copilot](#enabling-copilot).
 
----
+There are three ways to use Copilot:
 
-## Accessing Copilot
-
-The Copilot panel opens from the workflow editor toolbar. Click the **AI Copilot** button (sparkle icon) to toggle it. Use the **Ask** / **Build** toggle at the top of the panel to switch modes.
-
-Copilot is also available in:
- - the **Code Editor** - located in the Script component for generating code blocks in JavaScript, Python, and Ruby
- - **Cluster Elements** - located in the AI Agent component or in any vector database component, used for generating all configurations from zero
- - the **Skills** page - opens as a side panel for editing the currently-viewed skill, or as a full-page chat from the **Create Skill → Create With AI** dropdown
-
-Each surface has its own pair of Ask and Build agents wired with surface-specific tools and prompts. The list of surfaces and their conversation modes lives in the controller as a `Source` enum (`WORKFLOW_EDITOR`, `CODE_EDITOR`, `CLUSTER_ELEMENT`, `SKILLS`).
+- **Conversational Copilot** — a chat panel with **Ask** and **Build** modes for exploring and building whole workflows, scripts, skills, and more.
+- **One-shot generation** — a dialog where you describe a whole workflow or skill in a sentence and Copilot builds it end-to-end in a single step, with no back-and-forth.
+- **Inline generation** — one-click "sparkle" buttons next to individual fields that generate a value, formula, JSON schema, sample output, or description from a short prompt.
 
 ---
 
-## Ask Mode
+## Conversational Copilot
 
-Ask mode is a read-only assistant for exploring and understanding the current surface.
+Open the Copilot panel from the editor toolbar by clicking the **AI Copilot** button (sparkle icon). Use the **Ask** / **Build** toggle at the top of the panel to switch modes, and the model picker to choose which LLM answers (see [Choosing the model](#choosing-the-model)).
 
-**Both modes share (workflow editor):**
+### Where it appears
+
+Copilot is context-aware: each surface has its own pair of Ask and Build agents wired with surface-specific tools and prompts.
+
+| Surface | What it helps with |
+|---|---|
+| **Workflow editor** | Understand, design, and build the current workflow |
+| **Code Editor** (Script component) | Generate and explain code blocks in JavaScript, Python, and Ruby |
+| **Cluster Elements** (AI Agent component, vector database components) | Generate full element configurations from scratch |
+| **Workflow execution** | Analyze a finished or failed execution and debug errors |
+| **Skills** | Explain, audit, and edit AI Skills — opens as a side panel for the open skill. To create a skill from a prompt, use the one-shot **Create Skill → Create With AI** dialog (see [One-shot generation](#one-shot-generation-from-a-prompt)) |
+
+### Ask mode
+
+Ask mode is a **read-only** assistant for exploring and understanding the current surface. It cannot modify anything.
+
+In the workflow editor, Ask mode has:
+
 - Full context of the current workflow definition
 - The last execution error on the workflow
 - Read-only access to component and task definitions
+- Grounding in the ByteChef documentation (see [How Copilot grounds answers](#how-copilot-grounds-answers))
+- Optional internet search via Firecrawl (if configured)
 
-**Ask mode additionally:**
-- Searches the internet for relevant information (via Firecrawl, if configured)
-- Queries the ByteChef documentation knowledge base
-- Suggests when to switch to Build mode for making changes
-- Cannot modify anything on the current surface
+Use Ask mode to get explanations, debug errors, research components, or plan changes before building. When a change is needed, it suggests switching to Build mode.
 
-Use Ask mode to get explanations, debug errors, research components, or plan changes before building.
+### Build mode
 
-On the **Skills** surface, Ask is scoped to *explaining* and *auditing* skills — it can summarize a skill, diff its SKILL.md against the agentskills.io format, or suggest improvements, but it refuses mutations and directs you to Build mode.
+Build mode has full access to **create and modify** content on the current surface. In the workflow editor it follows a structured process:
+
+> discover the right components → configure them → pre-validate each task → build → validate the full workflow → deploy
+
+It fixes any validation errors before proceeding, and can deploy the finished workflow directly from the conversation.
+
+### Interactive prompts
+
+While building, Copilot may pause to ask you something rather than guess. In the workflow editor it can:
+
+- Ask a short multiple-choice question to clarify intent
+- List the connections available for a component and let you pick one (or start creating a new connection)
+- Look up the real option values for a dynamic property (for example, a Slack channel or a spreadsheet column) and let you select one
+
+You answer inline in the chat, and Copilot continues with your choice.
 
 ---
 
-## Build Mode
+## One-shot generation from a prompt
 
-Build mode has full access to create and modify content on the current surface.
+When you want a whole workflow or skill built from a single description — without a back-and-forth chat — use the one-shot **Generate with AI** dialogs. You type one prompt, Copilot runs autonomously to completion, and the finished result opens for you to review.
 
-**Build mode (workflow editor) can:**
-- Create new workflows or update existing ones
-- Search and configure components and actions
-- Validate task configurations before applying them
-- Validate the complete workflow after building
-- Deploy the workflow directly from the conversation
+| What | How to open | What it produces |
+|---|---|---|
+| **Workflow** | In a project's workflow list (from the project list or project details), **Create Workflow → Generate with AI** | A new workflow in that project — trigger, actions, and data flow — built from your description |
+| **Skill** | On the Skills page, **Create Skill → Create With AI** | A new AI Skill with a generated `SKILL.md` (and any bundled files) built from your description |
 
-Build mode follows a structured process: discover the right components → configure them → pre-validate → build → validate the full workflow → deploy. It will fix any validation errors before proceeding.
+Unlike Build mode, one-shot generation runs **autonomously**: it never pauses to ask questions and picks sensible defaults for anything ambiguous. The workflow or skill is created first, so a real result with a stable id always exists even before generation finishes — you are never left wondering whether anything was saved.
 
-**Build mode (Skills) can:**
-- Create new skills from a conversation (via the `createAiSkill` tool)
-- Edit the body of any file in a skill archive (`updateAiSkillContent`)
-- Rename a skill or rewrite its description (`updateAiSkill`)
-- Delete a skill
-- Both Skills agents are *context-aware*: when you have a skill open, `currentSelectedSkillId` and `currentSelectedSkillName` are injected into every turn so "this skill" resolves to the visible one.
+Generation runs synchronously and can take up to a few minutes for a complex workflow; the dialog shows a **Generating…** state until it completes, then opens the finished workflow or skill. You wire up connections and fine-tune afterward, the same as with any other workflow or skill.
+
+---
+
+## Inline generation
+
+Throughout the workflow editor, fields that Copilot can fill show a small **sparkle** button. Click it, describe what you want in plain language, and Copilot generates the value in place. Each generator validates its output and automatically retries once if the first attempt is not usable; if it still cannot produce a valid result it returns the draft with a note so you can review it.
+
+| Generator | Where | What it produces |
+|---|---|---|
+| **Value** | Any text property | A plain value for the field, using only data that exists in earlier steps |
+| **Formula** | Properties that accept expressions | A single `=` expression, validated against the workflow's expression evaluator and the available functions |
+| **JSON Schema** | The JSON Schema builder | A valid JSON Schema object for structured/typed properties |
+| **Sample output** | A node's Sample Output editor | A realistic sample output (JSON object or array) for the step |
+| **Description** | The Description field of a workflow or node | A concise description of the workflow or the selected step |
+
+Because inline generators are grounded in the surrounding workflow, they reference earlier-step outputs (data pills like `${nodeName.path}`) only when those outputs actually exist, and they validate formulas before handing them back.
+
+The Sample Output editor goes a step further than a one-shot sparkle button: it opens Copilot as a full-height sidebar next to the editor, so you can iterate conversationally — "add a nested address object", "make it an array of five items" — and each reply updates the sample output in place.
+
+---
+
+## Choosing the model
+
+By default, Copilot uses the workspace's configured chat model. In the Copilot panel you can override this per conversation with the **model picker**: choose a provider and model, and that selection is used for the rest of the conversation. Starting a new conversation resets it back to the default.
+
+The picker lists the AI providers your workspace has activated. The provider's API key is resolved from the activated provider for the current environment, so the same picker works across Development, Staging, and Production with each environment's own credentials. If no override is selected (or the selection can't be resolved), Copilot falls back to the workspace default model.
+
+---
+
+## How Copilot grounds answers
+
+To answer documentation questions accurately, Copilot indexes the ByteChef documentation and component references into a vector store and retrieves the most relevant passages on each turn (retrieval-augmented generation).
+
+This documentation corpus is **instance-global** — it is the same for every workspace and tenant — so it is indexed once into a single shared table and reused everywhere. Indexing runs automatically at server startup and re-indexes only the documents that changed since the last run. It is embedded with a dedicated internal key, kept separate from per-tenant provider credentials (see [Documentation embeddings](#documentation-embeddings)).
 
 ---
 
 ## Enabling Copilot
 
-Copilot is disabled by default. Set the following environment variables to enable it:
+Copilot is disabled by default. Set the following environment variables to enable it.
 
 ### Anthropic (default provider)
 
@@ -89,20 +144,16 @@ BYTECHEF_AI_COPILOT_PROVIDER="openai"
 BYTECHEF_AI_PROVIDER_OPENAI_API_KEY="sk-..."
 ```
 
-> Embeddings for the knowledge base always uses OpenAI. When using the Anthropic provider, `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY` is still required for embeddings.
+### Documentation embeddings
 
-### All Copilot Variables
+Copilot grounds its answers in an instance-global documentation corpus that it embeds into a single shared vector store table (the same table is used in both single- and multi-tenant deployments). Because this corpus belongs to the whole instance rather than any one tenant, it embeds with a dedicated, internally-managed OpenAI key:
 
-| Environment Variable                               | Description                                                 | Default                  |
-|----------------------------------------------------|-------------------------------------------------------------|--------------------------|
-| `BYTECHEF_AI_COPILOT_ENABLED`                      | Enable or disable Copilot                                   | `false`                  |
-| `BYTECHEF_AI_COPILOT_PROVIDER`                     | AI provider (`openai`, `anthropic`)                         | `anthropic`              |
-| `BYTECHEF_AI_PROVIDER_ANTHROPIC_API_KEY`           | Anthropic API key                                           | -                        |
-| `BYTECHEF_AI_CHAT_ANTHROPIC_OPTIONS_MODEL`         | Anthropic chat model                                        | `claude-sonnet-4-6`      |
-| `BYTECHEF_AI_CHAT_ANTHROPIC_OPTIONS_TEMPERATURE`   | Anthropic temperature                                       | `0.5`                    |
-| `BYTECHEF_AI_PROVIDER_OPENAI_API_KEY`              | OpenAI API key                                              | -                        |
-| `BYTECHEF_AI_CHAT_OPENAI_OPTIONS_MODEL`            | OpenAI chat model                                           | `gpt-5.1`                |
-| `BYTECHEF_AI_CHAT_OPENAI_OPTIONS_TEMPERATURE`      | OpenAI temperature                                          | `1`                      |
-| `BYTECHEF_AI_CHAT_OPENAI_OPTIONS_REASONING_EFFECT` | OpenAI reasoning effort (`none`, `low`, `medium`, `high`)   | `medium`                 |
-| `BYTECHEF_AI_CHAT_OPENAI_OPTIONS_VERBOSITY`        | OpenAI verbosity (`low`, `medium`, `high`)                  | `low`                    |
-| `BYTECHEF_AI_EMBEDDING_OPENAI_OPTIONS_MODEL`       | OpenAI embedding model                                      | `text-embedding-3-small` |
+```bash
+BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY="sk-..."
+```
+
+This key is kept separate from the per-environment/per-tenant `BYTECHEF_AI_PROVIDER_*` keys so that, in cloud deployments, users still configure their own AI provider through the UI while Copilot documentation is embedded with the operator's internal key. When `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` is unset, Copilot falls back to the UI-activated embedding provider; when neither is configured, documentation indexing is skipped (the app still boots) and resumes on the next restart once a key or provider is available.
+
+> Embeddings always use OpenAI (`text-embedding-3-small`). When using the Anthropic chat provider, an embedding key — `BYTECHEF_AI_COPILOT_EMBEDDING_API_KEY` or an OpenAI provider activated through the UI — is still required for Copilot documentation.
+
+For the complete list of Copilot variables — chat model, temperature, reasoning effort, verbosity, and embedding model — and every other ByteChef setting, see the [environment variables reference](/self-hosting/configuration/environment-variables#ai-copilot-configuration).
