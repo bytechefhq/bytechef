@@ -74,7 +74,8 @@ public class StripeClientImpl implements StripeClient {
 
             List<Price> prices = priceCollection.getData();
 
-            Assert.isTrue(prices.size() == 1, "Product " + productId + " has more than one price configured");
+            Assert.isTrue(prices.size() == 1,
+                "Product " + productId + " must have exactly one active price configured");
 
             return prices.getFirst()
                 .getId();
