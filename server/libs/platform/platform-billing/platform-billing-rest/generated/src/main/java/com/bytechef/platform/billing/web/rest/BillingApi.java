@@ -35,7 +35,7 @@ import java.util.Map;
 import java.util.Optional;
 import jakarta.annotation.Generated;
 
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-08T14:03:14.706845+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T14:33:03.269520+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 @Validated
 @Tag(name = "billing", description = "The Platform Billing Internal API")
 public interface BillingApi {
@@ -120,6 +120,7 @@ public interface BillingApi {
      * Get the current billing subscription
      *
      * @return Successful operation. (status code 200)
+     *         or No billing subscription exists for the current tenant. (status code 404)
      */
     @Operation(
         operationId = "getCurrentSubscription",
@@ -129,7 +130,8 @@ public interface BillingApi {
         responses = {
             @ApiResponse(responseCode = "200", description = "Successful operation.", content = {
                 @Content(mediaType = "application/json", schema = @Schema(implementation = BillingSubscriptionModel.class))
-            })
+            }),
+            @ApiResponse(responseCode = "404", description = "No billing subscription exists for the current tenant.")
         }
     )
     @RequestMapping(
