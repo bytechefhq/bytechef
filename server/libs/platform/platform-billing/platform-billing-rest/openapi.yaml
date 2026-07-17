@@ -23,6 +23,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BillingSubscription"
+        "404":
+          description: "No billing subscription exists for the current tenant."
     put:
       description: "Upgrade or downgrade the current billing subscription. Upgrades are applied immediately with prorated charge; downgrades are scheduled for the end of the current billing period."
       summary: "Upgrade or downgrade the current billing subscription"
