@@ -168,6 +168,90 @@ public class ProjectDeploymentFacadeIntTest {
         // TODO
     }
 
+    @Test
+    public void testCreateProjectDeploymentWithRequiredIntegerInputs() {
+        ProjectDTO projectDTO = projectDeploymentFacadeHelper.createProject(workspace.getId());
+
+        projectDeploymentFacadeHelper.addTestWorkflow(
+            projectDTO,
+            """
+                {
+                    "label": "BUG - RunDaily - Scheduler",
+                    "inputs": [
+                        {"name": "destinationFolderName", "label": "Destination folder name", "type": "string"},
+                        {"name": "serviceProviderEmail", "label": "Email", "type": "string", "required": true},
+                        {"name": "hourToRun", "label": "Hour", "type": "integer", "required": true},
+                        {"name": "minutesToRun", "label": "Minute", "type": "integer", "required": true}
+                    ],
+                    "triggers": [
+                        {
+                            "label": "Every Work Day",
+                            "name": "trigger_1",
+                            "type": "schedule/v1/everyDay",
+                            "parameters": {
+                                "hour": "${hourToRun}",
+                                "minute": "${minutesToRun}",
+                                "timezone": "Europe/Zagreb",
+                                "dayOfWeek": [2, 3, 4, 5, 6]
+                            }
+                        }
+                    ],
+                    "tasks": [
+                        {
+                            "label": "Logger",
+                            "name": "logger_1",
+                            "type": "logger/v1/info",
+                            "parameters": {"text": "Run every day at ${hourToRun}:${minutesToRun}"}
+                        }
+                    ]
+                }""");
+
+        projectFacade.publishProject(projectDTO.id(), "Published for test", false);
+
+        ProjectWorkflow publishedProjectWorkflow = projectWorkflowRepository.findAllByProjectIdAndProjectVersion(
+            projectDTO.id(), 1)
+            .getFirst();
+
+        Map<String, Object> inputs = Map.of(
+            "serviceProviderEmail", "racuni@example.com",
+            "hourToRun", 11,
+            "minutesToRun", 50);
+
+        ProjectDeploymentWorkflowDTO projectDeploymentWorkflowDTO = new ProjectDeploymentWorkflowDTO(
+            List.of(), null, null, inputs, true, null, null, null, null, null, null, null, 0,
+            publishedProjectWorkflow.getWorkflowId(), publishedProjectWorkflow.getUuidAsString());
+
+        ProjectDeploymentDTO projectDeploymentDTO = ProjectDeploymentDTO.builder()
+            .projectId(projectDTO.id())
+            .name("GH-5404")
+            .environment(Environment.DEVELOPMENT)
+            .projectVersion(1)
+            .projectDeploymentWorkflows(List.of(projectDeploymentWorkflowDTO))
+            .build();
+
+        long projectDeploymentId = projectDeploymentFacade.createProjectDeployment(projectDeploymentDTO);
+
+        projectDeploymentFacade.enableProjectDeployment(projectDeploymentId, true);
+        projectDeploymentFacade.enableProjectDeploymentWorkflow(
+            projectDeploymentId, publishedProjectWorkflow.getWorkflowId(), true);
+
+        ProjectDeploymentDTO createdProjectDeployment = projectDeploymentFacade.getProjectDeployment(
+            projectDeploymentId);
+
+        assertThat(createdProjectDeployment.projectDeploymentWorkflows())
+            .hasSize(1)
+            .first()
+            .satisfies(projectDeploymentWorkflow -> {
+                assertThat(projectDeploymentWorkflow.enabled()).isTrue();
+
+                Map<String, ?> savedInputs = projectDeploymentWorkflow.inputs();
+
+                assertThat(savedInputs.get("hourToRun")).isEqualTo(11);
+                assertThat(savedInputs.get("minutesToRun")).isEqualTo(50);
+                assertThat(savedInputs.get("serviceProviderEmail")).isEqualTo("racuni@example.com");
+            });
+    }
+
     @Disabled
     @Test
     public void testCreateProjectDeploymentJob() {
