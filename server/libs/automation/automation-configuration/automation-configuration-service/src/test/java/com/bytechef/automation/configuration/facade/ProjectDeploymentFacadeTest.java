@@ -56,16 +56,16 @@ class ProjectDeploymentFacadeTest {
     private ProjectDeploymentFacadeImpl projectDeploymentFacade;
 
     @Test
-    void testGetProjectDeploymentTagsScopesToWorkspace() {
+    void testGetProjectDeploymentTags() {
         ProjectDeployment projectDeployment = new ProjectDeployment();
 
         projectDeployment.setTagIds(List.of(20L, 21L));
 
-        when(projectDeploymentService.getProjectDeployments(null, null, null, null, 7L))
+        when(projectDeploymentService.getProjectDeployments())
             .thenReturn(List.of(projectDeployment));
         when(tagService.getTags(List.of(20L, 21L))).thenReturn(List.of(new Tag("x"), new Tag("y")));
 
-        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags(7L);
+        List<Tag> tags = projectDeploymentFacade.getProjectDeploymentTags();
 
         assertThat(tags).hasSize(2);
     }
