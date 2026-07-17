@@ -23,7 +23,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CheckoutSessionRequest", description = "A checkout session request.")
 @JsonTypeName("CheckoutSessionRequest")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-08T14:03:14.706845+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T14:33:03.269520+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class CheckoutSessionRequestModel {
 
   /**
