@@ -86,9 +86,10 @@ public class BillingApiController implements BillingApi {
 
     @Override
     public ResponseEntity<BillingSubscriptionModel> getCurrentSubscription() {
-        return ResponseEntity.ok(
-            billingSubscriptionFacade.fetchCurrentSubscription()
-                .map(dto -> conversionService.convert(dto, BillingSubscriptionModel.class))
-                .orElse(null));
+        return billingSubscriptionFacade.fetchCurrentSubscription()
+            .map(dto -> conversionService.convert(dto, BillingSubscriptionModel.class))
+            .map(ResponseEntity::ok)
+            .orElseGet(() -> ResponseEntity.notFound()
+                .build());
     }
 }
