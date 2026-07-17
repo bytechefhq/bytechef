@@ -915,11 +915,16 @@ public class ProjectDeploymentFacadeImpl implements ProjectDeploymentFacade {
         }
     }
 
-    private void validateProjectDeploymentWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
+    static void validateProjectDeploymentWorkflowInputs(Map<String, ?> inputs, Workflow workflow) {
         for (Workflow.Input input : workflow.getInputs()) {
             if (input.required()) {
-                Assert.isTrue(inputs.containsKey(input.name()), "Missing required param: " + input.name());
-                Assert.hasText((String) inputs.get(input.name()), "Missing required param: " + input.name());
+                Object value = inputs.get(input.name());
+
+                Assert.notNull(value, "Missing required param: " + input.name());
+
+                if (value instanceof String string) {
+                    Assert.hasText(string, "Missing required param: " + input.name());
+                }
             }
         }
     }
