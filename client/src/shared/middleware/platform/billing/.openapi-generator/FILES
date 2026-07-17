@@ -1,4 +1,3 @@
-.openapi-generator-ignore
 apis/BillingApi.ts
 apis/index.ts
 docs/BillingApi.md
