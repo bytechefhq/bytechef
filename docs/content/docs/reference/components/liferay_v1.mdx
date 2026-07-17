@@ -19,6 +19,17 @@ Type: liferay/v1
 Version: 1
 
 
+### OAuth2
+
+#### Properties
+
+|      Name       |      Label     |     Type     |     Description     | Required |
+|:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
+| clientId | Client ID | STRING |  | true |
+| clientSecret | Client Secret | STRING |  | true |
+
+
+
 ### API Key
 
 #### Properties
@@ -52,6 +63,45 @@ Version: 1
 
 
 
+## Connection Setup
+
+### API Key
+
+### Bearer Token
+
+1. Click on **Open Application Menu**.
+2. Navigate to Settings → APIs to generate an access token.
+3. Choose the duration (e.g. 30 days, 6 months, 1 year, or indefinite) for when the access token expires.
+4. Click **Generate Token**.
+5. To use the new token, click **Copy** and paste it into Bytechef connection.
+
+### Basic Auth
+
+1. Use your username and password to create Liferay connection in Bytechef.
+
+### OAuth
+
+1. Navigate to your Liferay portal.
+2. Click this icon to open **Applications Menu**.
+3. Click on **Control Panel**
+4. Click on **OAuth 2 Administration**
+5. Click on **New**
+6. Enter name of your OAuth application.
+7. Enter a redirect URI, e.g., `https://app.bytechef.io/callback`, `http://127.0.0.1:5173/callback`
+8. Enable **Trusted Application**.
+9. Click on **Save**
+10. Here you can see your **Client ID** and **Client Secret**.
+11. Click on **Scopes**
+12. Click on **Liferay.Headless.Discovery.OpenAPI**
+13. Enable scopes you need.
+14. Click on **Save**
+15. Done 🚀
+
+
+<div style={{ position: 'relative', height: 0, width: '100%', overflow: 'hidden', zIndex: 49, boxSizing: 'border-box', paddingBottom: 'calc(53.02672956% + 32px)' }}>
+    <iframe src="https://www.guidejar.com/embed/011a5e01-ee67-4132-8af6-0ad785e2c03c?type=1&controls=on" width="100%" height="100%" style={{ height: '100%', position: 'absolute', inset: 0 }} allowFullScreen frameBorder="0"></iframe>
+</div>
+
 
 
 
@@ -64,14 +114,14 @@ Version: 1
 ### Headless Request
 Name: headlessRequest
 
-`The Headless endpoint to use.`
+`Executes a Liferay Headless API action using the configured endpoint.`
 
 #### Properties
 
 |      Name       |      Label     |     Type     |     Description     | Required |
 |:---------------:|:--------------:|:------------:|:-------------------:|:--------:|
-| application | Application | STRING |  | true |
-| endpoint | Endpoint | STRING <details> <summary> Depends On </summary> application </details> |  | true |
+| application | Application | STRING | Liferay REST Application you want to use. | true |
+| endpoint | Endpoint | STRING <details> <summary> Depends On </summary> application </details> | API endpoint where requests are sent. | true |
 | properties | | DYNAMIC_PROPERTIES <details> <summary> Depends On </summary> application, endpoint </details> |  | false |
 
 #### Example JSON Structure
@@ -100,7 +150,7 @@ The output for this action is dynamic and may vary depending on the input parame
 ### JSON WS Services
 Name: jsonWsRequest
 
-`The Headless endpoint to use.`
+`Sends a JSON-based HTTP request to a configured external web service endpoint.`
 
 #### Properties
 
@@ -130,8 +180,55 @@ The output for this action is dynamic and may vary depending on the input parame
 
 
 
+#### Find Context Name and Service ID
+
+To find the Context Name, click [here](/reference/components/liferay_v1#how-to-find-the-context-name).
+
+To find the Service ID, click [here](/reference/components/liferay_v1#how-to-find-the-service-id).
 
 
 
 
 
+## What to do if your action is not listed here?
+
+If this component doesn't have the action you need, you can use **Custom Action** to create your own. Custom Actions empower you to define HTTP requests tailored to your specific requirements, allowing for greater flexibility in integrating with external services or APIs.
+
+To create a Custom Action, simply specify the desired HTTP method, path, and any necessary parameters. This way, you can extend the functionality of your component beyond the predefined actions, ensuring that you can meet all your integration needs effectively.
+
+<hr />
+
+# Additional Instructions
+
+### How to find the Application
+
+- **Method 1: Via API**
+
+Use the `GET /o/openapi/openapi.json` endpoint to retrieve a list of all applications.
+
+- **Method 2: Via UI*
+
+Go to `[server]:[port]/o/api`, click on REST Applications and there you have a list of all applications.
+
+### How to find the Endpoint
+
+- **Method 1: Via API**
+
+Use the `GET /o/APPLICATION/openapi.json"` endpoint to retrieve a list of all endpoints in specific application.
+
+- **Method 2: Via UI*
+
+Go to `[server]:[port]/o/api`, choose the REST Application you want and there you have a list of all endpoints.
+If endpoint starts with a version, you need to remove that part. For example if endpoint is `/v1.0/accounts`, your need to use `/accounts`.
+
+### How to find the Context Name
+
+- **Method 1: Via UI*
+
+Go to `[server]:[port]/api/jsonws`, click on Context Name and there you have a list of all contexts.
+
+### How to find the Service ID
+
+- **Method 1: Via API**
+
+Use the `GET "/api/jsonws?contextName=CONTEXT_NAME&discover=""` endpoint to retrieve a list of all service IDs in specific context.
