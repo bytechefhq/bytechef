@@ -142,6 +142,10 @@ const SelectPlanDialog = ({
 
                 if (session.checkoutUrl) {
                     window.location.href = session.checkoutUrl;
+                } else {
+                    toast.error('Failed to start checkout. Please try again.');
+
+                    setLoadingPlan(null);
                 }
             } catch {
                 toast.error('Failed to start checkout. Please try again.');
