@@ -73,7 +73,7 @@ public class AwsStripeUsageReportScheduler {
                 .target(sqsTarget)
                 .flexibleTimeWindow(mode -> mode.mode(FlexibleTimeWindowMode.OFF)));
         } catch (ConflictException e) {
-            log.error("Schedule already exists — no update needed for a static recurring schedule");
+            log.warn("Schedule already exists — no update needed for a static recurring schedule");
         }
     }
 }
