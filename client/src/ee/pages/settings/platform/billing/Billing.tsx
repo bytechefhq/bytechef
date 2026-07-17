@@ -39,7 +39,7 @@ const Billing = () => {
         (isCheckoutSuccess || isCancelPolling || isReactivatePending || isUpgradePending) &&
         pollAttempts < MAX_POLL_ATTEMPTS;
 
-    const {data: subscription} = useGetCurrentSubscriptionQuery({
+    const {data: subscription, error: subscriptionError} = useGetCurrentSubscriptionQuery({
         refetchInterval: isPolling ? POLL_INTERVAL_MS : false,
     });
 
@@ -173,113 +173,121 @@ const Billing = () => {
             }
             leftSidebarOpen={false}
         >
-            <div className="w-full space-y-4 px-4 3xl:mx-auto 3xl:w-4/5">
-                {isCheckoutSuccess && !subscription && (
-                    <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                        {pollAttempts >= MAX_POLL_ATTEMPTS
-                            ? "It's taking longer than expected. Please refresh the page."
-                            : 'Activating your subscription, please wait…'}
+            {subscriptionError ? (
+                <div className="w-full px-4 3xl:mx-auto 3xl:w-4/5">
+                    <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+                        Unable to load subscription. Please refresh the page or contact support if the problem persists.
                     </div>
-                )}
+                </div>
+            ) : (
+                <div className="w-full space-y-4 px-4 3xl:mx-auto 3xl:w-4/5">
+                    {isCheckoutSuccess && !subscription && (
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Activating your subscription, please wait…'}
+                        </div>
+                    )}
 
-                {isCancelPolling && (
-                    <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
-                        {pollAttempts >= MAX_POLL_ATTEMPTS
-                            ? "It's taking longer than expected. Please refresh the page."
-                            : 'Scheduling cancellation, please wait…'}
-                    </div>
-                )}
+                    {isCancelPolling && (
+                        <div className="rounded-lg border border-orange-200 bg-orange-50 px-4 py-3 text-sm text-orange-800">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Scheduling cancellation, please wait…'}
+                        </div>
+                    )}
 
-                {isReactivatePending && (
-                    <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
-                        {pollAttempts >= MAX_POLL_ATTEMPTS
-                            ? "It's taking longer than expected. Please refresh the page."
-                            : 'Reactivating your subscription, please wait…'}
-                    </div>
-                )}
+                    {isReactivatePending && (
+                        <div className="rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Reactivating your subscription, please wait…'}
+                        </div>
+                    )}
 
-                {isUpgradePending && (
-                    <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                        {pollAttempts >= MAX_POLL_ATTEMPTS
-                            ? "It's taking longer than expected. Please refresh the page."
-                            : 'Upgrading your plan, please wait…'}
-                    </div>
-                )}
+                    {isUpgradePending && (
+                        <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+                            {pollAttempts >= MAX_POLL_ATTEMPTS
+                                ? "It's taking longer than expected. Please refresh the page."
+                                : 'Upgrading your plan, please wait…'}
+                        </div>
+                    )}
 
-                <Tabs defaultValue="overview">
-                    <TabsList>
-                        <TabsTrigger value="overview">Overview</TabsTrigger>
+                    <Tabs defaultValue="overview">
+                        <TabsList>
+                            <TabsTrigger value="overview">Overview</TabsTrigger>
 
-                        <TabsTrigger value="invoices">Invoices</TabsTrigger>
-                    </TabsList>
+                            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+                        </TabsList>
 
-                    <TabsContent className="mt-4 space-y-4" value="overview">
-                        <PlanCard
-                            {...planCardProps}
-                            onCancelPlan={
-                                subscription && !subscription.cancelAtPeriodEnd
-                                    ? () => setCancelDialogOpen(true)
-                                    : undefined
-                            }
-                            onChangePlan={() => setSelectPlanOpen(true)}
-                            onReactivatePlan={
-                                subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
-                            }
-                        />
-                    </TabsContent>
+                        <TabsContent className="mt-4 space-y-4" value="overview">
+                            <PlanCard
+                                {...planCardProps}
+                                onCancelPlan={
+                                    subscription && !subscription.cancelAtPeriodEnd
+                                        ? () => setCancelDialogOpen(true)
+                                        : undefined
+                                }
+                                onChangePlan={() => setSelectPlanOpen(true)}
+                                onReactivatePlan={
+                                    subscription?.cancelAtPeriodEnd ? () => setReactivateDialogOpen(true) : undefined
+                                }
+                            />
+                        </TabsContent>
 
-                    <TabsContent className="mt-4" value="invoices">
-                        <p className="text-sm text-muted-foreground">No invoices yet.</p>
-                    </TabsContent>
-                </Tabs>
+                        <TabsContent className="mt-4" value="invoices">
+                            <p className="text-sm text-muted-foreground">No invoices yet.</p>
+                        </TabsContent>
+                    </Tabs>
 
-                <CancelPlanDialog
-                    isPending={isCancelPending}
-                    onClose={() => setCancelDialogOpen(false)}
-                    onConfirm={() =>
-                        cancelSubscription(undefined, {
-                            onSuccess: () => {
-                                setCancelDialogOpen(false);
-                                setPollAttempts(0);
-                                setSearchParams({cancel: 'pending'}, {replace: true});
-                            },
-                        })
-                    }
-                    open={cancelDialogOpen}
-                />
-
-                <ReactivatePlanDialog
-                    isPending={isReactivateMutationPending}
-                    onClose={() => setReactivateDialogOpen(false)}
-                    onConfirm={() =>
-                        reactivateSubscription(undefined, {
-                            onSuccess: () => {
-                                setReactivateDialogOpen(false);
-                                setPollAttempts(0);
-                                setSearchParams({reactivate: 'pending'}, {replace: true});
-                            },
-                        })
-                    }
-                    open={reactivateDialogOpen}
-                />
-
-                <SelectPlanDialog
-                    currentPlanName={subscription?.planName ?? undefined}
-                    hasActiveSubscription={!!subscription}
-                    onClose={() => setSelectPlanOpen(false)}
-                    onUpgradeSuccess={(isUpgrade, newPlanName) => {
-                        setPollAttempts(0);
-
-                        if (isUpgrade) {
-                            setPendingUpgradePlanName(newPlanName);
-                            setSearchParams({upgrade: 'pending'}, {replace: true});
-                        } else {
-                            toast('Your plan will be downgraded at the end of the current billing period.');
+                    <CancelPlanDialog
+                        isPending={isCancelPending}
+                        onClose={() => setCancelDialogOpen(false)}
+                        onConfirm={() =>
+                            cancelSubscription(undefined, {
+                                onSuccess: () => {
+                                    setCancelDialogOpen(false);
+                                    setPollAttempts(0);
+                                    setSearchParams({cancel: 'pending'}, {replace: true});
+                                },
+                            })
                         }
-                    }}
-                    open={selectPlanOpen}
-                />
-            </div>
+                        open={cancelDialogOpen}
+                    />
+
+                    <ReactivatePlanDialog
+                        isPending={isReactivateMutationPending}
+                        onClose={() => setReactivateDialogOpen(false)}
+                        onConfirm={() =>
+                            reactivateSubscription(undefined, {
+                                onSuccess: () => {
+                                    setReactivateDialogOpen(false);
+                                    setPollAttempts(0);
+                                    setSearchParams({reactivate: 'pending'}, {replace: true});
+                                },
+                            })
+                        }
+                        open={reactivateDialogOpen}
+                    />
+
+                    <SelectPlanDialog
+                        currentPlanName={subscription?.planName ?? undefined}
+                        hasActiveSubscription={!!subscription}
+                        onClose={() => setSelectPlanOpen(false)}
+                        onUpgradeSuccess={(isUpgrade, newPlanName) => {
+                            setPollAttempts(0);
+
+                            if (isUpgrade) {
+                                setPendingUpgradePlanName(newPlanName);
+                                setSearchParams({upgrade: 'pending'}, {replace: true});
+                            } else {
+                                toast('Your plan will be downgraded at the end of the current billing period.');
+                            }
+                        }}
+                        open={selectPlanOpen}
+                    />
+                </div>
+            )}
         </LayoutContainer>
     );
 };
