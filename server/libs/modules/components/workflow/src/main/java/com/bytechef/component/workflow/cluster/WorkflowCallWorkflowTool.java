@@ -206,8 +206,7 @@ public class WorkflowCallWorkflowTool {
         baseProperty.getDescription()
             .ifPresent(property::description);
 
-        baseProperty.getRequired()
-            .ifPresent(property::required);
+        baseProperty.getRequired();
 
         return property;
     }

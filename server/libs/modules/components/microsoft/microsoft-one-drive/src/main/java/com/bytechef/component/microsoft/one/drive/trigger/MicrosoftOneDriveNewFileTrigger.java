@@ -64,10 +64,17 @@ public class MicrosoftOneDriveNewFileTrigger {
         Parameters inputParameters, Parameters connectionParameters, Parameters closureParameters,
         TriggerContext context) {
 
-        String url = "/me/drive/items/%s/".formatted(getFolderId(inputParameters.getString(PARENT_ID)));
+        return MicrosoftTriggerUtils.poll(getPollUrl(inputParameters), "file", closureParameters, context);
+    }
 
-        return MicrosoftTriggerUtils.poll(
-            inputParameters.getBoolean(RECURSIVE) ? url + "delta" : url + "children", "file", closureParameters,
-            context);
+    private static String getPollUrl(Parameters inputParameters) {
+        String recursiveDefaultUrlSuffix = "children";
+
+        if (RECURSIVE_PROPERTY.getRequired() && inputParameters.getRequiredBoolean(RECURSIVE)) {
+            recursiveDefaultUrlSuffix = "delta";
+        }
+
+        return "/me/drive/items/%s/%s".formatted(
+            getFolderId(inputParameters.getString(PARENT_ID)), recursiveDefaultUrlSuffix);
     }
 }

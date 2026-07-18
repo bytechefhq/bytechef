@@ -1047,7 +1047,7 @@ public final class TaskDispatcherDsl {
         private Boolean expressionEnabled; // Defaults to true
         private Boolean hidden;
         private Map<String, Object> metadata = new HashMap<>();
-        private Boolean required;
+        private Boolean required = Boolean.FALSE;
         private final Type type;
 
         protected String name;
@@ -1153,8 +1153,8 @@ public final class TaskDispatcherDsl {
         }
 
         @Override
-        public Optional<Boolean> getRequired() {
-            return Optional.ofNullable(required);
+        public Boolean getRequired() {
+            return required;
         }
 
         @Override

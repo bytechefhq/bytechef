@@ -45,7 +45,7 @@ public abstract class BaseProperty {
         this.expressionEnabled = OptionalUtils.orElse(property.getExpressionEnabled(), true);
         this.hidden = OptionalUtils.orElse(property.getHidden(), false);
         this.metadata = property.getMetadata();
-        this.required = OptionalUtils.orElse(property.getRequired(), false);
+        this.required = property.getRequired();
         this.name = property.getName();
     }
 

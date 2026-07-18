@@ -22,6 +22,7 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.ComponentCategory;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 import com.bytechef.component.definition.UnifiedApiDefinition.UnifiedApiCategory;
+import com.bytechef.definition.BaseProperty;
 import com.bytechef.platform.component.definition.ClusterRootComponentDefinition;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Collections;
@@ -96,8 +97,7 @@ public class ComponentDefinition {
             .map(connectionDefinition -> CollectionUtils.anyMatch(
                 connectionDefinition.getProperties()
                     .orElse(List.of()),
-                property -> property.getRequired()
-                    .orElse(false))
+                BaseProperty::getRequired)
                 ||
                 connectionDefinition.getAuthorizationRequired()
                     .orElse(true))

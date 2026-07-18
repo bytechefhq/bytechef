@@ -3082,7 +3082,7 @@ public final class ComponentDsl {
         private Boolean expressionEnabled; // Defaults to true
         private Boolean hidden;
         private Map<String, Object> metadata = new HashMap<>();
-        private Boolean required;
+        private Boolean required = Boolean.FALSE;
         private final String name;
         private final Property.Type type;
 
@@ -3203,8 +3203,8 @@ public final class ComponentDsl {
         }
 
         @Override
-        public Optional<Boolean> getRequired() {
-            return Optional.ofNullable(required);
+        public Boolean getRequired() {
+            return required;
         }
 
         @Override

@@ -66,7 +66,9 @@ public interface BaseProperty {
     /**
      *
      */
-    Optional<Boolean> getRequired();
+    default Boolean getRequired() {
+        return Boolean.FALSE;
+    }
 
     /**
      *
