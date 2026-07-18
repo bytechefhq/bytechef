@@ -24,6 +24,8 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.Objects;
+
 import org.quartz.Job;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -34,29 +36,26 @@ import org.springframework.context.ApplicationEventPublisher;
 
 /**
  * @author Ivica Cardic
+ * @author Igor Beslic
  */
 public class ScheduleTriggerJob implements Job {
 
-    private static final Logger logger = LoggerFactory.getLogger(ScheduleTriggerJob.class);
+    private static final Logger log = LoggerFactory.getLogger(ScheduleTriggerJob.class);
     private ApplicationEventPublisher eventPublisher;
 
     @Override
     public void execute(JobExecutionContext context) {
         JobDataMap jobDataMap = context.getMergedJobDataMap();
-        Date fireTime = context.getFireTime();
-
         Map<String, Object> output = JsonUtils.readMap(jobDataMap.getString("output"), Object.class);
-
-        LocalDateTime localDateTime = fireTime.toInstant()
-            .atZone(getZoneId(output))
-            .toLocalDateTime();
+        Date fireTime = context.getFireTime();
 
         eventPublisher.publishEvent(
             new TriggerListenerEvent(
                 new TriggerListenerEvent.ListenerParameters(
                     WorkflowExecutionId.parse(jobDataMap.getString("workflowExecutionId")),
                     fireTime.toInstant(),
-                    MapUtils.concat(Map.of("fireTime", fireTime, "dateTime", localDateTime), output))));
+                    MapUtils.concat(Map.of("fireTime", fireTime, "dateTime", getFireLocalDateTime(output, fireTime)),
+                        output))));
     }
 
     @Autowired
@@ -65,23 +64,33 @@ public class ScheduleTriggerJob implements Job {
     }
 
     /**
-     * This method returns the default ZoneId if the key or value miss. Method mitigates NullPointerException in the
-     * cases when we upgrade action with the new zoneId required parameter which old definitions present in production
-     * don't have. This method can be removed once you confirm there are no workflow definitions that miss this value.
+     * This method returns the fire time in the desired local time zone. Default ZoneId is used if the key or value
+     * misses. Usage of default time zone mitigates NullPointerException in the cases when we upgrade action with the
+     * new zoneId required parameter which old definitions present in production don't have. This method can be removed
+     * once you confirm there are no workflow definitions that miss this value.
      *
      * @param map
-     * @return configured value or default given by defaultValue argument
+     * @param fireTime
+     * @return
      */
-    private static ZoneId getZoneId(Map<String, ?> map) {
+    private static LocalDateTime getFireLocalDateTime(Map<String, ?> map, Date fireTime) {
+        ZoneId zoneId = ZoneId.systemDefault();
+
         if (map.containsKey("timezone")) {
             Object value = map.get("timezone");
 
             if (value instanceof String stringValue) {
-                return ZoneId.of(stringValue);
+                zoneId = ZoneId.of(stringValue);
             }
         }
 
-        return ZoneId.systemDefault();
+        if (Objects.equals(zoneId, ZoneId.systemDefault())) {
+            log.info("Default ZoneId is used. Workflow definition parameters miss zone id - check/update db values");
+        }
+
+        return fireTime.toInstant()
+            .atZone(zoneId)
+            .toLocalDateTime();
     }
 
 }
