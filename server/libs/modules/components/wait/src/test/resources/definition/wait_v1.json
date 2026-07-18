@@ -261,7 +261,7 @@
         "required": true,
         "type": "STRING"
       } ],
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "advancedOption": null,
@@ -285,7 +285,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "resumePerform": { },

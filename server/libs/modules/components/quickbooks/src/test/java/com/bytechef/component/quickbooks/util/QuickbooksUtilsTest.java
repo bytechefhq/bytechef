@@ -80,14 +80,11 @@ class QuickbooksUtilsTest {
 
         assertEquals(3, properties.size());
         assertEquals(incomeRequired, properties.get(0)
-            .getRequired()
-            .orElse(false));
+            .getRequired());
         assertEquals(assetRequired, properties.get(1)
-            .getRequired()
-            .orElse(false));
+            .getRequired());
         assertEquals(inventoryDateRequired, properties.get(2)
-            .getRequired()
-            .orElse(false));
+            .getRequired());
     }
 
     private void setupHttpMock(Map<String, Object> responseBody) {

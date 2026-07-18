@@ -193,7 +193,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Data",
@@ -208,7 +208,7 @@
             "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -356,7 +356,7 @@
             "optionsDataSource": null,
             "placeholder": null,
             "properties": null,
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Data",
@@ -371,7 +371,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": {
@@ -540,7 +540,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Data",
@@ -555,7 +555,7 @@
             "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -703,7 +703,7 @@
             "optionsDataSource": null,
             "placeholder": null,
             "properties": null,
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Data",
@@ -718,7 +718,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": {
@@ -892,7 +892,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Data",
@@ -977,7 +977,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Errors",
@@ -992,7 +992,7 @@
             "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1060,7 +1060,7 @@
             "optionsDataSource": null,
             "placeholder": null,
             "properties": null,
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Data",
@@ -1145,7 +1145,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Errors",
@@ -1160,7 +1160,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": {
@@ -1251,7 +1251,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Data",
@@ -1336,7 +1336,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Errors",
@@ -1351,7 +1351,7 @@
             "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1412,7 +1412,7 @@
             "optionsDataSource": null,
             "placeholder": null,
             "properties": null,
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Data",
@@ -1497,7 +1497,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Errors",
@@ -1512,7 +1512,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": {
@@ -1694,7 +1694,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": "IBANs",
@@ -1731,7 +1731,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Bank Entries",
@@ -1746,7 +1746,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "External Users",
@@ -1890,7 +1890,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       } ],
       "refresh": null,

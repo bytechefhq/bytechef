@@ -177,7 +177,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -192,7 +192,7 @@
             "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -357,7 +357,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": null,
@@ -372,7 +372,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null

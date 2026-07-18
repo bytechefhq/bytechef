@@ -23,7 +23,7 @@
     "optionsLoadedDynamically": null,
     "placeholder": null,
     "regex": null,
-    "required": null,
+    "required": false,
     "type": "STRING"
   } ],
   "resources": null,
@@ -71,7 +71,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       }, {
         "advancedOption": null,
@@ -95,7 +95,7 @@
           "label": null,
           "metadata": { },
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TASK"
         } ],
         "label": null,
@@ -106,10 +106,10 @@
         "name": "tasks",
         "options": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "ARRAY"
       } ],
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     } ],
     "label": null,
@@ -120,7 +120,7 @@
     "name": "cases",
     "options": null,
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   }, {
     "advancedOption": null,
@@ -144,7 +144,7 @@
       "label": null,
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "TASK"
     } ],
     "label": null,
@@ -155,7 +155,7 @@
     "name": "default",
     "options": null,
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   } ],
   "title": "Branch",

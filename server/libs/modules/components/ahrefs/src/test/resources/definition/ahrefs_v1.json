@@ -210,7 +210,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -411,7 +411,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -765,7 +765,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -902,7 +902,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -1205,7 +1205,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1396,7 +1396,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -1611,7 +1611,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1812,7 +1812,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -2163,7 +2163,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -2300,7 +2300,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -2600,7 +2600,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -2791,7 +2791,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null

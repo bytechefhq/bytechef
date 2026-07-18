@@ -35,7 +35,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -61,7 +61,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -152,7 +152,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -178,7 +178,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -269,7 +269,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -295,7 +295,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -386,7 +386,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -412,7 +412,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -503,7 +503,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -529,7 +529,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -613,7 +613,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -639,7 +639,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -727,7 +727,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -753,7 +753,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -841,7 +841,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -867,7 +867,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -955,7 +955,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -981,7 +981,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -1069,7 +1069,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -1095,7 +1095,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null

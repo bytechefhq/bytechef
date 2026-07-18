@@ -170,7 +170,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": "Photo Urls",
@@ -252,7 +252,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Tags",
@@ -301,7 +301,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -460,7 +460,7 @@
             "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
-            "required": null,
+            "required": false,
             "type": "STRING"
           } ],
           "label": "Photo Urls",
@@ -542,7 +542,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Tags",
@@ -591,7 +591,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -737,7 +737,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Photo Urls",
@@ -821,7 +821,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Tags",
@@ -1088,7 +1088,7 @@
             "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1287,7 +1287,7 @@
           "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -1699,7 +1699,7 @@
               "required": false,
               "type": "INTEGER"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": null,
@@ -1716,7 +1716,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "ARRAY"
         },
         "placeholder": null,
@@ -1919,7 +1919,7 @@
             "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         } ],
         "label": null,
@@ -1936,7 +1936,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "ARRAY"
       },
       "sampleOutput": null
@@ -2140,7 +2140,7 @@
           "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Items",
@@ -2154,7 +2154,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": "Add to Items",
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     } ],
     "resumePerform": null,
@@ -2483,7 +2483,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": "Photo Urls",
@@ -2565,7 +2565,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": "Tags",
@@ -2614,7 +2614,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": null,
@@ -2631,7 +2631,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "ARRAY"
         },
         "placeholder": null,
@@ -2794,7 +2794,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": "Photo Urls",
@@ -2876,7 +2876,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Tags",
@@ -2925,7 +2925,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         } ],
         "label": null,
@@ -2942,7 +2942,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "ARRAY"
       },
       "sampleOutput": null
@@ -3162,7 +3162,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": "Photo Urls",
@@ -3244,7 +3244,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": "Tags",
@@ -3293,7 +3293,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": null,
@@ -3310,7 +3310,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "ARRAY"
         },
         "placeholder": null,
@@ -3473,7 +3473,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": "Photo Urls",
@@ -3555,7 +3555,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Tags",
@@ -3604,7 +3604,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         } ],
         "label": null,
@@ -3621,7 +3621,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "ARRAY"
       },
       "sampleOutput": null
@@ -3657,7 +3657,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Tags",
@@ -3711,7 +3711,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           } ],
           "advancedOption": null,
@@ -3735,7 +3735,7 @@
           "optionsDataSource": null,
           "placeholder": null,
           "properties": null,
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -3759,7 +3759,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         } ],
         "advancedOption": null,
@@ -3783,7 +3783,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -3965,7 +3965,7 @@
             "required": false,
             "type": "BOOLEAN"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -4126,7 +4126,7 @@
           "required": false,
           "type": "BOOLEAN"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -4327,7 +4327,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": "Photo Urls",
@@ -4409,7 +4409,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Tags",
@@ -4458,7 +4458,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -4617,7 +4617,7 @@
             "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
-            "required": null,
+            "required": false,
             "type": "STRING"
           } ],
           "label": "Photo Urls",
@@ -4699,7 +4699,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Tags",
@@ -4748,7 +4748,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -4989,7 +4989,7 @@
             "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -5188,7 +5188,7 @@
           "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -5396,7 +5396,7 @@
             "required": false,
             "type": "BOOLEAN"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -5557,7 +5557,7 @@
           "required": false,
           "type": "BOOLEAN"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -5883,7 +5883,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": "Photo Urls",
@@ -5965,7 +5965,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Tags",
@@ -6014,7 +6014,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -6173,7 +6173,7 @@
             "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
-            "required": null,
+            "required": false,
             "type": "STRING"
           } ],
           "label": "Photo Urls",
@@ -6255,7 +6255,7 @@
               "required": false,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "OBJECT"
           } ],
           "label": "Tags",
@@ -6304,7 +6304,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -6450,7 +6450,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Photo Urls",
@@ -6534,7 +6534,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Tags",
@@ -6890,7 +6890,7 @@
             "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -7089,7 +7089,7 @@
           "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -7414,7 +7414,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -7506,7 +7506,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -7662,7 +7662,7 @@
         "required": true,
         "type": "STRING"
       } ],
-      "required": null,
+      "required": false,
       "type": "FILE_ENTRY"
     } ],
     "resumePerform": null,

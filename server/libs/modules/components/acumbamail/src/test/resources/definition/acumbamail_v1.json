@@ -29,7 +29,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         },
         "placeholder": null,
@@ -52,7 +52,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "INTEGER"
       },
       "sampleOutput": null
@@ -179,7 +179,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         },
         "placeholder": null,
@@ -202,7 +202,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "INTEGER"
       },
       "sampleOutput": null

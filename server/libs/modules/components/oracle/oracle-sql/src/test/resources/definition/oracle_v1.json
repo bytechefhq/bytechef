@@ -62,7 +62,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       }, {
         "advancedOption": null,
@@ -79,7 +79,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       }, {
         "advancedOption": null,
@@ -101,7 +101,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       }, {
         "advancedOption": null,
@@ -123,7 +123,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "advancedOption": null,
@@ -142,7 +142,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     } ],
     "resumePerform": null,
@@ -317,7 +317,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Columns",
@@ -329,7 +329,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "name": "values",
@@ -344,7 +344,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
@@ -541,7 +541,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Columns",
@@ -553,7 +553,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "name": "values",
@@ -568,7 +568,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
@@ -731,7 +731,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "ARRAY"
         }, {
           "advancedOption": null,
@@ -755,7 +755,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -772,7 +772,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE"
         }, {
           "advancedOption": null,
@@ -789,7 +789,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -808,7 +808,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "name": null,
@@ -823,7 +823,7 @@
           "label": null,
           "metadata": { },
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NULL"
         }, {
           "advancedOption": null,
@@ -845,7 +845,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "additionalProperties": null,
@@ -865,7 +865,7 @@
           "optionsDataSource": null,
           "placeholder": null,
           "properties": null,
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         }, {
           "advancedOption": null,
@@ -887,7 +887,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -904,7 +904,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TIME"
         } ],
         "advancedOption": null,
@@ -923,7 +923,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Fields to select",
@@ -935,7 +935,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "additionalProperties": [ {
@@ -960,7 +960,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       }, {
         "advancedOption": null,
@@ -977,7 +977,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       }, {
         "advancedOption": null,
@@ -999,7 +999,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       }, {
         "advancedOption": null,
@@ -1021,7 +1021,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "advancedOption": null,
@@ -1040,7 +1040,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     } ],
     "resumePerform": null,
@@ -1205,7 +1205,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Columns",
@@ -1217,7 +1217,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     } ],
     "title": "Write table rows",

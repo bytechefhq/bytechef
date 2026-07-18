@@ -32,7 +32,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -58,7 +58,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": "Sample result"
@@ -85,7 +85,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     } ],
     "resumePerform": null,
@@ -124,7 +124,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -150,7 +150,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": "Sample result"
@@ -325,7 +325,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Authentication",
@@ -337,7 +337,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     } ],
     "resumePerform": null,
@@ -376,7 +376,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -402,7 +402,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": "Sample result"

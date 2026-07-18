@@ -48,7 +48,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -67,7 +67,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -89,7 +89,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -113,7 +113,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -130,7 +130,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -147,7 +147,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE"
         }, {
           "advancedOption": null,
@@ -164,7 +164,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TIME"
         } ],
         "advancedOption": null,
@@ -183,7 +183,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Metadata Filter",
@@ -244,7 +244,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -263,7 +263,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -285,7 +285,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -309,7 +309,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -326,7 +326,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -343,7 +343,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE"
         }, {
           "advancedOption": null,
@@ -360,7 +360,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TIME"
         } ],
         "advancedOption": null,
@@ -379,7 +379,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Metadata Filter",
@@ -467,7 +467,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -486,7 +486,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -508,7 +508,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -532,7 +532,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -549,7 +549,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -566,7 +566,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE"
         }, {
           "advancedOption": null,
@@ -583,7 +583,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TIME"
         } ],
         "advancedOption": null,
@@ -602,7 +602,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Metadata Filter",
@@ -704,7 +704,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -723,7 +723,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -745,7 +745,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -769,7 +769,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -786,7 +786,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -803,7 +803,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE"
         }, {
           "advancedOption": null,
@@ -820,7 +820,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "TIME"
         } ],
         "advancedOption": null,
@@ -839,7 +839,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Metadata Filter",

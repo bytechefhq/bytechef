@@ -173,7 +173,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -195,7 +195,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -214,7 +214,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -233,7 +233,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "resumePerform": null,
@@ -354,7 +354,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -462,7 +462,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null
@@ -527,7 +527,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "additionalProperties": null,
@@ -765,7 +765,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -787,7 +787,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -806,7 +806,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -825,7 +825,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "title": "Read from File",
@@ -947,7 +947,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -1055,7 +1055,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null
@@ -1119,7 +1119,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "additionalProperties": null,

@@ -22,7 +22,7 @@
     "name": "items",
     "options": null,
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   } ],
   "resources": null,
@@ -39,7 +39,7 @@
     "label": null,
     "metadata": { },
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "TASK"
   } ],
   "title": "Each",

@@ -55,7 +55,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
@@ -132,7 +132,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Tools to Include",
@@ -147,7 +147,7 @@
         "optionsLookupDependsOn": [ "toolFilterType" ]
       },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "advancedOption": null,
@@ -178,7 +178,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Tools to Exclude",
@@ -193,7 +193,7 @@
         "optionsLookupDependsOn": [ "toolFilterType" ]
       },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     } ],
     "title": "MCP Server Tools",
@@ -378,7 +378,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       }, {
         "advancedOption": null,
@@ -400,7 +400,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "refresh": null,
@@ -509,7 +509,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       }, {
         "advancedOption": null,
@@ -531,7 +531,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "refresh": null,

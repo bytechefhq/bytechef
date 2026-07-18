@@ -37,7 +37,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": null,
@@ -150,7 +150,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       } ],
       "label": "Attachments",
@@ -162,7 +162,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": "Add attachment",
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     } ],
     "resumePerform": null,
@@ -257,7 +257,7 @@
             "optionsLoadedDynamically": null,
             "placeholder": null,
             "regex": null,
-            "required": null,
+            "required": false,
             "type": "STRING"
           }, {
             "advancedOption": null,
@@ -370,7 +370,7 @@
                 "required": true,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "FILE_ENTRY"
             } ],
             "label": null,
@@ -382,10 +382,10 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "ARRAY"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -450,7 +450,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -563,7 +563,7 @@
               "required": true,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "FILE_ENTRY"
           } ],
           "label": null,
@@ -575,10 +575,10 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null

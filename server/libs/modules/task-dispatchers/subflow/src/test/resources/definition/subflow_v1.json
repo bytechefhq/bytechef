@@ -30,7 +30,7 @@
     "optionsLoadedDynamically": null,
     "placeholder": null,
     "regex": null,
-    "required": null,
+    "required": false,
     "type": "STRING"
   }, {
     "advancedOption": null,
@@ -45,7 +45,7 @@
     "hidden": null,
     "metadata": { },
     "name": "inputs",
-    "required": null,
+    "required": false,
     "type": "DYNAMIC_PROPERTIES"
   } ],
   "resources": null,

@@ -363,7 +363,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "ARRAY"
       }, {
         "advancedOption": null,
@@ -387,7 +387,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       }, {
         "advancedOption": null,
@@ -404,7 +404,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE"
       }, {
         "advancedOption": null,
@@ -421,7 +421,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       }, {
         "advancedOption": null,
@@ -440,7 +440,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "INTEGER"
       }, {
         "advancedOption": null,
@@ -462,7 +462,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       }, {
         "name": null,
@@ -477,7 +477,7 @@
         "label": null,
         "metadata": { },
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NULL"
       }, {
         "additionalProperties": null,
@@ -497,7 +497,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       }, {
         "advancedOption": null,
@@ -519,7 +519,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       }, {
         "advancedOption": null,
@@ -536,7 +536,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "TIME"
       } ],
       "advancedOption": null,
@@ -555,7 +555,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "advancedOption": null,
@@ -862,7 +862,7 @@
           "required": true,
           "type": "TIME"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Key-Value Pairs",
@@ -918,7 +918,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -946,7 +946,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -1104,7 +1104,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -1132,7 +1132,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null

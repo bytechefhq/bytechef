@@ -81,7 +81,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -161,7 +161,7 @@
           "required": true,
           "type": "BOOLEAN"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       }, {
         "additionalProperties": null,
@@ -198,7 +198,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -262,7 +262,7 @@
           "required": true,
           "type": "DATE_TIME"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       }, {
         "additionalProperties": null,
@@ -299,7 +299,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -393,7 +393,7 @@
           "required": true,
           "type": "NUMBER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       }, {
         "additionalProperties": null,
@@ -430,7 +430,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         }, {
           "advancedOption": null,
@@ -553,7 +553,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "AND Condition",
@@ -575,7 +575,7 @@
     "name": "conditions",
     "options": null,
     "placeholder": "Add OR Condition",
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   }, {
     "advancedOption": null,
@@ -622,7 +622,7 @@
       "label": null,
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "TASK"
     } ],
     "label": null,
@@ -633,7 +633,7 @@
     "name": "caseTrue",
     "options": null,
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   }, {
     "advancedOption": null,
@@ -657,7 +657,7 @@
       "label": null,
       "metadata": { },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "TASK"
     } ],
     "label": null,
@@ -668,7 +668,7 @@
     "name": "caseFalse",
     "options": null,
     "placeholder": null,
-    "required": null,
+    "required": false,
     "type": "ARRAY"
   } ],
   "title": "Condition",

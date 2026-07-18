@@ -35,7 +35,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -61,7 +61,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -331,7 +331,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -359,7 +359,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -530,7 +530,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -558,7 +558,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -681,7 +681,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -707,7 +707,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -801,7 +801,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         },
         "placeholder": null,
@@ -822,7 +822,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       },
       "sampleOutput": null
@@ -1063,7 +1063,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -1089,7 +1089,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -1218,7 +1218,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -1246,7 +1246,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -1502,7 +1502,7 @@
           "optionsDataSource": null,
           "placeholder": null,
           "properties": null,
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1526,7 +1526,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -1680,7 +1680,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -1706,7 +1706,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -1865,7 +1865,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         },
         "placeholder": null,
@@ -1888,7 +1888,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "INTEGER"
       },
       "sampleOutput": null
@@ -1969,7 +1969,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -1995,7 +1995,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -2121,7 +2121,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -2140,7 +2140,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -2159,7 +2159,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -2178,7 +2178,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -2197,7 +2197,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -2216,10 +2216,10 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -2259,7 +2259,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -2278,7 +2278,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -2297,7 +2297,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -2316,7 +2316,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -2335,7 +2335,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -2354,10 +2354,10 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -2438,7 +2438,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -2464,7 +2464,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -2530,7 +2530,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -2558,7 +2558,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -2684,7 +2684,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
@@ -2728,7 +2728,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -2756,7 +2756,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -2836,7 +2836,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": null,
@@ -2860,7 +2860,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
@@ -2904,7 +2904,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -2932,7 +2932,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -3151,7 +3151,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -3179,7 +3179,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -3263,7 +3263,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         },
         "placeholder": null,
@@ -3284,7 +3284,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       },
       "sampleOutput": null
@@ -3545,7 +3545,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -3571,7 +3571,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -3838,7 +3838,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -3866,7 +3866,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -4034,7 +4034,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -4062,7 +4062,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -4182,7 +4182,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -4208,7 +4208,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -4299,7 +4299,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         },
         "placeholder": null,
@@ -4320,7 +4320,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       },
       "sampleOutput": null
@@ -4558,7 +4558,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         },
         "placeholder": null,
@@ -4584,7 +4584,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       },
       "sampleOutput": null
@@ -4710,7 +4710,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -4738,7 +4738,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -4988,7 +4988,7 @@
           "optionsDataSource": null,
           "placeholder": null,
           "properties": null,
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -5012,7 +5012,7 @@
         "optionsDataSource": null,
         "placeholder": null,
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -5163,7 +5163,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -5189,7 +5189,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -5345,7 +5345,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         },
         "placeholder": null,
@@ -5368,7 +5368,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "INTEGER"
       },
       "sampleOutput": null
@@ -5446,7 +5446,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -5472,7 +5472,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -5595,7 +5595,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -5614,7 +5614,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -5633,7 +5633,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -5652,7 +5652,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -5671,7 +5671,7 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           }, {
             "advancedOption": null,
@@ -5690,10 +5690,10 @@
             "options": null,
             "optionsDataSource": null,
             "placeholder": null,
-            "required": null,
+            "required": false,
             "type": "INTEGER"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -5733,7 +5733,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -5752,7 +5752,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -5771,7 +5771,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -5790,7 +5790,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -5809,7 +5809,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         }, {
           "advancedOption": null,
@@ -5828,10 +5828,10 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "INTEGER"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -5909,7 +5909,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         },
         "placeholder": null,
@@ -5935,7 +5935,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       },
       "sampleOutput": null
@@ -5998,7 +5998,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -6026,7 +6026,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -6151,7 +6151,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "title": "Is Between Dates?",
@@ -6193,7 +6193,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -6221,7 +6221,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -6300,7 +6300,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": null,
@@ -6324,7 +6324,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "title": "Is Between Times?",
@@ -6366,7 +6366,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -6394,7 +6394,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -6610,7 +6610,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         },
         "placeholder": null,
@@ -6638,7 +6638,7 @@
           "value": false
         } ],
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "BOOLEAN"
       },
       "sampleOutput": null
@@ -6719,7 +6719,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         },
         "placeholder": null,
@@ -6740,7 +6740,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "DATE_TIME"
       },
       "sampleOutput": null

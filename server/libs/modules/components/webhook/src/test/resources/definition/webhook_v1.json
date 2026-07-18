@@ -57,7 +57,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "additionalProperties": [ {
@@ -80,7 +80,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "advancedOption": null,
@@ -99,7 +99,7 @@
       "optionsDataSource": null,
       "placeholder": "Add header",
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "additionalProperties": null,
@@ -286,7 +286,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "resumePerform": null,
@@ -473,7 +473,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "title": "Await Workflow and Respond",

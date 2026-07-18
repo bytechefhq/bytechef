@@ -37,7 +37,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": "Edit Output schema",
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "name": "response",
@@ -153,7 +153,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "title": "Call Workflow",
@@ -219,7 +219,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": "Edit Inputs schema",
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     } ],
     "title": "New Workflow Call",

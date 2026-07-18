@@ -896,7 +896,7 @@
                       "required": false,
                       "type": "OBJECT"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": "Subpods",
@@ -953,7 +953,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": "Pods",
@@ -971,7 +971,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -1855,7 +1855,7 @@
                     "required": false,
                     "type": "OBJECT"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": "Subpods",
@@ -1912,7 +1912,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Pods",
@@ -1930,7 +1930,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -2026,7 +2026,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Format",
@@ -3475,7 +3475,7 @@
                       "required": false,
                       "type": "OBJECT"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": "Subpods",
@@ -3532,7 +3532,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": "Pods",
@@ -3550,7 +3550,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -4434,7 +4434,7 @@
                     "required": false,
                     "type": "OBJECT"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": "Subpods",
@@ -4491,7 +4491,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": "Pods",
@@ -4509,7 +4509,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -4604,7 +4604,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Format",

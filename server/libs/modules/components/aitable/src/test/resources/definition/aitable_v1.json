@@ -83,7 +83,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,
@@ -189,7 +189,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Field Names",
@@ -235,7 +235,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Record IDs",
@@ -359,7 +359,7 @@
       "header": null,
       "hidden": null,
       "metadata": { },
-      "required": null,
+      "required": false,
       "type": "DYNAMIC_PROPERTIES"
     } ],
     "resumePerform": null,

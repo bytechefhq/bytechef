@@ -141,7 +141,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -163,7 +163,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": "\" ' / ",
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -187,7 +187,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -211,7 +211,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -230,7 +230,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -249,7 +249,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -273,7 +273,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "resumePerform": null,
@@ -394,7 +394,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -502,7 +502,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null
@@ -541,7 +541,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -558,7 +558,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -580,7 +580,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -602,7 +602,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         } ],
         "advancedOption": null,
@@ -621,7 +621,7 @@
         "optionsDataSource": null,
         "placeholder": "Add Column",
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Rows",
@@ -655,7 +655,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     } ],
     "resumePerform": null,
@@ -776,7 +776,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -884,7 +884,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null
@@ -1027,7 +1027,7 @@
             "value": false
           } ],
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "BOOLEAN"
         }, {
           "advancedOption": null,
@@ -1044,7 +1044,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "DATE_TIME"
         }, {
           "advancedOption": null,
@@ -1066,7 +1066,7 @@
           "options": null,
           "optionsDataSource": null,
           "placeholder": null,
-          "required": null,
+          "required": false,
           "type": "NUMBER"
         }, {
           "advancedOption": null,
@@ -1088,7 +1088,7 @@
           "optionsLoadedDynamically": null,
           "placeholder": null,
           "regex": null,
-          "required": null,
+          "required": false,
           "type": "STRING"
         } ],
         "advancedOption": null,
@@ -1107,7 +1107,7 @@
         "optionsDataSource": null,
         "placeholder": "Add Column",
         "properties": null,
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Rows",
@@ -1257,7 +1257,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": null,
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -1279,7 +1279,7 @@
       "optionsLoadedDynamically": null,
       "placeholder": "\" ' / ",
       "regex": null,
-      "required": null,
+      "required": false,
       "type": "STRING"
     }, {
       "advancedOption": true,
@@ -1303,7 +1303,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -1327,7 +1327,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     }, {
       "advancedOption": true,
@@ -1346,7 +1346,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -1365,7 +1365,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -1389,7 +1389,7 @@
         "value": false
       } ],
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "BOOLEAN"
     } ],
     "title": "Read CSV file row",

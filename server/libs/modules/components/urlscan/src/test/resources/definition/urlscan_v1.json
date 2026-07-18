@@ -248,7 +248,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "advancedOption": null,
@@ -1145,7 +1145,7 @@
                         "options": null,
                         "optionsDataSource": null,
                         "placeholder": null,
-                        "required": null,
+                        "required": false,
                         "type": "NUMBER"
                       } ],
                       "label": null,
@@ -1387,7 +1387,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "advancedOption": null,
@@ -2191,7 +2191,7 @@
                           "optionsLoadedDynamically": null,
                           "placeholder": null,
                           "regex": null,
-                          "required": null,
+                          "required": false,
                           "type": "STRING"
                         } ],
                         "label": null,
@@ -2294,7 +2294,7 @@
                           "optionsLoadedDynamically": null,
                           "placeholder": null,
                           "regex": null,
-                          "required": null,
+                          "required": false,
                           "type": "STRING"
                         } ],
                         "label": null,
@@ -2447,7 +2447,7 @@
                           "required": false,
                           "type": "STRING"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -2554,7 +2554,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -2595,7 +2595,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -2636,7 +2636,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -2721,7 +2721,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -2782,7 +2782,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -2950,7 +2950,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -2993,7 +2993,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3071,7 +3071,7 @@
                   "required": false,
                   "type": "INTEGER"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -3219,7 +3219,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3262,7 +3262,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3338,7 +3338,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -3486,7 +3486,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3529,7 +3529,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3580,7 +3580,7 @@
                     "options": null,
                     "optionsDataSource": null,
                     "placeholder": null,
-                    "required": null,
+                    "required": false,
                     "type": "INTEGER"
                   } ],
                   "advancedOption": null,
@@ -3624,7 +3624,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -3772,7 +3772,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3815,7 +3815,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -3871,7 +3871,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -3959,7 +3959,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4059,7 +4059,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4121,7 +4121,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4177,7 +4177,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -4265,7 +4265,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4365,7 +4365,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4427,7 +4427,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4553,7 +4553,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -4568,7 +4568,7 @@
                   "required": false,
                   "type": "ARRAY"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -4808,7 +4808,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4851,7 +4851,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -4894,7 +4894,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -5001,7 +5001,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -5444,7 +5444,7 @@
                       "options": null,
                       "optionsDataSource": null,
                       "placeholder": null,
-                      "required": null,
+                      "required": false,
                       "type": "NUMBER"
                     } ],
                     "label": null,
@@ -5667,7 +5667,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -5803,7 +5803,7 @@
                       "required": false,
                       "type": "INTEGER"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -6041,7 +6041,7 @@
                           "options": null,
                           "optionsDataSource": null,
                           "placeholder": null,
-                          "required": null,
+                          "required": false,
                           "type": "NUMBER"
                         } ],
                         "label": null,
@@ -6097,7 +6097,7 @@
                       "required": false,
                       "type": "OBJECT"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -6202,7 +6202,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -6461,7 +6461,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -6589,7 +6589,7 @@
                           "required": false,
                           "type": "STRING"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -6778,7 +6778,7 @@
                           "required": false,
                           "type": "INTEGER"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -6793,7 +6793,7 @@
                       "required": false,
                       "type": "ARRAY"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -7102,7 +7102,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7383,7 +7383,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7426,7 +7426,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7469,7 +7469,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7512,7 +7512,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7555,7 +7555,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7598,7 +7598,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7641,7 +7641,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7764,7 +7764,7 @@
                   "required": false,
                   "type": "INTEGER"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -7807,7 +7807,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -7906,7 +7906,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -7947,7 +7947,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -7990,7 +7990,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8120,7 +8120,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8161,7 +8161,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8204,7 +8204,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8334,7 +8334,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8375,7 +8375,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8418,7 +8418,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8584,7 +8584,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8625,7 +8625,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8666,7 +8666,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8772,7 +8772,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -8813,7 +8813,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -8856,7 +8856,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -9024,7 +9024,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -9260,7 +9260,7 @@
                       "optionsLoadedDynamically": null,
                       "placeholder": null,
                       "regex": null,
-                      "required": null,
+                      "required": false,
                       "type": "STRING"
                     } ],
                     "advancedOption": null,
@@ -10157,7 +10157,7 @@
                       "options": null,
                       "optionsDataSource": null,
                       "placeholder": null,
-                      "required": null,
+                      "required": false,
                       "type": "NUMBER"
                     } ],
                     "label": null,
@@ -10399,7 +10399,7 @@
                       "optionsLoadedDynamically": null,
                       "placeholder": null,
                       "regex": null,
-                      "required": null,
+                      "required": false,
                       "type": "STRING"
                     } ],
                     "advancedOption": null,
@@ -11203,7 +11203,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "label": null,
@@ -11306,7 +11306,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "label": null,
@@ -11459,7 +11459,7 @@
                         "required": false,
                         "type": "STRING"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -11566,7 +11566,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -11607,7 +11607,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -11648,7 +11648,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -11733,7 +11733,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -11794,7 +11794,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -11962,7 +11962,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12005,7 +12005,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12083,7 +12083,7 @@
                 "required": false,
                 "type": "INTEGER"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -12231,7 +12231,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12274,7 +12274,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12350,7 +12350,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -12498,7 +12498,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12541,7 +12541,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12592,7 +12592,7 @@
                   "options": null,
                   "optionsDataSource": null,
                   "placeholder": null,
-                  "required": null,
+                  "required": false,
                   "type": "INTEGER"
                 } ],
                 "advancedOption": null,
@@ -12636,7 +12636,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -12784,7 +12784,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12827,7 +12827,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -12883,7 +12883,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -12971,7 +12971,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13071,7 +13071,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13133,7 +13133,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13189,7 +13189,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -13277,7 +13277,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13377,7 +13377,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13439,7 +13439,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13565,7 +13565,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -13580,7 +13580,7 @@
                 "required": false,
                 "type": "ARRAY"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -13820,7 +13820,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13863,7 +13863,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -13906,7 +13906,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -14013,7 +14013,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -14456,7 +14456,7 @@
                     "options": null,
                     "optionsDataSource": null,
                     "placeholder": null,
-                    "required": null,
+                    "required": false,
                     "type": "NUMBER"
                   } ],
                   "label": null,
@@ -14679,7 +14679,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -14815,7 +14815,7 @@
                     "required": false,
                     "type": "INTEGER"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -15053,7 +15053,7 @@
                         "options": null,
                         "optionsDataSource": null,
                         "placeholder": null,
-                        "required": null,
+                        "required": false,
                         "type": "NUMBER"
                       } ],
                       "label": null,
@@ -15109,7 +15109,7 @@
                     "required": false,
                     "type": "OBJECT"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -15214,7 +15214,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -15473,7 +15473,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -15601,7 +15601,7 @@
                         "required": false,
                         "type": "STRING"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -15790,7 +15790,7 @@
                         "required": false,
                         "type": "INTEGER"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -15805,7 +15805,7 @@
                     "required": false,
                     "type": "ARRAY"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -16114,7 +16114,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16395,7 +16395,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16438,7 +16438,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16481,7 +16481,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16524,7 +16524,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16567,7 +16567,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16610,7 +16610,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16653,7 +16653,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16776,7 +16776,7 @@
                 "required": false,
                 "type": "INTEGER"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -16819,7 +16819,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -16918,7 +16918,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -16959,7 +16959,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17002,7 +17002,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17132,7 +17132,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17173,7 +17173,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17216,7 +17216,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17346,7 +17346,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17387,7 +17387,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17430,7 +17430,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17596,7 +17596,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17637,7 +17637,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17678,7 +17678,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17784,7 +17784,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -17825,7 +17825,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -17868,7 +17868,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -18036,7 +18036,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -18203,7 +18203,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -18320,7 +18320,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -18418,7 +18418,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Tags",
@@ -18564,7 +18564,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -18677,7 +18677,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null
@@ -18951,7 +18951,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "advancedOption": null,
@@ -19848,7 +19848,7 @@
                         "options": null,
                         "optionsDataSource": null,
                         "placeholder": null,
-                        "required": null,
+                        "required": false,
                         "type": "NUMBER"
                       } ],
                       "label": null,
@@ -20090,7 +20090,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "advancedOption": null,
@@ -20894,7 +20894,7 @@
                           "optionsLoadedDynamically": null,
                           "placeholder": null,
                           "regex": null,
-                          "required": null,
+                          "required": false,
                           "type": "STRING"
                         } ],
                         "label": null,
@@ -20997,7 +20997,7 @@
                           "optionsLoadedDynamically": null,
                           "placeholder": null,
                           "regex": null,
-                          "required": null,
+                          "required": false,
                           "type": "STRING"
                         } ],
                         "label": null,
@@ -21150,7 +21150,7 @@
                           "required": false,
                           "type": "STRING"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -21257,7 +21257,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21298,7 +21298,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21339,7 +21339,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21424,7 +21424,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21485,7 +21485,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21653,7 +21653,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -21696,7 +21696,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -21774,7 +21774,7 @@
                   "required": false,
                   "type": "INTEGER"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -21922,7 +21922,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -21965,7 +21965,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22041,7 +22041,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -22189,7 +22189,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22232,7 +22232,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22283,7 +22283,7 @@
                     "options": null,
                     "optionsDataSource": null,
                     "placeholder": null,
-                    "required": null,
+                    "required": false,
                     "type": "INTEGER"
                   } ],
                   "advancedOption": null,
@@ -22327,7 +22327,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -22475,7 +22475,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22518,7 +22518,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22574,7 +22574,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -22662,7 +22662,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22762,7 +22762,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22824,7 +22824,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -22880,7 +22880,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -22968,7 +22968,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23068,7 +23068,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23130,7 +23130,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23256,7 +23256,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -23271,7 +23271,7 @@
                   "required": false,
                   "type": "ARRAY"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -23511,7 +23511,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23554,7 +23554,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23597,7 +23597,7 @@
                     "optionsLoadedDynamically": null,
                     "placeholder": null,
                     "regex": null,
-                    "required": null,
+                    "required": false,
                     "type": "STRING"
                   } ],
                   "label": null,
@@ -23704,7 +23704,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -24147,7 +24147,7 @@
                       "options": null,
                       "optionsDataSource": null,
                       "placeholder": null,
-                      "required": null,
+                      "required": false,
                       "type": "NUMBER"
                     } ],
                     "label": null,
@@ -24370,7 +24370,7 @@
                   "required": false,
                   "type": "OBJECT"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -24506,7 +24506,7 @@
                       "required": false,
                       "type": "INTEGER"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -24744,7 +24744,7 @@
                           "options": null,
                           "optionsDataSource": null,
                           "placeholder": null,
-                          "required": null,
+                          "required": false,
                           "type": "NUMBER"
                         } ],
                         "label": null,
@@ -24800,7 +24800,7 @@
                       "required": false,
                       "type": "OBJECT"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -24905,7 +24905,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -25164,7 +25164,7 @@
                       "required": false,
                       "type": "STRING"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -25292,7 +25292,7 @@
                           "required": false,
                           "type": "STRING"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -25481,7 +25481,7 @@
                           "required": false,
                           "type": "INTEGER"
                         } ],
-                        "required": null,
+                        "required": false,
                         "type": "OBJECT"
                       } ],
                       "label": null,
@@ -25496,7 +25496,7 @@
                       "required": false,
                       "type": "ARRAY"
                     } ],
-                    "required": null,
+                    "required": false,
                     "type": "OBJECT"
                   } ],
                   "label": null,
@@ -25805,7 +25805,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26086,7 +26086,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26129,7 +26129,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26172,7 +26172,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26215,7 +26215,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26258,7 +26258,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26301,7 +26301,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26344,7 +26344,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26467,7 +26467,7 @@
                   "required": false,
                   "type": "INTEGER"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -26510,7 +26510,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -26609,7 +26609,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -26650,7 +26650,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -26693,7 +26693,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -26823,7 +26823,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -26864,7 +26864,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -26907,7 +26907,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -27037,7 +27037,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -27078,7 +27078,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -27121,7 +27121,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -27287,7 +27287,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -27328,7 +27328,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -27369,7 +27369,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -27475,7 +27475,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -27516,7 +27516,7 @@
                   "optionsDataSource": null,
                   "placeholder": null,
                   "properties": null,
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -27559,7 +27559,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -27727,7 +27727,7 @@
             "required": false,
             "type": "OBJECT"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -27963,7 +27963,7 @@
                       "optionsLoadedDynamically": null,
                       "placeholder": null,
                       "regex": null,
-                      "required": null,
+                      "required": false,
                       "type": "STRING"
                     } ],
                     "advancedOption": null,
@@ -28860,7 +28860,7 @@
                       "options": null,
                       "optionsDataSource": null,
                       "placeholder": null,
-                      "required": null,
+                      "required": false,
                       "type": "NUMBER"
                     } ],
                     "label": null,
@@ -29102,7 +29102,7 @@
                       "optionsLoadedDynamically": null,
                       "placeholder": null,
                       "regex": null,
-                      "required": null,
+                      "required": false,
                       "type": "STRING"
                     } ],
                     "advancedOption": null,
@@ -29906,7 +29906,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "label": null,
@@ -30009,7 +30009,7 @@
                         "optionsLoadedDynamically": null,
                         "placeholder": null,
                         "regex": null,
-                        "required": null,
+                        "required": false,
                         "type": "STRING"
                       } ],
                       "label": null,
@@ -30162,7 +30162,7 @@
                         "required": false,
                         "type": "STRING"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -30269,7 +30269,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30310,7 +30310,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30351,7 +30351,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30436,7 +30436,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30497,7 +30497,7 @@
               "optionsDataSource": null,
               "placeholder": null,
               "properties": null,
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30665,7 +30665,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -30708,7 +30708,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -30786,7 +30786,7 @@
                 "required": false,
                 "type": "INTEGER"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -30934,7 +30934,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -30977,7 +30977,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31053,7 +31053,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -31201,7 +31201,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31244,7 +31244,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31295,7 +31295,7 @@
                   "options": null,
                   "optionsDataSource": null,
                   "placeholder": null,
-                  "required": null,
+                  "required": false,
                   "type": "INTEGER"
                 } ],
                 "advancedOption": null,
@@ -31339,7 +31339,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -31487,7 +31487,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31530,7 +31530,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31586,7 +31586,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -31674,7 +31674,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31774,7 +31774,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31836,7 +31836,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -31892,7 +31892,7 @@
                 "required": false,
                 "type": "STRING"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -31980,7 +31980,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32080,7 +32080,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32142,7 +32142,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32268,7 +32268,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -32283,7 +32283,7 @@
                 "required": false,
                 "type": "ARRAY"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -32523,7 +32523,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32566,7 +32566,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32609,7 +32609,7 @@
                   "optionsLoadedDynamically": null,
                   "placeholder": null,
                   "regex": null,
-                  "required": null,
+                  "required": false,
                   "type": "STRING"
                 } ],
                 "label": null,
@@ -32716,7 +32716,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -33159,7 +33159,7 @@
                     "options": null,
                     "optionsDataSource": null,
                     "placeholder": null,
-                    "required": null,
+                    "required": false,
                     "type": "NUMBER"
                   } ],
                   "label": null,
@@ -33382,7 +33382,7 @@
                 "required": false,
                 "type": "OBJECT"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -33518,7 +33518,7 @@
                     "required": false,
                     "type": "INTEGER"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -33756,7 +33756,7 @@
                         "options": null,
                         "optionsDataSource": null,
                         "placeholder": null,
-                        "required": null,
+                        "required": false,
                         "type": "NUMBER"
                       } ],
                       "label": null,
@@ -33812,7 +33812,7 @@
                     "required": false,
                     "type": "OBJECT"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -33917,7 +33917,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -34176,7 +34176,7 @@
                     "required": false,
                     "type": "STRING"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -34304,7 +34304,7 @@
                         "required": false,
                         "type": "STRING"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -34493,7 +34493,7 @@
                         "required": false,
                         "type": "INTEGER"
                       } ],
-                      "required": null,
+                      "required": false,
                       "type": "OBJECT"
                     } ],
                     "label": null,
@@ -34508,7 +34508,7 @@
                     "required": false,
                     "type": "ARRAY"
                   } ],
-                  "required": null,
+                  "required": false,
                   "type": "OBJECT"
                 } ],
                 "label": null,
@@ -34817,7 +34817,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35098,7 +35098,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35141,7 +35141,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35184,7 +35184,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35227,7 +35227,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35270,7 +35270,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35313,7 +35313,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35356,7 +35356,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35479,7 +35479,7 @@
                 "required": false,
                 "type": "INTEGER"
               } ],
-              "required": null,
+              "required": false,
               "type": "OBJECT"
             } ],
             "label": null,
@@ -35522,7 +35522,7 @@
               "optionsLoadedDynamically": null,
               "placeholder": null,
               "regex": null,
-              "required": null,
+              "required": false,
               "type": "STRING"
             } ],
             "label": null,
@@ -35621,7 +35621,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -35662,7 +35662,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -35705,7 +35705,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -35835,7 +35835,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -35876,7 +35876,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -35919,7 +35919,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -36049,7 +36049,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -36090,7 +36090,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -36133,7 +36133,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -36299,7 +36299,7 @@
                   "required": false,
                   "type": "STRING"
                 } ],
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -36340,7 +36340,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -36381,7 +36381,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -36487,7 +36487,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -36528,7 +36528,7 @@
                 "optionsDataSource": null,
                 "placeholder": null,
                 "properties": null,
-                "required": null,
+                "required": false,
                 "type": "OBJECT"
               } ],
               "label": null,
@@ -36571,7 +36571,7 @@
                 "optionsLoadedDynamically": null,
                 "placeholder": null,
                 "regex": null,
-                "required": null,
+                "required": false,
                 "type": "STRING"
               } ],
               "label": null,
@@ -36739,7 +36739,7 @@
           "required": false,
           "type": "OBJECT"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -36898,7 +36898,7 @@
             "required": false,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "OBJECT"
         },
         "placeholder": null,
@@ -37015,7 +37015,7 @@
           "required": false,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       },
       "sampleOutput": null
@@ -37112,7 +37112,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Tags",
@@ -37253,7 +37253,7 @@
             "required": true,
             "type": "STRING"
           } ],
-          "required": null,
+          "required": false,
           "type": "FILE_ENTRY"
         },
         "placeholder": null,
@@ -37366,7 +37366,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       },
       "sampleOutput": null

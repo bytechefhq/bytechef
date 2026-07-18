@@ -80,7 +80,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "title": "Await Workflow and Respond",

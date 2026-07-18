@@ -227,7 +227,7 @@
           "required": true,
           "type": "STRING"
         } ],
-        "required": null,
+        "required": false,
         "type": "FILE_ENTRY"
       } ],
       "label": "Attachments",
@@ -434,7 +434,7 @@
               "required": true,
               "type": "STRING"
             } ],
-            "required": null,
+            "required": false,
             "type": "FILE_ENTRY"
           } ],
           "label": "Attachments",
@@ -449,7 +449,7 @@
           "required": false,
           "type": "ARRAY"
         } ],
-        "required": null,
+        "required": false,
         "type": "OBJECT"
       } ],
       "label": "Messages",
@@ -552,7 +552,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -571,7 +571,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -593,7 +593,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -615,7 +615,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -637,7 +637,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -659,7 +659,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "additionalProperties": [ {
@@ -682,7 +682,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       } ],
       "advancedOption": true,
@@ -701,7 +701,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "advancedOption": true,
@@ -732,7 +732,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Stop",
@@ -744,7 +744,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "advancedOption": true,
@@ -891,7 +891,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -910,7 +910,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     }, {
       "advancedOption": true,
@@ -932,7 +932,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -954,7 +954,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -976,7 +976,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "advancedOption": true,
@@ -998,7 +998,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "NUMBER"
     }, {
       "additionalProperties": [ {
@@ -1021,7 +1021,7 @@
         "options": null,
         "optionsDataSource": null,
         "placeholder": null,
-        "required": null,
+        "required": false,
         "type": "NUMBER"
       } ],
       "advancedOption": true,
@@ -1040,7 +1040,7 @@
       "optionsDataSource": null,
       "placeholder": null,
       "properties": null,
-      "required": null,
+      "required": false,
       "type": "OBJECT"
     }, {
       "advancedOption": true,
@@ -1071,7 +1071,7 @@
         "optionsLoadedDynamically": null,
         "placeholder": null,
         "regex": null,
-        "required": null,
+        "required": false,
         "type": "STRING"
       } ],
       "label": "Stop",
@@ -1083,7 +1083,7 @@
       "options": null,
       "optionsDataSource": null,
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "ARRAY"
     }, {
       "advancedOption": true,

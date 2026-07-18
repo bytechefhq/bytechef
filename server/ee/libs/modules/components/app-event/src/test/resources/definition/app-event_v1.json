@@ -54,7 +54,7 @@
         "optionsLookupDependsOn": null
       },
       "placeholder": null,
-      "required": null,
+      "required": false,
       "type": "INTEGER"
     } ],
     "title": "New Event",
