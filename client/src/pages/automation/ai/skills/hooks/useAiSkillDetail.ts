@@ -5,6 +5,7 @@ import {
     useAiSkillFileContentQuery,
     useAiSkillFilePathsQuery,
     useAiSkillQuery,
+    useCreateAdditionalFilesInSkillMutation,
     useDeleteAiSkillMutation,
     useRemoveFileInSkillMutation,
     useUpdateAiSkillContentMutation,
@@ -98,6 +99,7 @@ export default function useAiSkillDetail() {
         onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkills']}),
     });
     const {mutateAsync: removeFileInSkill} = useRemoveFileInSkillMutation();
+    const {mutateAsync: createAdditionalFilesInSkill} = useCreateAdditionalFilesInSkillMutation();
 
     const {data: skillData, isError: isSkillError} = useAiSkillQuery(
         {id: selectedSkillId ?? ''},
@@ -177,6 +179,29 @@ export default function useAiSkillDetail() {
     const handleFileSelect = useCallback((path: string) => {
         setSelectedFilePath(path);
     }, []);
+
+    const handleAddFile = useCallback(
+        async (path: string) => {
+            if (!selectedSkillId) {
+                return;
+            }
+
+            try {
+                await createAdditionalFilesInSkill({additionalFiles: {[path]: ''}, id: selectedSkillId});
+
+                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
+
+                setSelectedFilePath(path);
+
+                toast.success('File added');
+            } catch (error) {
+                toast.error('Failed to add file', {
+                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
+                });
+            }
+        },
+        [createAdditionalFilesInSkill, queryClient, selectedSkillId]
+    );
 
     const handleDelete = useCallback(async () => {
         if (!selectedSkillId) {
@@ -309,7 +334,9 @@ export default function useAiSkillDetail() {
     return {
         editorLanguage,
         fileContent,
+        filePaths,
         fileTree,
+        handleAddFile,
         handleBack,
         handleDelete,
         handleDownload,
