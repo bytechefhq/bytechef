@@ -1,8 +1,0 @@
-mutation createAdditionalFilesInSkill($id: ID!, $additionalFiles: Map!) {
-    createAdditionalFilesInSkill(id: $id, additionalFiles: $additionalFiles) {
-        description
-        id
-        lastModifiedDate
-        name
-    }
-}
