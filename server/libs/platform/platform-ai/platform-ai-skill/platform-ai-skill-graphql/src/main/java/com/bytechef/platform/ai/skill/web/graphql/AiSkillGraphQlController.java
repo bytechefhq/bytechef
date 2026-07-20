@@ -21,7 +21,6 @@ import com.bytechef.platform.ai.skill.facade.AiSkillFacade;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.Base64;
 import java.util.List;
-import java.util.Map;
 import org.jspecify.annotations.Nullable;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
@@ -97,16 +96,6 @@ class AiSkillGraphQlController {
     @MutationMapping
     AiSkill updateAiSkillContent(@Argument long id, @Argument @Nullable String path, @Argument String content) {
         return aiSkillFacade.updateAiSkillContent(id, path, content);
-    }
-
-    @MutationMapping
-    AiSkill createAdditionalFilesInSkill(@Argument long id, @Argument Map<String, String> additionalFiles) {
-        return aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
-    }
-
-    @MutationMapping
-    AiSkill removeFileInSkill(@Argument long id, @Argument String path) {
-        return aiSkillFacade.removeFileInSkill(id, path);
     }
 
     @MutationMapping

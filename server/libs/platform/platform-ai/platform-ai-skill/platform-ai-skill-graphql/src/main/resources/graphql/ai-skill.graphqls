@@ -10,8 +10,6 @@ extend type Mutation {
     createAiSkillFromInstructions(name: String!, description: String, "Markdown instructions for the skill" instructions: String!): AiSkill!
     updateAiSkill(id: ID!, name: String!, description: String): AiSkill!
     updateAiSkillContent(id: ID!, path: String, content: String!): AiSkill!
-    createAdditionalFilesInSkill(id: ID!, additionalFiles: Map!): AiSkill!
-    removeFileInSkill(id: ID!, path: String!): AiSkill!
     deleteAiSkill(id: ID!): Boolean!
 }
 
