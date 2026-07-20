@@ -8,6 +8,7 @@ import {DEVELOPMENT_ENVIRONMENT} from '@/shared/constants';
 import {useAnalytics} from '@/shared/hooks/useAnalytics';
 import {useHelpHub} from '@/shared/hooks/useHelpHub';
 import {MobileTopNavigation} from '@/shared/layout/MobileTopNavigation';
+import {TrialBanner} from '@/shared/layout/TrialBanner';
 import {AppSidebar} from '@/shared/layout/app-sidebar/AppSidebar';
 import {EditionType, useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useAuthenticationStore} from '@/shared/stores/useAuthenticationStore';
@@ -131,9 +132,10 @@ const platformNavigation = [
 function App() {
     const [searchOpen, setSearchOpen] = useState(false);
 
-    const {ai, edition} = useApplicationInfoStore(
+    const {ai, billingEnabled, edition} = useApplicationInfoStore(
         useShallow((state) => ({
             ai: state.ai,
+            billingEnabled: state.billing.enabled,
             edition: state.application?.edition,
         }))
     );
@@ -300,6 +302,8 @@ function App() {
 
             <SidebarInset className="flex h-full min-w-0 flex-col">
                 <MobileTopNavigation />
+
+                {billingEnabled && location.pathname.includes('/automation/') && <TrialBanner />}
 
                 <div className="flex size-full">
                     <div className="flex h-full min-w-0 flex-1">
