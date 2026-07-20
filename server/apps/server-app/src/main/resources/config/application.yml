@@ -231,6 +231,8 @@ spring:
   liquibase:
     contexts: mono, #spring.profiles.active#
     enabled: ${bytechef.upgrade.enabled:true}
+    parameters:
+      bytechef.billing.enabled: ${bytechef.billing.enabled:false}
   output:
     ansi:
       enabled: always
