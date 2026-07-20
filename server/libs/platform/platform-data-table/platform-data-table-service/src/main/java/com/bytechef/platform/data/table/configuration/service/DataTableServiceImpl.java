@@ -359,14 +359,6 @@ public class DataTableServiceImpl implements DataTableService {
         }
     }
 
-    private DataTable createDataTable(String baseName, String description) {
-        DataTable dataTable = new DataTable(null, baseName);
-
-        dataTable.setDescription(description);
-
-        return dataTableRepository.save(dataTable);
-    }
-
     private String escapeIdentifier(String identifier) {
         Assert.hasText(identifier, "identifier must not be empty");
 
