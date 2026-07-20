@@ -202,6 +202,34 @@ describe('useFetchInterceptor', () => {
         });
     });
 
+    describe('response interceptor - trial expiration', () => {
+        afterEach(() => {
+            window.history.pushState({}, '', '/');
+        });
+
+        it('navigates to billing settings on 402', () => {
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({status: 402, url: 'http://localhost/internal/api/test'});
+
+            hoisted.registeredHandlers!.response(response);
+
+            expect(hoisted.navigate).toHaveBeenCalledWith('/automation/settings/billing');
+        });
+
+        it('does not navigate again when already on the billing settings page', () => {
+            window.history.pushState({}, '', '/automation/settings/billing');
+
+            renderHook(() => useFetchInterceptor());
+
+            const response = createMockResponse({status: 402, url: 'http://localhost/internal/api/test'});
+
+            hoisted.registeredHandlers!.response(response);
+
+            expect(hoisted.navigate).not.toHaveBeenCalled();
+        });
+    });
+
     describe('response interceptor - error toast', () => {
         it('shows error toast for non-2xx responses', async () => {
             renderHook(() => useFetchInterceptor());

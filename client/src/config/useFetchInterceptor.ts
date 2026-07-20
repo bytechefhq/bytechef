@@ -141,6 +141,14 @@ export default function useFetchInterceptor() {
                     return response;
                 }
 
+                if (response.status === 402) {
+                    if (!window.location.pathname.startsWith('/automation/settings/billing')) {
+                        navigate('/automation/settings/billing');
+                    }
+
+                    return response;
+                }
+
                 // A 403 on a CSRF-protected endpoint is a transient token race handled by the
                 // csrf-aware fetch wrapper below (refresh + replay, then escalate). Don't toast or
                 // log out here, otherwise the recovered request would still flash an error.
