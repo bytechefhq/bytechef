@@ -51,7 +51,9 @@ const AiSkillFileAddDialog = ({existingPaths, onAdd, onClose}: AiSkillFileAddDia
                         value={path}
                     />
 
-                    {isDuplicate && <p className="text-sm text-red-600">A file with this path already exists.</p>}
+                    {isDuplicate && (
+                        <p className="text-sm text-red-600">A file with this path already exists.</p>
+                    )}
 
                     {isSkillMd && !isDuplicate && (
                         <p className="text-sm text-red-600">SKILL.md already exists and cannot be re-added.</p>
