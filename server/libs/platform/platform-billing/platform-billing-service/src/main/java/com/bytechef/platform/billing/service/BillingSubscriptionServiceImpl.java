@@ -38,8 +38,14 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
     @Override
     @Transactional(readOnly = true)
     public Optional<BillingSubscription> fetchCurrentSubscription() {
-        return billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()
-            .filter(subscription -> subscription.getStatus() != BillingSubscription.Status.CANCELED);
+        Optional<BillingSubscription> subscription = billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()
+            .filter(currentSubscription -> currentSubscription.getStatus() != BillingSubscription.Status.CANCELED);
+
+        if (subscription.isPresent()) {
+            return subscription;
+        }
+
+        return billingSubscriptionRepository.findFirstByPlanNameOrderByCreatedDateDesc("TRIAL");
     }
 
     @Override
