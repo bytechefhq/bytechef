@@ -45,17 +45,42 @@ class BillingSubscriptionServiceImplTest {
     }
 
     @Test
-    void testFetchCurrentSubscriptionReturnsEmptyWhenSubscriptionIsCanceled() {
+    void testFetchCurrentSubscriptionReturnsEmptyWhenSubscriptionIsCanceledAndNoTrialExists() {
         BillingSubscription canceledSubscription = new BillingSubscription();
 
         canceledSubscription.setStatus(BillingSubscription.Status.CANCELED);
 
         when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
             .thenReturn(Optional.of(canceledSubscription));
+        when(billingSubscriptionRepository.findFirstByPlanNameOrderByCreatedDateDesc("TRIAL"))
+            .thenReturn(Optional.empty());
 
         Optional<BillingSubscription> result = billingSubscriptionService.fetchCurrentSubscription();
 
         assertThat(result).isEmpty();
+    }
+
+    @Test
+    void testFetchCurrentSubscriptionFallsBackToTrialWhenCurrentIsCanceled() {
+        BillingSubscription canceledSubscription = new BillingSubscription();
+
+        canceledSubscription.setStatus(BillingSubscription.Status.CANCELED);
+
+        BillingSubscription trialSubscription = new BillingSubscription();
+
+        trialSubscription.setPlanName("TRIAL");
+        trialSubscription.setStatus(BillingSubscription.Status.ACTIVE);
+
+        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
+            .thenReturn(Optional.of(canceledSubscription));
+        when(billingSubscriptionRepository.findFirstByPlanNameOrderByCreatedDateDesc("TRIAL"))
+            .thenReturn(Optional.of(trialSubscription));
+
+        Optional<BillingSubscription> result = billingSubscriptionService.fetchCurrentSubscription();
+
+        assertThat(result).isPresent();
+        assertThat(result.get()
+            .getPlanName()).isEqualTo("TRIAL");
     }
 
     @Test
