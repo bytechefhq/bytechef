@@ -63,4 +63,33 @@
                                  referencedTableName="billing_subscription"
                                  referencedColumnNames="id"/>
     </changeSet>
+
+    <changeSet id="20260625000000-1" author="Matija Petanjek">
+        <preConditions onFail="MARK_RAN" onError="MARK_RAN">
+            <changeLogPropertyDefined property="bytechef.billing.enabled" value="true"/>
+            <sqlCheck expectedResult="0">SELECT COUNT(*) FROM billing_subscription</sqlCheck>
+        </preConditions>
+
+        <sql>
+            INSERT INTO billing_subscription (
+                status,
+                plan_name,
+                task_limit,
+                current_period_start,
+                current_period_end,
+                cancel_at_period_end,
+                created_date,
+                last_modified_date
+            ) VALUES (
+                         'ACTIVE',
+                         'TRIAL',
+                         5000,
+                         NOW(),
+                         NOW() + INTERVAL '14 days',
+                         false,
+                         NOW(),
+                         NOW()
+                     )
+        </sql>
+    </changeSet>
 </databaseChangeLog>
