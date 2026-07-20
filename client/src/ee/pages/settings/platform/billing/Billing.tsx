@@ -43,12 +43,14 @@ const Billing = () => {
         refetchInterval: isPolling ? POLL_INTERVAL_MS : false,
     });
 
+    const isTrialSubscription = subscription?.planName?.toUpperCase() === 'TRIAL';
+
     useEffect(() => {
         if (!isCheckoutSuccess) {
             return;
         }
 
-        if (subscription) {
+        if (subscription && !isTrialSubscription) {
             setSearchParams({}, {replace: true});
 
             return;
@@ -63,7 +65,7 @@ const Billing = () => {
         }, POLL_INTERVAL_MS);
 
         return () => clearTimeout(timer);
-    }, [isCheckoutSuccess, pollAttempts, searchParams, setSearchParams, subscription]);
+    }, [isCheckoutSuccess, isTrialSubscription, pollAttempts, searchParams, setSearchParams, subscription]);
 
     useEffect(() => {
         if (!isCancelPolling) {
@@ -140,31 +142,30 @@ const Billing = () => {
         : undefined;
 
     const trialDaysRemaining =
-        !subscription && !isCheckoutSuccess
-            ? 30
-            : subscription?.trialEnd
-              ? Math.max(0, Math.ceil((subscription.trialEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
-              : undefined;
+        isTrialSubscription && subscription?.currentPeriodEnd
+            ? Math.max(0, Math.ceil((subscription.currentPeriodEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
+            : undefined;
 
-    const planCardProps = subscription
-        ? {
-              cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
-              planName: subscription.planName ?? 'Active',
-              renewalDate,
-              scheduledPlanName: subscription.scheduledPlanName,
-              taskLimit: subscription.taskLimit ?? TRIAL_TASK_LIMIT,
-              tasksUsed: subscription.tasksUsed ?? 0,
-              trialDaysRemaining: undefined,
-          }
-        : {
-              cancelAtPeriodEnd: false,
-              planName: 'Trial',
-              renewalDate: undefined,
-              scheduledPlanName: undefined,
-              taskLimit: TRIAL_TASK_LIMIT,
-              tasksUsed: 0,
-              trialDaysRemaining,
-          };
+    const planCardProps =
+        subscription && !isTrialSubscription
+            ? {
+                  cancelAtPeriodEnd: subscription.cancelAtPeriodEnd ?? false,
+                  planName: subscription.planName ?? 'Active',
+                  renewalDate,
+                  scheduledPlanName: subscription.scheduledPlanName,
+                  taskLimit: subscription.taskLimit ?? TRIAL_TASK_LIMIT,
+                  tasksUsed: subscription.tasksUsed ?? 0,
+                  trialDaysRemaining: undefined,
+              }
+            : {
+                  cancelAtPeriodEnd: false,
+                  planName: 'Trial',
+                  renewalDate: undefined,
+                  scheduledPlanName: undefined,
+                  taskLimit: subscription?.taskLimit ?? TRIAL_TASK_LIMIT,
+                  tasksUsed: subscription?.tasksUsed ?? 0,
+                  trialDaysRemaining,
+              };
 
     return (
         <LayoutContainer
@@ -181,7 +182,7 @@ const Billing = () => {
                 </div>
             ) : (
                 <div className="w-full space-y-4 px-4 3xl:mx-auto 3xl:w-4/5">
-                    {isCheckoutSuccess && !subscription && (
+                    {isCheckoutSuccess && (!subscription || isTrialSubscription) && (
                         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
                             {pollAttempts >= MAX_POLL_ATTEMPTS
                                 ? "It's taking longer than expected. Please refresh the page."
@@ -224,7 +225,7 @@ const Billing = () => {
                             <PlanCard
                                 {...planCardProps}
                                 onCancelPlan={
-                                    subscription && !subscription.cancelAtPeriodEnd
+                                    subscription && !isTrialSubscription && !subscription.cancelAtPeriodEnd
                                         ? () => setCancelDialogOpen(true)
                                         : undefined
                                 }
@@ -272,7 +273,7 @@ const Billing = () => {
 
                     <SelectPlanDialog
                         currentPlanName={subscription?.planName ?? undefined}
-                        hasActiveSubscription={!!subscription}
+                        hasActiveSubscription={!!subscription && !isTrialSubscription}
                         onClose={() => setSelectPlanOpen(false)}
                         onUpgradeSuccess={(isUpgrade, newPlanName) => {
                             setPollAttempts(0);
