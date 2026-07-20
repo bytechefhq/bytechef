@@ -1,8 +1,6 @@
 import Button from '@/components/Button/Button';
 import LoadingIcon from '@/components/LoadingIcon';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
-import AiSkillFileAddDialog from '@/pages/automation/ai/skills/components/AiSkillFileAddDialog';
-import AiSkillFileDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillFileDeleteAlertDialog';
 import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
@@ -10,7 +8,7 @@ import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotP
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
-import {FileIcon, FileTextIcon, FolderIcon, PlusIcon, TrashIcon} from 'lucide-react';
+import {FileIcon, FileTextIcon, FolderIcon} from 'lucide-react';
 import {Suspense, lazy, useEffect, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
@@ -19,12 +17,11 @@ const MonacoEditorWrapper = lazy(() => import('@/shared/components/MonacoEditorW
 
 interface FileTreeNodeProps {
     node: FileTreeNodeI;
-    onRemove: (path: string) => void;
     onSelect: (path: string) => void;
     selectedPath: string | null;
 }
 
-const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProps) => {
+const FileTreeNode = ({node, onSelect, selectedPath}: FileTreeNodeProps) => {
     const isSelected = node.type === 'file' && node.path === selectedPath;
 
     if (node.type === 'directory') {
@@ -38,60 +35,33 @@ const FileTreeNode = ({node, onRemove, onSelect, selectedPath}: FileTreeNodeProp
 
                 <div className="ml-3">
                     {node.children.map((child) => (
-                        <FileTreeNode
-                            key={child.path}
-                            node={child}
-                            onRemove={onRemove}
-                            onSelect={onSelect}
-                            selectedPath={selectedPath}
-                        />
+                        <FileTreeNode key={child.path} node={child} onSelect={onSelect} selectedPath={selectedPath} />
                     ))}
                 </div>
             </div>
         );
     }
 
-    const isSkillMd = node.path.toLowerCase() === 'skill.md';
-
     return (
-        <div className="group flex items-center">
-            <Button
-                className={twMerge(
-                    'h-auto min-w-0 flex-1 justify-start gap-1.5 rounded px-2 py-1 text-left text-sm font-normal',
-                    isSelected &&
-                        'bg-blue-50 text-blue-700 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-50 active:text-blue-700'
-                )}
-                onClick={() => onSelect(node.path)}
-                size="xs"
-                type="button"
-                variant="ghost"
-            >
-                {node.name.toLowerCase().endsWith('.md') ? (
-                    <FileTextIcon className="size-4 shrink-0" />
-                ) : (
-                    <FileIcon className="size-4 shrink-0" />
-                )}
-
-                <span className="truncate">{node.name}</span>
-            </Button>
-
-            {!isSkillMd && (
-                <Button
-                    aria-label={`Remove ${node.name}`}
-                    className="h-auto shrink-0 rounded p-1 text-gray-400 opacity-0 group-hover:opacity-100 hover:text-red-600"
-                    onClick={(event) => {
-                        event.stopPropagation();
-
-                        onRemove(node.path);
-                    }}
-                    size="xs"
-                    type="button"
-                    variant="ghost"
-                >
-                    <TrashIcon className="size-3.5" />
-                </Button>
+        <Button
+            className={twMerge(
+                'h-auto w-full justify-start gap-1.5 rounded px-2 py-1 text-left text-sm font-normal',
+                isSelected &&
+                    'bg-blue-50 text-blue-700 hover:bg-blue-50 hover:text-blue-700 active:bg-blue-50 active:text-blue-700'
             )}
-        </div>
+            onClick={() => onSelect(node.path)}
+            size="xs"
+            type="button"
+            variant="ghost"
+        >
+            {node.name.toLowerCase().endsWith('.md') ? (
+                <FileTextIcon className="size-4" />
+            ) : (
+                <FileIcon className="size-4" />
+            )}
+
+            <span>{node.name}</span>
+        </Button>
     );
 };
 
@@ -139,7 +109,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
     });
 
     useEffect(() => {
-        if (editor) {
+        if (editor && body) {
             editor.commands.setContent(body);
         }
     }, [body, editor]);
@@ -160,9 +130,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
 };
 
 const AiSkillDetail = () => {
-    const [showAddFileDialog, setShowAddFileDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-    const [fileToRemove, setFileToRemove] = useState<string | null>(null);
     const [isContentDirty, setIsContentDirty] = useState(false);
 
     const latestContentRef = useRef('');
@@ -181,13 +149,10 @@ const AiSkillDetail = () => {
     const {
         editorLanguage,
         fileContent,
-        filePaths,
         fileTree,
-        handleAddFile,
         handleDelete,
         handleDownload,
         handleFileSelect,
-        handleRemoveFile,
         handleSaveContent,
         isFileContentLoading,
         isMarkdown,
@@ -252,26 +217,10 @@ const AiSkillDetail = () => {
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="flex min-h-0 flex-1 overflow-hidden">
                 <div className="w-60 shrink-0 border-r border-r-border/50 py-2 pr-2">
-                    <div className="mb-1 flex items-center justify-between px-2">
-                        <span className="text-xs font-medium text-gray-400 uppercase">Files</span>
-
-                        <Button
-                            aria-label="Add file"
-                            className="h-auto rounded p-1 text-gray-400 hover:text-gray-700"
-                            onClick={() => setShowAddFileDialog(true)}
-                            size="xs"
-                            type="button"
-                            variant="ghost"
-                        >
-                            <PlusIcon className="size-3.5" />
-                        </Button>
-                    </div>
-
                     {fileTree.map((node) => (
                         <FileTreeNode
                             key={node.path}
                             node={node}
-                            onRemove={setFileToRemove}
                             onSelect={handleFileSelect}
                             selectedPath={selectedFilePath}
                         />
@@ -339,32 +288,6 @@ const AiSkillDetail = () => {
 
                         await handleDelete();
                     }}
-                />
-            )}
-
-            {fileToRemove && (
-                <AiSkillFileDeleteAlertDialog
-                    fileName={fileToRemove}
-                    onClose={() => setFileToRemove(null)}
-                    onDelete={async () => {
-                        const path = fileToRemove;
-
-                        setFileToRemove(null);
-
-                        await handleRemoveFile(path);
-                    }}
-                />
-            )}
-
-            {showAddFileDialog && (
-                <AiSkillFileAddDialog
-                    existingPaths={filePaths}
-                    onAdd={async (path) => {
-                        setShowAddFileDialog(false);
-
-                        await handleAddFile(path);
-                    }}
-                    onClose={() => setShowAddFileDialog(false)}
                 />
             )}
         </div>

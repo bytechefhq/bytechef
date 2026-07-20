@@ -292,22 +292,6 @@ export type UpdateAiSkillContentMutationVariables = Exact<{
 
 export type UpdateAiSkillContentMutation = { updateAiSkillContent: { description: string | null, id: string, lastModifiedDate: any, name: string } };
 
-export type RemoveFileInSkillMutationVariables = Exact<{
-  id: string | number;
-  path: string;
-}>;
-
-
-export type RemoveFileInSkillMutation = { removeFileInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
-
-export type CreateAdditionalFilesInSkillMutationVariables = Exact<{
-  id: string | number;
-  additionalFiles: any;
-}>;
-
-
-export type CreateAdditionalFilesInSkillMutation = { createAdditionalFilesInSkill: { description: string | null, id: string, lastModifiedDate: any, name: string } };
-
 export type ApprovalTaskQueryVariables = Exact<{
   id: string | number;
 }>;
@@ -2823,59 +2807,11 @@ export const useUpdateAiSkillContentMutation = <
       TError = unknown,
       TContext = unknown
     >(options?: UseMutationOptions<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>) => {
-
+    
     return useMutation<UpdateAiSkillContentMutation, TError, UpdateAiSkillContentMutationVariables, TContext>(
       {
     mutationKey: ['updateAiSkillContent'],
     mutationFn: (variables?: UpdateAiSkillContentMutationVariables) => fetcher<UpdateAiSkillContentMutation, UpdateAiSkillContentMutationVariables>(UpdateAiSkillContentDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const RemoveFileInSkillDocument = new TypedDocumentString(`
-    mutation removeFileInSkill($id: ID!, $path: String!) {
-  removeFileInSkill(id: $id, path: $path) {
-    description
-    id
-    lastModifiedDate
-    name
-  }
-}
-    `);
-
-export const useRemoveFileInSkillMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>) => {
-
-    return useMutation<RemoveFileInSkillMutation, TError, RemoveFileInSkillMutationVariables, TContext>(
-      {
-    mutationKey: ['removeFileInSkill'],
-    mutationFn: (variables?: RemoveFileInSkillMutationVariables) => fetcher<RemoveFileInSkillMutation, RemoveFileInSkillMutationVariables>(RemoveFileInSkillDocument, variables)(),
-    ...options
-  }
-    )};
-
-export const CreateAdditionalFilesInSkillDocument = new TypedDocumentString(`
-    mutation createAdditionalFilesInSkill($id: ID!, $additionalFiles: Map!) {
-  createAdditionalFilesInSkill(id: $id, additionalFiles: $additionalFiles) {
-    description
-    id
-    lastModifiedDate
-    name
-  }
-}
-    `);
-
-export const useCreateAdditionalFilesInSkillMutation = <
-      TError = unknown,
-      TContext = unknown
-    >(options?: UseMutationOptions<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>) => {
-
-    return useMutation<CreateAdditionalFilesInSkillMutation, TError, CreateAdditionalFilesInSkillMutationVariables, TContext>(
-      {
-    mutationKey: ['createAdditionalFilesInSkill'],
-    mutationFn: (variables?: CreateAdditionalFilesInSkillMutationVariables) => fetcher<CreateAdditionalFilesInSkillMutation, CreateAdditionalFilesInSkillMutationVariables>(CreateAdditionalFilesInSkillDocument, variables)(),
     ...options
   }
     )};
