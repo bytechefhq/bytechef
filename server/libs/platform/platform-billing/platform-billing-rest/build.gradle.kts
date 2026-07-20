@@ -69,7 +69,13 @@ dependencies {
     implementation(project(":server:libs:atlas:atlas-coordinator:atlas-coordinator-api"))
     implementation(project(":server:libs:core:commons:commons-util"))
     implementation(project(":server:libs:core:rest:rest-api"))
+    implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-billing:platform-billing-api"))
     implementation(project(":server:libs:platform:platform-security-web:platform-security-web-api"))
+
+    testImplementation("jakarta.servlet:jakarta.servlet-api")
+    testImplementation("org.assertj:assertj-core")
+    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation("org.mockito:mockito-core")
 }
