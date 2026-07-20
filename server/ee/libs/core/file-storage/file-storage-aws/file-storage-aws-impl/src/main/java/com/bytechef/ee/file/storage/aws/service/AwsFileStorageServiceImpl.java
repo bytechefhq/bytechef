@@ -103,14 +103,14 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     public URL getFileEntryURL(String directory, FileEntry fileEntry) {
         S3Resource s3Resource = resolveResource(fileEntry);
 
         try {
             return s3Resource.getURL();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Unable to get URL for file %s in directory %s".formatted(fileEntry.getName(), directory), e);
         }
     }
 
@@ -120,19 +120,19 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
     }
 
     @Override
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     public OutputStream getOutputStream(String directory, FileEntry fileEntry) throws FileStorageException {
         S3Resource s3Resource = resolveResource(fileEntry);
 
         try {
             return s3Resource.getOutputStream();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Unable to get output stream for file %s in directory %s".formatted(fileEntry.getName(), directory),
+                e);
         }
     }
 
     @Override
-    @SuppressWarnings("PMD.UnusedFormalParameter")
     public byte[] readFileToBytes(String directory, FileEntry fileEntry) throws FileStorageException {
         S3Resource s3Resource = resolveResource(fileEntry);
 
@@ -141,7 +141,8 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         try (InputStream inputStream = s3Resource.getInputStream()) {
             bytes = inputStream.readAllBytes();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Unable to read file %s in directory %s".formatted(fileEntry.getName(), directory), e);
         }
 
         return MIME_DECODER.decode(bytes);
@@ -190,7 +191,8 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         try {
             return storeFileContent(directory, filename, inputStream.readAllBytes());
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Unable to store file %s in directory %s".formatted(filename, directory), e);
         }
     }
 
@@ -202,7 +204,8 @@ public class AwsFileStorageServiceImpl implements AwsFileStorageService {
         try {
             return storeFileContent(directory, filename, inputStream.readAllBytes(), generateFilename);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException(
+                "Unable to store file %s in directory %s".formatted(filename, directory), e);
         }
     }
 
