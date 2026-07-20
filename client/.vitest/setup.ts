@@ -2,15 +2,27 @@ import '@testing-library/jest-dom';
 import {vi} from 'vitest';
 
 // Mock window.location to prevent JSDOM navigation errors
+const mockLocation = {
+    href: 'http://localhost:3000',
+    pathname: '/',
+    assign: vi.fn(),
+    replace: vi.fn(),
+    reload: vi.fn(),
+};
+
 Object.defineProperty(window, 'location', {
-    value: {
-        href: 'http://localhost:3000',
-        assign: vi.fn(),
-        replace: vi.fn(),
-        reload: vi.fn(),
-    },
+    value: mockLocation,
     writable: true,
 });
+
+// Mock window.history.pushState to update location.pathname
+const originalPushState = window.history.pushState.bind(window.history);
+window.history.pushState = function (_state, _title, url) {
+    originalPushState(_state, _title, url);
+    if (url) {
+        mockLocation.pathname = url.toString();
+    }
+};
 
 // Mock window.open to prevent navigation errors
 Object.defineProperty(window, 'open', {
