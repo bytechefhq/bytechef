@@ -1,0 +1,8 @@
+mutation removeFileInSkill($id: ID!, $path: String!) {
+    removeFileInSkill(id: $id, path: $path) {
+        description
+        id
+        lastModifiedDate
+        name
+    }
+}

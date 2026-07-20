@@ -6,6 +6,7 @@ import {
     useAiSkillFilePathsQuery,
     useAiSkillQuery,
     useDeleteAiSkillMutation,
+    useRemoveFileInSkillMutation,
     useUpdateAiSkillContentMutation,
     useUpdateAiSkillMutation,
 } from '@/shared/middleware/graphql';
@@ -96,6 +97,7 @@ export default function useAiSkillDetail() {
     const {mutateAsync: deleteAiSkill} = useDeleteAiSkillMutation({
         onSuccess: () => queryClient.invalidateQueries({queryKey: ['aiSkills']}),
     });
+    const {mutateAsync: removeFileInSkill} = useRemoveFileInSkillMutation();
 
     const {data: skillData, isError: isSkillError} = useAiSkillQuery(
         {id: selectedSkillId ?? ''},
@@ -208,6 +210,33 @@ export default function useAiSkillDetail() {
         }
     }, [closeSkillDetail, deleteAiSkill, navigate, queryClient, selectedSkillId]);
 
+    const handleRemoveFile = useCallback(
+        async (path: string) => {
+            if (!selectedSkillId) {
+                return;
+            }
+
+            try {
+                await removeFileInSkill({id: selectedSkillId, path});
+
+                queryClient.removeQueries({queryKey: ['aiSkillFileContent', {id: selectedSkillId, path}]});
+
+                await queryClient.invalidateQueries({queryKey: ['aiSkillFilePaths', {id: selectedSkillId}]});
+
+                if (selectedFilePath === path) {
+                    setSelectedFilePath(null);
+                }
+
+                toast.success('File removed');
+            } catch (error) {
+                toast.error('Failed to remove file', {
+                    description: error instanceof Error ? error.message : 'An unexpected error occurred',
+                });
+            }
+        },
+        [queryClient, removeFileInSkill, selectedFilePath, selectedSkillId]
+    );
+
     const handleSaveContent = useCallback(
         async (content: string) => {
             if (!selectedSkillId) {
@@ -285,6 +314,7 @@ export default function useAiSkillDetail() {
         handleDelete,
         handleDownload,
         handleFileSelect,
+        handleRemoveFile,
         handleSaveContent,
         isFileContentLoading,
         isMarkdown,
