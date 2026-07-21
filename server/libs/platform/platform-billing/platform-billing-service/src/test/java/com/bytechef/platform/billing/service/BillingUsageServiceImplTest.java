@@ -76,6 +76,21 @@ class BillingUsageServiceImplTest {
     }
 
     @Test
+    void reportUsageSkipsForTrialSubscription() {
+        BillingSubscription subscription = buildSubscription("cus_trial", "sub_trial", null);
+
+        subscription.setPlanName("TRIAL");
+
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(subscription));
+
+        billingUsageService.reportUsage(Instant.now());
+
+        verify(billingSubscriptionRepository, never()).countCompletedTaskExecutions(any(), any());
+        verify(stripeClient, never()).reportMeterEvent(anyString(), anyInt(), anyString());
+        verify(billingSubscriptionService, never()).save(any());
+    }
+
+    @Test
     void reportUsageSkipsStripeWhenCountIsZero() {
         BillingSubscription subscription = buildSubscription("cus_test", "sub_test", null);
 

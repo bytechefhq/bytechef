@@ -71,6 +71,10 @@ public class BillingUsageServiceImpl implements BillingUsageService {
 
         BillingSubscription subscription = subscriptionOptional.get();
 
+        if ("TRIAL".equals(subscription.getPlanName())) {
+            return;
+        }
+
         Instant lowerBound = subscription.getLastReportedAt() != null
             ? subscription.getLastReportedAt()
             : subscription.getCurrentPeriodStart();
