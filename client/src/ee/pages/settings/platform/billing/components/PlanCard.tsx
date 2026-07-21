@@ -13,6 +13,7 @@ interface PlanCardPropsI {
     taskLimit: number;
     tasksUsed: number;
     trialDaysRemaining?: number;
+    trialExpired?: boolean;
 }
 
 const PlanCard = ({
@@ -26,6 +27,7 @@ const PlanCard = ({
     taskLimit,
     tasksUsed,
     trialDaysRemaining,
+    trialExpired,
 }: PlanCardPropsI) => {
     const isTrial = trialDaysRemaining !== undefined;
     const tasksAvailable = taskLimit - tasksUsed;
@@ -83,6 +85,8 @@ const PlanCard = ({
                                         <span className="font-semibold text-foreground">{renewalDate}</span>
                                     </>
                                 )
+                            ) : trialExpired ? (
+                                'Your trial has expired.'
                             ) : (
                                 <>
                                     {'Expires in '}
