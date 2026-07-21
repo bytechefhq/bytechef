@@ -19,7 +19,6 @@ package com.bytechef.platform.billing.service;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.repository.BillingSubscriptionRepository;
 import java.util.Optional;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +29,14 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
 
+    private final BillingSubscriptionCacheService billingSubscriptionCacheService;
     private final BillingSubscriptionRepository billingSubscriptionRepository;
 
-    BillingSubscriptionServiceImpl(BillingSubscriptionRepository billingSubscriptionRepository) {
+    BillingSubscriptionServiceImpl(
+        BillingSubscriptionCacheService billingSubscriptionCacheService,
+        BillingSubscriptionRepository billingSubscriptionRepository) {
+
+        this.billingSubscriptionCacheService = billingSubscriptionCacheService;
         this.billingSubscriptionRepository = billingSubscriptionRepository;
     }
 
@@ -56,8 +60,11 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
     }
 
     @Override
-    @CacheEvict(cacheNames = TrialServiceImpl.TRIAL_STATUS_CACHE, allEntries = true)
     public BillingSubscription save(BillingSubscription subscription) {
-        return billingSubscriptionRepository.save(subscription);
+        BillingSubscription savedSubscription = billingSubscriptionRepository.save(subscription);
+
+        billingSubscriptionCacheService.evictTrialStatusCacheAfterCommit();
+
+        return savedSubscription;
     }
 }

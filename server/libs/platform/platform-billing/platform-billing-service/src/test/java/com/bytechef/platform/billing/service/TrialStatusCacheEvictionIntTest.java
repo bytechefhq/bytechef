@@ -42,7 +42,7 @@ import org.springframework.context.annotation.Configuration;
  * Proves that mutating a subscription via {@link BillingSubscriptionServiceImpl#save(BillingSubscription)} evicts the
  * {@code trialStatus} cache so the next {@link TrialServiceImpl#validateTrial()} call recomputes instead of serving a
  * stale cached result. Uses a real Spring AOP cache proxy (via {@link AnnotationConfigApplicationContext}) rather than
- * Mockito, since {@code @Cacheable}/{@code @CacheEvict} behavior only exists through the proxy.
+ * Mockito, since {@code @Cacheable} behavior only exists through the proxy.
  *
  * @author Matija Petanjek
  */
@@ -58,13 +58,21 @@ class TrialStatusCacheEvictionIntTest {
         }
 
         @Bean
+        BillingSubscriptionCacheService billingSubscriptionCacheService(CacheManager cacheManager) {
+            return new BillingSubscriptionCacheService(cacheManager);
+        }
+
+        @Bean
         BillingSubscriptionRepository billingSubscriptionRepository() {
             return mock(BillingSubscriptionRepository.class);
         }
 
         @Bean
-        BillingSubscriptionService billingSubscriptionService(BillingSubscriptionRepository repository) {
-            return new BillingSubscriptionServiceImpl(repository);
+        BillingSubscriptionService billingSubscriptionService(
+            BillingSubscriptionCacheService billingSubscriptionCacheService,
+            BillingSubscriptionRepository repository) {
+
+            return new BillingSubscriptionServiceImpl(billingSubscriptionCacheService, repository);
         }
 
         @Bean
