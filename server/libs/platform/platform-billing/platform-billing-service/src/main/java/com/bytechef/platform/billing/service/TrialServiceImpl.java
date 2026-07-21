@@ -24,7 +24,6 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
@@ -52,11 +51,6 @@ public class TrialServiceImpl implements TrialService {
     }
 
     @Override
-    @CacheEvict(cacheNames = TRIAL_STATUS_CACHE)
-    public void evictTrialStatusCache() {
-    }
-
-    @Override
     @Cacheable(cacheNames = TRIAL_STATUS_CACHE)
     public TrialDTO validateTrial() {
         Optional<BillingSubscription> subscriptionOptional = billingSubscriptionService.fetchCurrentSubscription();
@@ -68,7 +62,7 @@ public class TrialServiceImpl implements TrialService {
         BillingSubscription subscription = subscriptionOptional.get();
 
         if (!"TRIAL".equals(subscription.getPlanName())) {
-            return new TrialDTO(true, 0, 0, 0);
+            return new TrialDTO(false, 0, 0, 0);
         }
 
         Instant now = Instant.now();
@@ -95,8 +89,6 @@ public class TrialServiceImpl implements TrialService {
 
         applicationEventPublisher.publishEvent(
             new TrialExpiredEvent(this, TenantContext.getCurrentTenantId()));
-
-        this.evictTrialStatusCache(); // TODO will this trigger proxy annotation?
     }
 
 }
