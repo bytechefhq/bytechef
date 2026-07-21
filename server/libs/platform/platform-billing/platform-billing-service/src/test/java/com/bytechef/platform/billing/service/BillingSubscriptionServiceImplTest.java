@@ -99,18 +99,4 @@ class BillingSubscriptionServiceImplTest {
             .getStatus()).isEqualTo(BillingSubscription.Status.ACTIVE);
     }
 
-    @Test
-    void testFetchExistingStripeCustomerIdReturnsIdFromLatestSubscription() {
-        BillingSubscription subscription = new BillingSubscription();
-
-        subscription.setStripeCustomerId("cus_existing_123");
-        subscription.setStatus(BillingSubscription.Status.ACTIVE);
-
-        when(billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc())
-            .thenReturn(Optional.of(subscription));
-
-        Optional<String> result = billingSubscriptionService.fetchExistingStripeCustomerId();
-
-        assertThat(result).contains("cus_existing_123");
-    }
 }

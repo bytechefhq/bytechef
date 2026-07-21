@@ -91,15 +91,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         String usagePriceId = stripeClient.fetchProductDefaultPriceId(billingProperties.stripe()
             .productUsageId());
 
-        String customerId = billingSubscriptionService.fetchExistingStripeCustomerId()
-            .orElseGet(() -> {
-                String tenantId = TenantContext.getCurrentTenantId();
-                String userEmail = SecurityContextHolder.getContext()
-                    .getAuthentication()
-                    .getName();
-
-                return stripeClient.createCustomer(userEmail, tenantId);
-            });
+        String customerId = getStripeCustomerId();
 
         Session session = stripeClient.createCheckoutSession(
             customerId, flatPriceId, usagePriceId, planName, billingProperties.stripe()
@@ -109,6 +101,16 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
             TenantContext.getCurrentTenantId());
 
         return session.getUrl();
+    }
+
+    private String getStripeCustomerId() {
+        String tenantId = TenantContext.getCurrentTenantId();
+        String userEmail = SecurityContextHolder.getContext()
+            .getAuthentication()
+            .getName();
+
+        return stripeClient.fetchCustomerId(userEmail, tenantId)
+            .orElseGet(() -> stripeClient.createCustomer(userEmail, tenantId));
     }
 
     @Override
@@ -302,6 +304,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
                         Instant newPeriodStart = Instant.ofEpochSecond(flatItem.getCurrentPeriodStart());
 
                         if (!newPeriodStart.equals(subscription.getCurrentPeriodStart())) {
+                            subscription.setTaskLimit(getTaskLimit(flatItem));
                             subscription.setCurrentPeriodStart(newPeriodStart);
                             subscription.setCurrentPeriodEnd(
                                 Instant.ofEpochSecond(flatItem.getCurrentPeriodEnd()));
