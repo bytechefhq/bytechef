@@ -17,6 +17,7 @@
 package com.bytechef.platform.billing.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.platform.billing.domain.BillingSubscription;
@@ -35,13 +36,17 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class BillingSubscriptionServiceImplTest {
 
     @Mock
+    private BillingSubscriptionCacheService billingSubscriptionCacheService;
+
+    @Mock
     private BillingSubscriptionRepository billingSubscriptionRepository;
 
     private BillingSubscriptionServiceImpl billingSubscriptionService;
 
     @BeforeEach
     void setUp() {
-        billingSubscriptionService = new BillingSubscriptionServiceImpl(billingSubscriptionRepository);
+        billingSubscriptionService = new BillingSubscriptionServiceImpl(
+            billingSubscriptionCacheService, billingSubscriptionRepository);
     }
 
     @Test
@@ -99,4 +104,16 @@ class BillingSubscriptionServiceImplTest {
             .getStatus()).isEqualTo(BillingSubscription.Status.ACTIVE);
     }
 
+    @Test
+    void testSaveEvictsTrialStatusCacheAfterCommit() {
+        BillingSubscription subscription = new BillingSubscription();
+
+        when(billingSubscriptionRepository.save(subscription)).thenReturn(subscription);
+
+        BillingSubscription result = billingSubscriptionService.save(subscription);
+
+        assertThat(result).isEqualTo(subscription);
+
+        verify(billingSubscriptionCacheService).evictTrialStatusCacheAfterCommit();
+    }
 }
