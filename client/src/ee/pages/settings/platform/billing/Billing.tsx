@@ -146,6 +146,8 @@ const Billing = () => {
             ? Math.max(0, Math.ceil((subscription.currentPeriodEnd.getTime() - Date.now()) / (1000 * 60 * 60 * 24)))
             : undefined;
 
+    const isTrialExpired = isTrialSubscription && subscription?.status === 'CANCELED';
+
     const planCardProps =
         subscription && !isTrialSubscription
             ? {
@@ -156,6 +158,7 @@ const Billing = () => {
                   taskLimit: subscription.taskLimit ?? TRIAL_TASK_LIMIT,
                   tasksUsed: subscription.tasksUsed ?? 0,
                   trialDaysRemaining: undefined,
+                  trialExpired: undefined,
               }
             : {
                   cancelAtPeriodEnd: false,
@@ -165,6 +168,7 @@ const Billing = () => {
                   taskLimit: subscription?.taskLimit ?? TRIAL_TASK_LIMIT,
                   tasksUsed: subscription?.tasksUsed ?? 0,
                   trialDaysRemaining,
+                  trialExpired: isTrialExpired,
               };
 
     return (
