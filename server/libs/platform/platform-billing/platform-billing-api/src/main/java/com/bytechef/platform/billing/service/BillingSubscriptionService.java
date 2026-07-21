@@ -26,8 +26,6 @@ public interface BillingSubscriptionService {
 
     Optional<BillingSubscription> fetchCurrentSubscription();
 
-    Optional<String> fetchExistingStripeCustomerId();
-
     Optional<BillingSubscription> fetchSubscriptionByStripeSubscriptionId(String stripeSubscriptionId);
 
     BillingSubscription save(BillingSubscription subscription);

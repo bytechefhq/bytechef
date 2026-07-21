@@ -21,6 +21,7 @@ import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
+import com.stripe.model.CustomerCollection;
 import com.stripe.model.Event;
 import com.stripe.model.Price;
 import com.stripe.model.PriceCollection;
@@ -31,6 +32,7 @@ import com.stripe.model.checkout.Session;
 import com.stripe.net.RequestOptions;
 import com.stripe.net.Webhook;
 import com.stripe.param.CustomerCreateParams;
+import com.stripe.param.CustomerListParams;
 import com.stripe.param.PriceListParams;
 import com.stripe.param.PriceRetrieveParams;
 import com.stripe.param.SubscriptionScheduleCreateParams;
@@ -42,7 +44,10 @@ import com.stripe.param.checkout.SessionCreateParams;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
@@ -51,6 +56,8 @@ import org.springframework.util.Assert;
  */
 @Service
 public class StripeClientImpl implements StripeClient {
+
+    private static final Logger log = LoggerFactory.getLogger(StripeClientImpl.class);
 
     private final BillingProperties billingProperties;
 
@@ -202,6 +209,29 @@ public class StripeClientImpl implements StripeClient {
             releaseScheduleIfPresent(subscription);
         } catch (StripeException stripeException) {
             throw new RuntimeException(stripeException);
+        }
+    }
+
+    @Override
+    public Optional<String> fetchCustomerId(String email, String tenantId) {
+        try {
+            CustomerListParams params = CustomerListParams.builder()
+                .setEmail(email)
+                .setLimit(100L)
+                .build();
+
+            CustomerCollection customers = Customer.list(params);
+
+            return customers.getData()
+                .stream()
+                .filter(customer -> tenantId.equals(customer.getMetadata()
+                    .get("tenantId")))
+                .findFirst()
+                .map(Customer::getId);
+        } catch (StripeException stripeException) {
+            log.error("Failed to fetch customer id for email {} and tenant id {}", email, tenantId, stripeException);
+
+            return Optional.empty();
         }
     }
 

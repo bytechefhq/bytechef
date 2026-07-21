@@ -51,13 +51,6 @@ class BillingSubscriptionServiceImpl implements BillingSubscriptionService {
 
     @Override
     @Transactional(readOnly = true)
-    public Optional<String> fetchExistingStripeCustomerId() {
-        return billingSubscriptionRepository.findFirstByOrderByCreatedDateDesc()
-            .map(BillingSubscription::getStripeCustomerId);
-    }
-
-    @Override
-    @Transactional(readOnly = true)
     public Optional<BillingSubscription> fetchSubscriptionByStripeSubscriptionId(String stripeSubscriptionId) {
         return billingSubscriptionRepository.findByStripeSubscriptionId(stripeSubscriptionId);
     }
