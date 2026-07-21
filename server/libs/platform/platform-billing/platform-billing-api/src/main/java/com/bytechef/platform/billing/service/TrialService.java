@@ -23,8 +23,6 @@ import com.bytechef.platform.billing.dto.TrialDTO;
  */
 public interface TrialService {
 
-    void evictTrialStatusCache();
-
     TrialDTO validateTrial();
 
 }
