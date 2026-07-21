@@ -20,6 +20,7 @@ import com.stripe.model.Event;
 import com.stripe.model.Price;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
+import java.util.Optional;
 
 /**
  * @author Matija Petanjek
@@ -40,6 +41,8 @@ public interface StripeClient {
         String newMeteredPriceId, String planName, String tenantId, long currentPeriodEnd);
 
     void releaseSubscriptionScheduleIfPresent(Subscription subscription);
+
+    Optional<String> fetchCustomerId(String email, String tenantId);
 
     String createCustomer(String email, String tenantId);
 
