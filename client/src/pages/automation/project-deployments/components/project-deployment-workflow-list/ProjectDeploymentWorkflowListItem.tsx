@@ -119,44 +119,88 @@ const ProjectDeploymentWorkflowListItem = ({
     };
 
     return (
-        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-gray-50">
-            <div className="flex flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
-                <span className={twMerge('w-80 text-sm font-semibold', !enabled && 'text-muted-foreground')}>
-                    {workflow.label}
-                </span>
-
-                <div className="ml-6 flex space-x-1">
-                    <WorkflowComponentsList
-                        filteredComponentNames={filteredComponentNames || []}
-                        workflowComponentDefinitions={workflowComponentDefinitions}
-                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                    />
-                </div>
-            </div>
-
-            <div className="flex items-center gap-x-4">
-                {projectDeploymentWorkflow?.lastExecutionDate ? (
+        <li className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover">
+            <div className="flex min-w-0 flex-1 cursor-pointer items-center" onClick={handleWorkflowClick}>
+                <div className="flex w-full max-w-80 min-w-0 shrink flex-col gap-1">
                     <Tooltip>
-                        <TooltipTrigger
-                            className={twMerge(
-                                'flex items-center text-sm text-content-neutral-secondary',
-                                lastExecutionStatus === 'FAILED' && 'text-content-destructive-primary'
-                            )}
-                        >
-                            <span className="pr-1 text-xs capitalize">
-                                {lastExecutionStatus?.toLocaleLowerCase() || ''}
-                            </span>
-
-                            <span className="text-xs">
-                                {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                        <TooltipTrigger className="line-clamp-1 w-full truncate text-start">
+                            <span
+                                className={twMerge(
+                                    'block truncate text-sm font-semibold',
+                                    !enabled && 'text-content-neutral-secondary'
+                                )}
+                            >
+                                {workflow.label}
                             </span>
                         </TooltipTrigger>
 
-                        <TooltipContent>Last Execution Date</TooltipContent>
+                        <TooltipContent className="max-w-md break-all">{workflow.label}</TooltipContent>
                     </Tooltip>
-                ) : (
-                    <span className="text-xs">No executions</span>
-                )}
+
+                    <div className="flex gap-x-6 xl:hidden">
+                        {projectDeploymentWorkflow?.lastExecutionDate ? (
+                            <Tooltip>
+                                <TooltipTrigger
+                                    className={twMerge(
+                                        'flex items-center text-xs text-content-neutral-secondary',
+                                        lastExecutionStatus === 'FAILED' && 'text-content-destructive-primary'
+                                    )}
+                                >
+                                    <span className="pr-1 text-xs capitalize">
+                                        {lastExecutionStatus?.toLocaleLowerCase() || ''}
+                                    </span>
+
+                                    <span className="text-xs">
+                                        {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                                    </span>
+                                </TooltipTrigger>
+
+                                <TooltipContent>Last Execution Date</TooltipContent>
+                            </Tooltip>
+                        ) : (
+                            <span className="flex items-center text-xs text-content-neutral-secondary">
+                                No executions
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="ml-6 flex items-center gap-1">
+                    <div className="hidden sm:flex">
+                        <WorkflowComponentsList
+                            filteredComponentNames={filteredComponentNames || []}
+                            workflowComponentDefinitions={workflowComponentDefinitions}
+                            workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                        />
+                    </div>
+                </div>
+            </div>
+
+            <div className="flex shrink-0 items-center gap-x-4">
+                <div className="hidden xl:block">
+                    {projectDeploymentWorkflow?.lastExecutionDate ? (
+                        <Tooltip>
+                            <TooltipTrigger
+                                className={twMerge(
+                                    'flex items-center text-sm text-content-neutral-secondary',
+                                    lastExecutionStatus === 'FAILED' && 'text-content-destructive-primary'
+                                )}
+                            >
+                                <span className="pr-1 text-xs capitalize">
+                                    {lastExecutionStatus?.toLocaleLowerCase() || ''}
+                                </span>
+
+                                <span className="text-xs">
+                                    {`at ${lastExecutionDate?.toLocaleDateString()} ${lastExecutionDate?.toLocaleTimeString()}`}
+                                </span>
+                            </TooltipTrigger>
+
+                            <TooltipContent>Last Execution Date</TooltipContent>
+                        </Tooltip>
+                    ) : (
+                        <span className="text-xs">No executions</span>
+                    )}
+                </div>
 
                 <div className="flex items-center gap-x-6">
                     <div className="min-w-[36px]">
