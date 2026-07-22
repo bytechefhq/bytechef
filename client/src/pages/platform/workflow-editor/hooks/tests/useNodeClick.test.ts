@@ -142,6 +142,79 @@ describe('useNodeClick', () => {
         expect(currentNode?.label).toBe('Fallback Label');
     });
 
+    // Characterizes the pre-merge divergence between currentNode and currentComponent
+    // (see docs/agents/merge-current-node-component.md, risk #3). currentNode is cleared to an
+    // empty description while currentComponent keeps the node's description. This asserts the
+    // projection contract; update it in Phase 3 when the two collapse into one entity.
+    it('should clear currentNode description but keep it on the currentComponent projection', async () => {
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: makeNodeData({description: 'My note'}),
+                    id: 'http_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+            workflow: {
+                nodeNames: [],
+                tasks: [{label: 'Updated Label', name: 'http_1', type: 'http/v1/get'}],
+            },
+        });
+
+        const {default: useNodeClick} = await import('../useNodeClick');
+
+        const nodeData = makeNodeData({description: 'My note'});
+
+        const {result} = renderHook(() => useNodeClick(nodeData, 'http_1'));
+
+        act(() => {
+            result.current();
+        });
+
+        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+        expect(currentNode?.description).toBe('');
+        expect(currentComponent?.description).toBe('My note');
+        expect(currentComponent?.workflowNodeName).toBe(nodeData.name);
+    });
+
+    // Characterizes the pre-merge conditional set (risk #4): currentComponent is only written when
+    // the clicked node has a `type`. A typeless node updates currentNode but leaves currentComponent
+    // untouched. Update in Phase 3 when the single entity always follows.
+    it('should not set currentComponent for a typeless node', async () => {
+        const previousComponent = makeNodeData({name: 'previous_1', workflowNodeName: 'previous_1'});
+
+        useWorkflowNodeDetailsPanelStore.setState({currentComponent: previousComponent});
+
+        useWorkflowDataStore.setState({
+            nodes: [
+                {
+                    data: makeNodeData({name: 'note_1', type: undefined, workflowNodeName: 'note_1'}),
+                    id: 'note_1',
+                    position: {x: 0, y: 0},
+                    type: 'workflow',
+                },
+            ],
+            workflow: {nodeNames: [], tasks: []},
+        });
+
+        const {default: useNodeClick} = await import('../useNodeClick');
+
+        const typelessNodeData = makeNodeData({name: 'note_1', type: undefined, workflowNodeName: 'note_1'});
+
+        const {result} = renderHook(() => useNodeClick(typelessNodeData, 'note_1'));
+
+        act(() => {
+            result.current();
+        });
+
+        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+
+        expect(currentNode?.workflowNodeName).toBe('note_1');
+        expect(currentComponent).toBe(previousComponent);
+    });
+
     it('should use the label from workflow triggers for trigger nodes', async () => {
         useWorkflowDataStore.setState({
             nodes: [
