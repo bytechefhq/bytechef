@@ -175,82 +175,98 @@ const ProjectWorkflowListItem = ({
 
     return (
         <li
-            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-destructive-foreground"
+            className="flex items-center justify-between rounded-md px-3 py-1 hover:bg-surface-neutral-primary-hover"
             key={workflow.id}
         >
             <Link
                 aria-label={`Link to workflow ${workflow.label}`}
-                className="flex flex-1 items-center gap-2"
+                className="flex min-w-0 flex-1 items-center gap-2"
                 data-testid={`${workflow.projectWorkflowId}-link`}
                 to={`/automation/projects/${project.id}/project-workflows/${workflow.projectWorkflowId}?${searchParams}`}
             >
-                <div className="w-80 shrink-0 pr-1 text-sm font-semibold">
+                <div className="flex w-80 min-w-0 shrink-0 flex-col gap-1 pr-1 text-sm font-semibold">
                     <Tooltip>
-                        <TooltipTrigger className="line-clamp-1 text-start">{workflow.label}</TooltipTrigger>
+                        <TooltipTrigger className="line-clamp-1 w-full truncate text-start">
+                            {workflow.label}
+                        </TooltipTrigger>
 
-                        <TooltipContent>{workflow.label}</TooltipContent>
+                        <TooltipContent className="max-w-md break-all">{workflow.label}</TooltipContent>
                     </Tooltip>
-                </div>
 
-                {triggerData && (
-                    <div className="flex shrink-0 items-center gap-1">
+                    <div className="flex gap-x-6">
                         <Tooltip>
-                            <TooltipTrigger asChild>
-                                <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
-                                    {triggerData.iconSrc ? (
-                                        <InlineSVG
-                                            className="size-5"
-                                            loader={<ComponentIcon className="size-5 flex-none" />}
-                                            src={triggerData.iconSrc}
-                                            title={null}
-                                        />
-                                    ) : (
-                                        <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
-                                    )}
-                                </div>
+                            <TooltipTrigger className="flex items-center text-sm font-normal text-content-neutral-secondary xl:hidden">
+                                <span className="text-xs">
+                                    {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
+                                </span>
                             </TooltipTrigger>
 
-                            <TooltipContent>{triggerData.componentName}</TooltipContent>
+                            <TooltipContent>Last Modified Date</TooltipContent>
                         </Tooltip>
+                    </div>
+                </div>
 
-                        {triggerData.description ? (
+                <div className="hidden items-center gap-1 sm:flex">
+                    {triggerData && (
+                        <div className="flex shrink-0 items-center gap-1">
                             <Tooltip>
                                 <TooltipTrigger asChild>
-                                    <div className="shrink-0">
-                                        <Badge
-                                            label={triggerData.label || triggerData.componentName}
-                                            styleType="outline-outline"
-                                            weight="semibold"
-                                        />
+                                    <div className="flex shrink-0 items-center justify-center rounded-full border border-stroke-neutral-primary bg-surface-neutral-primary p-1">
+                                        {triggerData.iconSrc ? (
+                                            <InlineSVG
+                                                className="size-5"
+                                                loader={<ComponentIcon className="size-5 flex-none" />}
+                                                src={triggerData.iconSrc}
+                                                title={null}
+                                            />
+                                        ) : (
+                                            <ComponentIcon className="size-3 flex-none text-content-neutral-primary" />
+                                        )}
                                     </div>
                                 </TooltipTrigger>
 
-                                <TooltipContent className="max-w-xs text-sm" side="right">
-                                    {triggerData.description}
-                                </TooltipContent>
+                                <TooltipContent>{triggerData.componentName}</TooltipContent>
                             </Tooltip>
-                        ) : (
-                            <div className="shrink-0">
-                                <Badge
-                                    label={triggerData.label || triggerData.componentName}
-                                    styleType="outline-outline"
-                                    weight="semibold"
-                                />
-                            </div>
-                        )}
-                    </div>
-                )}
 
-                <WorkflowComponentsList
-                    filteredComponentNames={taskOnlyComponentNames}
-                    workflowComponentDefinitions={workflowComponentDefinitions}
-                    workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
-                />
+                            {triggerData.description ? (
+                                <Tooltip>
+                                    <TooltipTrigger asChild>
+                                        <div className="shrink-0">
+                                            <Badge
+                                                label={triggerData.label || triggerData.componentName}
+                                                styleType="outline-outline"
+                                                weight="semibold"
+                                            />
+                                        </div>
+                                    </TooltipTrigger>
+
+                                    <TooltipContent className="max-w-xs text-sm" side="right">
+                                        {triggerData.description}
+                                    </TooltipContent>
+                                </Tooltip>
+                            ) : (
+                                <div className="shrink-0">
+                                    <Badge
+                                        label={triggerData.label || triggerData.componentName}
+                                        styleType="outline-outline"
+                                        weight="semibold"
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
+
+                    <WorkflowComponentsList
+                        filteredComponentNames={taskOnlyComponentNames}
+                        workflowComponentDefinitions={workflowComponentDefinitions}
+                        workflowTaskDispatcherDefinitions={workflowTaskDispatcherDefinitions}
+                    />
+                </div>
             </Link>
 
             <div className="flex justify-end gap-x-6">
                 <Tooltip>
-                    <TooltipTrigger className="flex items-center text-sm text-muted-foreground">
+                    <TooltipTrigger className="hidden items-center text-sm text-content-neutral-secondary xl:block">
                         <span className="text-xs">
                             {`Modified at ${workflow.lastModifiedDate?.toLocaleDateString()} ${workflow.lastModifiedDate?.toLocaleTimeString()}`}
                         </span>
