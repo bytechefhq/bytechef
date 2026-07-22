@@ -51,7 +51,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     const defaultValueSavedRef = useRef(false);
 
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
@@ -430,7 +430,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             return;
         }
 
-        const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+        const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentNode;
 
         if (!currentComponent) {
             return;

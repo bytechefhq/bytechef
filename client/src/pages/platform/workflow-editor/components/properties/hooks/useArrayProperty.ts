@@ -56,7 +56,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
     const [newPropertyType, setNewPropertyType] = useState<string>();
 
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();

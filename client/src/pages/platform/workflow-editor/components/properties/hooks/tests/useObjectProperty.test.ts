@@ -5,7 +5,7 @@ const hoisted = vi.hoisted(() => {
     const mockSaveProperty = vi.fn();
 
     const storeState = {
-        currentComponent: null as {
+        currentNode: null as {
             metadata?: {ui?: {dynamicPropertyTypes?: Record<string, string>}};
             parameters?: Record<string, unknown>;
         } | null,
@@ -52,7 +52,7 @@ describe('useObjectProperty — default value save guard', () => {
         vi.useFakeTimers();
         vi.clearAllMocks();
 
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             parameters: {response: {}},
         };
     });
@@ -114,7 +114,7 @@ describe('useObjectProperty — default value save guard', () => {
         expect(hoisted.mockSaveProperty).toHaveBeenCalledTimes(1);
 
         act(() => {
-            hoisted.storeState.currentComponent = {
+            hoisted.storeState.currentNode = {
                 parameters: {response: {outputSchema: {testField: {}}}},
             };
         });
@@ -129,7 +129,7 @@ describe('useObjectProperty — default value save guard', () => {
     });
 
     it('should not save when object already exists in parameters', async () => {
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             parameters: {response: {outputSchema: {testField: {}}}},
         };
 
@@ -155,7 +155,7 @@ describe('useObjectProperty — default value save guard', () => {
     });
 
     it('should not add a duplicate subproperty when the typed name matches an existing one', async () => {
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             parameters: {response: {outputSchema: {testField: {}}}},
         };
 

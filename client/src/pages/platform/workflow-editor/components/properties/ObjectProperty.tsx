@@ -18,7 +18,7 @@ interface ObjectPropertyProps {
 }
 
 const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const {
         availablePropertyTypes,
