@@ -14,16 +14,13 @@ interface WorkflowNodeDetailsPanelStoreI {
     connectionDialogAllowed: boolean;
     setConnectionDialogAllowed: (connectionDialogAllowed: boolean) => void;
 
-    currentComponent: NodeDataType | undefined;
-    setCurrentComponent: (
-        currentComponent:
+    currentNode: NodeDataType | undefined;
+    setCurrentNode: (
+        currentNode:
             | NodeDataType
             | undefined
-            | ((previousCurrentComponent: NodeDataType | undefined) => NodeDataType | undefined)
+            | ((previousCurrentNode: NodeDataType | undefined) => NodeDataType | undefined)
     ) => void;
-
-    currentNode: NodeDataType | undefined;
-    setCurrentNode: (currentNode: NodeDataType | undefined) => void;
 
     focusedInput: Editor | null;
     setFocusedInput: (focusedInput: Editor | null) => void;
@@ -54,18 +51,13 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             setConnectionDialogAllowed: (connectionDialogAllowed) =>
                 set((state) => ({...state, connectionDialogAllowed})),
 
-            currentComponent: undefined,
-            setCurrentComponent: (currentComponent) =>
+            currentNode: undefined,
+            setCurrentNode: (currentNode) =>
                 set((state) => ({
                     ...state,
-                    currentComponent:
-                        typeof currentComponent === 'function'
-                            ? currentComponent(state.currentComponent)
-                            : currentComponent,
+                    currentNode:
+                        typeof currentNode === 'function' ? currentNode(state.currentNode) : currentNode,
                 })),
-
-            currentNode: undefined,
-            setCurrentNode: (currentNode) => set((state) => ({...state, currentNode})),
 
             focusedInput: null,
             setFocusedInput: (focusedInput) => set((state) => ({...state, focusedInput})),
@@ -80,8 +72,6 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             reset: () =>
                 set(() => ({
                     aiAgentNodeDetailsPanelOpen: false,
-                    currentComponent: undefined,
-                    currentComponentDefinition: undefined,
                     currentNode: undefined,
                     focusedInput: null,
                     operationChangeInProgress: false,

@@ -59,33 +59,6 @@ export type ComponentPropertiesType =
       }
     | undefined;
 
-export type ComponentType = {
-    componentName: string;
-    connections?: Array<ComponentConnection>;
-    connectionId?: number;
-    description?: string;
-    displayConditions?: {
-        [key: string]: boolean;
-    };
-    label?: string;
-    maxRetries?: number;
-    metadata?: {
-        ui?: {
-            condition?: string;
-            dynamicPropertyTypes?: {[key: string]: string};
-            fromAi?: Array<string>;
-        };
-    };
-    name?: string;
-    operationName?: string;
-    parameters?: {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        [key: string]: any;
-    };
-    type?: string;
-    workflowNodeName: string;
-};
-
 export type DefinitionType = (ComponentDefinitionBasic | TaskDispatcherDefinition) & {
     taskDispatcher: boolean;
     trigger: boolean;

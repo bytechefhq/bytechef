@@ -34,7 +34,6 @@ function createMockMutation(
 describe('deleteProperty', () => {
     beforeEach(() => {
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: undefined,
             currentNode: undefined,
         });
 
@@ -47,7 +46,6 @@ describe('deleteProperty', () => {
         const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: {componentName: 'test', workflowNodeName: 'test_1'} as never,
             currentNode: {componentName: 'test', workflowNodeName: 'test_1'} as never,
         });
 
@@ -70,7 +68,6 @@ describe('deleteProperty', () => {
         const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: {componentName: 'test', workflowNodeName: 'test_1'} as never,
             currentNode: {componentName: 'test', workflowNodeName: 'test_1'} as never,
         });
 

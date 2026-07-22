@@ -36,15 +36,13 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {setActiveTab, setAiAgentNodeDetailsPanelOpen, setCurrentComponent, setCurrentNode} =
-        useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                setActiveTab: state.setActiveTab,
-                setAiAgentNodeDetailsPanelOpen: state.setAiAgentNodeDetailsPanelOpen,
-                setCurrentComponent: state.setCurrentComponent,
-                setCurrentNode: state.setCurrentNode,
-            }))
-        );
+    const {setActiveTab, setAiAgentNodeDetailsPanelOpen, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            setActiveTab: state.setActiveTab,
+            setAiAgentNodeDetailsPanelOpen: state.setAiAgentNodeDetailsPanelOpen,
+            setCurrentNode: state.setCurrentNode,
+        }))
+    );
 
     const queryClient = useQueryClient();
 
@@ -170,21 +168,18 @@ export default function useAiAgentModelSelectField(): UseAiAgentModelSelectField
             };
 
             setActiveTab('description');
-            setCurrentNode({...modelNodeData, description: ''});
-            setAiAgentNodeDetailsPanelOpen(true);
-
-            setCurrentComponent((previousCurrentComponent) => ({
+            setCurrentNode((previousCurrentNode) => ({
                 ...modelNodeData,
-                displayConditions: previousCurrentComponent?.displayConditions,
-                workflowNodeName: modelItem.name,
+                description: '',
+                displayConditions: previousCurrentNode?.displayConditions,
             }));
+            setAiAgentNodeDetailsPanelOpen(true);
         },
         [
             queryClient,
             rootClusterElementNodeData?.name,
             rootClusterElementNodeData?.workflowNodeName,
             setActiveTab,
-            setCurrentComponent,
             setCurrentNode,
             setAiAgentNodeDetailsPanelOpen,
             workflow.definition,

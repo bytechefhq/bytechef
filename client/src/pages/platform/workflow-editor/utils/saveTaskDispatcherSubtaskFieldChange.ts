@@ -29,8 +29,7 @@ export default function saveTaskDispatcherSubtaskFieldChange({
     fieldUpdate,
     updateWorkflowMutation,
 }: SaveTaskDispatcherSubtaskFieldChangeProps): void {
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
-        useWorkflowNodeDetailsPanelStore.getState();
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
     const {workflow} = useWorkflowDataStore.getState();
 
@@ -310,11 +309,6 @@ export default function saveTaskDispatcherSubtaskFieldChange({
             } else {
                 commonUpdates[fieldUpdate.field as 'label' | 'description'] = fieldUpdate.value as string;
             }
-
-            setCurrentComponent({
-                ...currentComponent,
-                ...commonUpdates,
-            });
 
             setCurrentNode({
                 ...currentNode,

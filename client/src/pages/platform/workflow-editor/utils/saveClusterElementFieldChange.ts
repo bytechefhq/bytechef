@@ -27,8 +27,7 @@ export default function saveClusterElementFieldChange({
     fieldUpdate,
     updateWorkflowMutation,
 }: SaveClusterElementFieldChangeProps): void {
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
-        useWorkflowNodeDetailsPanelStore.getState();
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
     const {rootClusterElementNodeData, setRootClusterElementNodeData} = useWorkflowEditorStore.getState();
     const {workflow} = useWorkflowDataStore.getState();
 
@@ -136,11 +135,6 @@ export default function saveClusterElementFieldChange({
 
             setCurrentNode({
                 ...currentNode,
-                ...commonUpdates,
-            });
-
-            setCurrentComponent({
-                ...currentComponent,
                 ...commonUpdates,
             });
 

@@ -28,11 +28,9 @@ interface DescriptionTabProps {
 }
 
 const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTabProps) => {
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
-            currentComponent: state.currentComponent,
             currentNode: state.currentNode,
-            setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
         }))
     );
@@ -92,14 +90,6 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                 version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
             },
             onSuccess: () => {
-                setCurrentComponent({
-                    ...currentComponent,
-                    componentName: currentNode.componentName,
-                    label: event.target.value,
-                    name: currentNode.workflowNodeName,
-                    workflowNodeName: currentNode.workflowNodeName,
-                });
-
                 setCurrentNode({
                     ...currentNode,
                     label: event.target.value,
@@ -158,14 +148,6 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                 version: 'version' in nodeDefinition ? nodeDefinition.version : 1,
             },
             onSuccess: () => {
-                setCurrentComponent({
-                    ...currentComponent,
-                    componentName: currentNode.componentName,
-                    description: event.target.value,
-                    name: currentNode.workflowNodeName,
-                    workflowNodeName: currentNode.workflowNodeName,
-                });
-
                 setCurrentNode({
                     ...currentNode,
                     description: event.target.value,

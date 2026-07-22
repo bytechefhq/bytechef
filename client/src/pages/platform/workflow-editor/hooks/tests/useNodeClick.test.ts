@@ -68,7 +68,6 @@ describe('useNodeClick', () => {
     beforeEach(() => {
         useWorkflowNodeDetailsPanelStore.setState({
             activeTab: 'description',
-            currentComponent: undefined,
             currentNode: undefined,
             workflowNodeDetailsPanelOpen: false,
         });
@@ -142,11 +141,14 @@ describe('useNodeClick', () => {
         expect(currentNode?.label).toBe('Fallback Label');
     });
 
-    // Characterizes the pre-merge divergence between currentNode and currentComponent
-    // (see docs/agents/merge-current-node-component.md, risk #3). currentNode is cleared to an
-    // empty description while currentComponent keeps the node's description. This asserts the
-    // projection contract; update it in Phase 3 when the two collapse into one entity.
-    it('should clear currentNode description but keep it on the currentComponent projection', async () => {
+    // Merged-entity behavior (see docs/agents/merge-current-node-component.md, risk #3): the single
+    // currentNode is cleared to an empty description on click, and preserves the previous node's
+    // displayConditions (the carry that the old currentComponent projection used to hold).
+    it('should clear currentNode description and preserve displayConditions from the previous node', async () => {
+        useWorkflowNodeDetailsPanelStore.setState({
+            currentNode: makeNodeData({displayConditions: {show: true}, name: 'previous_1', workflowNodeName: 'previous_1'}),
+        });
+
         useWorkflowDataStore.setState({
             nodes: [
                 {
@@ -172,21 +174,16 @@ describe('useNodeClick', () => {
             result.current();
         });
 
-        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+        const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
         expect(currentNode?.description).toBe('');
-        expect(currentComponent?.description).toBe('My note');
-        expect(currentComponent?.workflowNodeName).toBe(nodeData.name);
+        expect(currentNode?.displayConditions).toEqual({show: true});
     });
 
-    // Characterizes the pre-merge conditional set (risk #4): currentComponent is only written when
-    // the clicked node has a `type`. A typeless node updates currentNode but leaves currentComponent
-    // untouched. Update in Phase 3 when the single entity always follows.
-    it('should not set currentComponent for a typeless node', async () => {
-        const previousComponent = makeNodeData({name: 'previous_1', workflowNodeName: 'previous_1'});
-
-        useWorkflowNodeDetailsPanelStore.setState({currentComponent: previousComponent});
-
+    // Merged-entity behavior (risk #4): a typeless node updates the single currentNode unconditionally.
+    // The panel-open gate (previously encoded by the conditional currentComponent set) now lives in
+    // WorkflowEditorLayout via a currentNode?.type check.
+    it('should update currentNode for a typeless node', async () => {
         useWorkflowDataStore.setState({
             nodes: [
                 {
@@ -209,10 +206,9 @@ describe('useNodeClick', () => {
             result.current();
         });
 
-        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+        const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
         expect(currentNode?.workflowNodeName).toBe('note_1');
-        expect(currentComponent).toBe(previousComponent);
     });
 
     it('should use the label from workflow triggers for trigger nodes', async () => {

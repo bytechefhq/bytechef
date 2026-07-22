@@ -47,11 +47,9 @@ const ConnectionTab = ({
         }))
     );
 
-    const {currentComponent, currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
-            currentComponent: state.currentComponent,
             currentNode: state.currentNode,
-            setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
         }))
     );
@@ -118,14 +116,6 @@ const ConnectionTab = ({
                 version: currentComponentDefinition?.version ?? 1,
             },
             onSuccess: () => {
-                setCurrentComponent({
-                    ...currentComponent,
-                    componentName: currentNode.componentName,
-                    maxRetries,
-                    name: currentNode.workflowNodeName,
-                    workflowNodeName: currentNode.workflowNodeName,
-                });
-
                 setCurrentNode({
                     ...currentNode,
                     maxRetries,

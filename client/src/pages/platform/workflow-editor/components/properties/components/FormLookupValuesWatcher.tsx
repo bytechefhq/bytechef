@@ -13,7 +13,7 @@ interface FormLookupValuesWatcherPropsI {
 /**
  * Subscribes to react-hook-form value changes for a property's lookup-dependency paths so
  * dynamic-property and options queries refetch as the user types, instead of waiting for a
- * save round-trip to propagate new values through currentComponent.parameters.
+ * save round-trip to propagate new values through currentNode.parameters.
  */
 const FormLookupValuesWatcher = ({
     arrayIndex,

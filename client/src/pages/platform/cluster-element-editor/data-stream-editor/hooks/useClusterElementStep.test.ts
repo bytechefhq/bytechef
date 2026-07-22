@@ -390,7 +390,11 @@ describe('useClusterElementStep', () => {
 
             expect(mockSetCurrentNode).toHaveBeenCalled();
 
-            const nodeDataArgument = mockSetCurrentNode.mock.calls[0][0];
+            const setCurrentNodeArgument = mockSetCurrentNode.mock.calls[0][0];
+            const nodeDataArgument =
+                typeof setCurrentNodeArgument === 'function'
+                    ? setCurrentNodeArgument(undefined)
+                    : setCurrentNodeArgument;
 
             expect(nodeDataArgument.connectionId).toBe(testConnectionId);
         });
@@ -427,7 +431,11 @@ describe('useClusterElementStep', () => {
 
             expect(mockSetCurrentNode).toHaveBeenCalled();
 
-            const nodeDataArgument = mockSetCurrentNode.mock.calls[0][0];
+            const setCurrentNodeArgument = mockSetCurrentNode.mock.calls[0][0];
+            const nodeDataArgument =
+                typeof setCurrentNodeArgument === 'function'
+                    ? setCurrentNodeArgument(undefined)
+                    : setCurrentNodeArgument;
 
             expect(nodeDataArgument.parameters).toEqual(storedParameters);
         });

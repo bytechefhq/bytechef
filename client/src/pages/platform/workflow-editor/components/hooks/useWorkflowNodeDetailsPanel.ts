@@ -138,24 +138,20 @@ export default function useWorkflowNodeDetailsPanel({
 
     const {
         activeTab,
-        currentComponent,
         currentNode,
         operationChangeInProgress,
         pendingSaveNodeName,
         setActiveTab,
-        setCurrentComponent,
         setCurrentNode,
         setOperationChangeInProgress,
         workflowNodeDetailsPanelOpen,
     } = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             activeTab: state.activeTab,
-            currentComponent: state.currentComponent,
             currentNode: state.currentNode,
             operationChangeInProgress: state.operationChangeInProgress,
             pendingSaveNodeName: state.pendingSaveNodeName,
             setActiveTab: state.setActiveTab,
-            setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
             setOperationChangeInProgress: state.setOperationChangeInProgress,
             workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
@@ -730,8 +726,8 @@ export default function useWorkflowNodeDetailsPanel({
     );
 
     const operationDataMissing = useMemo(
-        () => currentComponent?.operationName && (!matchingOperation?.name || !currentOperationFetched),
-        [currentComponent, matchingOperation, currentOperationFetched]
+        () => currentNode?.operationName && (!matchingOperation?.name || !currentOperationFetched),
+        [currentNode, matchingOperation, currentOperationFetched]
     );
 
     const tabDataExists = useMemo(
@@ -945,7 +941,7 @@ export default function useWorkflowNodeDetailsPanel({
 
             let newOperationDefinition: ActionDefinition | TriggerDefinition | ClusterElementDefinition | undefined;
 
-            if (!currentComponentDefinition || !currentComponent) {
+            if (!currentComponentDefinition || !currentNode) {
                 return;
             }
 
@@ -985,7 +981,7 @@ export default function useWorkflowNodeDetailsPanel({
                 queryKey: WorkflowNodeOptionKeys.clusterElementNodeOptions,
             });
 
-            const {componentName, description, label, workflowNodeName} = currentComponent;
+            const {componentName, description, label, workflowNodeName} = currentNode;
 
             const nodeData: NodeDataType = {
                 componentName,
@@ -1037,17 +1033,6 @@ export default function useWorkflowNodeDetailsPanel({
             saveWorkflowDefinition({
                 nodeData,
                 onSuccess: () => {
-                    setCurrentComponent({
-                        ...currentComponent,
-                        displayConditions: {},
-                        metadata: {},
-                        operationName: newOperationName,
-                        parameters: getParametersWithDefaultValues({
-                            properties: newOperationDefinition.properties as Array<PropertyAllType>,
-                        }),
-                        type: `${componentName}/v${currentComponentDefinition.version}/${newOperationName}`,
-                    });
-
                     setCurrentNode({
                         ...currentNode,
                         componentName,
@@ -1071,7 +1056,6 @@ export default function useWorkflowNodeDetailsPanel({
             currentEnvironmentId,
             currentOperationName,
             currentComponentDefinition,
-            currentComponent,
             currentNode,
             clusterElementsCanvasOpen,
             isClusterElement,
@@ -1083,7 +1067,6 @@ export default function useWorkflowNodeDetailsPanel({
             fetchClusterElementDefinition,
             fetchActionDefinition,
             currentNodeIndex,
-            setCurrentComponent,
             setCurrentNode,
             setOperationChangeInProgress,
         ]
@@ -1258,7 +1241,7 @@ export default function useWorkflowNodeDetailsPanel({
                 ...updatedNode,
                 operationName: currentOperationName,
                 triggerType: currentTriggerDefinition?.type,
-                type: `${currentComponent?.componentName}/v${currentComponentDefinition?.version}/${currentOperationName}`,
+                type: `${currentNode?.componentName}/v${currentComponentDefinition?.version}/${currentOperationName}`,
             };
         }
 
@@ -1276,15 +1259,12 @@ export default function useWorkflowNodeDetailsPanel({
 
         if (!isEqual(updatedNode, currentNode)) {
             setCurrentNode(updatedNode);
-
-            setCurrentComponent(updatedNode);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         currentNode,
         currentOperationName,
-        currentComponent?.componentName,
         currentComponentDefinition?.version,
         currentWorkflowNodeConnections,
         workflowTestConfigurationConnections,
@@ -1392,20 +1372,6 @@ export default function useWorkflowNodeDetailsPanel({
             });
         }
 
-        if (
-            currentComponent &&
-            (workflowNodeParameterDisplayConditions?.displayConditions ||
-                clusterElementParameterDisplayConditions?.displayConditions)
-        ) {
-            if (currentComponent.workflowNodeName === currentNode?.name) {
-                setCurrentComponent({
-                    ...currentComponent,
-                    displayConditions:
-                        workflowNodeParameterDisplayConditions?.displayConditions ||
-                        clusterElementParameterDisplayConditions?.displayConditions,
-                });
-            }
-        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
         clusterElementParameterDisplayConditions?.displayConditions,
