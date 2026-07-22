@@ -28,14 +28,13 @@ export default function deleteProperty(
         unknown
     >
 ) {
-    const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
     const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
     const rootClusterElementNodeData = useWorkflowEditorStore.getState().rootClusterElementNodeData;
 
     const decodedPath = decodePath(path);
 
-    if (!currentComponent) {
-        console.error('No current component found in the store');
+    if (!currentNode) {
+        console.error('No current node found in the store');
 
         return;
     }
@@ -65,14 +64,7 @@ export default function deleteProperty(
                         console.error('Failed to delete cluster element parameter:', error);
                     },
                     onSuccess: (response) => {
-                        const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
-
-                        setCurrentComponent({
-                            ...currentComponent,
-                            displayConditions: response.displayConditions,
-                            metadata: response.metadata,
-                            parameters: response.parameters,
-                        });
+                        const {setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
                         setCurrentNode({
                             ...currentNode,
@@ -116,14 +108,7 @@ export default function deleteProperty(
                     console.error('Failed to delete workflow node parameter:', error);
                 },
                 onSuccess: (response) => {
-                    const {setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
-
-                    setCurrentComponent({
-                        ...currentComponent,
-                        displayConditions: response.displayConditions,
-                        metadata: response.metadata,
-                        parameters: response.parameters,
-                    });
+                    const {setCurrentNode} = useWorkflowNodeDetailsPanelStore.getState();
 
                     if (currentNode) {
                         setCurrentNode({

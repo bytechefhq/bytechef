@@ -349,7 +349,7 @@ describe('ConnectionTabConnectionSelect', () => {
             });
         });
 
-        it('should update current node and component after connection creation', async () => {
+        it('should update current node after connection creation', async () => {
             render(
                 <ConnectionTabConnectionSelect
                     componentConnection={mockComponentConnection}
@@ -374,10 +374,6 @@ describe('ConnectionTabConnectionSelect', () => {
                 expect(mockSetCurrentNode).toHaveBeenCalledWith({
                     connectionId: 123,
                     id: 'node1',
-                });
-                expect(mockSetCurrentComponent).toHaveBeenCalledWith({
-                    connectionId: 123,
-                    id: 'comp1',
                 });
             });
         });
@@ -671,10 +667,6 @@ describe('ConnectionTabConnectionSelect', () => {
                 expect(mockSetCurrentNode).toHaveBeenCalledWith({
                     connectionId: 1,
                     id: 'node1',
-                });
-                expect(mockSetCurrentComponent).toHaveBeenCalledWith({
-                    connectionId: 1,
-                    id: 'comp1',
                 });
             });
         });

@@ -46,11 +46,11 @@ export default function saveProperty({
     value,
     workflowId,
 }: SavePropertyProps) {
-    const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore.getState();
+    const {currentNode} = useWorkflowNodeDetailsPanelStore.getState();
     const {rootClusterElementNodeData} = useWorkflowEditorStore.getState();
 
-    if (!currentComponent) {
-        console.error('No current component found in the store');
+    if (!currentNode) {
+        console.error('No current node found in the store');
 
         return;
     }
@@ -63,15 +63,6 @@ export default function saveProperty({
     ) {
         if (successCallback) {
             successCallback();
-        }
-
-        if (currentComponent) {
-            useWorkflowNodeDetailsPanelStore.getState().setCurrentComponent({
-                ...currentComponent,
-                displayConditions: response.displayConditions,
-                metadata: response.metadata,
-                parameters: response.parameters,
-            });
         }
 
         if (currentNode) {

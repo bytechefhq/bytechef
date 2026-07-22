@@ -21,10 +21,8 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     }
 
     const {
-        currentComponent,
         currentNode,
         setActiveTab,
-        setCurrentComponent,
         setCurrentNode,
         setPendingSaveNodeName,
         setWorkflowNodeDetailsPanelOpen,
@@ -38,12 +36,10 @@ export function openNodeDetailsPanelForNewNode(nodeData: NodeDataType): void {
     if (workflowNodeDetailsPanelOpen) {
         if (currentNode?.trigger && nodeData.trigger) {
             setCurrentNode({...currentNode, ...nodeData});
-            setCurrentComponent({...currentComponent, ...nodeData});
         }
     } else {
         setActiveTab('description');
         setCurrentNode({...nodeData, description: ''});
-        setCurrentComponent({...nodeData, description: ''});
         setWorkflowNodeDetailsPanelOpen(true);
     }
 }

@@ -71,7 +71,7 @@ const WorkflowEditorLayout = ({
     const copilotPanelOpen = useCopilotPanelStore((state) => state.copilotPanelOpen);
     const rightSidebarOpen = useRightSidebarStore((state) => state.rightSidebarOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const {
         clusterElementsCanvasOpen,
         setShowWorkflowCodeEditorSheet,
@@ -117,14 +117,14 @@ const WorkflowEditorLayout = ({
     useEffect(() => {
         return useCopilotStateContributorRegistry.getState().register(() => {
             const activeWorkflow = useWorkflowDataStore.getState().workflow;
-            const activeComponent = useWorkflowNodeDetailsPanelStore.getState().currentComponent;
+            const activeNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
             const copilotContext = useCopilotStore.getState().context as {
                 workflowExecutionError?: {workflowId?: string};
             };
             const workflowExecutionError = copilotContext.workflowExecutionError;
 
             return {
-                currentSelectedNode: activeComponent?.name,
+                currentSelectedNode: activeNode?.name,
                 workflowId: activeWorkflow.id,
                 ...(activeWorkflow.id === workflowExecutionError?.workflowId ? {workflowExecutionError} : {}),
             };
@@ -248,7 +248,7 @@ const WorkflowEditorLayout = ({
                 )}
             </div>
 
-            {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && (
+            {currentNode?.type && !isMainRootClusterElement && !clusterElementsCanvasOpen && (
                 <WorkflowNodeDetailsPanel
                     previousComponentDefinitions={previousComponentDefinitions}
                     updateWorkflowMutation={updateWorkflowMutation!}
@@ -269,7 +269,7 @@ const WorkflowEditorLayout = ({
 
             {workflow.id && <WorkflowTestChatPanel />}
 
-            {currentComponent && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
+            {currentNode?.type && !isMainRootClusterElement && !clusterElementsCanvasOpen && dataPillPanelOpen && (
                 <Suspense fallback={<DataPillPanelSkeleton />}>
                     <DataPillPanel
                         loading={isWorkflowNodeOutputsPending}

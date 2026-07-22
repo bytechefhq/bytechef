@@ -38,7 +38,6 @@ function createMockMutation(
 describe('saveProperty', () => {
     beforeEach(() => {
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: undefined,
             currentNode: undefined,
         });
 
@@ -51,7 +50,6 @@ describe('saveProperty', () => {
         const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: {componentName: 'test', workflowNodeName: 'test_1'} as never,
             currentNode: {componentName: 'test', workflowNodeName: 'test_1'} as never,
         });
 
@@ -79,7 +77,6 @@ describe('saveProperty', () => {
         const mutateAsync = vi.fn().mockResolvedValue({displayConditions: {}, metadata: {}, parameters: {}});
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: {componentName: 'test', workflowNodeName: 'test_1'} as never,
             currentNode: {componentName: 'test', workflowNodeName: 'test_1'} as never,
         });
 

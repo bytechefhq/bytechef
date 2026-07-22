@@ -23,7 +23,6 @@ describe('openNodeDetailsPanelForNewNode', () => {
     beforeEach(() => {
         useWorkflowNodeDetailsPanelStore.setState({
             activeTab: 'description',
-            currentComponent: undefined,
             currentNode: undefined,
             pendingSaveNodeName: undefined,
             workflowNodeDetailsPanelOpen: false,
@@ -40,7 +39,7 @@ describe('openNodeDetailsPanelForNewNode', () => {
         expect(state.workflowNodeDetailsPanelOpen).toBe(true);
         expect(state.currentNode?.name).toBe('slack_1');
         expect(state.currentNode?.description).toBe('');
-        expect(state.currentComponent?.componentName).toBe('slack');
+        expect(state.currentNode?.componentName).toBe('slack');
     });
 
     it('should mark the new node as pending its first save so node-scoped queries wait for persistence', () => {
@@ -72,7 +71,6 @@ describe('openNodeDetailsPanelForNewNode', () => {
         const existingNode = makeNodeData({componentName: 'http', name: 'http_1'});
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: existingNode as NodeDataType,
             currentNode: existingNode,
             workflowNodeDetailsPanelOpen: true,
         });
@@ -119,7 +117,6 @@ describe('openNodeDetailsPanelForNewNode', () => {
         });
 
         useWorkflowNodeDetailsPanelStore.setState({
-            currentComponent: existingTrigger as NodeDataType,
             currentNode: existingTrigger,
             workflowNodeDetailsPanelOpen: true,
         });

@@ -58,10 +58,9 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
-            setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
         }))
     );
@@ -254,12 +253,9 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
                 workflowNodeName: item.name,
             };
 
-            setCurrentNode(nodeData);
-
-            setCurrentComponent((previousCurrentComponent) => ({
+            setCurrentNode((previousCurrentNode) => ({
                 ...nodeData,
-                displayConditions: previousCurrentComponent?.displayConditions,
-                workflowNodeName: item.name,
+                displayConditions: previousCurrentNode?.displayConditions,
             }));
         },
         [
@@ -268,7 +264,6 @@ export default function useClusterElementStep(elementType: ClusterElementStepTyp
             elementType,
             rootClusterElementNodeData?.name,
             rootClusterElementNodeData?.workflowNodeName,
-            setCurrentComponent,
             setCurrentNode,
             testConnections,
             workflow.definition,

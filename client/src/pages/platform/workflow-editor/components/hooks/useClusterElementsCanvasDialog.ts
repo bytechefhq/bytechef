@@ -131,15 +131,10 @@ export default function useClusterElementsCanvasDialog({
                     const panelStore = useWorkflowNodeDetailsPanelStore.getState();
 
                     if (rootClusterElementNodeData) {
-                        panelStore.setCurrentNode({
+                        panelStore.setCurrentNode((previousCurrentNode) => ({
                             ...rootClusterElementNodeData,
                             description: '',
-                        });
-
-                        panelStore.setCurrentComponent((previousComponent) => ({
-                            ...rootClusterElementNodeData,
-                            displayConditions: previousComponent?.displayConditions,
-                            workflowNodeName: rootClusterElementNodeData.workflowNodeName || '',
+                            displayConditions: previousCurrentNode?.displayConditions,
                         }));
 
                         panelStore.setWorkflowNodeDetailsPanelOpen(true);

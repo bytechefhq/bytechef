@@ -55,10 +55,9 @@ export default function useDataStreamMapping() {
     const componentDefinitions = useWorkflowDataStore((state) => state.componentDefinitions);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
-    const {currentNode, setCurrentComponent, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
             currentNode: state.currentNode,
-            setCurrentComponent: state.setCurrentComponent,
             setCurrentNode: state.setCurrentNode,
         }))
     );
@@ -219,18 +218,14 @@ export default function useDataStreamMapping() {
                 workflowNodeName: processorItem.name,
             };
 
-            setCurrentNode(processorNodeData);
-
-            setCurrentComponent((previousCurrentComponent) => ({
+            setCurrentNode((previousCurrentNode) => ({
                 ...processorNodeData,
-                displayConditions: previousCurrentComponent?.displayConditions,
-                workflowNodeName: processorItem.name,
+                displayConditions: previousCurrentNode?.displayConditions,
             }));
         },
         [
             rootClusterElementNodeData?.name,
             rootClusterElementNodeData?.workflowNodeName,
-            setCurrentComponent,
             setCurrentNode,
             workflow.definition,
         ]
@@ -295,10 +290,10 @@ export default function useDataStreamMapping() {
                 workflowNodeName: rootClusterElementNodeData.workflowNodeName,
             });
 
-            setCurrentComponent((previousCurrentComponent) => ({
-                ...previousCurrentComponent!,
+            setCurrentNode((previousCurrentNode) => ({
+                ...previousCurrentNode!,
                 parameters: {
-                    ...previousCurrentComponent?.parameters,
+                    ...previousCurrentNode?.parameters,
                     mappings: matchedMappings,
                 },
             }));
@@ -316,7 +311,7 @@ export default function useDataStreamMapping() {
         invalidateWorkflowQueries,
         processor,
         rootClusterElementNodeData?.workflowNodeName,
-        setCurrentComponent,
+        setCurrentNode,
         workflow.id,
     ]);
 

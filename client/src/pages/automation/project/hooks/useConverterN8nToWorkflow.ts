@@ -8,7 +8,7 @@ import {useCallback, useState} from 'react';
 
 export const useConvertN8nToWorkflow = () => {
     const workflow = useWorkflowDataStore((state) => state.workflow);
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentComponent);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const setWorkflow = useWorkflowDataStore((state) => state.setWorkflow);
     const [isRunning, setIsRunning] = useState(false);
 
@@ -32,7 +32,7 @@ export const useConvertN8nToWorkflow = () => {
             });
 
             agent.setState({
-                currentSelectedNode: currentComponent?.name,
+                currentSelectedNode: currentNode?.name,
                 environmentId: String(environmentStore.getState().currentEnvironmentId ?? 0),
                 workflowId: workflow.id,
             });
@@ -65,7 +65,7 @@ export const useConvertN8nToWorkflow = () => {
 
             return convertedWorkflowBuffer;
         },
-        [workflow.id, currentComponent?.name, setWorkflow]
+        [workflow.id, currentNode?.name, setWorkflow]
     );
 
     return {convertN8nWorkflow, isRunning};

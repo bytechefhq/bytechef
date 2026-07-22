@@ -52,16 +52,13 @@ const ConnectionTabConnectionSelect = ({
 
     const currentEnvironmentId = useEnvironmentStore((state) => state.currentEnvironmentId);
 
-    const {connectionDialogAllowed, currentComponent, currentNode, setCurrentComponent, setCurrentNode} =
-        useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                connectionDialogAllowed: state.connectionDialogAllowed,
-                currentComponent: state.currentComponent,
-                currentNode: state.currentNode,
-                setCurrentComponent: state.setCurrentComponent,
-                setCurrentNode: state.setCurrentNode,
-            }))
-        );
+    const {connectionDialogAllowed, currentNode, setCurrentNode} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            connectionDialogAllowed: state.connectionDialogAllowed,
+            currentNode: state.currentNode,
+            setCurrentNode: state.setCurrentNode,
+        }))
+    );
 
     const {
         ConnectionKeys,
@@ -151,14 +148,9 @@ const ConnectionTabConnectionSelect = ({
 
                         const latestState = useWorkflowNodeDetailsPanelStore.getState();
                         const latestNode = latestState.currentNode;
-                        const latestComponent = latestState.currentComponent;
 
                         if (latestNode) {
                             latestState.setCurrentNode({...latestNode, connectionId});
-                        }
-
-                        if (latestComponent) {
-                            latestState.setCurrentComponent({...latestComponent, connectionId});
                         }
 
                         queryClient.removeQueries({
@@ -224,10 +216,6 @@ const ConnectionTabConnectionSelect = ({
                 setCurrentNode({...currentNode, connectionId: undefined});
             }
 
-            if (currentComponent) {
-                setCurrentComponent({...currentComponent, connectionId: undefined});
-            }
-
             queryClient.removeQueries({
                 queryKey: [...WorkflowNodeDynamicPropertyKeys.workflowNodeDynamicProperties, workflowId],
             });
@@ -241,13 +229,11 @@ const ConnectionTabConnectionSelect = ({
         [
             ConnectionKeys,
             connectionId,
-            currentComponent,
             currentEnvironmentId,
             currentNode,
             deleteWorkflowTestConfigurationConnectionMutation,
             queryClient,
             rootClusterElementNodeData?.workflowNodeName,
-            setCurrentComponent,
             setCurrentNode,
             workflowId,
             workflowNodeName,
