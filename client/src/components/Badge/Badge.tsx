@@ -140,3 +140,4 @@ const Badge = ({
 Badge.displayName = 'Badge';
 
 export default Badge;
+export type {BadgePropsType as BadgeProps};

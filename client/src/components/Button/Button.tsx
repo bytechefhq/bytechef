@@ -84,25 +84,28 @@ const ICON_SIZES: IconSizeType[] = ['icon', 'iconSm', 'iconXs', 'iconXxs'];
 const isIconSize = (size?: TextSizeType | IconSizeType): size is IconSizeType =>
     !!size && ICON_SIZES.includes(size as IconSizeType);
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonPropsType>(
-    ({children, className, icon, label, size = 'default', variant = 'default', ...props}, ref) => {
-        const content = isIconSize(size) ? null : (label ?? children);
-        const sizeClass = isIconSize(size) ? iconButtonSizes[size] : textButtonSizes[size ?? 'default'];
+const Button = ({
+    children,
+    className,
+    icon,
+    label,
+    size = 'default',
+    variant = 'default',
+    ...props
+}: ButtonPropsType) => {
+    const content = isIconSize(size) ? null : (label ?? children);
+    const sizeClass = isIconSize(size) ? iconButtonSizes[size] : textButtonSizes[size ?? 'default'];
 
-        return (
-            <ShadcnButton
-                className={twMerge(basicStyles, sizeClass, variants[variant], className)}
-                ref={ref}
-                {...props}
-            >
-                {icon}
+    return (
+        <ShadcnButton className={twMerge(basicStyles, sizeClass, variants[variant], className)} {...props}>
+            {icon}
 
-                {content}
-            </ShadcnButton>
-        );
-    }
-);
+            {content}
+        </ShadcnButton>
+    );
+};
 
 Button.displayName = 'Button';
 
 export default Button;
+export type {ButtonPropsType as ButtonProps};
