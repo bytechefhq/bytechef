@@ -2,7 +2,7 @@ import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/work
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {ControlType, ObjectProperty, PropertyType} from '@/shared/middleware/platform/configuration';
-import {ArrayPropertyType, ComponentType, PropertyAllType} from '@/shared/types';
+import {ArrayPropertyType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Dispatch, SetStateAction, useCallback, useEffect, useMemo, useState} from 'react';
 
 import useWorkflowDataStore from '../../../stores/useWorkflowDataStore';
@@ -558,7 +558,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
 export interface UseArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
-    currentComponent?: ComponentType;
+    currentComponent?: NodeDataType;
     index: number;
     onDeleteClick: (path: string) => void;
     path: string;

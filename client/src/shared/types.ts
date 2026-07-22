@@ -247,7 +247,9 @@ export type NodeDataType = {
     metadata?: {
         ui?: {
             chainAlignedPosition?: {x: number; y: number};
+            condition?: string;
             dynamicPropertyTypes?: {[key: string]: string};
+            fromAi?: Array<string>;
             nodePosition?: {x: number; y: number};
             placeholderPositions?: Record<string, {x: number; y: number}>;
         };

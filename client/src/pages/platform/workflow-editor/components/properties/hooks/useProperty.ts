@@ -23,7 +23,7 @@ import {
     Workflow,
 } from '@/shared/middleware/platform/configuration';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {ArrayPropertyType, ClusterElementItemType, ComponentType, NodeDataType, PropertyAllType} from '@/shared/types';
+import {ArrayPropertyType, ClusterElementItemType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {UseQueryResult} from '@tanstack/react-query';
 import {Editor} from '@tiptap/react';
 import {usePrevious} from '@uidotdev/usehooks';
@@ -110,7 +110,7 @@ type UsePropertyReturnType = {
     controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
-    currentComponent: ComponentType | undefined;
+    currentComponent: NodeDataType | undefined;
     currentNode: NodeDataType | undefined;
     defaultValue: string;
     description?: string;

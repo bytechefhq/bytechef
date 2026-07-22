@@ -96,6 +96,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                     ...currentComponent,
                     componentName: currentNode.componentName,
                     label: event.target.value,
+                    name: currentNode.workflowNodeName,
                     workflowNodeName: currentNode.workflowNodeName,
                 });
 
@@ -161,6 +162,7 @@ const DescriptionTab = ({nodeDefinition, updateWorkflowMutation}: DescriptionTab
                     ...currentComponent,
                     componentName: currentNode.componentName,
                     description: event.target.value,
+                    name: currentNode.workflowNodeName,
                     workflowNodeName: currentNode.workflowNodeName,
                 });
 
