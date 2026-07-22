@@ -122,6 +122,7 @@ const ConnectionTab = ({
                     ...currentComponent,
                     componentName: currentNode.componentName,
                     maxRetries,
+                    name: currentNode.workflowNodeName,
                     workflowNodeName: currentNode.workflowNodeName,
                 });
 

@@ -1,5 +1,5 @@
 /* eslint-disable sort-keys */
-import {ComponentType, NodeDataType} from '@/shared/types';
+import {NodeDataType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
 import {create} from 'zustand';
 import {devtools} from 'zustand/middleware';
@@ -14,12 +14,12 @@ interface WorkflowNodeDetailsPanelStoreI {
     connectionDialogAllowed: boolean;
     setConnectionDialogAllowed: (connectionDialogAllowed: boolean) => void;
 
-    currentComponent: ComponentType | undefined;
+    currentComponent: NodeDataType | undefined;
     setCurrentComponent: (
         currentComponent:
-            | ComponentType
+            | NodeDataType
             | undefined
-            | ((previousCurrentComponent: ComponentType | undefined) => ComponentType | undefined)
+            | ((previousCurrentComponent: NodeDataType | undefined) => NodeDataType | undefined)
     ) => void;
 
     currentNode: NodeDataType | undefined;

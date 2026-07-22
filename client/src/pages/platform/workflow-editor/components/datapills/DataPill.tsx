@@ -7,7 +7,7 @@ import {
 } from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import getNestedObject from '@/pages/platform/workflow-editor/utils/getNestedObject';
 import {TYPE_ICONS} from '@/shared/typeIcons';
-import {ComponentType, DataPillDragPayloadType, PropertyAllType} from '@/shared/types';
+import {DataPillDragPayloadType, NodeDataType, PropertyAllType} from '@/shared/types';
 import {Editor} from '@tiptap/react';
 import {DragEvent, MouseEvent} from 'react';
 import {twMerge} from 'tailwind-merge';
@@ -96,7 +96,7 @@ const buildMentionId = ({
     return transformPathForObjectAccess(value);
 };
 
-const canInsertDataPill = (mentionInput: Editor | null, currentComponent?: ComponentType): boolean => {
+const canInsertDataPill = (mentionInput: Editor | null, currentComponent?: NodeDataType): boolean => {
     if (!mentionInput) {
         return false;
     }
