@@ -5,7 +5,7 @@ const hoisted = vi.hoisted(() => {
     const mockSaveProperty = vi.fn();
 
     type StoreShapeType = {
-        currentComponent: {
+        currentNode: {
             componentName?: string;
             metadata?: {ui?: {dynamicPropertyTypes?: Record<string, string>}};
             parameters?: Record<string, unknown>;
@@ -14,7 +14,7 @@ const hoisted = vi.hoisted(() => {
     };
 
     const storeState: StoreShapeType = {
-        currentComponent: null,
+        currentNode: null,
     };
 
     return {
@@ -44,17 +44,17 @@ vi.mock('../../../../providers/workflowEditorProvider', () => ({
     }),
 }));
 
-describe('useArrayProperty — hydration from currentComponent.parameters', () => {
+describe('useArrayProperty — hydration from currentNode.parameters', () => {
     beforeEach(() => {
         vi.clearAllMocks();
     });
 
     afterEach(() => {
-        hoisted.storeState.currentComponent = null;
+        hoisted.storeState.currentNode = null;
     });
 
     it('hydrates items on REMOUNT with items:null (exact var_v1 shape)', async () => {
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             componentName: 'var',
             metadata: {
                 ui: {
@@ -94,7 +94,7 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         first.unmount();
 
         // Simulate "switch back to Properties" — fresh mount.
-        // currentComponent in the store is unchanged from before (Zustand store persists).
+        // currentNode in the store is unchanged from before (Zustand store persists).
         const second = renderHook(() =>
             useArrayProperty({
                 onDeleteClick: vi.fn(),
@@ -115,7 +115,7 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         // Server's setParameter may leave a null in the array when the user clicks
         // "Add" for a new item but hasn't typed a value yet. On tab return we hit
         // hydration with a null value. This checks the third branch handles it.
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             componentName: 'var',
             metadata: {
                 ui: {
@@ -154,7 +154,7 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         // This mirrors the workflow JSON from the bug report:
         //   parameters: {type: 'ARRAY', value: ['www', 'wqewqe', 'rrrr']}
         //   metadata.ui.dynamicPropertyTypes: {value[0]: 'STRING', value[1]: 'STRING', value[2]: 'STRING'}
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             componentName: 'var',
             metadata: {
                 ui: {
@@ -208,7 +208,7 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
         // (integer(SKILL_ID).expressionEnabled(false)) must survive hydration so
         // Property.tsx hides the dynamic/expression toggle. The scalar hydration
         // branch previously hardcoded expressionEnabled: true, clobbering it.
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             componentName: 'aiAgentUtils',
             metadata: {
                 ui: {
@@ -261,9 +261,9 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
 
     it('re-syncs an item defaultValue from parameters after a save changes it', async () => {
         // Regression for the skills reset: mount hydration runs once, so after a save updates
-        // currentComponent.parameters the cached defaultValue must re-sync, otherwise the stale
+        // currentNode.parameters the cached defaultValue must re-sync, otherwise the stale
         // value overrides the user's selection and the row appears to revert.
-        hoisted.storeState.currentComponent = {
+        hoisted.storeState.currentNode = {
             componentName: 'aiAgentUtils',
             metadata: {
                 ui: {
@@ -303,8 +303,8 @@ describe('useArrayProperty — hydration from currentComponent.parameters', () =
 
         expect(items[0].defaultValue).toBe(1057);
 
-        hoisted.storeState.currentComponent = {
-            ...hoisted.storeState.currentComponent,
+        hoisted.storeState.currentNode = {
+            ...hoisted.storeState.currentNode,
             parameters: {skills: [1099, 1060]},
         };
 

@@ -261,7 +261,7 @@ export const useProperty = ({
     const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
         useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
-                currentComponent: state.currentComponent,
+                currentComponent: state.currentNode,
                 currentNode: state.currentNode,
                 setFocusedInput: state.setFocusedInput,
                 workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,

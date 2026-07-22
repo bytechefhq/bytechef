@@ -112,7 +112,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
-                currentComponent: state.currentComponent,
+                currentComponent: state.currentNode,
                 currentNode: state.currentNode,
             }))
         );

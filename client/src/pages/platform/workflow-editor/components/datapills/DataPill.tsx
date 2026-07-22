@@ -123,7 +123,7 @@ const DataPill = ({
 }: DataPillProps) => {
     const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
-            currentComponent: state.currentComponent,
+            currentComponent: state.currentNode,
             focusedInput: state.focusedInput,
         }))
     );
