@@ -49,6 +49,7 @@ public class CalComBookingCreatedTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("bookingCreated")
         .title("Booking Created")
         .description("Triggers when a booking is created.")
+        .help("", "https://docs.bytechef.io/reference/components/calcom_v1#booking-created")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(

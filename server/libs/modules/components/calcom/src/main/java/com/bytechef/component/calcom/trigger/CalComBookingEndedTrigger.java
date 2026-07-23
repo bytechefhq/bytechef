@@ -46,6 +46,7 @@ public class CalComBookingEndedTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("bookingEnded")
         .title("Booking Ended")
         .description("Triggers when a booking ends.")
+        .help("", "https://docs.bytechef.io/reference/components/calcom_v1#booking-ended")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(

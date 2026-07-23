@@ -39,6 +39,8 @@ public class CalComComponentHandler implements ComponentHandler {
         .description(
             "A fully customizable scheduling software for individuals, businesses taking calls and developers " +
                 "building scheduling platforms where users meet users.")
+        .customAction(true)
+        .customActionHelp("", "https://cal.com/docs/api-reference/v2/introduction")
         .icon("path:assets/calcom.svg")
         .categories(ComponentCategory.COMMUNICATION)
         .connection(CalComConnection.CONNECTION_DEFINITION)
@@ -46,7 +48,8 @@ public class CalComComponentHandler implements ComponentHandler {
             CalComBookingCancelledTrigger.TRIGGER_DEFINITION,
             CalComBookingCreatedTrigger.TRIGGER_DEFINITION,
             CalComBookingEndedTrigger.TRIGGER_DEFINITION,
-            CalComBookingRescheduledTrigger.TRIGGER_DEFINITION);
+            CalComBookingRescheduledTrigger.TRIGGER_DEFINITION)
+        .version(1);
 
     @Override
     public ComponentDefinition getDefinition() {

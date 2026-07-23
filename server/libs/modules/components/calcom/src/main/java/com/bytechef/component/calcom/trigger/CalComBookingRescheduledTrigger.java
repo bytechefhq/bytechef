@@ -49,6 +49,7 @@ public class CalComBookingRescheduledTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("bookingRescheduled")
         .title("Booking Rescheduled")
         .description("Triggers when a booking is rescheduled.")
+        .help("", "https://docs.bytechef.io/reference/components/calcom_v1#booking-rescheduled")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(

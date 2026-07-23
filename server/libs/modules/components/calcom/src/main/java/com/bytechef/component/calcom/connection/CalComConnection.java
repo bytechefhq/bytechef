@@ -39,7 +39,9 @@ public class CalComConnection {
                     string(TOKEN)
                         .label("Api Key")
                         .description("Can be found in Settings -> Developer -> API keys.")
-                        .required(true)));
+                        .required(true)))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/calcom_v1#connection-setup");
 
     private CalComConnection() {
     }
