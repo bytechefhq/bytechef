@@ -48,10 +48,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                                 arrayItem={subItem}
                                 arrayName={name}
                                 className={twMerge(
-                                    subPropertyPopoverVisible &&
-                                        index === lastArrayItemIndex &&
-                                        subItemIndex === arrayItem.length - 1 &&
-                                        'mb-2'
+                                    index === lastArrayItemIndex && subItemIndex === arrayItem.length - 1 && 'mb-2'
                                 )}
                                 currentNode={currentNode}
                                 index={index}
@@ -66,7 +63,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                         <ArrayPropertyItem
                             arrayItem={arrayItem}
                             arrayName={name}
-                            className={twMerge(subPropertyPopoverVisible && index === lastArrayItemIndex && 'mb-2')}
+                            className={twMerge(index === lastArrayItemIndex && 'mb-2')}
                             currentNode={currentNode}
                             index={index}
                             key={`${arrayItem.key}_${path}[${index}]`}
