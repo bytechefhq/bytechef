@@ -55,8 +55,7 @@ const useWorkflowNodeDetailsPanelStore = create<WorkflowNodeDetailsPanelStoreI>(
             setCurrentNode: (currentNode) =>
                 set((state) => ({
                     ...state,
-                    currentNode:
-                        typeof currentNode === 'function' ? currentNode(state.currentNode) : currentNode,
+                    currentNode: typeof currentNode === 'function' ? currentNode(state.currentNode) : currentNode,
                 })),
 
             focusedInput: null,

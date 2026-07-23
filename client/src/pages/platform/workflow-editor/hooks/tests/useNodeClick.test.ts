@@ -146,7 +146,11 @@ describe('useNodeClick', () => {
     // displayConditions (the carry that the old currentComponent projection used to hold).
     it('should clear currentNode description and preserve displayConditions from the previous node', async () => {
         useWorkflowNodeDetailsPanelStore.setState({
-            currentNode: makeNodeData({displayConditions: {show: true}, name: 'previous_1', workflowNodeName: 'previous_1'}),
+            currentNode: makeNodeData({
+                displayConditions: {show: true},
+                name: 'previous_1',
+                workflowNodeName: 'previous_1',
+            }),
         });
 
         useWorkflowDataStore.setState({
