@@ -1,5 +1,11 @@
 import {SchemaRecordType} from '@/components/JsonSchemaBuilder/utils/types';
 import {getClusterElementByName} from '@/pages/platform/cluster-element-editor/utils/clusterElementsUtils';
+import {
+    INPUT_PROPERTY_CONTROL_TYPES,
+    ParameterValueContextI,
+    getInitialPropertyValueState,
+    propertyValueReducer,
+} from '@/pages/platform/workflow-editor/components/properties/hooks/propertyValueReducer';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useDataPillPanelStore from '@/pages/platform/workflow-editor/stores/useDataPillPanelStore';
 import useWorkflowDataStore from '@/pages/platform/workflow-editor/stores/useWorkflowDataStore';
@@ -36,6 +42,7 @@ import {
     useCallback,
     useEffect,
     useMemo,
+    useReducer,
     useRef,
     useState,
 } from 'react';
@@ -44,29 +51,6 @@ import {useDebouncedCallback} from 'use-debounce';
 import {useShallow} from 'zustand/react/shallow';
 
 import {getTask} from '../../../utils/getTask';
-
-const INPUT_PROPERTY_CONTROL_TYPES = [
-    'DATE',
-    'DATE_TIME',
-    'EMAIL',
-    'INTEGER',
-    'NUMBER',
-    'PASSWORD',
-    'PHONE',
-    'TEXT',
-    'TIME',
-    'URL',
-];
-
-const MENTION_INPUT_PROPERTY_CONTROL_TYPES = [
-    'EMAIL',
-    'FORMULA_MODE',
-    'PHONE',
-    'RICH_TEXT',
-    'TEXT',
-    'TEXT_AREA',
-    'URL',
-];
 
 function getInitialControlledDynamicMode(
     control: Control<FieldValues, FieldValues> | undefined,
@@ -86,21 +70,6 @@ function getInitialControlledDynamicMode(
         );
 
     return typeof fieldValue === 'string' && fieldValue.startsWith('=');
-}
-
-function getInitialInputValue(
-    control: Control<FieldValues, FieldValues> | undefined,
-    property: PropertyAllType
-): string {
-    if (!control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-        return '';
-    }
-
-    if (!INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)) {
-        return '';
-    }
-
-    return property.defaultValue || '';
 }
 
 type UsePropertyReturnType = {
@@ -167,7 +136,7 @@ type UsePropertyReturnType = {
     setDataPillPanelOpen: (open: boolean) => void;
     setIsFormulaMode: Dispatch<SetStateAction<boolean>>;
     setLookupDependsOnValues: Dispatch<SetStateAction<Array<unknown> | undefined>>;
-    setSelectValue: Dispatch<SetStateAction<string>>;
+    setSelectValue: (value: string) => void;
     showInputTypeSwitchButton: boolean;
     type?: PropertyAllType['type'];
     typeIcon: ReactNode;
@@ -211,28 +180,18 @@ export const useProperty = ({
 }: UsePropertyProps): UsePropertyReturnType => {
     const [errorMessage, setErrorMessage] = useState('');
     const [hasError, setHasError] = useState(false);
-    const [inputValue, setInputValue] = useState(() => getInitialInputValue(control, property));
     const [isFormulaMode, setIsFormulaModeInternal] = useState(property.controlType === 'FORMULA_MODE');
     const [lookupDependsOnValues, setLookupDependsOnValues] = useState<Array<unknown> | undefined>();
-    const [mentionInputValue, setMentionInputValue] = useState(() => {
-        const initialMentionValue = parameterValue !== undefined ? parameterValue : property.defaultValue || '';
 
-        return typeof initialMentionValue === 'string' ? initialMentionValue : '';
-    });
-    const [mentionInput, setMentionInput] = useState(
-        !control && MENTION_INPUT_PROPERTY_CONTROL_TYPES.includes(property.controlType!)
+    const [valueState, dispatchValueAction] = useReducer(
+        propertyValueReducer,
+        {controlType: property.controlType, defaultValue: property.defaultValue, hasControl: !!control, parameterValue},
+        getInitialPropertyValueState
     );
-    const [multiSelectValue, setMultiSelectValue] = useState<string[]>(property.defaultValue || []);
-    const [propertyParameterValue, setPropertyParameterValue] = useState(() =>
-        parameterValue !== undefined ? parameterValue : property.defaultValue || ''
-    );
-    const [selectValue, setSelectValue] = useState(() => {
-        if (parameterValue !== undefined && parameterValue !== null) {
-            return typeof parameterValue === 'boolean' ? parameterValue.toString() : parameterValue;
-        }
 
-        return property.defaultValue !== undefined ? property.defaultValue : 'null';
-    });
+    const {inputValue, mentionInput, mentionInputValue, multiSelectValue, propertyParameterValue, selectValue} =
+        valueState;
+
     const [showInputTypeSwitchButton, setShowInputTypeSwitchButton] = useState(
         !control && ((property.type !== 'STRING' && property.expressionEnabled) || false)
     );
@@ -249,7 +208,6 @@ export const useProperty = ({
     const inputRef = useRef<HTMLInputElement>(null!);
     const latestValueRef = useRef<string | number | undefined>(property.defaultValue || '');
     const isSavingRef = useRef(false);
-    const mentionInputValueRef = useRef<string | number | undefined>(undefined);
     const parameterValueRef = useRef(parameterValue);
 
     parameterValueRef.current = parameterValue;
@@ -431,6 +389,40 @@ export const useProperty = ({
         [mentionInput, controlType]
     );
 
+    const parameterValueContext = useMemo<ParameterValueContextI>(
+        () => ({controlType, isNumericalInput, type}),
+        [controlType, isNumericalInput, type]
+    );
+
+    const parameterValueContextRef = useRef(parameterValueContext);
+    parameterValueContextRef.current = parameterValueContext;
+
+    const setInputValue = useCallback((value: string) => {
+        dispatchValueAction({type: 'inputValueChanged', value});
+    }, []);
+
+    const setMentionInputValue = useCallback((value: string) => {
+        dispatchValueAction({type: 'mentionInputValueChanged', value});
+    }, []);
+
+    const setMentionInput = useCallback((nextMentionInput: boolean) => {
+        dispatchValueAction({mentionInput: nextMentionInput, type: 'mentionInputModeChanged'});
+    }, []);
+
+    const setSelectValue = useCallback((value: string) => {
+        dispatchValueAction({type: 'selectValueChanged', value});
+    }, []);
+
+    const resolveParameterValue = useCallback((value: unknown, options?: {authoritativeValue?: unknown}) => {
+        dispatchValueAction({
+            authoritativeValue: options?.authoritativeValue,
+            context: parameterValueContextRef.current,
+            syncDisplayValues: !isSavingRef.current,
+            type: 'parameterValueResolved',
+            value,
+        });
+    }, []);
+
     const typeIcon = useMemo(() => {
         if (controlType === 'MULTI_SELECT') {
             return TYPE_ICONS[property.items?.[0]?.type as keyof typeof TYPE_ICONS];
@@ -451,32 +443,39 @@ export const useProperty = ({
         return propertyParameterValue === fromAiExpression;
     }, [controlledFromAi, currentNode?.metadata?.ui?.fromAi, fromAiExpression, path, propertyParameterValue]);
 
+    const currentNodeName = currentNode?.name;
+    const currentNodeClusterElementType = currentNode?.clusterElementType;
+
     const memoizedWorkflowTask = useMemo(() => {
-        return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
-            (node) => node.name === currentNode?.name
+        return (
+            workflow.triggers?.find((node) => node.name === currentNodeName) ??
+            workflow.tasks?.find((node) => node.name === currentNodeName)
         );
-    }, [workflow.triggers, workflow.tasks, currentNode?.name]);
+    }, [workflow.triggers, workflow.tasks, currentNodeName]);
 
     const memoizedClusterElementTask = useMemo((): ClusterElementItemType | undefined => {
-        if (!currentNode?.name || !workflow.definition) {
+        if (!currentNodeName || !workflow.definition || !currentNodeClusterElementType) {
             return undefined;
         }
 
-        if (currentNode.clusterElementType) {
-            const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
+        const workflowDefinitionTasks = JSON.parse(workflow.definition).tasks;
 
-            const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
-                ? getTask({
-                      tasks: workflowDefinitionTasks,
-                      workflowNodeName: rootClusterElementNodeData.workflowNodeName,
-                  })
-                : undefined;
+        const mainClusterRootTask = rootClusterElementNodeData?.workflowNodeName
+            ? getTask({
+                  tasks: workflowDefinitionTasks,
+                  workflowNodeName: rootClusterElementNodeData.workflowNodeName,
+              })
+            : undefined;
 
-            if (mainClusterRootTask?.clusterElements) {
-                return getClusterElementByName(mainClusterRootTask.clusterElements, currentNode.name);
-            }
+        if (mainClusterRootTask?.clusterElements) {
+            return getClusterElementByName(mainClusterRootTask.clusterElements, currentNodeName);
         }
-    }, [currentNode, workflow.definition, rootClusterElementNodeData?.workflowNodeName]);
+    }, [
+        currentNodeClusterElementType,
+        currentNodeName,
+        workflow.definition,
+        rootClusterElementNodeData?.workflowNodeName,
+    ]);
 
     const validatePropertyValue = useCallback(
         (value: string | number): boolean => {
@@ -618,7 +617,7 @@ export const useProperty = ({
         // otherwise onFocus flips isFocused=true before the sync effect runs, the clear never
         // reaches the input's internal localValue, and the stale time stays visible until blur.
         requestAnimationFrame(() => inputRef.current?.focus());
-    }, [saveInputValue]);
+    }, [saveInputValue, setInputValue]);
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (
@@ -911,18 +910,19 @@ export const useProperty = ({
             setHasError(hasValidationError);
             setErrorMessage(errorMessage);
         },
-        [INCORRECT_VALUE, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]
+        [INCORRECT_VALUE, maxLength, minLength, regex, setMentionInputValue, VALUE_DOES_NOT_MATCH_PATTERN]
     );
 
     const handleInputTypeSwitchButtonClick = () => {
         const switchingToDynamic = !mentionInput;
 
-        setMentionInput(switchingToDynamic);
-
         if (switchingToDynamic && isFromAi) {
-            setMentionInputValue(fromAiExpression.substring(1));
-            setPropertyParameterValue(fromAiExpression);
-            setMultiSelectValue([]);
+            dispatchValueAction({
+                mentionInput: switchingToDynamic,
+                mentionInputValue: fromAiExpression.substring(1),
+                propertyParameterValue: fromAiExpression,
+                type: 'inputTypeSwitched',
+            });
 
             setTimeout(() => {
                 setFocusedInput(editorRef.current);
@@ -950,9 +950,12 @@ export const useProperty = ({
             return;
         }
 
-        setMentionInputValue('');
-        setPropertyParameterValue('');
-        setMultiSelectValue([]);
+        dispatchValueAction({
+            mentionInput: switchingToDynamic,
+            mentionInputValue: '',
+            propertyParameterValue: '',
+            type: 'inputTypeSwitched',
+        });
 
         if (mentionInput) {
             setTimeout(() => {
@@ -999,12 +1002,15 @@ export const useProperty = ({
         saveProperty({
             path,
             successCallback: () => {
-                setInputValue('');
-                setMentionInputValue('');
-                setSelectValue('');
-                setMultiSelectValue([]);
+                dispatchValueAction({
+                    mentionInput,
+                    mentionInputValue: '',
+                    propertyParameterValue: '',
+                    type: 'inputTypeSwitched',
+                });
 
-                setPropertyParameterValue('');
+                setInputValue('');
+                setSelectValue('');
             },
             type,
             updateWorkflowNodeParameterMutation,
@@ -1029,8 +1035,7 @@ export const useProperty = ({
                 return;
             }
 
-            setSelectValue(value);
-            setPropertyParameterValue(value);
+            dispatchValueAction({type: 'selectValueChanged', value});
 
             isSavingRef.current = true;
 
@@ -1065,8 +1070,13 @@ export const useProperty = ({
                         return;
                     }
 
-                    setSelectValue(defaultValueString);
-                    setPropertyParameterValue(actualValue);
+                    dispatchValueAction({type: 'selectValueChanged', value: defaultValueString});
+                    dispatchValueAction({
+                        context: parameterValueContextRef.current,
+                        syncDisplayValues: false,
+                        type: 'parameterValueResolved',
+                        value: actualValue,
+                    });
 
                     saveProperty({
                         includeInMetadata: custom,
@@ -1133,8 +1143,7 @@ export const useProperty = ({
                 return;
             }
 
-            setPropertyParameterValue(value);
-            setMultiSelectValue(value);
+            dispatchValueAction({propertyParameterValue: value, type: 'multiSelectValueChanged', value});
 
             saveProperty({
                 includeInMetadata: custom,
@@ -1209,6 +1218,23 @@ export const useProperty = ({
         ]
     );
 
+    // A fresh array is built on every parameter change, so setting it unconditionally would
+    // always change state identity and force another render pass even when the resolved
+    // dependency values are unchanged.
+    const setLookupDependsOnValuesIfChanged = useCallback((nextValues: Array<unknown>) => {
+        setLookupDependsOnValues((previousValues) => {
+            if (
+                previousValues &&
+                previousValues.length === nextValues.length &&
+                previousValues.every((previousValue, index) => Object.is(previousValue, nextValues[index]))
+            ) {
+                return previousValues;
+            }
+
+            return nextValues;
+        });
+    }, []);
+
     const setIsFormulaMode: Dispatch<SetStateAction<boolean>> = useCallback(
         (value) => {
             if (property.controlType === 'FORMULA_MODE') {
@@ -1276,10 +1302,12 @@ export const useProperty = ({
     useEffect(() => {
         if (formState && name && path) {
             setHasError(
-                formState.touchedFields[path] &&
+                !!(
+                    formState.touchedFields[path] &&
                     formState.touchedFields[path]![name] &&
                     formState.errors[path] &&
                     (formState.errors[path] as never)[name]
+                )
             );
         }
     }, [formState, name, path]);
@@ -1304,7 +1332,7 @@ export const useProperty = ({
         if (Object.keys(parameters).length && (!propertyParameterValue || propertyParameterValue === defaultValue)) {
             if (parameterValue === undefined) {
                 if (!path || !encodedPath) {
-                    setPropertyParameterValue(parameters[name]);
+                    resolveParameterValue(parameters[name]);
 
                     return;
                 }
@@ -1312,20 +1340,15 @@ export const useProperty = ({
                 const valueFromDefinition = safeResolvePath(encodedParameters, encodedPath);
 
                 if (valueFromDefinition !== undefined && valueFromDefinition !== null) {
-                    setPropertyParameterValue(valueFromDefinition);
-
                     if (typeof valueFromDefinition === 'string' && valueFromDefinition.startsWith('=')) {
                         setMentionInput(true);
-                        setMentionInputValue(valueFromDefinition.substring(1));
 
                         setIsFormulaMode(true);
-                    } else if (mentionInput && typeof valueFromDefinition === 'string') {
-                        setMentionInputValue(valueFromDefinition);
-
-                        mentionInputValueRef.current = valueFromDefinition ? valueFromDefinition : undefined;
                     }
+
+                    resolveParameterValue(valueFromDefinition);
                 } else {
-                    setPropertyParameterValue(encodedParameters[name]);
+                    resolveParameterValue(encodedParameters[name]);
                 }
             }
         } else if (isExpressionValue) {
@@ -1396,35 +1419,36 @@ export const useProperty = ({
 
         if (effectiveValue !== undefined && effectiveValue !== null) {
             if (type === 'BOOLEAN' && typeof effectiveValue === 'boolean') {
-                setPropertyParameterValue(effectiveValue.toString());
+                resolveParameterValue(effectiveValue.toString());
 
                 return;
             }
-
-            setPropertyParameterValue(effectiveValue as never);
 
             if (typeof effectiveValue === 'string' && effectiveValue.startsWith('=')) {
                 setMentionInput(true);
-                setMentionInputValue(effectiveValue.substring(1));
 
                 setIsFormulaMode(true);
-
-                return;
             }
 
-            if (mentionInput && typeof effectiveValue === 'string') {
-                setMentionInputValue(effectiveValue);
-
-                mentionInputValueRef.current = effectiveValue ? effectiveValue : undefined;
-            }
+            resolveParameterValue(effectiveValue);
 
             return;
         }
 
         const fallbackParameterValue = parameterValue !== undefined ? parameterValue : defaultValue;
 
-        setPropertyParameterValue(fallbackParameterValue as never);
-    }, [control, currentNode?.parameters, defaultValue, mentionInput, parameterValue, path, setIsFormulaMode, type]);
+        resolveParameterValue(fallbackParameterValue);
+    }, [
+        control,
+        currentNode?.parameters,
+        defaultValue,
+        parameterValue,
+        path,
+        resolveParameterValue,
+        setIsFormulaMode,
+        setMentionInput,
+        type,
+    ]);
 
     // set error state for mention input
     useEffect(() => {
@@ -1463,105 +1487,9 @@ export const useProperty = ({
         setErrorMessage(regexMismatch ? VALUE_DOES_NOT_MATCH_PATTERN : INCORRECT_VALUE);
     }, [INCORRECT_VALUE, mentionInput, mentionInputValue, maxLength, minLength, regex, VALUE_DOES_NOT_MATCH_PATTERN]);
 
-    // Sync propertyParameterValue one-way into value states
-    useEffect(() => {
-        if (isSavingRef.current) {
-            return;
-        }
-
-        if (propertyParameterValue === '' || propertyParameterValue === undefined) {
-            if (mentionInput) {
-                const userHasUnsavedInput = !mentionInputValueRef.current && mentionInputValue;
-
-                if (!userHasUnsavedInput) {
-                    setMentionInputValue('');
-
-                    mentionInputValueRef.current = undefined;
-                }
-            } else {
-                const authoritativeValue = parameterValueRef.current;
-
-                const hasAuthoritativeValue =
-                    authoritativeValue !== undefined && authoritativeValue !== null && authoritativeValue !== '';
-
-                if (hasAuthoritativeValue) {
-                    setPropertyParameterValue(authoritativeValue as never);
-                } else {
-                    setInputValue('');
-                    setSelectValue('');
-                    setMultiSelectValue([]);
-
-                    setPropertyParameterValue('');
-                }
-            }
-
-            return;
-        }
-
-        if (typeof propertyParameterValue === 'string' && propertyParameterValue.startsWith('=')) {
-            if (mentionInputValueRef.current !== propertyParameterValue) {
-                setMentionInputValue(propertyParameterValue.substring(1));
-
-                mentionInputValueRef.current = propertyParameterValue;
-            }
-
-            return;
-        }
-
-        const shouldSyncMentionInputFromPlainStringParameter =
-            mentionInput &&
-            mentionInputValueRef.current !== propertyParameterValue &&
-            typeof propertyParameterValue === 'string' &&
-            propertyParameterValue !== '';
-
-        if (shouldSyncMentionInputFromPlainStringParameter) {
-            setMentionInputValue(propertyParameterValue);
-
-            mentionInputValueRef.current = propertyParameterValue;
-
-            return;
-        }
-
-        const shouldApplyParameterValueToEmptyPlainInput =
-            !mentionInput &&
-            controlType &&
-            INPUT_PROPERTY_CONTROL_TYPES.includes(controlType) &&
-            propertyParameterValue;
-
-        if (shouldApplyParameterValueToEmptyPlainInput) {
-            setInputValue(propertyParameterValue);
-        }
-
-        if (!mentionInput && controlType === 'JSON_SCHEMA_BUILDER' && propertyParameterValue !== undefined) {
-            setInputValue(propertyParameterValue);
-        }
-
-        if (controlType === 'SELECT' && propertyParameterValue !== undefined) {
-            if (propertyParameterValue === null) {
-                setSelectValue('null');
-            } else {
-                if (type === 'BOOLEAN') {
-                    setSelectValue(propertyParameterValue.toString());
-                } else {
-                    setSelectValue(propertyParameterValue);
-                }
-            }
-        }
-
-        if (controlType === 'MULTI_SELECT' && propertyParameterValue !== undefined) {
-            if (propertyParameterValue === null) {
-                setMultiSelectValue([]);
-            } else if (propertyParameterValue !== undefined) {
-                setMultiSelectValue(propertyParameterValue);
-            }
-        }
-
-        if (isNumericalInput && propertyParameterValue !== null && propertyParameterValue !== undefined) {
-            setInputValue(propertyParameterValue);
-        }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- omit mentionInputValue/inputValue to avoid feedback loop
-    }, [propertyParameterValue, parameterValue, mentionInput, controlType]);
+    // The one-way distribution of propertyParameterValue into the display values now happens
+    // inside propertyValueReducer's `parameterValueResolved` case, so resolving a parameter and
+    // showing it is a single state transition instead of a set-then-sync effect round trip.
 
     // Set options lookup dependencies from the saved workflow parameters. When `control`
     // is provided (array item / dialog form), FormLookupValuesWatcher subscribes to
@@ -1594,8 +1522,14 @@ export const useProperty = ({
             }
         );
 
-        setLookupDependsOnValues(optionsLookupDependsOnValues);
-    }, [arrayIndex, control, currentNode?.parameters, optionsDataSource?.optionsLookupDependsOn]);
+        setLookupDependsOnValuesIfChanged(optionsLookupDependsOnValues);
+    }, [
+        arrayIndex,
+        control,
+        currentNode?.parameters,
+        optionsDataSource?.optionsLookupDependsOn,
+        setLookupDependsOnValuesIfChanged,
+    ]);
 
     // See comment above; same control-present carve-out.
     useEffect(() => {
@@ -1626,8 +1560,14 @@ export const useProperty = ({
             }
         );
 
-        setLookupDependsOnValues(propertiesLookupDependsOnValues);
-    }, [arrayIndex, control, currentNode?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
+        setLookupDependsOnValuesIfChanged(propertiesLookupDependsOnValues);
+    }, [
+        arrayIndex,
+        control,
+        currentNode?.parameters,
+        propertiesDataSource?.propertiesLookupDependsOn,
+        setLookupDependsOnValuesIfChanged,
+    ]);
 
     // set showInputTypeSwitchButton state depending on the controlType
     useEffect(() => {
@@ -1686,7 +1626,7 @@ export const useProperty = ({
         const nextParameterValue =
             parameterValueRef.current !== undefined ? parameterValueRef.current : valueFromWorkflowDefinition;
 
-        setPropertyParameterValue(nextParameterValue);
+        resolveParameterValue(nextParameterValue, {authoritativeValue: parameterValueRef.current});
         // eslint-disable-next-line react-hooks/exhaustive-deps -- sync when workflow JSON changes; read latest parameterValue via ref
     }, [workflow.definition]);
 
@@ -1696,16 +1636,7 @@ export const useProperty = ({
             property.defaultValue !== undefined ? property.defaultValue : '';
 
         if (previousOperationName) {
-            setPropertyParameterValue(parameterDefaultValue);
-            setInputValue(parameterDefaultValue);
-            setMentionInputValue(parameterDefaultValue);
-            setSelectValue(parameterDefaultValue.toString());
-
-            mentionInputValueRef.current = undefined;
-
-            if (Array.isArray(parameterDefaultValue)) {
-                setMultiSelectValue(parameterDefaultValue);
-            }
+            dispatchValueAction({defaultValue: parameterDefaultValue, type: 'valuesResetToDefault'});
         }
     }, [currentNode?.operationName, previousOperationName, property.defaultValue]);
 
