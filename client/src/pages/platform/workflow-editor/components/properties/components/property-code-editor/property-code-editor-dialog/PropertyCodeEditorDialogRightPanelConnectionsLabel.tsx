@@ -21,7 +21,7 @@ const PropertyCodeEditorDialogRightPanelConnectionsLabel = ({
         <div className="flex items-center justify-between">
             <div className="space-x-1">
                 {componentDefinition && (
-                    <Label>
+                    <Label className="gap-0">
                         <span>{componentDefinition?.title}</span>
 
                         {componentConnection.required && <RequiredMark />}

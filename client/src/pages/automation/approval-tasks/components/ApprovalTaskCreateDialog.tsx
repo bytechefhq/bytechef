@@ -57,7 +57,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
 
                 <div className="space-y-4 py-4">
                     <fieldset className="space-y-2 border-0">
-                        <Label htmlFor="approval-task-title">
+                        <Label className="gap-0" htmlFor="approval-task-title">
                             Title
                             <RequiredMark />
                         </Label>
@@ -74,7 +74,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
                     </fieldset>
 
                     <fieldset className="space-y-2 border-0">
-                        <Label htmlFor="approval-task-description">
+                        <Label className="gap-0" htmlFor="approval-task-description">
                             Description
                             <RequiredMark />
                         </Label>
@@ -159,7 +159,7 @@ export default function ApprovalTaskCreateDialog({trigger}: ApprovalTaskCreateDi
 
                     <div className="grid grid-cols-2 gap-4">
                         <fieldset className="space-y-2 border-0">
-                            <Label>
+                            <Label className="gap-0">
                                 Assignee
                                 <RequiredMark />
                             </Label>

@@ -19,7 +19,7 @@ const RequiredMarker = () => (
 export const FormLabelWithDescription = ({description, label, required}: FormLabelWithDescriptionPropsI) => {
     if (!description) {
         return (
-            <FormLabel>
+            <FormLabel className="gap-0">
                 {label}
 
                 {required && <RequiredMarker />}

@@ -18,7 +18,7 @@ interface ObjectPropertyProps {
 }
 
 const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, path, property}: ObjectPropertyProps) => {
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
 
     const {
         availablePropertyTypes,
@@ -42,18 +42,24 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
         property,
     });
 
+    const subPropertyList = subProperties as unknown as Array<SubPropertyType> | undefined;
+
+    const subPropertyPopoverVisible = !!availablePropertyTypes?.length;
+
+    const lastSubPropertyIndex = (subPropertyList?.length ?? 0) - 1;
+
     return (
         <Fragment key={name}>
             <ul
                 aria-label={`${name} object properties`}
                 className={twMerge(
                     'space-y-4',
-                    label && !isContainerObject && 'ml-2 flex flex-col gap-4 border-l border-l-border/50',
+                    label && !isContainerObject && 'ml-2 flex flex-col border-l border-l-border/50',
                     arrayName && !isContainerObject && 'pl-2'
                 )}
                 role="list"
             >
-                {(subProperties as unknown as Array<SubPropertyType>)?.map((subProperty, index) => (
+                {subPropertyList?.map((subProperty, index) => (
                     <Property
                         arrayIndex={arrayIndex}
                         arrayName={arrayName}
@@ -61,10 +67,11 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                             'w-full last-of-type:pb-0',
                             label && 'mb-0',
                             isContainerObject && 'pb-0',
-                            !arrayName && !isContainerObject && 'pl-2'
+                            !arrayName && !isContainerObject && 'pl-2',
+                            subPropertyPopoverVisible && index === lastSubPropertyIndex && 'mb-2'
                         )}
                         deletePropertyButton={
-                            subProperty.custom && name && subProperty.name && currentComponent ? (
+                            subProperty.custom && name && subProperty.name && currentNode ? (
                                 <DeletePropertyButton
                                     onClick={() => handleDeleteClick(subProperty)}
                                     propertyName={subProperty.label ?? subProperty.name}
@@ -83,7 +90,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 ))}
             </ul>
 
-            {!!availablePropertyTypes?.length && (
+            {subPropertyPopoverVisible && (
                 <SubPropertyPopover
                     availablePropertyTypes={availablePropertyTypes}
                     buttonLabel={placeholder}

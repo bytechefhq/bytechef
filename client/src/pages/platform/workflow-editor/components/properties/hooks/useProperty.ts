@@ -110,7 +110,6 @@ type UsePropertyReturnType = {
     controlledDynamicOnChangeRef: RefObject<((value: string) => void) | null>;
     controlledFromAi: boolean | undefined;
     controlType?: ControlType;
-    currentComponent: NodeDataType | undefined;
     currentNode: NodeDataType | undefined;
     defaultValue: string;
     description?: string;
@@ -258,15 +257,13 @@ export const useProperty = ({
     const previousPropertyPathForParameterSyncRef = useRef<string | undefined>(undefined);
     const resetOnModeChangeRef = useRef(false);
 
-    const {currentComponent, currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} =
-        useWorkflowNodeDetailsPanelStore(
-            useShallow((state) => ({
-                currentComponent: state.currentNode,
-                currentNode: state.currentNode,
-                setFocusedInput: state.setFocusedInput,
-                workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
-            }))
-        );
+    const {currentNode, setFocusedInput, workflowNodeDetailsPanelOpen} = useWorkflowNodeDetailsPanelStore(
+        useShallow((state) => ({
+            currentNode: state.currentNode,
+            setFocusedInput: state.setFocusedInput,
+            workflowNodeDetailsPanelOpen: state.workflowNodeDetailsPanelOpen,
+        }))
+    );
     const setDataPillPanelOpen = useDataPillPanelStore((state) => state.setDataPillPanelOpen);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
@@ -447,12 +444,12 @@ export const useProperty = ({
             return controlledFromAi;
         }
 
-        if (path && currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
+        if (path && currentNode?.metadata?.ui?.fromAi?.includes(path)) {
             return true;
         }
 
         return propertyParameterValue === fromAiExpression;
-    }, [controlledFromAi, currentComponent?.metadata?.ui?.fromAi, fromAiExpression, path, propertyParameterValue]);
+    }, [controlledFromAi, currentNode?.metadata?.ui?.fromAi, fromAiExpression, path, propertyParameterValue]);
 
     const memoizedWorkflowTask = useMemo(() => {
         return [...(workflow.triggers ?? []), ...(workflow.tasks ?? [])].find(
@@ -567,7 +564,7 @@ export const useProperty = ({
 
     const saveInputValue = useDebouncedCallback(() => {
         if (
-            !currentComponent ||
+            !currentNode ||
             !workflow ||
             !name ||
             !path ||
@@ -625,7 +622,7 @@ export const useProperty = ({
 
     const handleCodeEditorChange = useDebouncedCallback((value?: string) => {
         if (
-            !currentComponent ||
+            !currentNode ||
             !name ||
             !path ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -744,7 +741,7 @@ export const useProperty = ({
 
     const handleJsonSchemaBuilderChange = useDebouncedCallback((value?: SchemaRecordType) => {
         if (
-            !currentComponent ||
+            !currentNode ||
             !name ||
             !path ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -932,7 +929,7 @@ export const useProperty = ({
             }, 50);
 
             if (
-                currentComponent &&
+                currentNode &&
                 name &&
                 path &&
                 (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) &&
@@ -978,7 +975,7 @@ export const useProperty = ({
         }
 
         if (
-            !currentComponent ||
+            !currentNode ||
             !name ||
             !path ||
             !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) ||
@@ -987,10 +984,7 @@ export const useProperty = ({
             return;
         }
 
-        const parentParameterValue = safeResolvePath(
-            encodeParameters(currentComponent.parameters ?? {}),
-            encodePath(path)
-        );
+        const parentParameterValue = safeResolvePath(encodeParameters(currentNode.parameters ?? {}), encodePath(path));
 
         if (mentionInput && !mentionInputValue) {
             return;
@@ -1022,7 +1016,7 @@ export const useProperty = ({
     const handleSelectChange = useCallback(
         (value: string, name: string) => {
             if (
-                !currentComponent ||
+                !currentNode ||
                 !workflow.id ||
                 !name ||
                 !path ||
@@ -1106,7 +1100,7 @@ export const useProperty = ({
             });
         },
         [
-            currentComponent,
+            currentNode,
             custom,
             deleteClusterElementParameterMutation,
             deleteWorkflowNodeParameterMutation,
@@ -1124,7 +1118,7 @@ export const useProperty = ({
     const handleMultiSelectChange = useCallback(
         (value: string[]) => {
             if (
-                !currentComponent ||
+                !currentNode ||
                 !workflow.id ||
                 !path ||
                 !(updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
@@ -1153,7 +1147,7 @@ export const useProperty = ({
             });
         },
         [
-            currentComponent,
+            currentNode,
             custom,
             path,
             propertyParameterValue,
@@ -1296,11 +1290,11 @@ export const useProperty = ({
             return;
         }
 
-        if (!name || !currentComponent || !currentComponent.parameters) {
+        if (!name || !currentNode || !currentNode.parameters) {
             return;
         }
 
-        const {parameters} = currentComponent;
+        const {parameters} = currentNode;
 
         const encodedParameters = encodeParameters(parameters);
         const encodedPath = path ? encodePath(path) : undefined;
@@ -1369,7 +1363,7 @@ export const useProperty = ({
     }, []);
 
     useEffect(() => {
-        if (control || !path || !currentComponent?.parameters) {
+        if (control || !path || !currentNode?.parameters) {
             return;
         }
 
@@ -1385,11 +1379,11 @@ export const useProperty = ({
             return;
         }
 
-        if (!Object.keys(currentComponent.parameters).length) {
+        if (!Object.keys(currentNode.parameters).length) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedParameters = encodeParameters(currentNode.parameters);
         const encodedPath = encodePath(path);
 
         if (!encodedPath) {
@@ -1430,16 +1424,7 @@ export const useProperty = ({
         const fallbackParameterValue = parameterValue !== undefined ? parameterValue : defaultValue;
 
         setPropertyParameterValue(fallbackParameterValue as never);
-    }, [
-        control,
-        currentComponent?.parameters,
-        defaultValue,
-        mentionInput,
-        parameterValue,
-        path,
-        setIsFormulaMode,
-        type,
-    ]);
+    }, [control, currentNode?.parameters, defaultValue, mentionInput, parameterValue, path, setIsFormulaMode, type]);
 
     // set error state for mention input
     useEffect(() => {
@@ -1590,14 +1575,14 @@ export const useProperty = ({
             return;
         }
 
-        if (!currentComponent?.parameters) {
+        if (!currentNode?.parameters) {
             return;
         }
 
         const optionsLookupDependsOnValues: unknown[] = optionsDataSource.optionsLookupDependsOn.map(
             (optionLookupDependency) => {
                 const resolvedValue = safeResolvePath(
-                    currentComponent.parameters,
+                    currentNode.parameters,
                     optionLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
 
@@ -1610,7 +1595,7 @@ export const useProperty = ({
         );
 
         setLookupDependsOnValues(optionsLookupDependsOnValues);
-    }, [arrayIndex, control, currentComponent?.parameters, optionsDataSource?.optionsLookupDependsOn]);
+    }, [arrayIndex, control, currentNode?.parameters, optionsDataSource?.optionsLookupDependsOn]);
 
     // See comment above; same control-present carve-out.
     useEffect(() => {
@@ -1622,14 +1607,14 @@ export const useProperty = ({
             return;
         }
 
-        if (!currentComponent?.parameters) {
+        if (!currentNode?.parameters) {
             return;
         }
 
         const propertiesLookupDependsOnValues: unknown[] = propertiesDataSource.propertiesLookupDependsOn.map(
             (propertyLookupDependency) => {
                 const resolvedValue = safeResolvePath(
-                    currentComponent.parameters,
+                    currentNode.parameters,
                     propertyLookupDependency.replace('[index]', `[${arrayIndex}]`)
                 );
 
@@ -1642,7 +1627,7 @@ export const useProperty = ({
         );
 
         setLookupDependsOnValues(propertiesLookupDependsOnValues);
-    }, [arrayIndex, control, currentComponent?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
+    }, [arrayIndex, control, currentNode?.parameters, propertiesDataSource?.propertiesLookupDependsOn]);
 
     // set showInputTypeSwitchButton state depending on the controlType
     useEffect(() => {
@@ -1729,7 +1714,7 @@ export const useProperty = ({
         if (
             type === 'NULL' &&
             propertyParameterValue === undefined &&
-            currentComponent &&
+            currentNode &&
             path &&
             (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation)
         ) {
@@ -1754,14 +1739,14 @@ export const useProperty = ({
 
     // set display condition fetching state
     useEffect(() => {
-        if (displayCondition && currentComponent?.displayConditions?.[displayCondition]) {
+        if (displayCondition && currentNode?.displayConditions?.[displayCondition]) {
             setIsFetchingCurrentDisplayCondition(true);
 
             if (isDisplayConditionsSuccess) {
                 setIsFetchingCurrentDisplayCondition(false);
             }
         }
-    }, [displayCondition, currentComponent?.displayConditions, isDisplayConditionsSuccess]);
+    }, [displayCondition, currentNode?.displayConditions, isDisplayConditionsSuccess]);
 
     useEffect(() => {
         if (controlledDynamicMode && resetOnModeChangeRef.current && controlledDynamicOnChangeRef.current) {
@@ -1776,7 +1761,7 @@ export const useProperty = ({
         type !== 'OBJECT' &&
         (isDisplayConditionsPending ||
             (displayConditionsQuery &&
-                currentComponent?.displayConditions?.[displayCondition] &&
+                currentNode?.displayConditions?.[displayCondition] &&
                 isFetchingCurrentDisplayCondition))
     );
 
@@ -1787,7 +1772,6 @@ export const useProperty = ({
         controlledDynamicMode,
         controlledDynamicOnChangeRef,
         controlledFromAi,
-        currentComponent,
         currentNode,
         defaultValue,
         description,

@@ -84,7 +84,6 @@ const Property = ({
         controlledDynamicMode,
         controlledDynamicOnChangeRef,
         controlledFromAi,
-        currentComponent,
         currentNode,
         defaultValue,
         description,
@@ -179,7 +178,7 @@ const Property = ({
         );
     }
 
-    if (!control && displayCondition && !currentComponent?.displayConditions?.[displayCondition]) {
+    if (!control && displayCondition && !currentNode?.displayConditions?.[displayCondition]) {
         return <></>;
     }
 
@@ -193,7 +192,7 @@ const Property = ({
                 controlType === 'ARRAY_BUILDER' && 'flex-col',
                 customClassName
             )}
-            key={`${currentNode?.name}_${currentComponent?.operationName}_${name}`}
+            key={`${currentNode?.name}_${currentNode?.operationName}_${name}`}
         >
             {control &&
                 !!(
@@ -209,7 +208,7 @@ const Property = ({
                     />
                 )}
 
-            {mentionInput && currentComponent && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
+            {mentionInput && currentNode && type !== 'DYNAMIC_PROPERTIES' && controlType !== 'CODE_EDITOR' && (
                 <PropertyMentionsInput
                     controlType={controlType || 'TEXT'}
                     defaultValue={parameterValue !== undefined ? parameterValue : defaultValue}
@@ -254,7 +253,7 @@ const Property = ({
                                     <div className="flex w-full items-center justify-between">
                                         <div className="flex items-center">
                                             {label && (
-                                                <Label className="leading-normal">
+                                                <Label className="gap-0 leading-normal">
                                                     {label}
 
                                                     {required && <RequiredMark />}

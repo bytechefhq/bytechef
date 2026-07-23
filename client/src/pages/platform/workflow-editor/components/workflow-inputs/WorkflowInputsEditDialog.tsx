@@ -81,8 +81,9 @@ const WorkflowInputsEditDialog = ({
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Name <RequiredMark />
+                                    <FormLabel className="gap-0">
+                                        Name
+                                        <RequiredMark />
                                     </FormLabel>
 
                                     <FormControl>
@@ -105,8 +106,9 @@ const WorkflowInputsEditDialog = ({
                             name="label"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Label <RequiredMark />
+                                    <FormLabel className="gap-0">
+                                        Label
+                                        <RequiredMark />
                                     </FormLabel>
 
                                     <FormControl>
@@ -124,8 +126,9 @@ const WorkflowInputsEditDialog = ({
                             name="type"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Type <RequiredMark />
+                                    <FormLabel className="gap-0">
+                                        Type
+                                        <RequiredMark />
                                     </FormLabel>
 
                                     <FormControl>
