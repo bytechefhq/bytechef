@@ -4,7 +4,7 @@ import SubPropertyPopover from '@/pages/platform/workflow-editor/components/prop
 import {useArrayProperty} from '@/pages/platform/workflow-editor/components/properties/hooks/useArrayProperty';
 import {ArrayPropertyType, PropertyAllType} from '@/shared/types';
 import {CircleAlertIcon, PlusIcon} from 'lucide-react';
-import {Fragment} from 'react';
+import {Fragment, useCallback} from 'react';
 import {twMerge} from 'tailwind-merge';
 
 interface ArrayPropertyProps {
@@ -20,23 +20,27 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
         arrayItems,
         availablePropertyTypes,
         currentNode,
+        defaultPropertyType,
         handleAddItemClick,
         handleDeleteClick,
         isAddDisabled,
         items,
         name,
-        newPropertyType,
         setArrayItems,
-        setNewPropertyType,
     } = useArrayProperty({onDeleteClick, parentArrayItems, path, property});
 
-    const subPropertyPopoverVisible = availablePropertyTypes.length > 1 && !!newPropertyType;
+    const subPropertyPopoverVisible = availablePropertyTypes.length > 1 && !!defaultPropertyType;
 
     const lastArrayItemIndex = (arrayItems?.length ?? 0) - 1;
 
+    const handleAddSingleTypeItemClick = useCallback(
+        () => handleAddItemClick({name: '', type: defaultPropertyType ?? 'STRING'}),
+        [defaultPropertyType, handleAddItemClick]
+    );
+
     return (
         <Fragment key={`${path}_${name}_arrayProperty`}>
-            <ul className="ml-2 flex flex-col space-y-4 border-l border-l-border/50">
+            <ul className="ml-2 flex flex-col gap-2 border-l border-l-border/50">
                 {arrayItems?.map((arrayItem, index) =>
                     Array.isArray(arrayItem) ? (
                         arrayItem.map((subItem: ArrayPropertyType, subItemIndex: number) => (
@@ -81,12 +85,11 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                         array
                         availablePropertyTypes={availablePropertyTypes}
                         buttonLabel={property.placeholder ?? parentArrayItems?.[0]?.placeholder}
+                        defaultPropertyType={defaultPropertyType}
                         disabled={isAddDisabled}
                         handleClick={handleAddItemClick}
                         insideConditionTaskDispatcher={currentNode?.componentName === 'condition'}
                         key={`${path}_${name}_subPropertyPopoverButton`}
-                        newPropertyType={newPropertyType}
-                        setNewPropertyType={setNewPropertyType}
                     />
                 ) : (
                     <Button
@@ -95,7 +98,7 @@ const ArrayProperty = ({onDeleteClick, parentArrayItems, path, property}: ArrayP
                         icon={<PlusIcon />}
                         key={`${path}_${name}_addPropertyPopoverButton`}
                         label={property.placeholder || 'Add array item'}
-                        onClick={handleAddItemClick}
+                        onClick={handleAddSingleTypeItemClick}
                         size="sm"
                         variant="secondary"
                     />

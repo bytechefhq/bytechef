@@ -1,3 +1,4 @@
+import {NewSubPropertyI} from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
@@ -44,10 +45,6 @@ interface UseObjectPropertyProps {
 
 export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectPropertyProps) => {
     const [subProperties, setSubProperties] = useState<Array<PropertyAllType>>();
-    const [newPropertyName, setNewPropertyName] = useState('');
-    const [newPropertyType, setNewPropertyType] = useState<keyof typeof VALUE_PROPERTY_CONTROL_TYPES>(
-        (property.additionalProperties?.[0]?.type as keyof typeof VALUE_PROPERTY_CONTROL_TYPES) || 'STRING'
-    );
 
     const defaultValueSavedRef = useRef(false);
 
@@ -94,63 +91,66 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         path = path.replace('.__item', '');
     }
 
-    const encodedNewPropertyName = useMemo(
-        () => (newPropertyName ? encodePath(newPropertyName) : ''),
-        [newPropertyName]
+    const existingSubPropertyNames = useMemo(
+        () =>
+            (subProperties ?? [])
+                .map((subProperty) => subProperty.name)
+                .filter((subPropertyName): subPropertyName is string => !!subPropertyName),
+        [subProperties]
     );
 
-    const isDuplicateName = useMemo(() => {
-        if (!encodedNewPropertyName) {
-            return false;
-        }
+    const handleAddItemClick = useCallback(
+        ({name: rawNewPropertyName, type: newPropertyType}: NewSubPropertyI) => {
+            if (!rawNewPropertyName) {
+                return;
+            }
 
-        return !!subProperties?.some(
-            (subProperty) => !!subProperty.name && encodePath(subProperty.name) === encodedNewPropertyName
-        );
-    }, [encodedNewPropertyName, subProperties]);
+            const encodedNewPropertyName = encodePath(rawNewPropertyName);
 
-    const handleAddItemClick = useCallback(() => {
-        if (!newPropertyName || isDuplicateName) {
-            return;
-        }
+            const isDuplicateName = !!subProperties?.some(
+                (subProperty) => !!subProperty.name && encodePath(subProperty.name) === encodedNewPropertyName
+            );
 
-        const newItem: SubPropertyType = {
-            additionalProperties,
-            controlType: VALUE_PROPERTY_CONTROL_TYPES[newPropertyType] as ControlType,
-            custom: true,
-            expressionEnabled: true,
-            label: newPropertyName,
-            name: encodedNewPropertyName,
-            type: (newPropertyType ||
+            if (isDuplicateName) {
+                return;
+            }
+
+            const resolvedPropertyType = (newPropertyType ||
                 additionalProperties?.[0].type ||
-                'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
-        };
+                'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES;
 
-        setSubProperties((previousSubProperties) => [...(previousSubProperties || []), newItem]);
+            const newItem: SubPropertyType = {
+                additionalProperties,
+                controlType: VALUE_PROPERTY_CONTROL_TYPES[resolvedPropertyType] as ControlType,
+                custom: true,
+                expressionEnabled: true,
+                label: rawNewPropertyName,
+                name: encodedNewPropertyName,
+                type: resolvedPropertyType,
+            };
 
-        setNewPropertyName('');
+            setSubProperties((previousSubProperties) => [...(previousSubProperties || []), newItem]);
 
-        if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
-            saveProperty({
-                includeInMetadata: true,
-                path: `${path}.${encodedNewPropertyName}`,
-                type: newPropertyType,
-                updateClusterElementParameterMutation,
-                updateWorkflowNodeParameterMutation,
-                workflowId: workflow.id!,
-            });
-        }
-    }, [
-        additionalProperties,
-        encodedNewPropertyName,
-        isDuplicateName,
-        newPropertyName,
-        newPropertyType,
-        path,
-        updateClusterElementParameterMutation,
-        updateWorkflowNodeParameterMutation,
-        workflow.id,
-    ]);
+            if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
+                saveProperty({
+                    includeInMetadata: true,
+                    path: `${path}.${encodedNewPropertyName}`,
+                    type: resolvedPropertyType,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    workflowId: workflow.id!,
+                });
+            }
+        },
+        [
+            additionalProperties,
+            path,
+            subProperties,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+        ]
+    );
 
     const handleDeleteClick = useCallback(
         (subProperty: SubPropertyType) => {
@@ -500,18 +500,16 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
     return {
         availablePropertyTypes,
         calculatedPath: path,
+        defaultPropertyType: (property.additionalProperties?.[0]?.type ??
+            'STRING') as keyof typeof VALUE_PROPERTY_CONTROL_TYPES,
+        existingSubPropertyNames,
         getPropertyKey,
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
-        isDuplicateName,
         label,
         name,
-        newPropertyName,
-        newPropertyType,
         placeholder,
-        setNewPropertyName,
-        setNewPropertyType,
         subProperties,
     };
 };
