@@ -49,6 +49,7 @@ public class CalComBookingCancelledTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("bookingCanceled")
         .title("Booking Canceled")
         .description("Triggers when a booking is canceled.")
+        .help("", "https://docs.bytechef.io/reference/components/calcom_v1#booking-canceled")
         .type(TriggerType.DYNAMIC_WEBHOOK)
         .output(
             outputSchema(
