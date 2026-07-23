@@ -23,18 +23,15 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
     const {
         availablePropertyTypes,
         calculatedPath,
+        defaultPropertyType,
+        existingSubPropertyNames,
         getPropertyKey,
         handleAddItemClick,
         handleDeleteClick,
         isContainerObject,
-        isDuplicateName,
         label,
         name,
-        newPropertyName,
-        newPropertyType,
         placeholder,
-        setNewPropertyName,
-        setNewPropertyType,
         subProperties,
     } = useObjectProperty({
         onDeleteClick,
@@ -53,7 +50,7 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
             <ul
                 aria-label={`${name} object properties`}
                 className={twMerge(
-                    'space-y-4',
+                    'gap-2 space-y-4',
                     label && !isContainerObject && 'ml-2 flex flex-col border-l border-l-border/50',
                     arrayName && !isContainerObject && 'pl-2'
                 )}
@@ -94,13 +91,10 @@ const ObjectProperty = ({arrayIndex, arrayName, onDeleteClick, operationName, pa
                 <SubPropertyPopover
                     availablePropertyTypes={availablePropertyTypes}
                     buttonLabel={placeholder}
+                    defaultPropertyType={defaultPropertyType}
+                    existingPropertyNames={existingSubPropertyNames}
                     handleClick={handleAddItemClick}
-                    isDuplicateName={isDuplicateName}
-                    newPropertyName={newPropertyName}
-                    newPropertyType={newPropertyType}
                     propertyName={name}
-                    setNewPropertyName={setNewPropertyName}
-                    setNewPropertyType={setNewPropertyType}
                 />
             )}
         </Fragment>

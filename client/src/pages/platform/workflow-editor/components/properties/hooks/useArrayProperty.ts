@@ -1,3 +1,4 @@
+import {NewSubPropertyI} from '@/pages/platform/workflow-editor/components/properties/components/SubPropertyPopover';
 import {useWorkflowEditor} from '@/pages/platform/workflow-editor/providers/workflowEditorProvider';
 import useWorkflowNodeDetailsPanelStore from '@/pages/platform/workflow-editor/stores/useWorkflowNodeDetailsPanelStore';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
@@ -54,7 +55,6 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
     const [arrayItems, setArrayItems] = useState<Array<ArrayPropertyType | Array<ArrayPropertyType>>>([]);
     const [availablePropertyTypes, setAvailablePropertyTypes] =
         useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
-    const [newPropertyType, setNewPropertyType] = useState<string>();
 
     const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
@@ -135,96 +135,98 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         return {variant: 'none'};
     }, [arrayItems.length, isAddDisabled, maxItems, minItems]);
 
-    const handleAddItemClick = useCallback(() => {
-        if (!currentNode || !name) {
-            return;
-        }
-
-        if (maxItems != null && arrayItems.length >= maxItems) {
-            return;
-        }
-
-        let matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
-
-        if (!matchingItem) {
-            matchingItem = items?.find((item) => item.name === newPropertyType);
-        }
-
-        const controlType: ControlType = matchingItem
-            ? (matchingItem.controlType as ControlType)
-            : newPropertyType && newPropertyType in VALUE_PROPERTY_CONTROL_TYPES
-              ? (VALUE_PROPERTY_CONTROL_TYPES[
-                    newPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
-                ] as ControlType)
-              : ('STRING' as ControlType);
-
-        const newItemPath = `${path}[${arrayItems.length.toString()}]`;
-        const newItemType = (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING';
-
-        const newItem = {
-            ...matchingItem,
-            controlType,
-            custom: true,
-            expressionEnabled: matchingItem?.expressionEnabled ?? true,
-            key: crypto.randomUUID(),
-            label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
-            name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
-            path: newItemPath,
-            type: newItemType,
-        };
-
-        // Refresh existing items' defaultValue from current workflow parameters before appending.
-        // Otherwise the re-render triggered by the new item passes a stale `defaultValue: undefined`
-        // (coerced to '' by getExplicitArrayCellParameterValue) down to useProperty, which then
-        // overwrites the user's just-selected value because '' !== undefined wins over the workflow.
-        const encodedParameters = encodeParameters(currentNode.parameters ?? {});
-        const encodedBasePath = encodePath(path);
-
-        const refreshedExistingItems = arrayItems.map((existingItem, existingIndex) => {
-            if (Array.isArray(existingItem)) {
-                return existingItem;
-            }
-
-            const savedValue = safeResolvePath(encodedParameters, `${encodedBasePath}[${existingIndex}]`);
-
-            if (savedValue === undefined || savedValue === null) {
-                return existingItem;
-            }
-
-            return {
-                ...existingItem,
-                defaultValue: savedValue,
-            };
-        });
-
-        setArrayItems([...refreshedExistingItems, newItem]);
-
-        if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
-            if (newItemType === 'OBJECT') {
+    const handleAddItemClick = useCallback(
+        ({type: newPropertyType}: NewSubPropertyI) => {
+            if (!currentNode || !name) {
                 return;
             }
 
-            saveProperty({
-                includeInMetadata: true,
+            if (maxItems != null && arrayItems.length >= maxItems) {
+                return;
+            }
+
+            let matchingItem: ArrayPropertyType | undefined = items?.find((item) => item.type === newPropertyType);
+
+            if (!matchingItem) {
+                matchingItem = items?.find((item) => item.name === newPropertyType);
+            }
+
+            const controlType: ControlType = matchingItem
+                ? (matchingItem.controlType as ControlType)
+                : newPropertyType && newPropertyType in VALUE_PROPERTY_CONTROL_TYPES
+                  ? (VALUE_PROPERTY_CONTROL_TYPES[
+                        newPropertyType as keyof typeof VALUE_PROPERTY_CONTROL_TYPES
+                    ] as ControlType)
+                  : ('STRING' as ControlType);
+
+            const newItemPath = `${path}[${arrayItems.length.toString()}]`;
+            const newItemType = (matchingItem?.type as PropertyType) || (newPropertyType as PropertyType) || 'STRING';
+
+            const newItem = {
+                ...matchingItem,
+                controlType,
+                custom: true,
+                expressionEnabled: matchingItem?.expressionEnabled ?? true,
+                key: crypto.randomUUID(),
+                label: `${matchingItem?.label ?? 'Item'} ${arrayItems.length.toString()}`,
+                name: `${matchingItem?.label ?? name}__${arrayItems.length.toString()}`,
                 path: newItemPath,
                 type: newItemType,
-                updateClusterElementParameterMutation,
-                updateWorkflowNodeParameterMutation,
-                workflowId: workflow.id!,
+            };
+
+            // Refresh existing items' defaultValue from current workflow parameters before appending.
+            // Otherwise the re-render triggered by the new item passes a stale `defaultValue: undefined`
+            // (coerced to '' by getExplicitArrayCellParameterValue) down to useProperty, which then
+            // overwrites the user's just-selected value because '' !== undefined wins over the workflow.
+            const encodedParameters = encodeParameters(currentNode.parameters ?? {});
+            const encodedBasePath = encodePath(path);
+
+            const refreshedExistingItems = arrayItems.map((existingItem, existingIndex) => {
+                if (Array.isArray(existingItem)) {
+                    return existingItem;
+                }
+
+                const savedValue = safeResolvePath(encodedParameters, `${encodedBasePath}[${existingIndex}]`);
+
+                if (savedValue === undefined || savedValue === null) {
+                    return existingItem;
+                }
+
+                return {
+                    ...existingItem,
+                    defaultValue: savedValue,
+                };
             });
-        }
-    }, [
-        arrayItems,
-        currentNode,
-        items,
-        name,
-        newPropertyType,
-        path,
-        updateClusterElementParameterMutation,
-        updateWorkflowNodeParameterMutation,
-        workflow.id,
-        maxItems,
-    ]);
+
+            setArrayItems([...refreshedExistingItems, newItem]);
+
+            if (updateWorkflowNodeParameterMutation || updateClusterElementParameterMutation) {
+                if (newItemType === 'OBJECT') {
+                    return;
+                }
+
+                saveProperty({
+                    includeInMetadata: true,
+                    path: newItemPath,
+                    type: newItemType,
+                    updateClusterElementParameterMutation,
+                    updateWorkflowNodeParameterMutation,
+                    workflowId: workflow.id!,
+                });
+            }
+        },
+        [
+            arrayItems,
+            currentNode,
+            items,
+            name,
+            path,
+            updateClusterElementParameterMutation,
+            updateWorkflowNodeParameterMutation,
+            workflow.id,
+            maxItems,
+        ]
+    );
 
     const handleDeleteClick = useCallback(
         (deletePath: string) => {
@@ -288,12 +290,6 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
-
-    useEffect(() => {
-        if (availablePropertyTypes.length) {
-            setNewPropertyType(availablePropertyTypes[0].value);
-        }
-    }, [availablePropertyTypes]);
 
     useEffect(() => {
         if (!name || !currentNode || !currentNode.parameters || !Object.keys(currentNode.parameters).length) {
@@ -538,14 +534,13 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         arrayItems,
         availablePropertyTypes,
         currentNode,
+        defaultPropertyType: availablePropertyTypes[0]?.value,
         handleAddItemClick,
         handleDeleteClick,
         isAddDisabled,
         items,
         name,
-        newPropertyType,
         setArrayItems,
-        setNewPropertyType,
     };
 }
 

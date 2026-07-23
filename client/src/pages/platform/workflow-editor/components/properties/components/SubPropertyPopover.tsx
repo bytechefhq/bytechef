@@ -3,52 +3,92 @@ import {Popover, PopoverClose, PopoverContent, PopoverTrigger} from '@/component
 import {Tooltip, TooltipContent, TooltipTrigger} from '@/components/ui/tooltip';
 import PropertySelect from '@/pages/platform/workflow-editor/components/properties/components/PropertySelect';
 import PropertyInput from '@/pages/platform/workflow-editor/components/properties/components/property-input/PropertyInput';
+import {encodePath} from '@/pages/platform/workflow-editor/utils/encodingUtils';
 import {VALUE_PROPERTY_CONTROL_TYPES} from '@/shared/constants';
 import {PlusIcon, XIcon} from 'lucide-react';
-import {ChangeEvent} from 'react';
+import {ChangeEvent, memo, useCallback, useEffect, useMemo, useState} from 'react';
+
+export interface NewSubPropertyI {
+    name: string;
+    type: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
+}
 
 interface SubPropertyPopoverProps {
     array?: boolean;
     availablePropertyTypes: Array<{label: string; value: string}>;
     buttonLabel?: string;
+    defaultPropertyType?: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
     disabled?: boolean;
     disabledTooltip?: string;
-    handleClick: () => void;
+    existingPropertyNames?: Array<string>;
+    handleClick: (newSubProperty: NewSubPropertyI) => void;
     insideConditionTaskDispatcher?: boolean;
-    isDuplicateName?: boolean;
-    newPropertyName?: string;
-    newPropertyType: keyof typeof VALUE_PROPERTY_CONTROL_TYPES | string;
     propertyName?: string;
-    setNewPropertyName?: (value: string) => void;
-    setNewPropertyType: (value: keyof typeof VALUE_PROPERTY_CONTROL_TYPES) => void;
 }
 
 const SubPropertyPopover = ({
     array,
     availablePropertyTypes,
     buttonLabel,
+    defaultPropertyType,
     disabled,
     disabledTooltip,
+    existingPropertyNames,
     handleClick,
     insideConditionTaskDispatcher,
-    isDuplicateName = false,
-    newPropertyName,
-    newPropertyType,
     propertyName,
-    setNewPropertyName,
-    setNewPropertyType,
 }: SubPropertyPopoverProps) => {
-    const handleNewPropertyNameChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const [newPropertyName, setNewPropertyName] = useState('');
+    const [newPropertyType, setNewPropertyType] = useState<string>(
+        defaultPropertyType ?? availablePropertyTypes[0]?.value ?? 'STRING'
+    );
+
+    const isDuplicateName = useMemo(() => {
+        if (!newPropertyName || !existingPropertyNames?.length) {
+            return false;
+        }
+
+        const encodedNewPropertyName = encodePath(newPropertyName);
+
+        return existingPropertyNames.some(
+            (existingPropertyName) => encodePath(existingPropertyName) === encodedNewPropertyName
+        );
+    }, [existingPropertyNames, newPropertyName]);
+
+    const typeOptions = useMemo(
+        () =>
+            availablePropertyTypes.map((availablePropertyType) => ({
+                label: availablePropertyType.label,
+                value: availablePropertyType.value,
+            })),
+        [availablePropertyTypes]
+    );
+
+    const handleNewPropertyNameChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
         let {value} = event.target;
 
         if (value.match(/^\d/)) {
             value = `_${value}`;
         }
 
-        if (setNewPropertyName) {
-            setNewPropertyName(value);
+        setNewPropertyName(value);
+    }, []);
+
+    const handleTypeChange = useCallback((value: string) => setNewPropertyType(value), []);
+
+    const handleAddClick = useCallback(() => {
+        handleClick({name: newPropertyName, type: newPropertyType});
+
+        setNewPropertyName('');
+    }, [handleClick, newPropertyName, newPropertyType]);
+
+    // The array flow resolves its available types asynchronously, so adopt the parent default
+    // whenever it changes rather than only on mount.
+    useEffect(() => {
+        if (defaultPropertyType) {
+            setNewPropertyType(defaultPropertyType);
         }
-    };
+    }, [defaultPropertyType]);
 
     if (disabled && disabledTooltip) {
         return (
@@ -95,7 +135,7 @@ const SubPropertyPopover = ({
                         <XIcon
                             aria-hidden="true"
                             className="size-4 cursor-pointer"
-                            onClick={() => setNewPropertyName && setNewPropertyName('')}
+                            onClick={() => setNewPropertyName('')}
                         />
                     </PopoverClose>
                 </header>
@@ -115,40 +155,30 @@ const SubPropertyPopover = ({
                         />
                     )}
 
-                    {insideConditionTaskDispatcher && availablePropertyTypes?.length > 1 && (
+                    {insideConditionTaskDispatcher && typeOptions.length > 1 && (
                         <PropertySelect
                             label="Type"
-                            onValueChange={(value) =>
-                                setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
-                            }
-                            options={availablePropertyTypes.map((property) => ({
-                                label: property.label!,
-                                value: property.value!,
-                            }))}
+                            onValueChange={handleTypeChange}
+                            options={typeOptions}
                             value={newPropertyType}
                         />
                     )}
 
                     {!insideConditionTaskDispatcher &&
-                        (availablePropertyTypes?.length > 1 ? (
+                        (typeOptions.length > 1 ? (
                             <PropertySelect
                                 label="Type"
-                                onValueChange={(value) =>
-                                    setNewPropertyType(value as keyof typeof VALUE_PROPERTY_CONTROL_TYPES)
-                                }
-                                options={availablePropertyTypes.map((property) => ({
-                                    label: property.label!,
-                                    value: property.value!,
-                                }))}
+                                onValueChange={handleTypeChange}
+                                options={typeOptions}
                                 value={newPropertyType}
                             />
                         ) : (
                             <div className="flex w-full items-center gap-2 text-sm">
                                 <span className="font-medium">Type</span>
 
-                                {availablePropertyTypes[0] && (
+                                {typeOptions[0] && (
                                     <span className="inline-flex w-full rounded-md bg-white">
-                                        {availablePropertyTypes[0].value}
+                                        {typeOptions[0].value}
                                     </span>
                                 )}
                             </div>
@@ -160,7 +190,7 @@ const SubPropertyPopover = ({
                         <Button
                             disabled={isDuplicateName || (!array && !newPropertyName)}
                             label="Add"
-                            onClick={handleClick}
+                            onClick={handleAddClick}
                             size="sm"
                         />
                     </PopoverClose>
@@ -170,4 +200,4 @@ const SubPropertyPopover = ({
     );
 };
 
-export default SubPropertyPopover;
+export default memo(SubPropertyPopover);

@@ -178,15 +178,10 @@ describe('useObjectProperty — default value save guard', () => {
         });
 
         expect(result.current.subProperties).toHaveLength(1);
+        expect(result.current.existingSubPropertyNames).toContain('testField');
 
         act(() => {
-            result.current.setNewPropertyName('testField');
-        });
-
-        expect(result.current.isDuplicateName).toBe(true);
-
-        act(() => {
-            result.current.handleAddItemClick();
+            result.current.handleAddItemClick({name: 'testField', type: 'STRING'});
         });
 
         expect(result.current.subProperties).toHaveLength(1);
