@@ -294,7 +294,7 @@ const ConnectionTabConnectionSelect = ({
             <div className="space-y-1">
                 <div className="flex items-center gap-1">
                     {componentDefinition && (
-                        <Label className="text-sm font-medium">
+                        <Label className="gap-0 text-sm font-medium">
                             {componentDefinition.title}
 
                             {required && <RequiredMark />}

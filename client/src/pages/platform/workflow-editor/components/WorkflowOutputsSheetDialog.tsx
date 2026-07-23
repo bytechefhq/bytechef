@@ -131,8 +131,9 @@ const WorkflowOutputsSheetDialog = ({
                             name="name"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Name <RequiredMark />
+                                    <FormLabel className="gap-0">
+                                        Name
+                                        <RequiredMark />
                                     </FormLabel>
 
                                     <FormControl>
@@ -153,8 +154,9 @@ const WorkflowOutputsSheetDialog = ({
                             name="value"
                             render={({field}) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Value <RequiredMark />
+                                    <FormLabel className="gap-0">
+                                        Value
+                                        <RequiredMark />
                                     </FormLabel>
 
                                     <FormControl>

@@ -49,7 +49,10 @@ const PropertyJsonSchemaBuilder = forwardRef<HTMLButtonElement, PropertyJsonSche
                     {label && (
                         <div className="flex w-full items-center justify-between">
                             <div className="flex items-center">
-                                <Label className={twMerge(description && 'mr-1', 'leading-normal')} htmlFor={name}>
+                                <Label
+                                    className={twMerge(description && 'mr-1', 'gap-0 leading-normal')}
+                                    htmlFor={name}
+                                >
                                     {label}
 
                                     {required && <RequiredMark />}

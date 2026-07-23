@@ -110,9 +110,8 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
         editorValueRef.current = editorValue;
         isFormulaModeRef.current = isFormulaMode;
 
-        const {currentComponent, currentNode} = useWorkflowNodeDetailsPanelStore(
+        const {currentNode} = useWorkflowNodeDetailsPanelStore(
             useShallow((state) => ({
-                currentComponent: state.currentNode,
                 currentNode: state.currentNode,
             }))
         );
@@ -476,7 +475,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
                 }
 
                 const attributes = view.props.attributes as Record<string, string>;
-                const parameters = currentComponent?.parameters || {};
+                const parameters = currentNode?.parameters || {};
 
                 if (!canInsertMentionForProperty(attributes.type, parameters, attributes.path)) {
                     return true;
@@ -500,7 +499,7 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
                 return true;
             },
-            [currentComponent?.parameters, isFromAi]
+            [currentNode?.parameters, isFromAi]
         );
 
         const editor = useEditor({
@@ -635,14 +634,14 @@ const PropertyMentionsInputEditor = forwardRef<Editor, PropertyMentionsInputEdit
 
         // Set editable based on isFromAi
         useEffect(() => {
-            if (path && !currentComponent?.metadata?.ui?.fromAi?.includes(path)) {
+            if (path && !currentNode?.metadata?.ui?.fromAi?.includes(path)) {
                 return;
             }
 
             if (editor && isFromAi !== undefined) {
                 editor.setEditable(!isFromAi);
             }
-        }, [currentComponent?.metadata?.ui?.fromAi, editor, isFromAi, path]);
+        }, [currentNode?.metadata?.ui?.fromAi, editor, isFromAi, path]);
 
         // Cleanup function to save mention input value on unmount
         useEffect(() => {

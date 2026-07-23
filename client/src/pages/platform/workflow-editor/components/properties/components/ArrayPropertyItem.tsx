@@ -2,13 +2,15 @@ import DeletePropertyButton from '@/pages/platform/workflow-editor/components/pr
 import {useArrayPropertyItem} from '@/pages/platform/workflow-editor/components/properties/hooks/useArrayProperty';
 import {ArrayPropertyType, NodeDataType} from '@/shared/types';
 import {Dispatch, SetStateAction} from 'react';
+import {twMerge} from 'tailwind-merge';
 
 import Property from '../Property';
 
 interface ArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
     arrayName?: string;
-    currentComponent?: NodeDataType;
+    className?: string;
+    currentNode?: NodeDataType;
     index: number;
     onDeleteClick: (path: string) => void;
     parentArrayItems?: Array<ArrayPropertyType>;
@@ -19,7 +21,8 @@ interface ArrayPropertyItemProps {
 const ArrayPropertyItem = ({
     arrayItem,
     arrayName,
-    currentComponent,
+    className,
+    currentNode,
     index,
     onDeleteClick,
     parentArrayItems,
@@ -28,7 +31,7 @@ const ArrayPropertyItem = ({
 }: ArrayPropertyItemProps) => {
     const {arrayCellParameterValue, handleOnDeleteClick} = useArrayPropertyItem({
         arrayItem,
-        currentComponent,
+        currentNode,
         index,
         onDeleteClick,
         path,
@@ -38,7 +41,7 @@ const ArrayPropertyItem = ({
     return (
         <div
             aria-label={`Array property item at index ${index}`}
-            className="flex"
+            className={twMerge('flex', className)}
             key={`${arrayName}_${arrayItem.name}`}
         >
             <Property
@@ -46,7 +49,7 @@ const ArrayPropertyItem = ({
                 arrayName={arrayName}
                 customClassName="pl-2 w-full"
                 deletePropertyButton={
-                    arrayItem.custom && arrayName && arrayItem.name && currentComponent ? (
+                    arrayItem.custom && arrayName && arrayItem.name && currentNode ? (
                         <DeletePropertyButton
                             key={`${arrayItem.key}_deleteSubPropertyButton`}
                             onClick={handleOnDeleteClick}

@@ -96,12 +96,12 @@ const buildMentionId = ({
     return transformPathForObjectAccess(value);
 };
 
-const canInsertDataPill = (mentionInput: Editor | null, currentComponent?: NodeDataType): boolean => {
+const canInsertDataPill = (mentionInput: Editor | null, currentNode?: NodeDataType): boolean => {
     if (!mentionInput) {
         return false;
     }
 
-    const parameters = currentComponent?.parameters || {};
+    const parameters = currentNode?.parameters || {};
 
     if (!Object.keys(parameters).length) {
         return true;
@@ -121,9 +121,9 @@ const DataPill = ({
     sampleOutput,
     workflowNodeName,
 }: DataPillProps) => {
-    const {currentComponent, focusedInput} = useWorkflowNodeDetailsPanelStore(
+    const {currentNode, focusedInput} = useWorkflowNodeDetailsPanelStore(
         useShallow((state) => ({
-            currentComponent: state.currentNode,
+            currentNode: state.currentNode,
             focusedInput: state.focusedInput,
         }))
     );
@@ -148,7 +148,7 @@ const DataPill = ({
             return;
         }
 
-        if (!canInsertDataPill(mentionInput, currentComponent)) {
+        if (!canInsertDataPill(mentionInput, currentNode)) {
             return;
         }
 

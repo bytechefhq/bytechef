@@ -56,7 +56,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         useState<Array<{label: string; value: string}>>(initialAvailablePropertyTypes);
     const [newPropertyType, setNewPropertyType] = useState<string>();
 
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
@@ -136,7 +136,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
     }, [arrayItems.length, isAddDisabled, maxItems, minItems]);
 
     const handleAddItemClick = useCallback(() => {
-        if (!currentComponent || !name) {
+        if (!currentNode || !name) {
             return;
         }
 
@@ -177,7 +177,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         // Otherwise the re-render triggered by the new item passes a stale `defaultValue: undefined`
         // (coerced to '' by getExplicitArrayCellParameterValue) down to useProperty, which then
         // overwrites the user's just-selected value because '' !== undefined wins over the workflow.
-        const encodedParameters = encodeParameters(currentComponent.parameters ?? {});
+        const encodedParameters = encodeParameters(currentNode.parameters ?? {});
         const encodedBasePath = encodePath(path);
 
         const refreshedExistingItems = arrayItems.map((existingItem, existingIndex) => {
@@ -215,7 +215,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         }
     }, [
         arrayItems,
-        currentComponent,
+        currentNode,
         items,
         name,
         newPropertyType,
@@ -228,17 +228,17 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
     const handleDeleteClick = useCallback(
         (deletePath: string) => {
-            if (!currentComponent || !deletePath) {
+            if (!currentNode || !deletePath) {
                 return;
             }
 
-            const clickedItemParameterValue = safeResolvePath(currentComponent.parameters ?? {}, deletePath);
+            const clickedItemParameterValue = safeResolvePath(currentNode.parameters ?? {}, deletePath);
 
             if (clickedItemParameterValue !== undefined) {
                 onDeleteClick(deletePath);
             }
         },
-        [currentComponent, onDeleteClick]
+        [currentNode, onDeleteClick]
     );
 
     useEffect(() => {
@@ -251,7 +251,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         const processItems = (itemList: Array<PropertyAllType>) =>
             itemList.reduce((types: Array<{label: string; value: string}>, item) => {
                 if (item && item.type) {
-                    if (currentComponent?.componentName === 'condition' && hasDuplicateTypes) {
+                    if (currentNode?.componentName === 'condition' && hasDuplicateTypes) {
                         types.push({
                             label: item.label!,
                             value: item.name!,
@@ -296,16 +296,11 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
     }, [availablePropertyTypes]);
 
     useEffect(() => {
-        if (
-            !name ||
-            !currentComponent ||
-            !currentComponent.parameters ||
-            !Object.keys(currentComponent.parameters).length
-        ) {
+        if (!name || !currentNode || !currentNode.parameters || !Object.keys(currentNode.parameters).length) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedParameters = encodeParameters(currentNode.parameters);
         const encodedPath = encodePath(path);
 
         const parameterValue = safeResolvePath(encodedParameters, encodedPath);
@@ -404,7 +399,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
             const parameterArrayItems = parameterValue.map((parameterItemValue: ArrayPropertyType, index: number) => {
                 const subPropertyPath = `${path}[${index}]`;
 
-                let parameterItemType = currentComponent.metadata?.ui?.dynamicPropertyTypes?.[subPropertyPath];
+                let parameterItemType = currentNode.metadata?.ui?.dynamicPropertyTypes?.[subPropertyPath];
 
                 if (!parameterItemType) {
                     parameterItemType = getParameterItemType(parameterItemValue);
@@ -452,9 +447,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
                             const subPropertyParameterValue = parameterItemValue[key as keyof ArrayPropertyType];
 
                             let subPropertyParameterItemType =
-                                currentComponent.metadata?.ui?.dynamicPropertyTypes?.[
-                                    `${path}[${index}].${decodedKey}`
-                                ];
+                                currentNode.metadata?.ui?.dynamicPropertyTypes?.[`${path}[${index}].${decodedKey}`];
 
                             if (!subPropertyParameterItemType) {
                                 subPropertyParameterItemType = getParameterItemType(subPropertyParameterValue);
@@ -503,15 +496,15 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Mount hydration runs once, so after a save updates currentComponent.parameters each item's
+    // Mount hydration runs once, so after a save updates currentNode.parameters each item's
     // cached defaultValue would stay stale and override the user's selection on the next render.
     // Re-sync existing items' defaultValue from the saved parameters whenever they change.
     useEffect(() => {
-        if (!currentComponent?.parameters || !name || !path) {
+        if (!currentNode?.parameters || !name || !path) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedParameters = encodeParameters(currentNode.parameters);
         const encodedBasePath = encodePath(path);
 
         setArrayItems((previousItems) => {
@@ -538,13 +531,13 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
             return changed ? refreshedItems : previousItems;
         });
-    }, [currentComponent?.parameters, name, path]);
+    }, [currentNode?.parameters, name, path]);
 
     return {
         arrayConstraintHint,
         arrayItems,
         availablePropertyTypes,
-        currentComponent,
+        currentNode,
         handleAddItemClick,
         handleDeleteClick,
         isAddDisabled,
@@ -558,7 +551,7 @@ export function useArrayProperty({onDeleteClick, parentArrayItems, path, propert
 
 export interface UseArrayPropertyItemProps {
     arrayItem: ArrayPropertyType;
-    currentComponent?: NodeDataType;
+    currentNode?: NodeDataType;
     index: number;
     onDeleteClick: (path: string) => void;
     path: string;
@@ -567,7 +560,7 @@ export interface UseArrayPropertyItemProps {
 
 export function useArrayPropertyItem({
     arrayItem,
-    currentComponent,
+    currentNode,
     index,
     onDeleteClick,
     path,
@@ -580,14 +573,14 @@ export function useArrayPropertyItem({
 
         let parameterArrayAfterDelete: unknown[] = [];
 
-        if (currentComponent?.parameters) {
-            const encodedParameters = encodeParameters(currentComponent.parameters);
+        if (currentNode?.parameters) {
+            const encodedParameters = encodeParameters(currentNode.parameters);
             const encodedBasePath = encodePath(basePath);
 
             let resolvedArray = safeResolvePath(encodedParameters, encodedBasePath);
 
             if (!Array.isArray(resolvedArray)) {
-                resolvedArray = safeResolvePath(currentComponent.parameters as Record<string, unknown>, basePath);
+                resolvedArray = safeResolvePath(currentNode.parameters as Record<string, unknown>, basePath);
             }
 
             if (Array.isArray(resolvedArray)) {
@@ -660,7 +653,7 @@ export function useArrayPropertyItem({
         });
 
         onDeleteClick(path);
-    }, [currentComponent, index, onDeleteClick, path, setArrayItems]);
+    }, [currentNode, index, onDeleteClick, path, setArrayItems]);
 
     return {
         arrayCellParameterValue,

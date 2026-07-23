@@ -56,7 +56,7 @@ const SubPropertyPopover = ({
                 <TooltipTrigger asChild>
                     <span className="inline-block">
                         <Button
-                            className="rounded-sm"
+                            className="mb-2 rounded-sm"
                             disabled
                             icon={<PlusIcon />}
                             label={buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
@@ -76,6 +76,7 @@ const SubPropertyPopover = ({
             <PopoverTrigger asChild>
                 <Button
                     aria-label={`Add ${propertyName ? `${propertyName} ` : ''}${array ? 'array item' : 'object property'}`}
+                    className="mb-2"
                     icon={<PlusIcon />}
                     label={buttonLabel || `Add ${array ? 'array item' : 'object property'}`}
                     size="sm"

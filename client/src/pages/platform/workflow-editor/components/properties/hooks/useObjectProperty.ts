@@ -51,7 +51,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     const defaultValueSavedRef = useRef(false);
 
-    const currentComponent = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
+    const currentNode = useWorkflowNodeDetailsPanelStore((state) => state.currentNode);
     const workflow = useWorkflowDataStore((state) => state.workflow);
 
     const {updateClusterElementParameterMutation, updateWorkflowNodeParameterMutation} = useWorkflowEditor();
@@ -303,11 +303,11 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
 
     // render individual object items with data gathered from parameters
     useEffect(() => {
-        if (!name || !path || !currentComponent?.parameters) {
+        if (!name || !path || !currentNode?.parameters) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters);
+        const encodedParameters = encodeParameters(currentNode.parameters);
         const encodedPath = encodePath(path);
 
         const resolvedParameterObject = safeResolvePath(encodedParameters, encodedPath);
@@ -322,7 +322,7 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             }
         }
 
-        const dynamicPropertyTypes = currentComponent?.metadata?.ui?.dynamicPropertyTypes;
+        const dynamicPropertyTypes = currentNode?.metadata?.ui?.dynamicPropertyTypes;
 
         const objectParameterKeys = buildOrderedPropertyKeys({
             dynamicPropertyTypes,
@@ -407,10 +407,10 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [
-        currentComponent?.parameters,
+        currentNode?.parameters,
         properties,
         path,
-        currentComponent?.metadata?.ui?.dynamicPropertyTypes,
+        currentNode?.metadata?.ui?.dynamicPropertyTypes,
         buildOrderedPropertyKeys,
         buildPropertyFromParameterKey,
     ]);
@@ -430,17 +430,17 @@ export const useObjectProperty = ({onDeleteClick, path, property}: UseObjectProp
             return;
         }
 
-        const currentComponent = useWorkflowNodeDetailsPanelStore.getState().currentNode;
+        const currentNode = useWorkflowNodeDetailsPanelStore.getState().currentNode;
 
-        if (!currentComponent) {
+        if (!currentNode) {
             return;
         }
 
-        if (path.includes('.') && (!currentComponent.parameters || !Object.keys(currentComponent.parameters).length)) {
+        if (path.includes('.') && (!currentNode.parameters || !Object.keys(currentNode.parameters).length)) {
             return;
         }
 
-        const encodedParameters = encodeParameters(currentComponent.parameters ?? {});
+        const encodedParameters = encodeParameters(currentNode.parameters ?? {});
         const encodedPath = encodePath(path);
 
         const existingObject = safeResolvePath(encodedParameters, encodedPath);

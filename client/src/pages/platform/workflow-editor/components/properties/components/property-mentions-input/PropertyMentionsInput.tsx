@@ -210,7 +210,7 @@ const PropertyMentionsInput = forwardRef<Editor, PropertyMentionsInputProps>(
                         {label && (
                             <div className="flex items-center">
                                 <Label
-                                    className={twMerge(description && 'mr-1', 'leading-normal')}
+                                    className={twMerge(description && 'mr-1', 'gap-0 leading-normal')}
                                     htmlFor={elementId}
                                     id={labelId}
                                 >
