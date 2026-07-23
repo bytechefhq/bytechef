@@ -73,6 +73,12 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
+        if (isClientAbortException(throwable)) {
+            log.debug("Client aborted the connection, skipping error response", throwable);
+
+            return null;
+        }
+
         Exception exception = getCauseException((Exception) throwable);
 
         if (exception instanceof IllegalArgumentException) {
@@ -110,6 +116,19 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
         return ResponseEntity
             .of(createProblemDetail(exception, HttpStatus.CONFLICT, "Concurrency Failure", null, null, request))
             .build();
+    }
+
+    private static boolean isClientAbortException(Throwable throwable) {
+        for (Throwable current = throwable; current != null; current = current.getCause()) {
+            String simpleClassName = current.getClass()
+                .getSimpleName();
+
+            if (simpleClassName.equals("ClientAbortException") || simpleClassName.equals("EofException")) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static Exception getCauseException(Exception throwable) {

@@ -18,6 +18,7 @@ package com.bytechef.web.rest.error;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import org.springframework.dao.ConcurrencyFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
@@ -76,6 +77,11 @@ public class ExceptionTranslatorTestController {
         throw new RuntimeException();
     }
 
+    @GetMapping("/client-abort")
+    public void clientAbort() throws IOException {
+        throw new ClientAbortException("simulated client abort");
+    }
+
     public static class TestDTO {
 
         @NotNull
@@ -93,5 +99,15 @@ public class ExceptionTranslatorTestController {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST, reason = "test response status")
     @SuppressWarnings("serial")
     public static class TestResponseStatusException extends RuntimeException {
+    }
+
+    // Mimics Tomcat's org.apache.catalina.connector.ClientAbortException by simple class name, without a
+    // servlet-container dependency; GlobalResponseEntityExceptionHandler matches on the simple name.
+    @SuppressWarnings("serial")
+    public static class ClientAbortException extends IOException {
+
+        public ClientAbortException(String message) {
+            super(message);
+        }
     }
 }
