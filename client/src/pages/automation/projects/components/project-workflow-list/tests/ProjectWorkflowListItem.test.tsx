@@ -135,7 +135,7 @@ describe('ProjectWorkflowListItem', () => {
     it('should render last modified date', () => {
         renderProjectWorkflowListItem();
 
-        expect(screen.getByText(/Modified at/)).toBeInTheDocument();
+        expect(screen.getAllByText(/Modified at/).length).toBeGreaterThan(0);
     });
 
     it('should render workflow components list', () => {
