@@ -87,7 +87,8 @@ public class BitbucketCreateProjectAction {
                 .required(false))
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#create-project");
 
     private BitbucketCreateProjectAction() {
     }
