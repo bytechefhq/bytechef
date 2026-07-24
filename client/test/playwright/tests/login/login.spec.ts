@@ -130,7 +130,7 @@ test.describe('Login Page', () => {
 
             await expect(page).toHaveURL(/\/automation\/projects/);
 
-            await expect(page.locator('div').filter({hasText: /^projects$/i})).toBeVisible();
+            await expect(page.getByRole('complementary').getByText('Projects', {exact: true})).toBeVisible();
         });
     });
 });

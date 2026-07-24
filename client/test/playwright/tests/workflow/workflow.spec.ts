@@ -21,7 +21,7 @@ test.describe('Workflow Editor', () => {
         });
 
         await test.step('Click on the Manual trigger node', async () => {
-            const manualTriggerNode = authenticatedPage.getByLabel('trigger_1 node');
+            const manualTriggerNode = authenticatedPage.getByLabel('trigger_1 node', {exact: true});
 
             await expect(manualTriggerNode).toBeVisible({timeout: 10000});
 

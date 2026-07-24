@@ -5,7 +5,6 @@ import {WorkflowPage} from '../../pages/workflowPage';
 import sampleWorkflow from '../../sampleWorkflow.json';
 import {clickAndExpectToBeVisible} from '../../utils/clickAndExpectToBeVisible';
 import {type TestProjectI, type TestWorkflowI} from '../../utils/projectUtils';
-import {fillPropertyInput} from '../../utils/propertyValidationUtils';
 import {getWorkflowDefinition, openPropertiesTab, reopenConfigurationPanel} from '../../utils/workflowUtils';
 
 export const test = mergeTests(loginTest(), projectTest, importWorkflowTest);
@@ -25,7 +24,7 @@ test.describe('Reading from Workflow Definition', () => {
         });
 
         await test.step('Open var_1 node configuration panel', async () => {
-            const varNode = authenticatedPage.getByLabel('var_1 node');
+            const varNode = authenticatedPage.getByLabel('var_1 node', {exact: true});
 
             configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
 
@@ -155,7 +154,7 @@ test.describe('Saving to Workflow Definition', () => {
         });
 
         await test.step('Open var_1 node configuration panel', async () => {
-            const varNode = authenticatedPage.getByLabel('var_1 node');
+            const varNode = authenticatedPage.getByLabel('var_1 node', {exact: true});
 
             configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
 
@@ -403,7 +402,7 @@ test.describe('Type change and subproperty cleanup', () => {
         });
 
         await test.step('Open var_1 node configuration panel and switch to Properties tab', async () => {
-            const varNode = authenticatedPage.getByLabel('var_1 node');
+            const varNode = authenticatedPage.getByLabel('var_1 node', {exact: true});
 
             const configurationPanel = authenticatedPage.getByLabel('var_1 component configuration panel');
 
