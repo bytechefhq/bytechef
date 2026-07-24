@@ -30,5 +30,6 @@ export default defineConfig({
         timeout: 120 * 1000,
         url: 'http://127.0.0.1:5173',
     },
-    workers: process.env.CI ? 1 : undefined,
+    // Prevent over-subscription of test workers due to workflow editor; the default (~50% of cores)
+    workers: process.env.CI ? 1 : 3,
 });
