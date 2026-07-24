@@ -23,15 +23,23 @@ import static com.bytechef.component.bitbucket.constant.BitbucketConstants.REPOS
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.URL;
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.WORKSPACE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.BodyContentType;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.HttpHeaders;
@@ -41,74 +49,83 @@ import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.definition.TriggerDefinition.WebhookMethod;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class BitbucketRepositoryPushTriggerTest {
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Executor mockedExecutor = mock(Executor.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
     private final HttpHeaders mockedHttpHeaders = mock(HttpHeaders.class);
     private final HttpParameters mockedHttpParameters = mock(HttpParameters.class);
     private final Map<String, Object> mockedMap = Map.of();
     private final Parameters mockedParameters = MockParametersFactory.create(
         Map.of(WORKSPACE, "workspace", REPOSITORY, "repository", ID, "id"));
-    private final Response mockedResponse = mock(Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
     private final Parameters mockedWebhookEnableOutputParameters = mock(Parameters.class);
     private final WebhookMethod mockedWebhookMethod = mock(WebhookMethod.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
 
     @Test
-    void testWebhookDisable() {
-        when(mockedTriggerContext.http(any()))
+    void testWebhookDisable(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         BitbucketRepositoryPushTrigger.webhookDisable(
             mockedParameters, mockedParameters, mockedParameters, "testWorkflowExecutionId",
-            mockedTriggerContext);
+            mockedContext);
 
-        verify(mockedTriggerContext, times(1)).http(any());
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/repositories/workspace/repository/hooks/id", stringArgumentCaptor.getValue());
+
+        verify(mockedContext, times(1)).http(any());
         verify(mockedExecutor, times(1)).execute();
     }
 
     @Test
-    void testWebhookEnable() {
-        when(mockedTriggerContext.http(any()))
+    void testWebhookEnable(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of("uuid", "id"));
 
         String webhookUrl = "testWebhookUrl";
         WebhookEnableOutput webhookEnableOutput = BitbucketRepositoryPushTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedTriggerContext);
+            mockedParameters, mockedParameters, webhookUrl, "testWorkflowExecutionId", mockedContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(ID, "id"), null);
 
         assertEquals(expectedWebhookEnableOutput, webhookEnableOutput);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/repositories/workspace/repository/hooks", stringArgumentCaptor.getValue());
 
-        Body body = bodyArgumentCaptor.getValue();
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
 
         Map<String, Object> expectedBody = Map.of(
             URL, webhookUrl,
             ACTIVE, true,
             EVENTS, List.of("repo:push"));
 
-        assertEquals(expectedBody, body.getContent());
+        assertEquals(Body.of(expectedBody, BodyContentType.JSON), bodyArgumentCaptor.getValue());
     }
 
     @Test
@@ -118,7 +135,7 @@ class BitbucketRepositoryPushTriggerTest {
 
         Object result = BitbucketRepositoryPushTrigger.webhookRequest(
             mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutputParameters, mockedTriggerContext);
+            mockedWebhookMethod, mockedWebhookEnableOutputParameters, null);
 
         assertEquals(Map.of(), result);
     }

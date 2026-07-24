@@ -24,45 +24,50 @@ import static com.bytechef.component.bitbucket.constant.BitbucketConstants.VALUE
 import static com.bytechef.component.bitbucket.constant.BitbucketConstants.WORKSPACE;
 import static com.bytechef.component.definition.ComponentDsl.option;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.component.definition.Context;
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Option;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class BitbucketUtilsTest {
-    private final Context mockedContext = mock(Context.class);
-    private final Executor mockedExecutor = mock(Executor.class);
     private final Parameters mockedParameters = MockParametersFactory.create(Map.of(WORKSPACE, "workspace"));
-    private final Response mockedResponse = mock(Response.class);
     private final Map<String, Object> responseMap = Map.of(VALUES, List.of(
         Map.of(NAME, "name1", KEY, "key1", SLUG, "slug1"),
         Map.of(NAME, "name2", KEY, "key2", SLUG, "slug2")));
     private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
 
     @Test
-    void testGetPaginationList() {
-        when(mockedContext.http(any()))
+    void testGetPaginationList(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -70,20 +75,25 @@ class BitbucketUtilsTest {
         List<Map<String, Object>> result = BitbucketUtils.getPaginationList(mockedContext, mockedUrl);
 
         assertEquals(responseMap.get(VALUES), result);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of(mockedUrl, PAGE, "1"), stringArgumentCaptor.getAllValues());
 
-        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetRepositoryOptions() {
-        when(mockedContext.http(any()))
+    void testGetRepositoryOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -95,20 +105,25 @@ class BitbucketUtilsTest {
             option("name2", "slug2"));
 
         assertEquals(expectedOptions, options);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("/repositories/workspace", PAGE, "1"), stringArgumentCaptor.getAllValues());
 
-        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetKeyOptions() {
-        when(mockedContext.http(any()))
+    void testGetKeyOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -120,20 +135,25 @@ class BitbucketUtilsTest {
             option("name2", "key2"));
 
         assertEquals(expectedOptions, options);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("/workspaces/workspace/projects", PAGE, "1"), stringArgumentCaptor.getAllValues());
 
-        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 
     @Test
-    void testGetWorkspaceOptions() {
-        when(mockedContext.http(any()))
+    void testGetWorkspaceOptions(
+        Context mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.get(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(responseMap);
 
@@ -145,7 +165,12 @@ class BitbucketUtilsTest {
             option("name2", "name2"));
 
         assertEquals(expectedOptions, options);
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals(List.of("/workspaces", PAGE, "1"), stringArgumentCaptor.getAllValues());
 
-        assertEquals(List.of(PAGE, "1"), stringArgumentCaptor.getAllValues());
+        ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(ResponseType.JSON, configuration.getResponseType());
     }
 }
