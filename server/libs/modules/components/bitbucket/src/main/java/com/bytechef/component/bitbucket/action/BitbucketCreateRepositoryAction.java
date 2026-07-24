@@ -115,7 +115,8 @@ public class BitbucketCreateRepositoryAction {
             .description("Bitbucket repository object returned from the API.")
             .metadata(
                 Map.of(
-                    "responseType", ResponseType.JSON))));
+                    "responseType", ResponseType.JSON))))
+        .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#create-repository");
 
     private BitbucketCreateRepositoryAction() {
     }
