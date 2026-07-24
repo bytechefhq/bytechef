@@ -57,6 +57,7 @@ public class BitbucketListProjectsAction {
                             .description("Bitbucket project.")
                             .properties(
                                 BitbucketProjectObjectProperties.PROPERTIES))))
+        .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#list-projects")
         .perform(BitbucketListProjectsAction::perform);
 
     private BitbucketListProjectsAction() {

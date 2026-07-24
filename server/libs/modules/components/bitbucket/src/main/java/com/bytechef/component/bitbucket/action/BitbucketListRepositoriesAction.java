@@ -57,6 +57,7 @@ public class BitbucketListRepositoriesAction {
                             .description("Bitbucket repository.")
                             .properties(
                                 BitbucketRepositoryObjectProperties.PROPERTIES))))
+        .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#list-repositories")
         .perform(BitbucketListRepositoriesAction::perform);
 
     private BitbucketListRepositoriesAction() {
