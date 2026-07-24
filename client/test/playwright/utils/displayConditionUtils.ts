@@ -1,6 +1,7 @@
 import {type Locator, type Page, expect} from '@playwright/test';
 
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
+import {propertyTestingParametersSavePromise} from './propertyValidationUtils';
 
 export const BOOLEAN_PROPERTY_LABEL = 'bool property';
 export const CONDITIONAL_PROPERTY_LABEL = 'displayCondition property';
@@ -20,7 +21,7 @@ export async function setBooleanPropertyValue({
 
     const booleanSelect = booleanProperty.getByLabel('Select');
 
-    const option = page.getByRole('option', {name: value ? 'True' : 'False', exact: true});
+    const option = page.getByRole('option', {exact: true, name: value ? 'True' : 'False'});
 
     await clickAndExpectToBeVisible({
         autoClick: true,
@@ -36,11 +37,7 @@ export async function setBooleanPropertyValueAndWaitForSave({
     page,
     value,
 }: SetBooleanPropertyValueProps): Promise<void> {
-    const saveResponsePromise = page.waitForResponse(
-        (response) =>
-            response.request().method() === 'PATCH' &&
-            response.url().includes('/workflow-nodes/propertyTesting_1/parameters')
-    );
+    const saveResponsePromise = propertyTestingParametersSavePromise(page);
 
     await setBooleanPropertyValue({configurationPanel, page, value});
 
