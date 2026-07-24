@@ -31,7 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.util.DisconnectedClientHelper;
 
 /**
  * Controller advice to translate the server side exceptions to client-friendly json structures. The error response
@@ -44,6 +46,14 @@ import org.springframework.web.context.request.WebRequest;
 public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntityExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalResponseEntityExceptionHandler.class);
+
+    /**
+     * Request-scoped marker signalling that this handler has already produced (or attempted to produce) an error
+     * response for the current request. It guards against unbounded recursion: rendering the error response can itself
+     * fail, and routing that second failure back into this handler would otherwise loop forever.
+     */
+    private static final String ERROR_HANDLED_ATTRIBUTE =
+        GlobalResponseEntityExceptionHandler.class.getName() + ".ERROR_HANDLED";
 
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(AbstractException.class)
@@ -70,9 +80,43 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
             .build();
     }
 
+    /**
+     * This method takes care of unhandled exceptions that were risen up during the request procession. Method takes
+     * special care if the client closed the connection before the response is being sent. This method has infinite loop
+     * protection. About client disconnection A client that has gone away (a browser that navigated off a page while a
+     * static asset was still streaming, a dropped SSE connection, ...) is not a server error. There is no live socket
+     * left to answer, so attempting to write a body would fail and only add noise. DisconnectedClientHelper recognizes
+     * the disconnect exceptions of every supported servlet container, so this stays independent of the container
+     * (Tomcat, Jetty, ...) and does not match exception types by name. Returning null tells Spring the exception was
+     * handled without a body. Recursion guard: Producing the error response can itself throw (broken pipe mid-write, no
+     * message converter for the negotiated content type, ...). Feeding that second failure back into this handler would
+     * spin forever. Marking the request the first time means any subsequent pass for the same request stops here
+     * instead of attempting another write. The marker lives on the request, so it is released with the request and
+     * survives internal re-dispatches - unlike thread- or call-stack-based state.
+     *
+     * @param throwable
+     * @param request
+     * @return
+     */
     @ExceptionHandler(Throwable.class)
     @SuppressFBWarnings("BC_UNCONFIRMED_CAST")
     public ResponseEntity<ProblemDetail> handleAnyException(final Throwable throwable, final WebRequest request) {
+        if (DisconnectedClientHelper.isClientDisconnectedException(throwable)) {
+            log.debug("Client disconnected before the response was written: {}", throwable.getMessage());
+
+            return null;
+        }
+
+        if (isErrorAlreadyHandled(request)) {
+            log.warn(
+                "Skipping repeated error handling for a request whose error response already failed: {}",
+                throwable.getMessage());
+
+            return null;
+        }
+
+        markErrorHandled(request);
+
         Exception exception = getCauseException((Exception) throwable);
 
         if (exception instanceof IllegalArgumentException) {
@@ -121,4 +165,19 @@ public class GlobalResponseEntityExceptionHandler extends AbstractResponseEntity
 
         return exception;
     }
+
+    private static boolean isErrorAlreadyHandled(WebRequest request) {
+        var errorHandledObject = request.getAttribute(ERROR_HANDLED_ATTRIBUTE, RequestAttributes.SCOPE_REQUEST);
+
+        if (errorHandledObject == null) {
+            return false;
+        }
+
+        return (Boolean) errorHandledObject;
+    }
+
+    private static void markErrorHandled(WebRequest request) {
+        request.setAttribute(ERROR_HANDLED_ATTRIBUTE, Boolean.TRUE, RequestAttributes.SCOPE_REQUEST);
+    }
+
 }
