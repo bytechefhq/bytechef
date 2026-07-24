@@ -41,17 +41,8 @@ export async function assertPropertyValidation(
     }
 }
 
-export async function openPropertyTestingPanelAndPropertiesTab(
-    page: Page,
-    projectId: string,
-    workflowId: string,
-    anchorPropertyLabel: string
-): Promise<Locator> {
-    const workflowPage = new WorkflowPage(page);
-
-    await workflowPage.goToWorkflowEditor(projectId, workflowId);
-
-    const propertyTestingNode = page.getByLabel('propertyTesting_1 node');
+export async function openPropertyTestingPanel(page: Page, anchorPropertyLabel: string): Promise<Locator> {
+    const propertyTestingNode = page.getByLabel('propertyTesting_1 node', {exact: true});
     const configurationPanel = page.getByLabel('propertyTesting_1 component configuration panel');
 
     await clickAndExpectToBeVisible({
@@ -68,4 +59,17 @@ export async function openPropertyTestingPanelAndPropertiesTab(
     });
 
     return configurationPanel;
+}
+
+export async function openPropertyTestingPanelAndPropertiesTab(
+    page: Page,
+    projectId: string,
+    workflowId: string,
+    anchorPropertyLabel: string
+): Promise<Locator> {
+    const workflowPage = new WorkflowPage(page);
+
+    await workflowPage.goToWorkflowEditor(projectId, workflowId);
+
+    return openPropertyTestingPanel(page, anchorPropertyLabel);
 }

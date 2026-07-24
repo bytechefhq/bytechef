@@ -533,7 +533,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
             });
 
             await test.step('Open another node (propertyTesting_1), then return to var_1', async () => {
-                const otherNode = authenticatedPage.getByLabel('propertyTesting_1 node');
+                const otherNode = authenticatedPage.getByLabel('propertyTesting_1 node', {exact: true});
 
                 await clickAndExpectToBeVisible({
                     target: authenticatedPage.getByLabel('propertyTesting_1 component configuration panel'),

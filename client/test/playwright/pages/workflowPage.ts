@@ -72,7 +72,7 @@ export class WorkflowPage {
 
     constructor(page: Page) {
         this.page = page;
-        this.firstNode = page.getByLabel('var_1 node');
+        this.firstNode = page.getByLabel('var_1 node', {exact: true});
         this.firstTaskComponentConfigurationPanel = page.getByLabel('var_1 component configuration panel');
         this.arrayProperty = this.firstTaskComponentConfigurationPanel.getByLabel('Array property', {exact: true});
 

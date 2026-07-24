@@ -5,7 +5,7 @@ import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
 export interface WorkflowDefinitionI {
     tasks?: Array<{
         name?: string;
-        parameters?: {
+        parameters?: Record<string, unknown> & {
             value?: Record<string, unknown>;
         };
         metadata?: {
@@ -26,6 +26,20 @@ export function getPropertyValue({propertyName, taskName, workflowDefinition}: G
     const task = workflowDefinition.tasks?.find((taskItem) => taskItem.name === taskName);
 
     return task?.parameters?.value?.[propertyName];
+}
+
+interface GetTaskParametersProps {
+    taskName: string;
+    workflowDefinition: WorkflowDefinitionI;
+}
+
+export function getTaskParameters({
+    taskName,
+    workflowDefinition,
+}: GetTaskParametersProps): Record<string, unknown> | undefined {
+    const task = workflowDefinition.tasks?.find((taskItem) => taskItem.name === taskName);
+
+    return task?.parameters;
 }
 
 export function formatPropertyValue(value: unknown, propertyName: string): string {
@@ -85,7 +99,7 @@ export async function replaceMentionsInputValue({input, page, value}: ReplaceMen
 }
 
 export async function reopenConfigurationPanel(page: Page): Promise<Locator> {
-    const varNode = page.getByLabel('var_1 node');
+    const varNode = page.getByLabel('var_1 node', {exact: true});
 
     const reloadedConfigurationPanel = page.getByLabel('var_1 component configuration panel');
 
