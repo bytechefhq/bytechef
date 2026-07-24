@@ -19,22 +19,31 @@ package com.bytechef.component.beamer.trigger;
 import static com.bytechef.component.beamer.constant.BeamerConstants.DATE_FROM;
 import static com.bytechef.component.beamer.constant.BeamerConstants.LAST_TIME_CHECKED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
 import com.bytechef.component.definition.Context.Http;
+import com.bytechef.component.definition.Context.Http.Configuration;
+import com.bytechef.component.definition.Context.Http.Configuration.ConfigurationBuilder;
+import com.bytechef.component.definition.Context.Http.Executor;
+import com.bytechef.component.definition.Context.Http.Response;
+import com.bytechef.component.definition.Context.Http.ResponseType;
 import com.bytechef.component.definition.Parameters;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.PollOutput;
 import com.bytechef.component.definition.TypeReference;
 import com.bytechef.component.test.definition.MockParametersFactory;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -42,17 +51,19 @@ import org.mockito.Mockito;
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class BeamerNewPostTriggerTest {
 
-    private final Http.Executor mockedExecutor = mock(Http.Executor.class);
-    private final Http.Response mockedResponse = mock(Http.Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
-    private final ArgumentCaptor<String> stringArgumentCaptor = ArgumentCaptor.forClass(String.class);
-    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = ArgumentCaptor.forClass(ZoneId.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
+    private final ArgumentCaptor<ZoneId> zoneIdArgumentCaptor = forClass(ZoneId.class);
     private final List<Map<String, Object>> responseList = List.of(Map.of());
 
     @Test
-    void poll() {
+    void poll(
+        TriggerContext mockedContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
         LocalDateTime startDate = LocalDateTime.of(2025, 4, 3, 0, 0, 0);
         LocalDateTime endDate = LocalDateTime.of(2025, 4, 4, 0, 0, 0);
 
@@ -65,26 +76,28 @@ class BeamerNewPostTriggerTest {
             localDateTimeMockedStatic.when(() -> LocalDateTime.now(zoneIdArgumentCaptor.capture()))
                 .thenReturn(endDate);
 
-            when(mockedTriggerContext.http(any()))
+            when(mockedHttp.get(stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
             when(mockedExecutor.queryParameter(stringArgumentCaptor.capture(), stringArgumentCaptor.capture()))
                 .thenReturn(mockedExecutor);
-            when(mockedExecutor.configuration(any()))
-                .thenReturn(mockedExecutor);
-            when(mockedExecutor.execute())
-                .thenReturn(mockedResponse);
             when(mockedResponse.getBody(any(TypeReference.class)))
                 .thenReturn(responseList);
 
             PollOutput pollOutput = BeamerNewPostTrigger.poll(
-                mockedParameters, mockedParameters, mockedParameters, mockedTriggerContext);
+                mockedParameters, mockedParameters, mockedParameters, mockedContext);
 
             PollOutput expectedPollOutput = new PollOutput(
                 List.of(Map.of()), Map.of(LAST_TIME_CHECKED, endDate), false);
 
             assertEquals(expectedPollOutput, pollOutput);
             assertEquals(ZoneId.systemDefault(), zoneIdArgumentCaptor.getValue());
-            assertEquals(List.of(DATE_FROM, startDate.toString()), stringArgumentCaptor.getAllValues());
+            assertEquals(List.of("/posts", DATE_FROM, startDate.toString()), stringArgumentCaptor.getAllValues());
+            assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+            ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+            Configuration configuration = configurationBuilder.build();
+
+            assertEquals(ResponseType.JSON, configuration.getResponseType());
         }
     }
 }
