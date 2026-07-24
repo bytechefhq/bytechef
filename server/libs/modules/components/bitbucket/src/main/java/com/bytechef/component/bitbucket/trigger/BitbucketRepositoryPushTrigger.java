@@ -62,6 +62,7 @@ public class BitbucketRepositoryPushTrigger {
                 .options((OptionsFunction<String>) BitbucketUtils::getRepositoryOptions)
                 .optionsLookupDependsOn(WORKSPACE))
         .output()
+        .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#repository-push")
         .webhookEnable(BitbucketRepositoryPushTrigger::webhookEnable)
         .webhookDisable(BitbucketRepositoryPushTrigger::webhookDisable)
         .webhookRequest(BitbucketRepositoryPushTrigger::webhookRequest);

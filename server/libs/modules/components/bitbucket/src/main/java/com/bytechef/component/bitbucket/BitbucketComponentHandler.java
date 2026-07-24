@@ -69,7 +69,9 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
         return modifiableComponentDefinition
             .icon("path:assets/bitbucket.svg")
             .categories(ComponentCategory.PROJECT_MANAGEMENT)
-            .customAction(true);
+            .customAction(true)
+            .customActionHelp(
+                "", "https://developer.atlassian.com/cloud/bitbucket/rest/intro/#authentication");
     }
 
     @Override
@@ -78,6 +80,8 @@ public class BitbucketComponentHandler extends AbstractBitbucketComponentHandler
 
         return modifiableConnectionDefinition
             .baseUri((connectionParameters, context) -> "https://api.bitbucket.org/2.0")
+            .version(1)
+            .help("", "https://docs.bytechef.io/reference/components/bitbucket_v1#connection-setup")
             .authorizations(
                 authorization(AuthorizationType.BASIC_AUTH)
                     .title("API Key Authorization")

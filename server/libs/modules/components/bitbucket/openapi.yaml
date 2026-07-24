@@ -3,7 +3,7 @@ openapi: "3.0.1"
 info:
   title: "Bitbucket"
   description: "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration."
-  version: "v0"
+  version: "v1"
 servers:
   - url: "https://api.bitbucket.org/2.0"
 paths:
@@ -13,6 +13,7 @@ paths:
       description: "Creates a repository in a selected workspace."
       operationId: "createRepository"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/bitbucket_v1#create-repository"
       parameters:
         - name: "workspace"
           description: "Workspace in which repository will be created."
@@ -96,6 +97,7 @@ paths:
       description: "Creates a project in selected workspace."
       operationId: "createProject"
       x-ai-agent-tool: true
+      x-help: "https://docs.bytechef.io/reference/components/bitbucket_v1#create-project"
       parameters:
         - name: "workspace"
           description: "Workspace where the project will be added."
