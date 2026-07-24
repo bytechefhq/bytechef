@@ -10,6 +10,7 @@ import {
     addArrayItemViaPopover,
     getPropertyValue,
     getWorkflowDefinition,
+    nodeParametersSavePromise,
     openPropertiesTab,
     reopenConfigurationPanel,
     replaceMentionsInputValue,
@@ -355,6 +356,12 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 const thirdRowInput = workflowPage.arrayPropertyItemTextboxAt(2);
 
+                const saveResponsePromise = nodeParametersSavePromise({
+                    nodeName: 'var_1',
+                    page: authenticatedPage,
+                    valueInBody: thirdRowValue,
+                });
+
                 await replaceMentionsInputValue({
                     input: thirdRowInput,
                     page: authenticatedPage,
@@ -364,7 +371,7 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
                 await expect(thirdRowInput).toHaveText(thirdRowValue, {timeout: 10000});
                 await expect(middleRowInput).toBeEmpty();
 
-                await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
+                await saveResponsePromise;
             });
 
             await test.step('Delete the middle row (the one with no value)', async () => {
@@ -523,13 +530,19 @@ test.describe('ArrayProperty - Array property type (ArrayProperty.tsx)', () => {
 
                 const newItemTextbox = workflowPage.arrayPropertyItemTextboxAt(initialCount);
 
+                const saveResponsePromise = nodeParametersSavePromise({
+                    nodeName: 'var_1',
+                    page: authenticatedPage,
+                    valueInBody: newValue,
+                });
+
                 await replaceMentionsInputValue({
                     input: newItemTextbox,
                     page: authenticatedPage,
                     value: newValue,
                 });
 
-                await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
+                await saveResponsePromise;
             });
 
             await test.step('Open another node (propertyTesting_1), then return to var_1', async () => {

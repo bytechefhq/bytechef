@@ -74,6 +74,24 @@ export function formatPropertyValue(value: unknown, propertyName: string): strin
     return String(value);
 }
 
+interface WaitForNodeParametersSaveProps {
+    nodeName: string;
+    page: Page;
+    valueInBody?: string;
+}
+
+export function nodeParametersSavePromise({nodeName, page, valueInBody}: WaitForNodeParametersSaveProps) {
+    return page.waitForResponse((response) => {
+        const request = response.request();
+
+        if (request.method() !== 'PATCH' || !response.url().includes(`/workflow-nodes/${nodeName}/parameters`)) {
+            return false;
+        }
+
+        return valueInBody === undefined || (request.postData()?.includes(valueInBody) ?? false);
+    });
+}
+
 export async function getWorkflowDefinition(page: Page, workflowId: string): Promise<WorkflowDefinitionI> {
     await page.waitForTimeout(2000);
 

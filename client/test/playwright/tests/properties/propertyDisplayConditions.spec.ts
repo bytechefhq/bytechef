@@ -1,7 +1,6 @@
 import {type Locator, type Page, expect, mergeTests} from '@playwright/test';
 
 import {importWorkflowTest, loginTest, projectTest} from '../../fixtures';
-import {WorkflowPage} from '../../pages/workflowPage';
 import {
     BOOLEAN_PROPERTY_LABEL,
     CONDITIONAL_PROPERTY_LABEL,
@@ -9,7 +8,11 @@ import {
     setBooleanPropertyValueAndWaitForSave,
 } from '../../utils/displayConditionUtils';
 import {type TestWorkflowI} from '../../utils/projectUtils';
-import {openPropertyTestingPanel, openPropertyTestingPanelAndPropertiesTab} from '../../utils/propertyValidationUtils';
+import {
+    fillInputAndWaitForSave,
+    openPropertyTestingPanel,
+    openPropertyTestingPanelAndPropertiesTab,
+} from '../../utils/propertyValidationUtils';
 import {getTaskParameters, getWorkflowDefinition} from '../../utils/workflowUtils';
 
 export const test = mergeTests(loginTest(), projectTest, importWorkflowTest);
@@ -96,9 +99,7 @@ test.describe('Property display conditions (displayCondition)', () => {
 
             const conditionalInput = getConditionalProperty(configurationPanel).getByRole('textbox');
 
-            await conditionalInput.fill(conditionalValue);
-
-            await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
+            await fillInputAndWaitForSave({input: conditionalInput, page: authenticatedPage, value: conditionalValue});
 
             const workflowDefinition = await getWorkflowDefinition(authenticatedPage, workflow.workflowId);
 
@@ -116,9 +117,7 @@ test.describe('Property display conditions (displayCondition)', () => {
 
             const conditionalInput = getConditionalProperty(configurationPanel).getByRole('textbox');
 
-            await conditionalInput.fill(conditionalValue);
-
-            await authenticatedPage.waitForTimeout(WorkflowPage.LONG_DEBOUNCE_MS);
+            await fillInputAndWaitForSave({input: conditionalInput, page: authenticatedPage, value: conditionalValue});
 
             await authenticatedPage.reload();
 

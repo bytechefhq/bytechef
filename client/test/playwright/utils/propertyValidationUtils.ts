@@ -2,6 +2,25 @@ import {type Locator, type Page, expect} from '@playwright/test';
 
 import {WorkflowPage} from '../pages/workflowPage';
 import {clickAndExpectToBeVisible} from './clickAndExpectToBeVisible';
+import {nodeParametersSavePromise} from './workflowUtils';
+
+export function propertyTestingParametersSavePromise(page: Page, valueInBody?: string) {
+    return nodeParametersSavePromise({nodeName: 'propertyTesting_1', page, valueInBody});
+}
+
+interface FillInputAndWaitForSaveProps {
+    input: Locator;
+    page: Page;
+    value: string;
+}
+
+export async function fillInputAndWaitForSave({input, page, value}: FillInputAndWaitForSaveProps): Promise<void> {
+    const saveResponsePromise = propertyTestingParametersSavePromise(page, value);
+
+    await input.fill(value);
+
+    await saveResponsePromise;
+}
 
 interface FillPropertyInputProps {
     configurationPanel: Locator;
