@@ -68,6 +68,7 @@ public class BeamerNewVoteAction {
                 .label("User Last Name")
                 .description("Last name of the user that is creating the new vote.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-vote")
         .output(
             outputSchema(
                 object()

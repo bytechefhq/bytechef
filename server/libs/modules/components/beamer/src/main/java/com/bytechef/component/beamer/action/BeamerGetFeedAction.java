@@ -43,6 +43,7 @@ public class BeamerGetFeedAction {
                     .properties(
                         string("url")
                             .description("URL for your standalone feed."))))
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#get-feed")
         .perform(BeamerGetFeedAction::perform);
 
     private BeamerGetFeedAction() {

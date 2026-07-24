@@ -73,6 +73,7 @@ public class BeamerNewCommentAction {
                 .label("User Last Name")
                 .description("Last name of the user that is creating the new comment.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-comment")
         .output(
             outputSchema(
                 object()

@@ -52,6 +52,7 @@ public class BeamerNewPostTrigger {
         .description("Triggers when a new post is added.")
         .type(TriggerType.POLLING)
         .properties()
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-post")
         .output(
             outputSchema(
                 array()

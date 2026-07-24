@@ -64,6 +64,7 @@ public class BeamerCreatePostAction {
                 .label("User Email")
                 .description("Email of the user that is creating the new post.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#create-post")
         .output(outputSchema(
             object()
                 .properties(

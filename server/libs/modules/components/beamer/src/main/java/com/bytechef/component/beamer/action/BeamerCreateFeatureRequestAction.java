@@ -62,6 +62,7 @@ public class BeamerCreateFeatureRequestAction {
                 .label("User Email")
                 .description("The email of the user that is creating the new feature request.")
                 .required(false))
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#create-feature-request")
         .output(
             outputSchema(
                 object()
