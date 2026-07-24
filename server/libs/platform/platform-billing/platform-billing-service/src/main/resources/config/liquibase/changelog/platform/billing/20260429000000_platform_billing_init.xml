@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.20.xsd">
+
+    <changeSet id="20260429000000-1" author="Matija Petanjek">
+        <createTable tableName="billing_subscription">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="stripe_customer_id" type="VARCHAR(255)"/>
+            <column name="stripe_subscription_id" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="ux_billing_subscription_stripe_subscription_id"/>
+            </column>
+            <column name="stripe_product_id" type="VARCHAR(255)"/>
+            <column name="stripe_usage_product_id" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(20)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="plan_name" type="VARCHAR(50)"/>
+            <column name="scheduled_plan_name" type="VARCHAR(50)"/>
+            <column name="task_limit" type="INTEGER">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_period_start" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="current_period_end" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="cancel_at_period_end" type="BOOLEAN" defaultValueBoolean="false">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_reported_at" type="TIMESTAMP"/>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_modified_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <createTable tableName="billing_subscription_webhook_event">
+            <column autoIncrement="true" name="id" type="BIGINT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="subscription_id" type="BIGINT"/>
+            <column name="stripe_event_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_billing_subscription_webhook_event_stripe_event_id"/>
+            </column>
+            <column name="event_type" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint baseTableName="billing_subscription_webhook_event"
+                                 baseColumnNames="subscription_id"
+                                 constraintName="fk_billing_subscription_webhook_event_billing_subscription"
+                                 referencedTableName="billing_subscription"
+                                 referencedColumnNames="id"/>
+    </changeSet>
+</databaseChangeLog>

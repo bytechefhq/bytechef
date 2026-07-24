@@ -2,6 +2,7 @@ import {PlatformType, usePlatformTypeStore} from '@/pages/home/stores/usePlatfor
 import Header from '@/shared/layout/Header';
 import LayoutContainer from '@/shared/layout/LayoutContainer';
 import {LeftSidebarNav, LeftSidebarNavItem} from '@/shared/layout/LeftSidebarNav';
+import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {Outlet, useLocation} from 'react-router-dom';
 
@@ -16,6 +17,7 @@ interface SettingsProps {
 const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
     const currentType = usePlatformTypeStore((state) => state.currentType);
 
+    const billingEnabled = useApplicationInfoStore((state) => state.billing.enabled);
     const isFeatureFlagEnabled = useFeatureFlagsStore();
 
     const location = useLocation();
@@ -57,6 +59,10 @@ const Settings = ({sidebarNavItems, title = 'Settings'}: SettingsProps) => {
 
         if (navItem.href === 'identity-providers') {
             return isFeatureFlagEnabled('ff-1040');
+        }
+
+        if (navItem.href === 'billing') {
+            return billingEnabled;
         }
 
         return true;

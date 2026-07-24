@@ -9,6 +9,7 @@ dependencies {
     implementation(project(":server:libs:platform:platform-scheduler:platform-scheduler-api"))
     implementation(project(":server:libs:platform:platform-workflow:platform-workflow-coordinator:platform-workflow-coordinator-api"))
     implementation(project(":server:libs:platform:platform-api"))
+    implementation(project(":server:libs:platform:platform-billing:platform-billing-api"))
     implementation(project(":server:libs:platform:platform-connection:platform-connection-api"))
 
     implementation(project(":server:ee:libs:core:cloud:cloud-aws"))

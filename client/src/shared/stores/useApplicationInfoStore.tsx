@@ -27,6 +27,9 @@ export interface ApplicationInfoI {
     application: {
         edition: EditionType;
     } | null;
+    billing: {
+        enabled: boolean;
+    };
     featureFlags: Record<string, boolean>;
     helpHub: {
         commandBar: {
@@ -80,6 +83,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                     },
                 },
                 application: null,
+                billing: {
+                    enabled: false,
+                },
                 featureFlags: {},
 
                 getApplicationInfo: async () => {
@@ -112,6 +118,9 @@ export const applicationInfoStore = createStore<ApplicationInfoI>()(
                                 postHog: json.analytics.postHog,
                             },
                             application: json.application,
+                            billing: {
+                                enabled: json.billing?.enabled === 'true',
+                            },
                             featureFlags: json.featureFlags,
                             helpHub: {
                                 commandBar: json.helpHub.commandBar,

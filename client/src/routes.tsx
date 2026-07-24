@@ -75,6 +75,7 @@ const ApiConnectorAiPage = lazy(() => import('@/ee/pages/settings/platform/api-c
 const EmbeddedApiKeys = lazy(() => import('@/ee/pages/settings/embedded/api-keys/ApiKeys'));
 const AppEvents = lazy(() => import('@/ee/pages/embedded/app-events/AppEvents'));
 const AdminApiKeys = lazy(() => import('@/ee/pages/settings/platform/admin-api-keys/AdminApiKeys'));
+const Billing = lazy(() => import('@/ee/pages/settings/platform/billing/Billing'));
 const IdentityProvidersPage = lazy(
     () => import('@/ee/pages/settings/platform/identity-providers/IdentityProvidersPage')
 );
@@ -203,6 +204,16 @@ const currentWorkspaceSettingsRoutes = {
 // Platform settings routes
 const platformSettingsRoutes = {
     children: [
+        {
+            element: (
+                <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
+                    <LazyLoadWrapper>
+                        <Billing />
+                    </LazyLoadWrapper>
+                </PrivateRoute>
+            ),
+            path: 'billing',
+        },
         {
             element: (
                 <PrivateRoute hasAnyAuthorities={[AUTHORITIES.ADMIN]}>
@@ -344,6 +355,10 @@ const platformSettingsRoutes = {
         {
             href: 'users',
             title: 'Users',
+        },
+        {
+            href: 'billing',
+            title: 'Billing',
         },
         {
             href: 'ai-providers',

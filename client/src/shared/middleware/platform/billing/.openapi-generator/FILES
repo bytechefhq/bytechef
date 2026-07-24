@@ -1,0 +1,13 @@
+.openapi-generator-ignore
+apis/BillingApi.ts
+apis/index.ts
+docs/BillingApi.md
+docs/BillingSubscription.md
+docs/CheckoutSession.md
+docs/CheckoutSessionRequest.md
+index.ts
+models/BillingSubscription.ts
+models/CheckoutSession.ts
+models/CheckoutSessionRequest.ts
+models/index.ts
+runtime.ts

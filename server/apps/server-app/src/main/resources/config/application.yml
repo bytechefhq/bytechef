@@ -25,6 +25,8 @@ info:
     postHog:
       apiKey: ${post-hog.api-key:}
       host: ${post-hog.host:}
+  billing:
+    enabled: ${bytechef.billing.enabled}
   application:
     edition: ${bytechef.edition:}
   featureFlags: ${bytechef.feature-flags}

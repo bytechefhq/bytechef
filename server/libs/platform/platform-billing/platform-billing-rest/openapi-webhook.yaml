@@ -1,0 +1,33 @@
+---
+openapi: "3.0.1"
+info:
+  title: "The Platform Billing Webhook API"
+  version: "1"
+servers:
+  - url: "/api/platform"
+tags:
+  - name: "billing-webhook"
+    description: "The Platform Billing Webhook API"
+paths:
+  /billing/webhook:
+    post:
+      description: "Handle Stripe webhook events"
+      summary: "Handle Stripe webhook events"
+      tags:
+        - "billing-webhook"
+      operationId: "handleWebhook"
+      parameters:
+        - name: "Stripe-Signature"
+          in: "header"
+          required: true
+          schema:
+            type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "string"
+      responses:
+        "200":
+          description: "Successful operation."
