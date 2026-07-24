@@ -6,7 +6,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a project in selected workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#create-project"
+    },
     "metadata": {
       "path": "/workspaces/{workspace}/projects",
       "mimeType": "application/json",
@@ -290,7 +293,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Creates a repository in a selected workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#create-repository"
+    },
     "metadata": {
       "path": "/repositories/{workspace}/{repo_slug}",
       "mimeType": "application/json",
@@ -2867,7 +2873,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns list of projects from workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#list-projects"
+    },
     "metadata": null,
     "name": "listProjects",
     "outputDefinition": {
@@ -3764,7 +3773,10 @@
     "beforeTimeoutResume": null,
     "deprecated": null,
     "description": "Returns list of repositories from workspace.",
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#list-repositories"
+    },
     "metadata": null,
     "name": "listRepositories",
     "outputDefinition": {
@@ -9467,14 +9479,20 @@
       "type": "BASIC_AUTH"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
   "customAction": true,
-  "customActionHelp": null,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://developer.atlassian.com/cloud/bitbucket/rest/intro/#authentication"
+  },
   "description": "Elevate your software delivery from planning to production and beyond, with built-in AI, CI/CD, and a best-in-class Jira integration.",
   "icon": "path:assets/bitbucket.svg",
   "inputs": null,
@@ -9489,7 +9507,10 @@
     "deprecated": null,
     "description": "Triggers whenever a repository push occurs.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/bitbucket_v1#repository-push"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "repositoryPush",
