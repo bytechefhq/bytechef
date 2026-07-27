@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -114,6 +115,7 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    @Transactional
     public void handleWebhookEvent(String payload, String stripeSignatureHeader) {
         Event event = stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
 
@@ -365,6 +367,8 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     private BillingSubscription handleCheckoutSessionCompleted(Event event) {
+        cancelTrialSubscription();
+
         Session session = (Session) event.getDataObjectDeserializer()
             .getObject()
             .orElseThrow(() -> new RuntimeException("Failed to deserialize checkout session"));
@@ -403,6 +407,17 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
         billingSubscription.setCancelAtPeriodEnd(stripeSubscription.getCancelAtPeriodEnd());
 
         return billingSubscriptionService.save(billingSubscription);
+    }
+
+    private void cancelTrialSubscription() {
+        billingSubscriptionService.fetchCurrentSubscription()
+            .filter(subscription -> "TRIAL".equals(subscription.getPlanName()))
+            .filter(subscription -> subscription.getStatus() != BillingSubscription.Status.CANCELED)
+            .ifPresent(trialSubscription -> {
+                trialSubscription.setStatus(BillingSubscription.Status.CANCELED);
+
+                billingSubscriptionService.save(trialSubscription);
+            });
     }
 
     private int getTaskLimit(SubscriptionItem usageItem) {
