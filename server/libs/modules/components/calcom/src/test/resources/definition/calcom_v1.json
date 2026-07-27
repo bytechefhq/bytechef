@@ -52,14 +52,20 @@
       "type": "BEARER_TOKEN"
     } ],
     "baseUri": { },
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calcom_v1#connection-setup"
+    },
     "processErrorResponse": null,
     "properties": null,
     "test": null,
     "version": 1
   },
-  "customAction": null,
-  "customActionHelp": null,
+  "customAction": true,
+  "customActionHelp": {
+    "body": "",
+    "learnMoreUrl": "https://cal.com/docs/api-reference/v2/introduction"
+  },
   "description": "A fully customizable scheduling software for individuals, businesses taking calls and developers building scheduling platforms where users meet users.",
   "icon": "path:assets/calcom.svg",
   "inputs": null,
@@ -74,7 +80,10 @@
     "deprecated": null,
     "description": "Triggers when a booking is canceled.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calcom_v1#booking-canceled"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "bookingCanceled",
@@ -4011,7 +4020,10 @@
     "deprecated": null,
     "description": "Triggers when a booking is created.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calcom_v1#booking-created"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "bookingCreated",
@@ -8674,7 +8686,10 @@
     "deprecated": null,
     "description": "Triggers when a booking ends.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calcom_v1#booking-ended"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "bookingEnded",
@@ -9845,7 +9860,10 @@
     "deprecated": null,
     "description": "Triggers when a booking is rescheduled.",
     "dynamicWebhookRefresh": null,
-    "help": null,
+    "help": {
+      "body": "",
+      "learnMoreUrl": "https://docs.bytechef.io/reference/components/calcom_v1#booking-rescheduled"
+    },
     "listenerDisable": null,
     "listenerEnable": null,
     "name": "bookingRescheduled",
