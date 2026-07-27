@@ -198,7 +198,7 @@
         "jsdom": "^29.1.1",
         "msw": "^2.14.6",
         "object-resolve-path": "^1.1.1",
-        "postcss": "^8.5.15",
+        "postcss": "^8.5.23",
         "prettier": "3.8.4",
         "prettier-plugin-tailwindcss": "^0.8.0",
         "react-fast-compare": "^3.2.2",
