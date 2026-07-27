@@ -297,37 +297,43 @@ function App() {
     }, [ff_2396]);
 
     return authenticated ? (
-        <SidebarProvider className="h-full" defaultOpen={false}>
-            <AppSidebar navigation={navigation} />
+        <div className="flex h-full flex-col">
+            {billingEnabled && location.pathname.includes('/automation/') && <TrialBanner />}
 
-            <SidebarInset className="flex h-full min-w-0 flex-col">
-                <MobileTopNavigation />
+            {/* transform-gpu gives fixed-position descendants (page sidebars) a containing
+                block scoped to this element, so they render below the banner instead of
+                anchoring to the viewport top and overlapping it. */}
 
-                {billingEnabled && location.pathname.includes('/automation/') && <TrialBanner />}
+            <SidebarProvider className="min-h-0 flex-1 transform-gpu" defaultOpen={false}>
+                <AppSidebar navigation={navigation} />
 
-                <div className="flex size-full">
-                    <div className="flex h-full min-w-0 flex-1">
-                        <Outlet />
+                <SidebarInset className="flex h-full min-w-0 flex-col">
+                    <MobileTopNavigation />
+
+                    <div className="flex size-full">
+                        <div className="flex h-full min-w-0 flex-1">
+                            <Outlet />
+                        </div>
+
+                        {ai.copilot.enabled && (
+                            <aside className="h-full shrink-0">
+                                <Suspense fallback={null}>
+                                    <CopilotPanel open={copilotPanelOpen} />
+                                </Suspense>
+                            </aside>
+                        )}
                     </div>
+                </SidebarInset>
 
-                    {ai.copilot.enabled && (
-                        <aside className="h-full shrink-0">
-                            <Suspense fallback={null}>
-                                <CopilotPanel open={copilotPanelOpen} />
-                            </Suspense>
-                        </aside>
-                    )}
-                </div>
-            </SidebarInset>
+                <Toaster />
 
-            <Toaster />
-
-            {ff_2396 && searchOpen && (
-                <Suspense fallback={null}>
-                    <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
-                </Suspense>
-            )}
-        </SidebarProvider>
+                {ff_2396 && searchOpen && (
+                    <Suspense fallback={null}>
+                        <GlobalSearchDialog onOpenChange={setSearchOpen} open={searchOpen} />
+                    </Suspense>
+                )}
+            </SidebarProvider>
+        </div>
     ) : (
         <Outlet />
     );

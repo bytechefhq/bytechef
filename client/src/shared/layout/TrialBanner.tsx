@@ -35,7 +35,7 @@ export function TrialBanner() {
             className={twMerge(
                 'flex items-center gap-2 border-b px-4 py-2',
                 expired
-                    ? 'bg-surface-error-secondary border-stroke-destructive-secondary'
+                    ? 'border-stroke-destructive-secondary bg-surface-destructive-secondary'
                     : 'border-stroke-warning-secondary bg-surface-warning-secondary'
             )}
         >
