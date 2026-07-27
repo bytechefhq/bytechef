@@ -22,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -31,9 +32,19 @@ import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
+import com.stripe.model.Price;
 import com.stripe.model.Subscription;
+import com.stripe.model.SubscriptionItem;
+import com.stripe.model.SubscriptionItemCollection;
+import com.stripe.net.Webhook;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +62,8 @@ class BillingSubscriptionFacadeImplOperationsTest {
     private static final String PRODUCT_STARTER_ID = "prod_starter_test";
     private static final String PRODUCT_GROWTH_ID = "prod_growth_test";
     private static final String PRODUCT_USAGE_ID = "prod_usage_test";
+    private static final String WEBHOOK_SECRET = "whsec_test";
+    private static final String CHECKOUT_SUBSCRIPTION_ID = "sub_checkout_test";
 
     @Mock
     private BillingSubscriptionService billingSubscriptionService;
@@ -79,6 +92,86 @@ class BillingSubscriptionFacadeImplOperationsTest {
         facade = new BillingSubscriptionFacadeImpl(
             billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
             new ObjectMapper(), stripeClient);
+    }
+
+    @Test
+    void testHandleCheckoutSessionCompletedCancelsExistingTrialSubscription() throws Exception {
+        BillingSubscription trialSubscription = new BillingSubscription();
+
+        trialSubscription.setPlanName("TRIAL");
+        trialSubscription.setStatus(BillingSubscription.Status.ACTIVE);
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(trialSubscription));
+        when(stripeClient.verifyWebhookSignature(any(), any())).thenAnswer(
+            invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
+                WEBHOOK_SECRET));
+        when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
+
+        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
+
+        ArgumentCaptor<BillingSubscription> captor = ArgumentCaptor.forClass(BillingSubscription.class);
+
+        verify(billingSubscriptionService, times(2)).save(captor.capture());
+
+        BillingSubscription canceledTrial = captor.getAllValues()
+            .get(0);
+
+        assertThat(canceledTrial).isSameAs(trialSubscription);
+        assertThat(canceledTrial.getStatus()).isEqualTo(BillingSubscription.Status.CANCELED);
+
+        BillingSubscription newSubscription = captor.getAllValues()
+            .get(1);
+
+        assertThat(newSubscription.getPlanName()).isEqualTo("STARTER");
+    }
+
+    @Test
+    void testHandleCheckoutSessionCompletedDoesNotCancelNonTrialSubscription() throws Exception {
+        BillingSubscription existingSubscription = starterSubscription();
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(existingSubscription));
+        when(stripeClient.verifyWebhookSignature(any(), any())).thenAnswer(
+            invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
+                WEBHOOK_SECRET));
+        when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
+
+        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
+
+        verify(billingSubscriptionService, times(1)).save(any());
+        assertThat(existingSubscription.getStatus()).isEqualTo(BillingSubscription.Status.ACTIVE);
+    }
+
+    @Test
+    void testHandleCheckoutSessionCompletedSkipsAlreadyCanceledTrialSubscription() throws Exception {
+        BillingSubscription canceledTrial = new BillingSubscription();
+
+        canceledTrial.setPlanName("TRIAL");
+        canceledTrial.setStatus(BillingSubscription.Status.CANCELED);
+
+        when(billingWebhookEventService.isEventProcessed(any())).thenReturn(false);
+        when(billingSubscriptionService.fetchCurrentSubscription()).thenReturn(Optional.of(canceledTrial));
+        when(stripeClient.verifyWebhookSignature(any(), any())).thenAnswer(
+            invocation -> Webhook.constructEvent(invocation.getArgument(0), invocation.getArgument(1),
+                WEBHOOK_SECRET));
+        when(stripeClient.retrieveSubscription(CHECKOUT_SUBSCRIPTION_ID)).thenReturn(checkoutStripeSubscription());
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
+        when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        String payload = checkoutSessionCompletedPayload(CHECKOUT_SUBSCRIPTION_ID, "cus_checkout", "STARTER");
+
+        facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET));
+
+        verify(billingSubscriptionService, times(1)).save(any());
     }
 
     @Test
@@ -193,5 +286,100 @@ class BillingSubscriptionFacadeImplOperationsTest {
         subscription.setCurrentPeriodEnd(Instant.parse("2026-07-01T00:00:00Z"));
 
         return subscription;
+    }
+
+    private Subscription checkoutStripeSubscription() {
+        Price.Recurring flatRecurring = new Price.Recurring();
+
+        flatRecurring.setUsageType("licensed");
+
+        Price flatPrice = new Price();
+
+        flatPrice.setId("price_flat_checkout");
+        flatPrice.setProduct(PRODUCT_STARTER_ID);
+        flatPrice.setRecurring(flatRecurring);
+
+        SubscriptionItem flatItem = new SubscriptionItem();
+
+        flatItem.setId("si_flat_checkout");
+        flatItem.setPrice(flatPrice);
+        flatItem.setCurrentPeriodStart(1780272000L);
+        flatItem.setCurrentPeriodEnd(1782864000L);
+
+        Price.Recurring usageRecurring = new Price.Recurring();
+
+        usageRecurring.setUsageType("metered");
+
+        Price usagePrice = new Price();
+
+        usagePrice.setId("price_usage_checkout");
+        usagePrice.setRecurring(usageRecurring);
+
+        SubscriptionItem usageItem = new SubscriptionItem();
+
+        usageItem.setId("si_usage_checkout");
+        usageItem.setPrice(usagePrice);
+
+        SubscriptionItemCollection items = new SubscriptionItemCollection();
+
+        items.setData(List.of(flatItem, usageItem));
+
+        Subscription subscription = new Subscription();
+
+        subscription.setId(CHECKOUT_SUBSCRIPTION_ID);
+        subscription.setStatus("active");
+        subscription.setCancelAtPeriodEnd(false);
+        subscription.setItems(items);
+
+        return subscription;
+    }
+
+    private Price priceWithTaskLimit(long upTo) {
+        Price.Tier tier = new Price.Tier();
+
+        tier.setUpTo(upTo);
+
+        Price price = new Price();
+
+        price.setTiers(List.of(tier));
+
+        return price;
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String checkoutSessionCompletedPayload(String subscriptionId, String customerId, String planName) {
+        return """
+            {
+              "id": "evt_checkout_completed",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "id": "cs_test_checkout",
+                  "object": "checkout.session",
+                  "client_reference_id": "public",
+                  "customer": "%s",
+                  "subscription": "%s",
+                  "metadata": { "planName": "%s" }
+                }
+              }
+            }
+            """.formatted(customerId, subscriptionId, planName);
+    }
+
+    private String signPayload(String payload, String secret) throws Exception {
+        long timestamp = Instant.now()
+            .getEpochSecond();
+        String signedPayload = timestamp + "." + payload;
+
+        Mac mac = Mac.getInstance("HmacSHA256");
+
+        mac.init(new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8), "HmacSHA256"));
+
+        String signature = HexFormat.of()
+            .formatHex(mac.doFinal(signedPayload.getBytes(StandardCharsets.UTF_8)));
+
+        return "t=" + timestamp + ",v1=" + signature;
     }
 }
