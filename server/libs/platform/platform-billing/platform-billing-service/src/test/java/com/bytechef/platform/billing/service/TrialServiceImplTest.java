@@ -75,7 +75,10 @@ class TrialServiceImplTest {
 
         TrialDTO status = trialService.validateTrial();
 
-        assertThat(status.expired()).isTrue();
+        assertThat(status.expired())
+            .as("a non-trial (paying) subscription must never be reported as expired, since TrialFilter blocks "
+                + "requests with a 402 response whenever expired() is true")
+            .isFalse();
         assertThat(status.daysRemaining()).isZero();
         assertThat(status.tasksUsed()).isZero();
         assertThat(status.taskLimit()).isZero();

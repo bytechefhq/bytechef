@@ -32,6 +32,20 @@ public interface BillingSubscriptionFacade {
 
     void updateSubscription(String planName);
 
+    /**
+     * Verifies that the webhook payload was genuinely sent by Stripe. Throws if the signature is invalid. Callers must
+     * do this before trusting any data read out of {@code payload}, e.g. via {@link #extractTenantId(String)}.
+     */
+    void verifyWebhookSignature(String payload, String stripeSignatureHeader);
+
+    /**
+     * Resolves the tenant a (already signature-verified) webhook event belongs to, without touching the database.
+     * Callers must establish this tenant as the current {@code TenantContext} before invoking
+     * {@link #handleWebhookEvent(String, String)}, since that method opens a transaction (and therefore acquires a
+     * tenant-scoped database connection) as soon as it is entered.
+     */
+    String extractTenantId(String payload);
+
     void handleWebhookEvent(String payload, String stripeSignatureHeader);
 
     Optional<BillingSubscriptionDTO> fetchCurrentSubscription();
