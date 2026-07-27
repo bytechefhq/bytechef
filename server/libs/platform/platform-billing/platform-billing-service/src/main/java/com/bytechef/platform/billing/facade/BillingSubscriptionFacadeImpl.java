@@ -115,40 +115,52 @@ public class BillingSubscriptionFacadeImpl implements BillingSubscriptionFacade 
     }
 
     @Override
+    public void verifyWebhookSignature(String payload, String stripeSignatureHeader) {
+        stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
+    }
+
+    @Override
+    public String extractTenantId(String payload) {
+        String eventType = objectMapper.readTree(payload)
+            .path("type")
+            .textValue();
+
+        return extractTenantId(payload, eventType);
+    }
+
+    @Override
     @Transactional
     public void handleWebhookEvent(String payload, String stripeSignatureHeader) {
         Event event = stripeClient.verifyWebhookSignature(payload, stripeSignatureHeader);
 
-        TenantContext.runWithTenantId(extractTenantId(payload, event.getType()), () -> {
-            if (billingWebhookEventService.isEventProcessed(event.getId())) {
-                log.info("Ignoring already processed webhook event: {}", event.getId());
+        if (billingWebhookEventService.isEventProcessed(event.getId())) {
+            log.info("Ignoring already processed webhook event: {}", event.getId());
 
-                return;
-            }
+            return;
+        }
 
-            log.info("Processing webhook event: {}", event);
+        log.info("Processing webhook event: {}", event);
 
-            BillingSubscription savedSubscription = null;
+        BillingSubscription savedSubscription = null;
 
-            if ("checkout.session.completed".equals(event.getType())) {
-                savedSubscription = handleCheckoutSessionCompleted(event);
-            } else if ("customer.subscription.updated".equals(event.getType())) {
-                savedSubscription = handleSubscriptionUpdated(event);
-            } else if ("customer.subscription.deleted".equals(event.getType())) {
-                savedSubscription = handleSubscriptionDeleted(event);
-            }
+        if ("checkout.session.completed".equals(event.getType())) {
+            savedSubscription = handleCheckoutSessionCompleted(event);
+        } else if ("customer.subscription.updated".equals(event.getType())) {
+            savedSubscription = handleSubscriptionUpdated(event);
+        } else if ("customer.subscription.deleted".equals(event.getType())) {
+            savedSubscription = handleSubscriptionDeleted(event);
+        }
 
-            BillingSubscriptionWebhookEvent webhookEvent = new BillingSubscriptionWebhookEvent();
+        BillingSubscriptionWebhookEvent webhookEvent = new BillingSubscriptionWebhookEvent();
 
-            webhookEvent.setStripeEventId(event.getId());
-            webhookEvent.setEventType(event.getType());
+        webhookEvent.setStripeEventId(event.getId());
+        webhookEvent.setEventType(event.getType());
 
-            if (savedSubscription != null) {
-                webhookEvent.setSubscriptionId(savedSubscription.getId());
-            }
+        if (savedSubscription != null) {
+            webhookEvent.setSubscriptionId(savedSubscription.getId());
+        }
 
-            billingWebhookEventService.save(webhookEvent);
-        });
+        billingWebhookEventService.save(webhookEvent);
     }
 
     @Override

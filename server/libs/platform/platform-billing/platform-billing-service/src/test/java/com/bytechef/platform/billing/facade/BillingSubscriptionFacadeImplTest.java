@@ -20,20 +20,25 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.bytechef.platform.billing.client.StripeClientImpl;
+import com.bytechef.platform.billing.client.StripeClient;
 import com.bytechef.platform.billing.config.BillingProperties;
 import com.bytechef.platform.billing.domain.BillingSubscription;
 import com.bytechef.platform.billing.service.BillingSubscriptionService;
 import com.bytechef.platform.billing.service.BillingUsageService;
 import com.bytechef.platform.billing.service.BillingWebhookEventService;
+import com.stripe.model.Price;
+import com.stripe.net.Webhook;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HexFormat;
+import java.util.List;
 import java.util.Optional;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -67,6 +72,9 @@ class BillingSubscriptionFacadeImplTest {
     @Mock
     private BillingWebhookEventService billingWebhookEventService;
 
+    @Mock
+    private StripeClient stripeClient;
+
     private BillingSubscriptionFacadeImpl facade;
 
     @BeforeEach
@@ -78,7 +86,11 @@ class BillingSubscriptionFacadeImplTest {
 
         facade = new BillingSubscriptionFacadeImpl(
             billingProperties, billingSubscriptionService, billingUsageService, billingWebhookEventService,
-            new ObjectMapper(), new StripeClientImpl(billingProperties));
+            new ObjectMapper(), stripeClient);
+
+        lenient().when(stripeClient.verifyWebhookSignature(any(), any()))
+            .thenAnswer(invocation -> Webhook.constructEvent(
+                invocation.getArgument(0), invocation.getArgument(1), WEBHOOK_SECRET));
     }
 
     @Test
@@ -103,6 +115,37 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
+    void testExtractTenantIdReturnsClientReferenceIdForCheckoutSessionCompleted() {
+        String payload = checkoutSessionCompletedPayload("acme");
+
+        String tenantId = facade.extractTenantId(payload);
+
+        assertThat(tenantId).isEqualTo("acme");
+    }
+
+    @Test
+    void testExtractTenantIdReturnsMetadataTenantIdForSubscriptionUpdated() {
+        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
+
+        String tenantId = facade.extractTenantId(payload);
+
+        assertThat(tenantId).isEqualTo("public");
+    }
+
+    @Test
+    void testVerifyWebhookSignaturePropagatesStripeClientFailure() {
+        String payload = subscriptionUpdatedPayload(STRIPE_SUBSCRIPTION_ID, "STARTER");
+
+        doThrow(new RuntimeException("Invalid Stripe signature"))
+            .when(stripeClient)
+            .verifyWebhookSignature(payload, "t=1,v1=invalid");
+
+        assertThatThrownBy(() -> facade.verifyWebhookSignature(payload, "t=1,v1=invalid"))
+            .isInstanceOf(RuntimeException.class)
+            .hasMessage("Invalid Stripe signature");
+    }
+
+    @Test
     void testHandleSubscriptionUpdatedResetsLastReportedAtOnPeriodRollover() throws Exception {
         BillingSubscription subscription = starterSubscription();
 
@@ -114,6 +157,7 @@ class BillingSubscriptionFacadeImplTest {
         when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
 
         String payload = subscriptionUpdatedPayloadWithPeriodRollover(
             STRIPE_SUBSCRIPTION_ID, 1780272000L, 1782864000L);
@@ -184,10 +228,10 @@ class BillingSubscriptionFacadeImplTest {
     }
 
     @Test
-    void testHandleUnknownEventTypeThrowsIllegalArgumentException() throws Exception {
+    void testExtractTenantIdThrowsIllegalArgumentExceptionForUnknownEventType() {
         String payload = unknownEventPayload();
 
-        assertThatThrownBy(() -> facade.handleWebhookEvent(payload, signPayload(payload, WEBHOOK_SECRET)))
+        assertThatThrownBy(() -> facade.extractTenantId(payload))
             .isInstanceOf(IllegalArgumentException.class)
             .hasMessage("Unhandled webhook event type: invoice.payment_succeeded");
     }
@@ -204,6 +248,7 @@ class BillingSubscriptionFacadeImplTest {
         when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
 
         String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
 
@@ -228,6 +273,7 @@ class BillingSubscriptionFacadeImplTest {
         when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
 
         String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_GROWTH_ID);
 
@@ -253,6 +299,7 @@ class BillingSubscriptionFacadeImplTest {
         when(billingSubscriptionService.fetchSubscriptionByStripeSubscriptionId(STRIPE_SUBSCRIPTION_ID))
             .thenReturn(Optional.of(subscription));
         when(billingSubscriptionService.save(any())).thenAnswer(invocation -> invocation.getArgument(0));
+        when(stripeClient.retrievePrice(any())).thenReturn(priceWithTaskLimit(100L));
 
         String payload = subscriptionUpdatedPayloadWithProduct(STRIPE_SUBSCRIPTION_ID, PRODUCT_STARTER_ID);
 
@@ -297,6 +344,18 @@ class BillingSubscriptionFacadeImplTest {
         subscription.setStatus(BillingSubscription.Status.ACTIVE);
 
         return subscription;
+    }
+
+    private Price priceWithTaskLimit(long upTo) {
+        Price.Tier tier = new Price.Tier();
+
+        tier.setUpTo(upTo);
+
+        Price price = new Price();
+
+        price.setTiers(List.of(tier));
+
+        return price;
     }
 
     @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
@@ -388,6 +447,28 @@ class BillingSubscriptionFacadeImplTest {
               }
             }
             """.formatted(subscriptionId);
+    }
+
+    @SuppressFBWarnings("VA_FORMAT_STRING_USES_NEWLINE")
+    private String checkoutSessionCompletedPayload(String clientReferenceId) {
+        return """
+            {
+              "id": "evt_checkout_completed",
+              "object": "event",
+              "api_version": "2026-04-22.dahlia",
+              "type": "checkout.session.completed",
+              "data": {
+                "object": {
+                  "id": "cs_test_checkout",
+                  "object": "checkout.session",
+                  "client_reference_id": "%s",
+                  "customer": "cus_checkout",
+                  "subscription": "sub_checkout_test",
+                  "metadata": { "planName": "STARTER" }
+                }
+              }
+            }
+            """.formatted(clientReferenceId);
     }
 
     private String unknownEventPayload() {
