@@ -20,6 +20,7 @@ import static com.bytechef.component.calcom.constant.CalComConstants.WEBHOOK_ID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.bytechef.component.calcom.util.CalComUtils;
+import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookEnableOutput;
 import com.bytechef.component.test.definition.MockParametersFactory;
 import java.util.List;
@@ -32,14 +33,14 @@ import org.junit.jupiter.api.Test;
 class CalComBookingRescheduledTriggerTest extends AbstractCalComTriggerTest {
 
     @Test
-    void testWebhookEnable() {
+    void testWebhookEnable(TriggerContext mockedTriggerContext) {
         calComUtilsMockedStatic.when(
             () -> CalComUtils.subscribeWebhook(
                 stringArgumentCaptor.capture(), triggerContextArgumentCaptor.capture(), stringArgumentCaptor.capture()))
             .thenReturn("123");
 
         WebhookEnableOutput webhookEnableOutput = CalComBookingRescheduledTrigger.webhookEnable(
-            mockedParameters, mockedParameters, webhookUrl, workflowExecutionId, mockedTriggerContext);
+            null, null, webhookUrl, null, mockedTriggerContext);
 
         WebhookEnableOutput expectedWebhookEnableOutput = new WebhookEnableOutput(Map.of(WEBHOOK_ID, "123"), null);
 
@@ -49,11 +50,11 @@ class CalComBookingRescheduledTriggerTest extends AbstractCalComTriggerTest {
     }
 
     @Test
-    void webhookDisable() {
+    void webhookDisable(TriggerContext mockedTriggerContext) {
         mockedParameters = MockParametersFactory.create(Map.of(WEBHOOK_ID, "123"));
 
         CalComBookingRescheduledTrigger.webhookDisable(
-            mockedParameters, mockedParameters, mockedParameters, workflowExecutionId, mockedTriggerContext);
+            null, null, mockedParameters, null, mockedTriggerContext);
 
         calComUtilsMockedStatic.verify(() -> CalComUtils.unsubscribeWebhook(mockedTriggerContext, "123"));
     }
@@ -67,8 +68,8 @@ class CalComBookingRescheduledTriggerTest extends AbstractCalComTriggerTest {
             .thenReturn(content);
 
         Object result = CalComBookingRescheduledTrigger.webhookRequest(
-            mockedParameters, mockedParameters, mockedHttpHeaders, mockedHttpParameters, mockedWebhookBody,
-            mockedWebhookMethod, mockedWebhookEnableOutput, mockedTriggerContext);
+            null, null, null, null, mockedWebhookBody,
+            null, null, null);
 
         assertEquals(content, result);
         assertEquals(mockedWebhookBody, webhookBodyArgumentCaptor.getValue());
