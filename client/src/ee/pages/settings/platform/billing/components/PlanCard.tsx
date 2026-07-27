@@ -121,71 +121,73 @@ const PlanCard = ({
                 </div>
             </CardHeader>
 
-            <CardContent>
-                <div className="rounded-lg bg-muted/50 px-4 py-6">
-                    <div className="mb-2">
-                        <span className="text-xl font-bold">
-                            {isTrial ? tasksAvailable.toLocaleString() : tasksUsed.toLocaleString()}
-                        </span>
+            {!trialExpired && (
+                <CardContent>
+                    <div className="rounded-lg bg-muted/50 px-4 py-6">
+                        <div className="mb-2">
+                            <span className="text-xl font-bold">
+                                {isTrial ? tasksAvailable.toLocaleString() : tasksUsed.toLocaleString()}
+                            </span>
 
-                        <span className="text-xl text-muted-foreground">
-                            {isTrial ? ' Tasks available' : ' Tasks used this period'}
-                        </span>
-                    </div>
-
-                    <div className="mb-2 flex justify-between text-sm font-medium">
-                        {isTrial ? (
-                            <>
-                                <span>Spent {tasksUsed.toLocaleString()}</span>
-
-                                <span>Limit {taskLimit.toLocaleString()}</span>
-                            </>
-                        ) : overageTasksCount > 0 ? (
-                            <>
-                                <span>{taskLimit.toLocaleString()} flat rate</span>
-
-                                <span>{overageTasksCount.toLocaleString()} usage billed</span>
-                            </>
-                        ) : (
-                            <>
-                                <span>{tasksUsed.toLocaleString()} flat rate</span>
-
-                                <span>{taskLimit.toLocaleString()} included</span>
-                            </>
-                        )}
-                    </div>
-
-                    <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
-                        <div className="h-full bg-muted" style={{width: `${blueZoneWidth}%`}}>
-                            <div className="h-full bg-blue-500" style={{width: `${blueFill}%`}} />
+                            <span className="text-xl text-muted-foreground">
+                                {isTrial ? ' Tasks available' : ' Tasks used this period'}
+                            </span>
                         </div>
 
-                        {orangeZoneWidth > 0 && (
-                            <div className="h-full bg-muted" style={{width: `${orangeZoneWidth}%`}}>
-                                <div className="h-full bg-orange-500" style={{width: `${orangeFill}%`}} />
+                        <div className="mb-2 flex justify-between text-sm font-medium">
+                            {isTrial ? (
+                                <>
+                                    <span>Spent {tasksUsed.toLocaleString()}</span>
+
+                                    <span>Limit {taskLimit.toLocaleString()}</span>
+                                </>
+                            ) : overageTasksCount > 0 ? (
+                                <>
+                                    <span>{taskLimit.toLocaleString()} flat rate</span>
+
+                                    <span>{overageTasksCount.toLocaleString()} usage billed</span>
+                                </>
+                            ) : (
+                                <>
+                                    <span>{tasksUsed.toLocaleString()} flat rate</span>
+
+                                    <span>{taskLimit.toLocaleString()} included</span>
+                                </>
+                            )}
+                        </div>
+
+                        <div className="flex h-2 w-full overflow-hidden rounded-full bg-muted">
+                            <div className="h-full bg-muted" style={{width: `${blueZoneWidth}%`}}>
+                                <div className="h-full bg-blue-500" style={{width: `${blueFill}%`}} />
                             </div>
-                        )}
-                    </div>
 
-                    {!isTrial && (
-                        <div className="mt-2 flex gap-4">
-                            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                <div className="size-2 rounded-full bg-blue-500" />
-
-                                <span>Flat rate (included)</span>
-                            </div>
-
-                            {overageTasksCount > 0 && (
-                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                                    <div className="size-2 rounded-full bg-orange-500" />
-
-                                    <span>Usage billed ($1 / 1,000 tasks)</span>
+                            {orangeZoneWidth > 0 && (
+                                <div className="h-full bg-muted" style={{width: `${orangeZoneWidth}%`}}>
+                                    <div className="h-full bg-orange-500" style={{width: `${orangeFill}%`}} />
                                 </div>
                             )}
                         </div>
-                    )}
-                </div>
-            </CardContent>
+
+                        {!isTrial && (
+                            <div className="mt-2 flex gap-4">
+                                <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                    <div className="size-2 rounded-full bg-blue-500" />
+
+                                    <span>Flat rate (included)</span>
+                                </div>
+
+                                {overageTasksCount > 0 && (
+                                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                                        <div className="size-2 rounded-full bg-orange-500" />
+
+                                        <span>Usage billed ($1 / 1,000 tasks)</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </CardContent>
+            )}
         </Card>
     );
 };
