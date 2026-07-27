@@ -20,44 +20,48 @@ import static com.bytechef.component.calcom.constant.CalComConstants.DATA;
 import static com.bytechef.component.calcom.constant.CalComConstants.ID;
 import static com.bytechef.component.calcom.constant.CalComConstants.PAYLOAD;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.bytechef.component.definition.Context.ContextFunction;
+import com.bytechef.component.definition.Context.Http;
 import com.bytechef.component.definition.Context.Http.Body;
+import com.bytechef.component.definition.Context.Http.Configuration;
 import com.bytechef.component.definition.Context.Http.Executor;
 import com.bytechef.component.definition.Context.Http.Response;
 import com.bytechef.component.definition.TriggerContext;
 import com.bytechef.component.definition.TriggerDefinition.WebhookBody;
 import com.bytechef.component.definition.TypeReference;
+import com.bytechef.component.test.definition.extension.MockContextSetupExtension;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 
 /**
  * @author Nikolina Spehar
  */
+@ExtendWith(MockContextSetupExtension.class)
 class CalComUtilsTest {
 
-    private final ArgumentCaptor<Body> bodyArgumentCaptor = ArgumentCaptor.forClass(Body.class);
-    private final Executor mockedExecutor = mock(Executor.class);
-    private final Response mockedResponse = mock(Response.class);
-    private final TriggerContext mockedTriggerContext = mock(TriggerContext.class);
+    private final ArgumentCaptor<Body> bodyArgumentCaptor = forClass(Body.class);
+    private final ArgumentCaptor<String> stringArgumentCaptor = forClass(String.class);
     private final WebhookBody mockedWebhookBody = mock(WebhookBody.class);
 
     @Test
-    void testSubscribeWebhook() {
-        when(mockedTriggerContext.http(any()))
+    void testSubscribeWebhook(
+        TriggerContext mockedTriggerContext, Response mockedResponse, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor,
+        ArgumentCaptor<Configuration.ConfigurationBuilder> configurationBuilderArgumentCaptor) {
+
+        when(mockedHttp.post(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
         when(mockedExecutor.body(bodyArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.configuration(any()))
-            .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
         when(mockedResponse.getBody(any(TypeReference.class)))
             .thenReturn(Map.of(DATA, Map.of(ID, "123")));
 
@@ -76,19 +80,28 @@ class CalComUtilsTest {
             "active", true);
 
         assertEquals(expectedBody, body.getContent());
+
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+
+        Configuration.ConfigurationBuilder configurationBuilder = configurationBuilderArgumentCaptor.getValue();
+        Configuration configuration = configurationBuilder.build();
+
+        assertEquals(Http.ResponseType.JSON, configuration.getResponseType());
+        assertEquals("/webhooks", stringArgumentCaptor.getValue());
     }
 
     @Test
-    void testUnsubscribeWebhook() {
-        when(mockedTriggerContext.http(any()))
+    void testUnsubscribeWebhook(
+        TriggerContext mockedTriggerContext, Executor mockedExecutor, Http mockedHttp,
+        ArgumentCaptor<ContextFunction<Http, Executor>> httpFunctionArgumentCaptor) {
+
+        when(mockedHttp.delete(stringArgumentCaptor.capture()))
             .thenReturn(mockedExecutor);
-        when(mockedExecutor.execute())
-            .thenReturn(mockedResponse);
 
         CalComUtils.unsubscribeWebhook(mockedTriggerContext, "123");
 
-        verify(mockedTriggerContext, times(1)).http(any());
-        verify(mockedExecutor, times(1)).execute();
+        assertNotNull(httpFunctionArgumentCaptor.getValue());
+        assertEquals("/webhooks/123", stringArgumentCaptor.getValue());
     }
 
     @Test
