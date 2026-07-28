@@ -17,6 +17,7 @@
 package com.bytechef.component.beamer;
 
 import static com.bytechef.component.definition.ComponentDsl.component;
+import static com.bytechef.component.definition.ComponentDsl.tool;
 
 import com.bytechef.component.ComponentHandler;
 import com.bytechef.component.beamer.action.BeamerCreateFeatureRequestAction;
@@ -42,6 +43,9 @@ public class BeamerComponentHandler implements ComponentHandler {
             "Beamer is a customer engagement platform that helps businesses communicate updates, collect feedback, " +
                 "and boost user engagement through in-app notifications, changelogs, and announcements.")
         .icon("path:assets/beamer.svg")
+        .version(1)
+        .customAction(true)
+        .customActionHelp("", "https://www.getbeamer.com/api")
         .categories(ComponentCategory.PRODUCTIVITY_AND_COLLABORATION)
         .connection(BeamerConnection.CONNECTION_DEFINITION)
         .actions(
@@ -50,6 +54,12 @@ public class BeamerComponentHandler implements ComponentHandler {
             BeamerGetFeedAction.ACTION_DEFINITION,
             BeamerNewCommentAction.ACTION_DEFINITION,
             BeamerNewVoteAction.ACTION_DEFINITION)
+        .clusterElements(
+            tool(BeamerCreateFeatureRequestAction.ACTION_DEFINITION),
+            tool(BeamerCreatePostAction.ACTION_DEFINITION),
+            tool(BeamerGetFeedAction.ACTION_DEFINITION),
+            tool(BeamerNewCommentAction.ACTION_DEFINITION),
+            tool(BeamerNewVoteAction.ACTION_DEFINITION))
         .triggers(BeamerNewPostTrigger.TRIGGER_DEFINITION);
 
     @Override

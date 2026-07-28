@@ -46,6 +46,7 @@ public class BeamerNewVoteAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("newVote")
         .title("New Vote")
         .description("Creates a new vote on selected feature request.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-vote")
         .properties(
             string(FEATURE_REQUEST_ID)
                 .label("Feature Request ID")

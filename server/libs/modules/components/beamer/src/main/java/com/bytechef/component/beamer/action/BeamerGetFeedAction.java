@@ -37,6 +37,7 @@ public class BeamerGetFeedAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("getFeed")
         .title("Get Feed")
         .description("Get the URL for your feed.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#get-feed")
         .output(
             outputSchema(
                 object()

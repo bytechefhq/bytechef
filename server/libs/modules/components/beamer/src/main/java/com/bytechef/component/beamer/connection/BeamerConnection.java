@@ -42,7 +42,9 @@ public class BeamerConnection {
                         .label("API key")
                         .required(true))
                 .apply((connectionParameters, context) -> ApplyResponse.ofHeaders(
-                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequiredString(KEY))))));
+                    Map.of("Beamer-Api-Key", List.of(connectionParameters.getRequiredString(KEY))))))
+        .version(1)
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#connection-setup");
 
     private BeamerConnection() {
     }
