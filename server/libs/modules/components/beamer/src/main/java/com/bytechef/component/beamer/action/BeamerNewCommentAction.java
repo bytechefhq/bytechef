@@ -47,6 +47,7 @@ public class BeamerNewCommentAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("newComment")
         .title("New Comment")
         .description("Creates a new comment on selected post.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-comment")
         .properties(
             string(POST_ID)
                 .label("Post")

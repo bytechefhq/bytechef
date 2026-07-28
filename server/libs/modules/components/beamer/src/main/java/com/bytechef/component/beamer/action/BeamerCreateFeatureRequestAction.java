@@ -49,6 +49,7 @@ public class BeamerCreateFeatureRequestAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createFeatureRequest")
         .title("Create Feature Request")
         .description("Creates a new feature request.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#create-feature-request")
         .properties(
             string(TITLE)
                 .label("Feature Request Title")

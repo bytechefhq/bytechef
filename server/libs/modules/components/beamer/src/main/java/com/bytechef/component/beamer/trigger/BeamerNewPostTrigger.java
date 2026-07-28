@@ -50,6 +50,7 @@ public class BeamerNewPostTrigger {
     public static final ModifiableTriggerDefinition TRIGGER_DEFINITION = trigger("newPost")
         .title("New Post")
         .description("Triggers when a new post is added.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#new-post")
         .type(TriggerType.POLLING)
         .properties()
         .output(
