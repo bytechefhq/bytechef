@@ -46,6 +46,7 @@ public class BeamerCreatePostAction {
     public static final ModifiableActionDefinition ACTION_DEFINITION = action("createPost")
         .title("Create Post")
         .description("Creates a new post.")
+        .help("", "https://docs.bytechef.io/reference/components/beamer_v1#create-post")
         .properties(
             string(TITLE)
                 .label("Title")
