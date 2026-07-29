@@ -405,6 +405,94 @@ service bean absent → plain copilot; instructions blank → title-only overlay
   `bytechef_workflow_chat_attachment_failure{reason}` — operational signals for resume HTTP outcome,
   unreachable workflows (disabled / deleted), and attachment promotion failures.
 
+### AI Hub agent tool architecture (EE)
+
+Tools reach the ai_hub ASK/BUILD agents through three tiers (wired in `AiHubConfiguration`):
+
+1. **Pinned static list** — everything added via `toolCallbacks.add(...)` on the agent bean.
+   `PinnedToolSearchToolCallingAdvisor` keeps the ENTIRE static list callable in every model
+   iteration, so each entry costs schema tokens on every call. Reserve for interaction primitives
+   (openResourceTab, askUserQuestion, connection pickers), self-configuration (attach/list task
+   tools, state-visibility lookups), and the subagent delegate tools.
+2. **Searchable catalog** — the per-mode `AiHubGlobalToolCatalog` beans
+   (`aiHubAskGlobalToolCatalog` / `aiHubBuildGlobalToolCatalog`) feed the pgvector tool-search
+   index; tools are callable only after a `searchTool` hit surfaces them. Catalog tools are
+   security-context-rehydration-wrapped by `ToolSearchAdvisorConfiguration`, so
+   `@PreAuthorize`-guarded facades work. Demote rarely-used tools here (cloneAssetFile,
+   createWorkflowChat, ASK's listApiCollections) and note them in the prompt as
+   "find with searchTool first".
+3. **Specialist subagents** — one-shot ChatClients registered as delegate tools. Two families:
+   Copilot specialists (skills, context_store, knowledge_base, data_table, cluster_element,
+   code_editor, workflow_editor, converter (BUILD-only), workflow_execution, custom_component,
+   code_workflow) via `registerCopilotSubAgentToolCallbacks`, and AI-hub-owned subagents
+   (research, data_analyst, image_generator, slide_builder via `registerSubAgentToolCallbacks`;
+   mcp_manager, personal_agent_manager, deployment_manager, api_collection_manager via
+   `registerManagerSubAgentToolCallbacks` + `ManagerSubAgentToolCallback`). Delegates MUST forward
+   the parent `ToolContext` into the inner ChatClient (`.toolContext(...)`) or workspace-scoped
+   tools fail with "Workspace context unavailable". Wrap delegates in
+   `ProgressReportingToolCallback` on the chat surface only (it narrates into the AG-UI stream).
+
+Rules of thumb: interactive or streaming contracts must stay pinned on the main agent —
+`runChatWorkflow`'s SSE/awaitingInput contract is client-coupled to the MAIN agent's tool-call
+event, and subagents are one-shot (they cannot ask the user and resume). Self-contained CRUD
+domains go behind a specialist; rare one-shot tools go to the catalog. Adding a subagent means:
+enum entry in `AiHubAgentType` (auto-registered via `AiHubAgentTypeProvider`), a
+`*Configuration` with a ChatClient bean + prompt resource + static `create*ToolCallback` factory,
+registration via `ObjectProvider.ifAvailable`, and prompt documentation on the parent agent.
+
+**Consolidated pinned tools** (AI Hub only; per-kind variants remain on the Copilot surface):
+- `openResourceTab({type, name, ...ids})` replaces the seven per-resource open*Tab tools. The
+  result echoes `type` plus the legacy field names; `AiHubRuntimeProvider` re-dispatches onto the
+  legacy client branches. `openWorkflowChatTab`/`openAiHubPersonalAgentTab` stay separate — their
+  results drive a task switch, not a resource-panel tab.
+- `lookupPropertyOptions` / `selectPropertyOption` take `kind: ACTION | TRIGGER` +
+  `operationName` (classes `LookupComponentPropertyOptionsToolCallback` /
+  `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
+  `select-property-option` marker payload are client-load-bearing — do not rename.
+
+### Domain copilot slice pattern (context store / knowledge base / data table)
+
+Each domain slice follows the same shape (see `docs/superpowers/plans/` for the slice plans):
+shared tool callbacks + a `*ToolCallbacksFactory` (read list feeds ASK, write list feeds BUILD)
+in `automation-ai-tool`; an EE `<Domain>AgentConfiguration` in ai-hub-service defining the
+source-panel agents and the ask/build subagent ChatClients; a `<domain>_agent` delegate callback
+in `ai-copilot-tool`; a source enum entry on both surfaces; AI Hub delegates the domain to the
+specialist instead of registering flat mutation tools; the client detail page gets a copilot
+trigger + post-turn query invalidation.
+
+### MCP servers and workflows-as-tools (fromAi mapping)
+
+- Per-server secret-key URLs: `/api/automation/{secretKey}/mcp` (AI Hub / workspace),
+  `/api/embedded/{secretKey}/mcp`, `/api/management/{secretKey}/mcp`. The secret doubles as the
+  tenant anchor for MCP OAuth (token is identity-only; a conflicting tenant claim is rejected).
+- A workflow is MCP-exposable only if it has a `workflow/newWorkflowCall` trigger. The tool
+  mapping (`toolName`, `toolDescription`, per-input values that may be `fromAi(...)` expression
+  strings) lives on **`McpProjectWorkflow.parameters`** — NOT in the workflow definition. Never
+  add fromAi to standalone workflow tasks; the copilot prompts forbid it there for good reason.
+  The serve path (`AutomationMcpToolFacade`) derives each tool's JSON schema from the fromAi
+  expressions at list time and requires a non-null `toolName`; `createMcpProject` attaches
+  workflows with EMPTY parameters, so a setup is not servable until the mapping is completed
+  (agent tools: `listMcpProjectWorkflows`, `updateMcpProjectWorkflowParameters` — merge
+  semantics, only supplied fields change; authorization via the service's `MCP_EDIT` checks).
+- The `mcp_manager` subagent owns the end-to-end playbook (`prompt_mcp_manager.txt`).
+- The management MCP server folds in `McpServerToolCallbackContributor` beans (SPI in
+  `ai-mcp-server-api`, keeps the CE server free of EE imports). The four manager subagents are
+  contributed there wrapped in `WorkspaceScopedManagerToolCallback`: an optional `workspaceId`
+  input is forwarded into the specialist's ToolContext; a sole workspace auto-selects; multiple
+  return a `workspace_required` error listing candidates. `ProgressReportingToolCallback` is NOT
+  applied on the MCP surface (no AG-UI stream). Spec:
+  `docs/superpowers/specs/2026-07-18-management-mcp-manager-subagents-design.md`.
+
+### Sidebar navigation groups (Client)
+
+`AppSidebarNavItemI` has an optional `group` field; `AppSidebar` folds CONSECUTIVE items sharing
+a `group` into one labeled `SidebarGroup` at the position of their first item (non-adjacent items
+with the same group form separate sections — keep group members adjacent in the nav arrays in
+`App.tsx`). Current groups: automation "Deployments" (Project Deployments, API Collections, MCP
+Servers, Context Store) and "Data" (Data Tables, Knowledge Base, Files); embedded
+"Configurations" (Integration Configurations, MCP Servers). Feature-flag filtering runs before
+grouping, so a group renders with whatever members survive their flags.
+
 ### Vitest mock factory hoisting (Client)
 
 `vi.mock(...)` calls hoist to the top of the file, so module-scope `const` declarations are NOT yet
