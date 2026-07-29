@@ -29,6 +29,7 @@ import com.bytechef.atlas.configuration.domain.CancelControlTask;
 import com.bytechef.atlas.configuration.domain.WorkflowTask;
 import com.bytechef.atlas.coordinator.event.TaskExecutionCompleteEvent;
 import com.bytechef.atlas.coordinator.event.TaskExecutionErrorEvent;
+import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.coordinator.message.route.TaskCoordinatorMessageRoute;
 import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
@@ -157,6 +158,67 @@ public class TaskWorkerTest {
         taskExecution.setJobId(4567L);
 
         worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+    }
+
+    @Test
+    public void testCompletedTaskExecutionCarriesStartAndEndDates() {
+        List<MessageEvent<?>> events = new CopyOnWriteArrayList<>();
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> events.add((MessageEvent<?>) event), NEW_SINGLE_THREAD_EXECUTOR::execute,
+            task -> taskExecution -> "done", taskFileStorage, List.of());
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+
+        TaskStartedApplicationEvent taskStartedApplicationEvent = events.stream()
+            .filter(TaskStartedApplicationEvent.class::isInstance)
+            .map(TaskStartedApplicationEvent.class::cast)
+            .findFirst()
+            .orElseThrow();
+        TaskExecution completedTaskExecution = events.stream()
+            .filter(TaskExecutionCompleteEvent.class::isInstance)
+            .map(event -> ((TaskExecutionCompleteEvent) event).getTaskExecution())
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertEquals(taskStartedApplicationEvent.getCreateDate(), completedTaskExecution.getStartDate());
+        Assertions.assertNotNull(completedTaskExecution.getEndDate());
+    }
+
+    @Test
+    public void testFailedTaskExecutionCarriesStartAndEndDates() {
+        List<MessageEvent<?>> events = new CopyOnWriteArrayList<>();
+
+        TaskWorker worker = new TaskWorker(
+            null, EVALUATOR, event -> events.add((MessageEvent<?>) event), NEW_SINGLE_THREAD_EXECUTOR::execute,
+            task -> taskExecution -> {
+                throw new IllegalArgumentException("bad input");
+            }, taskFileStorage, List.of());
+
+        TaskExecution taskExecution = TaskExecution.builder()
+            .workflowTask(new WorkflowTask(Map.of(NAME, "name", TYPE, "type")))
+            .build();
+
+        taskExecution.setId(1234L);
+        taskExecution.setJobId(4567L);
+
+        worker.onTaskExecutionEvent(new TaskExecutionEvent(taskExecution));
+
+        TaskExecution failedTaskExecution = events.stream()
+            .filter(TaskExecutionErrorEvent.class::isInstance)
+            .map(event -> ((TaskExecutionErrorEvent) event).getTaskExecution())
+            .findFirst()
+            .orElseThrow();
+
+        Assertions.assertNotNull(failedTaskExecution.getStartDate());
+        Assertions.assertNotNull(failedTaskExecution.getEndDate());
     }
 
     @Test
