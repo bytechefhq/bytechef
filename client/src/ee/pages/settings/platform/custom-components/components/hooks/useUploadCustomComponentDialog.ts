@@ -39,7 +39,7 @@ export default function useUploadCustomComponentDialog() {
 
             formData.append('componentFile', file);
 
-            const response = await fetch('/api/platform/v1/custom-components/deploy', {
+            const response = await fetch('/api/platform/internal/custom-components/deploy', {
                 body: formData,
                 headers: {
                     'X-XSRF-TOKEN': getCookie('XSRF-TOKEN') || '',
