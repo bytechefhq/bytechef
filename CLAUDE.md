@@ -1141,11 +1141,13 @@ when an `openapi.yaml` changes. The surrounding `docs/`, `gradlew`, `pom.xml` sc
 When an automation run ends `FAILED`, `ErrorWorkflowJobStatusApplicationEventListener`
 (platform-coordinator, `@Order(300)`, after cost and workflow alerts) dispatches the configured
 error workflow through `PrincipalJobFacade.createJob`. Config is a nullable
-`project.error_project_workflow_id` (set via the `updateProjectErrorWorkflow` GraphQL mutation)
-with a per-workflow override + a separate `error_workflow_disabled` flag on `project_workflow`
-(null already means inherit) — **those two columns exist and the resolver honours them, but there
-is no API to set them yet; only the project-level mutation is wired.** The handler must live in the
-same project and carry a `workflow/newWorkflowError` trigger; both are validated when configured
+`project.error_project_workflow_id` (set via the `updateProjectErrorWorkflow` GraphQL mutation, and
+in the client via the project header's Settings menu → Project tab → Error Workflow dialog) with a
+per-workflow override + a separate `error_workflow_disabled` flag on `project_workflow` (null
+already means inherit) — set together via `updateProjectWorkflowErrorWorkflow` (client: Settings
+menu → Workflow tab → Error Handling dialog's three-state Inherit/Override/Disabled radio). The
+handler must live in the same project and carry a `workflow/newWorkflowError` trigger; both are
+validated when configured
 (`ErrorWorkflowConfigurationValidator`), not at failure time. `errorHandlerFor` job metadata caps
 recursion at depth 1 — a failing handler does not spawn another; a subflow child job is also
 skipped (only the top-level failed run dispatches). Admission gates are deliberately not bypassed,
@@ -1156,9 +1158,11 @@ a genuinely uncaught, inter-workflow failure. **Monolith only** — resolution n
 `ProjectWorkflowService` lookups, and `RemoteProjectWorkflowServiceClient` is all
 `UnsupportedOperationException` stubs, so distributed EE can't resolve the handler at all (same
 root cause as orphaned-job recovery); the listener detects this, logs once, and records the
-`skipped_unsupported` outcome instead of warning on every failed job. Payload's `execution.mode`
-and `execution.resumeOf` fields are reserved but always `null` — nothing populates those
-job-metadata keys yet. Metric: `bytechef_error_workflow_dispatch{outcome=dispatched|
+`skipped_unsupported` outcome instead of warning on every failed job. The payload carries
+`execution.autoRecoveryAttempts` rather than n8n's `retryOf`: ByteChef resumes a job IN PLACE
+(`resumeToStatusStarted` reuses the same id), so there is no prior job to point at — what a handler
+can use is how many times this run was already auto-recovered. Metric:
+`bytechef_error_workflow_dispatch{outcome=dispatched|rejected|
 skipped_recursion|skipped_subflow_child|skipped_no_config|skipped_unsupported|failed}`.
 
 ## Public URL Signing
