@@ -32,6 +32,8 @@ public class NotificationHandlerRegistry {
 
     private final Map<NotificationEvent.Type, EmailNotificationHandler> emailNotificationHanlderMap =
         new HashMap<>();
+    private final Map<NotificationEvent.Type, SlackNotificationHandler> slackNotificationHandlerMap =
+        new HashMap<>();
     private final Map<NotificationEvent.Type, WebhookNotificationHandler> webhookNotificationHandlerMap =
         new HashMap<>();
 
@@ -51,6 +53,10 @@ public class NotificationHandlerRegistry {
                 for (NotificationEvent.Type eventType : notificationEventType.value()) {
                     emailNotificationHanlderMap.put(eventType, emailNotificationHandler);
                 }
+            } else if (notificationHandler instanceof SlackNotificationHandler slackNotificationHandler) {
+                for (NotificationEvent.Type eventType : notificationEventType.value()) {
+                    slackNotificationHandlerMap.put(eventType, slackNotificationHandler);
+                }
             } else if (notificationHandler instanceof WebhookNotificationHandler webhookNotificationHandler) {
                 for (NotificationEvent.Type eventType : notificationEventType.value()) {
                     webhookNotificationHandlerMap.put(eventType, webhookNotificationHandler);
@@ -62,10 +68,10 @@ public class NotificationHandlerRegistry {
     public NotificationHandler getNotificationHandler(
         NotificationEvent.Type eventType, Notification.Type notificationType) {
 
-        if (notificationType == Notification.Type.EMAIL) {
-            return emailNotificationHanlderMap.get(eventType);
-        }
-
-        return webhookNotificationHandlerMap.get(eventType);
+        return switch (notificationType) {
+            case EMAIL -> emailNotificationHanlderMap.get(eventType);
+            case SLACK -> slackNotificationHandlerMap.get(eventType);
+            case WEBHOOK -> webhookNotificationHandlerMap.get(eventType);
+        };
     }
 }

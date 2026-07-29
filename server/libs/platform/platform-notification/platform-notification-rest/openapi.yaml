@@ -150,6 +150,7 @@ components:
           enum:
             - "EMAIL"
             - "WEBHOOK"
+            - "SLACK"
         settings:
           description: "Notification type related settings"
           type: "object"

@@ -200,6 +200,19 @@ class AgentSubflowResumeListenerTest {
     }
 
     @Test
+    void testCancelledSubflowReleasesTheAgentWithAnError() {
+        stubSubflowJob(Job.Status.CANCELLED);
+
+        agentSubflowResumeListener.onApplicationEvent(
+            new JobStatusApplicationEvent(SUBFLOW_JOB_ID, Job.Status.CANCELLED));
+
+        Map<String, Object> resumeData = captureResumeData();
+
+        assertThat(resumeData).containsEntry("status", "failed");
+        assertThat((String) resumeData.get("error")).contains("cancelled");
+    }
+
+    @Test
     void testStoppedSubflowReleasesTheAgentWithAnError() {
         stubSubflowJob(Job.Status.STOPPED);
 

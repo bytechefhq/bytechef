@@ -16,24 +16,64 @@
 
 package com.bytechef.platform.notification.handler;
 
+import com.bytechef.platform.notification.delivery.WebhookDeliveryRequest;
+import com.bytechef.platform.notification.delivery.WebhookNotificationClient;
 import com.bytechef.platform.notification.domain.Notification;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 /**
+ * Delivers WEBHOOK-channel notifications through the shared {@link WebhookNotificationClient} — the same transport the
+ * EE AI-observability alert channels use. Settings: {@code webhook} (destination URL, required) and
+ * {@code webhookSecret} (optional HMAC secret; when set, deliveries carry an {@code X-ByteChef-Signature} header).
+ *
  * @author Matija Petanjek
+ * @author Ivica Cardic
  */
-
 @Component
 public class WebhookNotificationSender implements NotificationSender<WebhookNotificationHandler> {
 
+    private static final Logger log = LoggerFactory.getLogger(WebhookNotificationSender.class);
+
+    private final WebhookNotificationClient webhookNotificationClient;
+
+    public WebhookNotificationSender(WebhookNotificationClient webhookNotificationClient) {
+        this.webhookNotificationClient = webhookNotificationClient;
+    }
+
+    @Override
     public Notification.Type getType() {
         return Notification.Type.WEBHOOK;
     }
 
+    @Async
     @Override
     public void send(
         Notification notification, WebhookNotificationHandler webhookNotificationHandler,
         NotificationHandlerContext notificationHandlerContext) {
 
+        Map<String, Object> settings = notification.getSettings();
+
+        String url = (String) settings.get("webhook");
+
+        if (url == null || url.isBlank()) {
+            log.warn("Notification {} has no webhook URL configured; skipping delivery", notification.getId());
+
+            return;
+        }
+
+        String secret = (String) settings.get("webhookSecret");
+
+        try {
+            webhookNotificationClient.deliver(
+                new WebhookDeliveryRequest(
+                    url, "job.status", webhookNotificationHandler.getPayload(notificationHandlerContext), Map.of(),
+                    secret));
+        } catch (RuntimeException exception) {
+            log.error("Failed to deliver webhook notification {}", notification.getId(), exception);
+        }
     }
 }
