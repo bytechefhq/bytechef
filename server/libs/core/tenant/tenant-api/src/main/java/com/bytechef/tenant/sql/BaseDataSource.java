@@ -25,7 +25,6 @@ import java.sql.ConnectionBuilder;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.SQLFeatureNotSupportedException;
-import java.util.Objects;
 import javax.sql.DataSource;
 
 /**
@@ -131,14 +130,22 @@ public abstract class BaseDataSource implements DataSource {
 
         TenantIdValidator.validateDatabaseSchema(currentDatabaseSchema);
 
-        String searchPath = Objects.equals(currentDatabaseSchema, TenantContext.DEFAULT_TENANT_ID)
-            ? currentDatabaseSchema : currentDatabaseSchema + ", " + TenantContext.DEFAULT_TENANT_ID;
-
         try (PreparedStatement statement =
-            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + searchPath)) {
+            connection.prepareStatement(SET_SEARCH_PATH_STATEMENT + getSearchPath(currentDatabaseSchema))) {
 
             statement.execute();
         }
+    }
+
+    /**
+     * Builds the value used in the {@code SET search_path TO} statement for the given tenant schema. Subclasses may
+     * append additional schemas (such as {@code public}) that hold shared objects like PostgreSQL extensions.
+     *
+     * @param currentDatabaseSchema the validated tenant schema
+     * @return the search path value
+     */
+    protected String getSearchPath(String currentDatabaseSchema) {
+        return currentDatabaseSchema;
     }
 
     /**
