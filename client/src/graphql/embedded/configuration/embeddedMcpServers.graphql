@@ -3,6 +3,7 @@ query embeddedMcpServers {
         id
         enabled
         enforceToolAuthorization
+        authenticationRequired
         environmentId
         lastModifiedDate
         mcpComponents {
