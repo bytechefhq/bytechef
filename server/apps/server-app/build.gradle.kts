@@ -343,6 +343,7 @@ dependencies {
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-connected-user:embedded-connected-user-service"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
+    implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-admin-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-public-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-rest:embedded-configuration-rest-impl"))

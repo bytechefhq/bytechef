@@ -32,6 +32,14 @@ public interface ProjectDeploymentService {
 
     Optional<ProjectDeployment> fetchProjectDeployment(long projectId, Environment environment);
 
+    /**
+     * {@link #fetchProjectDeployment(long, Environment)} assumes one deployment per project+environment, which only
+     * holds because copy-mode gives each connected user their own private project. A catalog project shared by many
+     * referencing connected users has one {@link ProjectDeployment} per (project, connected user), disambiguated by
+     * name rather than environment.
+     */
+    Optional<ProjectDeployment> fetchProjectDeploymentByName(long projectId, String name);
+
     ProjectDeployment getProjectDeployment(long id);
 
     ProjectDeployment getProjectDeployment(long projectId, Environment environment);
