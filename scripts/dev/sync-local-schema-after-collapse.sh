@@ -80,6 +80,48 @@ END
 \$\$;"
 done <<< "$PAIRS"
 
+# The AI-observability notification channels never shipped (the module is absent from master and every
+# release tag), so the conversion migration 20260720000004 was deleted instead of kept as a permanent
+# no-op, and the init changelog now creates ai_observability_alert_rule_channel with a notification_id
+# column FK'd straight to notification. A local DB created before that edit still has the pre-migration
+# shape, so bring it forward here. Guarded throughout, so it is safe to re-run.
+SQL="$SQL
+DO \$\$
+BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.tables
+               WHERE table_name = 'ai_observability_alert_rule_channel') THEN
+
+        IF EXISTS (SELECT 1 FROM information_schema.columns
+                   WHERE table_name = 'ai_observability_alert_rule_channel'
+                     AND column_name = 'notification_channel_id') THEN
+            ALTER TABLE ai_observability_alert_rule_channel
+                DROP CONSTRAINT IF EXISTS fk_ai_obs_arc_notif_channel;
+
+            ALTER TABLE ai_observability_alert_rule_channel
+                RENAME COLUMN notification_channel_id TO notification_id;
+        END IF;
+
+        IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'notification') THEN
+            -- Surviving ids referenced channel rows, not notification rows. Nothing can legitimately
+            -- point anywhere yet (no deployment ever held a channel), so purge before adding the FK.
+            DELETE FROM ai_observability_alert_rule_channel
+            WHERE notification_id NOT IN (SELECT id FROM notification);
+
+            IF NOT EXISTS (SELECT 1 FROM information_schema.table_constraints
+                           WHERE constraint_name = 'fk_ai_obs_arc_notification'
+                             AND table_name = 'ai_observability_alert_rule_channel') THEN
+                ALTER TABLE ai_observability_alert_rule_channel
+                    ADD CONSTRAINT fk_ai_obs_arc_notification FOREIGN KEY (notification_id)
+                    REFERENCES notification(id) ON DELETE CASCADE;
+            END IF;
+        END IF;
+    END IF;
+
+    DROP TABLE IF EXISTS workspace_ai_observability_notification_channel CASCADE;
+    DROP TABLE IF EXISTS ai_observability_notification_channel CASCADE;
+END
+\$\$;"
+
 # Init changelogs were edited in place, so recorded checksums no longer match. Nulling md5sum
 # makes Liquibase recompute on next run; it does NOT re-run changesets (they stay marked executed).
 SQL="$SQL

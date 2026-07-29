@@ -279,76 +279,6 @@
         </createIndex>
     </changeSet>
 
-    <changeSet id="00000000000002-11" author="Ivica Cardic">
-        <preConditions onFail="MARK_RAN">
-            <not>
-                <tableExists tableName="ai_observability_notification_channel"/>
-            </not>
-        </preConditions>
-
-        <createTable tableName="ai_observability_notification_channel">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="name" type="VARCHAR(256)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="type" type="INT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="config" type="TEXT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="enabled" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_error" type="TEXT"/>
-            <column name="last_error_date" type="TIMESTAMP"/>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <createTable tableName="workspace_ai_observability_notification_channel">
-            <column name="id" type="BIGINT" autoIncrement="true" startWith="1050">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="ai_observability_notification_channel_id" type="BIGINT">
-                <constraints nullable="false" foreignKeyName="fk_ws_ai_obs_notif_channel" references="ai_observability_notification_channel(id)"/>
-            </column>
-            <column name="workspace_id" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_by" type="VARCHAR(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="last_modified_date" type="TIMESTAMP">
-                <constraints nullable="false"/>
-            </column>
-            <column name="version" type="BIGINT">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addUniqueConstraint constraintName="uk_ws_ai_obs_notif_channel" tableName="workspace_ai_observability_notification_channel" columnNames="workspace_id,ai_observability_notification_channel_id"/>
-
-        <createIndex tableName="workspace_ai_observability_notification_channel" indexName="idx_ws_ai_obs_notif_channel_workspace">
-            <column name="workspace_id"/>
-        </createIndex>
-    </changeSet>
-
     <changeSet id="00000000000002-12" author="Ivica Cardic">
         <preConditions onFail="MARK_RAN">
             <not>
@@ -360,7 +290,7 @@
             <column name="ai_observability_alert_rule" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
-            <column name="notification_channel_id" type="BIGINT">
+            <column name="notification_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -368,10 +298,25 @@
         <addForeignKeyConstraint constraintName="fk_ai_obs_arc_alert_rule"
                                  baseTableName="ai_observability_alert_rule_channel" baseColumnNames="ai_observability_alert_rule"
                                  referencedTableName="ai_observability_alert_rule" referencedColumnNames="id"/>
+    </changeSet>
 
-        <addForeignKeyConstraint constraintName="fk_ai_obs_arc_notif_channel"
-                                 baseTableName="ai_observability_alert_rule_channel" baseColumnNames="notification_channel_id"
-                                 referencedTableName="ai_observability_notification_channel" referencedColumnNames="id"/>
+    <!-- The foreign key targets the notification table, owned by the platform/notification changelog, which
+         master.xml includes before platform/ai/observability. It lives in its own changeset because
+         module-scoped test contexts load only a subset of changelogs, so notification may be absent there; the
+         tableExists precondition then skips the constraint instead of failing the whole changelog. -->
+    <changeSet id="00000000000002-16" author="Ivica Cardic">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="notification"/>
+
+            <not>
+                <foreignKeyConstraintExists foreignKeyName="fk_ai_obs_arc_notification"
+                    foreignKeyTableName="ai_observability_alert_rule_channel"/>
+            </not>
+        </preConditions>
+
+        <addForeignKeyConstraint constraintName="fk_ai_obs_arc_notification"
+                                 baseTableName="ai_observability_alert_rule_channel" baseColumnNames="notification_id"
+                                 referencedTableName="notification" referencedColumnNames="id" onDelete="CASCADE"/>
     </changeSet>
 
     <changeSet id="00000000000002-13" author="Ivica Cardic">

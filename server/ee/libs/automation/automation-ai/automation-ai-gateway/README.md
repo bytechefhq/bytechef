@@ -202,7 +202,6 @@ versioning, and encryption.
 - `ai_observability_alert_rule`
 - `ai_observability_alert_rule_channel`
 - `ai_observability_alert_event`
-- `ai_observability_notification_channel`
 - `ai_observability_webhook_subscription`
 - `ai_observability_export_job`
 
