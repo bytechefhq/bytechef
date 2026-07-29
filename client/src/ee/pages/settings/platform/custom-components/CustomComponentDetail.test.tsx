@@ -41,6 +41,15 @@ const renderDetail = (id: string) =>
         </MemoryRouter>
     );
 
+const renderEmbeddedDetail = (customComponentId: string) =>
+    render(
+        <MemoryRouter initialEntries={['/']}>
+            <Routes>
+                <Route element={<CustomComponentDetail customComponentId={customComponentId} />} path="/" />
+            </Routes>
+        </MemoryRouter>
+    );
+
 beforeEach(() => {
     hoisted.mockUseCustomComponentDefinitionQuery.mockReturnValue({data: undefined, error: null, isLoading: false});
     hoisted.mockUseCustomComponentSourceQuery.mockReturnValue({data: undefined, error: null, isLoading: false});
@@ -116,5 +125,36 @@ describe('CustomComponentDetail', () => {
         expect(await screen.findByText('Do Something')).toBeInTheDocument();
         expect(screen.queryByTestId('monaco-editor-mock')).not.toBeInTheDocument();
         expect(screen.queryByRole('button', {name: 'Save'})).not.toBeInTheDocument();
+    });
+
+    it('fetches and renders by the customComponentId prop without a route param', async () => {
+        hoisted.mockUseCustomComponentQuery.mockReturnValue({
+            data: {
+                customComponent: {
+                    componentVersion: 1,
+                    description: null,
+                    enabled: true,
+                    id: '7',
+                    language: CustomComponentLanguage.Javascript,
+                    name: 'my-embedded-component',
+                    title: 'My Embedded Component',
+                },
+            },
+            error: null,
+            isLoading: false,
+        });
+        hoisted.mockUseCustomComponentSourceQuery.mockReturnValue({
+            data: {customComponentSource: 'console.log("embedded");'},
+            error: null,
+            isLoading: false,
+        });
+
+        renderEmbeddedDetail('7');
+
+        const editor = await screen.findByTestId('monaco-editor-mock');
+
+        expect(editor).toHaveTextContent('console.log("embedded");');
+        expect(hoisted.mockUseCustomComponentQuery).toHaveBeenCalledWith({id: '7'}, {enabled: true});
+        expect(screen.queryByRole('button', {name: 'Back'})).not.toBeInTheDocument();
     });
 });

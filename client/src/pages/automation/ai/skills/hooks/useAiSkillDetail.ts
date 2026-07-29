@@ -40,7 +40,7 @@ const FILE_LANGUAGE_MAP: Record<string, string> = {
     yml: 'yaml',
 };
 
-function buildFileTree(paths: string[]): FileTreeNodeI[] {
+export function buildFileTree(paths: string[]): FileTreeNodeI[] {
     const root: FileTreeNodeI[] = [];
 
     for (const filePath of paths) {
@@ -71,10 +71,18 @@ function buildFileTree(paths: string[]): FileTreeNodeI[] {
     return root;
 }
 
-function getFileLanguage(filename: string): string {
+export function getFileLanguage(filename: string): string {
     const extension = filename.substring(filename.lastIndexOf('.') + 1).toLowerCase();
 
     return FILE_LANGUAGE_MAP[extension] || 'plaintext';
+}
+
+export function findDefaultFilePath(filePaths: string[]): string | undefined {
+    return filePaths.find((path) => path.split('/').pop()?.toLowerCase() === 'skill.md');
+}
+
+export function isMarkdownPath(path: string): boolean {
+    return path.toLowerCase().endsWith('.md');
 }
 
 export type {FileTreeNodeI};
@@ -131,7 +139,7 @@ export default function useAiSkillDetail() {
         [selectedFilePath]
     );
 
-    const isMarkdown = selectedFilePath ? selectedFilePath.toLowerCase().endsWith('.md') : false;
+    const isMarkdown = selectedFilePath ? isMarkdownPath(selectedFilePath) : false;
 
     useEffect(() => {
         if (skill?.name) {
@@ -150,7 +158,7 @@ export default function useAiSkillDetail() {
             return;
         }
 
-        const skillMdPath = filePaths.find((path) => path.split('/').pop()?.toLowerCase() === 'skill.md');
+        const skillMdPath = findDefaultFilePath(filePaths);
 
         if (skillMdPath) {
             setSelectedFilePath(skillMdPath);

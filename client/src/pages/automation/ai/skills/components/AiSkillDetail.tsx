@@ -3,15 +3,22 @@ import LoadingIcon from '@/components/LoadingIcon';
 import AiSkillDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillDeleteAlertDialog';
 import AiSkillFileAddDialog from '@/pages/automation/ai/skills/components/AiSkillFileAddDialog';
 import AiSkillFileDeleteAlertDialog from '@/pages/automation/ai/skills/components/AiSkillFileDeleteAlertDialog';
-import useAiSkillDetail, {type FileTreeNodeI} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
+import useAiSkillDetail, {
+    type FileTreeNodeI,
+    buildFileTree,
+    findDefaultFilePath,
+    getFileLanguage,
+    isMarkdownPath,
+} from '@/pages/automation/ai/skills/hooks/useAiSkillDetail';
 import useAiSkillDetailToolbarStore from '@/pages/automation/ai/skills/stores/useAiSkillDetailToolbarStore';
 import parseFrontmatter from '@/pages/automation/ai/skills/utils/parseFrontmatter';
 import useCopilotPanelStore from '@/shared/components/copilot/stores/useCopilotPanelStore';
 import {MODE, Source, useCopilotStore} from '@/shared/components/copilot/stores/useCopilotStore';
+import {useAiSkillFileContentQuery, useAiSkillFilePathsQuery, useAiSkillQuery} from '@/shared/middleware/graphql';
 import {EditorContent, useEditor} from '@tiptap/react';
 import {StarterKit} from '@tiptap/starter-kit';
 import {FileIcon, FileTextIcon, FolderIcon, PlusIcon, TrashIcon} from 'lucide-react';
-import {Suspense, lazy, useEffect, useRef, useState} from 'react';
+import {Suspense, lazy, useEffect, useMemo, useRef, useState} from 'react';
 import {twMerge} from 'tailwind-merge';
 import {Markdown} from 'tiptap-markdown';
 
@@ -159,7 +166,7 @@ const MarkdownViewer = ({content, editable, onContentChange}: MarkdownViewerProp
     );
 };
 
-const AiSkillDetail = () => {
+const AiSkillDetailRoute = () => {
     const [showAddFileDialog, setShowAddFileDialog] = useState(false);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
     const [fileToRemove, setFileToRemove] = useState<string | null>(null);
@@ -373,6 +380,130 @@ const AiSkillDetail = () => {
             )}
         </div>
     );
+};
+
+interface AiSkillDetailEmbeddedProps {
+    skillId: string;
+}
+
+/**
+ * Read-only rendering of a skill's file tree and content, used when `AiSkillDetail` is embedded
+ * outside the settings route (e.g. inside the AI Hub resource panel). It fetches directly by the
+ * given `skillId` instead of going through the route-driven `useAiSkillDetail` hook, so it does not
+ * touch the settings page's toolbar/copilot/navigation state.
+ */
+const AiSkillDetailEmbedded = ({skillId}: AiSkillDetailEmbeddedProps) => {
+    const [selectedFilePath, setSelectedFilePath] = useState<string | null>(null);
+
+    const {data: skillData} = useAiSkillQuery({id: skillId});
+    const {data: filePathsData} = useAiSkillFilePathsQuery({id: skillId});
+    const {data: fileContentData, isLoading: isFileContentLoading} = useAiSkillFileContentQuery(
+        {id: skillId, path: selectedFilePath ?? ''},
+        {enabled: !!selectedFilePath}
+    );
+
+    const skill = skillData?.aiSkill;
+    const filePaths = useMemo(() => filePathsData?.aiSkillFilePaths ?? [], [filePathsData]);
+    const fileTree = useMemo(() => buildFileTree(filePaths), [filePaths]);
+    const fileContent = fileContentData?.aiSkillFileContent ?? '';
+    const isMarkdown = selectedFilePath ? isMarkdownPath(selectedFilePath) : false;
+    const editorLanguage = useMemo(
+        () => (selectedFilePath ? getFileLanguage(selectedFilePath) : 'plaintext'),
+        [selectedFilePath]
+    );
+
+    useEffect(() => {
+        if (selectedFilePath !== null || filePaths.length === 0) {
+            return;
+        }
+
+        const skillMdPath = findDefaultFilePath(filePaths);
+
+        if (skillMdPath) {
+            setSelectedFilePath(skillMdPath);
+        }
+    }, [filePaths, selectedFilePath]);
+
+    if (!skill) {
+        return (
+            <div className="flex flex-1 items-center justify-center">
+                <LoadingIcon />
+            </div>
+        );
+    }
+
+    return (
+        <div className="flex min-h-0 flex-1 overflow-hidden">
+            <div className="w-60 shrink-0 border-r border-r-border/50 py-2 pr-2">
+                {fileTree.map((node) => (
+                    <FileTreeNode
+                        key={node.path}
+                        node={node}
+                        onSelect={setSelectedFilePath}
+                        selectedPath={selectedFilePath}
+                    />
+                ))}
+            </div>
+
+            <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+                {selectedFilePath ? (
+                    <div className="relative min-h-0 flex-1">
+                        {isFileContentLoading ? (
+                            <div className="flex items-center justify-center p-8">
+                                <LoadingIcon />
+                            </div>
+                        ) : isMarkdown ? (
+                            <div className="absolute inset-0 overflow-y-auto">
+                                <MarkdownViewer content={fileContent} editable={false} onContentChange={() => {}} />
+                            </div>
+                        ) : (
+                            <div className="absolute inset-0">
+                                <Suspense
+                                    fallback={
+                                        <div className="flex items-center justify-center p-8">
+                                            <LoadingIcon />
+                                        </div>
+                                    }
+                                >
+                                    <MonacoEditorWrapper
+                                        defaultLanguage={editorLanguage}
+                                        onChange={() => {}}
+                                        onMount={() => {}}
+                                        options={{
+                                            automaticLayout: true,
+                                            folding: true,
+                                            lineNumbers: 'on',
+                                            minimap: {enabled: false},
+                                            readOnly: true,
+                                            scrollBeyondLastLine: false,
+                                            wordWrap: 'on',
+                                        }}
+                                        value={fileContent}
+                                    />
+                                </Suspense>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className="flex flex-1 items-center justify-center text-sm text-gray-400">
+                        Select a file to view its contents
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+};
+
+interface AiSkillDetailProps {
+    skillId?: string;
+}
+
+const AiSkillDetail = ({skillId}: AiSkillDetailProps = {}) => {
+    if (skillId) {
+        return <AiSkillDetailEmbedded skillId={skillId} />;
+    }
+
+    return <AiSkillDetailRoute />;
 };
 
 export default AiSkillDetail;

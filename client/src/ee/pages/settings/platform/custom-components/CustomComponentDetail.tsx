@@ -32,7 +32,7 @@ interface CustomComponentDetailHeaderProps {
     customComponent: CustomComponent | undefined;
     isSaveDisabled: boolean;
     isSaving: boolean;
-    onBack: () => void;
+    onBack?: () => void;
     onSave: () => void;
     showSaveButton: boolean;
 }
@@ -55,13 +55,15 @@ const CustomComponentDetailHeader = ({
         }
         title={
             <div className="flex items-center gap-2">
-                <Button
-                    aria-label="Back"
-                    icon={<ArrowLeftIcon className="size-5" />}
-                    onClick={onBack}
-                    size="icon"
-                    variant="ghost"
-                />
+                {onBack && (
+                    <Button
+                        aria-label="Back"
+                        icon={<ArrowLeftIcon className="size-5" />}
+                        onClick={onBack}
+                        size="icon"
+                        variant="ghost"
+                    />
+                )}
 
                 <span>{customComponent?.title || customComponent?.name || 'Custom Component'}</span>
 
@@ -185,8 +187,14 @@ const CustomComponentSourceEditor = ({monacoLanguage, onChange, value}: CustomCo
     </div>
 );
 
-const CustomComponentDetail = () => {
-    const {id = ''} = useParams<{id: string}>();
+interface CustomComponentDetailProps {
+    customComponentId?: string;
+}
+
+const CustomComponentDetail = ({customComponentId: customComponentIdProp}: CustomComponentDetailProps = {}) => {
+    const params = useParams<{id: string}>();
+
+    const id = customComponentIdProp ?? params.id ?? '';
 
     const [isSourceDirty, setIsSourceDirty] = useState(false);
 
@@ -230,7 +238,7 @@ const CustomComponentDetail = () => {
     const actions = definitionData?.customComponentDefinition?.actions ?? [];
     const triggers = definitionData?.customComponentDefinition?.triggers ?? [];
 
-    const handleBack = () => navigate(-1);
+    const handleBack = customComponentIdProp ? undefined : () => navigate(-1);
 
     const handleSave = () => {
         updateCustomComponentSourceMutation.mutate({content: latestSourceRef.current, id});
