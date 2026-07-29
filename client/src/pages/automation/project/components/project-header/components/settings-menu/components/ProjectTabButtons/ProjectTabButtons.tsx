@@ -5,6 +5,7 @@ import EEVersion from '@/shared/edition/EEVersion';
 import {useApplicationInfoStore} from '@/shared/stores/useApplicationInfoStore';
 import {useFeatureFlagsStore} from '@/shared/stores/useFeatureFlagsStore';
 import {
+    AlertTriangleIcon,
     CopyIcon,
     DownloadIcon,
     EditIcon,
@@ -23,6 +24,7 @@ const ProjectTabButtons = ({
     onPullProjectFromGitClick,
     onShareProject,
     onShowEditProjectDialogClick,
+    onShowErrorWorkflowDialog,
     onShowProjectGitConfigurationDialog,
     onShowProjectVersionHistorySheet,
     projectGitConfigurationEnabled,
@@ -34,6 +36,7 @@ const ProjectTabButtons = ({
     onPullProjectFromGitClick: () => void;
     onShareProject: () => void;
     onShowEditProjectDialogClick: () => void;
+    onShowErrorWorkflowDialog: () => void;
     onShowProjectGitConfigurationDialog: () => void;
     onShowProjectVersionHistorySheet: () => void;
     projectGitConfigurationEnabled: boolean;
@@ -139,6 +142,15 @@ const ProjectTabButtons = ({
                 icon={<HistoryIcon />}
                 label="Project History"
                 onClick={onShowProjectVersionHistorySheet}
+                variant="ghost"
+            />
+
+            <Button
+                aria-label="Error Workflow"
+                className="dropdown-menu-item"
+                icon={<AlertTriangleIcon />}
+                label="Error Workflow"
+                onClick={onShowErrorWorkflowDialog}
                 variant="ghost"
             />
 

@@ -70,6 +70,8 @@ const CodeWorkflowReferencesDialog = ({onClose, projectName, workflowTemplates}:
 
                                 <TableHead>External User</TableHead>
 
+                                <TableHead>Environment</TableHead>
+
                                 <TableHead>Status</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -83,6 +85,8 @@ const CodeWorkflowReferencesDialog = ({onClose, projectName, workflowTemplates}:
                                     </TableCell>
 
                                     <TableCell>{reference.externalUserId}</TableCell>
+
+                                    <TableCell>{reference.environment}</TableCell>
 
                                     <TableCell>
                                         <div className="flex items-center gap-2">

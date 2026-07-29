@@ -2,6 +2,7 @@ query connectedUserCodeWorkflowReferences($catalogWorkflowUuids: [ID!]!) {
     connectedUserCodeWorkflowReferences(catalogWorkflowUuids: $catalogWorkflowUuids) {
         catalogWorkflowUuid
         externalUserId
+        environment
         enabled
         dangling
         danglingReason

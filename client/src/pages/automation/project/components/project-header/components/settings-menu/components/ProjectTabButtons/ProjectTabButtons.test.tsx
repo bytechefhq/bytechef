@@ -33,6 +33,7 @@ const mockProps = {
     onPullProjectFromGitClick: vi.fn(),
     onShareProject: vi.fn(),
     onShowEditProjectDialogClick: vi.fn(),
+    onShowErrorWorkflowDialog: vi.fn(),
     onShowProjectGitConfigurationDialog: vi.fn(),
     onShowProjectVersionHistorySheet: vi.fn(),
     projectGitConfigurationEnabled: false,
