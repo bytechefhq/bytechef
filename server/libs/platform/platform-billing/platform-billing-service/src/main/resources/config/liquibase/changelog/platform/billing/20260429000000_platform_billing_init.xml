@@ -9,18 +9,18 @@
             <column autoIncrement="true" name="id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="stripe_customer_id" type="VARCHAR(255)"/>
-            <column name="stripe_subscription_id" type="VARCHAR(255)">
-                <constraints unique="true" uniqueConstraintName="ux_billing_subscription_stripe_subscription_id"/>
+            <column name="customer_id" type="VARCHAR(255)"/>
+            <column name="subscription_id" type="VARCHAR(255)">
+                <constraints unique="true" uniqueConstraintName="ux_billing_subscription_subscription_id"/>
             </column>
-            <column name="stripe_product_id" type="VARCHAR(255)"/>
-            <column name="stripe_usage_product_id" type="VARCHAR(255)"/>
+            <column name="product_id" type="VARCHAR(255)"/>
+            <column name="usage_product_id" type="VARCHAR(255)"/>
             <column name="status" type="VARCHAR(20)">
                 <constraints nullable="false"/>
             </column>
             <column name="plan_name" type="VARCHAR(50)"/>
             <column name="scheduled_plan_name" type="VARCHAR(50)"/>
-            <column name="task_limit" type="INTEGER">
+            <column name="product_unit_limit" type="INTEGER">
                 <constraints nullable="false"/>
             </column>
             <column name="current_period_start" type="TIMESTAMP">
@@ -46,8 +46,8 @@
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="subscription_id" type="BIGINT"/>
-            <column name="stripe_event_id" type="VARCHAR(255)">
-                <constraints nullable="false" unique="true" uniqueConstraintName="ux_billing_subscription_webhook_event_stripe_event_id"/>
+            <column name="event_id" type="VARCHAR(255)">
+                <constraints nullable="false" unique="true" uniqueConstraintName="ux_billing_subscription_webhook_event_event_id"/>
             </column>
             <column name="event_type" type="VARCHAR(100)">
                 <constraints nullable="false"/>
@@ -74,7 +74,7 @@
             INSERT INTO billing_subscription (
                 status,
                 plan_name,
-                task_limit,
+                product_unit_limit,
                 current_period_start,
                 current_period_end,
                 cancel_at_period_end,
