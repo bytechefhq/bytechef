@@ -22,7 +22,7 @@ import jakarta.annotation.Generated;
 
 @Schema(name = "CheckoutSession", description = "A checkout session.")
 @JsonTypeName("CheckoutSession")
-@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-17T14:33:03.269520+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
+@Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2026-07-29T13:00:37.518114+02:00[Europe/Zagreb]", comments = "Generator version: 7.22.0")
 public class CheckoutSessionModel {
 
   private @Nullable String checkoutUrl;

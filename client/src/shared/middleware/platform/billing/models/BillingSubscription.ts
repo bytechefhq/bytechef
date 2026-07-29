@@ -32,11 +32,11 @@ export interface BillingSubscription {
      */
     status?: string;
     /**
-     * The task limit.
+     * The number of units that can be used in the current billing period under flat plan.
      * @type {number}
      * @memberof BillingSubscription
      */
-    taskLimit?: number;
+    productUnitLimit?: number;
     /**
      * The current period end date.
      * @type {Date}
@@ -82,7 +82,7 @@ export function BillingSubscriptionFromJSONTyped(json: any, ignoreDiscriminator:
         
         'planName': json['planName'] == null ? undefined : json['planName'],
         'status': json['status'] == null ? undefined : json['status'],
-        'taskLimit': json['taskLimit'] == null ? undefined : json['taskLimit'],
+        'productUnitLimit': json['productUnitLimit'] == null ? undefined : json['productUnitLimit'],
         'currentPeriodEnd': json['currentPeriodEnd'] == null ? undefined : (new Date(json['currentPeriodEnd'])),
         'cancelAtPeriodEnd': json['cancelAtPeriodEnd'] == null ? undefined : json['cancelAtPeriodEnd'],
         'scheduledPlanName': json['scheduledPlanName'] == null ? undefined : json['scheduledPlanName'],
@@ -103,7 +103,7 @@ export function BillingSubscriptionToJSONTyped(value?: BillingSubscription | nul
         
         'planName': value['planName'],
         'status': value['status'],
-        'taskLimit': value['taskLimit'],
+        'productUnitLimit': value['productUnitLimit'],
         'currentPeriodEnd': value['currentPeriodEnd'] == null ? value['currentPeriodEnd'] : value['currentPeriodEnd'].toISOString(),
         'cancelAtPeriodEnd': value['cancelAtPeriodEnd'],
         'scheduledPlanName': value['scheduledPlanName'],
