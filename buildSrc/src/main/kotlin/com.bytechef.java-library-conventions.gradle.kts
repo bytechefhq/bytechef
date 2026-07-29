@@ -9,3 +9,34 @@ plugins {
     // Apply the java-library plugin for API and implementation separation.
     `java-library`
 }
+
+// Sanitize OpenAPI-generated "native" clients against server-driven path traversal in the
+// prepareDownloadFile helper: the Content-Disposition filename is used unsanitized, so a malicious or
+// MITM'd server could write outside the temp dir. Re-applied after every regeneration so the fix
+// survives the generator. Only configures modules that define a `generateClient` task (the CLI clients).
+tasks.matching { it.name == "generateClient" }.configureEach {
+    doLast {
+        val vulnerable =
+            "      java.nio.file.Path filePath = java.nio.file.Files.createFile(tempDir.resolve(filename));"
+        val patched = listOf(
+            "      java.nio.file.Path safeName = java.nio.file.Path.of(filename).getFileName();",
+            "      if (safeName == null) {",
+            "        throw new java.io.IOException(\"Rejected unsafe filename: \" + filename);",
+            "      }",
+            "      java.nio.file.Path filePath = tempDir.resolve(safeName.toString()).normalize();",
+            "      if (!filePath.startsWith(tempDir)) {",
+            "        throw new java.io.IOException(\"Rejected unsafe filename: \" + filename);",
+            "      }",
+            "      filePath = java.nio.file.Files.createFile(filePath);"
+        ).joinToString("\n")
+
+        project.fileTree("${project.projectDir}/generated/src/main/java") { include("**/api/*.java") }
+            .forEach { file ->
+                val text = file.readText()
+
+                if (text.contains(vulnerable)) {
+                    file.writeText(text.replace(vulnerable, patched))
+                }
+            }
+    }
+}
