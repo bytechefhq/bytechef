@@ -43,6 +43,21 @@ public class TaskFileStorageImpl implements TaskFileStorage {
     }
 
     @Override
+    public void deleteContextValue(FileEntry fileEntry) {
+        fileStorageService.deleteFile(CONTEXT_FILES_DIR, fileEntry);
+    }
+
+    @Override
+    public void deleteJobOutputs(FileEntry fileEntry) {
+        fileStorageService.deleteFile(JOB_FILES_DIR, fileEntry);
+    }
+
+    @Override
+    public void deleteTaskExecutionOutput(FileEntry fileEntry) {
+        fileStorageService.deleteFile(TASK_EXECUTION_FILES_DIR, fileEntry);
+    }
+
+    @Override
     public Map<String, ?> readContextValue(FileEntry fileEntry) {
         Map<String, ?> value = JsonUtils.read(
             CompressionUtils.decompressToString(fileStorageService.readFileToBytes(CONTEXT_FILES_DIR, fileEntry)),

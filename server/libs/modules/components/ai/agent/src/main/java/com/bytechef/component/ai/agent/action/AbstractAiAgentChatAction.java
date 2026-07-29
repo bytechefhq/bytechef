@@ -31,11 +31,14 @@ import static com.bytechef.platform.component.definition.ai.agent.RagFunction.RA
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailCheckFunction.CHECK_FOR_VIOLATIONS;
 import static com.bytechef.platform.component.definition.ai.agent.guardrails.GuardrailSanitizerFunction.SANITIZE_TEXT;
 
+import com.bytechef.commons.util.ConvertUtils;
 import com.bytechef.commons.util.JsonUtils;
 import com.bytechef.commons.util.MapUtils;
 import com.bytechef.component.ai.agent.action.event.ToolExecutionEvent;
 import com.bytechef.component.ai.agent.action.event.listener.ToolExecutionListener;
 import com.bytechef.component.ai.agent.tool.AgentToolSuspension;
+import com.bytechef.component.ai.agent.tool.AiAgentConversationCheckpoint;
+import com.bytechef.component.ai.agent.tool.ConversationState;
 import com.bytechef.component.ai.agent.tool.SuspendableToolCallingManager;
 import com.bytechef.component.ai.llm.ChatModel.ResponseFormat;
 import com.bytechef.component.ai.llm.advisor.CodeFenceStrippingAdvisor;
@@ -64,9 +67,13 @@ import com.bytechef.platform.component.service.ClusterElementDefinitionService;
 import com.bytechef.platform.configuration.domain.ClusterElement;
 import com.bytechef.platform.configuration.domain.ClusterElementMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HexFormat;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,7 +181,7 @@ public abstract class AbstractAiAgentChatAction {
                 .advisors(
                     getAdvisors(
                         clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId,
-                        resumedTurn))
+                        resumedTurn, createConversationCheckpointer(inputParameters, context)))
                 .advisors(getConversationAdvisor(conversationId))
                 .advisors(new TextGenerationFirstAdvisor())
                 .messages(messages)
@@ -361,6 +368,94 @@ public abstract class AbstractAiAgentChatAction {
             agentToolSuspension.resumeConversation(toolResult), true);
     }
 
+    protected @Nullable Consumer<List<Message>> createConversationCheckpointer(
+        Parameters inputParameters, ActionContext context) {
+
+        if (!(context instanceof ActionContextAware actionContextAware) || actionContextAware.getJobId() == null ||
+            actionContextAware.isEditorEnvironment()) {
+
+            return null;
+        }
+
+        return conversation -> context.data(
+            data -> data.put(
+                ActionContext.Data.Scope.CURRENT_EXECUTION, AiAgentConversationCheckpoint.DATA_KEY,
+                new AiAgentConversationCheckpoint(
+                    getConversationFingerprint(inputParameters), ConversationState.from(conversation))));
+    }
+
+    protected @Nullable List<Message> fetchCheckpointedConversation(
+        Parameters inputParameters, ActionContext context) {
+
+        if (!(context instanceof ActionContextAware actionContextAware) || actionContextAware.getJobId() == null ||
+            actionContextAware.isEditorEnvironment()) {
+
+            return null;
+        }
+
+        try {
+            Optional<Object> checkpointOptional = context.data(
+                data -> data.fetch(
+                    ActionContext.Data.Scope.CURRENT_EXECUTION, AiAgentConversationCheckpoint.DATA_KEY));
+
+            if (checkpointOptional.isEmpty()) {
+                return null;
+            }
+
+            AiAgentConversationCheckpoint checkpoint = ConvertUtils.convertValue(
+                checkpointOptional.get(), AiAgentConversationCheckpoint.class);
+
+            if (!Objects.equals(checkpoint.fingerprint(), getConversationFingerprint(inputParameters))) {
+                return null;
+            }
+
+            ConversationState conversationState = checkpoint.conversationState();
+
+            List<Message> messages = conversationState.toMessages();
+
+            context.log(logger -> logger.info(
+                "Resuming agent conversation from crash checkpoint (%d messages)".formatted(messages.size())));
+
+            return messages;
+        } catch (RuntimeException exception) {
+            log.warn("Failed to restore agent conversation checkpoint; starting fresh", exception);
+
+            return null;
+        }
+    }
+
+    protected void clearConversationCheckpoint(ActionContext context) {
+        if (!(context instanceof ActionContextAware actionContextAware) || actionContextAware.getJobId() == null ||
+            actionContextAware.isEditorEnvironment()) {
+
+            return;
+        }
+
+        try {
+            context.data(
+                data -> data.remove(
+                    ActionContext.Data.Scope.CURRENT_EXECUTION, AiAgentConversationCheckpoint.DATA_KEY));
+        } catch (RuntimeException exception) {
+            log.warn("Failed to clear agent conversation checkpoint", exception);
+        }
+    }
+
+    private static String getConversationFingerprint(Parameters inputParameters) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+
+            byte[] digest = messageDigest.digest(
+                JsonUtils.write(inputParameters.toMap())
+                    .getBytes(StandardCharsets.UTF_8));
+
+            HexFormat hexFormat = HexFormat.of();
+
+            return hexFormat.formatHex(digest);
+        } catch (NoSuchAlgorithmException exception) {
+            throw new IllegalStateException(exception);
+        }
+    }
+
     private static ChatClient.ChatClientRequestSpec createPrompt(
         ChatClient chatClient, Parameters inputParameters, ActionContext context) {
 
@@ -435,13 +530,15 @@ public abstract class AbstractAiAgentChatAction {
         @Nullable String conversationId) {
 
         return getAdvisors(
-            clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false);
+            clusterElementMap, connectionParameters, chatModel, context, chatMemoryResult, conversationId, false,
+            null);
     }
 
     List<Advisor> getAdvisors(
         ClusterElementMap clusterElementMap, Map<String, ComponentConnection> connectionParameters,
         ChatModel chatModel, ActionContext context, Optional<ChatMemoryFunction.Result> chatMemoryResult,
-        @Nullable String conversationId, boolean resumedTurn) {
+        @Nullable String conversationId, boolean resumedTurn,
+        @Nullable Consumer<List<Message>> conversationCheckpointer) {
 
         List<Advisor> advisors = new ArrayList<>();
 
@@ -495,7 +592,8 @@ public abstract class AbstractAiAgentChatAction {
         ToolCallingManager agentToolCallingManager = toolCallingManager;
 
         if (context instanceof ActionContextAware actionContextAware) {
-            agentToolCallingManager = new SuspendableToolCallingManager(toolCallingManager, actionContextAware);
+            agentToolCallingManager = new SuspendableToolCallingManager(
+                toolCallingManager, actionContextAware, conversationCheckpointer);
         }
 
         ToolCallingAdvisor toolCallingAdvisor = persistToolMessagesInLoop

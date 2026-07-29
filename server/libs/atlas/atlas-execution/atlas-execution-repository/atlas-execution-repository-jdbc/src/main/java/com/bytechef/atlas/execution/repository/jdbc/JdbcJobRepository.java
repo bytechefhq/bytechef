@@ -18,6 +18,7 @@ package com.bytechef.atlas.execution.repository.jdbc;
 
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.repository.JobRepository;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jdbc.repository.query.Query;
@@ -35,6 +36,15 @@ public interface JdbcJobRepository
 
     @Override
     List<Job> findAllByIdIn(List<Long> ids);
+
+    @Override
+    List<Job> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate);
+
+    @Override
+    List<Job> findAllByStatusAndStartDateBefore(int status, Instant startDate);
+
+    @Override
+    List<Job> findAllByEndDateBefore(Instant endDate);
 
     @Override
     Optional<Job> findById(Long id);

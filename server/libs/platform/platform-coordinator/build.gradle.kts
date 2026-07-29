@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":server:libs:core:tenant:tenant-api"))
     implementation(project(":server:libs:platform:platform-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-api"))
+    implementation(project(":server:libs:platform:platform-data-storage:platform-data-storage-api"))
     implementation(project(":server:libs:platform:platform-notification:platform-notification-delivery"))
     implementation(project(":server:libs:platform:platform-webhook:platform-webhook-api"))
 }

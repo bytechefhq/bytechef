@@ -15,6 +15,7 @@ import com.bytechef.ee.remote.client.LoadBalancedRestClient;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
@@ -83,7 +84,47 @@ public class RemoteJobServiceClient implements JobService {
 
     @Override
     public List<Long> getChildJobIds(long parentJobId) {
-        throw new UnsupportedOperationException();
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-child-job-ids/{parentJobId}")
+                .build(parentJobId),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Job> getStaleJobs(Job.Status status, java.time.Instant lastModifiedDateBefore) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-stale-jobs")
+                .queryParam("status", status.name())
+                .queryParam("lastModifiedDateBefore", lastModifiedDateBefore.toString())
+                .build(),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Job> getLongRunningJobs(Job.Status status, java.time.Instant startDateBefore) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-long-running-jobs")
+                .queryParam("status", status.name())
+                .queryParam("startDateBefore", startDateBefore.toString())
+                .build(),
+            new ParameterizedTypeReference<>() {});
+    }
+
+    @Override
+    public List<Job> getEndedJobs(java.time.Instant endDateBefore) {
+        return loadBalancedRestClient.get(
+            uriBuilder -> uriBuilder
+                .host(EXECUTION_APP)
+                .path(JOB_SERVICE + "/get-ended-jobs")
+                .queryParam("endDateBefore", endDateBefore.toString())
+                .build(),
+            new ParameterizedTypeReference<>() {});
     }
 
     @Override

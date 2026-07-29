@@ -22,6 +22,7 @@ import com.bytechef.atlas.execution.domain.TaskExecution;
 import com.bytechef.atlas.execution.repository.TaskExecutionRepository;
 import com.bytechef.commons.util.RandomUtils;
 import com.bytechef.tenant.util.TenantCacheKeyUtils;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -150,6 +151,21 @@ public class InMemoryTaskExecutionRepository implements TaskExecutionRepository 
         } finally {
             lock.unlock();
         }
+    }
+
+    @Override
+    public List<TaskExecution> findAllByStatusAndLastModifiedDateBefore(int status, Instant lastModifiedDate) {
+        return findAll()
+            .stream()
+            .filter(taskExecution -> {
+                TaskExecution.Status taskExecutionStatus = taskExecution.getStatus();
+
+                return taskExecutionStatus != null && taskExecutionStatus.ordinal() == status &&
+                    taskExecution.getLastModifiedDate() != null &&
+                    taskExecution.getLastModifiedDate()
+                        .isBefore(lastModifiedDate);
+            })
+            .toList();
     }
 
     @Override

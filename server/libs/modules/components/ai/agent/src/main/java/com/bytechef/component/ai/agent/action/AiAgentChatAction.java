@@ -36,6 +36,7 @@ import com.bytechef.platform.component.definition.MultipleConnectionsOutputFunct
 import com.bytechef.platform.component.definition.MultipleConnectionsPerformFunction;
 import com.bytechef.platform.component.definition.MultipleConnectionsResumePerformFunction;
 import com.bytechef.platform.component.service.ClusterElementDefinitionService;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.Optional;
 import org.jspecify.annotations.Nullable;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.ChatClient.ChatClientRequestSpec;
+import org.springframework.ai.chat.messages.Message;
 import org.springframework.ai.model.tool.ToolCallingManager;
 
 /**
@@ -82,6 +84,7 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
     public class ChatActionDefinitionWrapper extends AbstractActionDefinitionWrapper {
 
+        @SuppressFBWarnings("EI_EXPOSE_REP2")
         public ChatActionDefinitionWrapper(ActionDefinition actionDefinition) {
             super(actionDefinition);
         }
@@ -102,6 +105,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
             inputParameters, connectionParameters, extensions, continueParameters, data,
             createToolExecutionListener(toolExecutionEvents, context), context);
 
+        clearConversationCheckpoint(context);
+
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }
 
@@ -112,9 +117,14 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         List<ToolExecutionEvent> toolExecutionEvents = new ArrayList<>();
 
-        ChatClientRequestSpec chatClientRequestSpec = getChatClientRequestSpec(
-            inputParameters, connectionParameters, extensions,
-            createToolExecutionListener(toolExecutionEvents, context), context);
+        ToolExecutionListener toolExecutionListener = createToolExecutionListener(toolExecutionEvents, context);
+        List<Message> checkpointedConversation = fetchCheckpointedConversation(inputParameters, context);
+
+        ChatClientRequestSpec chatClientRequestSpec = checkpointedConversation == null
+            ? getChatClientRequestSpec(inputParameters, connectionParameters, extensions, toolExecutionListener,
+                context)
+            : getChatClientRequestSpec(inputParameters, connectionParameters, extensions, toolExecutionListener,
+                context, checkpointedConversation, true);
 
         applyStructuredOutputValidation(chatClientRequestSpec, inputParameters, context);
 
@@ -124,6 +134,8 @@ public class AiAgentChatAction extends AbstractAiAgentChatAction {
 
         ModelUtils.ChatActionResult chatActionResult = ModelUtils.getChatActionResult(
             call, inputParameters, context);
+
+        clearConversationCheckpoint(context);
 
         return toOutput(chatActionResult, toolExecutionEvents, context);
     }

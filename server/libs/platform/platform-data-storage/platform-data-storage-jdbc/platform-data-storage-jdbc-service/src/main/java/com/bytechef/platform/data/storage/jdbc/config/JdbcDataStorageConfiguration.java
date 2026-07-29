@@ -50,6 +50,11 @@ public class JdbcDataStorageConfiguration {
     private record DataStorageImpl(JdbcDataStorageService jdbcDataStorageService) implements DataStorage {
 
         @Override
+        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+            jdbcDataStorageService.deleteScopeData(scope, scopeId);
+        }
+
+        @Override
         public <T> Optional<T> fetch(
             String componentName, DataStorageScope scope, String scopeId,
             String key, long environmentId, PlatformType type) {

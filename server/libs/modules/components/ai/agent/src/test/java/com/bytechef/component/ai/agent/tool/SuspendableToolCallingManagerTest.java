@@ -79,6 +79,84 @@ class SuspendableToolCallingManagerTest {
     }
 
     @Test
+    void testCheckpointerInvokedAfterNonSuspendRound() {
+        List<Message> conversation = List.of(
+            ToolResponseMessage.builder()
+                .responses(List.of(new ToolResponseMessage.ToolResponse("call_a", "someTool", "result")))
+                .build());
+        ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+        when(delegate.executeToolCalls(prompt, chatResponse)).thenReturn(
+            ToolExecutionResult.builder()
+                .conversationHistory(conversation)
+                .returnDirect(false)
+                .build());
+
+        ActionContextAware context = mock(ActionContextAware.class);
+
+        when(context.getSuspend()).thenReturn(null);
+
+        List<List<Message>> checkpointedConversations = new ArrayList<>();
+
+        new SuspendableToolCallingManager(delegate, context, checkpointedConversations::add)
+            .executeToolCalls(prompt, chatResponse);
+
+        assertEquals(List.of(conversation), checkpointedConversations);
+    }
+
+    @Test
+    void testCheckpointerFailureDoesNotFailTheRound() {
+        ToolExecutionResult delegateResult = ToolExecutionResult.builder()
+            .conversationHistory(List.of())
+            .returnDirect(false)
+            .build();
+        ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+        when(delegate.executeToolCalls(prompt, chatResponse)).thenReturn(delegateResult);
+
+        ActionContextAware context = mock(ActionContextAware.class);
+
+        when(context.getSuspend()).thenReturn(null);
+
+        ToolExecutionResult result = new SuspendableToolCallingManager(
+            delegate, context, conversation -> {
+                throw new RuntimeException("storage down");
+            }).executeToolCalls(prompt, chatResponse);
+
+        assertEquals(delegateResult, result);
+    }
+
+    @Test
+    void testCheckpointerNotInvokedOnSuspend() {
+        List<Message> conversation = List.of(
+            ToolResponseMessage.builder()
+                .responses(
+                    List.of(
+                        new ToolResponseMessage.ToolResponse(
+                            "call_b", "requestApproval", SUSPENDED_TOOL_RESULT)))
+                .build());
+        ToolCallingManager delegate = mock(ToolCallingManager.class);
+
+        when(delegate.executeToolCalls(prompt, chatResponse)).thenReturn(
+            ToolExecutionResult.builder()
+                .conversationHistory(conversation)
+                .returnDirect(false)
+                .build());
+
+        ActionContextAware context = mock(ActionContextAware.class);
+
+        when(context.getSuspend()).thenReturn(suspendWithSuspendedToolResult(Map.of()));
+
+        List<List<Message>> checkpointedConversations = new ArrayList<>();
+
+        ToolExecutionResult result = new SuspendableToolCallingManager(
+            delegate, context, checkpointedConversations::add).executeToolCalls(prompt, chatResponse);
+
+        assertTrue(result.returnDirect());
+        assertTrue(checkpointedConversations.isEmpty());
+    }
+
+    @Test
     void testSuspendCapturesConversationAndHaltsLoop() {
         List<Message> conversation = List.of(
             ToolResponseMessage.builder()

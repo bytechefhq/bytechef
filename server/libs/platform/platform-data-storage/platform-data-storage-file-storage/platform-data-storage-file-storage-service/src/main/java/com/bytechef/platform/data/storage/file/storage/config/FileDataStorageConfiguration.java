@@ -93,5 +93,10 @@ public class FileDataStorageConfiguration {
 
             fileDataStorageService.delete(componentName, scope, scopeId, key, environmentId, type);
         }
+
+        @Override
+        public void deleteScopeData(DataStorageScope scope, String scopeId) {
+            throw new UnsupportedOperationException();
+        }
     }
 }

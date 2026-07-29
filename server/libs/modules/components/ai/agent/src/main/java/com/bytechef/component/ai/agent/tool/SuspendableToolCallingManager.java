@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.Consumer;
 import org.jspecify.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +62,19 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
 
     private final ToolCallingManager delegate;
     private final ActionContextAware actionContext;
+    private final @Nullable Consumer<List<Message>> conversationCheckpointer;
 
     public SuspendableToolCallingManager(ToolCallingManager delegate, ActionContextAware actionContext) {
+        this(delegate, actionContext, null);
+    }
+
+    public SuspendableToolCallingManager(
+        ToolCallingManager delegate, ActionContextAware actionContext,
+        @Nullable Consumer<List<Message>> conversationCheckpointer) {
+
         this.delegate = delegate;
         this.actionContext = actionContext;
+        this.conversationCheckpointer = conversationCheckpointer;
     }
 
     @Override
@@ -94,6 +104,14 @@ public final class SuspendableToolCallingManager implements ToolCallingManager {
         ActionContext.Suspend suspend = actionContext.getSuspend();
 
         if (suspend == null) {
+            if (conversationCheckpointer != null) {
+                try {
+                    conversationCheckpointer.accept(result.conversationHistory());
+                } catch (RuntimeException exception) {
+                    log.warn("Failed to checkpoint agent conversation after tool round", exception);
+                }
+            }
+
             return result;
         }
 

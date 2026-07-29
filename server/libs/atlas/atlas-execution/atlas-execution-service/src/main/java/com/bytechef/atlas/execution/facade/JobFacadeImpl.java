@@ -30,6 +30,7 @@ import com.bytechef.atlas.execution.service.ContextService;
 import com.bytechef.atlas.execution.service.JobService;
 import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.atlas.file.storage.TaskFileStorage;
+import com.bytechef.file.storage.domain.FileEntry;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.time.Instant;
 import java.util.HashMap;
@@ -102,9 +103,49 @@ public class JobFacadeImpl implements JobFacade {
             deleteJob(childJobId);
         }
 
+        deleteJobFiles(id);
+
         taskExecutionService.deleteJobTaskExecutions(id);
 
         jobService.deleteJob(id);
+    }
+
+    private void deleteJobFiles(long jobId) {
+        Job job = jobService.getJob(jobId);
+
+        if (job.getOutputs() != null) {
+            deleteFileQuietly(() -> taskFileStorage.deleteJobOutputs(job.getOutputs()));
+        }
+
+        for (TaskExecution taskExecution : taskExecutionService.getJobTaskExecutions(jobId)) {
+            if (taskExecution.getOutput() != null) {
+                deleteFileQuietly(() -> taskFileStorage.deleteTaskExecutionOutput(taskExecution.getOutput()));
+            }
+
+            deleteStackFiles(Validate.notNull(taskExecution.getId(), "id"));
+        }
+
+        deleteStackFiles(jobId);
+    }
+
+    private void deleteStackFiles(long stackId) {
+        try {
+            for (FileEntry fileEntry : contextService.getStackFileEntries(stackId)) {
+                deleteFileQuietly(() -> taskFileStorage.deleteContextValue(fileEntry));
+            }
+
+            contextService.deleteStackContexts(stackId);
+        } catch (UnsupportedOperationException exception) {
+            log.debug("Context enumeration unsupported in this deployment; skipping context cleanup");
+        }
+    }
+
+    private static void deleteFileQuietly(Runnable deleteAction) {
+        try {
+            deleteAction.run();
+        } catch (RuntimeException exception) {
+            log.warn("Failed to delete job file-storage blob", exception);
+        }
     }
 
     @Override

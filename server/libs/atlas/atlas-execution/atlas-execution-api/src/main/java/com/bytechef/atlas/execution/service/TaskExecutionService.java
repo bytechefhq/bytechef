@@ -43,6 +43,8 @@ public interface TaskExecutionService {
 
     List<TaskExecution> getJobTaskExecutions(long jobId);
 
+    List<TaskExecution> getStaleTaskExecutions(TaskExecution.Status status, java.time.Instant lastModifiedDateBefore);
+
     List<TaskExecution> getParentTaskExecutions(long parentId);
 
     TaskExecution update(TaskExecution taskExecution);

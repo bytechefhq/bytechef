@@ -218,7 +218,7 @@ public class JobSyncExecutor {
 
         DefaultTaskCompletionHandler defaultTaskCompletionHandler = new DefaultTaskCompletionHandler(
             contextService, evaluator, coordinatorEventPublisher, jobExecutor, jobService, taskExecutionService,
-            taskFileStorage, workflowService);
+            taskFileStorage, null, workflowService);
 
         TaskCompletionHandlerChain taskCompletionHandlerChain = new TaskCompletionHandlerChain();
 
