@@ -21,6 +21,7 @@
         "node": "^20.19.0 || ^22.12.0 || >=24.0.0"
     },
     "scripts": {
+        "assert:chunks": "node scripts/assert-entry-chunks.mjs",
         "dev": "vite",
         "codegen": "graphql-codegen --config codegen.ts",
         "check:node": "node scripts/check-node-version.mjs",
