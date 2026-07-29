@@ -76,7 +76,7 @@ docker compose -f docker-compose.dev.server.yml up -d
 
 ### Core Technology Stack
 - **Backend**: Java 25 with Spring Boot 4.0.7
-- **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 3.4
+- **Frontend**: React 19.2 with TypeScript 5.9, Vite 8, TailwindCSS 4.3 (v4 — Vite plugin, not PostCSS)
 - **Database**: PostgreSQL 15+ with Liquibase migrations
 - **Message Broker**: Memory(default), Redis, RabbitMQ, Kafka, JMS, AMQP, AWS SQS
 - **Build System**: Gradle 9.4.1 with Kotlin DSL
@@ -146,7 +146,7 @@ The `server/ee/` directory contains microservices for distributed deployment:
 - `runtime-job-app/` - Runtime job execution
 
 ### Available Components
-ByteChef includes 180+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
+ByteChef includes 190+ built-in components in `server/libs/modules/components/` covering CRM, project management, communication, e-commerce, cloud storage, AI/ML, databases, and custom code execution.
 
 ## Development Patterns
 
@@ -452,133 +452,14 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
 
 ### Agent HITL approvals (chat cards + tool gate)
 
-Spec: `docs/superpowers/specs/2026-07-21-agent-hitl-approval-chat-design.md`; user docs
-`docs/content/docs/automation/human-in-the-loop.mdx`. Load-bearing pieces:
-
-- Two primitives, disjoint jobs: **Approval** (decision; comment valid on BOTH outcomes under the
-  reserved `comment` key) and **AskUserQuestion** (LLM clarification). No free-text mode on
-  Approval; typing in chat NEVER resolves an approval (D4).
-- **ChatApprovalChannel** (`approval/chat` APPROVAL_CHANNELS element) publishes an
-  `__eventType: approval_request` data event (`AiAgentSseEventType.APPROVAL_REQUEST`) onto the
-  job's SSE stream via the `SSE_STREAM_EVENTS` broker route; requires `getJobId()` (now on
-  `JobContextAware`), throws without one. Both SSE bridges + `JobResumeSseStreamBridge` map
-  `__eventType` payloads to named events; `AgUiStreamBridge` passes them as AG-UI CustomEvents and
-  folds a persist-only markdown form-link marker into accumulated text for reload.
-- **Channel fan-out is best-effort**: `ApprovalRequestApprovalAction.deliverToChannels` and
-  `ApprovalGateToolCallback.deliverApprovalRequest` try/catch per channel (warn log), failing the
-  step ONLY when every configured channel fails. Per-channel counters:
-  `bytechef_approval_request` (success) + `bytechef_approval_delivery_failure` (failure), both
-  incremented in `ClusterElementDefinitionServiceImpl.executeApprovalChannel`. Channels receive
-  the computed expiry under `ApprovalChannelFunction.EXPIRES_AT` (ISO-8601) and render it in
-  their messages; the approval-task channel maps it onto the task's `dueDate`; the chat channel
-  carries it in the `approval_request` event. Markdown channels (Mattermost, Rocket.Chat) escape
-  link-forming characters in title/description — gate descriptions embed AI-chosen tool args.
-  One-click `?approved=` links NEVER auto-submit:
-  `ApprovalForm` shows a pre-selected Confirm view (link scanners must not resolve approvals).
-  Delivery channels: chat, Slack, Discord, Telegram, Mattermost, Rocket.Chat, Gmail, Outlook 365,
-  generic SMTP email, WhatsApp (Meta/Twilio/Infobip), SMS (Twilio/Infobip), approval task.
-  In-place Slack resolution IS implemented: an optional `signingSecret` on the Slack connection
-  switches `SlackApprovalChannel` to `block_actions` buttons (value = tokenized resume id), and
-  `SlackInteractivityController`/`SlackInteractivityHandler` (platform-webhook-rest-impl,
-  anonymous `/slack/interactivity`, permit-listed) verify the `X-Slack-Signature` HMAC per
-  tenant (anchored by the resume id), resolve via `JobResumeFacade`, and rewrite the message via
-  `response_url`. Spec: `docs/superpowers/specs/2026-07-22-slack-inplace-approval-interactivity-design.md`.
-  In-place is also implemented for **WhatsApp (Meta)** (`appSecret` on the connection →
-  interactive reply buttons; `WhatsAppInteractivityController`/`Handler` verify `X-Hub-Signature-256`,
-  GET verify-handshake via `bytechef.webhook.whatsapp.verify-token`; button id carries the
-  decision-prefixed signed token), **Mattermost** (interactive attachment buttons whose
-  `integration.url` = `/mattermost/interactivity` carry the token in `integration.context`; unsigned,
-  so no `approvedBy`), **Telegram** (`webhookSecretToken` on the connection → inline-keyboard callback
-  buttons; `/telegram/interactivity` verifies `X-Telegram-Bot-Api-Secret-Token`), and **Discord**
-  (`publicKey` on the connection → interaction buttons; `/discord/interactivity` verifies the Ed25519
-  signature against `bytechef.webhook.discord.public-key`, answers `PING`→`PONG`). Telegram/Discord
-  cap the button payload below the signed token, so the channel mints a short id via the anonymous
-  `POST /approval/short-token` (`ApprovalShortTokenStore`, process-local — form-link fallback covers a
-  restart; distributed EE needs a shared store). Twilio/Infobip SMS+WhatsApp and Rocket.Chat
-  intentionally stay on URL buttons (won't be built — SMS/BSP reply-code UX and Rocket.Chat's lack of
-  a callback aren't worth it; see `docs/superpowers/plans/2026-07-22-hitl-gap-remaining-backlog.md`).
-- **Tool gate**: `requiresApproval: true` in a TOOLS cluster-element entry's parameters
-  (`ToolConstants.REQUIRES_APPROVAL`; editor checkbox in `AiAgentToolDropdownMenu`) wraps the
-  callback in `ApprovalGateToolCallback` (inside the observable/audit wrapper). Suspends via the
-  sentinel protocol with `GATED_TOOL_NAME`/`GATED_TOOL_INPUT` continueParameters; second flagged
-  call in one round defers (single-suspend-per-round invariant). Resume branch
-  `AbstractAiAgentChatAction.resolveGatedToolResumeData`: approve → RAW callback executes original
-  args; reject → denial JSON. Agent node declares APPROVAL_CHANNELS
-  (`AiAgentComponentDefinition`); empty list defaults to the chat channel. Editor runs deliver the
-  card via the agent's ToolContext SSE emitter (channels are production transports); the standalone
-  Approval action delivers it in editor runs by returning a one-shot `SuspendAwareSseEmitterHandler`
-  (suspend happens INSIDE the handler — suspending before returning makes `checkSuspend` swallow
-  the emitter output) that the in-process post-output processor drains into the test-run stream.
-- **Client cards**: `ApprovalRequestMessage` (`data-approval-request` in `aiChatDataComponents`) —
-  self-contained buttons+comment for field-less approvals (`hasInputs` flag threaded from event
-  `inputs`), embeds `ApprovalForm` only when fields exist. Resolution goes through
-  `ApprovalResolutionContext` when the surface provides it (CE Chats page, canvas test chat,
-  AI Hub workflow chat — each points its SSE machinery at `POST /job/resume/{id}` with
-  `Accept: text/event-stream`, streaming the continuation through its normal event handlers), else
-  the plain resume mutation. AI Hub persists the continuation on stream close via the
-  `appendAiHubTaskAssistantMessage` GraphQL mutation. The `@bytechef/chat` widget has its own
-  inline card + `drainSseResponse`-based continuation.
-- `WebhookBridgeAgent` routes runs with an approval task onto the streaming path
-  (`WebhookWorkflowExecutor.hasApprovalTask`). The coordinator's `SseStreamApplicationEventListener`
-  emits a named `result` data event on COMPLETED (message read from the `WEBHOOK_RESPONSE`-tagged
-  task execution, published before the terminal job-status event) so approval-only chat workflows
-  keep their final reply; `AgUiStreamBridge` renders it only when nothing was streamed. MCP/A2A
-  sync runs paused on an approval return "approval required — resolve at <form URL>"
-  (`ApprovalFormUrls.buildFormUrl`, STOPPED + `jobResumeId` metadata) instead of an empty result;
-  MCP workflow tools additionally URL-elicit the form on capable clients (form-elicitation
-  fallback with a simple approved/comment schema on form-only clients; bounded at 3 rounds per
-  call for chained approvals) and return the resumed run's output in the same tools/call
-  (`ApprovalElicitingToolSpecifications` + `AutomationMcpToolFacade.awaitApprovedWorkflowRun`,
-  which polls the job out of STOPPED before awaiting — STOPPED is terminal to
-  `JobCompletionAwaiter`), and A2A surfaces the task as `input-required`
-  (`A2AAgentResult.ofInputRequired(text, jobId)`); a later `tasks/get` refreshes it through the
-  `A2AAgentExecutor.pollRun(jobId)` SPI. Enriched `task_started` events
-  (`{event, payload:{taskExecutionId,name,type}}` from the coordinator) render as AG-UI tool-call
-  step chips in `AgUiStreamBridge` and as a floating step chip on the CE Chats page.
-- **Suspend expiry is enforced and configurable**: the Approval action's `expiresIn`/`expiresInUnit`
-  properties (HOURS/DAYS, default 60 days) and a gated tool's `approvalExpiresIn`/
-  `approvalExpiresInUnit` entry parameters (`ToolConstants`) drive the suspend `expiresAt`.
-  `JobResumeFacadeImpl` rejects expired resumes (GONE), and
-  `ApprovalExpiryMonitor` (platform-coordinator, 15-min per-tenant sweep over
-  `getStaleJobs(STOPPED, now)`, `bytechef.workflow.execution.approval-expiry.enabled` default on)
-  fails runs whose suspend `expiresAt` passed. Metrics: `bytechef_approval_expired{source=resume|sweep}`
-  counter + `bytechef_approval_pending` gauge. `ApprovalReminderMonitor` (platform-coordinator,
-  15-min sweep, `bytechef.workflow.execution.approval-reminder.*` — `enabled` default on,
-  `lead-time` default PT24H) fires a `JOB_APPROVAL_EXPIRING` notification (new
-  `NotificationEvent.Type`, append-only ordinal; `ApprovalReminder{Email,Slack,Webhook}NotificationHandler`)
-  through the central notification registry once per run (idempotence via job metadata
-  `approvalReminderSentAt`), carrying expiry + form URL in `NotificationHandlerContext`.
-  `ApprovalEscalationMonitor` (platform-coordinator, 15-min sweep,
-  `bytechef.workflow.execution.approval-escalation.*` — `enabled` default on, `after` a Duration
-  with NO default so the sweep is a no-op until set) fires a `JOB_APPROVAL_ESCALATED` notification
-  (new `NotificationEvent.Type`, append-only ordinal 7; liquibase id 8/type 7;
-  `ApprovalEscalation{Email,Slack,Webhook}NotificationHandler`) once a run has been paused on an
-  approval longer than `after` (measured from the suspended task execution's startDate) and is
-  still unexpired — routed to a DIFFERENT subscribed `Notification` than the reminder. Idempotence
-  via job metadata `approvalEscalatedAt`; both `approvalReminderSentAt` and `approvalEscalatedAt`
-  are cleared on resume in `SuspendTaskDispatcherPreSendProcessor` (per-suspend, not per-run).
-  The gate's expiry is editable via the "Approval expires in" preset submenu in
-  `AiAgentToolDropdownMenu` (expiresIn 0 = clear override). `ApprovalTaskReconciliationMonitor`
-  (automation-task-service, per-tenant sweep) closes OPEN/IN_PROGRESS Approval Task rows whose
-  backing run is no longer STOPPED: COMPLETED run → COMPLETED row (covers cross-process resumes
-  the in-JVM `ApprovalTaskCompletionListener` misses), FAILED/CANCELLED/purged run → EXPIRED row
-  (`ApprovalTask.Status.EXPIRED`, appended last — ordinal storage). The **pending-approvals inbox**
-  (`ApprovalTaskFacade.getPendingApprovals` → `pendingApprovals` GraphQL query →
-  `PendingApprovalsList` on the Approval Tasks page) lists all STOPPED runs carrying a
-  `jobResumeId`, with workflow label, form URL, createdDate, and expiry — channel-independent.
-  In distributed EE the approval-task channel + inbox are NOT monolith-only: worker-app's
-  `RemoteApprovalTaskFacadeClient` issues real `LoadBalancedRestClient` calls to configuration-app's
-  `automation-task-remote-rest` `RemoteApprovalTaskFacadeController` (`/remote/approval-task-facade`),
-  and configuration-app hosts the real `automation-task-service` (facade + `ApprovalTaskReconciliationMonitor`
-  + `ApprovalTaskCompletionListener`) and `automation-task-graphql`. The service-level
-  `RemoteApprovalTaskServiceClient` stays a stub — `ApprovalTaskService` is only consumed by the
-  GraphQL controller, which runs in configuration-app against the real bean.
-- **Chat-only channel validation**: `WorkflowValidator.validateChatOnlyApprovalChannels`
-  (platform-workflow-validator-service) warns when a task's `approvalChannels` are chat-only — or
-  an AI agent has a `requiresApproval` tool with no channels, which defaults to chat — and the
-  workflow has no `chat/` trigger: such webhook/schedule runs pause with no live card and are
-  only reachable via the pending-approvals inbox or the hosted form.
-- AI Hub copilot chat is OUT of scope (keeps its pinned `askUserQuestion`).
+Two disjoint primitives: **Approval** (a decision; a comment is valid on BOTH outcomes) and
+**AskUserQuestion** (LLM clarification). Typing in chat NEVER resolves an approval. Delivery fans out
+best-effort over a dozen channels (chat, Slack, Discord, Telegram, Mattermost, Rocket.Chat, email, WhatsApp,
+SMS, approval task), failing the step only when every configured channel fails; five of them resolve in
+place. A `requiresApproval: true` TOOLS entry wraps the callback in `ApprovalGateToolCallback`, which
+suspends via the sentinel protocol. Expiry, reminders, and escalation each run a 15-minute
+platform-coordinator sweep. Never add notification logic under `server/libs/atlas/`.
+See `docs/agents/hitl-approvals.md`.
 
 ### Auto-memory storage providers
 
@@ -709,57 +590,12 @@ trigger + post-turn query invalidation.
 
 ### AI Gateway content guardrails (EE)
 
-- `AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on chat sync + streaming paths (via
-  `apply`) and the embeddings path (via `applyToInputs`) after prompt resolution. Effective
-  policy per request = global properties (`bytechef.ai.gateway.guardrails.*`) OR'd/unioned with
-  the per-workspace `AiGatewayWorkspaceSettings` fields. Everything is off by default. Six
-  request-direction controls:
-  - PII redaction — `pii-redaction-enabled` / `redactPii` (email, SSN, CC, phone, IPv4 →
-    `[REDACTED_*]`). The workspace `redactPii` also drives trace-payload digesting.
-  - Secret redaction — `secret-redaction-enabled` / `redactSecrets` (AWS/GitHub/Slack/OpenAI/
-    Stripe/Google keys, JWTs, PEM private keys → `[REDACTED_SECRET]`). High-signal curated
-    regex subset; entropy detection stays in the workflow-layer `SecretKeyDetectorUtils`.
-  - Blocked terms — `blocked-terms` / `blockedTerms` (case-insensitive substring block).
-  - Moderation — `moderation-enabled` / `moderationEnabled`, needs an
-    `AiGatewayModerationClassifier` bean.
-  - Injection detection — `injection-detection-enabled` / `injectionDetectionEnabled`, needs an
-    `AiGatewayInjectionClassifier` bean.
-- Dual-directional: response scanning (`response-scan-enabled` / `scanResponses`) redacts
-  PII+secrets from the completion via `redactResponse` before it is traced/returned. Redaction
-  only, never blocks. Streaming responses are also covered (opt-in): when the operator flag
-  `response-scan-streaming-enabled` is set AND response scanning is effective for the workspace,
-  `newStreamingResponseRedactor` returns a `StreamingResponseRedactor` that masks SSE deltas
-  across chunk boundaries (safe-cut / lookahead-window algorithm over
-  `sensitiveMatchRanges`) and defers the terminal `finish_reason` onto its flush chunk. Null
-  redactor → the streaming path is byte-for-byte unchanged. A value still incomplete and longer
-  than the window (default 512) may have a prefix emitted before its pattern matches — documented
-  trade-off of not buffering the whole stream.
-- Order (request): redact PII → redact secrets → blocked terms → moderation → injection; every
-  check sees the redacted text. Embeddings run the same minus moderation. Response path is
-  redaction only.
-- Per-project overlay: `AiGatewayProjectSettings` (PROJECT-scoped `Property` row
-  `ai_gateway_project_settings`, guardrail fields only) layers on top of global+workspace with the
-  same **additive union** semantics (a project can enable a guardrail / add blocked terms, never
-  turn one off; null = inherit). `resolvePolicy(workspaceId, projectId)` unions all three levels;
-  the four guardrail methods have `projectId` overloads (originals delegate with null).
-  `AiGatewayFacadeImpl.resolveProjectId` maps the `project_id` request tag (a per-workspace slug)
-  to the numeric project id. Admin-only GraphQL: `aiGatewayProjectSettings` /
-  `updateAiGatewayProjectSettings`. The project settings service is a Spring-optional `@Nullable`
-  dep — absent bean → project layer skipped. Per-API-key scoping is NOT implemented (no api-key
-  `Property` scope).
-- Violations throw `AiGatewayGuardrailException` (lives in `platform-ai-gateway-api` so the
-  public-rest `AiGatewayExceptionHandler` can map it) → HTTP 422 `guardrail_violation`; the
-  wire message never echoes the offending content or matched term.
-- Both classifier SPIs (`AiGatewayModerationClassifier`, `AiGatewayInjectionClassifier`) are
-  Spring-optional `@Nullable` constructor deps; their `PromptBased*` impls register only when
-  `moderation-model` / `injection-model` name a catalog model identifier and fail open on any
-  error. Regexes must stay free of nested optional quantifiers (SpotBugs ReDoS). Spec:
-  `docs/superpowers/specs/2026-07-22-ai-gateway-guardrail-hardening-design.md`.
-- Metrics: `AiGatewayGuardrailMetrics` emits the `bytechef_ai_gateway_guardrail` counter tagged by
-  `event` (`pii_redacted` / `secret_redacted` / `response_redacted` / `blocked_term` /
-  `moderation_flagged` / `injection_flagged`) — low-cardinality (no workspace/project tag), wired
-  via `ObjectProvider<MeterRegistry>` so it no-ops without a registry. `AiGatewayGuardrails` takes
-  it as a `@Nullable` dep and records at each redact/block/flag point.
+`AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on the chat and embeddings paths. Effective policy is
+global properties unioned with per-workspace settings and a per-project overlay — **additive**, so a narrower
+scope can enable a guardrail or add blocked terms but never turn one off. The request path covers PII and
+secret redaction, blocked terms, moderation, and injection detection; response and streaming redaction are
+opt-in. Violations throw `AiGatewayGuardrailException` → HTTP 422 and never echo the offending content.
+See `docs/agents/ai-gateway-guardrails.md`.
 
 ### Workspace scoping for platform entities
 
@@ -889,17 +725,23 @@ app variants without actuator start cleanly.
 
 ## Access and Authentication
 
+### API facade vs shared facade
+Where a domain has both (e.g. `AiSkillApiFacade` / `AiSkillFacade`), the **API facade is the HTTP surface and
+owns authorization** (`checkOwnerOrAdmin(id)` on every by-id operation). The shared facade is deliberately
+unguarded because runtime agent tools call it with no security context. Controllers and GraphQL mappings must
+go through the API facade — wiring one to the shared facade compiles fine and silently removes the ownership
+check. When adding a method, add it to BOTH interfaces, not just the shared one.
+
 ### Development Login Credentials
 - **Admin**: admin@localhost.com / admin
 - **User**: user@localhost.com / user
 
 ### Default Ports
-- **Server**: 8080 (main application)
-- **API**: 9555 (backend API server)
+- **Server**: 9555 in the `dev` profile, 8080 in `prod` — one app, not two services
 - **Client**: 3000 (development server)
 - **PostgreSQL**: 5432
 - **Redis**: 6379
-- **Mailhog**: 1025
+- **Mailpit**: 1025 (`axllent/mailpit`; the compose service is `mailpit`, not mailhog)
 
 ## Common Development Workflows
 
@@ -922,6 +764,17 @@ app variants without actuator start cleanly.
 - Migration files are in `server/libs/config/liquibase-config/`
 - Database changes are applied automatically on startup
 - After renaming migration files, delete stale copies from `build/resources/` — Liquibase sees both old and new on classpath
+- Before editing an init changelog **in place**, prove the schema is unreleased:
+  `git ls-tree -r --name-only <latest-tag> | grep <module>` plus `git merge-base --is-ancestor <introducing-commit> master`.
+  Unreleased ⇒ edit init directly; released ⇒ add a new changeset (never rewrite what customers have run)
+- In-place init edits break local dev DBs two ways (schema drift + stale md5sums);
+  `scripts/dev/sync-local-schema-after-collapse.sh` patches both, idempotently
+- The `liquibase` Spring profile does **not** apply migrations via `bootRun` — it exits 0 having created nothing.
+  Verify changelog edits with an existing `*IntTest` instead; Testcontainers builds the schema from scratch,
+  which is stronger evidence anyway
+- `--spring.profiles.active=X` *replaces* the value baked into `build/resources/main/config/application.yml`
+  at processResources time (`profiles.active: dev`, `contexts: mono, dev`), silently dropping the dev
+  `bytechef.*` defaults. Layer it instead: `--spring.profiles.active=dev,X`
 
 ### New Spring Data JDBC Modules
 - Create `@AutoConfiguration` class with `@EnableJdbcRepositories(basePackages = "...")` + `@ConditionalOnBean(AbstractJdbcConfiguration.class)`
@@ -972,6 +825,13 @@ Integration tests use Testcontainers to spin up real services:
 
 ### Code Quality Workflow
 - When committing, only stage files directly modified by the current task — do not include pre-existing unstaged changes that are unrelated
+- **Never judge a Gradle run piped into `tail`/`grep`** — the pipeline exit code is the filter's, not Gradle's,
+  and `${PIPESTATUS[0]}` is already clobbered if another command ran. Redirect to a file, check `$?` on its own
+  line, then grep the file. Use `--continue` so one failing task doesn't hide the rest, and grep
+  `^> Task .* FAILED` — not `error:`, which matches module paths like `:server:libs:core:error:`
+- After a rebase, always run `./gradlew compileJava compileTestJava --continue` **and** `cd client && npm run check`.
+  Git merges non-overlapping lines cleanly even when one side renamed a field or replaced `useState` setters with
+  a reducer — a clean merge is not a correct one
 
 Before committing code, ensure:
 ```bash
@@ -1008,6 +868,11 @@ working directory is `cli/cli-app`, so pass **absolute** paths:
 ./gradlew :cli:cli-app:run --args="component init --name my-component --open-api-path /abs/openapi.yaml --output-path /abs/out"
 ```
 See `cli/README.md` for the full command reference.
+
+Regenerate the CLI's OpenAPI clients with each project's **`generateClient`** task — not the plugin's
+default `openApiGenerate`, which is unconfigured and fails with "generator name must be specified".
+Generated Java sources are committed and deliberately not wired to `compileJava`; regenerate manually
+when an `openapi.yaml` changes. The surrounding `docs/`, `gradlew`, `pom.xml` scaffolding is gitignored.
 
 ### Resolving PR Review Comments
 - Use `gh api graphql` with `resolveReviewThread` mutation to close threads programmatically
@@ -1132,9 +997,14 @@ See `cli/README.md` for the full command reference.
   every workspace. (It was previously the `workspace_notification` membership table, where the ABSENCE
   of a row meant global; that table was collapsed into the column, so "no row" became "null".) Writes go
   through `NotificationWorkspaceRepository` in `platform-notification-workspace`. The former EE
-  `AiObservabilityNotificationChannel` table is GONE — a Liquibase data migration (`20260720000004`)
-  converted channels into `Notification` rows, carrying the channel's workspace onto the notification,
-  and repointed `ai_observability_alert_rule_channel.notification_id`.
+  `AiObservabilityNotificationChannel` table is GONE, along with its `workspace_*` relation table.
+  There is no migration to run: the whole `platform-ai-observability` module is unreleased (absent
+  from `master` and every release tag), so no database ever held a channel row. The observability init
+  changelog therefore creates `ai_observability_alert_rule_channel` with a `notification_id` column
+  FK'd straight to `notification(id)` — the conversion migration (`20260720000004`) that used to
+  create, convert, then drop the channel tables was deleted rather than kept as a permanent no-op.
+  That FK sits in its own changeset behind a `tableExists` precondition, because module-scoped test
+  contexts load only a subset of changelogs and may not have `notification`.
 
 - Webhook + Slack transports live in CE `server/libs/platform/platform-notification/platform-notification-delivery`:
   `WebhookNotificationClient` is THE single outbound-webhook transport (one `RestTemplate`, one Spring
