@@ -450,6 +450,136 @@ registration via `ObjectProvider.ifAvailable`, and prompt documentation on the p
   `SelectComponentPropertyOptionToolCallback`). The `selectPropertyOption` name and its
   `select-property-option` marker payload are client-load-bearing — do not rename.
 
+### Agent HITL approvals (chat cards + tool gate)
+
+Spec: `docs/superpowers/specs/2026-07-21-agent-hitl-approval-chat-design.md`; user docs
+`docs/content/docs/automation/human-in-the-loop.mdx`. Load-bearing pieces:
+
+- Two primitives, disjoint jobs: **Approval** (decision; comment valid on BOTH outcomes under the
+  reserved `comment` key) and **AskUserQuestion** (LLM clarification). No free-text mode on
+  Approval; typing in chat NEVER resolves an approval (D4).
+- **ChatApprovalChannel** (`approval/chat` APPROVAL_CHANNELS element) publishes an
+  `__eventType: approval_request` data event (`AiAgentSseEventType.APPROVAL_REQUEST`) onto the
+  job's SSE stream via the `SSE_STREAM_EVENTS` broker route; requires `getJobId()` (now on
+  `JobContextAware`), throws without one. Both SSE bridges + `JobResumeSseStreamBridge` map
+  `__eventType` payloads to named events; `AgUiStreamBridge` passes them as AG-UI CustomEvents and
+  folds a persist-only markdown form-link marker into accumulated text for reload.
+- **Channel fan-out is best-effort**: `ApprovalRequestApprovalAction.deliverToChannels` and
+  `ApprovalGateToolCallback.deliverApprovalRequest` try/catch per channel (warn log), failing the
+  step ONLY when every configured channel fails. Per-channel counters:
+  `bytechef_approval_request` (success) + `bytechef_approval_delivery_failure` (failure), both
+  incremented in `ClusterElementDefinitionServiceImpl.executeApprovalChannel`. Channels receive
+  the computed expiry under `ApprovalChannelFunction.EXPIRES_AT` (ISO-8601) and render it in
+  their messages; the approval-task channel maps it onto the task's `dueDate`; the chat channel
+  carries it in the `approval_request` event. Markdown channels (Mattermost, Rocket.Chat) escape
+  link-forming characters in title/description — gate descriptions embed AI-chosen tool args.
+  One-click `?approved=` links NEVER auto-submit:
+  `ApprovalForm` shows a pre-selected Confirm view (link scanners must not resolve approvals).
+  Delivery channels: chat, Slack, Discord, Telegram, Mattermost, Rocket.Chat, Gmail, Outlook 365,
+  generic SMTP email, WhatsApp (Meta/Twilio/Infobip), SMS (Twilio/Infobip), approval task.
+  In-place Slack resolution IS implemented: an optional `signingSecret` on the Slack connection
+  switches `SlackApprovalChannel` to `block_actions` buttons (value = tokenized resume id), and
+  `SlackInteractivityController`/`SlackInteractivityHandler` (platform-webhook-rest-impl,
+  anonymous `/slack/interactivity`, permit-listed) verify the `X-Slack-Signature` HMAC per
+  tenant (anchored by the resume id), resolve via `JobResumeFacade`, and rewrite the message via
+  `response_url`. Spec: `docs/superpowers/specs/2026-07-22-slack-inplace-approval-interactivity-design.md`.
+  In-place is also implemented for **WhatsApp (Meta)** (`appSecret` on the connection →
+  interactive reply buttons; `WhatsAppInteractivityController`/`Handler` verify `X-Hub-Signature-256`,
+  GET verify-handshake via `bytechef.webhook.whatsapp.verify-token`; button id carries the
+  decision-prefixed signed token), **Mattermost** (interactive attachment buttons whose
+  `integration.url` = `/mattermost/interactivity` carry the token in `integration.context`; unsigned,
+  so no `approvedBy`), **Telegram** (`webhookSecretToken` on the connection → inline-keyboard callback
+  buttons; `/telegram/interactivity` verifies `X-Telegram-Bot-Api-Secret-Token`), and **Discord**
+  (`publicKey` on the connection → interaction buttons; `/discord/interactivity` verifies the Ed25519
+  signature against `bytechef.webhook.discord.public-key`, answers `PING`→`PONG`). Telegram/Discord
+  cap the button payload below the signed token, so the channel mints a short id via the anonymous
+  `POST /approval/short-token` (`ApprovalShortTokenStore`, process-local — form-link fallback covers a
+  restart; distributed EE needs a shared store). Twilio/Infobip SMS+WhatsApp and Rocket.Chat
+  intentionally stay on URL buttons (won't be built — SMS/BSP reply-code UX and Rocket.Chat's lack of
+  a callback aren't worth it; see `docs/superpowers/plans/2026-07-22-hitl-gap-remaining-backlog.md`).
+- **Tool gate**: `requiresApproval: true` in a TOOLS cluster-element entry's parameters
+  (`ToolConstants.REQUIRES_APPROVAL`; editor checkbox in `AiAgentToolDropdownMenu`) wraps the
+  callback in `ApprovalGateToolCallback` (inside the observable/audit wrapper). Suspends via the
+  sentinel protocol with `GATED_TOOL_NAME`/`GATED_TOOL_INPUT` continueParameters; second flagged
+  call in one round defers (single-suspend-per-round invariant). Resume branch
+  `AbstractAiAgentChatAction.resolveGatedToolResumeData`: approve → RAW callback executes original
+  args; reject → denial JSON. Agent node declares APPROVAL_CHANNELS
+  (`AiAgentComponentDefinition`); empty list defaults to the chat channel. Editor runs deliver the
+  card via the agent's ToolContext SSE emitter (channels are production transports); the standalone
+  Approval action delivers it in editor runs by returning a one-shot `SuspendAwareSseEmitterHandler`
+  (suspend happens INSIDE the handler — suspending before returning makes `checkSuspend` swallow
+  the emitter output) that the in-process post-output processor drains into the test-run stream.
+- **Client cards**: `ApprovalRequestMessage` (`data-approval-request` in `aiChatDataComponents`) —
+  self-contained buttons+comment for field-less approvals (`hasInputs` flag threaded from event
+  `inputs`), embeds `ApprovalForm` only when fields exist. Resolution goes through
+  `ApprovalResolutionContext` when the surface provides it (CE Chats page, canvas test chat,
+  AI Hub workflow chat — each points its SSE machinery at `POST /job/resume/{id}` with
+  `Accept: text/event-stream`, streaming the continuation through its normal event handlers), else
+  the plain resume mutation. AI Hub persists the continuation on stream close via the
+  `appendAiHubTaskAssistantMessage` GraphQL mutation. The `@bytechef/chat` widget has its own
+  inline card + `drainSseResponse`-based continuation.
+- `WebhookBridgeAgent` routes runs with an approval task onto the streaming path
+  (`WebhookWorkflowExecutor.hasApprovalTask`). The coordinator's `SseStreamApplicationEventListener`
+  emits a named `result` data event on COMPLETED (message read from the `WEBHOOK_RESPONSE`-tagged
+  task execution, published before the terminal job-status event) so approval-only chat workflows
+  keep their final reply; `AgUiStreamBridge` renders it only when nothing was streamed. MCP/A2A
+  sync runs paused on an approval return "approval required — resolve at <form URL>"
+  (`ApprovalFormUrls.buildFormUrl`, STOPPED + `jobResumeId` metadata) instead of an empty result;
+  MCP workflow tools additionally URL-elicit the form on capable clients (form-elicitation
+  fallback with a simple approved/comment schema on form-only clients; bounded at 3 rounds per
+  call for chained approvals) and return the resumed run's output in the same tools/call
+  (`ApprovalElicitingToolSpecifications` + `AutomationMcpToolFacade.awaitApprovedWorkflowRun`,
+  which polls the job out of STOPPED before awaiting — STOPPED is terminal to
+  `JobCompletionAwaiter`), and A2A surfaces the task as `input-required`
+  (`A2AAgentResult.ofInputRequired(text, jobId)`); a later `tasks/get` refreshes it through the
+  `A2AAgentExecutor.pollRun(jobId)` SPI. Enriched `task_started` events
+  (`{event, payload:{taskExecutionId,name,type}}` from the coordinator) render as AG-UI tool-call
+  step chips in `AgUiStreamBridge` and as a floating step chip on the CE Chats page.
+- **Suspend expiry is enforced and configurable**: the Approval action's `expiresIn`/`expiresInUnit`
+  properties (HOURS/DAYS, default 60 days) and a gated tool's `approvalExpiresIn`/
+  `approvalExpiresInUnit` entry parameters (`ToolConstants`) drive the suspend `expiresAt`.
+  `JobResumeFacadeImpl` rejects expired resumes (GONE), and
+  `ApprovalExpiryMonitor` (platform-coordinator, 15-min per-tenant sweep over
+  `getStaleJobs(STOPPED, now)`, `bytechef.workflow.execution.approval-expiry.enabled` default on)
+  fails runs whose suspend `expiresAt` passed. Metrics: `bytechef_approval_expired{source=resume|sweep}`
+  counter + `bytechef_approval_pending` gauge. `ApprovalReminderMonitor` (platform-coordinator,
+  15-min sweep, `bytechef.workflow.execution.approval-reminder.*` — `enabled` default on,
+  `lead-time` default PT24H) fires a `JOB_APPROVAL_EXPIRING` notification (new
+  `NotificationEvent.Type`, append-only ordinal; `ApprovalReminder{Email,Slack,Webhook}NotificationHandler`)
+  through the central notification registry once per run (idempotence via job metadata
+  `approvalReminderSentAt`), carrying expiry + form URL in `NotificationHandlerContext`.
+  `ApprovalEscalationMonitor` (platform-coordinator, 15-min sweep,
+  `bytechef.workflow.execution.approval-escalation.*` — `enabled` default on, `after` a Duration
+  with NO default so the sweep is a no-op until set) fires a `JOB_APPROVAL_ESCALATED` notification
+  (new `NotificationEvent.Type`, append-only ordinal 7; liquibase id 8/type 7;
+  `ApprovalEscalation{Email,Slack,Webhook}NotificationHandler`) once a run has been paused on an
+  approval longer than `after` (measured from the suspended task execution's startDate) and is
+  still unexpired — routed to a DIFFERENT subscribed `Notification` than the reminder. Idempotence
+  via job metadata `approvalEscalatedAt`; both `approvalReminderSentAt` and `approvalEscalatedAt`
+  are cleared on resume in `SuspendTaskDispatcherPreSendProcessor` (per-suspend, not per-run).
+  The gate's expiry is editable via the "Approval expires in" preset submenu in
+  `AiAgentToolDropdownMenu` (expiresIn 0 = clear override). `ApprovalTaskReconciliationMonitor`
+  (automation-task-service, per-tenant sweep) closes OPEN/IN_PROGRESS Approval Task rows whose
+  backing run is no longer STOPPED: COMPLETED run → COMPLETED row (covers cross-process resumes
+  the in-JVM `ApprovalTaskCompletionListener` misses), FAILED/CANCELLED/purged run → EXPIRED row
+  (`ApprovalTask.Status.EXPIRED`, appended last — ordinal storage). The **pending-approvals inbox**
+  (`ApprovalTaskFacade.getPendingApprovals` → `pendingApprovals` GraphQL query →
+  `PendingApprovalsList` on the Approval Tasks page) lists all STOPPED runs carrying a
+  `jobResumeId`, with workflow label, form URL, createdDate, and expiry — channel-independent.
+  In distributed EE the approval-task channel + inbox are NOT monolith-only: worker-app's
+  `RemoteApprovalTaskFacadeClient` issues real `LoadBalancedRestClient` calls to configuration-app's
+  `automation-task-remote-rest` `RemoteApprovalTaskFacadeController` (`/remote/approval-task-facade`),
+  and configuration-app hosts the real `automation-task-service` (facade + `ApprovalTaskReconciliationMonitor`
+  + `ApprovalTaskCompletionListener`) and `automation-task-graphql`. The service-level
+  `RemoteApprovalTaskServiceClient` stays a stub — `ApprovalTaskService` is only consumed by the
+  GraphQL controller, which runs in configuration-app against the real bean.
+- **Chat-only channel validation**: `WorkflowValidator.validateChatOnlyApprovalChannels`
+  (platform-workflow-validator-service) warns when a task's `approvalChannels` are chat-only — or
+  an AI agent has a `requiresApproval` tool with no channels, which defaults to chat — and the
+  workflow has no `chat/` trigger: such webhook/schedule runs pause with no live card and are
+  only reachable via the pending-approvals inbox or the hosted form.
+- AI Hub copilot chat is OUT of scope (keeps its pinned `askUserQuestion`).
+
 ### Domain copilot slice pattern (context store / knowledge base / data table)
 
 Each domain slice follows the same shape (see `docs/superpowers/plans/` for the slice plans):
@@ -552,20 +682,57 @@ trigger + post-turn query invalidation.
 
 ### AI Gateway content guardrails (EE)
 
-- `AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on sync + streaming paths after prompt
-  resolution. Effective policy per request = global properties
-  (`bytechef.ai.gateway.guardrails.pii-redaction-enabled` / `blocked-terms` /
-  `moderation-enabled`) OR'd/unioned with the per-workspace `AiGatewayWorkspaceSettings`
-  fields (`redactPii`, `blockedTerms`, `moderationEnabled`). The workspace `redactPii`
-  setting drives BOTH trace-payload digesting and upstream prompt masking.
+- `AiGatewayGuardrails` runs in `AiGatewayFacadeImpl` on chat sync + streaming paths (via
+  `apply`) and the embeddings path (via `applyToInputs`) after prompt resolution. Effective
+  policy per request = global properties (`bytechef.ai.gateway.guardrails.*`) OR'd/unioned with
+  the per-workspace `AiGatewayWorkspaceSettings` fields. Everything is off by default. Six
+  request-direction controls:
+  - PII redaction — `pii-redaction-enabled` / `redactPii` (email, SSN, CC, phone, IPv4 →
+    `[REDACTED_*]`). The workspace `redactPii` also drives trace-payload digesting.
+  - Secret redaction — `secret-redaction-enabled` / `redactSecrets` (AWS/GitHub/Slack/OpenAI/
+    Stripe/Google keys, JWTs, PEM private keys → `[REDACTED_SECRET]`). High-signal curated
+    regex subset; entropy detection stays in the workflow-layer `SecretKeyDetectorUtils`.
+  - Blocked terms — `blocked-terms` / `blockedTerms` (case-insensitive substring block).
+  - Moderation — `moderation-enabled` / `moderationEnabled`, needs an
+    `AiGatewayModerationClassifier` bean.
+  - Injection detection — `injection-detection-enabled` / `injectionDetectionEnabled`, needs an
+    `AiGatewayInjectionClassifier` bean.
+- Dual-directional: response scanning (`response-scan-enabled` / `scanResponses`) redacts
+  PII+secrets from the completion via `redactResponse` before it is traced/returned. Redaction
+  only, never blocks. Streaming responses are also covered (opt-in): when the operator flag
+  `response-scan-streaming-enabled` is set AND response scanning is effective for the workspace,
+  `newStreamingResponseRedactor` returns a `StreamingResponseRedactor` that masks SSE deltas
+  across chunk boundaries (safe-cut / lookahead-window algorithm over
+  `sensitiveMatchRanges`) and defers the terminal `finish_reason` onto its flush chunk. Null
+  redactor → the streaming path is byte-for-byte unchanged. A value still incomplete and longer
+  than the window (default 512) may have a prefix emitted before its pattern matches — documented
+  trade-off of not buffering the whole stream.
+- Order (request): redact PII → redact secrets → blocked terms → moderation → injection; every
+  check sees the redacted text. Embeddings run the same minus moderation. Response path is
+  redaction only.
+- Per-project overlay: `AiGatewayProjectSettings` (PROJECT-scoped `Property` row
+  `ai_gateway_project_settings`, guardrail fields only) layers on top of global+workspace with the
+  same **additive union** semantics (a project can enable a guardrail / add blocked terms, never
+  turn one off; null = inherit). `resolvePolicy(workspaceId, projectId)` unions all three levels;
+  the four guardrail methods have `projectId` overloads (originals delegate with null).
+  `AiGatewayFacadeImpl.resolveProjectId` maps the `project_id` request tag (a per-workspace slug)
+  to the numeric project id. Admin-only GraphQL: `aiGatewayProjectSettings` /
+  `updateAiGatewayProjectSettings`. The project settings service is a Spring-optional `@Nullable`
+  dep — absent bean → project layer skipped. Per-API-key scoping is NOT implemented (no api-key
+  `Property` scope).
 - Violations throw `AiGatewayGuardrailException` (lives in `platform-ai-gateway-api` so the
   public-rest `AiGatewayExceptionHandler` can map it) → HTTP 422 `guardrail_violation`; the
   wire message never echoes the offending content or matched term.
-- Moderation: `AiGatewayModerationClassifier` SPI; `PromptBasedModerationClassifier`
-  registers only when `bytechef.ai.gateway.guardrails.moderation-model` names a catalog model
-  identifier and fails open on any error. Guardrails takes the classifier as a Spring-optional
-  `@Nullable` constructor dep. Order: redact → blocked terms → moderation (checks see
-  redacted text). Regexes must stay free of nested optional quantifiers (SpotBugs ReDoS).
+- Both classifier SPIs (`AiGatewayModerationClassifier`, `AiGatewayInjectionClassifier`) are
+  Spring-optional `@Nullable` constructor deps; their `PromptBased*` impls register only when
+  `moderation-model` / `injection-model` name a catalog model identifier and fail open on any
+  error. Regexes must stay free of nested optional quantifiers (SpotBugs ReDoS). Spec:
+  `docs/superpowers/specs/2026-07-22-ai-gateway-guardrail-hardening-design.md`.
+- Metrics: `AiGatewayGuardrailMetrics` emits the `bytechef_ai_gateway_guardrail` counter tagged by
+  `event` (`pii_redacted` / `secret_redacted` / `response_redacted` / `blocked_term` /
+  `moderation_flagged` / `injection_flagged`) — low-cardinality (no workspace/project tag), wired
+  via `ObjectProvider<MeterRegistry>` so it no-ops without a registry. `AiGatewayGuardrails` takes
+  it as a `@Nullable` dep and records at each redact/block/flag point.
 
 ### Sidebar navigation groups (Client)
 
