@@ -21,16 +21,21 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.bytechef.atlas.configuration.domain.Workflow;
 import com.bytechef.atlas.configuration.service.WorkflowService;
+import com.bytechef.atlas.coordinator.event.TaskStartedApplicationEvent;
 import com.bytechef.atlas.execution.domain.Job;
 import com.bytechef.atlas.execution.dto.JobParametersDTO;
+import com.bytechef.atlas.execution.service.JobService;
+import com.bytechef.atlas.execution.service.TaskExecutionService;
 import com.bytechef.platform.component.constant.MetadataConstants;
 import com.bytechef.platform.component.domain.ComponentDefinition;
 import com.bytechef.platform.component.domain.TriggerDefinition;
@@ -52,7 +57,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -82,7 +90,13 @@ public class TestWorkflowExecutorTest {
     private WorkflowTestConfigurationService workflowTestConfigurationService;
 
     @Mock
+    private JobService jobService;
+
+    @Mock
     private JobSyncExecutor jobSyncExecutor;
+
+    @Mock
+    private TaskExecutionService taskExecutionService;
 
     @Mock
     private Workflow workflow;
@@ -93,10 +107,9 @@ public class TestWorkflowExecutorTest {
     void beforeEach() {
         testWorkflowExecutor = new TestWorkflowExecutorImpl(
             componentDefinitionService, mock(com.bytechef.atlas.execution.service.ContextService.class),
-            mock(com.bytechef.evaluator.Evaluator.class), mock(com.bytechef.atlas.execution.service.JobService.class),
-            jobSyncExecutor,
+            mock(com.bytechef.evaluator.Evaluator.class), jobService, jobSyncExecutor,
             mock(com.bytechef.platform.workflow.task.dispatcher.service.TaskDispatcherDefinitionService.class),
-            mock(com.bytechef.atlas.execution.service.TaskExecutionService.class),
+            taskExecutionService,
             mock(com.bytechef.atlas.file.storage.TaskFileStorage.class), workflowService, workflowNodeOutputFacade,
             workflowTestConfigurationService);
     }
@@ -335,7 +348,7 @@ public class TestWorkflowExecutorTest {
                 latch.countDown();
             });
 
-        latch.await(5, java.util.concurrent.TimeUnit.SECONDS);
+        latch.await(5, TimeUnit.SECONDS);
 
         // Then verify error event contains the exception message (start event + error event = 2)
         ArgumentCaptor<Map> eventCaptor = ArgumentCaptor.forClass(Map.class);
@@ -527,6 +540,83 @@ public class TestWorkflowExecutorTest {
 
         assertThat(resultEvent).isNotNull();
         assertThat(resultEvent.get("payload")).isInstanceOf(WorkflowTestExecutionDTO.class);
+    }
+
+    @Test
+    @SuppressWarnings({
+        "rawtypes", "unchecked"
+    })
+    void executeAsyncStreamsProgressSnapshotsBeforeResult() throws Exception {
+        // Given a workflow without triggers whose job keeps running until released
+        when(workflowService.getWorkflow(anyString())).thenReturn(workflow);
+        when(workflow.getExtensions(anyString(), any(), anyList())).thenReturn(Collections.emptyList());
+
+        WorkflowTestConfiguration workflowTestConfiguration = new WorkflowTestConfiguration(
+            ENVIRONMENT_ID, Map.of(), WORKFLOW_ID, List.of());
+
+        when(workflowTestConfigurationService.fetchWorkflowTestConfiguration(WORKFLOW_ID, ENVIRONMENT_ID))
+            .thenReturn(Optional.of(workflowTestConfiguration));
+
+        Job job = mock(Job.class);
+        CountDownLatch jobReleaseLatch = new CountDownLatch(1);
+
+        when(jobSyncExecutor.startJob(any(JobParametersDTO.class))).thenReturn(1L);
+        when(jobSyncExecutor.awaitJob(anyLong(), any(Boolean.class), any())).thenAnswer(invocation -> {
+            assertThat(jobReleaseLatch.await(5, TimeUnit.SECONDS)).isTrue();
+
+            return job;
+        });
+        when(job.getId()).thenReturn(1L);
+        when(jobService.getJob(1L)).thenReturn(job);
+        when(jobService.getChildJobIds(1L)).thenReturn(List.of());
+        when(jobService.getJobs(List.of())).thenReturn(List.of());
+        when(taskExecutionService.getJobTaskExecutions(1L)).thenReturn(List.of());
+
+        AutoCloseable mockHandle = mock(AutoCloseable.class);
+        ArgumentCaptor<Consumer<TaskStartedApplicationEvent>> taskStartedListenerCaptor =
+            ArgumentCaptor.forClass(Consumer.class);
+
+        when(jobSyncExecutor.addJobStatusListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskStartedListener(anyLong(), taskStartedListenerCaptor.capture()))
+            .thenReturn(mockHandle);
+        when(jobSyncExecutor.addTaskExecutionCompleteListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addErrorListener(anyLong(), any())).thenReturn(mockHandle);
+        when(jobSyncExecutor.addSseStreamBridge(anyLong(), any())).thenReturn(mockHandle);
+
+        SseStreamBridge mockSseStreamBridge = mock(SseStreamBridge.class);
+        CompletableFuture<?>[] futures = new CompletableFuture<?>[1];
+
+        testWorkflowExecutor.executeAsync(
+            WORKFLOW_ID, Map.of(), ENVIRONMENT_ID, key -> {}, key -> mockSseStreamBridge,
+            (key, future) -> futures[0] = future, key -> {});
+
+        // When a task starts, repeatedly -- the requests coalesce into a throttled snapshot
+        Consumer<TaskStartedApplicationEvent> taskStartedListener = taskStartedListenerCaptor.getValue();
+
+        taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 5L));
+        taskStartedListener.accept(new TaskStartedApplicationEvent(1L, 6L));
+
+        // Then a progress snapshot of the running job is streamed
+        verify(mockSseStreamBridge, timeout(5000)).onEvent(
+            argThat(event -> event instanceof Map map && "progress".equals(map.get("event")) &&
+                map.get("payload") instanceof WorkflowTestExecutionDTO));
+
+        // And once the job completes, the result is the last event -- a late snapshot never follows it
+        jobReleaseLatch.countDown();
+
+        futures[0].join();
+
+        ArgumentCaptor<Map> eventCaptor = ArgumentCaptor.forClass(Map.class);
+
+        verify(mockSseStreamBridge, timeout(5000).atLeast(3)).onEvent(eventCaptor.capture());
+
+        List<Map> events = eventCaptor.getAllValues();
+
+        assertThat(events.getLast()
+            .get("event")).isEqualTo("result");
+        assertThat(events.stream()
+            .filter(event -> "progress".equals(event.get("event")))
+            .count()).isEqualTo(1);
     }
 
     @Test
