@@ -1269,6 +1269,14 @@ components:
           properties:
             category:
               $ref: "#/components/schemas/Category"
+            codeWorkflow:
+              description: "Whether the project is backed by a code workflow."
+              type: "boolean"
+              readOnly: true
+            codeWorkflowLanguage:
+              description: "The programming language of the code workflow, if the project is code-backed."
+              type: "string"
+              readOnly: true
             projectWorkflowIds:
               description: "The project workflow ids belonging to this project."
               type: "array"

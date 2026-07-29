@@ -30,6 +30,8 @@ import com.bytechef.automation.configuration.dto.ProjectTemplateDTO.WorkflowInfo
 import com.bytechef.automation.configuration.dto.ProjectWorkflowDTO;
 import com.bytechef.automation.configuration.dto.SharedProjectDTO;
 import com.bytechef.automation.configuration.service.PreBuiltTemplateService;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier;
+import com.bytechef.automation.configuration.service.ProjectCodeWorkflowInfoSupplier.CodeWorkflowInfo;
 import com.bytechef.automation.configuration.service.ProjectDeploymentService;
 import com.bytechef.automation.configuration.service.ProjectService;
 import com.bytechef.automation.configuration.service.ProjectWorkflowService;
@@ -65,6 +67,7 @@ import java.util.zip.ZipOutputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -81,6 +84,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     private final CategoryService categoryService;
     private final ComponentDefinitionHelper componentDefinitionHelper;
     private final PreBuiltTemplateService preBuiltTemplateService;
+    private final ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider;
     private final ProjectService projectService;
     private final ProjectWorkflowService projectWorkflowService;
     private final ProjectDeploymentFacade projectDeploymentFacade;
@@ -98,6 +102,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
     public ProjectFacadeImpl(
         ApplicationProperties applicationProperties, CategoryService categoryService,
         ComponentDefinitionHelper componentDefinitionHelper, PreBuiltTemplateService preBuiltTemplateService,
+        ObjectProvider<ProjectCodeWorkflowInfoSupplier> projectCodeWorkflowInfoSupplierProvider,
         ProjectWorkflowService projectWorkflowService,
         ProjectDeploymentService projectDeploymentService, ProjectService projectService,
         ProjectDeploymentFacade projectDeploymentFacade, ProjectWorkflowFacade projectWorkflowFacade,
@@ -109,6 +114,7 @@ public class ProjectFacadeImpl implements ProjectFacade {
         this.categoryService = categoryService;
         this.componentDefinitionHelper = componentDefinitionHelper;
         this.preBuiltTemplateService = preBuiltTemplateService;
+        this.projectCodeWorkflowInfoSupplierProvider = projectCodeWorkflowInfoSupplierProvider;
         this.projectWorkflowService = projectWorkflowService;
         this.projectDeploymentService = projectDeploymentService;
         this.projectService = projectService;
@@ -687,10 +693,19 @@ public class ProjectFacadeImpl implements ProjectFacade {
     }
 
     private ProjectDTO toProjectDTO(Project project) {
+        ProjectCodeWorkflowInfoSupplier projectCodeWorkflowInfoSupplier =
+            projectCodeWorkflowInfoSupplierProvider.getIfAvailable();
+
+        Optional<CodeWorkflowInfo> codeWorkflowInfo = projectCodeWorkflowInfoSupplier == null
+            ? Optional.empty()
+            : projectCodeWorkflowInfoSupplier.fetchCodeWorkflowInfo(project.getId());
+
         return new ProjectDTO(
             getCategory(project), project,
             projectWorkflowService.getProjectProjectWorkflowIds(project.getId(), project.getLastProjectVersion()),
-            tagService.getTags(project.getTagIds()));
+            tagService.getTags(project.getTagIds()), codeWorkflowInfo.isPresent(),
+            codeWorkflowInfo.map(CodeWorkflowInfo::language)
+                .orElse(null));
     }
 
     record ProjectInfo(String name, String description) {
