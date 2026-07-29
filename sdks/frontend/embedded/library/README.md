@@ -28,46 +28,47 @@ Requires `react` and `react-dom` >= 19.2.3 as peer dependencies.
 
 ## Development
 
-### Setting up Yalc for Local Development
+### Local Development Against a Consumer App
 
-[Yalc](https://github.com/wclr/yalc) is a tool for local package development that simulates publishing a package without actually publishing to a registry.
+The workspace (`sdks/frontend/embedded`) uses a local [Verdaccio](https://verdaccio.org/) registry
+and `npm link` -- there are no `yalc:*` scripts.
 
-#### Prerequisites
+#### Option A: npm link (quickest)
 
-- Install Yalc globally: `npm install -g yalc`
+From the workspace root (`sdks/frontend/embedded`):
 
-#### Publishing the Library
+```bash
+npm run setup:link
+```
 
-- **One-time build and publish**:
+This builds the library, runs `npm link` in it, and links `@bytechef/embedded` into
+`test-apps`. Inside the library you can also run `npm run link:local` / `npm run unlink:local`
+directly.
 
-    ```bash
-    npm run yalc:publish
-    ```
+#### Option B: Local Verdaccio registry (closest to a real publish)
 
-    This builds the library and publishes it to the local Yalc store.
+```bash
+# from the workspace root
+npm run registry:start        # starts Verdaccio on http://localhost:4873
+npm run publish:library       # builds and publishes @bytechef/embedded to it
+npm run install:test-app      # installs the published package into test-apps
+npm run registry:stop
+```
 
-- **Update after changes:**
+Inside the library, `npm run publish:local` publishes to the running registry.
 
-    ```
-    npm run yalc:push
-    ```
+#### Watch mode
 
-    This rebuilds the library and pushes updates to all projects using it.
-
-- **Add the package to your project:**
-    ```
-    yalc add @bytechef/embedded
-    npm install
-    ```
-    This adds the package from your local Yalc store to the project.
+From the workspace root, `npm run dev` runs the library in watch mode (`npm run watch`)
+concurrently with the `test-apps` Next.js dev server.
 
 #### Suggested workflow steps
 
-1. In the Bytechef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
+1. In the ByteChef `DesktopSidebar` component initialize the dialog with `const {openDialog} = useConnectDialog({options})`
    a. `options` are described in `UseConnectDialogProps`
-2. `cd ~/.../bytechef/sdks/frontend/embedded/library`
-3. Run `npm run dev:yalc`
-4. On change inside the `sdk/index.tsx` the Bytechef dev server needs to be restarted to see the changes
+2. `cd ~/.../bytechef/sdks/frontend/embedded`
+3. Run `npm run dev`
+4. On change inside the `sdk/index.tsx` the ByteChef dev server needs to be restarted to see the changes
    a. This is because of Vite's caching
 
 #### Troubleshooting
@@ -105,4 +106,6 @@ npm install
 |      `test`       | Run the tests with **Vitest** using `jsdom` and starts a **Vitest UI** dev server.                                                     |
 |    `coverage`     | Generate a coverage report, with **v8**.                                                                                               |
 |      `watch`      | Rebuilds the project and watches for file changes to trigger automatic rebuilds.                                                       |
-|    `dev:yalc`     | Rebuilds the project and watches for file changes to trigger automatic rebuilds. Also, publishes it via yalc to be consumed elsewhere. |
+| `publish:local`   | Publish the built package to the local Verdaccio registry (`npm run registry:start` at the workspace root).                            |
+|   `link:local`    | `npm link` the library for consumption via `npm link @bytechef/embedded`.                                                              |
+| `unlink:local`    | Remove the global `npm link` registration.                                                                                             |

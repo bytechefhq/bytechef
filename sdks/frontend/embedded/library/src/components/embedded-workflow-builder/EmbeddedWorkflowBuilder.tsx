@@ -114,7 +114,7 @@ const EmbeddedWorkflowBuilder = ({
         <div className="absolute inset-0 lg:pl-72">
             <iframe
                 ref={iframeRef}
-                src={`${baseUrl}/embedded/workflow-builder/${workflowUuid}`}
+                src={`${baseUrl}/embedded/builder/${workflowUuid}`}
                 width="100%"
                 height="100%"
                 style={{border: 'none'}}
