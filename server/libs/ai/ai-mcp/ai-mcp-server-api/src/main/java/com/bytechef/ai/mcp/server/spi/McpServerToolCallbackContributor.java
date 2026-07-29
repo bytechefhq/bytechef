@@ -17,6 +17,7 @@
 package com.bytechef.ai.mcp.server.spi;
 
 import java.util.List;
+import java.util.Map;
 import org.springframework.ai.tool.ToolCallback;
 
 /**
@@ -29,4 +30,13 @@ import org.springframework.ai.tool.ToolCallback;
 public interface McpServerToolCallbackContributor {
 
     List<ToolCallback> getToolCallbacks();
+
+    /**
+     * MCP App UI descriptors for contributed tools, keyed by tool name. A tool named here is rendered by its
+     * {@link McpAppUiDescriptor#resourceUri()} widget in MCP Apps hosts, with {@code structuredContent} injected by the
+     * descriptor's shaper. Defaults to none, so existing contributors are unaffected.
+     */
+    default Map<String, McpAppUiDescriptor> getMcpAppUiDescriptors() {
+        return Map.of();
+    }
 }

@@ -16,6 +16,8 @@
 
 package com.bytechef.ai.mcp.server.config;
 
+import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
+import com.bytechef.ai.mcp.server.spi.McpAppViewerResources;
 import com.bytechef.ai.mcp.server.spi.McpServerToolCallbackContributor;
 import com.bytechef.automation.ai.tool.ClusterElementTools;
 import com.bytechef.automation.ai.tool.ProjectTools;
@@ -26,6 +28,7 @@ import com.bytechef.config.ApplicationProperties;
 import com.bytechef.platform.ai.tool.ComponentTools;
 import com.bytechef.platform.ai.tool.TaskDispatcherTools;
 import com.bytechef.platform.ai.tool.TaskTools;
+import com.bytechef.platform.mcp.server.McpAppViewer;
 import com.bytechef.platform.mcp.server.McpAppWorkflowEditor;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.modelcontextprotocol.server.McpAsyncServer;
@@ -123,9 +126,10 @@ public class ManagementMcpServerConfiguration {
                     .prompts(true)
                     .logging()
                     .build())
-            .tools(attachWorkflowEditorUi(
-                McpToolUtils.toAsyncToolSpecifications(toolCallbackProvider().getToolCallbacks())))
-            .resources(McpAppWorkflowEditor.getResourceSpecifications(applicationProperties.getPublicUrl()))
+            .tools(attachMcpAppUi(
+                McpToolUtils.toAsyncToolSpecifications(toolCallbackProvider().getToolCallbacks()),
+                collectMcpAppUiDescriptors()))
+            .resources(mcpAppResourceSpecifications(applicationProperties.getPublicUrl()))
             .build();
     }
 
@@ -138,15 +142,138 @@ public class ManagementMcpServerConfiguration {
     static List<McpServerFeatures.AsyncToolSpecification> attachWorkflowEditorUi(
         List<McpServerFeatures.AsyncToolSpecification> toolSpecifications) {
 
+        return attachMcpAppUi(toolSpecifications, Map.of());
+    }
+
+    /**
+     * Attaches MCP App UI metadata + {@code structuredContent} to the tools that back a widget: the built-in workflow
+     * editor tools, plus any tool named in a contributor's {@link McpAppUiDescriptor} map (the read-only viewers).
+     * Every other tool passes through untouched.
+     */
+    static List<McpServerFeatures.AsyncToolSpecification> attachMcpAppUi(
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications,
+        Map<String, McpAppUiDescriptor> descriptors) {
+
         return toolSpecifications.stream()
             .map(toolSpecification -> {
-                McpSchema.Tool tool = toolSpecification.tool();
+                String name = toolSpecification.tool()
+                    .name();
 
-                return WORKFLOW_EDITOR_TOOL_NAMES.contains(tool.name())
-                    ? toWorkflowEditorToolSpecification(toolSpecification)
-                    : toolSpecification;
+                if (WORKFLOW_EDITOR_TOOL_NAMES.contains(name)) {
+                    return toWorkflowEditorToolSpecification(toolSpecification);
+                }
+
+                McpAppUiDescriptor descriptor = descriptors.get(name);
+
+                return descriptor == null
+                    ? toolSpecification
+                    : toMcpAppToolSpecification(toolSpecification, descriptor);
             })
             .toList();
+    }
+
+    private Map<String, McpAppUiDescriptor> collectMcpAppUiDescriptors() {
+        Map<String, McpAppUiDescriptor> descriptors = new java.util.HashMap<>();
+
+        for (McpServerToolCallbackContributor contributor : mcpServerToolCallbackContributors) {
+            descriptors.putAll(contributor.getMcpAppUiDescriptors());
+        }
+
+        return descriptors;
+    }
+
+    private List<McpServerFeatures.AsyncResourceSpecification> mcpAppResourceSpecifications(String publicUrl) {
+        List<McpServerFeatures.AsyncResourceSpecification> resourceSpecifications =
+            new ArrayList<>(McpAppWorkflowEditor.getResourceSpecifications(publicUrl));
+
+        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
+            McpAppViewerResources.DATA_TABLE_VIEWER_URI, "ByteChef Data Table Viewer",
+            "Read-only data table rendered while data tables are queried via MCP tools"));
+        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
+            McpAppViewerResources.CODE_WORKFLOW_VIEWER_URI, "ByteChef Code Workflow Viewer",
+            "Read-only code workflow source rendered while code workflows are read via MCP tools"));
+        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
+            McpAppViewerResources.CUSTOM_COMPONENT_VIEWER_URI, "ByteChef Custom Component Viewer",
+            "Read-only custom component source rendered while custom components are read via MCP tools"));
+        resourceSpecifications.addAll(McpAppViewer.getResourceSpecifications(
+            McpAppViewerResources.FILE_VIEWER_URI, "ByteChef File Viewer",
+            "Read-only file content rendered while asset files are read via MCP tools"));
+
+        return resourceSpecifications;
+    }
+
+    private static McpServerFeatures.AsyncToolSpecification toMcpAppToolSpecification(
+        McpServerFeatures.AsyncToolSpecification toolSpecification, McpAppUiDescriptor descriptor) {
+
+        McpSchema.Tool tool = toolSpecification.tool();
+
+        McpSchema.Tool.Builder toolBuilder = McpSchema.Tool.builder(tool.name(), tool.inputSchema())
+            .description(tool.description())
+            .meta(Map.of("ui", Map.of("resourceUri", descriptor.resourceUri())));
+
+        if (tool.title() != null) {
+            toolBuilder.title(tool.title());
+        }
+
+        if (tool.outputSchema() != null) {
+            toolBuilder.outputSchema(tool.outputSchema());
+        }
+
+        if (tool.icons() != null) {
+            toolBuilder.icons(tool.icons());
+        }
+
+        // The viewer-backed tools are all reads (query/get/list), so mark them read-only for hosts that gate writes.
+        toolBuilder.annotations(McpSchema.ToolAnnotations.builder()
+            .readOnlyHint(true)
+            .build());
+
+        var delegateCallHandler = toolSpecification.callHandler();
+
+        return new McpServerFeatures.AsyncToolSpecification(
+            toolBuilder.build(),
+            (exchange, callToolRequest) -> delegateCallHandler.apply(exchange, callToolRequest)
+                .map(callToolResult -> withShapedStructuredContent(callToolResult, descriptor)));
+    }
+
+    static McpSchema.CallToolResult withShapedStructuredContent(
+        McpSchema.CallToolResult callToolResult, McpAppUiDescriptor descriptor) {
+
+        if (Boolean.TRUE.equals(callToolResult.isError()) || callToolResult.structuredContent() != null) {
+            return callToolResult;
+        }
+
+        McpSchema.TextContent firstTextContent = callToolResult.content()
+            .stream()
+            .filter(McpSchema.TextContent.class::isInstance)
+            .map(McpSchema.TextContent.class::cast)
+            .findFirst()
+            .orElse(null);
+
+        if (firstTextContent == null) {
+            return callToolResult;
+        }
+
+        Map<String, Object> structuredContent;
+
+        try {
+            structuredContent = descriptor.structuredContentShaper()
+                .apply(firstTextContent.text());
+        } catch (RuntimeException exception) {
+            log.warn("MCP App structuredContent shaper failed for {}; structuredContent omitted",
+                descriptor.resourceUri(), exception);
+
+            return callToolResult;
+        }
+
+        if (structuredContent == null) {
+            return callToolResult;
+        }
+
+        return McpSchema.CallToolResult.builder()
+            .content(callToolResult.content())
+            .structuredContent(structuredContent)
+            .build();
     }
 
     private static McpServerFeatures.AsyncToolSpecification toWorkflowEditorToolSpecification(

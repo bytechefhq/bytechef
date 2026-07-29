@@ -36,6 +36,7 @@ import com.bytechef.ai.copilot.tool.CreateConnectionToolCallback;
 import com.bytechef.ai.copilot.tool.JsonSchemaTools;
 import com.bytechef.ai.copilot.tool.ListConnectionsForComponentToolCallback;
 import com.bytechef.ai.copilot.tool.LookupActionPropertyOptionsToolCallback;
+import com.bytechef.ai.copilot.tool.LookupComponentPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.LookupTriggerPropertyOptionsToolCallback;
 import com.bytechef.ai.copilot.tool.PropertyOptionsResolver;
 import com.bytechef.ai.copilot.tool.RehydrateContextToolCallback;
@@ -753,6 +754,13 @@ public class CopilotConfiguration {
             .defaultTools(
                 projectTools, projectWorkflowTools, taskTools, scriptTools, workflowValidatorTools,
                 workflowInstructionTools)
+            // One-shot subagent (backs the management MCP workflow_editor agent + AI Hub delegation): give it
+            // lookupPropertyOptions so it fetches real option values for dynamic-option properties and sets a valid
+            // one itself. Not the interactive askUserQuestion/select picker — a one-shot subagent can't ask + resume.
+            .defaultToolCallbacks(
+                new LookupComponentPropertyOptionsToolCallback(
+                    actionDefinitionService, actionDefinitionFacade, triggerDefinitionService, triggerDefinitionFacade,
+                    propertyOptionsResolver, ToolStateVisibilityMetrics.NOOP))
             .build();
     }
 

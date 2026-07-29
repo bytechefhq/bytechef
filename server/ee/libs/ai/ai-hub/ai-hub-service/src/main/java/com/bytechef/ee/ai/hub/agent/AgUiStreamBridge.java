@@ -15,6 +15,8 @@ import com.agui.core.event.RunFinishedEvent;
 import com.agui.core.event.TextMessageContentEvent;
 import com.agui.core.event.TextMessageEndEvent;
 import com.agui.core.event.TextMessageStartEvent;
+import com.agui.core.event.ToolCallEndEvent;
+import com.agui.core.event.ToolCallStartEvent;
 import com.bytechef.atlas.execution.facade.JobFacade;
 import com.bytechef.platform.ai.constant.AiAgentSseEventType;
 import com.bytechef.platform.job.sync.SseStreamBridge;
@@ -42,7 +44,9 @@ import org.slf4j.LoggerFactory;
  * {@code "ask-workflow-question"}, value carries the questions array and the resume URL. Client renders an inline
  * follow-up form (mirrors the existing {@code request-connection} custom-event pattern).</li>
  * <li><b>{@code onEvent(Map &lt;ai-agent-sse-event-type&gt;)}</b> — pass through as a {@link CustomEvent} preserving
- * the event-type key so AI Agent SSE events survive the bridge intact.</li>
+ * the event-type key so AI Agent SSE events survive the bridge intact. {@code approval_request} events additionally
+ * fold a markdown form-link marker into the accumulated assistant text, so a reloaded conversation still surfaces the
+ * pending approval even though the inline card itself is client-only.</li>
  * <li><b>{@code onEvent(Map other)}</b> — forwarded as a generic {@code CustomEvent("workflow-event", map)}; the client
  * decides whether to render or ignore.</li>
  * <li><b>{@code onComplete()}</b> — emit {@link TextMessageEndEvent} (when a stream was started) followed by
@@ -183,27 +187,43 @@ public class AgUiStreamBridge implements SseStreamBridge {
         }
 
         if (payload instanceof Map<?, ?> map) {
-            // The workflow executor emits {event=start, payload.jobId=...} when a streaming run begins. Capture
-            // that jobId into the cancel registry so a user-initiated cancel can map back to the right
-            // JobFacade.stopJob target. The event itself isn't surfaced to the client — the AG-UI client doesn't
-            // need to know about server-side job ids — so we stop processing here.
-            if ("start".equals(map.get("event")) && map.get("payload") instanceof Map<?, ?> payloadMap) {
-                Object jobIdObject = payloadMap.get("jobId");
+            // The workflow executor emits {event=start, payload.jobId=...} when a streaming run begins; capture the
+            // jobId into the cancel registry. The event itself is not surfaced to the client.
+            if (registerJobIdFromStartEvent(map)) {
+                return;
+            }
 
-                if (jobIdObject != null) {
-                    try {
-                        long jobId = jobIdObject instanceof Number jobIdNumber
-                            ? jobIdNumber.longValue()
-                            : Long.parseLong(jobIdObject.toString());
+            // Enriched coordinator task_started: render the workflow step as an AG-UI tool-call chip (start +
+            // immediate end — the pipeline carries no per-task completion event), so the chat shows live step
+            // progress with the actual task name instead of dropping the event as an unrenderable payload.
+            if ("task_started".equals(map.get("event"))) {
+                if (map.get("payload") instanceof Map<?, ?> payloadMap) {
+                    emitTaskStartedToolCall(payloadMap);
+                }
 
-                        jobRegistry.register(taskId, jobId);
-                    } catch (NumberFormatException exception) {
-                        if (log.isDebugEnabled()) {
-                            log.debug(
-                                "Could not parse jobId from start event for task {}: {}",
-                                taskId, jobIdObject);
-                        }
-                    }
+                return;
+            }
+
+            // The coordinator emits {event=result, result={message=...}} when the job completes, carrying the
+            // final chat reply read back from the WEBHOOK_RESPONSE-tagged task. Streaming runs have already
+            // delivered the same text as deltas — appending it again would double the message — so the result
+            // only renders when nothing has been streamed yet: the approval-routed path for chat workflows
+            // without a streaming task, which previously lost their final reply entirely.
+            if ("result".equals(map.get("event"))) {
+                if (assistantTextBuilder.length() == 0
+                    && map.get("result") instanceof Map<?, ?> resultMap
+                    && resultMap.get("message") instanceof String message && !message.isBlank()) {
+
+                    ensureStarted();
+
+                    TextMessageContentEvent resultEvent = new TextMessageContentEvent();
+
+                    resultEvent.setMessageId(messageId);
+                    resultEvent.setDelta(message);
+
+                    dispatch(resultEvent);
+
+                    assistantTextBuilder.append(message);
                 }
 
                 return;
@@ -233,19 +253,7 @@ public class AgUiStreamBridge implements SseStreamBridge {
 
             // AI Agent SSE event types from the underlying workflow's AI nodes. Pass them through unchanged so the
             // client's existing AI-agent event handlers see them.
-            if (map.containsKey(AiAgentSseEventType.EVENT_TYPE)) {
-                String eventType = (String) map.get(AiAgentSseEventType.EVENT_TYPE);
-
-                Map<String, Object> eventData = new LinkedHashMap<>();
-
-                for (Map.Entry<?, ?> entry : map.entrySet()) {
-                    if (!AiAgentSseEventType.EVENT_TYPE.equals(entry.getKey())) {
-                        eventData.put(String.valueOf(entry.getKey()), entry.getValue());
-                    }
-                }
-
-                emitCustomEvent(eventType, eventData);
-
+            if (emitAiAgentSseEvent(map)) {
                 return;
             }
 
@@ -255,13 +263,10 @@ public class AgUiStreamBridge implements SseStreamBridge {
             return;
         }
 
-        // Anything non-String non-Map is dropped with a DEBUG log rather than rendered. The streaming
-        // executor emits {@code task_started} events with a Long {@code taskExecutionId} payload via
-        // {@code SseStreamBridgeRegistry}; without this guard those Longs would land in the chat as raw
-        // numbers via Objects.toString. Rich step rendering (translating task_started into AG-UI
-        // tool-call events with the actual task name) needs the coordinator to enrich the task_started
-        // payload with task name + status — a follow-up that touches the {@code SseStreamApplicationEventListener}
-        // shape — and the client's tool-call renderer to handle the new event kind.
+        // Anything non-String non-Map is dropped with a DEBUG log rather than rendered. The coordinator normally
+        // emits task_started as an enriched map (handled above), but falls back to a bare Long taskExecutionId
+        // when the task row can't be loaded; without this guard those Longs would land in the chat as raw numbers
+        // via Objects.toString.
         if (!(payload instanceof String stringPayload)) {
             if (log.isDebugEnabled()) {
                 log.debug(
@@ -288,6 +293,110 @@ public class AgUiStreamBridge implements SseStreamBridge {
         // Accumulate for chat-memory persistence after the run finalizes. Done after dispatch so a render failure
         // doesn't pollute the buffer with a chunk the client never saw.
         assistantTextBuilder.append(stringPayload);
+    }
+
+    /**
+     * Captures the {@code jobId} from a {@code {event=start, payload.jobId=...}} event into the cancel registry so a
+     * user-initiated cancel maps back to the right {@code JobFacade.stopJob} target. Returns {@code true} when the
+     * event was a start event (handled, not surfaced to the client), {@code false} otherwise.
+     */
+    private boolean registerJobIdFromStartEvent(Map<?, ?> map) {
+        if (!("start".equals(map.get("event")) && map.get("payload") instanceof Map<?, ?> payloadMap)) {
+            return false;
+        }
+
+        Object jobIdObject = payloadMap.get("jobId");
+
+        if (jobIdObject != null) {
+            try {
+                long jobId = jobIdObject instanceof Number jobIdNumber
+                    ? jobIdNumber.longValue()
+                    : Long.parseLong(jobIdObject.toString());
+
+                jobRegistry.register(taskId, jobId);
+            } catch (NumberFormatException exception) {
+                if (log.isDebugEnabled()) {
+                    log.debug("Could not parse jobId from start event for task {}: {}", taskId, jobIdObject);
+                }
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Passes an AI Agent SSE event (keyed by {@link AiAgentSseEventType#EVENT_TYPE}) through as a CustomEvent so the
+     * client's existing AI-agent handlers see it. For {@code approval_request} it also folds a persist-only markdown
+     * form-link marker into the accumulated assistant text so a reloaded conversation still surfaces the pending
+     * approval. Returns {@code true} when the map carried an AI Agent SSE event type, {@code false} otherwise.
+     */
+    private boolean emitAiAgentSseEvent(Map<?, ?> map) {
+        if (!map.containsKey(AiAgentSseEventType.EVENT_TYPE)) {
+            return false;
+        }
+
+        String eventType = (String) map.get(AiAgentSseEventType.EVENT_TYPE);
+
+        Map<String, Object> eventData = new LinkedHashMap<>();
+
+        for (Map.Entry<?, ?> entry : map.entrySet()) {
+            if (!AiAgentSseEventType.EVENT_TYPE.equals(entry.getKey())) {
+                eventData.put(String.valueOf(entry.getKey()), entry.getValue());
+            }
+        }
+
+        if (AiAgentSseEventType.APPROVAL_REQUEST.equals(eventType)
+            && map.get("formUrl") instanceof String formUrl && !formUrl.isBlank()) {
+
+            if (assistantTextBuilder.length() > 0) {
+                assistantTextBuilder.append("\n\n");
+            }
+
+            assistantTextBuilder.append("Approval requested — [open the approval form](")
+                .append(formUrl)
+                .append(").");
+        }
+
+        emitCustomEvent(eventType, eventData);
+
+        return true;
+    }
+
+    /**
+     * Emits an AG-UI tool-call start/end pair for an enriched {@code task_started} payload
+     * ({@code {taskExecutionId, name, type}}), labelled with the workflow task's name (falling back to its type). The
+     * client's existing tool-call renderer shows it as a step chip — no dedicated client handling needed. Payloads
+     * without a usable label are dropped silently.
+     */
+    private void emitTaskStartedToolCall(Map<?, ?> payloadMap) {
+        Object taskExecutionId = payloadMap.get("taskExecutionId");
+
+        if (taskExecutionId == null) {
+            return;
+        }
+
+        String label = payloadMap.get("name") instanceof String name && !name.isBlank()
+            ? name
+            : Objects.toString(payloadMap.get("type"), null);
+
+        if (label == null) {
+            return;
+        }
+
+        String toolCallId = "task-" + taskExecutionId;
+
+        ToolCallStartEvent toolCallStartEvent = new ToolCallStartEvent();
+
+        toolCallStartEvent.setToolCallId(toolCallId);
+        toolCallStartEvent.setToolCallName(label);
+
+        dispatch(toolCallStartEvent);
+
+        ToolCallEndEvent toolCallEndEvent = new ToolCallEndEvent();
+
+        toolCallEndEvent.setToolCallId(toolCallId);
+
+        dispatch(toolCallEndEvent);
     }
 
     @Override

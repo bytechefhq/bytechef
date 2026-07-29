@@ -18,6 +18,7 @@ package com.bytechef.ai.mcp.server.config;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.bytechef.ai.mcp.server.spi.McpAppUiDescriptor;
 import com.bytechef.test.extension.ObjectMapperSetupExtension;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -113,6 +114,60 @@ class ManagementMcpServerWorkflowEditorTest {
 
         assertThat(ManagementMcpServerConfiguration.withDefinitionStructuredContent(
             new McpSchema.CallToolRequest("updateWorkflow", Map.of()), plainTextResult)).isSameAs(plainTextResult);
+    }
+
+    @Test
+    void testAttachMcpAppUiDecoratesContributedDescriptorTool() {
+        McpAppUiDescriptor descriptor = new McpAppUiDescriptor(
+            "ui://bytechef/data-table-viewer", text -> Map.of("rows", List.of()));
+
+        List<McpServerFeatures.AsyncToolSpecification> toolSpecifications =
+            ManagementMcpServerConfiguration.attachMcpAppUi(
+                List.of(toolSpecification("queryDataTable"), toolSpecification("otherTool")),
+                Map.of("queryDataTable", descriptor));
+
+        McpSchema.Tool queryDataTableTool = toolSpecifications.getFirst()
+            .tool();
+
+        assertThat(queryDataTableTool.meta())
+            .containsEntry("ui", Map.of("resourceUri", "ui://bytechef/data-table-viewer"));
+        assertThat(queryDataTableTool.annotations()
+            .readOnlyHint()).isTrue();
+
+        assertThat(toolSpecifications.getLast()
+            .tool()
+            .meta()).isNull();
+    }
+
+    @Test
+    void testWithShapedStructuredContentAppliesShaper() {
+        McpAppUiDescriptor descriptor = new McpAppUiDescriptor(
+            "ui://bytechef/file-viewer", text -> Map.of("content", "hello"));
+
+        McpSchema.CallToolResult callToolResult = ManagementMcpServerConfiguration.withShapedStructuredContent(
+            textResult("{\"name\":\"a.txt\",\"content\":\"hello\"}"), descriptor);
+
+        assertThat(callToolResult.structuredContent()).isEqualTo(Map.of("content", "hello"));
+    }
+
+    @Test
+    void testWithShapedStructuredContentLeavesErrorAndNullShapeUntouched() {
+        McpAppUiDescriptor descriptor = new McpAppUiDescriptor("ui://bytechef/file-viewer", text -> null);
+
+        McpSchema.CallToolResult nullShapeResult = textResult("{}");
+
+        assertThat(ManagementMcpServerConfiguration.withShapedStructuredContent(nullShapeResult, descriptor))
+            .isSameAs(nullShapeResult);
+
+        McpSchema.CallToolResult errorResult = McpSchema.CallToolResult.builder()
+            .content(List.of(McpSchema.TextContent.builder("boom")
+                .build()))
+            .isError(true)
+            .build();
+
+        assertThat(ManagementMcpServerConfiguration.withShapedStructuredContent(
+            errorResult, new McpAppUiDescriptor("ui://bytechef/file-viewer", text -> Map.of("x", "y"))))
+                .isSameAs(errorResult);
     }
 
     @SuppressWarnings("unchecked")
