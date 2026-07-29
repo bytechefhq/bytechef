@@ -613,11 +613,18 @@ own Javadoc promises to keep. There is a SECOND, unrelated `noRollbackFor` site 
 `@Transactional(noRollbackFor = IllegalArgumentException.class)`, needed because
 `AutomationWorkflowProjectCodeWorkflowFacadeImpl#fetchPreviousWorkflowUuidsByName` catches that
 exception as normal control flow for "no previous deploy yet" and would otherwise poison the
-caller's participating transaction on every project's first deploy. **Not yet done**: no remote-client stub for
-`ConnectedUserCodeWorkflowReferenceFacade` in `embedded-configuration-remote-client` -- webhook-app
-pulls that module (not `embedded-configuration-service`) so the bean is simply absent there,
-leaving distributed-deployment invocation of this bridge unwired (monolith server-app, which carries
-both modules, works). Spec:
+caller's participating transaction on every project's first deploy. Distributed webhook-app invocation
+now works: `RemoteAutomationWorkflowProjectFacadeClient#getPublishedProjects`,
+`RemoteConnectedUserProjectFacadeClient#copyWorkflowTemplate`, and
+`RemoteConnectedUserCodeWorkflowReferenceFacadeClient#getOrCreateReference`/`getConnectedUserWorkflows`
+(all in `embedded-configuration-remote-client`) make real REST calls to configuration-app's
+`/remote/*-facade` controllers, covering every method the sync/async bridge dispatch paths need. The
+remaining methods on those three remote clients (project/workflow CRUD, `enableReference`,
+`deleteReference`, `markDanglingReferences`, etc. -- admin-console and per-user-mutation operations,
+not invocation) still throw `UnsupportedOperationException`; both `RequestTriggerApiController` and
+`AppEventTriggerApiController` catch that and degrade to the same `404`/empty-list an absent bridge
+would produce (WARN-logged once via a per-instance `AtomicBoolean`), so an unimplemented remote method
+never surfaces as a 500. Spec:
 `docs/superpowers/specs/2026-07-27-embedded-automation-code-workflows-design.md`.
 
 ### Agentic AI component (Embabel GOAP, opt-in)
