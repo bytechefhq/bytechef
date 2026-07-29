@@ -23,6 +23,9 @@ import org.springframework.data.repository.query.Param;
  */
 public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvocationLog, Long> {
 
+    // The two date bounds are cast explicitly: a null Instant is bound with an unspecified JDBC type, and a bare
+    // parameter in an "IS NULL" test gives PostgreSQL nothing to infer from, so it fails the statement with
+    // "could not determine data type of parameter". The other bounds are typed by their equality comparison.
     @Query("""
         SELECT * FROM tool_invocation_log
         WHERE (:surface IS NULL OR surface = :surface)
@@ -30,8 +33,8 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
-            AND (:startDate IS NULL OR created_date >= :startDate)
-            AND (:endDate IS NULL OR created_date <= :endDate)
+            AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
+            AND (CAST(:endDate AS TIMESTAMP) IS NULL OR created_date <= CAST(:endDate AS TIMESTAMP))
         ORDER BY created_date DESC
         LIMIT :limit OFFSET :offset
         """)
@@ -49,8 +52,8 @@ public interface ToolInvocationLogRepository extends ListCrudRepository<ToolInvo
             AND (:mcpServerId IS NULL OR mcp_server_id = :mcpServerId)
             AND (:connectedUserId IS NULL OR connected_user_id = :connectedUserId)
             AND (:integrationInstanceId IS NULL OR integration_instance_id = :integrationInstanceId)
-            AND (:startDate IS NULL OR created_date >= :startDate)
-            AND (:endDate IS NULL OR created_date <= :endDate)
+            AND (CAST(:startDate AS TIMESTAMP) IS NULL OR created_date >= CAST(:startDate AS TIMESTAMP))
+            AND (CAST(:endDate AS TIMESTAMP) IS NULL OR created_date <= CAST(:endDate AS TIMESTAMP))
         """)
     long countFiltered(
         @Param("surface") @Nullable Integer surface, @Param("outcome") @Nullable Integer outcome,

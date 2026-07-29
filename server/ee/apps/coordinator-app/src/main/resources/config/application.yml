@@ -1,6 +1,17 @@
 spring:
   application:
     name: coordinator-app
+  # The coordinator owns no database: it reaches execution and configuration state through remote clients, and no
+  # deployment profile gives it a spring.datasource. Spring Data JDBC is still on the classpath through the shared
+  # modules, so without this exclusion Spring Boot defines a Hikari dataSource that fails on "Failed to determine a
+  # suitable driver class" the moment anything resolves it (the JDBC transaction manager, the actuator db health
+  # contributor). Excluding the source auto-configuration makes those consumers back off cleanly instead.
+  # Keep this a single comma-joined scalar, not a YAML list: the message-broker EnvironmentPostProcessors append their
+  # own entries by reading getProperty("spring.autoconfigure.exclude") and re-publishing the result at the highest
+  # precedence, and a list form reads back as null there — the whole exclusion would be silently dropped.
+  autoconfigure:
+    exclude:
+      org.springframework.boot.jdbc.autoconfigure.DataSourceAutoConfiguration
   cloud:
     config:
       username: ${BYTECHEF_CONFIG_SERVER_USERNAME:configserver}

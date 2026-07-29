@@ -40,6 +40,11 @@ import org.springframework.context.annotation.Import;
 @Configuration
 public class ToolInvocationLogIntTestConfiguration {
 
+    // The nested class must carry a configuration-candidate annotation of its own: @TestConfiguration on
+    // AbstractIntTestJdbcConfiguration is not @Inherited, and this subclass declares no @Bean method, so without
+    // @Configuration Spring never registers it. No AbstractJdbcConfiguration bean means
+    // ToolInvocationLogJdbcRepositoryConfiguration (@ConditionalOnBean) backs off and the repository is missing.
+    @Configuration
     public static class ToolInvocationLogIntTestJdbcConfiguration extends AbstractIntTestJdbcConfiguration {
 
         @Override

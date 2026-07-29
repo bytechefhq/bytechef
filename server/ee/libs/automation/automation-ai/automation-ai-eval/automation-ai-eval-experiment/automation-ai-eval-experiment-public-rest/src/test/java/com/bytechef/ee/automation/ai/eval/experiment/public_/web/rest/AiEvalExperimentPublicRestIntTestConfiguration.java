@@ -83,7 +83,10 @@ import org.springframework.security.web.SecurityFilterChain;
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.public_\\.web\\.rest\\.AiGatewayScoreApiController",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.observability\\.service\\.AiObservabilityAlertEvaluator",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.observability\\.service\\.AiObservabilityExportExecutor",
-                "com\\.bytechef\\.ee\\.automation\\.ai\\.observability\\.service\\.AiObservabilityNotificationDispatcher",
+                // The dispatcher lives in the platform observability package, not the automation one — it moved there
+                // with the migration onto the central Notification registry, and it reads Notification rows through a
+                // NotificationService this slice does not scan.
+                "com\\.bytechef\\.ee\\.platform\\.ai\\.observability\\.service\\.AiObservabilityNotificationDispatcher",
                 // Nested test-scope configs that happen to live in the same packages would otherwise be picked up.
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.eval\\.experiment\\.public_\\.web\\.rest\\..+Test.*",
                 "com\\.bytechef\\.ee\\.automation\\.ai\\.gateway\\.experiment\\.public_\\.web\\.rest\\..+Test.*",

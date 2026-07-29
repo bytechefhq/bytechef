@@ -54,6 +54,9 @@ dependencies {
     implementation(project(":server:libs:core:evaluator:evaluator-impl"))
     implementation(project(":server:libs:core:graphql:graphql-impl"))
     implementation(project(":server:libs:core:rest:rest-impl"))
+    // ApprovalTaskReconciliationMonitor sweeps per tenant, so this app needs a TenantService. Both impls are
+    // mutually exclusive by condition (single-tenant vs EE multi-tenant), matching server-app's wiring.
+    implementation(project(":server:libs:core:tenant:tenant-single-service"))
     implementation(project(":server:libs:platform:platform-category:platform-category-service"))
     implementation(project(":server:libs:platform:platform-component:platform-component-log:platform-component-log-service"))
     implementation(project(":server:libs:platform:platform-configuration:platform-configuration-graphql"))
@@ -84,6 +87,7 @@ dependencies {
     implementation(project(":server:ee:libs:automation:automation-task:automation-task-remote-rest"))
     implementation(project(":server:ee:libs:config:tenant-multi-data-config"))
     implementation(project(":server:ee:libs:core:discovery:discovery-redis"))
+    implementation(project(":server:ee:libs:core:tenant:tenant-multi-service"))
     implementation(project(":server:ee:libs:core:remote:remote-rest"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-graphql"))
     implementation(project(":server:ee:libs:embedded:embedded-configuration:embedded-configuration-instance-impl"))
