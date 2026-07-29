@@ -24,31 +24,77 @@ import com.bytechef.component.definition.unified.accounting.model.ProviderContac
 import com.bytechef.component.definition.unified.base.adapter.ProviderModelAdapter;
 
 /**
- * Adapter for provider contact.
+ * Adapts a provider's native accounting contact API to ByteChef's unified accounting model. Implementations translate
+ * CRUD operations expressed in terms of {@link ProviderContactInputModel} and {@link ProviderContactOutputModel} into
+ * the concrete calls required by a specific accounting provider.
  *
  * @author Ivica Cardic
  */
 public interface ProviderContactAdapter
     extends ProviderModelAdapter<ProviderContactInputModel, ProviderContactOutputModel> {
 
+    /**
+     * Creates a new contact at the provider from the given provider-native input model.
+     *
+     * @param inputModel           the provider-native contact data to create
+     * @param connectionParameters the parameters describing the authenticated connection to the provider
+     * @param context              the execution context used to perform provider calls
+     * @return the identifier assigned to the newly created contact by the provider
+     */
     @Override
     String create(ProviderContactInputModel inputModel, Parameters connectionParameters, Context context);
 
+    /**
+     * Deletes the contact identified by the given id at the provider.
+     *
+     * @param id                   the provider identifier of the contact to delete
+     * @param connectionParameters the parameters describing the authenticated connection to the provider
+     * @param context              the execution context used to perform provider calls
+     */
     @Override
     void delete(String id, Parameters connectionParameters, Context context);
 
+    /**
+     * Retrieves a single contact by its provider identifier.
+     *
+     * @param id                   the provider identifier of the contact to retrieve
+     * @param connectionParameters the parameters describing the authenticated connection to the provider
+     * @param context              the execution context used to perform provider calls
+     * @return the provider-native output model for the requested contact
+     */
     @Override
     ProviderContactOutputModel get(String id, Parameters connectionParameters, Context context);
 
+    /**
+     * Returns the accounting model type handled by this adapter, always {@link AccountingModelType#CONTACT}.
+     *
+     * @return {@link AccountingModelType#CONTACT}
+     */
     @Override
     default AccountingModelType getModelType() {
         return AccountingModelType.CONTACT;
     }
 
+    /**
+     * Retrieves a single page of contacts from the provider, using the supplied cursor parameters for pagination.
+     *
+     * @param connectionParameters the parameters describing the authenticated connection to the provider
+     * @param cursorParameters     the pagination cursor parameters identifying the page to fetch
+     * @param context              the execution context used to perform provider calls
+     * @return a page of provider-native contact output models together with the cursor for the next page
+     */
     @Override
     Page<ProviderContactOutputModel> getPage(
         Parameters connectionParameters, Parameters cursorParameters, Context context);
 
+    /**
+     * Updates the contact identified by the given id at the provider with the supplied input model.
+     *
+     * @param id                   the provider identifier of the contact to update
+     * @param inputModel           the provider-native contact data to apply
+     * @param connectionParameters the parameters describing the authenticated connection to the provider
+     * @param context              the execution context used to perform provider calls
+     */
     @Override
     void update(String id, ProviderContactInputModel inputModel, Parameters connectionParameters, Context context);
 }

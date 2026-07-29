@@ -17,6 +17,13 @@
 package com.bytechef.workflow.definition;
 
 /**
+ * Marker interface for an output produced by a {@link WorkflowDefinition}.
+ *
+ * <p>
+ * An output describes a value that a workflow yields once its tasks have completed. The interface is intentionally
+ * empty so that concrete definition backends can supply their own output representations while exposing them uniformly
+ * through the workflow definition API.
+ *
  * @author Ivica Cardic
  */
 public interface Output {

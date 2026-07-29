@@ -21,32 +21,60 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 /**
- * Account unified input model.
+ * Represents the normalized, provider-agnostic output shape for an accounting contact. In addition to the contact
+ * attributes inherited from {@link ContactUnifiedInputModel}, it exposes the ByteChef identifier, the remote provider
+ * identifier, the raw provider payload, and the created and last-modified timestamps returned when reading contacts
+ * from a provider.
  *
  * @author Ivica Cardic
  */
 public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implements UnifiedOutputModel {
 
+    /**
+     * Returns the ByteChef unified identifier of the contact.
+     *
+     * @return the unified contact identifier
+     */
     @Override
     public String getId() {
         return "";
     }
 
+    /**
+     * Returns the identifier of the contact in the remote provider system.
+     *
+     * @return the remote contact identifier
+     */
     @Override
     public String getRemoteId() {
         return "";
     }
 
+    /**
+     * Returns the raw provider payload for the contact.
+     *
+     * @return the remote data map
+     */
     @Override
     public Map<String, ?> getRemoteData() {
         return Map.of();
     }
 
+    /**
+     * Returns the timestamp at which the contact was created.
+     *
+     * @return the creation timestamp
+     */
     @Override
     public OffsetDateTime getCreatedDate() {
         return null;
     }
 
+    /**
+     * Returns the timestamp at which the contact was last modified.
+     *
+     * @return the last-modified timestamp
+     */
     @Override
     public OffsetDateTime getLastModifiedDate() {
         return null;

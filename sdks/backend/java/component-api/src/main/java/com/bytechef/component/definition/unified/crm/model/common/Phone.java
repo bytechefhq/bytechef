@@ -17,13 +17,38 @@
 package com.bytechef.component.definition.unified.crm.model.common;
 
 /**
- * Phone model.
+ * Represents a phone number in ByteChef's unified CRM model, pairing the number with its classification.
+ *
+ * @param phoneNumber     the phone number
+ * @param phoneNumberType the classification of the phone number
  *
  * @author Ivica Cardic
  */
 public record Phone(String phoneNumber, PhoneNumberType phoneNumberType) {
 
+    /**
+     * Enumerates the supported classifications for a phone number.
+     */
     public enum PhoneNumberType {
-        PRIMARY, MOBILE, FAX, OTHER
+
+        /**
+         * The contact's primary phone number.
+         */
+        PRIMARY,
+
+        /**
+         * A mobile phone number.
+         */
+        MOBILE,
+
+        /**
+         * A fax number.
+         */
+        FAX,
+
+        /**
+         * Any phone number that does not fall into the other categories.
+         */
+        OTHER
     }
 }

@@ -24,6 +24,10 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
+ * Extends {@link Context} with facilities available while an action is executing, such as approval-link generation,
+ * scoped data storage, progress-event publishing, and execution suspension for long-running or human-in-the-loop
+ * actions.
+ *
  * @author Ivica Cardic
  */
 public interface ActionContext extends Context {
@@ -36,19 +40,29 @@ public interface ActionContext extends Context {
     String getTraceId();
 
     /**
-     * @param approvalFunction
+     * Applies the given function to an {@link Approval} instance, allowing the action to generate approval and
+     * disapproval links used for human-in-the-loop confirmation flows.
+     *
+     * @param approvalFunction the function that produces the approval {@link Links} from an {@link Approval}
+     * @return the generated approval and disapproval links
      */
     Links approval(ContextFunction<Approval, Links> approvalFunction);
 
     /**
-     * @param dataFunction
-     * @param <R>
-     * @return
+     * Applies the given function to a {@link Data} instance, providing scoped access to persistent data storage during
+     * action execution.
+     *
+     * @param dataFunction the function to apply to the {@link Data} utilities
+     * @param <R>          the type of the result produced by the function
+     * @return the result of applying the function
      */
     <R> R data(ContextFunction<Data, R> dataFunction);
 
     /**
-     * @param eventConsumer
+     * Passes an {@link Event} instance to the given consumer, allowing the action to publish events such as execution
+     * progress updates.
+     *
+     * @param eventConsumer the consumer that publishes events using the provided {@link Event} instance
      */
     void event(Consumer<Event> eventConsumer);
 
@@ -61,30 +75,44 @@ public interface ActionContext extends Context {
     void suspend(Suspend suspend);
 
     /**
+     * Provides generation of approval and disapproval links for human-in-the-loop approval flows.
      *
+     * @deprecated approval handling is being superseded by the action suspension mechanism
      */
     @Deprecated
     interface Approval {
         /**
+         * Generates a pair of approval and disapproval links that can be presented to a user to confirm or reject the
+         * continuation of the action.
+         *
+         * @return the generated approval and disapproval {@link Links}
          */
         Links generateLinks();
 
+        /**
+         * Holds a pair of links used to approve or disapprove the continuation of an action.
+         *
+         * @param approvalLink    the link that approves continuation of the action
+         * @param disapprovalLink the link that rejects continuation of the action
+         */
         record Links(String approvalLink, String disapprovalLink) {
         }
     }
 
     /**
-     *
+     * Provides publishing of events emitted while an action executes.
      */
     interface Event {
         /**
-         * @param progress
+         * Publishes an action progress event conveying how far the action has advanced.
+         *
+         * @param progress the completion percentage of the action, expressed as a value between 0 and 100
          */
         void publishActionProgressEvent(int progress);
     }
 
     /**
-     *
+     * Provides scoped, persistent key-value storage that actions can use to share and retain data across executions.
      */
     interface Data {
 
@@ -106,38 +134,50 @@ public interface ActionContext extends Context {
         }
 
         /**
-         * @param <T>
-         * @param scope
-         * @param key
-         * @return
+         * Fetches the value stored under the given key within the specified scope, if present.
+         *
+         * @param <T>   the expected type of the stored value
+         * @param scope the scope in which to look up the value
+         * @param key   the key identifying the value
+         * @return an {@link Optional} containing the stored value, or an empty {@link Optional} if no value is present
          */
         <T> Optional<T> fetch(Data.Scope scope, String key);
 
         /**
-         * @param <T>
-         * @param scope
-         * @param key
-         * @return
+         * Returns the value stored under the given key within the specified scope, or {@code null} if none is present.
+         *
+         * @param <T>   the expected type of the stored value
+         * @param scope the scope in which to look up the value
+         * @param key   the key identifying the value
+         * @return the stored value, or {@code null} if no value is present
          */
         <T> T get(Data.Scope scope, String key);
 
         /**
-         * @param <T>
-         * @param scope
-         * @return
+         * Returns all key-value pairs stored within the specified scope.
+         *
+         * @param <T>   the expected type of the stored values
+         * @param scope the scope whose entries are returned
+         * @return a map of all keys to their stored values within the given scope
          */
         <T> Map<String, T> getAll(Data.Scope scope);
 
         /**
-         * @param scope
-         * @param key
-         * @param data
+         * Stores the given data under the specified key within the given scope, overwriting any existing value.
+         *
+         * @param scope the scope in which to store the value
+         * @param key   the key under which to store the value
+         * @param data  the value to store
+         * @return always {@code null}; the return type exists to allow use within functional expressions
          */
         Void put(Data.Scope scope, String key, Object data);
 
         /**
-         * @param scope
-         * @param key
+         * Removes the value stored under the given key within the specified scope.
+         *
+         * @param scope the scope from which to remove the value
+         * @param key   the key identifying the value to remove
+         * @return always {@code null}; the return type exists to allow use within functional expressions
          */
         Void remove(Data.Scope scope, String key);
     }

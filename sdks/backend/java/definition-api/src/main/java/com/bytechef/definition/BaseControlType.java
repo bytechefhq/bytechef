@@ -16,7 +16,18 @@
 
 package com.bytechef.definition;
 
+/**
+ * Defines the type of user-interface control used to render and edit a property value, such as a text input, a select
+ * box, a date picker, or a code editor.
+ *
+ * @author Ivica Cardic
+ */
 public interface BaseControlType {
 
+    /**
+     * Returns the unique name identifying this control type.
+     *
+     * @return the control type name
+     */
     String name();
 }

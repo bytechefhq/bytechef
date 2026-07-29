@@ -19,19 +19,29 @@ package com.bytechef.component.definition.unified.ticketing;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 
 /**
- * Ticketing model type.
+ * Enumerates the unified model types exposed by the ticketing category of the unified API, covering the support and
+ * issue-tracking entities that ticketing platforms have in common.
  *
  * @author Ivica Cardic
  */
 public enum TicketingModelType implements UnifiedApiDefinition.ModelType {
 
+    /** A customer account or organization that tickets belong to. */
     ACCOUNT,
+    /** A file attached to a ticket or comment. */
     ATTACHMENT,
+    /** A collection, project, or board that groups tickets. */
     COLLECTION,
+    /** A comment posted on a ticket. */
     COMMENT,
+    /** An individual person who raises or is associated with tickets. */
     CONTACT,
+    /** A label used to categorize tickets. */
     TAG,
+    /** A team responsible for handling tickets. */
     TEAM,
+    /** A support ticket or tracked issue. */
     TICKET,
+    /** A user of the ticketing system, such as an agent. */
     USER
 }

@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.ticketing.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider contact output model.
+ * Marker interface for the provider-native output model of a ticketing contact. Provider-specific implementations hold
+ * the contact data as returned by a given provider's API, which a {@code ProviderContactMapper} unifies into a
+ * {@code ContactUnifiedOutputModel}.
  *
  * @author Ivica Cardic
  */

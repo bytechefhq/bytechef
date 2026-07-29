@@ -17,7 +17,15 @@
 package com.bytechef.component.definition.unified.crm.model.common;
 
 /**
- * Address model.
+ * Represents a postal address in ByteChef's unified CRM model, normalizing address data across CRM providers.
+ *
+ * @param street1     the first line of the street address
+ * @param street2     the second line of the street address, such as an apartment or suite
+ * @param city        the city or locality
+ * @param state       the state, province, or region
+ * @param postalCode  the postal or ZIP code
+ * @param country     the country
+ * @param addressType the type of address (for example billing or shipping)
  *
  * @author Ivica Cardic
  */

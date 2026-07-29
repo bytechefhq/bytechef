@@ -21,24 +21,52 @@ import com.bytechef.workflow.definition.WorkflowDefinition;
 import java.util.List;
 
 /**
+ * Entry point implemented by an embedded integration so that the platform can discover its
+ * {@link IntegrationDefinition}.
+ *
+ * <p>
+ * A handler supplies the integration's definition and exposes convenience accessors that delegate to it, giving the
+ * platform a uniform way to read the integration's name, version, and the workflows it bundles.
+ *
  * @author Ivica Cardic
  */
 public interface IntegrationHandler {
 
+    /**
+     * Returns the definition that describes this integration's identity and the workflows it contains.
+     *
+     * @return the {@link IntegrationDefinition} for this integration
+     */
     IntegrationDefinition getDefinition();
 
+    /**
+     * Returns the name of the integration, derived from the component name declared by its
+     * {@link IntegrationDefinition}.
+     *
+     * @return the integration name
+     */
     default String getName() {
         IntegrationDefinition integrationDefinition = getDefinition();
 
         return integrationDefinition.getComponentName();
     }
 
+    /**
+     * Returns the version of the integration, as declared by its {@link IntegrationDefinition}.
+     *
+     * @return the integration version
+     */
     default String getVersion() {
         IntegrationDefinition integrationDefinition = getDefinition();
 
         return integrationDefinition.getVersion();
     }
 
+    /**
+     * Returns the workflows bundled by the integration, or an empty list if none are declared.
+     *
+     * @return the list of {@link WorkflowDefinition} instances belonging to the integration, never {@code null}
+     */
     default List<WorkflowDefinition> getWorkflows() {
         IntegrationDefinition integrationDefinition = getDefinition();
 

@@ -25,22 +25,46 @@ import com.bytechef.component.definition.unified.crm.model.AccountUnifiedOutputM
 import java.util.List;
 
 /**
- * Mapper for account models.
+ * Maps CRM account data between ByteChef's unified account models and a provider's native account models.
+ * Implementations translate the normalized {@link AccountUnifiedInputModel} into a provider-native input model when
+ * writing to the provider, and translate a provider-native output model back into the normalized
+ * {@link AccountUnifiedOutputModel} when reading, applying any configured custom-field mappings in both directions.
  *
- * @param <OI>
- * @param <OO>
+ * @param <OI> the provider-native account input model type produced by {@link #desunify}
+ * @param <OO> the provider-native account output model type consumed by {@link #unify}
  *
  * @author Ivica Cardic
  */
 public interface ProviderAccountMapper<OI extends ProviderInputModel, OO extends ProviderOutputModel>
     extends ProviderModelMapper<AccountUnifiedInputModel, AccountUnifiedOutputModel, OI, OO> {
 
+    /**
+     * Converts a unified account input model into the provider-native input model, applying the supplied custom-field
+     * mappings so that unified custom fields are written to their provider-specific counterparts.
+     *
+     * @param inputModel          the unified account input model to convert
+     * @param customFieldMappings the mappings between unified and provider-specific custom fields
+     * @return the provider-native account input model
+     */
     @Override
     OI desunify(AccountUnifiedInputModel inputModel, List<CustomFieldMapping> customFieldMappings);
 
+    /**
+     * Converts a provider-native account output model into the unified account output model, applying the supplied
+     * custom-field mappings so that provider-specific fields surface as unified custom fields.
+     *
+     * @param outputModel         the provider-native account output model to convert
+     * @param customFieldMappings the mappings between unified and provider-specific custom fields
+     * @return the unified account output model
+     */
     @Override
     AccountUnifiedOutputModel unify(OO outputModel, List<CustomFieldMapping> customFieldMappings);
 
+    /**
+     * Returns the CRM model type handled by this mapper, which is always {@link CrmModelType#ACCOUNT}.
+     *
+     * @return {@link CrmModelType#ACCOUNT}
+     */
     @Override
     default CrmModelType getModelType() {
         return CrmModelType.ACCOUNT;

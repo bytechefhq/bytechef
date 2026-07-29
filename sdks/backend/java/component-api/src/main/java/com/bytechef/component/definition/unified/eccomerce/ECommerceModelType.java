@@ -19,15 +19,21 @@ package com.bytechef.component.definition.unified.eccomerce;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 
 /**
- * E-Commerce model type.
+ * Enumerates the unified model types exposed by the e-commerce category of the unified API, covering the storefront and
+ * order-management entities that e-commerce providers have in common.
  *
  * @author Ivica Cardic
  */
 public enum ECommerceModelType implements UnifiedApiDefinition.ModelType {
 
+    /** A shopper who places orders in the store. */
     CUSTOMER,
+    /** A purchase order placed by a customer. */
     ORDER,
+    /** A sellable product in the catalog. */
     PRODUCT,
+    /** A specific variant of a product, such as a size or color option. */
     PRODUCT_VARIANT,
+    /** The shipment or fulfillment of an order's items. */
     FULFILLMENT
 }

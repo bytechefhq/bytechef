@@ -39,17 +39,29 @@ public interface ComponentHandler {
     }
 
     /**
+     * Returns the {@link ComponentDefinition} that describes this component, including its name, version, actions,
+     * triggers, and connection configuration.
      *
-     * @return
+     * @return the component definition backing this handler
      */
     ComponentDefinition getDefinition();
 
+    /**
+     * Returns the unique name of this component as declared in its {@link ComponentDefinition}.
+     *
+     * @return the component name
+     */
     default String getName() {
         ComponentDefinition componentDefinition = getDefinition();
 
         return componentDefinition.getName();
     }
 
+    /**
+     * Returns the version of this component as declared in its {@link ComponentDefinition}.
+     *
+     * @return the component version
+     */
     default int getVersion() {
         ComponentDefinition componentDefinition = getDefinition();
 
@@ -57,17 +69,21 @@ public interface ComponentHandler {
     }
 
     /**
-     *
+     * Functional interface for a single handler that dispatches the execution of all of a component's actions, keyed by
+     * action name. It offers an alternative to defining a separate perform function for each individual
+     * {@link com.bytechef.component.definition.ActionDefinition}.
      */
     @FunctionalInterface
     interface ActionHandlerFunction {
 
         /**
+         * Executes the action identified by the given name using the supplied input parameters and context.
          *
-         * @param actionName
-         * @param inputParameters
-         * @param context
-         * @return
+         * @param actionName      the name of the action to execute
+         * @param inputParameters the input parameters supplied to the action
+         * @param context         the execution context providing access to runtime utilities and services
+         * @return a map holding the result produced by the action
+         * @throws Exception if an error occurs while executing the action
          */
         Map<String, ?> apply(String actionName, Map<String, ?> inputParameters, Context context) throws Exception;
     }

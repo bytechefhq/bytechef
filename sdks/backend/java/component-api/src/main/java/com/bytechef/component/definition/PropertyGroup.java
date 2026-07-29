@@ -20,25 +20,31 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Represents a named grouping of related value properties, allowing inputs to be organized into logical sections when
+ * presented in the workflow editor. A single standalone property is modeled as a group containing exactly one property.
+ *
  * @author Ivica Cardic
  */
 public interface PropertyGroup {
 
     /**
+     * Returns the technical name that uniquely identifies this property group.
      *
-     * @return
+     * @return the group name
      */
     String getName();
 
     /**
+     * Returns the human-readable label displayed for this group, when one is defined.
      *
-     * @return
+     * @return an {@link Optional} containing the display label, or an empty {@link Optional} if none is set
      */
     Optional<String> getLabel();
 
     /**
+     * Returns the value properties that belong to this group.
      *
-     * @return
+     * @return the list of properties contained in the group
      */
     List<? extends Property.ValueProperty<?>> getProperties();
 }

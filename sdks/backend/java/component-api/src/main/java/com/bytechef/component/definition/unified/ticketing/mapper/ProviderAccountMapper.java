@@ -25,22 +25,45 @@ import com.bytechef.component.definition.unified.ticketing.model.AccountUnifiedO
 import java.util.List;
 
 /**
- * Mapper for account models.
+ * Maps ticketing account models between ByteChef's unified shape and a provider's native shape. It converts a
+ * {@link AccountUnifiedInputModel} into the provider input model {@code OI} when sending data to a provider, and a
+ * provider output model {@code OO} into an {@link AccountUnifiedOutputModel} when reading data back.
  *
- * @param <OI>
- * @param <OO>
+ * @param <OI> the provider-native input model type produced by {@link #desunify}
+ * @param <OO> the provider-native output model type consumed by {@link #unify}
  *
  * @author Ivica Cardic
  */
 public interface ProviderAccountMapper<OI extends ProviderInputModel, OO extends ProviderOutputModel>
     extends ProviderModelMapper<AccountUnifiedInputModel, AccountUnifiedOutputModel, OI, OO> {
 
+    /**
+     * Converts a unified account input model into the provider's native input model, applying the supplied custom field
+     * mappings to translate unified fields onto provider-specific fields.
+     *
+     * @param inputModel          the unified account input model to convert
+     * @param customFieldMappings the mappings between unified and provider-specific custom fields
+     * @return the provider-native input model
+     */
     @Override
     OI desunify(AccountUnifiedInputModel inputModel, List<CustomFieldMapping> customFieldMappings);
 
+    /**
+     * Converts a provider's native account output model into the unified output model, applying the supplied custom
+     * field mappings to translate provider-specific fields onto unified fields.
+     *
+     * @param outputModel         the provider-native account output model to convert
+     * @param customFieldMappings the mappings between unified and provider-specific custom fields
+     * @return the unified account output model
+     */
     @Override
     AccountUnifiedOutputModel unify(OO outputModel, List<CustomFieldMapping> customFieldMappings);
 
+    /**
+     * Returns the model type handled by this mapper, always {@link TicketingModelType#ACCOUNT}.
+     *
+     * @return {@link TicketingModelType#ACCOUNT}
+     */
     @Override
     default TicketingModelType getModelType() {
         return TicketingModelType.ACCOUNT;

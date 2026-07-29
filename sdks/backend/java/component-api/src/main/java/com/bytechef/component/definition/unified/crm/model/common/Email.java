@@ -17,13 +17,33 @@
 package com.bytechef.component.definition.unified.crm.model.common;
 
 /**
- * Email model.
+ * Represents an email address in ByteChef's unified CRM model, pairing the address with its classification.
+ *
+ * @param emailAddress     the email address
+ * @param emailAddressType the classification of the email address
  *
  * @author Ivica Cardic
  */
 public record Email(String emailAddress, EmailAddressType emailAddressType) {
 
+    /**
+     * Enumerates the supported classifications for an email address.
+     */
     public enum EmailAddressType {
-        PRIMARY, WORK, OTHER
+
+        /**
+         * The contact's primary email address.
+         */
+        PRIMARY,
+
+        /**
+         * A work email address.
+         */
+        WORK,
+
+        /**
+         * Any email address that does not fall into the other categories.
+         */
+        OTHER
     }
 }

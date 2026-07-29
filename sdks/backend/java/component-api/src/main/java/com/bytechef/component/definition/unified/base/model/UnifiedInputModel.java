@@ -25,5 +25,11 @@ import java.util.Map;
  */
 public interface UnifiedInputModel {
 
+    /**
+     * Returns the provider-specific custom fields carried by this model that are not part of the standard unified
+     * schema, keyed by field name.
+     *
+     * @return the custom fields as a map of field name to value
+     */
     Map<String, ?> getCustomFields();
 }

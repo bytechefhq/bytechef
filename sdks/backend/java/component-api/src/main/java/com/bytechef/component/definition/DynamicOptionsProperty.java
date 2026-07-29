@@ -19,13 +19,21 @@ package com.bytechef.component.definition;
 import java.util.Optional;
 
 /**
+ * Represents a property whose selectable options can be resolved dynamically at runtime through an
+ * {@link OptionsDataSource}, rather than being fixed at definition time. The type parameter {@code T} denotes the type
+ * of the values held by the property's options.
+ *
+ * @param <T> the type of the option values exposed by this property
+ *
  * @author Ivica Cardic
  */
 public interface DynamicOptionsProperty<T> extends OptionsProperty<T> {
 
     /**
+     * Retrieves the data source used to load this property's options dynamically.
      *
-     * @return
+     * @return an {@link Optional} containing the {@link OptionsDataSource} when the property resolves its options
+     *         dynamically; otherwise an empty {@link Optional}
      */
     Optional<OptionsDataSource<?>> getOptionsDataSource();
 }

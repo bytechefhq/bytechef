@@ -28,7 +28,10 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Account unified input model.
+ * Normalized, provider-agnostic representation of a CRM account as supplied on write operations. This is the unified
+ * shape into which each provider's native account input model is translated, so that account creates and updates can be
+ * expressed identically across CRM providers. Custom fields that do not map onto a normalized property are carried in
+ * the {@link #getCustomFields() custom fields} map.
  *
  * @author Ivica Cardic
  */
@@ -51,6 +54,22 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
     protected AccountUnifiedInputModel() {
     }
 
+    /**
+     * Creates a fully populated unified account input model.
+     *
+     * @param name              the account name
+     * @param description       the free-form account description
+     * @param industry          the industry the account operates in
+     * @param numberOfEmployees the number of employees at the account
+     * @param lifecycleStage    the lifecycle stage the account is in
+     * @param lastActivityDate  the timestamp of the most recent activity on the account
+     * @param website           the account website URL
+     * @param ownerId           the identifier of the owning user
+     * @param addresses         the postal addresses of the account
+     * @param emails            the email addresses of the account
+     * @param phones            the phone numbers of the account
+     * @param customFields      the provider-specific custom fields keyed by field name
+     */
     public AccountUnifiedInputModel(
         String name, String description, String industry, int numberOfEmployees, LifecycleStage lifecycleStage,
         OffsetDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
@@ -70,50 +89,111 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
         this.customFields = customFields;
     }
 
+    /**
+     * Returns the account name.
+     *
+     * @return the account name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the free-form description of the account.
+     *
+     * @return the account description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the industry the account operates in.
+     *
+     * @return the account industry
+     */
     public String getIndustry() {
         return industry;
     }
 
+    /**
+     * Returns the number of employees at the account.
+     *
+     * @return the employee count
+     */
     public int getNumberOfEmployees() {
         return numberOfEmployees;
     }
 
+    /**
+     * Returns the lifecycle stage the account is currently in.
+     *
+     * @return the account lifecycle stage
+     */
     public LifecycleStage getLifecycleStage() {
         return lifecycleStage;
     }
 
+    /**
+     * Returns the timestamp of the most recent activity recorded against the account.
+     *
+     * @return the last activity date
+     */
     public OffsetDateTime getLastActivityDate() {
         return lastActivityDate;
     }
 
+    /**
+     * Returns the account's website URL.
+     *
+     * @return the account website
+     */
     public String getWebsite() {
         return website;
     }
 
+    /**
+     * Returns the identifier of the user who owns the account.
+     *
+     * @return the owner identifier
+     */
     public String getOwnerId() {
         return ownerId;
     }
 
+    /**
+     * Returns the postal addresses associated with the account.
+     *
+     * @return the account addresses
+     */
     public List<Address> getAddresses() {
         return addresses;
     }
 
+    /**
+     * Returns the email addresses associated with the account.
+     *
+     * @return the account emails
+     */
     public List<Email> getEmails() {
         return emails;
     }
 
+    /**
+     * Returns the phone numbers associated with the account.
+     *
+     * @return the account phone numbers
+     */
     public List<Phone> getPhones() {
         return phones;
     }
 
+    /**
+     * Returns the provider-specific custom fields that do not map onto a normalized account property, keyed by field
+     * name.
+     *
+     * @return the custom fields map
+     */
     @Override
     public Map<String, ?> getCustomFields() {
         return customFields;

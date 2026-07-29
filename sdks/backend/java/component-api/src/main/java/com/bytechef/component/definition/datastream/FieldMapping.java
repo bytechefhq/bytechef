@@ -28,6 +28,12 @@ import org.jspecify.annotations.Nullable;
  */
 public record FieldMapping(String sourceField, String destinationField, @Nullable Object defaultValue) {
 
+    /**
+     * Creates a field mapping without a default value, so a missing source field maps to {@code null}.
+     *
+     * @param sourceField      the name from the source fields provider
+     * @param destinationField the name from the destination fields provider
+     */
     public FieldMapping(String sourceField, String destinationField) {
         this(sourceField, destinationField, null);
     }

@@ -26,10 +26,22 @@ package com.bytechef.component.definition.datastream;
  */
 public record FieldDefinition(String name, String label, Class<?> type) {
 
+    /**
+     * Creates a field definition with an explicit name and label, defaulting the type to {@link String}.
+     *
+     * @param name  the column identifier
+     * @param label the display label shown to users
+     */
     public FieldDefinition(String name, String label) {
         this(name, label, String.class);
     }
 
+    /**
+     * Creates a field definition using the given name for both the identifier and the display label, defaulting the
+     * type to {@link String}.
+     *
+     * @param name the column identifier, also used as the display label
+     */
     public FieldDefinition(String name) {
         this(name, name, String.class);
     }

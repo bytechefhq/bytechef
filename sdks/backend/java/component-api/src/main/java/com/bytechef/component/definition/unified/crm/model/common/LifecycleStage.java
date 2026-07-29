@@ -17,11 +17,50 @@
 package com.bytechef.component.definition.unified.crm.model.common;
 
 /**
- * Lifecycle stage model.
+ * Enumerates the lifecycle stages of a CRM contact in ByteChef's unified CRM model, describing where a contact sits in
+ * the marketing and sales funnel.
  *
  * @author Ivica Cardic
  */
 public enum LifecycleStage {
 
-    SUBSCRIBER, LEAD, MARKETING_QUALIFIED_LEAD, SALES_QUALIFIED_LEAD, OPPORTUNITY, CUSTOMER, EVANGELIST, OTHER
+    /**
+     * A contact who has subscribed but has not yet been qualified as a lead.
+     */
+    SUBSCRIBER,
+
+    /**
+     * A contact who has shown interest and is considered a lead.
+     */
+    LEAD,
+
+    /**
+     * A lead qualified by marketing as likely to become a customer.
+     */
+    MARKETING_QUALIFIED_LEAD,
+
+    /**
+     * A lead qualified by sales as ready for direct sales engagement.
+     */
+    SALES_QUALIFIED_LEAD,
+
+    /**
+     * A contact associated with an active sales opportunity.
+     */
+    OPPORTUNITY,
+
+    /**
+     * A contact who has become a paying customer.
+     */
+    CUSTOMER,
+
+    /**
+     * A customer who actively promotes the product or brand.
+     */
+    EVANGELIST,
+
+    /**
+     * Any lifecycle stage that does not fall into the other categories.
+     */
+    OTHER
 }

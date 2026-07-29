@@ -37,40 +37,47 @@ import java.util.stream.Stream;
 public interface OpenApiComponentHandler extends ComponentHandler {
 
     /**
-     *
+     * Enumerates the possible locations of a request property within an HTTP request generated from an OpenAPI
+     * specification.
      */
     enum PropertyType {
         BODY, PATH, HEADER, QUERY
     }
 
     /**
+     * Returns additional, hand-written actions to be merged with the actions generated from the OpenAPI specification.
      *
-     * @return
+     * @return the list of custom action definitions, or an empty list if none are defined
      */
     default List<ModifiableActionDefinition> getCustomActions() {
         return List.of();
     }
 
     /**
+     * Returns additional, hand-written cluster elements to be merged with the cluster elements generated from the
+     * OpenAPI specification.
      *
-     * @return
+     * @return the list of custom cluster element definitions, or an empty list if none are defined
      */
     default List<ModifiableClusterElementDefinition<?>> getCustomClusterElements() {
         return List.of();
     }
 
     /**
+     * Returns the triggers to be added to the generated component. OpenAPI components define no triggers by default.
      *
-     * @return
+     * @return the list of trigger definitions, or an empty list if none are defined
      */
     default List<ModifiableTriggerDefinition> getTriggers() {
         return List.of();
     }
 
     /**
+     * Merges the generated action definitions with any custom actions and applies the component's action and property
+     * modifications to each of them.
      *
-     * @param actionDefinitions
-     * @return
+     * @param actionDefinitions the action definitions generated from the OpenAPI specification
+     * @return the combined and modified list of action definitions
      */
     default List<ModifiableActionDefinition> modifyActions(ModifiableActionDefinition... actionDefinitions) {
         return Stream.concat(Arrays.stream(actionDefinitions), getCustomActions().stream())
@@ -89,18 +96,21 @@ public interface OpenApiComponentHandler extends ComponentHandler {
     }
 
     /**
+     * Applies component-specific customizations to a single generated action definition. The default implementation
+     * returns the action unchanged; subclasses may override it to adjust the generated action.
      *
-     * @param modifiableActionDefinition
-     * @return
+     * @param modifiableActionDefinition the generated action definition to modify
+     * @return the modified action definition
      */
     default ModifiableActionDefinition modifyAction(ModifiableActionDefinition modifiableActionDefinition) {
         return modifiableActionDefinition;
     }
 
     /**
+     * Merges the generated cluster element definitions with any custom cluster elements defined by the component.
      *
-     * @param clusterElementDefinitions
-     * @return
+     * @param clusterElementDefinitions the cluster element definitions generated from the OpenAPI specification
+     * @return the combined list of cluster element definitions
      */
     default List<ModifiableClusterElementDefinition<?>> modifyClusterElements(
         ModifiableClusterElementDefinition<?>... clusterElementDefinitions) {
@@ -110,18 +120,22 @@ public interface OpenApiComponentHandler extends ComponentHandler {
     }
 
     /**
+     * Applies component-specific customizations to the generated component definition. The default implementation
+     * returns the component unchanged; subclasses may override it to adjust the generated component.
      *
-     * @param modifiableComponentDefinition
-     * @return
+     * @param modifiableComponentDefinition the generated component definition to modify
+     * @return the modified component definition
      */
     default ModifiableComponentDefinition modifyComponent(ModifiableComponentDefinition modifiableComponentDefinition) {
         return modifiableComponentDefinition;
     }
 
     /**
+     * Applies component-specific customizations to the generated connection definition. The default implementation
+     * returns the connection unchanged; subclasses may override it to adjust the generated connection.
      *
-     * @param modifiableConnectionDefinition
-     * @return
+     * @param modifiableConnectionDefinition the generated connection definition to modify
+     * @return the modified connection definition
      */
     default ModifiableConnectionDefinition modifyConnection(
         ModifiableConnectionDefinition modifiableConnectionDefinition) {
@@ -130,9 +144,13 @@ public interface OpenApiComponentHandler extends ComponentHandler {
     }
 
     /**
+     * Applies component-specific customizations to a single generated property belonging to the given action. The
+     * default implementation returns the property unchanged; subclasses may override it to adjust the generated
+     * property.
      *
-     * @param modifiableProperty
-     * @return
+     * @param actionDefinition   the action definition the property belongs to
+     * @param modifiableProperty the generated property to modify
+     * @return the modified property
      */
     default ModifiableProperty<?> modifyProperty(
         ActionDefinition actionDefinition, ModifiableProperty<?> modifiableProperty) {
@@ -141,10 +159,13 @@ public interface OpenApiComponentHandler extends ComponentHandler {
     }
 
     /**
+     * Post-processes the raw HTTP response returned by executing the named action before it is handed back to the
+     * workflow engine. The default implementation returns the response unchanged; subclasses may override it to
+     * transform the response.
      *
-     * @param actionName
-     * @param response
-     * @return
+     * @param actionName the name of the executed action
+     * @param response   the HTTP response produced by the action
+     * @return the post-processed HTTP response
      */
     default Http.Response postExecute(String actionName, Http.Response response) {
         return response;

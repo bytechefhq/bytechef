@@ -20,21 +20,68 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Defines the structure of a single workflow: its identity, the inputs it accepts, the triggers that start it, the
+ * tasks it performs, and the outputs it produces.
+ *
+ * <p>
+ * A workflow definition is the declarative, executable unit that ByteChef schedules and runs. It is typically assembled
+ * programmatically through the SDK's fluent DSL and consumed by the platform when registering and executing
+ * automations.
+ *
  * @author Ivica Cardic
  */
 public interface WorkflowDefinition {
 
+    /**
+     * Returns the human-readable description of the workflow, if one has been provided.
+     *
+     * @return an {@link Optional} containing the workflow description, or an empty {@link Optional} if none is set
+     */
     Optional<String> getDescription();
 
+    /**
+     * Returns the inputs the workflow accepts when executed, if any have been declared.
+     *
+     * @return an {@link Optional} containing the list of workflow inputs, or an empty {@link Optional} if none are
+     *         declared
+     */
     Optional<List<? extends Input>> getInputs();
 
+    /**
+     * Returns the display label of the workflow, if one has been provided.
+     *
+     * @return an {@link Optional} containing the workflow label, or an empty {@link Optional} if none is set
+     */
     Optional<String> getLabel();
 
+    /**
+     * Returns the unique name that identifies the workflow within its enclosing project or integration.
+     *
+     * @return the workflow name
+     */
     String getName();
 
+    /**
+     * Returns the outputs the workflow produces once it completes, if any have been declared.
+     *
+     * @return an {@link Optional} containing the list of workflow outputs, or an empty {@link Optional} if none are
+     *         declared
+     */
     Optional<List<? extends Output>> getOutputs();
 
+    /**
+     * Returns the tasks that make up the workflow's body, if any have been declared.
+     *
+     * @return an {@link Optional} containing the list of task definitions, or an empty {@link Optional} if none are
+     *         declared
+     */
     Optional<List<? extends TaskDefinition>> getTasks();
 
+    /**
+     * Returns the triggers that can initiate execution of the workflow, if any have been declared.
+     *
+     * @return an {@link Optional} containing the list of trigger definitions, or an empty {@link Optional} if none are
+     *         declared
+     */
     Optional<List<? extends TriggerDefinition>> getTriggers();
 }

@@ -26,7 +26,10 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Contact unified input model.
+ * Normalized, provider-agnostic representation of a CRM contact as supplied on write operations. This is the unified
+ * shape into which each provider's native contact input model is translated, so that contact creates and updates can be
+ * expressed identically across CRM providers. Custom fields that do not map onto a normalized property are carried in
+ * the {@link #getCustomFields() custom fields} map.
  *
  * @author Ivica Cardic
  */
@@ -44,6 +47,17 @@ public class ContactUnifiedInputModel implements UnifiedInputModel {
     protected ContactUnifiedInputModel() {
     }
 
+    /**
+     * Creates a fully populated unified contact input model.
+     *
+     * @param firstName    the contact's first name
+     * @param lastName     the contact's last name
+     * @param userId       the identifier of the user associated with the contact
+     * @param addresses    the postal addresses of the contact
+     * @param emails       the email addresses of the contact
+     * @param phoneNumbers the phone numbers of the contact
+     * @param customFields the provider-specific custom fields keyed by field name
+     */
     public ContactUnifiedInputModel(
         String firstName, String lastName, String userId, List<Address> addresses, List<Email> emails,
         List<Phone> phoneNumbers, Map<String, ?> customFields) {
@@ -57,30 +71,66 @@ public class ContactUnifiedInputModel implements UnifiedInputModel {
         this.customFields = customFields;
     }
 
+    /**
+     * Returns the contact's first name.
+     *
+     * @return the first name
+     */
     public String getFirstName() {
         return firstName;
     }
 
+    /**
+     * Returns the contact's last name.
+     *
+     * @return the last name
+     */
     public String getLastName() {
         return lastName;
     }
 
+    /**
+     * Returns the identifier of the user associated with the contact.
+     *
+     * @return the user identifier
+     */
     public String getUserId() {
         return userId;
     }
 
+    /**
+     * Returns the postal addresses associated with the contact.
+     *
+     * @return the contact addresses
+     */
     public List<Address> getAddresses() {
         return addresses;
     }
 
+    /**
+     * Returns the email addresses associated with the contact.
+     *
+     * @return the contact emails
+     */
     public List<Email> getEmails() {
         return emails;
     }
 
+    /**
+     * Returns the phone numbers associated with the contact.
+     *
+     * @return the contact phone numbers
+     */
     public List<Phone> getPhoneNumbers() {
         return phoneNumbers;
     }
 
+    /**
+     * Returns the provider-specific custom fields that do not map onto a normalized contact property, keyed by field
+     * name.
+     *
+     * @return the custom fields map
+     */
     @Override
     public Map<String, ?> getCustomFields() {
         return customFields;

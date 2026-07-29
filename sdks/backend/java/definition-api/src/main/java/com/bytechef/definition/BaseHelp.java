@@ -19,19 +19,24 @@ package com.bytechef.definition;
 import java.util.Optional;
 
 /**
+ * Represents contextual help shown to the user, consisting of a body of explanatory text and an optional link to
+ * further documentation.
+ *
  * @author Ivica Cardic
  */
 public interface BaseHelp {
 
     /**
+     * Returns the main body of the help text.
      *
-     * @return
+     * @return the help body
      */
     String getBody();
 
     /**
+     * Returns the optional URL pointing to additional documentation.
      *
-     * @return
+     * @return an {@link Optional} containing the "learn more" URL, or an empty {@link Optional} if none is set
      */
     Optional<String> getLearnMoreUrl();
 }

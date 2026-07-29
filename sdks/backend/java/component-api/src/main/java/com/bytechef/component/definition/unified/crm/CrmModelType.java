@@ -19,18 +19,27 @@ package com.bytechef.component.definition.unified.crm;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 
 /**
- * CRM model type.
+ * Enumerates the unified model types exposed by the CRM (Customer Relationship Management) category of the unified API,
+ * covering the sales and relationship entities that CRM providers have in common.
  *
  * @author Ivica Cardic
  */
 public enum CrmModelType implements UnifiedApiDefinition.ModelType {
 
+    /** A company or organization tracked in the CRM. */
     ACCOUNT,
+    /** An individual person associated with an account. */
     CONTACT,
+    /** A recorded interaction, such as a call or email, with a contact or account. */
     ENGAGEMENT,
+    /** A prospective, not-yet-qualified sales contact. */
     LEAD,
+    /** A free-text note attached to another CRM record. */
     NOTE,
+    /** A potential sale or deal in the sales pipeline. */
     OPPORTUNITY,
+    /** A to-do item or follow-up action. */
     TASK,
+    /** A user of the CRM, such as a sales representative. */
     USER
 }

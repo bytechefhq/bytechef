@@ -21,7 +21,11 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 /**
- * @param <T>
+ * Captures a full generic type at compile time so it can be recovered at runtime, working around Java's type erasure.
+ * Instances are created as anonymous subclasses (for example, {@code new TypeReference<List<String>>() {}}) so the
+ * actual type argument can be read from the generic superclass and used to drive type-safe conversions.
+ *
+ * @param <T> the referenced type
  *
  * @author Ivica Cardic
  */
@@ -29,6 +33,12 @@ public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
 
     protected final Type type;
 
+    /**
+     * Constructs a type reference, capturing the actual type argument {@code T} from the anonymous subclass's generic
+     * superclass.
+     *
+     * @throws IllegalArgumentException if the reference is constructed without supplying actual type information
+     */
     @SuppressFBWarnings("CT_CONSTRUCTOR_THROW")
     protected TypeReference() {
         Type superClass = getClass().getGenericSuperclass();
@@ -41,6 +51,11 @@ public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
         type = ((ParameterizedType) superClass).getActualTypeArguments()[0];
     }
 
+    /**
+     * Returns the captured generic {@link Type}.
+     *
+     * @return the referenced type
+     */
     public Type getType() {
         return type;
     }
@@ -48,6 +63,9 @@ public abstract class TypeReference<T> implements Comparable<TypeReference<T>> {
     /**
      * The only reason we define this method (and require implementation of <code>Comparable</code>) is to prevent
      * constructing a reference without type information.
+     *
+     * @param o the other type reference to compare against
+     * @return always {@code 0}; ordering is not meaningful for type references
      */
     @Override
     public int compareTo(TypeReference<T> o) {

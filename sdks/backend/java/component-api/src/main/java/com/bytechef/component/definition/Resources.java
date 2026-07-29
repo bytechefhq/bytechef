@@ -19,6 +19,9 @@ package com.bytechef.component.definition;
 import com.bytechef.definition.BaseResources;
 
 /**
+ * Represents the set of external resources associated with a component, such as documentation links and additional
+ * reference URLs surfaced to users.
+ *
  * @author Ivica Cardic
  */
 public interface Resources extends BaseResources {

@@ -20,6 +20,9 @@ import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
+ * Extends {@link Context} with facilities available while a cluster element executes, notably utilities for reading and
+ * writing nested map structures using dot-notation paths.
+ *
  * @author Ivica Cardic
  */
 public interface ClusterElementContext extends Context {

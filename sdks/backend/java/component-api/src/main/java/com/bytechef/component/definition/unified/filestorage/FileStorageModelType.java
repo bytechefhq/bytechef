@@ -19,15 +19,21 @@ package com.bytechef.component.definition.unified.filestorage;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 
 /**
- * File Storage model type.
+ * Enumerates the unified model types exposed by the file storage category of the unified API, covering the storage and
+ * access-control entities that cloud file-storage providers have in common.
  *
  * @author Ivica Cardic
  */
 public enum FileStorageModelType implements UnifiedApiDefinition.ModelType {
 
+    /** A top-level storage volume that contains folders and files. */
     DRIVE,
+    /** An individual stored file. */
     FILE,
+    /** A directory that groups files and other folders. */
     FOLDER,
+    /** A group of users used for sharing and permissions. */
     GROUP,
+    /** A user of the file storage system. */
     USER
 }

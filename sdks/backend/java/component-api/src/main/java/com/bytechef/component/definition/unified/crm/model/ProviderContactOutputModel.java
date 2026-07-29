@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.crm.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider contact output model.
+ * Marker interface for a provider's native contact output model, i.e. the contact payload shaped exactly as the CRM
+ * provider returns it on read operations. Provider-specific implementations carry the concrete fields; contact mappers
+ * consume instances of this type to produce the unified {@link ContactUnifiedOutputModel}.
  *
  * @author Ivica Cardic
  */

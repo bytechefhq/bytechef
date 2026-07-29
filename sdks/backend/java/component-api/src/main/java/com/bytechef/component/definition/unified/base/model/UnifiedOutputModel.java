@@ -26,13 +26,39 @@ import java.util.Map;
  */
 public interface UnifiedOutputModel extends UnifiedInputModel {
 
+    /**
+     * Returns the ByteChef-assigned unified identifier of this resource.
+     *
+     * @return the unified identifier
+     */
     String getId();
 
+    /**
+     * Returns the identifier of this resource as assigned by the remote provider.
+     *
+     * @return the provider-assigned identifier
+     */
     String getRemoteId();
 
+    /**
+     * Returns the raw, provider-specific representation of this resource as returned by the remote API, keyed by field
+     * name.
+     *
+     * @return the original remote data as a map of field name to value
+     */
     Map<String, ?> getRemoteData();
 
+    /**
+     * Returns the timestamp at which this resource was created on the remote provider.
+     *
+     * @return the creation date
+     */
     OffsetDateTime getCreatedDate();
 
+    /**
+     * Returns the timestamp at which this resource was last modified on the remote provider.
+     *
+     * @return the last modification date
+     */
     OffsetDateTime getLastModifiedDate();
 }

@@ -19,6 +19,9 @@ package com.bytechef.component.definition;
 import com.bytechef.definition.BaseFileEntry;
 
 /**
+ * Represents a reference to a stored file that flows through component actions and triggers. It carries the metadata
+ * needed to identify and retrieve the file's contents, such as its name, extension, MIME type, and storage location.
+ *
  * @author Ivica Cardic
  */
 public interface FileEntry extends BaseFileEntry {

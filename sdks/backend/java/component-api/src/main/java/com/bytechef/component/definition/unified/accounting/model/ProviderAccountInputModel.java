@@ -19,7 +19,8 @@ package com.bytechef.component.definition.unified.accounting.model;
 import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
 
 /**
- * Provider account input model.
+ * Marker interface for a provider's native representation of an accounting account used as input. Implementations model
+ * the account payload in the shape expected by a specific accounting provider when creating or updating accounts.
  *
  * @author Ivica Cardic
  */

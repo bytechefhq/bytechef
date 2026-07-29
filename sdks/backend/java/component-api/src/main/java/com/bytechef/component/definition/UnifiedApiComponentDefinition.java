@@ -19,13 +19,18 @@ package com.bytechef.component.definition;
 import java.util.Optional;
 
 /**
+ * Extends a component definition with support for the unified API layer, which exposes a normalized model across
+ * multiple providers within the same category (for example, CRM or ticketing).
+ *
  * @author Ivica Cardic
  */
 public interface UnifiedApiComponentDefinition {
 
     /**
+     * Returns the unified API definition contributed by this component, when it participates in a unified API category.
      *
-     * @return
+     * @return an {@link Optional} containing the unified API definition, or an empty {@link Optional} if the component
+     *         does not provide one
      */
     Optional<UnifiedApiDefinition> getUnifiedApi();
 }

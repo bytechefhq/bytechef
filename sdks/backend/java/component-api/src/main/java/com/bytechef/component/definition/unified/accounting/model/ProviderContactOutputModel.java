@@ -19,7 +19,8 @@ package com.bytechef.component.definition.unified.accounting.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider contact output model.
+ * Marker interface for a provider's native representation of an accounting contact returned as output. Implementations
+ * model the contact payload in the shape returned by a specific accounting provider when reading contacts.
  *
  * @author Ivica Cardic
  */

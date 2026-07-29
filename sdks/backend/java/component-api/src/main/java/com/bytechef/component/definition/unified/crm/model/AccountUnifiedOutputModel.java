@@ -28,7 +28,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Account unified output model.
+ * Normalized, provider-agnostic representation of a CRM account as returned on read operations. It extends
+ * {@link AccountUnifiedInputModel} with the read-only metadata assigned by the platform and the provider — the ByteChef
+ * {@link #getId() id}, the provider's own {@link #getRemoteId() remote id}, the untouched {@link #getRemoteData()
+ * remote data} payload, and the {@link #getCreatedDate() created} and {@link #getLastModifiedDate() last modified}
+ * timestamps. Each provider's native account output model is translated into this unified shape so that account reads
+ * look identical across CRM providers.
  *
  * @author Ivica Cardic
  */
@@ -44,6 +49,28 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
     private AccountUnifiedOutputModel() {
     }
 
+    /**
+     * Creates a fully populated unified account output model, combining the unified account attributes with the
+     * platform- and provider-assigned read-only metadata.
+     *
+     * @param name              the account name
+     * @param description       the free-form account description
+     * @param industry          the industry the account operates in
+     * @param numberOfEmployees the number of employees at the account
+     * @param lifecycleStage    the lifecycle stage the account is in
+     * @param lastActivityDate  the timestamp of the most recent activity on the account
+     * @param website           the account website URL
+     * @param ownerId           the identifier of the owning user
+     * @param addresses         the postal addresses of the account
+     * @param emails            the email addresses of the account
+     * @param phoneNumbers      the phone numbers of the account
+     * @param customFields      the provider-specific custom fields keyed by field name
+     * @param id                the ByteChef unified identifier of the account
+     * @param remoteId          the provider's native identifier of the account
+     * @param remoteData        the raw, provider-native account payload as returned by the provider
+     * @param createdDate       the timestamp at which the account was created
+     * @param lastModifiedDate  the timestamp at which the account was last modified
+     */
     public AccountUnifiedOutputModel(
         String name, String description, String industry, int numberOfEmployees, LifecycleStage lifecycleStage,
         OffsetDateTime lastActivityDate, String website, String ownerId, List<Address> addresses, List<Email> emails,
@@ -61,26 +88,51 @@ public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implemen
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    /**
+     * Returns the ByteChef unified identifier of the account.
+     *
+     * @return the unified identifier
+     */
     @Override
     public String getId() {
         return id;
     }
 
+    /**
+     * Returns the provider's native identifier of the account.
+     *
+     * @return the remote identifier
+     */
     @Override
     public String getRemoteId() {
         return remoteId;
     }
 
+    /**
+     * Returns the raw, provider-native account payload preserved alongside the unified fields.
+     *
+     * @return the remote data map
+     */
     @Override
     public Map<String, ?> getRemoteData() {
         return remoteData;
     }
 
+    /**
+     * Returns the timestamp at which the account was created.
+     *
+     * @return the created date
+     */
     @Override
     public OffsetDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /**
+     * Returns the timestamp at which the account was last modified.
+     *
+     * @return the last modified date
+     */
     @Override
     public OffsetDateTime getLastModifiedDate() {
         return lastModifiedDate;

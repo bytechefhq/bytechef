@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.ticketing.model;
 import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
 
 /**
- * Provider contact input model.
+ * Marker interface for the provider-native input model of a ticketing contact. Provider-specific implementations hold
+ * the contact data in the shape expected by a given provider's API, as produced by a {@code ProviderContactMapper} when
+ * desunifying a {@code ContactUnifiedInputModel}.
  *
  * @author Ivica Cardic
  */

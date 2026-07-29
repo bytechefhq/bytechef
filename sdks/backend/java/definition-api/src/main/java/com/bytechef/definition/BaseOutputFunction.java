@@ -17,6 +17,9 @@
 package com.bytechef.definition;
 
 /**
+ * Marks a function that dynamically computes the output schema and sample data produced by an action or trigger,
+ * allowing the output to be derived at runtime rather than declared statically.
+ *
  * @author Ivica Cardic
  */
 public interface BaseOutputFunction {

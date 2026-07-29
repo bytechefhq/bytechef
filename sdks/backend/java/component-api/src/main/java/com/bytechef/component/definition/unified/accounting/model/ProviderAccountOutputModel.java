@@ -19,7 +19,8 @@ package com.bytechef.component.definition.unified.accounting.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider account output model.
+ * Marker interface for a provider's native representation of an accounting account returned as output. Implementations
+ * model the account payload in the shape returned by a specific accounting provider when reading accounts.
  *
  * @author Ivica Cardic
  */

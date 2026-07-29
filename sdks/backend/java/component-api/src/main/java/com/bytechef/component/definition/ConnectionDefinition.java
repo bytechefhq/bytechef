@@ -29,28 +29,39 @@ import java.util.Optional;
 public interface ConnectionDefinition {
 
     /**
-     *
+     * Parameter key holding the base URI used as the prefix for the connection's HTTP requests.
      */
     String BASE_URI = "baseUri";
 
     /**
+     * Returns whether an authorization must be configured for this connection to be usable.
      *
-     * @return
+     * @return an {@code Optional} containing {@code true} if authorization is required, {@code false} if it is
+     *         optional, or an empty {@code Optional} if not specified
      */
     Optional<Boolean> getAuthorizationRequired();
 
     /**
+     * Returns the authorization schemes supported by this connection.
      *
-     * @return
+     * @return an {@code Optional} containing the list of authorizations if defined, or an empty {@code Optional}
+     *         otherwise
      */
     Optional<List<? extends Authorization>> getAuthorizations();
 
     /**
+     * Returns the optional function that resolves the base URI used as the prefix for the connection's HTTP requests.
      *
-     * @return
+     * @return an {@code Optional} containing the {@link BaseUriFunction} if defined, or an empty {@code Optional}
+     *         otherwise
      */
     Optional<BaseUriFunction> getBaseUri();
 
+    /**
+     * Returns the optional {@link Help} content that provides additional guidance to users configuring the connection.
+     *
+     * @return an {@code Optional} containing the help content if defined, or an empty {@code Optional} otherwise
+     */
     Optional<Help> getHelp();
 
     /**
@@ -63,8 +74,9 @@ public interface ConnectionDefinition {
     Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
+     * Returns the input properties that define the parameters collected from the user to configure the connection.
      *
-     * @return
+     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
      */
     Optional<List<? extends Property>> getProperties();
 
@@ -76,34 +88,41 @@ public interface ConnectionDefinition {
     Optional<TestConsumer> getTest();
 
     /**
+     * Returns the version of the connection definition, used to distinguish successive revisions.
      *
-     * @return
+     * @return the connection version
      */
     int getVersion();
 
     /**
-     *
+     * Functional interface that resolves the base URI used as the prefix for a connection's HTTP requests, based on the
+     * connection parameters.
      */
     @FunctionalInterface
     interface BaseUriFunction {
 
         /**
-         * @param connectionParameters
-         * @param context
-         * @return
+         * Resolves the base URI for the connection.
+         *
+         * @param connectionParameters the parameters of the connection
+         * @param context              the context for the current call
+         * @return the resolved base URI
          */
         String apply(Parameters connectionParameters, Context context);
     }
 
     /**
-     *
+     * Functional interface that verifies a connection's parameters by performing a test call against the external
+     * service, throwing an exception if the connection is not valid.
      */
     @FunctionalInterface
     interface TestConsumer {
 
         /**
-         * @param connectionParameters
-         * @param context
+         * Tests the connection using the given parameters.
+         *
+         * @param connectionParameters the parameters of the connection to test
+         * @param context              the context for the current call
          */
         void accept(Parameters connectionParameters, Context context);
     }

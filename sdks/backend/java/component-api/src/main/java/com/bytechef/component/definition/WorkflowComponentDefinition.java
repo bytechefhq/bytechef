@@ -20,25 +20,32 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Exposes the workflow-facing surface of a component: the actions and triggers it makes available within a workflow,
+ * its component-level inputs, and its optional custom-action support.
+ *
  * @author Ivica Cardic
  */
 public interface WorkflowComponentDefinition {
 
     /**
+     * Returns the actions this component contributes to workflows.
      *
-     * @return
+     * @return an {@link Optional} containing the list of actions, or an empty {@link Optional} if none are defined
      */
     Optional<List<ActionDefinition>> getActions();
 
     /**
+     * Indicates whether this component supports user-defined custom actions.
      *
-     * @return
+     * @return an {@link Optional} containing {@code true} when custom actions are supported, or an empty
+     *         {@link Optional} if not specified
      */
     Optional<Boolean> getCustomAction();
 
     /**
+     * Returns the contextual help shown for this component's custom action.
      *
-     * @return
+     * @return an {@link Optional} containing the custom-action help, or an empty {@link Optional} if none is set
      */
     Optional<Help> getCustomActionHelp();
 
@@ -46,13 +53,15 @@ public interface WorkflowComponentDefinition {
      * Returns the component-level workflow inputs, always modeled as property groups (a lone property is a group with
      * one property).
      *
-     * @return
+     * @return an {@link Optional} containing the list of input property groups, or an empty {@link Optional} if none
+     *         are defined
      */
     Optional<List<? extends PropertyGroup>> getInputs();
 
     /**
+     * Returns the triggers this component contributes to workflows.
      *
-     * @return
+     * @return an {@link Optional} containing the list of triggers, or an empty {@link Optional} if none are defined
      */
     Optional<List<TriggerDefinition>> getTriggers();
 }

@@ -20,13 +20,18 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Contract for a component that contributes cluster elements, which are the reusable building blocks (such as models,
+ * tools, or memory) that can be assembled into cluster-based components like AI agents.
+ *
  * @author Ivica Cardic
  */
 public interface ClusterElementComponentDefinition {
 
     /**
+     * Returns the cluster elements contributed by this component.
      *
-     * @return
+     * @return an {@code Optional} containing the list of cluster element definitions if any are defined, or an empty
+     *         {@code Optional} otherwise
      */
     Optional<List<ClusterElementDefinition<?>>> getClusterElements();
 }

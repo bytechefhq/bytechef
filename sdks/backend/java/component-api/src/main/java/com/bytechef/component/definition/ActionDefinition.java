@@ -34,6 +34,11 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 /**
+ * Defines an action, which is a single operation a component exposes for execution as a task within a workflow. An
+ * action declares its metadata (name, title, description, help), its input properties, its output schema, and the
+ * functions that carry out its execution, including support for suspension, resumption, streaming, and webhook
+ * responses.
+ *
  * @author Ivica Cardic
  */
 public interface ActionDefinition {
@@ -84,32 +89,37 @@ public interface ActionDefinition {
     Optional<Boolean> getDeprecated();
 
     /**
+     * Returns the human-readable description of the action, explaining what it does.
      *
-     * @return
+     * @return an {@code Optional} containing the description if defined, or an empty {@code Optional} otherwise
      */
     Optional<String> getDescription();
 
     /**
+     * Returns the optional {@link Help} content that provides additional guidance to users configuring the action.
      *
-     * @return
+     * @return an {@code Optional} containing the help content if defined, or an empty {@code Optional} otherwise
      */
     Optional<Help> getHelp();
 
     /**
+     * Returns optional, implementation-specific metadata associated with the action.
      *
-     * @return
+     * @return an {@code Optional} containing the metadata map if defined, or an empty {@code Optional} otherwise
      */
     Optional<Map<String, Object>> getMetadata();
 
     /**
+     * Returns the unique name that identifies this action within its component.
      *
-     * @return
+     * @return the action name
      */
     String getName();
 
     /**
+     * Returns the optional {@link OutputDefinition} that describes the schema and sample of the action's output.
      *
-     * @return
+     * @return an {@code Optional} containing the output definition if defined, or an empty {@code Optional} otherwise
      */
     Optional<OutputDefinition> getOutputDefinition();
 
@@ -121,32 +131,42 @@ public interface ActionDefinition {
     Optional<? extends BasePerformFunction> getPerform();
 
     /**
+     * Returns the optional function used to map an error response returned during the action's execution to a
+     * {@link ProviderException}.
      *
-     * @return
+     * @return an {@code Optional} containing the error-processing function if defined, or an empty {@code Optional}
+     *         otherwise
      */
     Optional<ProcessErrorResponseFunction> getProcessErrorResponse();
 
     /**
+     * Returns the list of input properties that define the parameters the action accepts.
      *
-     * @return
+     * @return an {@code Optional} containing the list of properties if defined, or an empty {@code Optional} otherwise
      */
     Optional<List<? extends Property>> getProperties();
 
     /**
+     * Returns the optional function invoked to resume the action after it has been suspended.
      *
-     * @return
+     * @return an {@code Optional} containing the resume-perform function if defined, or an empty {@code Optional}
+     *         otherwise
      */
     Optional<? extends BaseResumePerformFunction> getResumePerform();
 
     /**
+     * Returns the human-readable title of the action displayed in the user interface.
      *
-     * @return
+     * @return an {@code Optional} containing the title if defined, or an empty {@code Optional} otherwise
      */
     Optional<String> getTitle();
 
     /**
+     * Returns the optional function that dynamically produces the description shown for the action's node in the
+     * workflow editor.
      *
-     * @return
+     * @return an {@code Optional} containing the workflow-node-description function if defined, or an empty
+     *         {@code Optional} otherwise
      */
     Optional<WorkflowNodeDescriptionFunction> getWorkflowNodeDescription();
 
@@ -377,6 +397,33 @@ public interface ActionDefinition {
             void addTimeoutListener(Runnable timeoutListener);
 
             /**
+             * Registers a listener for turn-cancel events. Fires when {@link #cancelTurn(String)} is called or when the
+             * platform's WS handler propagates a cancellation from an adjacent chain node. Components are expected to
+             * abort in-flight work for the given turnId — close provider WS connections, drop queued audio/text, stop
+             * ongoing LLM streams.
+             *
+             * <p>
+             * Default implementation is a no-op so existing components keep compiling. Components that should
+             * participate in barge-in coordination (streaming agents, TTS) override and wire cancellation here.
+             *
+             * @param turnCancelListener consumer invoked with the cancelled turnId
+             */
+            default void addTurnCancelListener(Consumer<String> turnCancelListener) {
+            }
+
+            /**
+             * Signals that a turn was cancelled (typically due to user barge-in). The runtime propagates this across
+             * all emitters in the chain plus the WS session itself (which flushes any queued outbound audio bytes).
+             *
+             * <p>
+             * Default implementation is a no-op so emitter consumers that don't need cancellation keep compiling.
+             *
+             * @param turnId the turn to cancel
+             */
+            default void cancelTurn(String turnId) {
+            }
+
+            /**
              * Marks the WebSocket communication as completed.
              */
             void complete();
@@ -405,20 +452,25 @@ public interface ActionDefinition {
     }
 
     /**
+     * Functional interface that dynamically supplies the list of selectable options for a property, optionally filtered
+     * by a search term and dependent on the values of other properties.
      *
+     * @param <T> the type of the value held by each produced {@link Option}
      */
     @FunctionalInterface
     interface OptionsFunction<T> extends OptionsDataSource.BaseOptionsFunction {
 
         /**
+         * Produces the list of options available for a property given the current input and connection parameters.
          *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param searchText
-         * @param context
-         * @return
-         * @throws Exception
+         * @param inputParameters      the current input parameters of the action
+         * @param connectionParameters the parameters of the connection used by the action
+         * @param lookupDependsOnPaths the property paths whose values this lookup depends on, mapped to their resolved
+         *                             values
+         * @param searchText           the text used to filter the returned options, or an empty string for no filtering
+         * @param context              the action context providing access to runtime utilities and services
+         * @return the list of available options
+         * @throws Exception if an error occurs while producing the options
          */
         List<? extends Option<T>> apply(
             Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -473,17 +525,21 @@ public interface ActionDefinition {
     }
 
     /**
-     *
+     * Functional interface that maps a failed HTTP response produced during an action's execution to a
+     * {@link ProviderException}, enabling components to provide custom error handling specific to their API.
      */
     @FunctionalInterface
     interface ProcessErrorResponseFunction {
 
         /**
+         * Maps a failed HTTP response to a {@link ProviderException}.
          *
-         * @param statusCode
-         * @param body
-         * @param actionContext
-         * @return
+         * @param statusCode    the HTTP status code of the error response
+         * @param body          the response body associated with the error
+         * @param headers       the HTTP response headers, keyed by header name
+         * @param actionContext the action context for the current execution
+         * @return a {@link ProviderException} representing the mapped remote error
+         * @throws Exception if the error response cannot be mapped to a {@link ProviderException}
          */
         ProviderException
             apply(int statusCode, Object body, Map<String, List<String>> headers, ActionContext actionContext)
@@ -492,19 +548,23 @@ public interface ActionDefinition {
     }
 
     /**
-     *
+     * Functional interface that dynamically supplies the list of input properties for an action, allowing the property
+     * set to depend on the current input and connection parameters.
      */
     @FunctionalInterface
     interface PropertiesFunction extends PropertiesDataSource.BasePropertiesFunction {
 
         /**
+         * Produces the list of value properties available for the action given the current input and connection
+         * parameters.
          *
-         * @param inputParameters
-         * @param connectionParameters
-         * @param lookupDependsOnPaths
-         * @param context
-         * @return
-         * @throws Exception
+         * @param inputParameters      the current input parameters of the action
+         * @param connectionParameters the parameters of the connection used by the action
+         * @param lookupDependsOnPaths the property paths whose values this lookup depends on, mapped to their resolved
+         *                             values
+         * @param context              the action context providing access to runtime utilities and services
+         * @return the list of dynamically resolved value properties
+         * @throws Exception if an error occurs while producing the properties
          */
         List<? extends Property.ValueProperty<?>> apply(
             Parameters inputParameters, Parameters connectionParameters, Map<String, String> lookupDependsOnPaths,
@@ -667,15 +727,19 @@ public interface ActionDefinition {
     }
 
     /**
-     *
+     * Functional interface that dynamically produces the description text shown for an action's node in the workflow
+     * editor based on the current input parameters.
      */
     @FunctionalInterface
     interface WorkflowNodeDescriptionFunction {
 
         /**
-         * @param inputParameters
-         * @param context
-         * @return
+         * Produces the description shown for the action's workflow node.
+         *
+         * @param inputParameters the current input parameters of the action
+         * @param context         the action context providing access to runtime utilities and services
+         * @return the description text for the workflow node
+         * @throws Exception if an error occurs while producing the description
          */
         String apply(Parameters inputParameters, ActionContext context) throws Exception;
     }

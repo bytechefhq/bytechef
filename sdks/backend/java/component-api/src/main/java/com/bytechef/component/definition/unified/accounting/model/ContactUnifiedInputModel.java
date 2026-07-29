@@ -20,12 +20,19 @@ import com.bytechef.component.definition.unified.base.model.UnifiedInputModel;
 import java.util.Map;
 
 /**
- * Account unified input model.
+ * Represents the normalized, provider-agnostic input shape for an accounting contact. Instances carry the fields that
+ * ByteChef exposes uniformly across accounting providers when creating or updating a contact, together with a map of
+ * provider-specific custom fields.
  *
  * @author Ivica Cardic
  */
 public class ContactUnifiedInputModel implements UnifiedInputModel {
 
+    /**
+     * Returns the provider-specific custom fields keyed by field name.
+     *
+     * @return the custom fields
+     */
     @Override
     public Map<String, ?> getCustomFields() {
         return Map.of();

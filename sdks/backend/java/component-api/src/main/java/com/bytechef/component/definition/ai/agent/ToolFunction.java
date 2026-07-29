@@ -20,17 +20,22 @@ import com.bytechef.component.definition.ClusterElementContext;
 import com.bytechef.component.definition.Parameters;
 
 /**
+ * Implements the behavior of a tool that an AI agent can invoke, executing an action against a provider using the
+ * supplied parameters and returning a result the agent can consume.
+ *
  * @author Ivica Cardic
  */
 @FunctionalInterface
 public interface ToolFunction extends BaseToolFunction {
 
     /**
+     * Executes the tool with the given parameters.
      *
-     * @param inputParameters
-     * @param connectionParameters
-     * @param context
-     * @return
+     * @param inputParameters      the input parameters the agent supplied for the tool call
+     * @param connectionParameters the connection parameters
+     * @param context              the cluster element execution context
+     * @return the result of the tool invocation, returned to the agent
+     * @throws Exception if the tool invocation fails
      */
     Object apply(Parameters inputParameters, Parameters connectionParameters, ClusterElementContext context)
         throws Exception;

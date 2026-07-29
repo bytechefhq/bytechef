@@ -27,7 +27,12 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Contact unified output model.
+ * Normalized, provider-agnostic representation of a CRM contact as returned on read operations. It extends
+ * {@link ContactUnifiedInputModel} with the read-only metadata assigned by the platform and the provider — the ByteChef
+ * {@link #getId() id}, the provider's own {@link #getRemoteId() remote id}, the untouched {@link #getRemoteData()
+ * remote data} payload, and the {@link #getCreatedDate() created} and {@link #getLastModifiedDate() last modified}
+ * timestamps. Each provider's native contact output model is translated into this unified shape so that contact reads
+ * look identical across CRM providers.
  *
  * @author Ivica Cardic
  */
@@ -43,6 +48,23 @@ public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implemen
     private ContactUnifiedOutputModel() {
     }
 
+    /**
+     * Creates a fully populated unified contact output model, combining the unified contact attributes with the
+     * platform- and provider-assigned read-only metadata.
+     *
+     * @param firstName        the contact's first name
+     * @param lastName         the contact's last name
+     * @param userId           the identifier of the user associated with the contact
+     * @param addresses        the postal addresses of the contact
+     * @param emails           the email addresses of the contact
+     * @param phoneNumbers     the phone numbers of the contact
+     * @param customFields     the provider-specific custom fields keyed by field name
+     * @param id               the ByteChef unified identifier of the contact
+     * @param remoteId         the provider's native identifier of the contact
+     * @param remoteData       the raw, provider-native contact payload as returned by the provider
+     * @param createdDate      the timestamp at which the contact was created
+     * @param lastModifiedDate the timestamp at which the contact was last modified
+     */
     public ContactUnifiedOutputModel(
         String firstName, String lastName, String userId, List<Address> addresses, List<Email> emails,
         List<Phone> phoneNumbers, Map<String, ?> customFields, String id, String remoteId, Map<String, ?> remoteData,
@@ -56,26 +78,51 @@ public class ContactUnifiedOutputModel extends ContactUnifiedInputModel implemen
         this.lastModifiedDate = lastModifiedDate;
     }
 
+    /**
+     * Returns the ByteChef unified identifier of the contact.
+     *
+     * @return the unified identifier
+     */
     @Override
     public String getId() {
         return id;
     }
 
+    /**
+     * Returns the provider's native identifier of the contact.
+     *
+     * @return the remote identifier
+     */
     @Override
     public String getRemoteId() {
         return remoteId;
     }
 
+    /**
+     * Returns the raw, provider-native contact payload preserved alongside the unified fields.
+     *
+     * @return the remote data map
+     */
     @Override
     public Map<String, ?> getRemoteData() {
         return remoteData;
     }
 
+    /**
+     * Returns the timestamp at which the contact was created.
+     *
+     * @return the created date
+     */
     @Override
     public OffsetDateTime getCreatedDate() {
         return createdDate;
     }
 
+    /**
+     * Returns the timestamp at which the contact was last modified.
+     *
+     * @return the last modified date
+     */
     @Override
     public OffsetDateTime getLastModifiedDate() {
         return lastModifiedDate;

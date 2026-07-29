@@ -19,25 +19,32 @@ package com.bytechef.definition;
 import java.util.Optional;
 
 /**
+ * Represents a single selectable option offered by a property, pairing a human-readable label with the underlying value
+ * that is stored when the option is chosen.
+ *
+ * @param <T> the type of the value held by the option
  * @author Ivica Cardic
  */
 public interface BaseOption<T> {
 
     /**
+     * Returns the optional description providing additional details about this option.
      *
-     * @return
+     * @return an {@link Optional} containing the description, or an empty {@link Optional} if none is set
      */
     Optional<String> getDescription();
 
     /**
+     * Returns the human-readable label displayed for this option.
      *
-     * @return
+     * @return the option label
      */
     String getLabel();
 
     /**
+     * Returns the underlying value associated with this option.
      *
-     * @return
+     * @return the option value
      */
     T getValue();
 }

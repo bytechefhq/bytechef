@@ -17,6 +17,10 @@
 package com.bytechef.component.definition;
 
 /**
+ * Enumerates the standard HTTP status codes, each pairing a numeric status value with the {@link Series} it belongs to
+ * and a human-readable reason phrase. Used across component and trigger processing to interpret and produce HTTP
+ * responses.
+ *
  * @author Ivica Cardic
  *
  */
@@ -94,18 +98,37 @@ public enum HttpStatus {
         this.reasonPhrase = reasonPhrase;
     }
 
+    /**
+     * Returns the human-readable reason phrase associated with this status (for example, {@code "Not Found"}).
+     *
+     * @return the reason phrase describing this status
+     */
     public String getReasonPhrase() {
         return reasonPhrase;
     }
 
+    /**
+     * Returns the {@link Series} (status class) this status belongs to, derived from its leading digit.
+     *
+     * @return the series of this status
+     */
     public Series getSeries() {
         return series;
     }
 
+    /**
+     * Returns the numeric value of this status code (for example, {@code 404}).
+     *
+     * @return the integer status code
+     */
     public int getValue() {
         return value;
     }
 
+    /**
+     * Enumerates the five classes of HTTP status codes, grouping statuses by the leading digit of their numeric value:
+     * informational (1xx), successful (2xx), redirection (3xx), client error (4xx), and server error (5xx).
+     */
     public enum Series {
 
         INFORMATIONAL(1),
@@ -120,6 +143,11 @@ public enum HttpStatus {
             this.value = value;
         }
 
+        /**
+         * Returns the leading digit that identifies this series (for example, {@code 2} for successful responses).
+         *
+         * @return the numeric identifier of this series
+         */
         public int value() {
             return this.value;
         }

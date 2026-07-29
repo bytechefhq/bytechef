@@ -17,27 +17,38 @@
 package com.bytechef.definition;
 
 /**
+ * Represents a reference to a stored file, exposing its identifying metadata such as file name, extension, MIME type,
+ * and the URL from which its contents can be retrieved.
+ *
  * @author Ivica Cardic
  */
 public interface BaseFileEntry {
 
     /**
-     * @return
+     * Returns the file extension of this entry.
+     *
+     * @return the file extension
      */
     String getExtension();
 
     /**
-     * @return
+     * Returns the MIME type describing the content of this file.
+     *
+     * @return the MIME type
      */
     String getMimeType();
 
     /**
-     * @return
+     * Returns the name of this file.
+     *
+     * @return the file name
      */
     String getName();
 
     /**
-     * @return
+     * Returns the URL from which the contents of this file can be retrieved.
+     *
+     * @return the file URL
      */
     String getUrl();
 }

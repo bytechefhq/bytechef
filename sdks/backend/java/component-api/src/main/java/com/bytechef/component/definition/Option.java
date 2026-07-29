@@ -19,6 +19,11 @@ package com.bytechef.component.definition;
 import com.bytechef.definition.BaseOption;
 
 /**
+ * Represents a single selectable option offered by a property, pairing a display label with the underlying value the
+ * option resolves to. The type parameter {@code T} denotes the type of that value.
+ *
+ * @param <T> the type of the value represented by this option
+ *
  * @author Ivica Cardic
  */
 public interface Option<T> extends BaseOption<T> {

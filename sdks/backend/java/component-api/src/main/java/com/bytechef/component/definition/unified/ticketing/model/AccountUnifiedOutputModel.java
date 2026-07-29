@@ -21,32 +21,59 @@ import java.time.OffsetDateTime;
 import java.util.Map;
 
 /**
- * Account unified input model.
+ * Normalized, provider-agnostic output model for a ticketing account. It extends {@link AccountUnifiedInputModel} with
+ * the read-only fields returned by a provider (identifiers, timestamps and the raw provider payload), and is produced
+ * by a {@code ProviderAccountMapper} from a provider-native output model.
  *
  * @author Ivica Cardic
  */
 public class AccountUnifiedOutputModel extends AccountUnifiedInputModel implements UnifiedOutputModel {
 
+    /**
+     * Returns the ByteChef unified identifier of the account.
+     *
+     * @return the unified account identifier
+     */
     @Override
     public String getId() {
         return "";
     }
 
+    /**
+     * Returns the account identifier as assigned by the remote provider.
+     *
+     * @return the provider-assigned account identifier
+     */
     @Override
     public String getRemoteId() {
         return "";
     }
 
+    /**
+     * Returns the raw, unmodified data as returned by the remote provider for this account.
+     *
+     * @return a map of the provider's raw account data; empty when no remote data is retained
+     */
     @Override
     public Map<String, ?> getRemoteData() {
         return Map.of();
     }
 
+    /**
+     * Returns the date and time at which the account was created at the provider.
+     *
+     * @return the account creation timestamp, or {@code null} when unknown
+     */
     @Override
     public OffsetDateTime getCreatedDate() {
         return null;
     }
 
+    /**
+     * Returns the date and time at which the account was last modified at the provider.
+     *
+     * @return the account last-modified timestamp, or {@code null} when unknown
+     */
     @Override
     public OffsetDateTime getLastModifiedDate() {
         return null;

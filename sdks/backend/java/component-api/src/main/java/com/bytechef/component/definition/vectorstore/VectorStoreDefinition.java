@@ -17,6 +17,9 @@
 package com.bytechef.component.definition.vectorstore;
 
 /**
+ * Marker interface for components that define a vector store, used by AI features to persist and retrieve embeddings
+ * for similarity search and retrieval-augmented generation.
+ *
  * @author Ivica Cardic
  */
 public interface VectorStoreDefinition {

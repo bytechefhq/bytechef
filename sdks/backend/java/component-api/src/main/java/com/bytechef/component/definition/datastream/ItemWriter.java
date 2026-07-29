@@ -21,11 +21,23 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Writes items in chunks to a DESTINATION component during a data stream job. Combines the lifecycle callbacks of
+ * {@link ItemStream} with the schema discovery of {@link FieldsProvider}.
+ *
  * @author Ivica Cardic
  */
 public interface ItemWriter extends ItemStream, FieldsProvider {
 
+    /**
+     * Cluster element type identifying a writer as the DESTINATION endpoint of a data stream.
+     */
     ClusterElementType DESTINATION = new ClusterElementType("DESTINATION", "destination", "Destination");
 
+    /**
+     * Writes a chunk of items to the destination. Each item is represented as a map keyed by field name.
+     *
+     * @param items the items to write, each expressed as a map of field name to value
+     * @throws Exception if writing the items fails
+     */
     void write(List<? extends Map<String, Object>> items) throws Exception;
 }

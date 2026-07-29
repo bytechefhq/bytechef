@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.crm.model;
 import com.bytechef.component.definition.unified.base.model.ProviderInputModel;
 
 /**
- * Provider contact input model.
+ * Marker interface for a provider's native contact input model, i.e. the contact payload shaped exactly as the CRM
+ * provider expects it on write operations. Provider-specific implementations carry the concrete fields; contact mappers
+ * produce instances of this type from the unified {@link ContactUnifiedInputModel}.
  *
  * @author Ivica Cardic
  */

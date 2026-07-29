@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.crm.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider account output model.
+ * Marker interface for a provider's native account output model, i.e. the account payload shaped exactly as the CRM
+ * provider returns it on read operations. Provider-specific implementations carry the concrete fields; account mappers
+ * consume instances of this type to produce the unified {@link AccountUnifiedOutputModel}.
  *
  * @author Ivica Cardic
  */

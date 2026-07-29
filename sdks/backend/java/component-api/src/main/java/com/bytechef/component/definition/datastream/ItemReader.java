@@ -20,10 +20,17 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import java.util.Map;
 
 /**
+ * Reads items one at a time from a SOURCE component during a data stream job. Combines the lifecycle callbacks of
+ * {@link ItemStream} with the schema discovery of {@link FieldsProvider}, and may optionally support incremental
+ * syncing driven by the {@link #SINCE_KEY} timestamp stored in the {@link ExecutionContext}.
+ *
  * @author Ivica Cardic
  */
 public interface ItemReader extends ItemStream, FieldsProvider {
 
+    /**
+     * Cluster element type identifying a reader as the SOURCE endpoint of a data stream.
+     */
     ClusterElementType SOURCE = new ClusterElementType("SOURCE", "source", "Source");
 
     /**
@@ -65,5 +72,12 @@ public interface ItemReader extends ItemStream, FieldsProvider {
         return false;
     }
 
+    /**
+     * Reads and returns the next item from the source, or {@code null} when the source is exhausted. Each item is
+     * represented as a map keyed by field name.
+     *
+     * @return the next item as a map of field name to value, or {@code null} if no more items are available
+     * @throws Exception if reading the next item fails
+     */
     Map<String, Object> read() throws Exception;
 }

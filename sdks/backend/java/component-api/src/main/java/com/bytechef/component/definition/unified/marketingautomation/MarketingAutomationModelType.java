@@ -19,20 +19,31 @@ package com.bytechef.component.definition.unified.marketingautomation;
 import com.bytechef.component.definition.UnifiedApiDefinition;
 
 /**
- * Marketing Automation model type.
+ * Enumerates the unified model types exposed by the marketing automation category of the unified API, covering the
+ * campaign, messaging, and audience entities that marketing platforms have in common.
  *
  * @author Ivica Cardic
  */
 public enum MarketingAutomationModelType implements UnifiedApiDefinition.ModelType {
 
+    /** A single step or action performed within an automation. */
     ACTION,
+    /** An automated workflow that executes marketing actions. */
     AUTOMATION,
+    /** A marketing campaign. */
     CAMPAIGN,
+    /** An individual person in the marketing audience. */
     CONTACT,
+    /** A marketing email. */
     EMAIL,
+    /** A tracked event, such as an open, click, or conversion. */
     EVENT,
+    /** A list or segment of contacts. */
     LIST,
+    /** A message sent to a contact through a channel. */
     MESSAGE,
+    /** A reusable content template. */
     TEMPLATE,
+    /** A user of the marketing automation platform. */
     USER
 }

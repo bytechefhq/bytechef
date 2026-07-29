@@ -19,7 +19,9 @@ package com.bytechef.component.definition.unified.ticketing.model;
 import com.bytechef.component.definition.unified.base.model.ProviderOutputModel;
 
 /**
- * Provider account output model.
+ * Marker interface for the provider-native output model of a ticketing account. Provider-specific implementations hold
+ * the account data as returned by a given provider's API, which a {@code ProviderAccountMapper} unifies into an
+ * {@code AccountUnifiedOutputModel}.
  *
  * @author Ivica Cardic
  */

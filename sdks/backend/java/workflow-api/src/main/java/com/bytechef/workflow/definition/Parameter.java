@@ -17,6 +17,13 @@
 package com.bytechef.workflow.definition;
 
 /**
+ * Marker interface for a single configuration parameter supplied to a workflow task or trigger.
+ *
+ * <p>
+ * Implementations carry the concrete key/value binding that configures a {@link TaskDefinition} or
+ * {@link TriggerDefinition}. The interface is intentionally empty so that different definition backends can provide
+ * their own parameter representations while still being exposed uniformly through the workflow definition API.
+ *
  * @author Ivica Cardic
  */
 public interface Parameter {

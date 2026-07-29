@@ -20,13 +20,19 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * Represents a property that offers a predefined set of selectable options, each pairing a label with an underlying
+ * value of type {@code T}.
+ *
+ * @param <T> the type of the value held by each option
+ * @param <I> the concrete {@link BaseOption} type describing the options
  * @author Ivica Cardic
  */
 public interface BaseOptionsProperty<T, I extends BaseOption<T>> {
 
     /**
+     * Returns the selectable options offered by this property.
      *
-     * @return
+     * @return an {@link Optional} containing the list of options, or an empty {@link Optional} if none are defined
      */
     Optional<List<? extends I>> getOptions();
 }

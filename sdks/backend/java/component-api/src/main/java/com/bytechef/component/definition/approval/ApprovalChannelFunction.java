@@ -21,11 +21,18 @@ import com.bytechef.component.definition.ClusterElementDefinition.ClusterElement
 import com.bytechef.component.definition.Parameters;
 
 /**
+ * Implements an approval channel, the cluster element that delivers a human-approval request (for example, via chat or
+ * email) and returns the outcome. The calling approval action publishes its form metadata under the well-known keys
+ * defined here so the channel can decide how to render the request.
+ *
  * @author Ivica Cardic
  */
 @FunctionalInterface
 public interface ApprovalChannelFunction {
 
+    /**
+     * The cluster element type under which approval channels are registered.
+     */
     ClusterElementType APPROVAL_CHANNELS =
         new ClusterElementType("APPROVAL_CHANNELS", "approvalChannels", "Channels", true, false);
 
@@ -46,6 +53,16 @@ public interface ApprovalChannelFunction {
      */
     String INPUTS = "inputs";
 
+    /**
+     * Delivers the approval request through this channel and returns the channel-specific result.
+     *
+     * @param inputParameters      the input parameters configured for the channel
+     * @param connectionParameters the connection parameters
+     * @param formUrl              the URL of the approval form the user opens to respond
+     * @param context              the cluster element execution context
+     * @return the result of delivering the approval request
+     * @throws Exception if the request cannot be delivered
+     */
     Object apply(
         Parameters inputParameters, Parameters connectionParameters, String formUrl, ClusterElementContext context)
         throws Exception;

@@ -19,9 +19,15 @@ package com.bytechef.component.definition.ai.agent;
 import com.bytechef.component.definition.ClusterElementDefinition.ClusterElementType;
 
 /**
+ * Base type shared by tool functions that can be attached to an AI agent as callable tools. It defines the
+ * {@link ClusterElementType} under which such tools are registered.
+ *
  * @author Ivica Cardic
  */
 public interface BaseToolFunction {
 
+    /**
+     * The cluster element type under which agent tools are registered.
+     */
     ClusterElementType TOOLS = new ClusterElementType("TOOLS", "tools", "Tools", true, false);
 }

@@ -17,10 +17,20 @@
 package com.bytechef.component.definition;
 
 /**
+ * Represents a category used to classify components, pairing a machine-readable name with a human-readable label. A set
+ * of predefined categories is provided as constants.
+ *
+ * @param name  the machine-readable identifier of the category
+ * @param label the human-readable label of the category displayed in the user interface
  * @author Monika Domiter
  */
 public record ComponentCategory(String name, String label) {
 
+    /**
+     * Creates a category whose label is the same as its name.
+     *
+     * @param name the machine-readable identifier of the category, also used as its label
+     */
     public ComponentCategory(String name) {
         this(name, name);
     }
@@ -54,6 +64,11 @@ public record ComponentCategory(String name, String label) {
     public static final ComponentCategory SURVEYS_AND_FEEDBACK = new ComponentCategory(
         "surveys-and-feedback", "Surveys and Feedback");
 
+    /**
+     * Returns the machine-readable identifier of this category.
+     *
+     * @return the category name
+     */
     public String getName() {
         return name;
     }

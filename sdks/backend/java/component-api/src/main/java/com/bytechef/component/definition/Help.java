@@ -19,6 +19,9 @@ package com.bytechef.component.definition;
 import com.bytechef.definition.BaseHelp;
 
 /**
+ * Represents contextual help associated with a component, action, or trigger, providing explanatory body text and an
+ * optional link to further learning resources shown to users in the workflow editor.
+ *
  * @author Ivica Cardic
  *
  */

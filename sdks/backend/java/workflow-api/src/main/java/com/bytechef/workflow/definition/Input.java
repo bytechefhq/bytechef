@@ -17,6 +17,13 @@
 package com.bytechef.workflow.definition;
 
 /**
+ * Marker interface for an input declared by a {@link WorkflowDefinition}.
+ *
+ * <p>
+ * An input describes a value that a workflow expects to receive when it is executed, such as a user-provided argument
+ * or a value fed in by a trigger. The interface is intentionally empty so that concrete definition backends can supply
+ * their own input representations while exposing them uniformly through the workflow definition API.
+ *
  * @author Ivica Cardic
  */
 public interface Input {

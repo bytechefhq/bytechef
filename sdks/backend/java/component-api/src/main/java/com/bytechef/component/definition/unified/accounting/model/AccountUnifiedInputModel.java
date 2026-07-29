@@ -23,7 +23,9 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * Account unified input model.
+ * Represents the normalized, provider-agnostic input shape for an accounting account. Instances carry the fields that
+ * ByteChef exposes uniformly across accounting providers when creating or updating an account, together with a map of
+ * provider-specific custom fields.
  *
  * @author Ivica Cardic
  */
@@ -45,6 +47,21 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
     protected AccountUnifiedInputModel() {
     }
 
+    /**
+     * Creates a fully populated unified account input model.
+     *
+     * @param accountNumber   the account number assigned within the accounting system
+     * @param companyInfoId   the identifier of the company the account belongs to
+     * @param classification  the account classification (for example asset, liability, income)
+     * @param currentBalance  the current balance of the account
+     * @param currency        the ISO currency code of the account
+     * @param description     a human-readable description of the account
+     * @param name            the display name of the account
+     * @param parentAccountId the identifier of the parent account, when the account is nested
+     * @param status          the account status (for example active or archived)
+     * @param type            the account type as defined by the accounting system
+     * @param customFields    provider-specific custom fields keyed by field name
+     */
     public AccountUnifiedInputModel(
         String accountNumber, String companyInfoId, String classification, BigDecimal currentBalance, String currency,
         String description, String name, String parentAccountId, String status, String type,
@@ -63,46 +80,101 @@ public class AccountUnifiedInputModel implements UnifiedInputModel {
         this.customFields = customFields;
     }
 
+    /**
+     * Returns the account number assigned within the accounting system.
+     *
+     * @return the account number
+     */
     public String getAccountNumber() {
         return accountNumber;
     }
 
+    /**
+     * Returns the identifier of the company the account belongs to.
+     *
+     * @return the company info identifier
+     */
     public String getCompanyInfoId() {
         return companyInfoId;
     }
 
+    /**
+     * Returns the account classification (for example asset, liability, income).
+     *
+     * @return the account classification
+     */
     public String getClassification() {
         return classification;
     }
 
+    /**
+     * Returns the current balance of the account.
+     *
+     * @return the current balance
+     */
     public BigDecimal getCurrentBalance() {
         return currentBalance;
     }
 
+    /**
+     * Returns the ISO currency code of the account.
+     *
+     * @return the currency code
+     */
     public String getCurrency() {
         return currency;
     }
 
+    /**
+     * Returns the human-readable description of the account.
+     *
+     * @return the account description
+     */
     public String getDescription() {
         return description;
     }
 
+    /**
+     * Returns the display name of the account.
+     *
+     * @return the account name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the identifier of the parent account, when the account is nested.
+     *
+     * @return the parent account identifier
+     */
     public String getParentAccountId() {
         return parentAccountId;
     }
 
+    /**
+     * Returns the account status (for example active or archived).
+     *
+     * @return the account status
+     */
     public String getStatus() {
         return status;
     }
 
+    /**
+     * Returns the account type as defined by the accounting system.
+     *
+     * @return the account type
+     */
     public String getType() {
         return type;
     }
 
+    /**
+     * Returns the provider-specific custom fields keyed by field name.
+     *
+     * @return the custom fields
+     */
     @Override
     public Map<String, ?> getCustomFields() {
         return customFields;

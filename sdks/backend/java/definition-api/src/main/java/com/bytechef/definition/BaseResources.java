@@ -20,19 +20,24 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
+ * Represents a collection of reference resources associated with a component, such as its primary documentation URL and
+ * any supplementary links.
+ *
  * @author Ivica Cardic
  */
 public interface BaseResources {
 
     /**
+     * Returns the primary documentation URL for the associated component.
      *
-     * @return
+     * @return the documentation URL
      */
     String documentationUrl();
 
     /**
+     * Returns the optional supplementary links, keyed by a descriptive label.
      *
-     * @return
+     * @return an {@link Optional} containing a map of labels to URLs, or an empty {@link Optional} if none are defined
      */
     Optional<Map<String, String>> getAdditionalUrls();
 }
