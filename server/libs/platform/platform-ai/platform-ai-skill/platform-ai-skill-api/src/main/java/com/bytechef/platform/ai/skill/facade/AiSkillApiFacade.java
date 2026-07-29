@@ -19,6 +19,7 @@ package com.bytechef.platform.ai.skill.facade;
 import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.ai.skill.facade.AiSkillFacade.AiSkillDownload;
 import java.util.List;
+import java.util.Map;
 import org.jspecify.annotations.Nullable;
 
 /**
@@ -34,6 +35,8 @@ import org.jspecify.annotations.Nullable;
  * @author Ivica Cardic
  */
 public interface AiSkillApiFacade {
+
+    AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles);
 
     AiSkill createAiSkill(String name, @Nullable String description, String filename, byte[] bytes);
 
@@ -52,6 +55,8 @@ public interface AiSkillApiFacade {
     List<String> getAiSkillFilePaths(long id);
 
     List<AiSkill> getAiSkills();
+
+    AiSkill removeFileInSkill(long id, String path);
 
     AiSkill updateAiSkill(long id, String name, @Nullable String description);
 

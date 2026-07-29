@@ -106,12 +106,12 @@ class AiSkillGraphQlController {
 
     @MutationMapping
     AiSkill createAdditionalFilesInSkill(@Argument long id, @Argument Map<String, String> additionalFiles) {
-        return aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
+        return aiSkillApiFacade.createAdditionalFilesInSkill(id, additionalFiles);
     }
 
     @MutationMapping
     AiSkill removeFileInSkill(@Argument long id, @Argument String path) {
-        return aiSkillFacade.removeFileInSkill(id, path);
+        return aiSkillApiFacade.removeFileInSkill(id, path);
     }
 
     @MutationMapping

@@ -21,6 +21,7 @@ import com.bytechef.platform.ai.skill.domain.AiSkill;
 import com.bytechef.platform.security.constant.AuthorityConstants;
 import com.bytechef.platform.security.util.SecurityUtils;
 import java.util.List;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.Nullable;
 import org.springframework.beans.factory.ObjectProvider;
@@ -98,6 +99,13 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
     }
 
     @Override
+    public AiSkill createAdditionalFilesInSkill(long id, Map<String, String> additionalFiles) {
+        checkOwnerOrAdmin(id);
+
+        return aiSkillFacade.createAdditionalFilesInSkill(id, additionalFiles);
+    }
+
+    @Override
     public void deleteAiSkill(long id) {
         checkOwnerOrAdmin(id);
 
@@ -149,6 +157,13 @@ class AiSkillApiFacadeImpl implements AiSkillApiFacade {
             .stream()
             .filter(aiSkill -> currentUserLogin.equals(aiSkill.getCreatedBy()))
             .toList();
+    }
+
+    @Override
+    public AiSkill removeFileInSkill(long id, String path) {
+        checkOwnerOrAdmin(id);
+
+        return aiSkillFacade.removeFileInSkill(id, path);
     }
 
     @Override
